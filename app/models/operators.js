@@ -47,7 +47,7 @@ var OperatorInputDTO = t.struct({
 
 OperatorInputDTO.prototype.toDatabase = function () {
     
-    console.log('this', JSON.stringify(this));
+    //console.log('this', JSON.stringify(this));
 
     // manual bindings
     let manual = {

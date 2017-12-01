@@ -7,7 +7,7 @@ var modelHelper = require('./models-helper');
 var OwnerDTO = t.struct({
 
     _documentType: t.Str,
-    id: t.Number,
+    id                  : t.Str,
 
     name			    : t.maybe(t.Str),
     phone			    : t.maybe(t.Str),
@@ -16,7 +16,7 @@ var OwnerDTO = t.struct({
     email			    : t.maybe(t.Str),
     web			        : t.maybe(t.Str),
     address			    : t.maybe(t.Str),
-    zipCode			    : t.maybe(t.Str),
+    postalCode			    : t.maybe(t.Str),
     cityId			    : t.maybe(t.Integer),
     communityId		    : t.maybe(t.Integer),
     stateId			    : t.maybe(t.Integer),
@@ -109,7 +109,7 @@ OwnerInputDTO.prototype.toDatabase = function () {
     // // manual bindings
     let manual = {
         _documentType: 'owner',
-        id: parseInt(this.id_fornitore),
+        id: this.id_fornitore,
 
         name: this.ragionesociale,		
         phone: this.telefono,		
@@ -118,7 +118,7 @@ OwnerInputDTO.prototype.toDatabase = function () {
         email: this.email,
         web: this.internet,
         address: this.address,
-        zipCode: this.cap,
+        postalCode: this.cap,
         cityId: typeof this.id_localita !== "undefined" && this.id_localita !== "NULL" ? parseInt(this.id_localita) : undefined,
         communityId: typeof this.id_comune !== "undefined" && this.id_comune !== "NULL" ? parseInt(this.id_comune) : undefined,
         stateId: typeof this.id_prov !== "undefined" && this.id_prov !== "NULL" ? parseInt(this.id_prov) : undefined,
@@ -140,8 +140,6 @@ OwnerInputDTO.prototype.toDatabase = function () {
             street: this.street !== "NULL" ? this.street : null, 
             number: this.number !== "NULL" ? this.number : null, 
         },
-        //street	
-        //number	
         numberPB: this.num_pb, 
         numberIB: this.num_ib,    
         numberBD: this.num_bd,    
