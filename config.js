@@ -4,6 +4,4 @@ module.exports = {
 	'databaseUser': 'admin',
 	'databasePassword': 'password',
 	'bucketName': 'mkpremium'
-	//'secret': '6vM/Z$!Z_@N5',	
-	//'saltRounds': 10
 };
