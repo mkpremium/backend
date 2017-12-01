@@ -1,0 +1,9 @@
+module.exports = {
+
+	'database': 'couchbase://127.0.0.1/',
+	'databaseUser': 'admin',
+	'databasePassword': 'password',
+	'bucketName': 'mkpremium'
+	//'secret': '6vM/Z$!Z_@N5',	
+	//'saltRounds': 10
+};
