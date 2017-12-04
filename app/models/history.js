@@ -47,7 +47,7 @@ HistoryInputDTO.prototype.toDatabase = function () {
 
     // manual bindings
     let manual = {
-        _documentType: 'operator',
+        _documentType: 'history',
         id: this.id_notachiamatafornitore,
         worksheetId: data.id_chiamatafornitore,
         notes: data.note,

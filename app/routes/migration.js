@@ -303,7 +303,7 @@ var importWorkSheet = function(obj, response) {
 }
 
 var importHistory = function(obj, response) {
-    let inputData = new worksheets.HistoryInputDTO(modelHelper.toLowerCaseRequest(obj));
+    let inputData = new history.HistoryInputDTO(modelHelper.toLowerCaseRequest(obj));
     let data = inputData.toDatabase();
     let pk = 'history:' + data.id;
     return upsertToDb(pk, data, response);
