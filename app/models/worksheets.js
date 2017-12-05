@@ -7,13 +7,15 @@ var modelHelper = require('./models-helper');
 var WorkSheetDTO = t.struct({
     _documentType: t.Str,
     id                      : t.Str,
-    buildingId              : t.maybe(t.Str),    
+    catastroId              : t.maybe(t.Str),    
     supplierId  	        : t.maybe(t.Str),
 
-    lastOwner               : t.maybe(t.Any),
-    currentOwner            : t.maybe(t.Any),    
-    history: t.maybe(t.list(t.Any)),
+    //lastOwner               : t.maybe(t.Any),
+    //currentOwner            : t.maybe(t.Any),    
+    //flags: t.maybe(t.list(t.Any)),
     info: t.maybe(t.Any),
+
+    history: t.maybe(t.list(t.Any)),
     
 
 }, { defaultProps: { _documentType: 'worksheet' } });
@@ -93,24 +95,14 @@ WorkSheetInputDTO.prototype.toDatabase = function () {
         _documentType: 'worksheet',
 
         id: data.id_chiamatafornitore,
-        buildingId: data.id_catastro,    
+        catastroId: data.id_catastro,    
         supplierId: data.id_fornitore,
-
-
-        lastOwner: {name: data.name, surname: data.cognome, phone: data.telefono},
-        currentOwner: {name: data.proprietari },
-
-        history:[
-            { operator: data.id_operatorelivello1, date: data.data_livello1, action: 'create' }
-        ],
-
-        
 
         info: {
             state: data.street,
             date: data.number,
             tmStmp: data.tmStmp,
-            cellulare__: data.cellulare,
+            number: data.cellulare,
             price: data.prezzo !== null ? parseFloat(data.prezzo) : undefined,
             proposedPrice: data.proposta !== null ? parseFloat(data.proposta) : undefined,
             city: data.filter,
@@ -126,65 +118,68 @@ WorkSheetInputDTO.prototype.toDatabase = function () {
             requestedPrice: data.prezzorichiesto !== null ? parseFloat(data.prezzorichiesto) : undefined,
             negotationId: data.id_negoziazione,
             commercialOperatorId: data.id_commerciale,
+
+            lastOwner: {name: data.name, surname: data.cognome, phone: data.telefono},
+            currentOwner: {name: data.proprietari },
+
+            flags:[
+                { operator: data.id_operatorelivello1, date: data.data_livello1, action: 'create' }
+            ],        
         },
         
     };
 
     if (data.id_operatorelivello2 != null) {
-        manual.history.push({ operator: data.id_operatorelivello2, date: data.data_livello2, action: 'update' });
+        manual.info.flags.push({ operator: data.id_operatorelivello2, date: data.data_livello2, action: 'update' });
     }
 
     if (data.visitare == "1") {
-        manual.history.push({ action: 'visit', visitDate: data.data_visita });
+        manual.info.flags.push({ action: 'visit', visitDate: data.data_visita });
     }
 
     if (data.richiamare == "1") {
-        manual.history.push({ action: 'recall', recallDate: data.data_richiamo });
+        manual.info.flags.push({ action: 'recall', recallDate: data.data_richiamo });
     }
 
     if (data.verificato == "1") {
-        manual.history.push({ action: 'verificated' });
+        manual.info.flags.push({ action: 'verificated' });
     }
 
     if (data.id_errore !== null) {
-        manual.history.push({ action: 'error', errorId: data.id_errore });
+        manual.info.flags.push({ action: 'error', errorId: data.id_errore });
     }
     else {
         if (data.errore == "1") {
-            manual.history.push({ action: 'error' });
+            manual.info.flags.push({ action: 'error' });
         }
     }
 
     if (data.novende !== null) {
-        manual.history.push({ action: 'sells', sells: data.novende == "0" });
+        manual.info.flags.push({ action: 'sells', sells: data.novende == "0" });
     }
 
     if (data.venduto == "1") {
-        manual.history.push({ action: 'alreadySold' });
+        manual.info.flags.push({ action: 'alreadySold' });
     }
 
     if (data.entepubblico == "1") {
-        manual.history.push({ action: 'public' });
+        manual.info.flags.push({ action: 'public' });
     }
 
     if (data.proprietario2 == "1") {
-        manual.history.push({ action: 'proprietario2__' });
+        manual.info.flags.push({ action: 'proprietario2__' });
     }
     
     if (data.famiglia == "1") {
-        manual.history.push({ action: 'family' });
+        manual.info.flags.push({ action: 'family' });
     }
 
     if (data.fratelli == "1") {
-        manual.history.push({ action: 'brothers' });
+        manual.info.flags.push({ action: 'brothers' });
     }
 
     if (data.figli == "1") {
-        manual.history.push({ action: 'sons' });
-    }
-
-    if (data.figli == "1") {
-        manual.history.push({ action: 'sons' });
+        manual.info.flags.push({ action: 'sons' });
     }
 
 

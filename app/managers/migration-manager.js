@@ -1,0 +1,608 @@
+var config      = require('../../config');
+var couchbase   = require('couchbase');
+var cluster     = new couchbase.Cluster(config.database);
+cluster.authenticate(config.databaseUser, config.databasePassword);
+var bucket      = cluster.openBucket(config.bucketName);
+
+var modelHelper = require('../models/models-helper');
+var buildings   = require('../models/building');
+var operators   = require('../models/operators');
+var owners      = require('../models/owners');
+var persons     = require('../models/persons');
+var houseStates = require('../models/housestate');
+var worksheets  = require('../models/worksheets');
+var history     = require('../models/history');
+
+var migrationManager = {
+
+    getList: function (documentType, res){
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "' + documentType + '" LIMIT 100'),
+            function (err, rows) {;          
+              res.json(rows);
+            });
+    },
+
+
+    upsertToDb: function(pk, data, response) {
+        
+        bucket.manager().createPrimaryIndex(function() {
+            bucket.upsert(pk, data, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+                if (response) {
+                    bucket.get(pk, function(err, result) {
+                        if (err) {
+                            console.log(err);
+                            throw err;
+                        }
+                        //console.log(result.value);
+                        return result;
+                    });
+                }
+            });
+        });
+        return;
+    },
+
+    importBuilding: function(obj, response) {
+        let inputData = new buildings.BuildingInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'building:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+    
+    importOperator: function(obj, response) {
+        let inputData = new operators.OperatorInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'operator:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+    
+    importOwner: function(obj, response) {
+        let inputData = new owners.OwnerInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'owner:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+    
+    importPerson: function(obj, response) {
+        let inputData = new persons.PersonInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'person:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+    
+    importHouseState: function(obj, response) {
+        let inputData = new houseStates.HouseStateInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'housestate:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+    
+    importWorkSheet: function(obj, response) {
+        let inputData = new worksheets.WorkSheetInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'worksheet:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+    
+    importHistory: function(obj, response) {
+        let inputData = new history.HistoryInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'history:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
+    bulkImport: function(name, documentType, res) {
+    
+        //console.log('IMPORT - ' + documentType);
+
+        const csv = require('csvtojson');
+        const csvFilePath = './app/csv/' + name;
+    
+        let count = 0;
+        let ok = 0;
+        let errors = [];
+        csv({
+            delimiter:";"
+        })
+            .fromFile(csvFilePath)
+            .on('json',(jsonObj)=>{
+    
+                let id = jsonObj[Object.keys(jsonObj)[0]];
+                console.log('Importing %s %s', documentType, id);
+    
+                count++;
+                try {
+                    if (documentType === 'building') {
+                        this.importBuilding(jsonObj, false);
+                        ok++;
+                    }
+                    else if (documentType === 'operator') {
+                        this.importOperator(jsonObj, false);
+                        ok++;
+                    }                
+                    else if (documentType === 'owner') {
+                        this.importOwner(jsonObj, false);
+                        ok++;
+                    }
+                    else if (documentType === 'person') {
+                        this.importPerson(jsonObj, false);
+                        ok++;
+                    }
+                    else if (documentType === 'housestate') {
+                        this.importHouseState(jsonObj, false);
+                        ok++;
+                    }
+                    else if (documentType === 'worksheet') {
+                        this.importWorkSheet(jsonObj, false);
+                        ok++;
+                    }                
+                    else if (documentType === 'history') {
+                        this.importHistory(jsonObj, false);
+                        ok++;
+                    }                
+                }
+                catch (e) {
+                    console.log(e);
+                    errors.push(id);
+                }
+            })
+            .on('done',(error)=>{
+                if (error){
+                    console.log('error', error);
+                }                
+                else {
+                    console.log('end');
+                }
+
+                if (res) {
+                    res.json({count: count, ok: ok, errors: errors});
+                }                
+            })
+    },
+
+    deleteAll: function(res) {
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('DELETE FROM ' + config.bucketName),
+            function (err, rows) {;          
+              res.json(rows);
+            });
+    },
+
+    importAuxiliar001: function() {
+
+        console.log('IMPORT - AUX 001');
+
+        this.upsertToDb('department:2', { _documentType: 'department', id: '2', description: 'Nota' }, false);
+        this.upsertToDb('department:3', { _documentType: 'department', id: '3', description: 'Visita' }, false);
+        this.upsertToDb('department:4', { _documentType: 'department', id: '4', description: 'Reunión' }, false);
+        this.upsertToDb('department:5', { _documentType: 'department', id: '5', description: 'Reserva / Arras' }, false);
+        this.upsertToDb('department:11', { _documentType: 'department', id: '11', description: 'Nuevo Contacto' }, false);
+        this.upsertToDb('department:12', { _documentType: 'department', id: '12', description: 'Llamada' }, false);
+        this.upsertToDb('department:13', { _documentType: 'department', id: '13', description: 'Rellamada' }, false);
+        this.upsertToDb('department:14', { _documentType: 'department', id: '14', description: 'Teléfono Erróneo' }, false);
+        this.upsertToDb('department:15', { _documentType: 'department', id: '15', description: 'Nota Rellamada' }, false);
+        this.upsertToDb('department:16', { _documentType: 'department', id: '16', description: 'No Vende' }, false);
+        this.upsertToDb('department:17', { _documentType: 'department', id: '17', description: 'Ya Vendido' }, false);
+    
+        this.upsertToDb('negotation:1', { _documentType: 'negotation', id: '1', description: 'EN CARTERA', color: 'Lime', timestamp: '0x0000000000968F65' }, false);
+        this.upsertToDb('negotation:2', { _documentType: 'negotation', id: '2', description: 'NO INTERESA', color: 'Red', timestamp: '0x00000000008F987E' }, false);
+        this.upsertToDb('negotation:3', { _documentType: 'negotation', id: '3', description: 'EN SEGUIMIENTO', color: 'YellowGreen', timestamp: '0x000000000094B2C6' }, false);
+        this.upsertToDb('negotation:4', { _documentType: 'negotation', id: '4', description: 'COMPRADO', color: 'Magenta', timestamp: '0x000000000094B2C7' }, false);
+    
+        this.upsertToDb('error:11', { _documentType: 'error', id: '11', description: 'FALLECIDO', type: 'PROPRIETARI', timestamp: '0x000000001F776E59' }, false);
+        this.upsertToDb('error:12', { _documentType: 'error', id: '12', description: 'DETERIORADO', type: 'EDIFICIO', timestamp: '0x000000001F776E5A' }, false);
+        this.upsertToDb('error:13', { _documentType: 'error', id: '13', description: 'FALLECIDO', type: 'EDIFICIO', timestamp: '0x000000001F776E5B' }, false);
+        this.upsertToDb('error:15', { _documentType: 'error', id: '15', description: 'NINGUNO', type: 'EDIFICIO', timestamp: '0x000000001F776E5C' }, false);
+        this.upsertToDb('error:18', { _documentType: 'error', id: '18', description: 'NO VENDE', type: 'WEB', timestamp: '0x000000001F776E5D' }, false);
+        this.upsertToDb('error:19', { _documentType: 'error', id: '19', description: 'VISITA', type: 'WEB', timestamp: '0x000000001F776E5E' }, false);
+        this.upsertToDb('error:21', { _documentType: 'error', id: '21', description: 'SEGUIR', type: 'WEB', timestamp: '0x000000001F776E5F' }, false);
+        this.upsertToDb('error:22', { _documentType: 'error', id: '22', description: 'NO SEGUIR', type: 'WEB', timestamp: '0x000000001F776E60' }, false);
+        this.upsertToDb('error:31', { _documentType: 'error', id: '31', description: 'MAL ESTADO', type: 'INFORMADORES', timestamp: '0x000000001F776E61' }, false);
+        this.upsertToDb('error:32', { _documentType: 'error', id: '32', description: 'SOLAR', type: 'INFORMADORES', timestamp: '0x000000001F776E62' }, false);
+        this.upsertToDb('error:33', { _documentType: 'error', id: '33', description: 'ENTE PUBLICO', type: 'INFORMADORES', timestamp: '0x000000001F776E63' }, false);
+        this.upsertToDb('error:42', { _documentType: 'error', id: '42', description: 'NO HAY DATOS', type: 'INFORMADORES!', timestamp: '0x000000001F776E64' }, false);
+        this.upsertToDb('error:44', { _documentType: 'error', id: '44', description: 'HOTELES', type: 'INFORMADORES', timestamp: '0x000000001F776E65' }, false);
+        this.upsertToDb('error:45', { _documentType: 'error', id: '45', description: 'NAVES INDUSTRIALES', type: 'INFORMADORES', timestamp: '0x000000001F776E66' }, false);
+        this.upsertToDb('error:47', { _documentType: 'error', id: '47', description: 'SIN INCIDENCIA', type: 'INFORMADORES!', timestamp: '0x0000000024DF4FFA' }, false);
+        this.upsertToDb('error:48', { _documentType: 'error', id: '48', description: 'HORIZONTALES', type: 'INFORMADORES', timestamp: '0x0000000024DF5010' }, false);
+        this.upsertToDb('error:49', { _documentType: 'error', id: '49', description: 'UNIFAMILIARES', type: 'INFORMADORES', timestamp: '0x0000000024DF5011' }, false);
+
+        this.upsertToDb('servicetype:10', { _documentType: 'servicetype', id: '10', description: 'INICIO', timestamp: ' 0x0000000001BD1333' }, false);
+        this.upsertToDb('servicetype:15', { _documentType: 'servicetype', id: '15', description: '', timestamp: ' 0x0000000001C69693' }, false);
+        this.upsertToDb('servicetype:16', { _documentType: 'servicetype', id: '16', description: 'PROP. ENVIADA', timestamp: ' 0x0000000001C6974B' }, false);
+        this.upsertToDb('servicetype:17', { _documentType: 'servicetype', id: '17', description: 'PROP. RECHAZADA', timestamp: ' 0x00000000436BDE52' }, false);
+        this.upsertToDb('servicetype:18', { _documentType: 'servicetype', id: '18', description: 'VENDIDO', timestamp: ' 0x0000000001EC9949' }, false);
+        this.upsertToDb('servicetype:19', { _documentType: 'servicetype', id: '19', description: 'DESCARTADO', timestamp: ' 0x0000000001C6973B' }, false);
+        this.upsertToDb('servicetype:21', { _documentType: 'servicetype', id: '21', description: 'NO VENDE', timestamp: ' 0x0000000001EC9963' }, false);
+        this.upsertToDb('servicetype:22', { _documentType: 'servicetype', id: '22', description: 'PROP. ACEPTADA', timestamp: ' 0x0000000001F18564' }, false);
+        this.upsertToDb('servicetype:24', { _documentType: 'servicetype', id: '24', description: 'COMPRADO', timestamp: ' 0x0000000003E44554' }, false);
+        this.upsertToDb('servicetype:25', { _documentType: 'servicetype', id: '25', description: 'PARA INTERMEDIACIÓN', timestamp: ' 0x0000000041C2EC21' }, false);
+        this.upsertToDb('servicetype:26', { _documentType: 'servicetype', id: '26', description: 'INTERMEDIACIÓN', timestamp: ' 0x0000000041C2EC22' }, false);
+        this.upsertToDb('servicetype:27', { _documentType: 'servicetype', id: '27', description: 'INTERMEDIATO', timestamp: ' 0x0000000041C4375F' }, false);
+
+        this.upsertToDb('ccbfis:1', { _documentType: 'ccbfis', id: '1', ccb: 'ADMINFINCAS', fis: '' }, false);
+        this.upsertToDb('ccbfis:2', { _documentType: 'ccbfis', id: '2', ccb: 'CONTACTO', fis: ' PRINCIPAL' }, false);
+        this.upsertToDb('ccbfis:3', { _documentType: 'ccbfis', id: '3', ccb: 'FAMILIARES', fis: ' PRINCIPAL' }, false);
+        this.upsertToDb('ccbfis:4', { _documentType: 'ccbfis', id: '4', ccb: 'FAMILIARES', fis: ' SECONDARY' }, false);
+        this.upsertToDb('ccbfis:5', { _documentType: 'ccbfis', id: '5', ccb: 'FAMILIARES', fis: ' VECINOS' }, false);
+
+        this.upsertToDb('situation:2', { _documentType: 'situation', id: '2', description: 'VACIO', color: 'WhiteSmoke' }, false);
+        this.upsertToDb('situation:4', { _documentType: 'situation', id: '4', description: 'INDEFINIDO', color: 'Red' }, false);
+        this.upsertToDb('situation:5', { _documentType: 'situation', id: '5', description: 'A TERMINO', color: 'LightSalmon' }, false);
+        this.upsertToDb('situation:6', { _documentType: 'situation', id: '6', description: 'OKUPAS', color: 'Magenta' }, false);
+
+        // TODO 
+        // CREATE INDEX documentType_idx ON mkpremium(_documentType);
+
+    },
+
+    // history-worksheet relations
+    importAuxiliar002: function(res){
+
+        console.log('IMPORT - AUX 002');
+        let t = this;
+
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "history" and worksheetId = "0" and owner is not null'),
+            function (err, rows) {;          
+    
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+
+                //console.log(rows);
+    
+                for(var i = 0; i < rows.length;i++) {                
+                    let row = rows[i];
+                    let historyId = row['id'];
+    
+                    let sql = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet"';
+    
+                    if (row['owner']) {
+                        sql += " and info.currentOwner.name = '" + row['owner'] + "'";
+                    }
+                    if (row['street']) {
+                        sql += " and info.street = '" + row['street'] + "'";
+                    }
+                    if (row['number']) {
+                        sql += " and info.`number` = '" + row['number'] + "'";
+                    }
+                    //console.log('sql', sql);
+    
+                    let worksheetId = "0";
+                    bucket.query(
+                        N1qlQuery.fromString(sql),
+                        function (err, rows2) {;
+                            if (rows2 && rows2.length > 0) {
+                                //console.log('rows2', rows2[0]['id']);
+                                worksheetId = rows2[0]['id'];
+    
+                                if (worksheetId != "0") {
+                                    row['worksheetId'] = worksheetId;
+                                    //console.log('upsert', 'history:' + historyId, row);
+                                    t.upsertToDb('history:' + historyId, row, false);            
+                                }
+                            }
+                            //console.log(rows2);
+                    });
+                }
+    
+                if (res) {
+                    res.json({done:true});
+                }                
+    
+            });
+    },
+
+    // history-worksheet relations
+    importAuxiliar003: function(res){
+
+        console.log('IMPORT - AUX 003');
+        let t = this;
+
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT worksheetId, id FROM ' + config.bucketName + ' t WHERE t._documentType = "history" and worksheetId <> "0" order by worksheetId'),
+            function (err, rows) {;              
+                //console.log(rows);
+    
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+
+                for(var i = 0; i < rows.length;i++) {                
+                    let row = rows[i];
+
+                    bucket.get('worksheet:' + row.worksheetId, function(err, result) {
+                        if (err) {
+                            console.log(err);
+                            //throw err;
+                        }
+                        else {
+                            //console.log(result.value);  
+                            let worksheet = result.value;
+                            if (!worksheet.history) {
+                                worksheet['history'] = [];                                
+                            }
+                            worksheet.history.push(row.id);
+                            t.upsertToDb('worksheet:' + row.worksheetId, worksheet, false);
+                        }                        
+                    });    
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+        
+    },
+
+    importAuxiliar004: function(res) {
+
+        console.log('IMPORT - AUX 004');
+        let t = this;
+
+        var N1qlQuery = couchbase.N1qlQuery;        
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.id, t.description FROM ' + config.bucketName + ' t WHERE t._documentType = "department"'),
+            function (err, departments) {;              
+                
+                //console.log('departments', departments);
+                //res.json({done:true});
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+                
+                bucket.query(
+                    N1qlQuery.fromString('SELECT t.id, t.departmentId FROM ' + config.bucketName + ' t WHERE t._documentType = "history" and departmentId is not null'),
+                    function (err, rows) {;              
+                        //console.log(rows);
+            
+                        for(var i = 0; i < rows.length;i++) {                
+                            let row = rows[i];
+            
+                            bucket.get('history:' + row.id, function(err, result) {
+                                if (err) {
+                                    //console.log(err);
+                                    throw err;
+                                }
+                                else {                                
+                                    let history = result.value;
+                                    //console.log('history', result.value);  
+    
+                                    if (departments.find(d=> d.id == row.departmentId)) {                                    
+                                        history.department = departments.find(d=> d.id == row.departmentId).description;
+                                        t.upsertToDb('history:' + row.id, history, false);
+                                    }                                
+                                }                        
+                            });    
+                        }    
+            
+                        if (res) {
+                            res.json({done:true});
+                        }
+            
+                    });
+    
+            });
+    },
+
+    importAuxiliar005: function(res) {
+
+        console.log('IMPORT - AUX 005');
+        let t = this;
+
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet"'),
+            function (err, rows) {;              
+                //console.log(rows);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                for(var i = 0; i < rows.length; i++) {                
+                    let worksheet = rows[i];
+    
+                    if (worksheet.info && worksheet.info.currentOwner) {
+                        let sql = 'SELECT t.id, t.mainOwner.name as mainOwnerName, t.verified, t.name FROM ' + config.bucketName + ' t WHERE t._documentType = "owner" and t.mainOwner.name = "' + worksheet.info.currentOwner.name + '"';
+                        
+                        //console.log(sql);
+                        bucket.query(
+                            N1qlQuery.fromString(sql),
+                            function (err, owners) {;      
+    
+                                //console.log('owners', owners);
+                                if (owners && owners.length > 0) {
+                                    for(var j = 0; j < owners.length; j++) {   
+                                        let owner = owners[j];
+                                        if (!worksheet.owners) {
+                                            worksheet['owners'] = [];
+                                        }
+                                        worksheet['owners'].push({ ownerId: owner.id, verified: owner.verified, main: (owner.mainOwnerName == owner.name) });            
+                                        //console.log('worksheet', worksheet);
+                                        t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+    
+                                    }
+                                }    
+    
+                        }); 
+    
+                    }
+                    
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+    },
+
+    importAuxiliar006: function(res) {
+
+        console.log('IMPORT - AUX 006');
+        let t = this;
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "owner" and t.mainOwner.name = t.name'),
+            function (err, owners) {;              
+                //console.log(owners);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                if (owners && owners.length > 0) {
+                    for(var i = 0; i < owners.length; i++) {                
+                        let owner = owners[i];
+        
+                        if (owner.mainOwner && owner.mainOwner.name) {
+                            bucket.query(
+                                N1qlQuery.fromString('SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.currentOwner.name = "' + owner.mainOwner.name + '"'),
+                                function (err, worksheets) {;      
+            
+                                    //console.log('worksheets', worksheets);
+                                    if (worksheets && worksheets.length > 0) {
+                                        owner['worksheetId'] = worksheets[0].id;
+                                        t.upsertToDb('owner:' + owner.id, owner, false);
+                                    }    
+            
+                            }); 
+                        }
+                        
+                    }    
+        
+                    if (res) {
+                        res.json({done:true});
+                    }
+                }
+                
+    
+            });
+    },
+    
+    importAuxiliar007: function(res) {
+
+        console.log('IMPORT - AUX 007');
+        let t = this;
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet"'),
+            function (err, rows) {;              
+                //console.log(rows);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                for(var i = 0; i < rows.length; i++) {                
+                    let worksheet = rows[i];
+    
+                    if (worksheet.info && worksheet.info.currentOwner) {
+                        let sql = 'SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "building" and t.ownerName = "' + worksheet.info.currentOwner.name + '"';
+                        
+                        //console.log(sql);
+                        bucket.query(
+                            N1qlQuery.fromString(sql),
+                            function (err, buildings) {;      
+    
+                                //console.log('owners', owners);
+                                if (buildings && buildings.length > 0) {
+                                    for(var j = 0; j < buildings.length; j++) {   
+                                        let building = buildings[j];
+                                        if (!worksheet.buildings) {
+                                            worksheet['buildings'] = [];
+                                        }
+                                        worksheet['buildings'].push(building.id);            
+                                        //console.log('worksheet', worksheet);
+                                        t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                                    }
+                                }    
+                        }); 
+    
+                    }
+                    
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+    },
+
+    importAuxiliar008: function(res) {
+
+        console.log('IMPORT - AUX 008');
+        let t = this;
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "building" AND ownerName is not null'),
+            function (err, buildings) {;              
+                //console.log(buildings);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                for(var i = 0; i < buildings.length;i++) {                
+                    let building = buildings[i];
+
+                    let sql = 'SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.currentOwner.name = "' + building.ownerName + '"';
+                    
+                    //console.log(sql);
+                    bucket.query(
+                        N1qlQuery.fromString(sql),
+                        function (err, worksheets) {;      
+
+                            //console.log('owners', owners);
+                            if (worksheets && worksheets.length > 0) {
+                                for(var j = 0; j < worksheets.length; j++) {   
+                                    let worksheet = worksheets[j];
+                                    if (!building.worksheets) {
+                                        building['worksheets'] = [];
+                                    }
+                                    building['worksheets'].push(worksheet.id);            
+                                    //console.log('worksheet', worksheet);
+                                    t.upsertToDb('building:' + building.id, building, false);
+                                }
+                            }    
+                    }); 
+
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+
+    }
+
+};
+
+
+
+
+// =================================================================
+// module
+// =================================================================
+module.exports = migrationManager;
