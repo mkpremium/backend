@@ -16,6 +16,7 @@ var port = process.env.PORT || 9080; // used to create, sign, and verify tokens
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
@@ -33,6 +34,9 @@ app.get('/', function(req, res) {
 // =================================================================
 var migrationRoutes = require('./app/routes/migration');
 app.use('/api/migration', migrationRoutes);
+
+var v1Routes = require('./app/routes/v1');
+app.use('/api/v1', v1Routes);
 
 // =================================================================
 // start the server ================================================

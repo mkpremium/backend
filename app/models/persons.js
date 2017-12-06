@@ -98,7 +98,7 @@ PersonInputDTO.prototype.toDatabase = function () {
         id: person.id,
 
         surname1: person.apellido_1,
-        surname2	: person.apellido_1,
+        surname2	: person.apellido_2,
         name	    : person.nombre,
         address     : {
             address: person.domicili,
@@ -120,8 +120,7 @@ PersonInputDTO.prototype.toDatabase = function () {
             month: person.mes_naci,
             year: person.ano_naci,
         },                
-        proprietari	: person.proprietari,
-        
+        owner: person.proprietari,        
         phones      : {
             pb: person.telefono_pb,
             ib: person.telefono_ib,

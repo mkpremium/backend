@@ -9,7 +9,7 @@ var HouseStateDTO = t.struct({
     id              : t.Str,
 
     folderId	    : t.maybe(t.Str),
-    buildingId		: t.maybe(t.Str),
+    catastroId		: t.maybe(t.Str),
     houseStateId    : t.maybe(t.Str),    
     address		    : t.maybe(t.Str),
     limitDate    	: t.maybe(t.Str), // Date
@@ -72,7 +72,7 @@ HouseStateInputDTO.prototype.toDatabase = function () {
         id: data.id_statoedificioentita,
 
         folderId	    : data.id_statoedificio,
-        buildingId	    : data.id_catastro,
+        catastroId	    : data.id_catastro,
         houseStateId    : data.id_situazione,
         address		    : data.entita,
         limitDate    	: data.data_limite,
