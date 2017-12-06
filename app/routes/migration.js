@@ -257,35 +257,35 @@ router.get('/aux/002', function(req, res) {
 
 
 // history-worksheet relations
-router.get('/other/003', function(req, res) {
+router.get('/aux/003', function(req, res) {
     migrationManager.importAuxiliar003(res);    
         
 });
 
 // history-department
-router.get('/other/004', function(req, res) {    
+router.get('/aux/004', function(req, res) {    
     migrationManager.importAuxiliar004(res);
 });
 
 // worksheet-owner
-router.get('/other/005', function(req, res) {   
+router.get('/aux/005', function(req, res) {   
     migrationManager.importAuxiliar005(res);
 });
 
 // owner-worksheet
-router.get('/other/006', function(req, res) {       
+router.get('/aux/006', function(req, res) {       
     migrationManager.importAuxiliar006(res);
 });
 
 
 // worksheet-building
-router.get('/other/007', function(req, res) {       
+router.get('/aux/007', function(req, res) {       
     migrationManager.importAuxiliar007(res);
 });
     
 
 // building-worksheet
-router.get('/other/008', function(req, res) {    
+router.get('/aux/008', function(req, res) {    
     migrationManager.importAuxiliar008(res);        
 });
 
