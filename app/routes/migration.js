@@ -245,6 +245,12 @@ router.get('/history/bulkimport', function(req, res) {
 // Migration endpoints: other
 // =================================================================
 
+
+router.get('/aux/000', function(req, res) {        
+    migrationManager.importAuxiliar000();
+    res.json({done: true});    
+});
+
 router.get('/aux/001', function(req, res) {        
     migrationManager.importAuxiliar001();
     res.json({done: true});    
@@ -258,8 +264,7 @@ router.get('/aux/002', function(req, res) {
 
 // history-worksheet relations
 router.get('/aux/003', function(req, res) {
-    migrationManager.importAuxiliar003(res);    
-        
+    migrationManager.importAuxiliar003(res);            
 });
 
 // history-department

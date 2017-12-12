@@ -4,6 +4,9 @@ var cluster     = new couchbase.Cluster(config.database);
 cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
 
+
+var migrationManager = require('../managers/migration-manager');
+
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
 // var operators   = require('../models/operators');
@@ -24,6 +27,28 @@ var v1Manager = {
                     //console.log(err);
                     throw err;
                 }
+
+                // try to get owners info
+                let id = rows[0]['id'];
+                migrationManager.importAuxiliar005ById(null, id);
+
+                res.json(rows[0]);
+            });
+    },
+
+    getQueueItemWithOwners: function (res){
+        let N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM mkpremium t WHERE t._documentType = "worksheet" and t.owners is not null order by random() limit 1'),
+            function (err, rows) {;          
+                if (err) {
+                    //console.log(err);
+                    throw err;
+                }
+
+                let id = rows[0]['id'];
+                migrationManager.importAuxiliar005ById(null, id);
+
                 res.json(rows[0]);
             });
     },

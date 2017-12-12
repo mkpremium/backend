@@ -18,6 +18,7 @@ var bucket      = cluster.openBucket(config.bucketName);
 // var modelHelper = require('../models/models-helper');
 var v1Manager = require('../managers/v1-manager');
 
+
 router.use(function(req, res, next) {
   //console.log('Something is happening.');
   next();
@@ -34,6 +35,10 @@ router.get('/worksheets/queueitem', function(req, res) {
     v1Manager.getQueueItem(res);
 });
 
+router.get('/worksheets/queueitem2', function(req, res) {
+    v1Manager.getQueueItemWithOwners(res);
+});
+
 router.get('/worksheets/allqueue', function(req, res) {
     v1Manager.getQueue(res);
 });
@@ -45,7 +50,7 @@ router.post('/worksheets/history/', function(req, res) {
     v1Manager.getHistory(res, req.body.worksheetId);
 });
 
-router.get('/owner/properties/:name', function(req, res) {        
+router.get('/worksheets/owner/:name', function(req, res) {        
     v1Manager.getOwnerProperties(res, req.params.name);
 });
 router.post('/owner/properties', function(req, res) {        

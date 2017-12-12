@@ -175,6 +175,15 @@ var migrationManager = {
             });
     },
 
+    importAuxiliar000: function(res) {
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('CREATE INDEX documentType_idx ON ' + config.bucketName + '(_documentType);'),
+            function (err, result) {;          
+              res.json(result);
+            });
+    },
+
     importAuxiliar001: function() {
 
         console.log('IMPORT - AUX 001');
@@ -453,6 +462,61 @@ var migrationManager = {
             });
     },
 
+    importAuxiliar005ById: function(res, id) {
+        
+            console.log('IMPORT - AUX 005');
+            let t = this;
+    
+            var N1qlQuery = couchbase.N1qlQuery;
+            bucket.query(
+                N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" AND id = "' + id + '"'),
+                function (err, rows) {;              
+                    //console.log(rows);
+    
+                    if (err) {
+                        console.log(err);
+                        throw err;
+                    }
+        
+                    for(var i = 0; i < rows.length; i++) {                
+                        let worksheet = rows[i];
+                        worksheet['owners'] = [];
+        
+                        if (worksheet.info && worksheet.info.currentOwner) {
+                            let sql = 'SELECT t.id, t.mainOwner.name as mainOwnerName, t.verified, t.name FROM ' + config.bucketName + ' t WHERE t._documentType = "owner" and t.mainOwner.name = "' + worksheet.info.currentOwner.name + '"';
+                            
+                            //console.log(sql);
+                            bucket.query(
+                                N1qlQuery.fromString(sql),
+                                function (err, owners) {;      
+        
+                                    //console.log('owners', owners);
+                                    if (owners && owners.length > 0) {
+                                        for(var j = 0; j < owners.length; j++) {   
+                                            let owner = owners[j];
+                                            // if (!worksheet.owners) {
+                                            //     worksheet['owners'] = [];
+                                            // }
+                                            worksheet['owners'].push({ ownerId: owner.id, verified: owner.verified, main: (owner.mainOwnerName == owner.name) });            
+                                            //console.log('worksheet', worksheet);
+                                            t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+        
+                                        }
+                                    }    
+        
+                            }); 
+        
+                        }
+                        
+                    }    
+        
+                    if (res) {
+                        res.json({done:true});
+                    }
+        
+                });
+        },
+            
     importAuxiliar006: function(res) {
 
         console.log('IMPORT - AUX 006');
