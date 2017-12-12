@@ -1,21 +1,19 @@
-version: '3'
+version: '2'
 
 services:
   couchbasedb:
     build: ./docker/couchbase
     container_name: bitdistrict-couchbase
-    networks:
-      - bitdistrict-network
     environment:
       - COUCHBASE_ADMINISTRATOR_USERNAME=Administrator
       - COUCHBASE_ADMINISTRATOR_PASSWORD=password
       - COUCHBASE_BUCKET=travel-sample
       - COUCHBASE_BUCKET_PASSWORD=
     ports:
-     - 8091:8091
-     - 8092:8092
-     - 8093:8093
-     - 8094:8094
+     - 28091:8091
+     - 28092:8092
+     - 28093:8093
+     - 28094:8094
   nodejs:
     build:
       context: .
@@ -24,8 +22,6 @@ services:
     command: /docker-setup.sh
     environment:
       - NODE_ENV=development
-      - DOCKER=true
-      - COPE_DB_HOST
     volumes:
       - .:/usr/src/app/
       - /usr/src/app/node_modules
@@ -33,10 +29,6 @@ services:
       - couchbasedb
     depends_on:
       - couchbasedb
-    networks:
-      - bitdistrict-network
     ports:
       - 3000:3000
       - 56745:56745 #debug port
-networks:
-  bitdistrict-network:
