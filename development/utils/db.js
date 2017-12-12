@@ -8,8 +8,8 @@ var endPoint = config.couchbase.endPoint;
 var bucket = config.couchbase.bucket;
 var myCluster = new couchbase.Cluster(endPoint + "?detailed_errcodes=true");
 
-var myBucket=myCluster.openBucket(bucket, "76a7722db3897a19ec4bc1ac9ae4d60e");
-var ODMBucket = myCluster.openBucket(bucket, "76a7722db3897a19ec4bc1ac9ae4d60e");
+var myBucket=myCluster.openBucket(bucket, config.couchbase.bucketPassword);
+var ODMBucket = myCluster.openBucket(bucket, config.couchbase.bucketPassword);
 
 var db = myBucket;
 var ottoman = require('ottoman');
