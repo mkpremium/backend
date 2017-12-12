@@ -9,6 +9,8 @@ services:
       - COUCHBASE_ADMINISTRATOR_PASSWORD=${COUCHBASE_ADMINISTRATOR_PASSWORD}
       - COUCHBASE_BUCKET=${COUCHBASE_BUCKET}
       - COUCHBASE_BUCKET_PASSWORD=${COUCHBASE_BUCKET_PASSWORD}
+    volumes:
+      - ./docker/couchbase/data:/opt/couchbase/var/lib/couchbase/data
     ports:
      - 28091:8091
      - 28092:8092
