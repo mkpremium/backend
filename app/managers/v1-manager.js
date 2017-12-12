@@ -24,8 +24,8 @@ var v1Manager = {
             N1qlQuery.fromString('SELECT t.* FROM mkpremium t WHERE t._documentType = "worksheet" order by random() limit 1'),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }
 
                 // try to get owners info
@@ -41,9 +41,9 @@ var v1Manager = {
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM mkpremium t WHERE t._documentType = "worksheet" and t.owners is not null order by random() limit 1'),
             function (err, rows) {;          
-                if (err) {
-                    //console.log(err);
-                    throw err;
+                if (err) {                    
+                    console.log(err);
+                    res.json(err);
                 }
 
                 let id = rows[0]['id'];
@@ -59,8 +59,8 @@ var v1Manager = {
             N1qlQuery.fromString('SELECT t.* FROM mkpremium t WHERE t._documentType = "worksheet" order by random() limit 100'),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }
                 res.json(rows);
             });
@@ -72,8 +72,8 @@ var v1Manager = {
             N1qlQuery.fromString('SELECT t.* FROM mkpremium t WHERE t._documentType = "history" AND t.worksheetId = "' + worksheetId + '"'),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }
                 res.json(rows);
             });
@@ -86,8 +86,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
@@ -98,8 +98,8 @@ var v1Manager = {
 
         bucket.get('owner:' + id, function(err, result) {
             if (err) {
-                //console.log(err);
-                throw err;
+                console.log(err);
+                res.json(err);
             }
             else {                                
                 res.json(result.value);
@@ -114,8 +114,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
@@ -128,8 +128,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
@@ -159,8 +159,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
@@ -175,8 +175,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
@@ -189,8 +189,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
@@ -203,8 +203,8 @@ var v1Manager = {
             N1qlQuery.fromString(sql),
             function (err, rows) {;          
                 if (err) {
-                    //console.log(err);
-                    throw err;
+                    console.log(err);
+                    res.json(err);
                 }                
                 res.json(rows);
             });
