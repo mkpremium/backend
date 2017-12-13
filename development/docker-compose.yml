@@ -4,6 +4,7 @@ services:
   couchbasedb:
     build: ./docker/couchbase
     container_name: bitdistrict-couchbase
+    privileged: true
     environment:
       - COUCHBASE_ADMINISTRATOR_USERNAME=${COUCHBASE_ADMINISTRATOR_USERNAME}
       - COUCHBASE_ADMINISTRATOR_PASSWORD=${COUCHBASE_ADMINISTRATOR_PASSWORD}
@@ -22,6 +23,7 @@ services:
       dockerfile: ./docker/nodejs/Dockerfile
     container_name: bitdistrict-nodejs
     command: /docker-setup.sh
+    privileged: true
     environment:
       - NODE_ENV=development
     volumes:
