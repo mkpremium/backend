@@ -184,57 +184,61 @@ router.get('/history/bulkimport', function(req, res) {
 
 // creation of index
 router.get('/aux/000', function(req, res) {        
-    migrationManager.importAuxiliar000();
+    migrationManager.importAuxiliar0000();
     res.json({done: true});    
 });
 
 // auxiliar inserts
-router.get('/aux/001', function(req, res) {        
-    migrationManager.importAuxiliar001();
+router.get('/aux/0010', function(req, res) {        
+    migrationManager.importAuxiliar0010();
     res.json({done: true});    
 });
 
 // history-worksheet relations
-router.get('/aux/002', function(req, res) {    
-    migrationManager.importAuxiliar002(res);
+router.get('/aux/0020', function(req, res) {    
+    migrationManager.importAuxiliar0020(res);
 });
 
 // history-worksheet relations
-router.get('/aux/002b', function(req, res) {    
-    migrationManager.importAuxiliar002b(res);
+router.get('/aux/0021', function(req, res) {    
+    migrationManager.importAuxiliar0021(res);
 });
 
+// history-worksheet relations
+router.get('/aux/0022', function(req, res) {    
+    migrationManager.importAuxiliar0022(res);
+});
 
 // history-worksheet relations
-router.get('/aux/003', function(req, res) {
-    migrationManager.importAuxiliar003(res);            
+router.get('/aux/0030', function(req, res) {
+    migrationManager.importAuxiliar0030(res);            
 });
 
 // history-department
-router.get('/aux/004', function(req, res) {    
-    migrationManager.importAuxiliar004(res);
+router.get('/aux/0040', function(req, res) {    
+    migrationManager.importAuxiliar0040(res);
 });
 
 // worksheet-owner
-router.get('/aux/005', function(req, res) {   
-    migrationManager.importAuxiliar005(res);
+router.get('/aux/0050', function(req, res) {   
+    migrationManager.importAuxiliar0050(res);
 });
 
 // owner-worksheet
-router.get('/aux/006', function(req, res) {       
-    migrationManager.importAuxiliar006(res);
+router.get('/aux/0060', function(req, res) {       
+    migrationManager.importAuxiliar0060(res);
 });
 
 
 // worksheet-building
-router.get('/aux/007', function(req, res) {       
-    migrationManager.importAuxiliar007(res);
+router.get('/aux/0070', function(req, res) {       
+    migrationManager.importAuxiliar0070(res);
 });
     
 
 // building-worksheet
-router.get('/aux/008', function(req, res) {    
-    migrationManager.importAuxiliar008(res);        
+router.get('/aux/0080', function(req, res) {    
+    migrationManager.importAuxiliar0080(res);        
 });
 
 // =================================================================

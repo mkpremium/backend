@@ -17,6 +17,7 @@ var HistoryDTO = t.struct({
     owner: t.maybe(t.Str),
     street: t.maybe(t.Str),
     number: t.maybe(t.Str),    
+    action: t.maybe(t.Str),    
 
 }, { defaultProps: { _documentType: 'history' } });
 

@@ -179,7 +179,7 @@ var migrationManager = {
             });
     },
 
-    importAuxiliar000: function(res) {
+    importAuxiliar0000: function(res) {
         var N1qlQuery = couchbase.N1qlQuery;
 
         let sql1 = 'CREATE INDEX idx_documentType ON ' + config.bucketName + '(_documentType);';
@@ -198,7 +198,7 @@ var migrationManager = {
         
     },
 
-    importAuxiliar001: function() {
+    importAuxiliar0010: function() {
 
         console.log('IMPORT - AUX 001');
 
@@ -267,7 +267,7 @@ var migrationManager = {
     },
 
     // history-worksheet relations
-    importAuxiliar002: function(res){
+    importAuxiliar0020: function(res){
 
         console.log('IMPORT - AUX 002');
         let t = this;
@@ -338,8 +338,8 @@ var migrationManager = {
             });
     },
 
-    // history-worksheet relations, sometimes there are repeated values...
-    importAuxiliar002b: function(res){
+    // history-worksheet relations, sometimes there are duplicates
+    importAuxiliar0021: function(res){
     
             console.log('IMPORT - AUX 002');
             let t = this;
@@ -376,8 +376,71 @@ var migrationManager = {
                 });
         },
 
+
+    // TODO External function
+    createGuid: function () {  
+        function _p8(s) {  
+            var p = (Math.random().toString(16)+"000000000").substr(2,8);  
+            return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;  
+        }  
+        return _p8() + _p8();  
+    },
+
+    // history-worksheet (flags)
+    importAuxiliar0022: function(res){
+    
+            console.log('IMPORT - AUX 0022');
+            let t = this;
+    
+            var N1qlQuery = couchbase.N1qlQuery;
+            bucket.query(
+                N1qlQuery.fromString('SELECT t.id, t.info.flags FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.flags is not null'),
+                function (err, worksheets) {;          
+        
+                    if (err) {
+                        console.log(err);
+                        throw err;
+                    }
+    
+                    //console.log(rows);
+        
+                    for(var i = 0; i < worksheets.length;i++) {                
+                        let worksheet = worksheets[i];
+
+                        for(var j = 0; j < worksheet.flags.length; j++) {                
+                            
+                            if (worksheet.flags[j].action == "create") {
+
+                                let historyData = {
+                                    _documentType: 'history',
+                                    id: t.createGuid(),
+                                    worksheetId: worksheet.id,                                
+                                    // operatorId: data.id_operatore,
+                                    // departmentId: data.id_dipartimento,
+                                };
+                                        
+                                if (worksheet.flags[j].operator) {
+                                    historyData.operatorId = worksheet.flags[j].operator;
+                                }
+                                if (worksheet.flags[j].date) {
+                                    historyData.tmStmp = worksheet.flags[j].date;
+                                }
+                                historyData.action = worksheet.flags[j].action;
+                                let historyDTO = JSON.parse(JSON.stringify(new history.HistoryDTO(historyData)));                                
+                                t.upsertToDb('history:' + historyDTO.id, historyDTO, false);
+                            }
+                        }
+                    }
+        
+                    if (res) {
+                        res.json({done:true});
+                    }                
+        
+                });
+        },        
+
     // history-worksheet relations
-    importAuxiliar003: function(res){
+    importAuxiliar0030: function(res){
 
         console.log('IMPORT - AUX 003');
         let t = this;
@@ -407,8 +470,11 @@ var migrationManager = {
                             if (!worksheet.history) {
                                 worksheet['history'] = [];                                
                             }
-                            worksheet.history.push(row.id);
-                            t.upsertToDb('worksheet:' + row.worksheetId, worksheet, false);
+                            if (worksheet.history.indexOf(row.id) <= -1) {
+                                worksheet.history.push(row.id);
+                                t.upsertToDb('worksheet:' + row.worksheetId, worksheet, false);
+                            }
+                            
                         }                        
                     });    
                 }    
@@ -421,7 +487,7 @@ var migrationManager = {
         
     },
 
-    importAuxiliar004: function(res) {
+    importAuxiliar0040: function(res) {
 
         console.log('IMPORT - AUX 004');
         let t = this;
@@ -472,7 +538,7 @@ var migrationManager = {
             });
     },
 
-    importAuxiliar005: function(res) {
+    importAuxiliar0050: function(res) {
 
         console.log('IMPORT - AUX 005');
         let t = this;
@@ -579,7 +645,7 @@ var migrationManager = {
                 });
         },
             
-    importAuxiliar006: function(res) {
+    importAuxiliar0060: function(res) {
 
         console.log('IMPORT - AUX 006');
         let t = this;
@@ -623,7 +689,7 @@ var migrationManager = {
             });
     },
     
-    importAuxiliar007: function(res) {
+    importAuxiliar0070: function(res) {
 
         console.log('IMPORT - AUX 007');
         let t = this;
@@ -671,7 +737,7 @@ var migrationManager = {
             });
     },
 
-    importAuxiliar008: function(res) {
+    importAuxiliar0080: function(res) {
 
         console.log('IMPORT - AUX 008');
         let t = this;
