@@ -1,5 +1,4 @@
 var db = require('./../utils/db');
-var jwt = require('jsonwebtoken');
 var config = require('./../utils/config');
 var User = require('./user.js');
 var jwt = require('jsonwebtoken');
@@ -144,4 +143,15 @@ module.exports.isLoggedIn = function(token,done) {
         done(false);
     });
     done(false);
+}
+
+module.exports.refreshToken = function(token,done) {
+    jwt.refresh(jwt.decode(token), 3600, sec, function(err,result)
+    {
+        if(err){
+            done(err,null);
+            return;
+        }
+        done(null,{"success":result});
+    });
 }

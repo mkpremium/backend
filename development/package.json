@@ -19,7 +19,7 @@
     "body-parser": "*",
     "progress": "*",
     "request": "*",
-    "jsonwebtoken": "*",
+    "jsonwebtoken": "git+https://github.com/jppellerin/node-jsonwebtoken.git",
     "haversine": "*",
     "faye": "*",
     "ottoman": "*"

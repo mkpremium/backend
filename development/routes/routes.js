@@ -94,6 +94,21 @@ module.exports = function (app) {
         });
     });
 
+    //// ▶▶ refresh token ◀◀ ////
+    app.get('/api/user/refreshToken',urlencodedParser,function(req,res){
+        auth.refreshToken(req.query.token,function(err,done){
+            if(err){
+                res.status=400;
+                res.send(err);
+                return;
+            }
+            res.status=202;
+            res.send(done);
+            return;
+
+        });
+    });
+
     //// ▶▶ book flights ◀◀ ////
     app.post('/api/user/flights',jsonParser,function(req,res){
         auth.book(req.body.token,req.body.flights,function(err,done){
