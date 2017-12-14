@@ -19,8 +19,8 @@ var v1Manager = {
                 }
 
                 // try to get owners info
-                let id = rows[0]['id'];
-                migrationManager.importAuxiliar005ById(null, id);
+                // let id = rows[0]['id'];
+                // migrationManager.importAuxiliar005ById(null, id);
 
                 res.json(rows[0]);
             });

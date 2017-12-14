@@ -53,7 +53,7 @@ router.post('/worksheets/history/', function(req, res) {
 router.get('/worksheets/owner/:name', function(req, res) {        
     v1Manager.getOwnerProperties(res, req.params.name);
 });
-router.post('/owner/properties', function(req, res) {        
+router.post('/worksheets/owner', function(req, res) {        
     v1Manager.getOwnerProperties(res, req.body.name);
 });
 
@@ -71,7 +71,6 @@ router.get('/owners/getregistry/:name', function(req, res) {
 router.post('/owners/getregistry/', function(req, res) {        
     v1Manager.getRegistryOwners(res, req.body.name);
 });
-
 
 router.get('/persons/getowners/:name', function(req, res) {        
     v1Manager.getPersonsOwners(res, req.params.name);
