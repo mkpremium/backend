@@ -59,74 +59,6 @@ router.get('/importall', function(req, res) {
 
 });
 
-// router.get('/importaux', function(req, res) {
-    
-//     console.log('IMPORT AUX');    
-
-//     migrationManager.importAuxiliar000();
-
-//     migrationManager.importAuxiliar001();
-    
-//     migrationManager.importAuxiliar002(null);
-    
-//     migrationManager.importAuxiliar003(null);
-    
-//     migrationManager.importAuxiliar004(null);
-    
-//     migrationManager.importAuxiliar005(null);
-    
-//     migrationManager.importAuxiliar006(null);
-    
-//     migrationManager.importAuxiliar007(null);
-    
-//     migrationManager.importAuxiliar008(null);
-    
-//     res.json({done: true});
-
-// });
-
-
-// router.get('/importaux01', function(req, res) {    
-//     migrationManager.importAuxiliar001();
-    
-    
-//     res.json({done: true});
-
-// });
-
-// router.get('/importaux/:id', function(req, res) {    
-
-//     if (req.params.id == '001') {
-//         migrationManager.importAuxiliar001();    
-//         res.json({done: true});
-//     }
-//     else if (req.params.id == '002') {
-//         migrationManager.importAuxiliar002(res);    
-//     }
-//     else if (req.params.id == '003') {
-//         migrationManager.importAuxiliar003(res);    
-//     }
-//     else if (req.params.id == '004') {
-//         migrationManager.importAuxiliar004(res);    
-//     }
-//     else if (req.params.id == '005') {
-//         migrationManager.importAuxiliar005(res);    
-//     }
-//     else if (req.params.id == '006') {
-//         migrationManager.importAuxiliar006(res);    
-//     }
-//     else if (req.params.id == '007') {
-//         migrationManager.importAuxiliar007(res);    
-//     }
-//     else if (req.params.id == '008') {
-//         migrationManager.importAuxiliar008(res);    
-//     }
-//     else {
-//         res.json({done: false});
-//     }
-    
-
-// });
 
 // =================================================================
 // Migration endpoints: Buildings
@@ -265,6 +197,11 @@ router.get('/aux/001', function(req, res) {
 // history-worksheet relations
 router.get('/aux/002', function(req, res) {    
     migrationManager.importAuxiliar002(res);
+});
+
+// history-worksheet relations
+router.get('/aux/002b', function(req, res) {    
+    migrationManager.importAuxiliar002b(res);
 });
 
 

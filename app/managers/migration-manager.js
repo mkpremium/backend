@@ -304,15 +304,27 @@ var migrationManager = {
                     let worksheetId = "0";
                     bucket.query(
                         N1qlQuery.fromString(sql),
-                        function (err, rows2) {;
-                            if (rows2 && rows2.length > 0) {
+                        function (err, worksheets) {;
+                            if (worksheets && worksheets.length > 0) {
                                 //console.log('rows2', rows2[0]['id']);
-                                worksheetId = rows2[0]['id'];
+                                let worksheet = worksheets[0];
+                                worksheetId = worksheet['id'];
     
                                 if (worksheetId != "0") {
                                     row['worksheetId'] = worksheetId;
                                     //console.log('upsert', 'history:' + historyId, row);
-                                    t.upsertToDb('history:' + historyId, row, false);            
+                                    t.upsertToDb('history:' + historyId, row, false);
+
+                                    // update worksheet
+                                    if (!worksheet['history']) {
+                                        worksheet['history'] = [];
+                                    }
+
+                                    if (worksheet.history.indexOf(historyId) <= -1) {
+                                        worksheet['history'].push(historyId);
+                                        t.upsertToDb('worksheet:' + worksheetId, worksheet, false);
+                                    }
+
                                 }
                             }
                             //console.log(rows2);
@@ -325,6 +337,44 @@ var migrationManager = {
     
             });
     },
+
+    // history-worksheet relations, sometimes there are repeated values...
+    importAuxiliar002b: function(res){
+    
+            console.log('IMPORT - AUX 002');
+            let t = this;
+    
+            var N1qlQuery = couchbase.N1qlQuery;
+            bucket.query(
+                N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.history is not null'),
+                function (err, worksheets) {;          
+        
+                    if (err) {
+                        console.log(err);
+                        throw err;
+                    }
+    
+                    //console.log(rows);
+        
+                    for(var i = 0; i < worksheets.length;i++) {                
+                        let worksheet = worksheets[i];
+
+                        if (worksheet.history && worksheet.history.length > 1) {
+
+                            var uniqueHistory = worksheet.history.filter((v, i, a) => a.indexOf(v) === i);
+                            worksheet.history = uniqueHistory;
+
+                            t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                        }
+
+                    }
+        
+                    if (res) {
+                        res.json({done:true});
+                    }                
+        
+                });
+        },
 
     // history-worksheet relations
     importAuxiliar003: function(res){

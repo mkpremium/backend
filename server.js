@@ -20,6 +20,12 @@ app.use(bodyParser.json());
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
+// catch exceptions
+process.on('uncaughtException', function (err) {
+	console.error(err.stack);
+	console.log("Node NOT Exiting...");
+});
+
 // =================================================================
 // routes ==========================================================
 // =================================================================
