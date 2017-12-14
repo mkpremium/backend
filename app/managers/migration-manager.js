@@ -1,8 +1,12 @@
 var config      = require('../../config');
 var couchbase   = require('couchbase');
 var cluster     = new couchbase.Cluster(config.database);
-cluster.authenticate(config.databaseUser, config.databasePassword);
+var auth        = cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
+
+// var bucket = config.couchbase.bucket;
+// var myCluster = new couchbase.Cluster(endPoint + "?detailed_errcodes=true");
+// var myBucket=myCluster.openBucket(bucket, config.couchbase.bucketPassword);
 
 var modelHelper = require('../models/models-helper');
 var buildings   = require('../models/building');
@@ -27,24 +31,24 @@ var migrationManager = {
 
     upsertToDb: function(pk, data, response) {
         
-        bucket.manager().createPrimaryIndex(function() {
+        //bucket.manager().createPrimaryIndex(function() {
             bucket.upsert(pk, data, function(err, result) {
                 if (err) {
                     console.log(err);
-                    throw err;
+                    //throw err;
                 }
                 if (response) {
                     bucket.get(pk, function(err, result) {
                         if (err) {
                             console.log(err);
-                            throw err;
+                            //throw err;
                         }
                         //console.log(result.value);
                         return result;
                     });
                 }
             });
-        });
+        //});
         return;
     },
 
@@ -177,11 +181,21 @@ var migrationManager = {
 
     importAuxiliar000: function(res) {
         var N1qlQuery = couchbase.N1qlQuery;
-        bucket.query(
-            N1qlQuery.fromString('CREATE INDEX documentType_idx ON ' + config.bucketName + '(_documentType);'),
-            function (err, result) {;          
-              res.json(result);
-            });
+
+        let sql1 = 'CREATE INDEX idx_documentType ON ' + config.bucketName + '(_documentType);';
+        let sql2 = 'CREATE INDEX idx_owner_001 ON ' + config.bucketName + '(_documentType, mainOwner.name) WHERE _documentType = "owner";'
+        let sql3 = 'CREATE INDEX idx_worksheet_001 ON ' + config.bucketName + '(_documentType, info.currentOwner.name, street, `number`) WHERE _documentType = "worksheet";'
+        let sql4 = 'CREATE INDEX idx_building_001 ON ' + config.bucketName + '(_documentType, ownerName, id) WHERE _documentType = "building";'
+
+        bucket.query(N1qlQuery.fromString(sql1),function (err, result) {;});
+        bucket.query(N1qlQuery.fromString(sql2),function (err, result) {;});
+        bucket.query(N1qlQuery.fromString(sql3),function (err, result) {;});
+        bucket.query(N1qlQuery.fromString(sql4),function (err, result) {;});
+
+        if (res) {
+            res.json(result);
+        }
+        
     },
 
     importAuxiliar001: function() {
@@ -426,9 +440,12 @@ var migrationManager = {
     
                 for(var i = 0; i < rows.length; i++) {                
                     let worksheet = rows[i];
-    
+                    worksheet['owners'] = [];
+                    let mainOwnerName = worksheet.info.currentOwner.name;
+
+                    // CREATE INDEX IX_owner_002 ON mkpremium(_documentType, mainOwner.name) WHERE _documentType = "owner" 
                     if (worksheet.info && worksheet.info.currentOwner) {
-                        let sql = 'SELECT t.id, t.mainOwner.name as mainOwnerName, t.verified, t.name FROM ' + config.bucketName + ' t WHERE t._documentType = "owner" and t.mainOwner.name = "' + worksheet.info.currentOwner.name + '"';
+                        let sql = 'SELECT t.id, t.verified, t.name FROM ' + config.bucketName + ' t WHERE t._documentType = "owner" and t.mainOwner.name = "' + mainOwnerName + '"';
                         
                         //console.log(sql);
                         bucket.query(
@@ -438,15 +455,10 @@ var migrationManager = {
                                 //console.log('owners', owners);
                                 if (owners && owners.length > 0) {
                                     for(var j = 0; j < owners.length; j++) {   
-                                        let owner = owners[j];
-                                        if (!worksheet.owners) {
-                                            worksheet['owners'] = [];
-                                        }
-                                        worksheet['owners'].push({ ownerId: owner.id, verified: owner.verified, main: (owner.mainOwnerName == owner.name) });            
-                                        //console.log('worksheet', worksheet);
-                                        t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
-    
+                                        let owner = owners[j];                                        
+                                        worksheet['owners'].push({ ownerId: owner.id, verified: owner.verified, main: (mainOwnerName == owner.name) });                                                    
                                     }
+                                    t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
                                 }    
     
                         }); 
@@ -578,7 +590,8 @@ var migrationManager = {
     
                 for(var i = 0; i < rows.length; i++) {                
                     let worksheet = rows[i];
-    
+                    worksheet['buildings'] = [];
+
                     if (worksheet.info && worksheet.info.currentOwner) {
                         let sql = 'SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "building" and t.ownerName = "' + worksheet.info.currentOwner.name + '"';
                         
@@ -590,14 +603,10 @@ var migrationManager = {
                                 //console.log('owners', owners);
                                 if (buildings && buildings.length > 0) {
                                     for(var j = 0; j < buildings.length; j++) {   
-                                        let building = buildings[j];
-                                        if (!worksheet.buildings) {
-                                            worksheet['buildings'] = [];
-                                        }
-                                        worksheet['buildings'].push(building.id);            
-                                        //console.log('worksheet', worksheet);
-                                        t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                                        let building = buildings[j];                                        
+                                        worksheet['buildings'].push(building.id);                                     
                                     }
+                                    t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
                                 }    
                         }); 
     
@@ -629,6 +638,7 @@ var migrationManager = {
     
                 for(var i = 0; i < buildings.length;i++) {                
                     let building = buildings[i];
+                    building['worksheets'] = [];
 
                     let sql = 'SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.currentOwner.name = "' + building.ownerName + '"';
                     
@@ -636,18 +646,14 @@ var migrationManager = {
                     bucket.query(
                         N1qlQuery.fromString(sql),
                         function (err, worksheets) {;      
-
                             //console.log('owners', owners);
                             if (worksheets && worksheets.length > 0) {
                                 for(var j = 0; j < worksheets.length; j++) {   
-                                    let worksheet = worksheets[j];
-                                    if (!building.worksheets) {
-                                        building['worksheets'] = [];
-                                    }
+                                    let worksheet = worksheets[j];                                    
                                     building['worksheets'].push(worksheet.id);            
-                                    //console.log('worksheet', worksheet);
-                                    t.upsertToDb('building:' + building.id, building, false);
+                                    //console.log('worksheet', worksheet);                                    
                                 }
+                                t.upsertToDb('building:' + building.id, building, false);
                             }    
                     }); 
 

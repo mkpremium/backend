@@ -59,69 +59,74 @@ router.get('/importall', function(req, res) {
 
 });
 
-router.get('/importaux', function(req, res) {
+// router.get('/importaux', function(req, res) {
     
-    console.log('IMPORT AUX');    
+//     console.log('IMPORT AUX');    
 
-    migrationManager.importAuxiliar001();
-    
-    migrationManager.importAuxiliar002(null);
-    
-    migrationManager.importAuxiliar003(null);
-    
-    migrationManager.importAuxiliar004(null);
-    
-    migrationManager.importAuxiliar005(null);
-    
-    migrationManager.importAuxiliar006(null);
-    
-    migrationManager.importAuxiliar007(null);
-    
-    migrationManager.importAuxiliar008(null);
-    
-    res.json({done: true});
+//     migrationManager.importAuxiliar000();
 
-});
+//     migrationManager.importAuxiliar001();
+    
+//     migrationManager.importAuxiliar002(null);
+    
+//     migrationManager.importAuxiliar003(null);
+    
+//     migrationManager.importAuxiliar004(null);
+    
+//     migrationManager.importAuxiliar005(null);
+    
+//     migrationManager.importAuxiliar006(null);
+    
+//     migrationManager.importAuxiliar007(null);
+    
+//     migrationManager.importAuxiliar008(null);
+    
+//     res.json({done: true});
+
+// });
 
 
-router.get('/importaux01', function(req, res) {    
-    migrationManager.importAuxiliar001();
+// router.get('/importaux01', function(req, res) {    
+//     migrationManager.importAuxiliar001();
     
     
-    res.json({done: true});
+//     res.json({done: true});
 
-});
+// });
 
-router.get('/importaux/:id', function(req, res) {    
+// router.get('/importaux/:id', function(req, res) {    
 
-    if (req.params.id == '001') {
-        migrationManager.importAuxiliar001();    
-        res.json({done: true});
-    }
-    else if (req.params.id == '002') {
-        migrationManager.importAuxiliar002(res);    
-    }
-    else if (req.params.id == '003') {
-        migrationManager.importAuxiliar003(res);    
-    }
-    else if (req.params.id == '004') {
-        migrationManager.importAuxiliar004(res);    
-    }
-    else if (req.params.id == '005') {
-        migrationManager.importAuxiliar005(res);    
-    }
-    else if (req.params.id == '006') {
-        migrationManager.importAuxiliar006(res);    
-    }
-    else if (req.params.id == '007') {
-        migrationManager.importAuxiliar007(res);    
-    }
-    else if (req.params.id == '008') {
-        migrationManager.importAuxiliar008(res);    
-    }
+//     if (req.params.id == '001') {
+//         migrationManager.importAuxiliar001();    
+//         res.json({done: true});
+//     }
+//     else if (req.params.id == '002') {
+//         migrationManager.importAuxiliar002(res);    
+//     }
+//     else if (req.params.id == '003') {
+//         migrationManager.importAuxiliar003(res);    
+//     }
+//     else if (req.params.id == '004') {
+//         migrationManager.importAuxiliar004(res);    
+//     }
+//     else if (req.params.id == '005') {
+//         migrationManager.importAuxiliar005(res);    
+//     }
+//     else if (req.params.id == '006') {
+//         migrationManager.importAuxiliar006(res);    
+//     }
+//     else if (req.params.id == '007') {
+//         migrationManager.importAuxiliar007(res);    
+//     }
+//     else if (req.params.id == '008') {
+//         migrationManager.importAuxiliar008(res);    
+//     }
+//     else {
+//         res.json({done: false});
+//     }
     
 
-});
+// });
 
 // =================================================================
 // Migration endpoints: Buildings
@@ -245,12 +250,13 @@ router.get('/history/bulkimport', function(req, res) {
 // Migration endpoints: other
 // =================================================================
 
-
+// creation of index
 router.get('/aux/000', function(req, res) {        
     migrationManager.importAuxiliar000();
     res.json({done: true});    
 });
 
+// auxiliar inserts
 router.get('/aux/001', function(req, res) {        
     migrationManager.importAuxiliar001();
     res.json({done: true});    
