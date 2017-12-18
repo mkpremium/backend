@@ -135,23 +135,66 @@ function filterScan(term,done){
 }
 
 module.exports.isLoggedIn = function(token,done) {
-    jwt.verify(token,sec,{ignoreExpiration:true},function(err,verified)
+    jwt.verify(token,sec,{ignoreExpiration:false},function(err,verified)
     {
-        if(verfied){
+        if(verified){
             done(true);
         }
         done(false);
     });
     done(false);
-}
+};
 
-module.exports.refreshToken = function(token,done) {
-    jwt.refresh(jwt.decode(token), 3600, sec, function(err,result)
+module.exports.refreshToken = function (token, done) {
+
+    jwt.verify(token,sec,{ignoreExpiration:false},function(err,verified)
     {
-        if(err){
-            done(err,null);
+        if(verified){
+            var userJson = jwt.decode(token);
+            User.findByName(userJson.user, function (err, userResult) {
+                if (err) {
+                    done(err, null);
+                    return;
+                }
+
+                if (userResult.length == 0) {
+                    done(null, {"failure": "Invalid token"});
+                    return;
+                }
+
+                var user = userResult[0];
+
+                if (token != user.token) {
+                    done(null, {"failure": "Invalid token"});
+                    return;
+                }
+
+                var newToken = jwt.refresh(jwt.decode(token), 3600, sec);
+                user.token = newToken;
+
+                user.save(function (err) {
+                    if (err) {
+                        done(err, null);
+                        return;
+                    }
+
+                    db.refreshExpiry("$User$name|" + user.name, 14400, function(error, result) {
+                        db.refreshExpiry("User|" + user._id, 14400, function(error, result) {});
+                        if(error) {
+                            return done(error, null);
+                        }
+                        return done(null, {"success": user.token});
+                    });
+
+                });
+
+            });
+
+        } else {
+            done(null, {"failure": "Invalid token"});
             return;
         }
-        done(null,{"success":result});
+
     });
+
 }
