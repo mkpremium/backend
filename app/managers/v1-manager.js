@@ -29,7 +29,7 @@ var v1Manager = {
     getQueueItemNormal: function (res){
         let N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
-            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.fifo = "NORMAL" order by t.info.fifoDate, random() limit 1'),
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.fifo = "NORMAL" order by t.info.fifoDate, random() limit 1'),
             function (err, rows) {;          
                 if (err) {
                     console.log(err);
@@ -47,7 +47,7 @@ var v1Manager = {
     getQueueItemRecall: function (res){
         let N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
-            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.fifo = "RECALL" order by t.info.fifoDate, random() limit 1'),
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.fifo = "RECALL" order by t.info.fifoDate, random() limit 1'),
             function (err, rows) {;          
                 if (err) {
                     console.log(err);
@@ -312,16 +312,21 @@ var v1Manager = {
     removeHistory: function (res, history){
         
         if (history['id']) {
-            let sql = 'DELETE FROM ' + config.bucketName + ' t WHERE t._documentType = "history" AND t.id = "' + history.id + '"';                        
-            bucket.query(
-                N1qlQuery.fromString(sql),
-                function (err, rows) {;          
-                    if (err) {
-                        console.log(err);
-                        res.json(err);
-                    }                
-                    res.json({done:true});
-                });
+
+
+            bucket.get('history:' + history.id, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                }
+                else {                   
+                    history = result.value;
+                    history['deleted'] = true;                        
+                    migrationManager.upsertToDb('history:' + history.id, history);
+                    res.json(history);
+                }                        
+            });
+
         }
         else {
             res.json({done:false});

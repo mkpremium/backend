@@ -878,16 +878,16 @@ var migrationManager = {
 
 
                     if (worksheet.info.flags.filter(f => f.action == 'recall').length > 0) {
-                        worksheet['fifo'] = 'RECALL';                        
+                        worksheet.info['fifo'] = 'RECALL';                        
                     }
                     else if (worksheet.info.flags.filter(f => f.action == 'sells' && f.sells == false).length > 0) {
-                        worksheet['fifo'] = 'SELLS';
+                        worksheet.info['fifo'] = 'SELLS';
                     }
                     else if (worksheet.info.flags.filter(f => f.action == 'visit').length > 0) {
-                        worksheet['fifo'] = 'VISIT';
+                        worksheet.info['fifo'] = 'VISIT';
                     }
                     else {
-                        worksheet['fifo'] = 'NORMAL';
+                        worksheet.info['fifo'] = 'NORMAL';
                     }
 
                     if (worksheet.info.date) {

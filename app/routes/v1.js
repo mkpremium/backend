@@ -35,6 +35,14 @@ router.get('/worksheets/queueitem', function(req, res) {
     v1Manager.getQueueItem(res);
 });
 
+router.get('/worksheets/fifo/normal', function(req, res) {
+    v1Manager.getQueueItemNormal(res);
+});
+
+router.get('/worksheets/fifo/recall', function(req, res) {
+    v1Manager.getQueueItemRecall(res);
+});
+
 router.get('/worksheets/queueitem2', function(req, res) {
     v1Manager.getQueueItemWithOwners(res);
 });
