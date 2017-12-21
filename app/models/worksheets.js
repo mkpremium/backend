@@ -167,7 +167,7 @@ WorkSheetInputDTO.prototype.toDatabase = function () {
     }
 
     if (data.proprietario2 == "1") {
-        manual.info.flags.push({ action: 'proprietario2__' });
+        manual.info.flags.push({ action: 'proprietario2' });
     }
     
     if (data.famiglia == "1") {

@@ -781,8 +781,135 @@ var migrationManager = {
     
             });
 
-    }
+    },
 
+    // create empty array of owners when null
+    importAuxiliar0090: function(res) {
+        
+        console.log('IMPORT - AUX 008');
+        let t = this;
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" AND t.owners is null'),
+            function (err, worksheets) {;              
+                //console.log(buildings);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                for(var i = 0; i < worksheets.length;i++) {                
+                    let worksheet = worksheets[i];
+                    worksheet['owners'] = [];
+
+                    t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+    },
+
+    // create notes documents from history
+    importAuxiliar0100: function(res) {
+        
+        console.log('IMPORT - AUX 008');
+        let t = this;
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "history" AND t.notes is not null'),
+            function (err, histories) {;              
+                //console.log(buildings);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                for(var i = 0; i < histories.length;i++) {                
+                    let history = histories[i];
+
+                    let note = {
+                        _documentType: "note",
+                        id: history.id,
+                        notes: history.notes,
+                        notesDate: history.notes,
+                        operatorId: history.operatorId,
+                        // the fields are needed because, sometimes, worksheetId doesn't match
+                        number: history.notes,                        
+                        owner: history.owner,
+                        street: history.street,
+                        worksheetId: history.worksheetId,
+
+                    };
+
+
+                    t.upsertToDb('note:' + history.id, note, false);
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+    },
+
+    // create fifo data
+    importAuxiliar0110: function(res) {
+        
+        console.log('IMPORT - AUX 110');
+        let t = this;
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" order by random()'),
+            function (err, worksheets) {;              
+                //console.log(buildings);
+
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+    
+                for(var i = 0; i < worksheets.length;i++) {                
+                    let worksheet = worksheets[i];
+
+
+                    if (worksheet.info.flags.filter(f => f.action == 'recall').length > 0) {
+                        worksheet['fifo'] = 'RECALL';                        
+                    }
+                    else if (worksheet.info.flags.filter(f => f.action == 'sells' && f.sells == false).length > 0) {
+                        worksheet['fifo'] = 'SELLS';
+                    }
+                    else if (worksheet.info.flags.filter(f => f.action == 'visit').length > 0) {
+                        worksheet['fifo'] = 'VISIT';
+                    }
+                    else {
+                        worksheet['fifo'] = 'NORMAL';
+                    }
+
+                    if (worksheet.info.date) {
+                        worksheet.info['fifoDate'] = worksheet.info.date;
+                    }
+                    else {
+                        worksheet.info['fifoDate'] = (new Date()).toISOString().slice(0,19).replace(/-/g,"");
+                    }
+
+                    if (worksheet.info.fifoDate == "") {
+                        worksheet.info.fifoDate = (new Date()).toISOString().slice(0,19).replace(/-/g,"");
+                    }                    
+
+                    t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                }    
+    
+                if (res) {
+                    res.json({done:true});
+                }
+    
+            });
+    }
 };
 
 

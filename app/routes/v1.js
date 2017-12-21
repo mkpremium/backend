@@ -57,6 +57,14 @@ router.post('/worksheets/owner', function(req, res) {
     v1Manager.getOwnerProperties(res, req.body.name);
 });
 
+router.post('/worksheets/addOwner', function(req, res) {        
+    v1Manager.addWorksheetOwner(res, req.body.worksheetId, req.body.owner);
+});
+
+router.post('/worksheets/setFifoState', function(req, res) {        
+    v1Manager.setFIFOState(res, req.body.worksheetId, req.body.fifo, req.body.state);
+});
+
 router.get('/owner/get/:id', function(req, res) {        
     v1Manager.getOwner(res, req.params.id);
 });
@@ -70,6 +78,10 @@ router.get('/owners/getregistry/:name', function(req, res) {
 });
 router.post('/owners/getregistry/', function(req, res) {        
     v1Manager.getRegistryOwners(res, req.body.name);
+});
+
+router.post('/owners/update/', function(req, res) {        
+    v1Manager.updateOwner(res, req.body.owner);
 });
 
 router.get('/persons/getowners/:name', function(req, res) {        
@@ -98,6 +110,19 @@ router.post('/persons/house/', function(req, res) {
 
 router.post('/housestate/get/:catastroid', function(req, res) {        
     v1Manager.getHouseState(res, req.body.catastroid);
+});
+
+
+router.post('/history/add/', function(req, res) {        
+    v1Manager.addHistory(res, req.body.history);
+});
+
+router.post('/history/remove/', function(req, res) {        
+    v1Manager.removeHistory(res, req.body.history);
+});
+
+router.post('/history/search/', function(req, res) {        
+    v1Manager.searchHistory(res, req.body.search);
 });
 
 // =================================================================
