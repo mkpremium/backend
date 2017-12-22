@@ -17,6 +17,7 @@ var bucket      = cluster.openBucket(config.bucketName);
 
 // var modelHelper = require('../models/models-helper');
 var v1Manager = require('../managers/v1-manager');
+var verifyToken = require('../middleware/verify-token');
 
 router.use(function(req, res, next) {
   //console.log('Something is happening.');
@@ -102,6 +103,10 @@ router.post('/operator/register', function(req, res) {
 
 router.post('/operator/login', function(req, res) {
     v1Manager.login(res, req.body.name, req.body.password);
+});
+
+router.get('/me', verifyToken, function(req, res) {
+    v1Manager.me(res, req.userId);
 });
 
 // =================================================================

@@ -228,7 +228,7 @@ var v1Manager = {
         let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.name = "' + name + '"';
         bucket.query(
             N1qlQuery.fromString(sql),
-            function (err, users) {;
+            function (err, users) {
                 if (err) {
                     //console.log(err);
                     throw err;
@@ -242,6 +242,25 @@ var v1Manager = {
                     expiresIn: 86400 // expires in 24 hours
                 });
                 res.json({ auth: true, token: token });
+            });
+
+    },
+
+    me: function (res, userId) {
+        let N1qlQuery = couchbase.N1qlQuery;
+        let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.name = "' + userId + '"';
+        bucket.query(
+            N1qlQuery.fromString(sql),
+            function (err, users) {
+                if (err) {
+                    //console.log(err);
+                    throw err;
+                }
+
+                if (users.length == 0) {
+                    return res.status(404).send("No user found.");
+                }
+                res.json(users[0]);
             });
 
     }
