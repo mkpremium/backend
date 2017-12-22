@@ -96,6 +96,14 @@ router.post('/housestate/get/:catastroid', function(req, res) {
     v1Manager.getHouseState(res, req.body.catastroid);
 });
 
+router.post('/operator/register', function(req, res) {
+    v1Manager.register(res, req.body.name, req.body.password);
+});
+
+router.post('/operator/login', function(req, res) {
+    v1Manager.login(res, req.body.name, req.body.password);
+});
+
 // =================================================================
 // module migration
 // =================================================================

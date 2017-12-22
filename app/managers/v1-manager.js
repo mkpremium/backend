@@ -3,6 +3,8 @@ var couchbase   = require('couchbase');
 var cluster     = new couchbase.Cluster(config.database);
 cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
+var bcrypt      = require('bcrypt');
+var jwt         = require('jsonwebtoken');
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -184,11 +186,67 @@ var v1Manager = {
                 res.json(rows);
             });
     },
-    
+
+    register: function (res, name, password){
+
+        var pk = "operator:" + name;
+        var hashedPassword = bcrypt.hashSync(password, 8);
+        var data = {
+            "_documentType": "operator",
+            "id": name,
+            "name": name,
+            "password": hashedPassword,
+            "operatorNumber": "0",
+            "ip": null,
+            "level": 0,
+            "blocked": false,
+            "superUser": false,
+            "tmstmp": "0x000000005E47C7F0",
+            "creationDate": null,
+            "deletionDate": null
+        }
+
+        bucket.manager().createPrimaryIndex(function() {
+            bucket.upsert(pk, data, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+
+                // create a token
+                var token = jwt.sign({ id: name }, config.secret, {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+                res.json({ auth: true, token: token });
+
+            });
+        });
+    },
+
+    login: function (res, name, password) {
+        let N1qlQuery = couchbase.N1qlQuery;
+        let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.name = "' + name + '"';
+        bucket.query(
+            N1qlQuery.fromString(sql),
+            function (err, users) {;
+                if (err) {
+                    //console.log(err);
+                    throw err;
+                }
+
+                var user = users[0];
+
+                var passwordIsValid = bcrypt.compareSync(password, user.password);
+                if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+                var token = jwt.sign({ id: user.name }, config.secret, {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+                res.json({ auth: true, token: token });
+            });
+
+    }
+
 };
-
-
-
 
 // =================================================================
 // module
