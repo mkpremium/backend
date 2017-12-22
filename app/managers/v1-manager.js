@@ -305,14 +305,34 @@ var v1Manager = {
             history['id'] = migrationManager.createGuid();
         }
 
-        migrationManager.upsertToDb('history:' + history.id, history, false);
-        res.json({done:true});
+        let worksheetId = history.worksheetId;
+        if (worksheetId) {
+
+            migrationManager.upsertToDb('history:' + history.id, history, false);
+
+            bucket.get('worksheetId:' + worksheetId, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                }
+                else {                   
+                    let worksheet = result.value;
+                    worksheet.history.push(history.id);                    
+                    migrationManager.upsertToDb('worksheetId:' + worksheetId, worksheet);
+                    res.json({done:true});
+                }                        
+            });
+        }
+        else {
+            res.json({done:false});
+        }
+
+        //res.json({done:true});
     },
 
     removeHistory: function (res, history){
         
         if (history['id']) {
-
 
             bucket.get('history:' + history.id, function(err, result) {
                 if (err) {
@@ -320,10 +340,10 @@ var v1Manager = {
                     res.json(err);
                 }
                 else {                   
-                    history = result.value;
-                    history['deleted'] = true;                        
-                    migrationManager.upsertToDb('history:' + history.id, history);
-                    res.json(history);
+                    let historyToDelete = result.value;
+                    historyToDelete['deleted'] = true;                        
+                    migrationManager.upsertToDb('history:' + history.id, historyToDelete);
+                    res.json(historyToDelete);
                 }                        
             });
 

@@ -241,6 +241,18 @@ router.get('/aux/0080', function(req, res) {
     migrationManager.importAuxiliar0080(res);        
 });
 
+router.get('/aux/0090', function(req, res) {    
+    migrationManager.importAuxiliar0090(res);        
+});
+
+router.get('/aux/0100', function(req, res) {    
+    migrationManager.importAuxiliar0100(res);        
+});
+
+router.get('/aux/0110', function(req, res) {    
+    migrationManager.importAuxiliar0110(res);        
+});
+
 // =================================================================
 // Common functions
 // =================================================================

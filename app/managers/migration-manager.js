@@ -786,11 +786,11 @@ var migrationManager = {
     // create empty array of owners when null
     importAuxiliar0090: function(res) {
         
-        console.log('IMPORT - AUX 008');
+        console.log('IMPORT - AUX 090');
         let t = this;
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
-            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" AND t.owners is null'),
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet"'),
             function (err, worksheets) {;              
                 //console.log(buildings);
 
@@ -801,9 +801,12 @@ var migrationManager = {
     
                 for(var i = 0; i < worksheets.length;i++) {                
                     let worksheet = worksheets[i];
-                    worksheet['owners'] = [];
 
-                    t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                    if (!worksheet.owners) {                        
+                        worksheet['owners'] = [];
+                        t.upsertToDb('worksheet:' + worksheet.id, worksheet, false);
+                    }
+                    
                 }    
     
                 if (res) {
@@ -816,7 +819,7 @@ var migrationManager = {
     // create notes documents from history
     importAuxiliar0100: function(res) {
         
-        console.log('IMPORT - AUX 008');
+        console.log('IMPORT - AUX 100');
         let t = this;
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
@@ -835,11 +838,11 @@ var migrationManager = {
                     let note = {
                         _documentType: "note",
                         id: history.id,
-                        notes: history.notes,
-                        notesDate: history.notes,
+                        note: history.notes,
+                        date: history.notesDate,
                         operatorId: history.operatorId,
                         // the fields are needed because, sometimes, worksheetId doesn't match
-                        number: history.notes,                        
+                        number: history.number,                        
                         owner: history.owner,
                         street: history.street,
                         worksheetId: history.worksheetId,
@@ -880,7 +883,7 @@ var migrationManager = {
                     if (worksheet.info.flags.filter(f => f.action == 'recall').length > 0) {
                         worksheet.info['fifo'] = 'RECALL';                        
                     }
-                    else if (worksheet.info.flags.filter(f => f.action == 'sells' && f.sells == false).length > 0) {
+                    else if (worksheet.info.flags.filter(f => f.action == 'sells' && f.sells == true).length > 0) {
                         worksheet.info['fifo'] = 'SELLS';
                     }
                     else if (worksheet.info.flags.filter(f => f.action == 'visit').length > 0) {
