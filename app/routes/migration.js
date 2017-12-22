@@ -184,8 +184,8 @@ router.get('/history/bulkimport', function(req, res) {
 
 // creation of index
 router.get('/aux/000', function(req, res) {        
-    migrationManager.importAuxiliar0000();
-    res.json({done: true});    
+    migrationManager.importAuxiliar0000(res);
+    //res.json({done: true});    
 });
 
 // auxiliar inserts

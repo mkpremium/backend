@@ -182,18 +182,34 @@ var migrationManager = {
     importAuxiliar0000: function(res) {
         var N1qlQuery = couchbase.N1qlQuery;
 
-        let sql1 = 'CREATE INDEX idx_documentType ON ' + config.bucketName + '(_documentType);';
-        let sql2 = 'CREATE INDEX idx_owner_001 ON ' + config.bucketName + '(_documentType, mainOwner.name) WHERE _documentType = "owner";'
-        let sql3 = 'CREATE INDEX idx_worksheet_001 ON ' + config.bucketName + '(_documentType, info.currentOwner.name, street, `number`) WHERE _documentType = "worksheet";'
-        let sql4 = 'CREATE INDEX idx_building_001 ON ' + config.bucketName + '(_documentType, ownerName, id) WHERE _documentType = "building";'
+        let sql1 = 'CREATE INDEX `idx_documentType` ON `' + config.bucketName + '`(`_documentType`)';
+        let sql2 = 'CREATE INDEX `idx_owner_001` ON `' + config.bucketName + '`(`_documentType`, `mainOwner`.`name`) WHERE `_documentType` = "owner";'
+        let sql3 = 'CREATE INDEX `idx_worksheet_001` ON `' + config.bucketName + '`(`_documentType`, `info`.`currentOwner`.`name`, `street`, `number`) WHERE `_documentType` = "worksheet";'
+        let sql4 = 'CREATE INDEX `idx_building_001` ON `' + config.bucketName + '`(`_documentType`, `ownerName`, `id`) WHERE `_documentType` = "building";'
 
-        bucket.query(N1qlQuery.fromString(sql1),function (err, result) {;});
-        bucket.query(N1qlQuery.fromString(sql2),function (err, result) {;});
-        bucket.query(N1qlQuery.fromString(sql3),function (err, result) {;});
-        bucket.query(N1qlQuery.fromString(sql4),function (err, result) {;});
+        bucket.query(N1qlQuery.fromString(sql1),function (err, result) {
+            if (err) {
+                console.log(err);                
+            }
+        });
+        bucket.query(N1qlQuery.fromString(sql2),function (err, result) {
+            if (err) {
+                console.log(err);                
+            }
+        });
+        bucket.query(N1qlQuery.fromString(sql3),function (err, result) {
+            if (err) {
+                console.log(err);                
+            }
+        });
+        bucket.query(N1qlQuery.fromString(sql4),function (err, result) {
+            if (err) {
+                console.log(err);                
+            }
+        });
 
         if (res) {
-            res.json(result);
+            res.json({ok:true});
         }
         
     },
