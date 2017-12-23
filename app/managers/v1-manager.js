@@ -5,6 +5,7 @@ cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
 var bcrypt      = require('bcrypt');
 var jwt         = require('jsonwebtoken');
+var uuid        = require('uuid');
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -189,11 +190,13 @@ var v1Manager = {
 
     register: function (res, name, password){
 
-        var pk = "operator:" + name;
+        var guid = uuid.v4();
+
+        var pk = "operator:" + guid;
         var hashedPassword = bcrypt.hashSync(password, 8);
         var data = {
             "_documentType": "operator",
-            "id": name,
+            "id": guid,
             "name": name,
             "password": hashedPassword,
             "operatorNumber": "0",
@@ -201,7 +204,7 @@ var v1Manager = {
             "level": 0,
             "blocked": false,
             "superUser": false,
-            "tmstmp": "0x000000005E47C7F0",
+            "tmstmp": "",
             "creationDate": null,
             "deletionDate": null
         }
@@ -214,7 +217,7 @@ var v1Manager = {
                 }
 
                 // create a token
-                var token = jwt.sign({ id: name }, config.secret, {
+                var token = jwt.sign({ id: guid }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
                 res.json({ auth: true, token: token });
@@ -234,11 +237,18 @@ var v1Manager = {
                     throw err;
                 }
 
+                if (users.length == 0) {
+                    return res.status(401).send({ auth: false, token: null });
+                }
+
                 var user = users[0];
 
                 var passwordIsValid = bcrypt.compareSync(password, user.password);
-                if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
-                var token = jwt.sign({ id: user.name }, config.secret, {
+                if (!passwordIsValid) {
+                    return res.status(401).send({ auth: false, token: null });
+                }
+
+                var token = jwt.sign({ id: user.id }, config.secret, {
                     expiresIn: 86400 // expires in 24 hours
                 });
                 res.json({ auth: true, token: token });
@@ -248,7 +258,7 @@ var v1Manager = {
 
     me: function (res, userId) {
         let N1qlQuery = couchbase.N1qlQuery;
-        let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.name = "' + userId + '"';
+        let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.id = "' + userId + '"';
         bucket.query(
             N1qlQuery.fromString(sql),
             function (err, users) {
