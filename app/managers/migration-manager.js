@@ -97,6 +97,13 @@ var migrationManager = {
         return this.upsertToDb(pk, data, response);
     },
 
+    importTempBankUpdate: function(obj, response) {
+        let inputData = new bank.BankInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'tempBankUpdate:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
     bulkImport: function(name, documentType, res) {
     
         //console.log('IMPORT - ' + documentType);

@@ -140,6 +140,16 @@ router.get('/buildings/bulkimport', function(req, res) {
     migrationManager.bulkImport('EDIFICIOS.csv', 'building', res);
 });
 
+
+// =================================================================
+// Migration endpoints: Banks
+// =================================================================
+
+router.get('/banks/importBank', function(req, res) {
+    migrationManager.bulkImport('BRUTO 4 COMUNIDADES.csv', 'tempBankUpdate', res);
+});
+
+
 // =================================================================
 // Migration endpoints: Operators
 // =================================================================
