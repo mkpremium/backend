@@ -17,6 +17,7 @@ var history     = require('../models/history');
 
 var modelHelper = require('../models/models-helper');
 var migrationManager = require('../managers/migration-manager');
+var verifyToken = require('../middleware/verify-token');
 
 router.use(function(req, res, next) {
   //console.log('Something is happening.');
@@ -145,8 +146,8 @@ router.get('/buildings/bulkimport', function(req, res) {
 // Migration endpoints: Banks
 // =================================================================
 
-router.get('/banks/importBank', function(req, res) {
-    migrationManager.bulkImport('BRUTO 4 COMUNIDADES.csv', 'tempBankUpdate', res);
+router.get('/banks/importBank', verifyToken, function(req, res) {
+    migrationManager.importBanks('BRUTO 4 COMUNIDADES.csv', 'tempBankUpdate', req.userId, res);
 });
 
 

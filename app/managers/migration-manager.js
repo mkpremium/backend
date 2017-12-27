@@ -12,6 +12,8 @@ var persons     = require('../models/persons');
 var houseStates = require('../models/housestate');
 var worksheets  = require('../models/worksheets');
 var history     = require('../models/history');
+var bank        = require('../models/bank');
+var uuid        = require('uuid');
 
 var migrationManager = {
 
@@ -171,6 +173,137 @@ var migrationManager = {
                     res.json({count: count, ok: ok, errors: errors});
                 }                
             })
+    },
+
+    importBanks: function (name, documentType, userId, res) {
+
+        var guid = uuid.v4();
+        const csv = require('csvtojson');
+        const csvFilePath = './app/csv/' + name;
+
+        let success = false;
+        let errors = [];
+        let data = {};
+        let checkFormedCSV = false;
+        let checkResult = false;
+        let inputBuildings = [];
+        let inputData = {
+            ticketId: guid,
+            userId: userId,
+            timestamp: Date.now()
+        };
+
+        csv({
+            delimiter: ","
+        })
+        .fromFile(csvFilePath)
+        .on('json', (jsonObj) => {
+            let bankFields = bank.BankDTO.BANK_FIELDS;
+
+            if (checkFormedCSV == false) {
+                checkFormedCSV = true;
+                let fields = Object.keys(jsonObj);
+                checkResult = modelHelper.checkCSVFormed(fields, bankFields);
+            }
+
+            if (checkResult == true) {
+                jsonObj = modelHelper.toLowerCaseRequest(jsonObj);
+                jsonObj['id'] = jsonObj.catastro;
+                inputBuildings.push(jsonObj);
+            } else {
+                var message = "Columns in CSV file aren't formed with list columns: " + bankFields.join(", ");
+                if (errors.indexOf(message) < 0) {
+                    errors.push(message);
+                }
+            }
+        })
+        .on('done', (error) => {
+            if (error) {
+                console.log('error', error);
+            }
+            else {
+                try {
+                    inputData.buildings = inputBuildings;
+
+                    console.log('Importing %s %s', documentType, inputData.ticketId);
+
+                    this.importTempBankUpdate(inputData, false);
+
+                    success = true;
+                    var news = [];
+                    var updated = [];
+                    var not_available = [];
+                    var tempBankUpdateData = [];
+                    var bankBuildingData = [];
+
+                    var N1qlQuery = couchbase.N1qlQuery;
+                    bucket.query(
+                        N1qlQuery.fromString('SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
+                        function (err, rows) {
+                            for (var i = 0; i < rows.length; i++) {
+                                bankBuildingData.push(rows[i]['id']);
+                            }
+
+                            bucket.query(
+                                N1qlQuery.fromString('SELECT t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND t.id = "' + inputData.ticketId + '"'),
+                                function (err, rows) {
+                                    if (rows.length > 0) {
+                                        var item = rows[0]['buildings'];
+                                        for (var i = 0; i < item.length; i++) {
+                                            tempBankUpdateData.push(item[i]['id']);
+                                        }
+
+                                        for(var i = 0; i < tempBankUpdateData.length; i++) {
+                                            if (bankBuildingData.indexOf(tempBankUpdateData[i]) >= 0) {
+                                                updated.push({'id' : tempBankUpdateData[i]});
+                                            } else {
+                                                news.push({'id' : tempBankUpdateData[i]});
+                                            }
+                                        }
+
+                                        for(var i = 0; i < bankBuildingData.length; i++) {
+                                            if (tempBankUpdateData.indexOf(bankBuildingData[i]) < 0) {
+                                                not_available.push({'id' : bankBuildingData[i]});
+                                            }
+                                        }
+                                    }
+
+                                    var buildings = {
+                                        'new': news,
+                                        'updated': updated,
+                                        'not_available': not_available
+                                    };
+
+                                    data = {
+                                        operation: 'checked',
+                                        ticketId: inputData.ticketId,
+                                        buildings: buildings,
+                                        expectedTimeNew: 0,
+                                        expectedTimeOutdated: 0
+                                    };
+
+                                    if (res) {
+                                        res.json({
+                                            success: success,
+                                            error: errors,
+                                            data: data
+                                        });
+                                    }
+                                });
+                            });
+                }
+                catch (e) {
+                    errors.push(e);
+                    if (res) {
+                        res.json({
+                            success: success,
+                            error: errors,
+                            data: data
+                        });
+                    }
+                }
+            }
+        })
     },
 
     deleteAll: function(res) {
