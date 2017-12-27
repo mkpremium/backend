@@ -152,6 +152,15 @@ router.get('/banks/importBank', verifyToken, function(req, res) {
 
 
 // =================================================================
+// Migration endpoints: BANKWORKSHEET
+// =================================================================
+
+router.get('/banks/confirmUpload', verifyToken, function(req, res) {
+    migrationManager.confirmUpload(req.query.ticketid, 'bankOperation', req.userId, res);
+});
+
+
+// =================================================================
 // Migration endpoints: Operators
 // =================================================================
 router.get('/operators', function(req, res) {    

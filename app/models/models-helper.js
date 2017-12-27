@@ -4,7 +4,7 @@ var toLowerCaseRequest = function (obj) {
     var newObj = {};
     while (n--) {
       key = keys[n];
-      newObj[key.toLowerCase()] = obj[key];
+      newObj[key.toLowerCase().replace(' ', '_')] = obj[key];
     }
     return newObj;
 };

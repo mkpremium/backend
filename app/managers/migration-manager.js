@@ -13,6 +13,8 @@ var houseStates = require('../models/housestate');
 var worksheets  = require('../models/worksheets');
 var history     = require('../models/history');
 var bank        = require('../models/bank');
+var bankOperation = require('../models/bankOperation');
+var bankBuilding = require('../models/bankBuilding');
 var uuid        = require('uuid');
 
 var migrationManager = {
@@ -21,7 +23,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "' + documentType + '" LIMIT 100'),
-            function (err, rows) {;          
+            function (err, rows) {
               res.json(rows);
             });
     },
@@ -103,6 +105,20 @@ var migrationManager = {
         let inputData = new bank.BankInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
         let pk = 'tempBankUpdate:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
+    importBankOperation: function(obj, response) {
+        let inputData = new bankOperation.BankOperationInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'bankOperation:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
+    importBankBuilding: function(obj, response) {
+        let inputData = new bankBuilding.BankBuildingInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'bankBuilding:' + data.id;
         return this.upsertToDb(pk, data, response);
     },
 
@@ -238,10 +254,10 @@ var migrationManager = {
 
                     var N1qlQuery = couchbase.N1qlQuery;
                     bucket.query(
-                        N1qlQuery.fromString('SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
+                        N1qlQuery.fromString('SELECT t.buildingId FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
                         function (err, rows) {
                             for (var i = 0; i < rows.length; i++) {
-                                bankBuildingData.push(rows[i]['id']);
+                                bankBuildingData.push(rows[i]['buildingId']);
                             }
 
                             bucket.query(
@@ -306,11 +322,137 @@ var migrationManager = {
         })
     },
 
+    confirmUpload: function (ticketId, documentType, userId, res) {
+
+        const csv = require('csvtojson');
+        const csvFilePath = './app/csv/BRUTO 4 COMUNIDADES.csv';
+
+        let success = false;
+        let errors = [];
+        let data = {};
+
+        let inputBuildings = [];
+        let inputOperationData = {
+            operationId: uuid.v4(),
+            timestamp: Date.now(),
+            operation: 'import',
+            processed: false
+        };
+
+        var current_timestamp = Date.now();
+
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.userId, t.timestamp, t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND ticketId = "' + ticketId + '"'),
+            (function (err, rows) {
+                if (rows.length > 0) {
+                    if (rows[0]['userId'] == userId) {
+                        var allowDays = 1;
+                        var now = Date.now();
+                        var days = (now - rows[0]['timestamp']) / 86400000;
+                        if (days <= allowDays) {
+                            success = true;
+                            var buildings = rows[0].buildings;
+                            var csvBuildingData = [];
+
+                            csv({
+                                delimiter: ","
+                            })
+                            .fromFile(csvFilePath)
+                            .on('json', (jsonObj) => {
+                                jsonObj = modelHelper.toLowerCaseRequest(jsonObj);
+                                csvBuildingData.push(jsonObj.catastro);
+                            })
+                            .on('done', (error) => {
+                                if (error) {
+                                    console.log('error', error);
+                                }
+                                else {
+                                    for(var i = 0; i < buildings.length; i++) {
+                                        inputBuildings.push({buildingId: buildings[i]['id']});
+
+                                        let inputBuildingData = {
+                                            id: uuid.v4(),
+                                            workflow: {
+                                                1: {'operation': 'buy', 'state': '', 'timestamp': current_timestamp},
+                                                2: {'operation': 'bought', 'state': '', 'timestamp': current_timestamp},
+                                                3: {'operation': 'sell', 'state': '', 'timestamp': current_timestamp},
+                                                4: {'operation': 'sold', 'state': '', 'timestamp': current_timestamp}
+                                            },
+                                            processTimestamp: false,
+                                            priceMetersZone: 0,
+                                            priceMetersLocation: 0,
+                                            priceZone: 0,
+                                            priceLocation: 0,
+                                            latitude: false,
+                                            longitude: false,
+                                            processed: false
+                                        };
+
+                                        var key;
+                                        var value;
+                                        var buildingFields = Object.keys(buildings[i]);
+                                        for(var j = 0; j < buildingFields.length; j++) {
+                                            value = buildings[i][buildingFields[j]];
+
+                                            if (buildingFields[j] == 'id') {
+                                                key = 'buildingId';
+                                                if (csvBuildingData.indexOf(value) < 0) {
+                                                    inputBuildingData['available'] = false;
+                                                } else {
+                                                    inputBuildingData['available'] = true;
+                                                }
+                                            } else {
+                                                key = buildingFields[j];
+                                            }
+
+                                            if (value.trim() != '' && bankBuilding.BankBuildingDTO.NUMBER_FIELDS.indexOf(key) >= 0) {
+                                                value = parseFloat(value);
+                                            }
+                                            inputBuildingData[key] =  value;
+                                        }
+
+                                        inputBuildingData['priceBuy'] = parseFloat(inputBuildingData['precio_web']) * 0.6;
+                                        inputBuildingData['priceSell'] = inputBuildingData['priceZone'] * parseFloat(inputBuildingData['sup_construida']) * 0.75;
+
+                                        //Create bank building document
+                                        this.importBankBuilding(inputBuildingData, false);
+                                    }
+
+                                    inputOperationData.buildings = inputBuildings;
+
+                                    console.log('Importing %s %s', documentType, inputOperationData.operationId);
+
+                                    //Create bank operation document
+                                    this.importBankOperation(inputOperationData, false);
+                                }
+                            });
+                        } else {
+                            errors.push("The timestamp is older than " + allowDays + " day(s).");
+                        }
+                    } else {
+                        errors.push("User ID doesn't match with User ID of access token");
+                    }
+                } else {
+                    errors.push("TempBankUpdate document not found with ticket id: " + ticketId);
+                }
+
+                if (res) {
+                    res.json({
+                        success: success,
+                        error: errors,
+                        data: data
+                    });
+                }
+            }).bind(this)
+        );
+    },
+
     deleteAll: function(res) {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('DELETE FROM ' + config.bucketName),
-            function (err, rows) {;          
+            function (err, rows) {
               res.json(rows);
             });
     },
@@ -392,7 +534,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "history" and worksheetId = "0" and owner is not null'),
-            function (err, rows) {;          
+            function (err, rows) {
     
                 if (err) {
                     console.log(err);
@@ -421,7 +563,7 @@ var migrationManager = {
                     let worksheetId = "0";
                     bucket.query(
                         N1qlQuery.fromString(sql),
-                        function (err, rows2) {;
+                        function (err, rows2) {
                             if (rows2 && rows2.length > 0) {
                                 //console.log('rows2', rows2[0]['id']);
                                 worksheetId = rows2[0]['id'];
@@ -452,7 +594,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT worksheetId, id FROM ' + config.bucketName + ' t WHERE t._documentType = "history" and worksheetId <> "0" order by worksheetId'),
-            function (err, rows) {;              
+            function (err, rows) {
                 //console.log(rows);
     
                 if (err) {
@@ -496,7 +638,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;        
         bucket.query(
             N1qlQuery.fromString('SELECT t.id, t.description FROM ' + config.bucketName + ' t WHERE t._documentType = "department"'),
-            function (err, departments) {;              
+            function (err, departments) {
                 
                 //console.log('departments', departments);
                 //res.json({done:true});
@@ -507,7 +649,7 @@ var migrationManager = {
                 
                 bucket.query(
                     N1qlQuery.fromString('SELECT t.id, t.departmentId FROM ' + config.bucketName + ' t WHERE t._documentType = "history" and departmentId is not null'),
-                    function (err, rows) {;              
+                    function (err, rows) {
                         //console.log(rows);
             
                         for(var i = 0; i < rows.length;i++) {                
@@ -547,7 +689,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet"'),
-            function (err, rows) {;              
+            function (err, rows) {
                 //console.log(rows);
 
                 if (err) {
@@ -564,7 +706,7 @@ var migrationManager = {
                         //console.log(sql);
                         bucket.query(
                             N1qlQuery.fromString(sql),
-                            function (err, owners) {;      
+                            function (err, owners) {
     
                                 //console.log('owners', owners);
                                 if (owners && owners.length > 0) {
@@ -600,7 +742,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "owner" and t.mainOwner.name = t.name'),
-            function (err, owners) {;              
+            function (err, owners) {
                 //console.log(owners);
 
                 if (err) {
@@ -615,7 +757,7 @@ var migrationManager = {
                         if (owner.mainOwner && owner.mainOwner.name) {
                             bucket.query(
                                 N1qlQuery.fromString('SELECT t.id FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet" and t.info.currentOwner.name = "' + owner.mainOwner.name + '"'),
-                                function (err, worksheets) {;      
+                                function (err, worksheets) {
             
                                     //console.log('worksheets', worksheets);
                                     if (worksheets && worksheets.length > 0) {
@@ -644,7 +786,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "worksheet"'),
-            function (err, rows) {;              
+            function (err, rows) {
                 //console.log(rows);
 
                 if (err) {
@@ -661,7 +803,7 @@ var migrationManager = {
                         //console.log(sql);
                         bucket.query(
                             N1qlQuery.fromString(sql),
-                            function (err, buildings) {;      
+                            function (err, buildings) {
     
                                 //console.log('owners', owners);
                                 if (buildings && buildings.length > 0) {
@@ -695,7 +837,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "building" AND ownerName is not null'),
-            function (err, buildings) {;              
+            function (err, buildings) {
                 //console.log(buildings);
 
                 if (err) {
@@ -711,7 +853,7 @@ var migrationManager = {
                     //console.log(sql);
                     bucket.query(
                         N1qlQuery.fromString(sql),
-                        function (err, worksheets) {;      
+                        function (err, worksheets) {
 
                             //console.log('owners', owners);
                             if (worksheets && worksheets.length > 0) {
