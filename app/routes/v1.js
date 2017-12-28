@@ -104,7 +104,7 @@ router.post('/persons/family/', function(req, res) {
 });
 
 router.post('/persons/brothers/', function(req, res) {        
-    v1Manager.getPersonBrothers(res, req.body.surname1, req.body.surname1, req.body.bornYear, req.body.id);
+    v1Manager.getPersonBrothers(res, req.body.surname1, req.body.surname2, req.body.bornYear, req.body.id);
 });
 
 router.post('/persons/sons/', function(req, res) {        
@@ -112,7 +112,7 @@ router.post('/persons/sons/', function(req, res) {
 });
 
 router.post('/persons/house/', function(req, res) {        
-    v1Manager.getPersonHouse(res, req.body.surname1, req.body.surname1Year, req.body.bornYear);
+    v1Manager.getPersonHouse(res, req.body.address, req.body.postalCode);
 });
 
 router.post('/housestate/get/:catastroid', function(req, res) {        
