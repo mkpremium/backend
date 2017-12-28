@@ -1,0 +1,41 @@
+{
+  "name": "try-cb",
+  "version": "0.1.0",
+  "description": "Sample Application for Couchbase, Node.js, Angular, and Express",
+  "homepage": "http://www.couchbase.com",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ToddGreenstein/try-cb-nodejs.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Todd Greenstein",
+    "email": "todd@couchbase.com"
+  },
+  "readme": "README.md",
+  "dependencies": {
+    "express": "*",
+    "couchbase": "~2.2.2",
+    "body-parser": "*",
+    "progress": "*",
+    "request": "*",
+    "jsonwebtoken": "git+https://github.com/jppellerin/node-jsonwebtoken.git",
+    "haversine": "*",
+    "faye": "*",
+    "ottoman": "*"
+  },
+  "scripts": {
+    "build": "node utils/provision.js",
+    "start": "node app.js"
+  },
+  "contributors": [
+    {
+      "name": "Todd Greenstein",
+      "email": "todd@couchbase.com"
+    },
+    {
+      "name": "Nic Raboy",
+      "email": "nic@couchbase.com"
+    }
+  ]
+}
