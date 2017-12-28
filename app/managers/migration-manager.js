@@ -412,8 +412,23 @@ var migrationManager = {
                                             inputBuildingData[key] =  value;
                                         }
 
+                                        //Set value for priceBuy and priceSell
                                         inputBuildingData['priceBuy'] = parseFloat(inputBuildingData['precio_web']) * 0.6;
                                         inputBuildingData['priceSell'] = inputBuildingData['priceZone'] * parseFloat(inputBuildingData['sup_construida']) * 0.75;
+
+                                        //Set false for buy operation
+                                        var pisoArr = ['-1', '-2', '0', '00', 'BAJ', 'BAJA', 'BAJO', 'BAJOS', 'BJ', 'BJ-1', 'BX', 'PB', 'S1', 'SO', 'SOT', 'SM', 'SMS'];
+                                        var cituacionArr = ['OBRA NUEVA EN CURSO. TERMINADA FISICAMENTE PERO NO REGISTRALMENTE', 'OBRA NUEVA EN CURSO. NO TERMINADA FISICAMENTE', 'ACTIVO EN RUINA', 'PROINDIVISO'];
+                                        if (inputBuildingData['available'] == true
+                                            && (inputBuildingData['tipo1'] != 'VIVIENDA')
+                                            && (inputBuildingData['tipo2'] == 'PISO' && pisoArr.indexOf(inputBuildingData['piso']) >= 0)
+                                            && (cituacionArr.indexOf(inputBuildingData['cituacion']) >= 0)
+                                            && (inputBuildingData['priceZona'] < inputBuildingData['priceLocation'])
+                                            && ((inputBuildingData['priceSell'] - inputBuildingData['priceBuy']) / inputBuildingData['priceBuy'] < 1)
+                                            && (inputBuildingData['priceSell'] - inputBuildingData['priceBuy'] < 40000)
+                                            && (inputBuildingData['priceBuy'] < inputBuildingData['priceMetersZone'] * 26)) {
+                                            inputBuildingData['workflow'][1]['state'] = false;
+                                        }
 
                                         //Create bank building document
                                         this.importBankBuilding(inputBuildingData, false);
