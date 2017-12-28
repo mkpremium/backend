@@ -17,6 +17,7 @@ var history     = require('../models/history');
 
 var modelHelper = require('../models/models-helper');
 var migrationManager = require('../managers/migration-manager');
+var verifyToken = require('../middleware/verify-token');
 
 router.use(function(req, res, next) {
   //console.log('Something is happening.');
@@ -59,6 +60,69 @@ router.get('/importall', function(req, res) {
 
 });
 
+router.get('/importaux', function(req, res) {
+    
+    console.log('IMPORT AUX');    
+
+    migrationManager.importAuxiliar001();
+    
+    migrationManager.importAuxiliar002(null);
+    
+    migrationManager.importAuxiliar003(null);
+    
+    migrationManager.importAuxiliar004(null);
+    
+    migrationManager.importAuxiliar005(null);
+    
+    migrationManager.importAuxiliar006(null);
+    
+    migrationManager.importAuxiliar007(null);
+    
+    migrationManager.importAuxiliar008(null);
+    
+    res.json({done: true});
+
+});
+
+
+router.get('/importaux01', function(req, res) {    
+    migrationManager.importAuxiliar001();
+    
+    
+    res.json({done: true});
+
+});
+
+router.get('/importaux/:id', function(req, res) {    
+
+    if (req.params.id == '001') {
+        migrationManager.importAuxiliar001();    
+        res.json({done: true});
+    }
+    else if (req.params.id == '002') {
+        migrationManager.importAuxiliar002(res);    
+    }
+    else if (req.params.id == '003') {
+        migrationManager.importAuxiliar003(res);    
+    }
+    else if (req.params.id == '004') {
+        migrationManager.importAuxiliar004(res);    
+    }
+    else if (req.params.id == '005') {
+        migrationManager.importAuxiliar005(res);    
+    }
+    else if (req.params.id == '006') {
+        migrationManager.importAuxiliar006(res);    
+    }
+    else if (req.params.id == '007') {
+        migrationManager.importAuxiliar007(res);    
+    }
+    else if (req.params.id == '008') {
+        migrationManager.importAuxiliar008(res);    
+    }
+    
+
+});
 
 // =================================================================
 // Migration endpoints: Buildings
@@ -76,6 +140,25 @@ router.post('/buildings', function(req, res) {
 router.get('/buildings/bulkimport', function(req, res) {    
     migrationManager.bulkImport('EDIFICIOS.csv', 'building', res);
 });
+
+
+// =================================================================
+// Migration endpoints: Banks
+// =================================================================
+
+router.get('/banks/importBank', verifyToken, function(req, res) {
+    migrationManager.importBanks('BRUTO 4 COMUNIDADES.csv', 'tempBankUpdate', req.userId, res);
+});
+
+
+// =================================================================
+// Migration endpoints: BANKWORKSHEET
+// =================================================================
+
+router.get('/banks/confirmUpload', verifyToken, function(req, res) {
+    migrationManager.confirmUpload(req.query.ticketid, 'bankOperation', req.userId, res);
+});
+
 
 // =================================================================
 // Migration endpoints: Operators
@@ -181,6 +264,7 @@ router.get('/history/bulkimport', function(req, res) {
 // =================================================================
 // Migration endpoints: other
 // =================================================================
+
 
 // creation of index
 router.get('/aux/000', function(req, res) {        

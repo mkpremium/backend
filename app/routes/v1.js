@@ -17,7 +17,7 @@ var bucket      = cluster.openBucket(config.bucketName);
 
 // var modelHelper = require('../models/models-helper');
 var v1Manager = require('../managers/v1-manager');
-
+var verifyToken = require('../middleware/verify-token');
 
 router.use(function(req, res, next) {
   //console.log('Something is happening.');
@@ -115,11 +115,9 @@ router.post('/persons/house/', function(req, res) {
     v1Manager.getPersonHouse(res, req.body.surname1, req.body.surname1Year, req.body.bornYear);
 });
 
-
 router.post('/housestate/get/:catastroid', function(req, res) {        
     v1Manager.getHouseState(res, req.body.catastroid);
 });
-
 
 router.post('/history/add/', function(req, res) {        
     v1Manager.addHistory(res, req.body.history);
@@ -131,6 +129,18 @@ router.post('/history/remove/', function(req, res) {
 
 router.post('/history/search/', function(req, res) {        
     v1Manager.searchHistory(res, req.body.search);
+});
+
+router.post('/operator/register', function(req, res) {
+    v1Manager.register(res, req.body.name, req.body.password);
+});
+
+router.post('/operator/login', function(req, res) {
+    v1Manager.login(res, req.body.name, req.body.password);
+});
+
+router.get('/me', verifyToken, function(req, res) {
+    v1Manager.me(res, req.userId);
 });
 
 // =================================================================

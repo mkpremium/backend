@@ -1,12 +1,8 @@
 var config      = require('../../config');
 var couchbase   = require('couchbase');
 var cluster     = new couchbase.Cluster(config.database);
-var auth        = cluster.authenticate(config.databaseUser, config.databasePassword);
+cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
-
-// var bucket = config.couchbase.bucket;
-// var myCluster = new couchbase.Cluster(endPoint + "?detailed_errcodes=true");
-// var myBucket=myCluster.openBucket(bucket, config.couchbase.bucketPassword);
 
 var modelHelper = require('../models/models-helper');
 var buildings   = require('../models/building');
@@ -16,6 +12,10 @@ var persons     = require('../models/persons');
 var houseStates = require('../models/housestate');
 var worksheets  = require('../models/worksheets');
 var history     = require('../models/history');
+var bank        = require('../models/bank');
+var bankOperation = require('../models/bankOperation');
+var bankBuilding = require('../models/bankBuilding');
+var uuid        = require('uuid');
 
 var migrationManager = {
 
@@ -23,7 +23,7 @@ var migrationManager = {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "' + documentType + '" LIMIT 100'),
-            function (err, rows) {;          
+            function (err, rows) {
               res.json(rows);
             });
     },
@@ -31,24 +31,24 @@ var migrationManager = {
 
     upsertToDb: function(pk, data, response) {
         
-        //bucket.manager().createPrimaryIndex(function() {
+        bucket.manager().createPrimaryIndex(function() {
             bucket.upsert(pk, data, function(err, result) {
                 if (err) {
                     console.log(err);
-                    //throw err;
+                    throw err;
                 }
                 if (response) {
                     bucket.get(pk, function(err, result) {
                         if (err) {
                             console.log(err);
-                            //throw err;
+                            throw err;
                         }
                         //console.log(result.value);
                         return result;
                     });
                 }
             });
-        //});
+        });
         return;
     },
 
@@ -98,6 +98,27 @@ var migrationManager = {
         let inputData = new history.HistoryInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
         let pk = 'history:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
+    importTempBankUpdate: function(obj, response) {
+        let inputData = new bank.BankInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'tempBankUpdate:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
+    importBankOperation: function(obj, response) {
+        let inputData = new bankOperation.BankOperationInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'bankOperation:' + data.id;
+        return this.upsertToDb(pk, data, response);
+    },
+
+    importBankBuilding: function(obj, response) {
+        let inputData = new bankBuilding.BankBuildingInputDTO(modelHelper.toLowerCaseRequest(obj));
+        let data = inputData.toDatabase();
+        let pk = 'bankBuilding:' + data.id;
         return this.upsertToDb(pk, data, response);
     },
 
@@ -170,11 +191,283 @@ var migrationManager = {
             })
     },
 
+    importBanks: function (name, documentType, userId, res) {
+
+        var guid = uuid.v4();
+        const csv = require('csvtojson');
+        const csvFilePath = './app/csv/' + name;
+
+        let success = false;
+        let errors = [];
+        let data = {};
+        let checkFormedCSV = false;
+        let checkResult = false;
+        let inputBuildings = [];
+        let inputData = {
+            ticketId: guid,
+            userId: userId,
+            timestamp: Date.now()
+        };
+
+        csv({
+            delimiter: ","
+        })
+        .fromFile(csvFilePath)
+        .on('json', (jsonObj) => {
+            let bankFields = bank.BankDTO.BANK_FIELDS;
+
+            if (checkFormedCSV == false) {
+                checkFormedCSV = true;
+                let fields = Object.keys(jsonObj);
+                checkResult = modelHelper.checkCSVFormed(fields, bankFields);
+            }
+
+            if (checkResult == true) {
+                jsonObj = modelHelper.toLowerCaseRequest(jsonObj);
+                jsonObj['id'] = jsonObj.catastro;
+                inputBuildings.push(jsonObj);
+            } else {
+                var message = "Columns in CSV file aren't formed with list columns: " + bankFields.join(", ");
+                if (errors.indexOf(message) < 0) {
+                    errors.push(message);
+                }
+            }
+        })
+        .on('done', (error) => {
+            if (error) {
+                console.log('error', error);
+            }
+            else {
+                try {
+                    inputData.buildings = inputBuildings;
+
+                    console.log('Importing %s %s', documentType, inputData.ticketId);
+
+                    this.importTempBankUpdate(inputData, false);
+
+                    success = true;
+                    var news = [];
+                    var updated = [];
+                    var not_available = [];
+                    var tempBankUpdateData = [];
+                    var bankBuildingData = [];
+
+                    var N1qlQuery = couchbase.N1qlQuery;
+                    bucket.query(
+                        N1qlQuery.fromString('SELECT t.buildingId FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
+                        function (err, rows) {
+                            for (var i = 0; i < rows.length; i++) {
+                                bankBuildingData.push(rows[i]['buildingId']);
+                            }
+
+                            bucket.query(
+                                N1qlQuery.fromString('SELECT t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND t.id = "' + inputData.ticketId + '"'),
+                                function (err, rows) {
+                                    if (rows.length > 0) {
+                                        var item = rows[0]['buildings'];
+                                        for (var i = 0; i < item.length; i++) {
+                                            tempBankUpdateData.push(item[i]['id']);
+                                        }
+
+                                        for(var i = 0; i < tempBankUpdateData.length; i++) {
+                                            if (bankBuildingData.indexOf(tempBankUpdateData[i]) >= 0) {
+                                                updated.push({'id' : tempBankUpdateData[i]});
+                                            } else {
+                                                news.push({'id' : tempBankUpdateData[i]});
+                                            }
+                                        }
+
+                                        for(var i = 0; i < bankBuildingData.length; i++) {
+                                            if (tempBankUpdateData.indexOf(bankBuildingData[i]) < 0) {
+                                                not_available.push({'id' : bankBuildingData[i]});
+                                            }
+                                        }
+                                    }
+
+                                    var buildings = {
+                                        'new': news,
+                                        'updated': updated,
+                                        'not_available': not_available
+                                    };
+
+                                    data = {
+                                        operation: 'checked',
+                                        ticketId: inputData.ticketId,
+                                        buildings: buildings,
+                                        expectedTimeNew: 0,
+                                        expectedTimeOutdated: 0
+                                    };
+
+                                    if (res) {
+                                        res.json({
+                                            success: success,
+                                            error: errors,
+                                            data: data
+                                        });
+                                    }
+                                });
+                            });
+                }
+                catch (e) {
+                    errors.push(e);
+                    if (res) {
+                        res.json({
+                            success: success,
+                            error: errors,
+                            data: data
+                        });
+                    }
+                }
+            }
+        })
+    },
+
+    confirmUpload: function (ticketId, documentType, userId, res) {
+
+        const csv = require('csvtojson');
+        const csvFilePath = './app/csv/BRUTO 4 COMUNIDADES.csv';
+
+        let success = false;
+        let errors = [];
+        let data = {};
+
+        let inputBuildings = [];
+        let inputOperationData = {
+            operationId: uuid.v4(),
+            timestamp: Date.now(),
+            operation: 'import',
+            processed: false
+        };
+
+        var current_timestamp = Date.now();
+
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.userId, t.timestamp, t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND ticketId = "' + ticketId + '"'),
+            (function (err, rows) {
+                if (rows.length > 0) {
+                    if (rows[0]['userId'] == userId) {
+                        var allowDays = 1;
+                        var now = Date.now();
+                        var days = (now - rows[0]['timestamp']) / 86400000;
+                        if (days <= allowDays) {
+                            success = true;
+                            var buildings = rows[0].buildings;
+                            var csvBuildingData = [];
+
+                            csv({
+                                delimiter: ","
+                            })
+                            .fromFile(csvFilePath)
+                            .on('json', (jsonObj) => {
+                                jsonObj = modelHelper.toLowerCaseRequest(jsonObj);
+                                csvBuildingData.push(jsonObj.catastro);
+                            })
+                            .on('done', (error) => {
+                                if (error) {
+                                    console.log('error', error);
+                                }
+                                else {
+                                    for(var i = 0; i < buildings.length; i++) {
+                                        inputBuildings.push({buildingId: buildings[i]['id']});
+
+                                        let inputBuildingData = {
+                                            id: uuid.v4(),
+                                            workflow: {
+                                                1: {'operation': 'buy', 'state': '', 'timestamp': current_timestamp},
+                                                2: {'operation': 'bought', 'state': '', 'timestamp': current_timestamp},
+                                                3: {'operation': 'sell', 'state': '', 'timestamp': current_timestamp},
+                                                4: {'operation': 'sold', 'state': '', 'timestamp': current_timestamp}
+                                            },
+                                            processTimestamp: false,
+                                            priceMetersZone: 0,
+                                            priceMetersLocation: 0,
+                                            priceZone: 0,
+                                            priceLocation: 0,
+                                            latitude: false,
+                                            longitude: false,
+                                            processed: false
+                                        };
+
+                                        var key;
+                                        var value;
+                                        var buildingFields = Object.keys(buildings[i]);
+                                        for(var j = 0; j < buildingFields.length; j++) {
+                                            value = buildings[i][buildingFields[j]];
+
+                                            if (buildingFields[j] == 'id') {
+                                                key = 'buildingId';
+                                                if (csvBuildingData.indexOf(value) < 0) {
+                                                    inputBuildingData['available'] = false;
+                                                } else {
+                                                    inputBuildingData['available'] = true;
+                                                }
+                                            } else {
+                                                key = buildingFields[j];
+                                            }
+
+                                            if (value.trim() != '' && bankBuilding.BankBuildingDTO.NUMBER_FIELDS.indexOf(key) >= 0) {
+                                                value = parseFloat(value);
+                                            }
+                                            inputBuildingData[key] =  value;
+                                        }
+
+                                        //Set value for priceBuy and priceSell
+                                        inputBuildingData['priceBuy'] = parseFloat(inputBuildingData['precio_web']) * 0.6;
+                                        inputBuildingData['priceSell'] = inputBuildingData['priceZone'] * parseFloat(inputBuildingData['sup_construida']) * 0.75;
+
+                                        //Set false for buy operation
+                                        var pisoArr = ['-1', '-2', '0', '00', 'BAJ', 'BAJA', 'BAJO', 'BAJOS', 'BJ', 'BJ-1', 'BX', 'PB', 'S1', 'SO', 'SOT', 'SM', 'SMS'];
+                                        var cituacionArr = ['OBRA NUEVA EN CURSO. TERMINADA FISICAMENTE PERO NO REGISTRALMENTE', 'OBRA NUEVA EN CURSO. NO TERMINADA FISICAMENTE', 'ACTIVO EN RUINA', 'PROINDIVISO'];
+                                        if (inputBuildingData['available'] == true
+                                            && (inputBuildingData['tipo1'] != 'VIVIENDA')
+                                            && (inputBuildingData['tipo2'] == 'PISO' && pisoArr.indexOf(inputBuildingData['piso']) >= 0)
+                                            && (cituacionArr.indexOf(inputBuildingData['cituacion']) >= 0)
+                                            && (inputBuildingData['priceZona'] < inputBuildingData['priceLocation'])
+                                            && ((inputBuildingData['priceSell'] - inputBuildingData['priceBuy']) / inputBuildingData['priceBuy'] < 1)
+                                            && (inputBuildingData['priceSell'] - inputBuildingData['priceBuy'] < 40000)
+                                            && (inputBuildingData['priceBuy'] < inputBuildingData['priceMetersZone'] * 26)) {
+                                            inputBuildingData['workflow'][1]['state'] = false;
+                                        }
+
+                                        //Create bank building document
+                                        this.importBankBuilding(inputBuildingData, false);
+                                    }
+
+                                    inputOperationData.buildings = inputBuildings;
+
+                                    console.log('Importing %s %s', documentType, inputOperationData.operationId);
+
+                                    //Create bank operation document
+                                    this.importBankOperation(inputOperationData, false);
+                                }
+                            });
+                        } else {
+                            errors.push("The timestamp is older than " + allowDays + " day(s).");
+                        }
+                    } else {
+                        errors.push("User ID doesn't match with User ID of access token");
+                    }
+                } else {
+                    errors.push("TempBankUpdate document not found with ticket id: " + ticketId);
+                }
+
+                if (res) {
+                    res.json({
+                        success: success,
+                        error: errors,
+                        data: data
+                    });
+                }
+            }).bind(this)
+        );
+    },
+
     deleteAll: function(res) {
         var N1qlQuery = couchbase.N1qlQuery;
         bucket.query(
             N1qlQuery.fromString('DELETE FROM ' + config.bucketName),
-            function (err, rows) {;          
+            function (err, rows) {
               res.json(rows);
             });
     },

@@ -1,10 +1,20 @@
-var config           = require('../../config');
-var couchbase        = require('couchbase');
-var cluster          = new couchbase.Cluster(config.database);
+var config      = require('../../config');
+var couchbase   = require('couchbase');
+var cluster     = new couchbase.Cluster(config.database);
 cluster.authenticate(config.databaseUser, config.databasePassword);
-var bucket           = cluster.openBucket(config.bucketName);
-var migrationManager = require('../managers/migration-manager');
+var bucket      = cluster.openBucket(config.bucketName);
+var bcrypt      = require('bcrypt');
+var jwt         = require('jsonwebtoken');
+var uuid        = require('uuid');
 
+// var modelHelper = require('../models/models-helper');
+// var buildings   = require('../models/building');
+// var operators   = require('../models/operators');
+// var owners      = require('../models/owners');
+// var persons     = require('../models/persons');
+// var houseStates = require('../models/housestate');
+// var worksheets  = require('../models/worksheets');
+// var history     = require('../models/history');
 
 var v1Manager = {
 
@@ -392,10 +402,95 @@ var v1Manager = {
         }
     },   
 
+
+    register: function (res, name, password){
+
+        var guid = uuid.v4();
+
+        var pk = "operator:" + guid;
+        var hashedPassword = bcrypt.hashSync(password, 8);
+        var data = {
+            "_documentType": "operator",
+            "id": guid,
+            "name": name,
+            "password": hashedPassword,
+            "operatorNumber": "0",
+            "ip": null,
+            "level": 0,
+            "blocked": false,
+            "superUser": false,
+            "tmstmp": "",
+            "creationDate": null,
+            "deletionDate": null
+        }
+
+        bucket.manager().createPrimaryIndex(function() {
+            bucket.upsert(pk, data, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+
+                // create a token
+                var token = jwt.sign({ id: guid }, config.secret, {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+                res.json({ auth: true, token: token });
+
+            });
+        });
+    },
+
+    login: function (res, name, password) {
+        let N1qlQuery = couchbase.N1qlQuery;
+        let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.name = "' + name + '"';
+        bucket.query(
+            N1qlQuery.fromString(sql),
+            function (err, users) {
+                if (err) {
+                    //console.log(err);
+                    throw err;
+                }
+
+                if (users.length == 0) {
+                    return res.status(401).send({ auth: false, token: null });
+                }
+
+                var user = users[0];
+
+                var passwordIsValid = bcrypt.compareSync(password, user.password);
+                if (!passwordIsValid) {
+                    return res.status(401).send({ auth: false, token: null });
+                }
+
+                var token = jwt.sign({ id: user.id }, config.secret, {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+                res.json({ auth: true, token: token });
+            });
+
+    },
+
+    me: function (res, userId) {
+        let N1qlQuery = couchbase.N1qlQuery;
+        let sql = 'SELECT t.* FROM mkpremium t WHERE t._documentType = "operator" AND t.id = "' + userId + '"';
+        bucket.query(
+            N1qlQuery.fromString(sql),
+            function (err, users) {
+                if (err) {
+                    //console.log(err);
+                    throw err;
+                }
+
+                if (users.length == 0) {
+                    return res.status(404).send("No user found.");
+                }
+                res.json(users[0]);
+            });
+
+    }
+
 };
-
-
-
 
 // =================================================================
 // module

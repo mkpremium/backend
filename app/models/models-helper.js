@@ -1,10 +1,10 @@
 var toLowerCaseRequest = function (obj) {    
     var key, keys = Object.keys(obj);
     var n = keys.length;
-    var newObj={}
+    var newObj = {};
     while (n--) {
       key = keys[n];
-      newObj[key.toLowerCase()] = obj[key];
+      newObj[key.toLowerCase().replace(' ', '_')] = obj[key];
     }
     return newObj;
 };
@@ -22,7 +22,21 @@ var removeNulls = function(obj) {
 
     // insert or update
     return obj;
-}
+};
+
+var checkCSVFormed = function(fields, bankFields) {
+    if (fields.length === bankFields.length) {
+        for (var i = 0; i < fields.length; i++) {
+            if (fields[i] !== bankFields[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    } else {
+        return false;
+    }
+};
 
 
 // =================================================================
@@ -30,6 +44,7 @@ var removeNulls = function(obj) {
 // =================================================================
 module.exports.toLowerCaseRequest = toLowerCaseRequest;
 module.exports.removeNulls = removeNulls;
+module.exports.checkCSVFormed = checkCSVFormed;
 
 
 
