@@ -14,7 +14,10 @@
     "express": "^4.13.4",
     "jsonwebtoken": "^5.7.0",
     "morgan": "^1.7.0",
+    "request": "^2.83.0",
     "tcomb": "^3.2.24",
-    "uuid": "^3.1.0"
+    "utm-latlng": "^1.0.3",
+    "uuid": "^3.1.0",
+    "xmldoc": "^1.1.0"
   }
 }

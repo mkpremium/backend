@@ -1,5 +1,8 @@
 var config      = require('../../config');
 var couchbase   = require('couchbase');
+var request     = require('request');
+var xmldoc      = require('xmldoc');
+var utmObj      = require('utm-latlng');
 var cluster     = new couchbase.Cluster(config.database);
 cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
@@ -16,6 +19,7 @@ var bank        = require('../models/bank');
 var bankOperation = require('../models/bankOperation');
 var bankBuilding = require('../models/bankBuilding');
 var uuid        = require('uuid');
+var bankBuildings = {};
 
 var migrationManager = {
 
@@ -108,14 +112,14 @@ var migrationManager = {
         return this.upsertToDb(pk, data, response);
     },
 
-    importBankOperation: function(obj, response) {
+    createBankOperation: function(obj, response) {
         let inputData = new bankOperation.BankOperationInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
         let pk = 'bankOperation:' + data.id;
         return this.upsertToDb(pk, data, response);
     },
 
-    importBankBuilding: function(obj, response) {
+    createBankBuilding: function(obj, response) {
         let inputData = new bankBuilding.BankBuildingInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
         let pk = 'bankBuilding:' + data.id;
@@ -322,7 +326,7 @@ var migrationManager = {
         })
     },
 
-    confirmUpload: function (ticketId, documentType, userId, res) {
+    confirmUpload: function (ticketId, processOutdated, documentType, userId, res) {
 
         const csv = require('csvtojson');
         const csvFilePath = './app/csv/BRUTO 4 COMUNIDADES.csv';
@@ -379,14 +383,8 @@ var migrationManager = {
                                                 3: {'operation': 'sell', 'state': '', 'timestamp': current_timestamp},
                                                 4: {'operation': 'sold', 'state': '', 'timestamp': current_timestamp}
                                             },
-                                            processTimestamp: false,
                                             priceMetersZone: 0,
-                                            priceMetersLocation: 0,
-                                            priceZone: 0,
-                                            priceLocation: 0,
-                                            latitude: false,
-                                            longitude: false,
-                                            processed: false
+                                            priceMetersLocation: 0
                                         };
 
                                         var key;
@@ -414,7 +412,6 @@ var migrationManager = {
 
                                         //Set value for priceBuy and priceSell
                                         inputBuildingData['priceBuy'] = parseFloat(inputBuildingData['precio_web']) * 0.6;
-                                        inputBuildingData['priceSell'] = inputBuildingData['priceZone'] * parseFloat(inputBuildingData['sup_construida']) * 0.75;
 
                                         //Set false for buy operation
                                         var pisoArr = ['-1', '-2', '0', '00', 'BAJ', 'BAJA', 'BAJO', 'BAJOS', 'BJ', 'BJ-1', 'BX', 'PB', 'S1', 'SO', 'SOT', 'SM', 'SMS'];
@@ -430,16 +427,158 @@ var migrationManager = {
                                             inputBuildingData['workflow'][1]['state'] = false;
                                         }
 
-                                        //Create bank building document
-                                        this.importBankBuilding(inputBuildingData, false);
+                                        inputBuildingData['processTimestamp'] = Date.now();
+                                        bankBuildings[inputBuildingData['buildingId']] = inputBuildingData;
+
+                                        this.getInfoCatastro(inputBuildingData['buildingId'], (function (catastroObj) {
+                                            var SRS = bankBuilding.BankBuildingDTO.SRS[catastroObj['srs']];
+                                            var zoneNum = bankBuilding.BankBuildingDTO.ZONE_NUM[catastroObj['srs']];
+                                            var utm = new utmObj(SRS);
+                                            var latLongObj = utm.convertUtmToLatLng(catastroObj['xcen'], catastroObj['ycen'], zoneNum, 'N');
+
+                                            bankBuildings[catastroObj['buildingId']]['latitude'] = latLongObj['lat'];
+                                            bankBuildings[catastroObj['buildingId']]['longitude'] = latLongObj['lng'];
+
+                                            this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], 1, '', 10, function (result) {
+                                                bankBuildings[result['buildingId']]['priceZone'] = result['avg'];
+                                            });
+
+                                            this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', inputBuildingData['comunidad'], 50, function (result) {
+                                                bankBuildings[result['buildingId']]['priceLocation'] = result['avg'];
+                                            });
+                                        }).bind(this));
                                     }
+
+                                    var returned = false;
+                                    var expectedTimeOutdated = 0;
+                                    if (processOutdated == "true") {
+                                        N1qlQuery = couchbase.N1qlQuery;
+                                        bucket.query(
+                                            N1qlQuery.fromString('SELECT t.processTimestamp FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
+                                            function (err, rows) {
+                                                if (rows.length > 0) {
+                                                    var now = Date.now();
+                                                    for (var i = 0; i < rows.length; i++) {
+                                                        var days = (now - rows[i]['processTimestamp']) / 86400000;
+                                                        if (days > 30) { //not processed 1 month ago
+                                                            expectedTimeOutdated++;
+                                                        }
+                                                    }
+                                                }
+                                                returned = true;
+                                            });
+                                    }
+
+                                    var createBankBuilding = (function () {
+                                        setTimeout((function () {
+                                            var done = true;
+                                            var bankBuilding;
+                                            var buildingFields = Object.keys(bankBuildings);
+                                            for(var j = 0; j < buildingFields.length; j++) {
+                                                bankBuilding = bankBuildings[buildingFields[j]];
+                                                if (bankBuilding['latitude'] == undefined || bankBuilding['longitude'] == undefined || bankBuilding['priceZone'] == undefined){
+                                                    done = false;
+                                                    break;
+                                                }
+                                            }
+
+                                            if ((processOutdated == undefined || processOutdated == "false" || returned == true) && done == true) {
+                                                for(var j = 0; j < buildingFields.length; j++) {
+                                                    bankBuilding = bankBuildings[buildingFields[j]];
+                                                    bankBuilding['priceSell'] = bankBuilding['priceZone'] * parseFloat(bankBuilding['sup_construida']) * 0.75;
+                                                    //Create bank building document
+                                                    this.createBankBuilding(bankBuilding, false);
+                                                }
+
+                                                inputOperationData['processed'] = true;
+                                                //Update processed to true of bank operation document
+                                                this.createBankOperation(inputOperationData, false);
+                                            } else {
+                                                createBankBuilding();
+                                            }
+                                        }).bind(this), 1000);
+                                    }).bind(this);
+
+                                    createBankBuilding();
 
                                     inputOperationData.buildings = inputBuildings;
 
                                     console.log('Importing %s %s', documentType, inputOperationData.operationId);
 
                                     //Create bank operation document
-                                    this.importBankOperation(inputOperationData, false);
+                                    this.createBankOperation(inputOperationData, false);
+
+                                    //Handle response
+                                    var news = [];
+                                    var updated = [];
+                                    var not_available = [];
+                                    var tempBankUpdateData = [];
+                                    var bankBuildingData = [];
+
+                                    var N1qlQuery = couchbase.N1qlQuery;
+                                    bucket.query(
+                                        N1qlQuery.fromString('SELECT t.buildingId FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
+                                        function (err, rows) {
+                                            for (var i = 0; i < rows.length; i++) {
+                                                bankBuildingData.push(rows[i]['buildingId']);
+                                            }
+
+                                            bucket.query(
+                                                N1qlQuery.fromString('SELECT t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND t.id = "' + ticketId + '"'),
+                                                function (err, rows) {
+                                                    if (rows.length > 0) {
+                                                        var item = rows[0]['buildings'];
+                                                        for (var i = 0; i < item.length; i++) {
+                                                            tempBankUpdateData.push(item[i]['id']);
+                                                        }
+
+                                                        for(var i = 0; i < tempBankUpdateData.length; i++) {
+                                                            if (bankBuildingData.indexOf(tempBankUpdateData[i]) >= 0) {
+                                                                updated.push({'id' : tempBankUpdateData[i]});
+                                                            } else {
+                                                                news.push({'id' : tempBankUpdateData[i]});
+                                                            }
+                                                        }
+
+                                                        for(var i = 0; i < bankBuildingData.length; i++) {
+                                                            if (tempBankUpdateData.indexOf(bankBuildingData[i]) < 0) {
+                                                                not_available.push({'id' : bankBuildingData[i]});
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var buildings = {
+                                                        'new': news,
+                                                        'updated': updated,
+                                                        'not_available': not_available
+                                                    };
+
+                                                    var returnResponse = function () {
+                                                        setTimeout(function () {
+                                                            if (processOutdated == undefined || processOutdated == "false" || returned == true) {
+                                                                data = {
+                                                                    operation: 'upload',
+                                                                    buildings: buildings,
+                                                                    expectedTimeNew: news.length,
+                                                                    expectedTimeOutdated: expectedTimeOutdated
+                                                                };
+
+                                                                if (res) {
+                                                                    res.json({
+                                                                        success: success,
+                                                                        error: errors,
+                                                                        data: data
+                                                                    });
+                                                                }
+                                                            } else {
+                                                                returnResponse();
+                                                            }
+                                                        }, 1000);
+                                                    };
+
+                                                    returnResponse();
+                                                });
+                                        });
                                 }
                             });
                         } else {
@@ -452,7 +591,7 @@ var migrationManager = {
                     errors.push("TempBankUpdate document not found with ticket id: " + ticketId);
                 }
 
-                if (res) {
+                if (errors.length > 0 && res) {
                     res.json({
                         success: success,
                         error: errors,
@@ -1221,6 +1360,102 @@ var migrationManager = {
                 }
     
             });
+
+    },
+
+    getInfoCatastro: function (catastro, callback) {
+        var params = {
+            'Provincia': '',
+            'Municipio': '',
+            'SRS': '',
+            'RC': catastro.substr(0, 14)
+        };
+        var url = 'https://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC';
+        var options = {
+            "method": "GET",
+            "rejectUnauthorized": false,
+            "url": url,
+            'qs': params,
+            "headers": {"Content-Type": "text/xml"}
+        };
+
+        request(options, (function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var document = new xmldoc.XmlDocument(body);
+                var catastroObj = {
+                    'buildingId': catastro,
+                    'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
+                    'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
+                    'srs': document.valueWithPath("coordenadas.coord.geo.srs")
+                };
+                callback(catastroObj);
+            }
+        }).bind(catastro));
+    },
+
+    getSearchListings: function (buildingId, lat, lng, km, place_name, max_result, callback) {
+        var radius = lat + ',' + lng;
+        if (km != '') {
+            radius += ',' + km + 'km';
+        }
+        var params = {
+            'action': 'search_listings',
+            'encoding': 'json',
+            'pretty': 1,
+            'number_of_results': max_result,
+            'listing_type': 'buy',
+            'bedroom_min': '',
+            'bedroom_max': '',
+            'size_min': '',
+            'size_max': '',
+            'price_max': '',
+            'price_min': '',
+            'property_type': 'flat',
+            'radius': radius,
+            'page': 1,
+            'has_photo': 0,
+            'keywords': '',
+            '_': Date.now()
+        };
+
+        if (place_name != '') {
+            params['place_name'] = place_name;
+        }
+
+        var url = 'https://api.nestoria.es/api';
+        var options = {
+            "method": "GET",
+            "rejectUnauthorized": false,
+            "url": url,
+            'qs': params,
+            "headers": {"Content-Type": "application/json"}
+        };
+
+        request(options, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                body = JSON.parse(body);
+                var avg = 0;
+                var listings = body['response']['listings'];
+                if (listings != undefined) {
+                    var count = 0;
+                    var total = 0;
+                    for(var i = 0; i < listings.length; i++) {
+                        count++;
+                        if (listings[i]['size'] > 0) {
+                            total += listings[i]['price'] / listings[i]['size'];
+                        } else {
+                            total += 0;
+                        }
+                    }
+
+                    if (count > 0) {
+                        avg = total / count;
+                    }
+                }
+
+                callback({'buildingId': buildingId, 'avg': avg});
+            }
+        });
     }
 };
 

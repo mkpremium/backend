@@ -28,15 +28,15 @@ var BankBuildingDTO = t.struct({
     catastro	: t.maybe(t.Str),
     fr	: t.maybe(t.Str),
     workflow: t.maybe(t.Obj),
-    processTimestamp: t.maybe(t.Boolean),
+    processTimestamp: t.maybe(t.Number),
     priceMetersZone: t.maybe(t.Number),
     priceMetersLocation: t.maybe(t.Number),
     priceZone: t.maybe(t.Number),
     priceLocation: t.maybe(t.Number),
     priceBuy: t.maybe(t.Number),
     priceSell: t.maybe(t.Number),
-    latitude: t.maybe(t.Boolean),
-    longitude: t.maybe(t.Boolean),
+    latitude: t.maybe(t.Number),
+    longitude: t.maybe(t.Number),
     processed: t.maybe(t.Boolean),
     available: t.maybe(t.Boolean)
 }, { defaultProps: { _documentType: 'bankBuilding' } });
@@ -64,20 +64,46 @@ var BankBuildingInputDTO = t.struct({
     catastro: t.maybe(t.Str),
     fr: t.maybe(t.Str),
     workflow: t.maybe(t.Obj),
-    processtimestamp: t.maybe(t.Boolean),
+    processtimestamp: t.maybe(t.Number),
     pricemeterszone: t.maybe(t.Number),
     pricemeterslocation: t.maybe(t.Number),
     pricezone: t.maybe(t.Number),
     pricelocation: t.maybe(t.Number),
     pricebuy: t.maybe(t.Number),
     pricesell: t.maybe(t.Number),
-    latitude: t.maybe(t.Boolean),
-    longitude: t.maybe(t.Boolean),
+    latitude: t.maybe(t.Number),
+    longitude: t.maybe(t.Number),
     processed: t.maybe(t.Boolean),
     available: t.maybe(t.Boolean)
 });
 
 BankBuildingDTO.NUMBER_FIELDS = ['activo', 'sup_construida', 'cp', 'precio_web'];
+BankBuildingDTO.SRS = {
+    'EPSG:32627': 'WGS 84',
+    'EPSG:32628': 'WGS 84',
+    'EPSG:32629': 'WGS 84',
+    'EPSG:32630': 'WGS 84',
+    'EPSG:32631': 'WGS 84',
+    'EPSG:25829': 'ETRS89',
+    'EPSG:25830': 'ETRS89',
+    'EPSG:25831': 'ETRS89',
+    'EPSG:23029': 'ED50',
+    'EPSG:23030': 'ED50',
+    'EPSG:23031': 'ED50'
+};
+BankBuildingDTO.ZONE_NUM = {
+    'EPSG:32627': 27,
+    'EPSG:32628': 28,
+    'EPSG:32629': 297,
+    'EPSG:32630': 30,
+    'EPSG:32631': 31,
+    'EPSG:25829': 297,
+    'EPSG:25830': 30,
+    'EPSG:25831': 31,
+    'EPSG:23029': 29,
+    'EPSG:23030': 30,
+    'EPSG:23031': 31
+};
 
 BankBuildingInputDTO.prototype.toDatabase = function () {
     let data = JSON.parse(JSON.stringify(this));

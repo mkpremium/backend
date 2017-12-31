@@ -93,7 +93,7 @@ router.get('/banks/importBank', verifyToken, function(req, res) {
 // =================================================================
 
 router.get('/banks/confirmUpload', verifyToken, function(req, res) {
-    migrationManager.confirmUpload(req.query.ticketid, 'bankOperation', req.userId, res);
+    migrationManager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, res);
 });
 
 
