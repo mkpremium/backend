@@ -4,5 +4,6 @@ module.exports = {
     'databaseUser': 'admin',
     'databasePassword': 'password',
     'bucketName': 'mkpremium',
-    'secret': "Bitdistrict1sGreat"
+    'secret': "Bitdistrict1sGreat",
+    'reportDir': 'app/csv'
 };

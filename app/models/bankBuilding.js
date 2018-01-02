@@ -104,6 +104,35 @@ BankBuildingDTO.ZONE_NUM = {
     'EPSG:23030': 30,
     'EPSG:23031': 31
 };
+BankBuildingDTO.ExcelHeader = {
+    'buildingId': 'Building ID',
+    'sociedad' : 'Sociedad',
+    'activo' : 'Activo',
+    'municipio' : 'Municipio',
+    'provincia' : 'Provincia',
+    'comunidad' : 'Comunidad',
+    'sup_construida' : 'Sup_construida',
+    'portal' : 'Portal',
+    'piso' : 'Piso',
+    'escalera' : 'Escalera',
+    'puerta' : 'Puerta',
+    'domicilio' : 'Domicilio',
+    'cp' : 'CP',
+    'tipo1' : 'Tipo1',
+    'tipo2' : 'Tipo2',
+    'precio_web' : 'Precio_web',
+    'catastro' : 'Catastro',
+    'fr' : 'Fr',
+    'processTimestamp' : 'ProcessTimestamp',
+    'priceMetersZone' : 'PriceMetersZone',
+    'priceMetersLocation' : 'PriceMetersLocation',
+    'priceZone' : 'PriceZone',
+    'priceLocation' : 'PriceLocation',
+    'priceBuy' : 'PriceBuy',
+    'priceSell' : 'PriceSell',
+    'latitude' : 'Latitude',
+    'longitude' : 'Longitude'
+};
 
 BankBuildingInputDTO.prototype.toDatabase = function () {
     let data = JSON.parse(JSON.stringify(this));

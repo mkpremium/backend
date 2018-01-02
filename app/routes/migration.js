@@ -96,6 +96,17 @@ router.get('/banks/confirmUpload', verifyToken, function(req, res) {
     migrationManager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, res);
 });
 
+router.get('/banks/getPendingBankOperations', verifyToken, function(req, res) {
+    migrationManager.getPendingBankOperations(res);
+});
+
+router.get('/banks/getBankBuildings', verifyToken, function(req, res) {
+    migrationManager.getBankBuildings(req.query.operation, req.query.state, parseInt(req.query.from), parseInt(req.query.size), res);
+});
+
+router.get('/banks/exportBankBuilding', verifyToken, function(req, res) {
+    migrationManager.exportBankBuilding(req.query.operation, req.query.state, req.query.name, res);
+});
 
 // =================================================================
 // Migration endpoints: Operators

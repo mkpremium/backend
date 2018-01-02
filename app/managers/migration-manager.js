@@ -3,6 +3,7 @@ var couchbase   = require('couchbase');
 var request     = require('request');
 var xmldoc      = require('xmldoc');
 var utmObj      = require('utm-latlng');
+var Excel       = require('exceljs');
 var cluster     = new couchbase.Cluster(config.database);
 cluster.authenticate(config.databaseUser, config.databasePassword);
 var bucket      = cluster.openBucket(config.bucketName);
@@ -618,6 +619,114 @@ var migrationManager = {
             function (err, rows) {
               res.json(rows);
             });
+    },
+
+    getPendingBankOperations: function (res) {
+        var N1qlQuery = couchbase.N1qlQuery;
+        bucket.query(
+            N1qlQuery.fromString('SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "bankOperation" AND t.processed = false'),
+            function (err, rows) {
+                res.json(rows);
+            });
+    },
+
+    getBankBuildings: function (operation, state, from, size, res) {
+        var N1qlQuery = couchbase.N1qlQuery;
+        var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"';
+
+        bucket.query(
+            N1qlQuery.fromString(queryString),
+            function (err, rows) {
+                if (rows.length > 0) {
+                    var data = [];
+                    var result = true;
+                    for (var i = 0; i < rows.length; i++) {
+                        if (operation != undefined && operation != '') {
+                            result = result && modelHelper.searchInObject(rows[i]['workflow'], 'operation', operation);
+                        }
+
+                        if (state != undefined && state != '') {
+                            result = result && modelHelper.searchInObject(rows[i]['workflow'], 'state', Boolean(state));
+                        }
+
+                        if (result == true) {
+                            data.push(rows[i]);
+                        }
+                    }
+
+                    if (from != undefined && size != undefined) {
+                        rows = data.slice(from, from + size);
+                    } else {
+                        rows = data;
+                    }
+                }
+
+                res.json(rows);
+            });
+    },
+
+    exportBankBuilding: function (operation, state, name, res) {
+        var N1qlQuery = couchbase.N1qlQuery;
+        var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding" and t.available = true';
+
+        bucket.query(
+            N1qlQuery.fromString(queryString),
+            (function (err, rows) {
+                if (rows.length > 0) {
+                    var excelHeader = bankBuilding.BankBuildingDTO.ExcelHeader;
+                    var data = [];
+                    data.push(Object.values(excelHeader));
+                    var result = true;
+
+                    for (var i = 0; i < rows.length; i++) {
+                        if (operation != undefined && operation != '') {
+                            result = result && modelHelper.searchInObject(rows[i]['workflow'], 'operation', operation);
+                        }
+
+                        if (state != undefined && state != '') {
+                            result = result && modelHelper.searchInObject(rows[i]['workflow'], 'state', Boolean(state));
+                        }
+
+                        if (result == true) {
+                            var item = [];
+                            var inputBuildings = [];
+                            var value;
+                            var keys = Object.keys(excelHeader);
+                            for(var j = 0; j < keys.length; j++) {
+                                value = rows[i][keys[j]];
+                                if (value == undefined) {
+                                    value = '';
+                                }
+                                item.push(value);
+
+                                if (keys[j] == 'buildingId') {
+                                    inputBuildings.push({buildingId: value});
+                                }
+                            }
+                            data.push(item);
+                        }
+                    }
+
+                    this.exportToExcel(name, data, (function () {
+                        console.log('Export successfully!');
+
+                        let inputOperationData = {
+                            operationId: uuid.v4(),
+                            timestamp: Date.now(),
+                            operation: 'export',
+                            state: {
+                                operation: operation,
+                                value: state
+                            },
+                            buildings: inputBuildings
+                        };
+
+                        this.createBankOperation(inputOperationData, false);
+
+                        res.json(inputOperationData);
+                    }).bind(this));
+                }
+            }).bind(this));
     },
 
     importAuxiliar0000: function(res) {
@@ -1465,6 +1574,22 @@ var migrationManager = {
                 callback({'buildingId': buildingId, 'avg': avg});
             }
         });
+    },
+
+    exportToExcel: function (name, data, callback) {
+        let workbook = new Excel.Workbook();
+
+        workbook.creator = 'Kode Plus';
+        workbook.created = new Date();
+
+        let worksheet = workbook.addWorksheet(name, {properties: {showGridLines: false}});
+
+        for (const item of data) {
+            worksheet.addRow(item);
+        }
+
+        workbook.xlsx.writeFile(config.reportDir + '/' + name)
+            .then(callback);
     }
 };
 

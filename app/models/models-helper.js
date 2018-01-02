@@ -38,6 +38,17 @@ var checkCSVFormed = function(fields, bankFields) {
     }
 };
 
+var searchInObject = function (obj, attribute, value) {
+    var keys = Object.keys(obj);
+    for(var i = 0; i < keys.length; i++) {
+        var item = obj[keys[i]];
+        if (item[attribute].search(value) >= 0) {
+            return true;
+        }
+    }
+
+    return false;
+};
 
 // =================================================================
 // module
@@ -45,6 +56,6 @@ var checkCSVFormed = function(fields, bankFields) {
 module.exports.toLowerCaseRequest = toLowerCaseRequest;
 module.exports.removeNulls = removeNulls;
 module.exports.checkCSVFormed = checkCSVFormed;
-
+module.exports.searchInObject = searchInObject;
 
 
