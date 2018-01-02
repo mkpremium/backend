@@ -115,14 +115,14 @@ var migrationManager = {
     createBankOperation: function(obj, response) {
         let inputData = new bankOperation.BankOperationInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
-        let pk = 'bankOperation:' + data.id;
+        let pk = 'bankOperation:' + data.operationId;
         return this.upsertToDb(pk, data, response);
     },
 
     createBankBuilding: function(obj, response) {
         let inputData = new bankBuilding.BankBuildingInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
-        let pk = 'bankBuilding:' + data.id;
+        let pk = 'bankBuilding:' + data.buildingId;
         return this.upsertToDb(pk, data, response);
     },
 
@@ -382,9 +382,7 @@ var migrationManager = {
                                                 2: {'operation': 'bought', 'state': '', 'timestamp': current_timestamp},
                                                 3: {'operation': 'sell', 'state': '', 'timestamp': current_timestamp},
                                                 4: {'operation': 'sold', 'state': '', 'timestamp': current_timestamp}
-                                            },
-                                            priceMetersZone: 0,
-                                            priceMetersLocation: 0
+                                            }
                                         };
 
                                         var key;
@@ -410,24 +408,10 @@ var migrationManager = {
                                             inputBuildingData[key] =  value;
                                         }
 
-                                        //Set value for priceBuy and priceSell
+                                        //Set value for priceBuy and processTimestamp
                                         inputBuildingData['priceBuy'] = parseFloat(inputBuildingData['precio_web']) * 0.6;
-
-                                        //Set false for buy operation
-                                        var pisoArr = ['-1', '-2', '0', '00', 'BAJ', 'BAJA', 'BAJO', 'BAJOS', 'BJ', 'BJ-1', 'BX', 'PB', 'S1', 'SO', 'SOT', 'SM', 'SMS'];
-                                        var cituacionArr = ['OBRA NUEVA EN CURSO. TERMINADA FISICAMENTE PERO NO REGISTRALMENTE', 'OBRA NUEVA EN CURSO. NO TERMINADA FISICAMENTE', 'ACTIVO EN RUINA', 'PROINDIVISO'];
-                                        if (inputBuildingData['available'] == true
-                                            && (inputBuildingData['tipo1'] != 'VIVIENDA')
-                                            && (inputBuildingData['tipo2'] == 'PISO' && pisoArr.indexOf(inputBuildingData['piso']) >= 0)
-                                            && (cituacionArr.indexOf(inputBuildingData['cituacion']) >= 0)
-                                            && (inputBuildingData['priceZona'] < inputBuildingData['priceLocation'])
-                                            && ((inputBuildingData['priceSell'] - inputBuildingData['priceBuy']) / inputBuildingData['priceBuy'] < 1)
-                                            && (inputBuildingData['priceSell'] - inputBuildingData['priceBuy'] < 40000)
-                                            && (inputBuildingData['priceBuy'] < inputBuildingData['priceMetersZone'] * 26)) {
-                                            inputBuildingData['workflow'][1]['state'] = false;
-                                        }
-
                                         inputBuildingData['processTimestamp'] = Date.now();
+
                                         bankBuildings[inputBuildingData['buildingId']] = inputBuildingData;
 
                                         this.getInfoCatastro(inputBuildingData['buildingId'], (function (catastroObj) {
@@ -440,11 +424,11 @@ var migrationManager = {
                                             bankBuildings[catastroObj['buildingId']]['longitude'] = latLongObj['lng'];
 
                                             this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], 1, '', 10, function (result) {
-                                                bankBuildings[result['buildingId']]['priceZone'] = result['avg'];
+                                                bankBuildings[result['buildingId']]['priceMetersZone'] = result['avg'];
                                             });
 
                                             this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', inputBuildingData['comunidad'], 50, function (result) {
-                                                bankBuildings[result['buildingId']]['priceLocation'] = result['avg'];
+                                                bankBuildings[result['buildingId']]['priceMetersLocation'] = result['avg'];
                                             });
                                         }).bind(this));
                                     }
@@ -465,6 +449,7 @@ var migrationManager = {
                                                         }
                                                     }
                                                 }
+
                                                 returned = true;
                                             });
                                     }
@@ -474,9 +459,11 @@ var migrationManager = {
                                             var done = true;
                                             var bankBuilding;
                                             var buildingFields = Object.keys(bankBuildings);
+
                                             for(var j = 0; j < buildingFields.length; j++) {
                                                 bankBuilding = bankBuildings[buildingFields[j]];
-                                                if (bankBuilding['latitude'] == undefined || bankBuilding['longitude'] == undefined || bankBuilding['priceZone'] == undefined){
+                                                if (bankBuilding['latitude'] == undefined || bankBuilding['longitude'] == undefined
+                                                    || bankBuilding['priceMetersZone'] == undefined || bankBuilding['priceMetersLocation'] == undefined){
                                                     done = false;
                                                     break;
                                                 }
@@ -485,7 +472,29 @@ var migrationManager = {
                                             if ((processOutdated == undefined || processOutdated == "false" || returned == true) && done == true) {
                                                 for(var j = 0; j < buildingFields.length; j++) {
                                                     bankBuilding = bankBuildings[buildingFields[j]];
+
+                                                    bankBuilding['priceZone'] = bankBuilding['priceMetersZone'] * parseFloat(bankBuilding['cp']);
+                                                    bankBuilding['priceLocation'] = bankBuilding['priceMetersLocation'] * parseFloat(bankBuilding['cp']);
                                                     bankBuilding['priceSell'] = bankBuilding['priceZone'] * parseFloat(bankBuilding['sup_construida']) * 0.75;
+
+                                                    //Set false for buy operation
+                                                    var pisoArr = ['-1', '-2', '0', '00', 'BAJ', 'BAJA', 'BAJO', 'BAJOS', 'BJ', 'BJ-1', 'BX', 'PB', 'S1', 'SO', 'SOT', 'SM', 'SMS'];
+                                                    var cituacionArr = ['OBRA NUEVA EN CURSO. TERMINADA FISICAMENTE PERO NO REGISTRALMENTE', 'OBRA NUEVA EN CURSO. NO TERMINADA FISICAMENTE', 'ACTIVO EN RUINA', 'PROINDIVISO'];
+
+                                                    if (bankBuilding['available'] == true
+                                                        && (bankBuilding['tipo1'] != 'VIVIENDA')
+                                                        && (bankBuilding['tipo2'] == 'PISO' && pisoArr.indexOf(bankBuilding['piso']) >= 0)
+                                                        && (cituacionArr.indexOf(bankBuilding['cituacion']) >= 0)
+                                                        && (bankBuilding['priceZone'] < bankBuilding['priceLocation'])
+                                                        && ((bankBuilding['priceSell'] - bankBuilding['priceBuy']) / bankBuilding['priceBuy'] < 1)
+                                                        && (bankBuilding['priceSell'] - bankBuilding['priceBuy'] < 40000)
+                                                        && (bankBuilding['priceBuy'] < bankBuilding['priceMetersZone'] * 26)) {
+
+                                                        bankBuilding['workflow'][1]['state'] = false;
+
+                                                    }
+
+                                                    console.log('Creating bankBuilding: %s', bankBuilding['buildingId']);
                                                     //Create bank building document
                                                     this.createBankBuilding(bankBuilding, false);
                                                 }
@@ -503,7 +512,7 @@ var migrationManager = {
 
                                     inputOperationData.buildings = inputBuildings;
 
-                                    console.log('Importing %s %s', documentType, inputOperationData.operationId);
+                                    console.log('Creating bankOperation: %s', inputOperationData.operationId);
 
                                     //Create bank operation document
                                     this.createBankOperation(inputOperationData, false);
@@ -582,7 +591,7 @@ var migrationManager = {
                                 }
                             });
                         } else {
-                            errors.push("The timestamp is older than " + allowDays + " day(s).");
+                            errors.push("The timestamp is older than " + allowDays + " day.");
                         }
                     } else {
                         errors.push("User ID doesn't match with User ID of access token");
