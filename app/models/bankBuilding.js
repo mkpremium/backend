@@ -7,6 +7,7 @@ var modelHelper = require('./models-helper');
 var BankBuildingDTO = t.struct({
     _documentType: t.Str,
     id: t.maybe(t.Str),
+    index: t.maybe(t.Number),
     buildingId: t.maybe(t.Str),
     sociedad: t.maybe(t.Str),
     activo	: t.maybe(t.Number),
@@ -43,6 +44,7 @@ var BankBuildingDTO = t.struct({
 
 var BankBuildingInputDTO = t.struct({
     id: t.maybe(t.Str),
+    index: t.maybe(t.Number),
     buildingid: t.maybe(t.Str),
     sociedad: t.maybe(t.Str),
     activo: t.maybe(t.Number),
@@ -142,6 +144,7 @@ BankBuildingInputDTO.prototype.toDatabase = function () {
     let manual = {
         _documentType: 'bankBuilding',
         id: data.id,
+        index: data.index,
         buildingId: data.buildingid,
         sociedad: data.sociedad,
         activo: data.activo,

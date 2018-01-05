@@ -110,6 +110,7 @@ var migrationManager = {
         let inputData = new bank.BankInputDTO(modelHelper.toLowerCaseRequest(obj));
         let data = inputData.toDatabase();
         let pk = 'tempBankUpdate:' + data.id;
+        this.upsertToDb('indexGeneratorForBankBuilding', 0, response);
         return this.upsertToDb(pk, data, response);
     },
 
@@ -434,6 +435,11 @@ var migrationManager = {
                                         }).bind(this));
                                     }
 
+                                    var index = 0;
+                                    this.getIndexForBankBuilding(function (result) {
+                                        index = result + 1;
+                                    });
+
                                     var returned = false;
                                     var expectedTimeOutdated = 0;
                                     if (processOutdated == "true") {
@@ -464,7 +470,7 @@ var migrationManager = {
                                             for(var j = 0; j < buildingFields.length; j++) {
                                                 bankBuilding = bankBuildings[buildingFields[j]];
                                                 if (bankBuilding['latitude'] == undefined || bankBuilding['longitude'] == undefined
-                                                    || bankBuilding['priceMetersZone'] == undefined || bankBuilding['priceMetersLocation'] == undefined){
+                                                    || bankBuilding['priceMetersZone'] == undefined || bankBuilding['priceMetersLocation'] == undefined || index == 0){
                                                     done = false;
                                                     break;
                                                 }
@@ -474,6 +480,7 @@ var migrationManager = {
                                                 for(var j = 0; j < buildingFields.length; j++) {
                                                     bankBuilding = bankBuildings[buildingFields[j]];
 
+                                                    bankBuilding['index'] = index++;
                                                     bankBuilding['priceZone'] = bankBuilding['priceMetersZone'] * parseFloat(bankBuilding['cp']);
                                                     bankBuilding['priceLocation'] = bankBuilding['priceMetersLocation'] * parseFloat(bankBuilding['cp']);
                                                     bankBuilding['priceSell'] = bankBuilding['priceZone'] * parseFloat(bankBuilding['sup_construida']) * 0.75;
@@ -503,6 +510,10 @@ var migrationManager = {
                                                 inputOperationData['processed'] = true;
                                                 //Update processed to true of bank operation document
                                                 this.createBankOperation(inputOperationData, false);
+
+                                                //Update index
+                                                this.upsertToDb('indexGeneratorForBankBuilding', index - 1, false);
+                                                console.log('DONE');
                                             } else {
                                                 createBankBuilding();
                                             }
@@ -663,6 +674,203 @@ var migrationManager = {
 
                 res.json(rows);
             });
+    },
+
+    getBankBuilding: function (index, res) {
+        if (index != undefined && index != '') {
+            var N1qlQuery = couchbase.N1qlQuery;
+            var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE _documentType = "bankBuilding" AND `index` = ' + index;
+
+            bucket.query(
+                N1qlQuery.fromString(queryString),
+                function (err, rows) {
+                    var data;
+                    if (rows != null && rows.length > 0) {
+                        data = rows[0];
+                    } else {
+                        data = 'BankBuilding not found.'
+                    }
+
+                    res.json(data);
+                });
+        } else {
+            res.json("Index can not be empty.");
+        }
+    },
+
+    getNextBankBuilding: function (index, res) {
+        if (index != undefined && index != '') {
+            var N1qlQuery = couchbase.N1qlQuery;
+            var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE _documentType = "bankBuilding" AND `index` > ' + index + ' ORDER BY `index` ASC LIMIT 1';
+
+            bucket.query(
+                N1qlQuery.fromString(queryString),
+                function (err, rows) {
+                    var data;
+                    if (rows != null && rows.length > 0) {
+                        data = rows[0];
+                    } else {
+                        data = 'Next BankBuilding not found.'
+                    }
+
+                    res.json(data);
+                });
+        } else {
+            res.json("Index can not be empty.");
+        }
+    },
+
+    getPreviousBankBuilding: function (index, res) {
+        if (index != undefined && index != '') {
+            var N1qlQuery = couchbase.N1qlQuery;
+            var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE _documentType = "bankBuilding" AND `index` < ' + index + ' ORDER BY `index` ASC LIMIT 1';
+
+            bucket.query(
+                N1qlQuery.fromString(queryString),
+                function (err, rows) {
+                    var data;
+                    if (rows != null && rows.length > 0) {
+                        data = rows[0];
+                    } else {
+                        data = 'Previous BankBuilding not found.'
+                    }
+
+                    res.json(data);
+                });
+        } else {
+            res.json("Index can not be empty.");
+        }
+    },
+
+    setStateBankBuilding: function (index, operation, state, res) {
+        if (index != undefined && index != '' && operation != undefined && operation != '' && state != undefined && state != '') {
+            var N1qlQuery = couchbase.N1qlQuery;
+            var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE _documentType = "bankBuilding" AND `index` = ' + index;
+
+            bucket.query(
+                N1qlQuery.fromString(queryString),
+                (function (err, rows) {
+                    var data;
+                    var success = false;
+                    var message;
+
+                    if (rows != null && rows.length > 0) {
+                        data = rows[0];
+
+                        var foundFlag = false;
+                        var workflowObj;
+                        var workflow = data['workflow'];
+                        var keys = Object.keys(workflow);
+                        for (var i = 0; i < keys.length; i++) {
+                            workflowObj = workflow[keys[i]];
+                            if (workflowObj['operation'] == operation) {
+                                workflowObj['state'] = Boolean(state);
+                                workflow[keys[i]] = workflowObj;
+                                data['workflow'] = workflow;
+                                foundFlag = true;
+                                break;
+                            }
+                        }
+
+                        if (foundFlag == true) {
+                            //Update bank building
+                            this.createBankBuilding(data, false);
+
+                            success = true;
+                            message = 'Set state successfully.';
+                        } else {
+                            message = 'Operation not found.';
+                        }
+                    } else {
+                        message = 'BankBuilding not found.';
+                    }
+
+                    res.json({
+                        'success' : success,
+                        'message': message
+                    });
+                }).bind(this));
+        } else {
+            var message = '';
+            if (index == undefined || index == '') {
+                message = "Index can not be empty.";
+            } else if (operation == undefined || operation == '') {
+                message = "Operation can not be empty.";
+            } else if (state == undefined || state == '') {
+                message = "State is empty.";
+            }
+
+            res.json({
+                'success' : false,
+                'message': message
+            });
+        }
+    },
+
+    setAvailableBankBuilding: function (index, available, res) {
+        if (index != undefined && index != '' && available != undefined && available != '') {
+            var N1qlQuery = couchbase.N1qlQuery;
+            var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE _documentType = "bankBuilding" AND `index` = ' + index;
+
+            bucket.query(
+                N1qlQuery.fromString(queryString),
+                (function (err, rows) {
+                    var data;
+                    var success = false;
+                    var message;
+
+                    if (rows != null && rows.length > 0) {
+                        data = rows[0];
+
+                        data['available'] = Boolean(available);
+
+                        //Update bank building
+                        this.createBankBuilding(data, false);
+
+                        success = true;
+                        message = 'Set available successfully.';
+                    } else {
+                        message = 'BankBuilding not found.';
+                    }
+
+                    res.json({
+                        'success' : success,
+                        'message': message
+                    });
+                }).bind(this));
+        } else {
+            var message = '';
+            if (index == undefined || index == '') {
+                message = "Index can not be empty.";
+            } else if (available == undefined || available == '') {
+                message = "Operation can not be empty.";
+            }
+
+            res.json({
+                'success' : false,
+                'message': message
+            });
+        }
+    },
+
+    getOperations: function (operation, res) {
+        if (operation != undefined && operation != '') {
+            var N1qlQuery = couchbase.N1qlQuery;
+            var queryString = 'SELECT t.* FROM ' + config.bucketName + ' t WHERE _documentType = "bankOperation" AND `operation` = "' + operation + '"';
+
+            bucket.query(
+                N1qlQuery.fromString(queryString),
+                (function (err, rows) {
+                    res.json(rows);
+                }).bind(this));
+        } else {
+            var message = 'Operation can not be empty.';
+
+            res.json({
+                'success' : false,
+                'message': message
+            });
+        }
     },
 
     exportBankBuilding: function (operation, state, name, res) {
@@ -1573,6 +1781,17 @@ var migrationManager = {
 
                 callback({'buildingId': buildingId, 'avg': avg});
             }
+        });
+    },
+
+    getIndexForBankBuilding: function (callback) {
+        bucket.get('indexGeneratorForBankBuilding', function(err, result) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+
+            callback(result.value);
         });
     },
 
