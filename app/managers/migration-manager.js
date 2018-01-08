@@ -245,74 +245,95 @@ var migrationManager = {
             }
             else {
                 try {
-                    inputData.buildings = inputBuildings;
+                    if (errors.length == 0) {
+                        inputData.buildings = inputBuildings;
 
-                    console.log('Importing %s %s', documentType, inputData.ticketId);
+                        console.log('Importing %s %s', documentType, inputData.ticketId);
 
-                    this.importTempBankUpdate(inputData, false);
+                        this.importTempBankUpdate(inputData, false);
 
-                    success = true;
-                    var news = [];
-                    var updated = [];
-                    var not_available = [];
-                    var tempBankUpdateData = [];
-                    var bankBuildingData = [];
+                        success = true;
+                        var news = [];
+                        var updated = [];
+                        var not_available = [];
+                        var tempBankUpdateData = [];
+                        var bankBuildingData = [];
 
-                    var N1qlQuery = couchbase.N1qlQuery;
-                    bucket.query(
-                        N1qlQuery.fromString('SELECT t.buildingId FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
-                        function (err, rows) {
-                            for (var i = 0; i < rows.length; i++) {
-                                bankBuildingData.push(rows[i]['buildingId']);
+                        var N1qlQuery = couchbase.N1qlQuery;
+                        bucket.query(
+                            N1qlQuery.fromString('SELECT t.buildingId, t.processTimestamp FROM ' + config.bucketName + ' t WHERE t._documentType = "bankBuilding"'),
+                            function (err, rows) {
+                                var days;
+                                var now = Date.now();
+                                var expectedTimeOutdated = 0;
+
+                                for (var i = 0; i < rows.length; i++) {
+                                    bankBuildingData.push(rows[i]['buildingId']);
+
+                                    days = (now - rows[i]['processTimestamp']) / 86400000;
+                                    if (days > 30) { //not processed 1 month ago
+                                        expectedTimeOutdated++;
+                                    }
+                                }
+
+                                bucket.query(
+                                    N1qlQuery.fromString('SELECT t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND t.id = "' + inputData.ticketId + '"'),
+                                    function (err, rows) {
+                                        if (rows.length > 0) {
+                                            var item = rows[0]['buildings'];
+                                            for (var i = 0; i < item.length; i++) {
+                                                tempBankUpdateData.push(item[i]['id']);
+                                            }
+
+                                            for(var i = 0; i < tempBankUpdateData.length; i++) {
+                                                if (bankBuildingData.indexOf(tempBankUpdateData[i]) >= 0) {
+                                                    updated.push({'id' : tempBankUpdateData[i]});
+                                                } else {
+                                                    news.push({'id' : tempBankUpdateData[i]});
+                                                }
+                                            }
+
+                                            for(var i = 0; i < bankBuildingData.length; i++) {
+                                                if (tempBankUpdateData.indexOf(bankBuildingData[i]) < 0) {
+                                                    not_available.push({'id' : bankBuildingData[i]});
+                                                }
+                                            }
+                                        }
+
+                                        var buildings = {
+                                            'new': news,
+                                            'updated': updated,
+                                            'not_available': not_available
+                                        };
+
+                                        data = {
+                                            operation: 'checked',
+                                            ticketId: inputData.ticketId,
+                                            buildings: buildings,
+                                            expectedTimeNew: news.length,
+                                            expectedTimeOutdated: expectedTimeOutdated
+                                        };
+
+                                        if (res) {
+                                            res.json({
+                                                success: success,
+                                                error: errors,
+                                                data: data
+                                            });
+                                        }
+                                    }
+                                );
                             }
-
-                            bucket.query(
-                                N1qlQuery.fromString('SELECT t.buildings FROM ' + config.bucketName + ' t WHERE t._documentType = "tempBankUpdate" AND t.id = "' + inputData.ticketId + '"'),
-                                function (err, rows) {
-                                    if (rows.length > 0) {
-                                        var item = rows[0]['buildings'];
-                                        for (var i = 0; i < item.length; i++) {
-                                            tempBankUpdateData.push(item[i]['id']);
-                                        }
-
-                                        for(var i = 0; i < tempBankUpdateData.length; i++) {
-                                            if (bankBuildingData.indexOf(tempBankUpdateData[i]) >= 0) {
-                                                updated.push({'id' : tempBankUpdateData[i]});
-                                            } else {
-                                                news.push({'id' : tempBankUpdateData[i]});
-                                            }
-                                        }
-
-                                        for(var i = 0; i < bankBuildingData.length; i++) {
-                                            if (tempBankUpdateData.indexOf(bankBuildingData[i]) < 0) {
-                                                not_available.push({'id' : bankBuildingData[i]});
-                                            }
-                                        }
-                                    }
-
-                                    var buildings = {
-                                        'new': news,
-                                        'updated': updated,
-                                        'not_available': not_available
-                                    };
-
-                                    data = {
-                                        operation: 'checked',
-                                        ticketId: inputData.ticketId,
-                                        buildings: buildings,
-                                        expectedTimeNew: 0,
-                                        expectedTimeOutdated: 0
-                                    };
-
-                                    if (res) {
-                                        res.json({
-                                            success: success,
-                                            error: errors,
-                                            data: data
-                                        });
-                                    }
-                                });
+                        );
+                    } else {
+                        if (res) {
+                            res.json({
+                                success: success,
+                                error: errors,
+                                data: data
                             });
+                        }
+                    }
                 }
                 catch (e) {
                     errors.push(e);
