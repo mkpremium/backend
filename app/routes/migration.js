@@ -84,7 +84,7 @@ router.get('/buildings/bulkimport', function(req, res) {
 // =================================================================
 
 router.get('/banks/importBank', verifyToken, function(req, res) {
-    migrationManager.importBanks('BRUTO 4 COMUNIDADES.csv', 'tempBankUpdate', req.userId, res);
+    migrationManager.importBanks(req.query.csv, 'tempBankUpdate', req.userId, res);
 });
 
 
