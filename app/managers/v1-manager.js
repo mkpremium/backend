@@ -7,6 +7,7 @@ var bcrypt      = require('bcrypt');
 var jwt         = require('jsonwebtoken');
 var uuid        = require('uuid');
 var soap        = require('soap');
+var history     = require('../models/history');
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -488,6 +489,39 @@ var v1Manager = {
                 }
                 res.json(users[0]);
             });
+
+    },
+
+    getData: function (res, data) {
+
+        let historyData = {
+            _documentType: 'numintec',
+            id: uuid.v4(),
+            worksheetId: "",
+            operatorId: "",
+            departmentId: "",
+            tmStmp: "",
+            action: "event",
+            notes: JSON.stringify(data)
+        };
+
+        let historyDTO = JSON.parse(JSON.stringify(new history.HistoryDTO(historyData)));
+
+        var pk = 'history:' + historyDTO.id;
+
+        bucket.manager().createPrimaryIndex(function() {
+            bucket.upsert(pk, historyDTO, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+
+                res.json({
+                    "success": true,
+                    "data": data
+                });
+            });
+        });
 
     },
 

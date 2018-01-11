@@ -144,6 +144,10 @@ router.get('/me', verifyToken, function(req, res) {
     v1Manager.me(res, req.userId);
 });
 
+router.post('/getData', function(req, res) {
+    v1Manager.getData(res, req.body);
+});
+
 // router.post('/numintec/call', verifyToken, verifyNumintecKey, function(req, res) {
 //     v1Manager.call(res, req.userId, req.client, req.body.from, req.body.to);
 // });
