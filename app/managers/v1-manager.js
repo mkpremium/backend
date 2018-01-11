@@ -6,6 +6,7 @@ var bucket      = cluster.openBucket(config.bucketName);
 var bcrypt      = require('bcrypt');
 var jwt         = require('jsonwebtoken');
 var uuid        = require('uuid');
+var soap        = require('soap');
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -487,6 +488,82 @@ var v1Manager = {
                 }
                 res.json(users[0]);
             });
+
+    },
+
+    call: function (res, userId, from, to) {
+
+        // var args = {"from" : from, "to" : to};
+        // client.setSecurity(new soap.BasicAuthSecurity('operador.905', '98b1d8cf'));
+        // user: operador.905
+        // pass: 98b1d8cf
+
+        // client.setSecurity(new soap.BearerSecurity('MKPREMIUM-xtZVOGay7PqZzcKyVtZd2qiKsXq2CfSo9ts4wwGdXCqpq5QcElHfVvFalaM1GNDDb7iYbbxotdHy1VuIqWwrpmgtyd'));
+
+        // client.call(args, function(err, result) {
+        //
+        //     if (err) {
+        //         return res.status(500).send({auth: false, message: 'Failed to authenticate.'});
+        //     }
+        //
+        //     console.log(result);
+        //     res.json(result);
+        // });
+        res.json({"success" : true});
+
+    },
+
+    testcall: function (res, userId) {
+
+        var url = 'https://api.invoxcontact.com/Call/?wsdl';
+        var args = {'license': 'MKPREMIUM-xtZVOGay7PqZzcKyVtZd2qiKsXq2CfSo9ts4wwGdXCqpq5QcElHfVvFalaM1GNDDb7iYbbxotdHy1VuIqWwrpmgtyd'};
+
+        var soapOptions = {
+            forceSoap12Headers: true
+        };
+
+
+        soap.createClient(url, soapOptions, function(err, client) {
+
+            var args = {"from" : "abc", "to" : '+84907193168'};
+            client.setSecurity(new soap.BasicAuthSecurity('operador.905', '98b1d8cf'));
+            client.call(args, function(err, result) {
+
+                if (err) {
+                    return res.status(500).send({auth: false, message: 'Failed to make numintec call.'});
+                }
+
+                console.log(result);
+                res.json(result);
+            });
+
+
+            // client.Authentication(args, function(err, result) {
+            //     if (err) {
+            //         return res.status(500).send({auth: false, message: 'Failed to authenticate Numintec key.'});
+            //     }
+            //
+            //     if (result.return.$value) {
+            //
+            //         var args = {"from" : "abc", "to" : '+84907193168'};
+            //         // client.setSecurity(new soap.BasicAuthSecurity('operador.905', '98b1d8cf'));
+            //         client.call(args, function(err, result) {
+            //
+            //             if (err) {
+            //                 return res.status(500).send({auth: false, message: 'Failed to make numintec call.'});
+            //             }
+            //
+            //             console.log(result);
+            //             res.json(result);
+            //         });
+            //
+            //
+            //     } else {
+            //         return res.status(403).send({auth: false, message: 'Failed to authenticate Numintec key.'});
+            //     }
+            //
+            // });
+        });
 
     }
 

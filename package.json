@@ -17,6 +17,7 @@
     "jsonwebtoken": "^5.7.0",
     "morgan": "^1.7.0",
     "request": "^2.83.0",
+    "soap": "^0.23.0",
     "tcomb": "^3.2.24",
     "utm-latlng": "^1.0.3",
     "uuid": "^3.1.0",

@@ -18,6 +18,7 @@ var bucket      = cluster.openBucket(config.bucketName);
 // var modelHelper = require('../models/models-helper');
 var v1Manager = require('../managers/v1-manager');
 var verifyToken = require('../middleware/verify-token');
+var verifyNumintecKey = require('../middleware/verify-numintec-key');
 
 router.use(function(req, res, next) {
   //console.log('Something is happening.');
@@ -142,6 +143,19 @@ router.post('/operator/login', function(req, res) {
 router.get('/me', verifyToken, function(req, res) {
     v1Manager.me(res, req.userId);
 });
+
+// router.post('/numintec/call', verifyToken, verifyNumintecKey, function(req, res) {
+//     v1Manager.call(res, req.userId, req.client, req.body.from, req.body.to);
+// });
+
+router.post('/numintec/call', verifyToken, function(req, res) {
+    v1Manager.call(res, req.userId, req.body.from, req.body.to);
+});
+
+router.get('/numintec/testcall', verifyToken, function(req, res) {
+    v1Manager.testcall(res, req.userId);
+});
+
 
 // =================================================================
 // module migration
