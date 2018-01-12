@@ -165,7 +165,7 @@ router.get('/numintec/testcall', verifyToken, function(req, res) {
 // =================================================================
 
 router.get('/banks/confirmUpload', verifyToken, function(req, res) {
-    v1Manager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, res);
+    v1Manager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, req.query.csv, res);
 });
 
 router.get('/banks/getPendingBankOperations', verifyToken, function(req, res) {

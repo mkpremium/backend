@@ -678,9 +678,9 @@ var v1Manager = {
         return this.upsertToDb(pk, data, response);
     },
 
-    confirmUpload: function (ticketId, processOutdated, documentType, userId, res) {
+    confirmUpload: function (ticketId, processOutdated, documentType, userId, csvName, res) {
         const csv = require('csvtojson');
-        const csvFilePath = './app/csv/BRUTO 4 COMUNIDADES.csv';
+        const csvFilePath = './app/csv/' + csvName;
 
         let success = false;
         let errors = [];
