@@ -555,26 +555,59 @@ var v1Manager = {
         return;
     },
 
-    call: function (res, userId, from, to) {
+    numintecCall: function (res, userId, from, to) {
 
-        // var args = {"from" : from, "to" : to};
-        // client.setSecurity(new soap.BasicAuthSecurity('operador.905', '98b1d8cf'));
-        // user: operador.905
-        // pass: 98b1d8cf
+        if (!req.query.method) {
+            return res.status(404).send("Method not found.");
+        }
 
-        // client.setSecurity(new soap.BearerSecurity('MKPREMIUM-xtZVOGay7PqZzcKyVtZd2qiKsXq2CfSo9ts4wwGdXCqpq5QcElHfVvFalaM1GNDDb7iYbbxotdHy1VuIqWwrpmgtyd'));
+        var params = req.query;
 
-        // client.call(args, function(err, result) {
-        //
-        //     if (err) {
-        //         return res.status(500).send({auth: false, message: 'Failed to authenticate.'});
-        //     }
-        //
-        //     console.log(result);
-        //     res.json(result);
-        // });
-        res.json({"success" : true});
+        // The trailing slash "/" is important. Otherwise it will return 404
+        var url = 'https://api.invoxcontact.com/Call/rest/' + params.method + "/";
+        console.log(url);
+        var options = {
+            "url": url,
+            "method": "GET",
+            'qs': params
+        };
 
+        request(options, function (error, response, body) {
+
+            if (error) {
+                console.log(error);
+            }
+
+            res.json(JSON.parse(body));
+        });
+
+    },
+
+    numintecAgent: function (res, req) {
+
+        if (!req.query.method) {
+            return res.status(404).send("Method not found.");
+        }
+
+        var params = req.query;
+
+        // The trailing slash "/" is important. Otherwise it will return 404
+        var url = 'https://api.invoxcontact.com/Agent/rest/' + params.method + "/";
+        console.log(url);
+        var options = {
+            "url": url,
+            "method": "GET",
+            'qs': params
+        };
+
+        request(options, function (error, response, body) {
+
+            if (error) {
+                console.log(error);
+            }
+
+            res.json(JSON.parse(body));
+        });
     },
 
     testcall: function (res, userId) {

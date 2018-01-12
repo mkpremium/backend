@@ -148,12 +148,12 @@ router.post('/getData', function(req, res) {
     v1Manager.getData(res, req.body);
 });
 
-// router.post('/numintec/call', verifyToken, verifyNumintecKey, function(req, res) {
-//     v1Manager.call(res, req.userId, req.client, req.body.from, req.body.to);
-// });
+router.get('/numintec/call', verifyToken, function(req, res) {
+    v1Manager.numintecCall(res, req);
+});
 
-router.post('/numintec/call', verifyToken, function(req, res) {
-    v1Manager.call(res, req.userId, req.body.from, req.body.to);
+router.get('/numintec/agent', verifyToken, function(req, res) {
+    v1Manager.numintecAgent(res, req);
 });
 
 router.get('/numintec/testcall', verifyToken, function(req, res) {

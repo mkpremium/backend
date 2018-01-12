@@ -1,7 +1,7 @@
 var soap        = require('soap');
 
 function verifyNumintecKey(req, res, next) {
-    var numintecKey = req.headers['x-numintec-key'];
+    var numintecKey = req.license;
     if (!numintecKey) {
         return res.status(403).send({auth: false, message: 'No Numintec key provided.'});
     }
@@ -16,7 +16,7 @@ function verifyNumintecKey(req, res, next) {
 
             if (result.return.$value) {
                 // if everything good, save to request for use in other routes
-                req.client = client;
+                req.numintecKey = numintecKey;
                 next();
             } else {
                 return res.status(403).send({auth: false, message: 'Failed to authenticate Numintec key.'});
