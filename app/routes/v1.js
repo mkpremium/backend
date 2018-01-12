@@ -160,6 +160,49 @@ router.get('/numintec/testcall', verifyToken, function(req, res) {
     v1Manager.testcall(res, req.userId);
 });
 
+// =================================================================
+// Migration endpoints: BANKWORKSHEET
+// =================================================================
+
+router.get('/banks/confirmUpload', verifyToken, function(req, res) {
+    v1Manager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, res);
+});
+
+router.get('/banks/getPendingBankOperations', verifyToken, function(req, res) {
+    v1Manager.getPendingBankOperations(res);
+});
+
+router.get('/banks/getBankBuildings', verifyToken, function(req, res) {
+    v1Manager.getBankBuildings(req.query.operation, req.query.state, parseInt(req.query.from), parseInt(req.query.size), res);
+});
+
+router.get('/banks/getBankBuilding', verifyToken, function(req, res) {
+    v1Manager.getBankBuilding(req.query.index, res);
+});
+
+router.get('/banks/getNextBankBuilding', verifyToken, function(req, res) {
+    v1Manager.getNextBankBuilding(req.query.index, res);
+});
+
+router.get('/banks/getPreviousBankBuilding', verifyToken, function(req, res) {
+    v1Manager.getPreviousBankBuilding(req.query.index, res);
+});
+
+router.get('/banks/setStateBankBuilding', verifyToken, function(req, res) {
+    v1Manager.setStateBankBuilding(req.query.index, req.query.operation, req.query.state, res);
+});
+
+router.get('/banks/setAvailableBankBuilding', verifyToken, function(req, res) {
+    v1Manager.setAvailableBankBuilding(req.query.index, req.query.available, res);
+});
+
+router.get('/banks/getOperations', verifyToken, function(req, res) {
+    v1Manager.getOperations(req.query.operation, res);
+});
+
+router.get('/banks/exportBankBuilding', verifyToken, function(req, res) {
+    v1Manager.exportBankBuilding(req.query.operation, req.query.state, req.query.name, res);
+});
 
 // =================================================================
 // module migration

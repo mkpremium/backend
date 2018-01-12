@@ -87,51 +87,6 @@ router.get('/banks/importBank', verifyToken, function(req, res) {
     migrationManager.importBanks(req.query.csv, 'tempBankUpdate', req.userId, res);
 });
 
-
-// =================================================================
-// Migration endpoints: BANKWORKSHEET
-// =================================================================
-
-router.get('/banks/confirmUpload', verifyToken, function(req, res) {
-    migrationManager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, res);
-});
-
-router.get('/banks/getPendingBankOperations', verifyToken, function(req, res) {
-    migrationManager.getPendingBankOperations(res);
-});
-
-router.get('/banks/getBankBuildings', verifyToken, function(req, res) {
-    migrationManager.getBankBuildings(req.query.operation, req.query.state, parseInt(req.query.from), parseInt(req.query.size), res);
-});
-
-router.get('/banks/getBankBuilding', verifyToken, function(req, res) {
-    migrationManager.getBankBuilding(req.query.index, res);
-});
-
-router.get('/banks/getNextBankBuilding', verifyToken, function(req, res) {
-    migrationManager.getNextBankBuilding(req.query.index, res);
-});
-
-router.get('/banks/getPreviousBankBuilding', verifyToken, function(req, res) {
-    migrationManager.getPreviousBankBuilding(req.query.index, res);
-});
-
-router.get('/banks/setStateBankBuilding', verifyToken, function(req, res) {
-    migrationManager.setStateBankBuilding(req.query.index, req.query.operation, req.query.state, res);
-});
-
-router.get('/banks/setAvailableBankBuilding', verifyToken, function(req, res) {
-    migrationManager.setAvailableBankBuilding(req.query.index, req.query.available, res);
-});
-
-router.get('/banks/getOperations', verifyToken, function(req, res) {
-    migrationManager.getOperations(req.query.operation, res);
-});
-
-router.get('/banks/exportBankBuilding', verifyToken, function(req, res) {
-    migrationManager.exportBankBuilding(req.query.operation, req.query.state, req.query.name, res);
-});
-
 // =================================================================
 // Migration endpoints: Operators
 // =================================================================
