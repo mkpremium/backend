@@ -555,7 +555,7 @@ var v1Manager = {
         return;
     },
 
-    numintecCall: function (res, userId, from, to) {
+    numintecCall: function (res, req) {
 
         if (!req.query.method) {
             return res.status(404).send("Method not found.");
