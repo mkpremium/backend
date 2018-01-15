@@ -924,7 +924,7 @@ var v1Manager = {
                                                 console.log('Inserted BankBuilding: ' + countBankBuilding);
                                                 console.log('DONE');
                                             } else {
-                                                if (allowSendRequestCatastro == true && allowSendRequestSearchListings == true) {
+                                                if (countBankBuilding > 0 && allowSendRequestCatastro == true && allowSendRequestSearchListings == true) {
                                                     console.log('Inserted BankBuilding: ' + countBankBuilding);
                                                 }
 
@@ -1423,7 +1423,7 @@ var v1Manager = {
                 bankBuildingPending.splice(0, 1);
                 sentBankBuildings.push(catastro);
 
-                var waitRequestTime = 1000;
+                var waitRequestTime = 3000;
 
                 var sendRequestCatastro = function (catastro) {
                     setTimeout((function (catastro) {
@@ -1526,7 +1526,7 @@ var v1Manager = {
             "headers": {"Content-Type": "application/json"}
         };
 
-        var waitRequestTime = 1000;
+        var waitRequestTime = 3000;
 
         var sendRequestSearchListings = function (buildingId) {
             setTimeout((function (buildingId) {
