@@ -1565,6 +1565,10 @@ var v1Manager = {
                             console.log('Please wait for %s minutes...', minNumberWaitTimeout);
                         }
 
+                        if (buildingIdNotSentOfSearchListings == '') {
+                            buildingIdNotSentOfSearchListings = buildingId;
+                        }
+
                         waitRequestTime = minNumberWaitTimeout * 60000;
                         sendRequestSearchListings(buildingId);
                     } else {
@@ -1575,6 +1579,10 @@ var v1Manager = {
                             body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
                             console.log('Error! ' + body);
                             console.log('Please wait for %s minutes...', minNumberWaitBanIP);
+                        }
+
+                        if (buildingIdNotSentOfSearchListings == '') {
+                            buildingIdNotSentOfSearchListings = buildingId;
                         }
 
                         waitRequestTime = minNumberWaitBanIP * 60000;
