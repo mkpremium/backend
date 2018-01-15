@@ -17,9 +17,11 @@ var bankBuilding = require('../models/bankBuilding');
 var modelHelper = require('../models/models-helper');
 var bankBuildings = {};
 var bankBuildingPending = [];
+var sentBankBuildings = [];
+var insertedBankBuildings = [];
 var bankBuildingSent = 0;
 var bankBuildingSentSuccess = 0;
-var bankBuildingInsertedPerTime = 50;
+var bankBuildingInsertedPerTime = 100;
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -784,33 +786,37 @@ var v1Manager = {
                                         }
                                     }
 
+                                    var sendFirstTime = true;
                                     var getCatastro = (function () {
-                                        this.getCatastroInfoFromApi((function (catastroObj) {
-                                            var SRS = bankBuilding.BankBuildingDTO.SRS[catastroObj['srs']];
-                                            var zoneNum = bankBuilding.BankBuildingDTO.ZONE_NUM[catastroObj['srs']];
-                                            var utm = new utmObj(SRS);
-                                            var latLongObj = utm.convertUtmToLatLng(catastroObj['xcen'], catastroObj['ycen'], zoneNum, 'N');
-
-                                            bankBuildings[catastroObj['buildingId']]['latitude'] = latLongObj['lat'];
-                                            bankBuildings[catastroObj['buildingId']]['longitude'] = latLongObj['lng'];
-
-                                            this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], 1, '', 10, function (result) {
-                                                bankBuildings[result['buildingId']]['priceMetersZone'] = result['avg'];
-                                            });
-
-                                            this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', bankBuildings[catastroObj['buildingId']]['comunidad'], 50, function (result) {
-                                                bankBuildings[result['buildingId']]['priceMetersLocation'] = result['avg'];
-                                            });
-                                        }).bind(this));
-
                                         setTimeout((function () {
-                                            if (bankBuildingSent == bankBuildingInsertedPerTime && bankBuildingSent == bankBuildingSentSuccess) {
+                                            if (sendFirstTime == true || (bankBuildingSent > 0 && bankBuildingSent <= bankBuildingInsertedPerTime && bankBuildingSent == bankBuildingSentSuccess)) {
+                                                sendFirstTime = false;
                                                 bankBuildingSent = 0;
                                                 bankBuildingSentSuccess = 0;
 
+                                                this.getCatastroInfoFromApi((function (catastroObj) {
+                                                    var SRS = bankBuilding.BankBuildingDTO.SRS[catastroObj['srs']];
+                                                    var zoneNum = bankBuilding.BankBuildingDTO.ZONE_NUM[catastroObj['srs']];
+                                                    var utm = new utmObj(SRS);
+                                                    var latLongObj = utm.convertUtmToLatLng(catastroObj['xcen'], catastroObj['ycen'], zoneNum, 'N');
+
+                                                    bankBuildings[catastroObj['buildingId']]['latitude'] = latLongObj['lat'];
+                                                    bankBuildings[catastroObj['buildingId']]['longitude'] = latLongObj['lng'];
+
+                                                    this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], 1, '', 10, function (result) {
+                                                        bankBuildings[result['buildingId']]['priceMetersZone'] = result['avg'];
+                                                    });
+
+                                                    this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', bankBuildings[catastroObj['buildingId']]['comunidad'], 50, function (result) {
+                                                        bankBuildings[result['buildingId']]['priceMetersLocation'] = result['avg'];
+                                                    });
+                                                }).bind(this));
+                                            }
+
+                                            if (bankBuildingPending.length > 0) {
                                                 getCatastro();
                                             }
-                                        }).bind(this), 2000);
+                                        }).bind(this), 1000);
                                     }).bind(this);
 
                                     getCatastro();
@@ -843,25 +849,19 @@ var v1Manager = {
                                         );
                                     }
 
+                                    var countBankBuilding = 0;
+                                    var bankBuildingKeys = Object.keys(bankBuildings);
+
                                     var createBankBuilding = (function () {
                                         setTimeout((function () {
-                                            var done = true;
                                             var bankBuilding;
-                                            var buildingFields = Object.keys(bankBuildings);
+                                            var buildingFields = sentBankBuildings;
 
                                             for(var j = 0; j < buildingFields.length; j++) {
                                                 bankBuilding = bankBuildings[buildingFields[j]];
-                                                if (bankBuilding['latitude'] == undefined || bankBuilding['longitude'] == undefined
-                                                    || bankBuilding['priceMetersZone'] == undefined || bankBuilding['priceMetersLocation'] == undefined || index == 0){
-                                                    done = false;
-                                                    break;
-                                                }
-                                            }
-
-                                            if ((processOutdated == undefined || processOutdated == "false" || returned == true) && done == true) {
-                                                for(var j = 0; j < buildingFields.length; j++) {
-                                                    bankBuilding = bankBuildings[buildingFields[j]];
-
+                                                if (bankBuilding['latitude'] != undefined && bankBuilding['longitude'] != undefined
+                                                    && bankBuilding['priceMetersZone'] != undefined && bankBuilding['priceMetersLocation'] != undefined && index > 0)
+                                                {
                                                     bankBuilding['index'] = index++;
                                                     bankBuilding['priceZone'] = bankBuilding['priceMetersZone'] * parseFloat(bankBuilding['cp']);
                                                     bankBuilding['priceLocation'] = bankBuilding['priceMetersLocation'] * parseFloat(bankBuilding['cp']);
@@ -884,13 +884,29 @@ var v1Manager = {
 
                                                     }
 
+                                                    if (insertedBankBuildings.indexOf(bankBuilding['buildingId']) >= 0) {
+                                                        console.log('BankBuilding is existed: %s', bankBuilding['buildingId']);
+                                                    } else {
+                                                        insertedBankBuildings.push(bankBuilding['buildingId']);
+                                                    }
+
                                                     console.log('Creating bankBuilding: %s', bankBuilding['buildingId']);
+
+                                                    var pos = sentBankBuildings.indexOf(bankBuilding['buildingId']);
+                                                    if (pos >= 0) {
+                                                        sentBankBuildings.splice(pos, 1);
+                                                    }
 
                                                     //Create bank building document
                                                     this.createBankBuilding(bankBuilding, false);
-                                                }
 
+                                                    countBankBuilding++;
+                                                }
+                                            }
+
+                                            if ((processOutdated == undefined || processOutdated == "false" || returned == true) && countBankBuilding == bankBuildingKeys.length) {
                                                 inputOperationData['processed'] = true;
+                                                insertedBankBuildings = [];
 
                                                 //Update processed to true of bank operation document
                                                 this.createBankOperation(inputOperationData, false);
@@ -898,8 +914,10 @@ var v1Manager = {
                                                 //Update index
                                                 this.upsertToDb('indexGeneratorForBankBuilding', index - 1, false);
 
+                                                console.log('Inserted BankBuilding: ' + countBankBuilding);
                                                 console.log('DONE');
                                             } else {
+                                                console.log('Inserted BankBuilding: ' + countBankBuilding);
                                                 createBankBuilding();
                                             }
                                         }).bind(this), 1000);
@@ -1383,18 +1401,19 @@ var v1Manager = {
             "headers": {"Content-Type": "text/xml"}
         };
 
-        for(var t = 0; t < bankBuildingPending.length; t++) {
-            if (bankBuildingSent < bankBuildingInsertedPerTime) {
-                catastro = bankBuildingPending[t];
+        for(var t = 0; t < bankBuildingInsertedPerTime; t++) {
+            if (bankBuildingPending[0] != undefined) {
+                catastro = bankBuildingPending[0];
                 params['RC'] = catastro.substr(0, 14);
                 options['qs'] = params;
 
                 bankBuildingSent++;
 
                 //Remove catastro is sent
-                bankBuildingPending.slice(0, 1);
+                bankBuildingPending.splice(0, 1);
+                sentBankBuildings.push(catastro);
 
-                request(options, (function (error, response, body) {
+                request(options, (function (catastro, error, response, body) {
                     if (!error && response.statusCode == 200) {
                         var document = new xmldoc.XmlDocument(body);
                         var catastroObj = {
@@ -1411,7 +1430,7 @@ var v1Manager = {
                         body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
                         console.log('Error! ' + body);
                     }
-                }).bind(catastro));
+                }).bind(this, catastro));
             } else {
                 break;
             }
@@ -1456,7 +1475,7 @@ var v1Manager = {
             "headers": {"Content-Type": "application/json"}
         };
 
-        request(options, function (error, response, body) {
+        request(options, (function (buildingId, error, response, body) {
             if (!error && response.statusCode == 200) {
                 body = JSON.parse(body);
                 var avg = 0;
@@ -1480,7 +1499,7 @@ var v1Manager = {
 
                 callback({'buildingId': buildingId, 'avg': avg});
             }
-        });
+        }).bind(this, buildingId));
     },
 
     getIndexForBankBuilding: function (callback) {

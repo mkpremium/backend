@@ -209,8 +209,10 @@ var migrationManager = {
 
             if (checkResult == true) {
                 jsonObj = modelHelper.toLowerCaseRequest(jsonObj);
-                jsonObj['id'] = jsonObj.catastro;
-                inputBuildings.push(jsonObj);
+                if (jsonObj.catastro != '') {
+                    jsonObj['id'] = jsonObj.catastro;
+                    inputBuildings.push(jsonObj);
+                }
             } else {
                 var message = "Columns in CSV file aren't formed with list columns: " + bankFields.join(", ");
                 if (errors.indexOf(message) < 0) {
