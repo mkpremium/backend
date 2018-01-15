@@ -87,6 +87,21 @@ router.get('/banks/importBank', verifyToken, function(req, res) {
     migrationManager.importBanks(req.query.csv, 'tempBankUpdate', req.userId, res);
 });
 
+router.post('/banks/importBankCSV', verifyToken, function(req, res) {
+    let csvFile = req.files.file_upload;
+    let filePath = './app/csv/' + csvFile.name;
+
+    csvFile.mv(filePath, (function(fileName, err) {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        console.log('File uploaded!');
+
+        migrationManager.importBanks(fileName, 'tempBankUpdate', req.userId, res);
+    }).bind(this, csvFile.name));
+});
+
 // =================================================================
 // Migration endpoints: Operators
 // =================================================================

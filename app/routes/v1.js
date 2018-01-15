@@ -168,6 +168,21 @@ router.get('/banks/confirmUpload', verifyToken, function(req, res) {
     v1Manager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, req.query.csv, res);
 });
 
+router.post('/banks/confirmUploadCSV', verifyToken, function(req, res) {
+    let csvFile = req.files.file_upload;
+    let filePath = './app/csv/' + csvFile.name;
+
+    csvFile.mv(filePath, (function(fileName, err) {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        console.log('File uploaded!');
+
+        v1Manager.confirmUpload(req.query.ticketid, req.query.processOutdated, 'bankOperation', req.userId, fileName, res);
+    }).bind(this, csvFile.name));
+});
+
 router.get('/banks/getPendingBankOperations', verifyToken, function(req, res) {
     v1Manager.getPendingBankOperations(res);
 });
