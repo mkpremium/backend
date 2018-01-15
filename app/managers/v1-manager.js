@@ -19,9 +19,16 @@ var bankBuildings = {};
 var bankBuildingPending = [];
 var sentBankBuildings = [];
 var insertedBankBuildings = [];
+var buildingIdNotSentOfCatastro = '';
+var buildingIdNotSentOfSearchListings = '';
 var bankBuildingSent = 0;
 var bankBuildingSentSuccess = 0;
-var bankBuildingInsertedPerTime = 10;
+var allowSendRequestSearchListings = true;
+var allowSendRequestCatastro = true;
+
+const bankBuildingInsertedPerTime = 10;
+const minNumberWaitTimeout = 1; //minute
+const minNumberWaitBanIP = 15; //minute
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -917,7 +924,10 @@ var v1Manager = {
                                                 console.log('Inserted BankBuilding: ' + countBankBuilding);
                                                 console.log('DONE');
                                             } else {
-                                                console.log('Inserted BankBuilding: ' + countBankBuilding);
+                                                if (allowSendRequestCatastro == true && allowSendRequestSearchListings == true) {
+                                                    console.log('Inserted BankBuilding: ' + countBankBuilding);
+                                                }
+
                                                 createBankBuilding();
                                             }
                                         }).bind(this), 1000);
@@ -1413,28 +1423,65 @@ var v1Manager = {
                 bankBuildingPending.splice(0, 1);
                 sentBankBuildings.push(catastro);
 
-                setTimeout((function (catastro) {
-                    request(options, (function (catastro, error, response, body) {
-                        if (!error && response.statusCode == 200) {
-                            var document = new xmldoc.XmlDocument(body);
-                            var catastroObj = {
-                                'buildingId': catastro,
-                                'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
-                                'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
-                                'srs': document.valueWithPath("coordenadas.coord.geo.srs")
-                            };
+                var waitRequestTime = 1000;
 
-                            bankBuildingSentSuccess++;
+                var sendRequestCatastro = function (catastro) {
+                    setTimeout((function (catastro) {
+                        request(options, (function (catastro, error, response, body) {
+                            if (!error && response.statusCode == 200) {
+                                allowSendRequestCatastro = true;
+                                buildingIdNotSentOfCatastro = '';
 
-                            callback(catastroObj);
-                        } else if (error != undefined) {
-                            console.log('Error! ' + error['message']);
-                        } else {
-                            body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
-                            console.log('Error! ' + body);
-                        }
-                    }).bind(this, catastro));
-                }).bind(this, catastro), 1000);
+                                var document = new xmldoc.XmlDocument(body);
+                                var catastroObj = {
+                                    'buildingId': catastro,
+                                    'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
+                                    'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
+                                    'srs': document.valueWithPath("coordenadas.coord.geo.srs")
+                                };
+
+                                bankBuildingSentSuccess++;
+
+                                callback(catastroObj);
+                            } else if (error != undefined) {
+                                if (allowSendRequestCatastro == true || buildingIdNotSentOfCatastro == catastro) {
+                                    allowSendRequestCatastro = false;
+                                    buildingIdNotSentOfCatastro = '';
+
+                                    console.log('Error! ' + error['message']);
+                                    console.log('Please wait for %s minutes...', minNumberWaitTimeout);
+                                }
+
+                                if (buildingIdNotSentOfCatastro == '') {
+                                    buildingIdNotSentOfCatastro = catastro;
+                                }
+
+                                waitRequestTime = minNumberWaitTimeout * 60000;
+                                sendRequestCatastro(catastro);
+                            } else {
+                                if (allowSendRequestCatastro == true || buildingIdNotSentOfCatastro == catastro) {
+                                    allowSendRequestCatastro = false;
+                                    buildingIdNotSentOfCatastro = '';
+
+                                    body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
+                                    console.log('Error! ' + body);
+                                    console.log('Please wait for %s minutes...', minNumberWaitBanIP);
+                                }
+
+                                if (buildingIdNotSentOfCatastro == '') {
+                                    buildingIdNotSentOfCatastro = catastro;
+                                }
+
+                                waitRequestTime = minNumberWaitBanIP * 60000;
+                                sendRequestCatastro(catastro);
+                            }
+                        }).bind(this, catastro));
+                    }).bind(this, catastro), waitRequestTime);
+                };
+
+                if (allowSendRequestCatastro == true) {
+                    sendRequestCatastro(catastro);
+                }
             } else {
                 break;
             }
@@ -1479,38 +1526,67 @@ var v1Manager = {
             "headers": {"Content-Type": "application/json"}
         };
 
-        setTimeout((function (buildingId) {
-            request(options, (function (buildingId, error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    body = JSON.parse(body);
-                    var avg = 0;
-                    var listings = body['response']['listings'];
-                    if (listings != undefined) {
-                        var count = 0;
-                        var total = 0;
-                        for(var i = 0; i < listings.length; i++) {
-                            count++;
-                            if (listings[i]['size'] > 0) {
-                                total += listings[i]['price'] / listings[i]['size'];
-                            } else {
-                                total += 0;
+        var waitRequestTime = 1000;
+
+        var sendRequestSearchListings = function (buildingId) {
+            setTimeout((function (buildingId) {
+                request(options, (function (buildingId, error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        allowSendRequestSearchListings = true;
+                        buildingIdNotSentOfSearchListings = '';
+
+                        body = JSON.parse(body);
+                        var avg = 0;
+                        var listings = body['response']['listings'];
+                        if (listings != undefined) {
+                            var count = 0;
+                            var total = 0;
+                            for(var i = 0; i < listings.length; i++) {
+                                count++;
+                                if (listings[i]['size'] > 0) {
+                                    total += listings[i]['price'] / listings[i]['size'];
+                                } else {
+                                    total += 0;
+                                }
+                            }
+
+                            if (count > 0) {
+                                avg = total / count;
                             }
                         }
 
-                        if (count > 0) {
-                            avg = total / count;
-                        }
-                    }
+                        callback({'buildingId': buildingId, 'avg': avg});
+                    } else if (error != undefined) {
+                        if (allowSendRequestSearchListings == true || buildingIdNotSentOfSearchListings == buildingId) {
+                            allowSendRequestSearchListings = false;
+                            buildingIdNotSentOfSearchListings = '';
 
-                    callback({'buildingId': buildingId, 'avg': avg});
-                } else if (error != undefined) {
-                    console.log('Error! ' + error['message']);
-                } else {
-                    body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
-                    console.log('Error! ' + body);
-                }
-            }).bind(this, buildingId));
-        }).bind(this, buildingId), 1000);
+                            console.log('Error! ' + error['message']);
+                            console.log('Please wait for %s minutes...', minNumberWaitTimeout);
+                        }
+
+                        waitRequestTime = minNumberWaitTimeout * 60000;
+                        sendRequestSearchListings(buildingId);
+                    } else {
+                        if (allowSendRequestSearchListings == true || buildingIdNotSentOfSearchListings == buildingId) {
+                            allowSendRequestSearchListings = false;
+                            buildingIdNotSentOfSearchListings = '';
+
+                            body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
+                            console.log('Error! ' + body);
+                            console.log('Please wait for %s minutes...', minNumberWaitBanIP);
+                        }
+
+                        waitRequestTime = minNumberWaitBanIP * 60000;
+                        sendRequestSearchListings(buildingId);
+                    }
+                }).bind(this, buildingId));
+            }).bind(this, buildingId), waitRequestTime);
+        };
+
+        if (allowSendRequestSearchListings == true) {
+            sendRequestSearchListings(buildingId);
+        }
     },
 
     getIndexForBankBuilding: function (callback) {
