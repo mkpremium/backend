@@ -16,6 +16,10 @@ var bankOperation = require('../models/bankOperation');
 var bankBuilding = require('../models/bankBuilding');
 var modelHelper = require('../models/models-helper');
 var bankBuildings = {};
+var bankBuildingPending = [];
+var bankBuildingSent = 0;
+var bankBuildingSentSuccess = 0;
+var bankBuildingInsertedPerTime = 50;
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -775,7 +779,13 @@ var v1Manager = {
 
                                         bankBuildings[inputBuildingData['buildingId']] = inputBuildingData;
 
-                                        this.getInfoCatastro(inputBuildingData['buildingId'], (function (catastroObj) {
+                                        if (bankBuildingPending.indexOf(inputBuildingData['buildingId']) < 0) {
+                                            bankBuildingPending.push(inputBuildingData['buildingId']);
+                                        }
+                                    }
+
+                                    var getCatastro = (function () {
+                                        this.getCatastroInfoFromApi((function (catastroObj) {
                                             var SRS = bankBuilding.BankBuildingDTO.SRS[catastroObj['srs']];
                                             var zoneNum = bankBuilding.BankBuildingDTO.ZONE_NUM[catastroObj['srs']];
                                             var utm = new utmObj(SRS);
@@ -788,11 +798,22 @@ var v1Manager = {
                                                 bankBuildings[result['buildingId']]['priceMetersZone'] = result['avg'];
                                             });
 
-                                            this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', inputBuildingData['comunidad'], 50, function (result) {
+                                            this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', bankBuildings[catastroObj['buildingId']]['comunidad'], 50, function (result) {
                                                 bankBuildings[result['buildingId']]['priceMetersLocation'] = result['avg'];
                                             });
                                         }).bind(this));
-                                    }
+
+                                        setTimeout((function () {
+                                            if (bankBuildingSent == bankBuildingInsertedPerTime && bankBuildingSent == bankBuildingSentSuccess) {
+                                                bankBuildingSent = 0;
+                                                bankBuildingSentSuccess = 0;
+
+                                                getCatastro();
+                                            }
+                                        }).bind(this), 2000);
+                                    }).bind(this);
+
+                                    getCatastro();
 
                                     var index = 0;
                                     this.getIndexForBankBuilding(function (result) {
@@ -1347,34 +1368,54 @@ var v1Manager = {
             }).bind(this));
     },
 
-    getInfoCatastro: function (catastro, callback) {
+    getCatastroInfoFromApi: function (callback) {
+        var catastro;
         var params = {
             'Provincia': '',
             'Municipio': '',
-            'SRS': '',
-            'RC': catastro.substr(0, 14)
+            'SRS': ''
         };
         var url = 'https://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC';
         var options = {
             "method": "GET",
             "rejectUnauthorized": false,
             "url": url,
-            'qs': params,
             "headers": {"Content-Type": "text/xml"}
         };
 
-        request(options, (function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var document = new xmldoc.XmlDocument(body);
-                var catastroObj = {
-                    'buildingId': catastro,
-                    'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
-                    'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
-                    'srs': document.valueWithPath("coordenadas.coord.geo.srs")
-                };
-                callback(catastroObj);
+        for(var t = 0; t < bankBuildingPending.length; t++) {
+            if (bankBuildingSent < bankBuildingInsertedPerTime) {
+                catastro = bankBuildingPending[t];
+                params['RC'] = catastro.substr(0, 14);
+                options['qs'] = params;
+
+                bankBuildingSent++;
+
+                //Remove catastro is sent
+                bankBuildingPending.slice(0, 1);
+
+                request(options, (function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        var document = new xmldoc.XmlDocument(body);
+                        var catastroObj = {
+                            'buildingId': catastro,
+                            'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
+                            'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
+                            'srs': document.valueWithPath("coordenadas.coord.geo.srs")
+                        };
+
+                        bankBuildingSentSuccess++;
+
+                        callback(catastroObj);
+                    } else {
+                        body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
+                        console.log('Error! ' + body);
+                    }
+                }).bind(catastro));
+            } else {
+                break;
             }
-        }).bind(catastro));
+        }
     },
 
     getSearchListings: function (buildingId, lat, lng, km, place_name, max_result, callback) {
