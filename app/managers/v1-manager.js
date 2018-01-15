@@ -810,13 +810,13 @@ var v1Manager = {
                                                     bankBuildings[catastroObj['buildingId']]['latitude'] = latLongObj['lat'];
                                                     bankBuildings[catastroObj['buildingId']]['longitude'] = latLongObj['lng'];
 
-                                                    this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], 1, '', 10, function (result) {
-                                                        bankBuildings[result['buildingId']]['priceMetersZone'] = result['avg'];
-                                                    });
+                                                    this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], 1, '', 10, (function (catastroObj, latLongObj, resultZone) {
+                                                        bankBuildings[resultZone['buildingId']]['priceMetersZone'] = resultZone['avg'];
 
-                                                    this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', bankBuildings[catastroObj['buildingId']]['comunidad'], 50, function (result) {
-                                                        bankBuildings[result['buildingId']]['priceMetersLocation'] = result['avg'];
-                                                    });
+                                                        this.getSearchListings(catastroObj['buildingId'], latLongObj['lat'], latLongObj['lng'], '', bankBuildings[catastroObj['buildingId']]['comunidad'], 50, function (resultLocation) {
+                                                            bankBuildings[resultLocation['buildingId']]['priceMetersLocation'] = resultLocation['avg'];
+                                                        });
+                                                    }).bind(this, catastroObj, latLongObj));
                                                 }).bind(this));
                                             }
 
