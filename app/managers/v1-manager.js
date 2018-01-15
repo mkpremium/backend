@@ -21,7 +21,7 @@ var sentBankBuildings = [];
 var insertedBankBuildings = [];
 var bankBuildingSent = 0;
 var bankBuildingSentSuccess = 0;
-var bankBuildingInsertedPerTime = 100;
+var bankBuildingInsertedPerTime = 10;
 
 // var modelHelper = require('../models/models-helper');
 // var buildings   = require('../models/building');
@@ -1413,24 +1413,28 @@ var v1Manager = {
                 bankBuildingPending.splice(0, 1);
                 sentBankBuildings.push(catastro);
 
-                request(options, (function (catastro, error, response, body) {
-                    if (!error && response.statusCode == 200) {
-                        var document = new xmldoc.XmlDocument(body);
-                        var catastroObj = {
-                            'buildingId': catastro,
-                            'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
-                            'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
-                            'srs': document.valueWithPath("coordenadas.coord.geo.srs")
-                        };
+                setTimeout((function (catastro) {
+                    request(options, (function (catastro, error, response, body) {
+                        if (!error && response.statusCode == 200) {
+                            var document = new xmldoc.XmlDocument(body);
+                            var catastroObj = {
+                                'buildingId': catastro,
+                                'xcen': document.valueWithPath("coordenadas.coord.geo.xcen"),
+                                'ycen': document.valueWithPath("coordenadas.coord.geo.ycen"),
+                                'srs': document.valueWithPath("coordenadas.coord.geo.srs")
+                            };
 
-                        bankBuildingSentSuccess++;
+                            bankBuildingSentSuccess++;
 
-                        callback(catastroObj);
-                    } else {
-                        body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
-                        console.log('Error! ' + body);
-                    }
-                }).bind(this, catastro));
+                            callback(catastroObj);
+                        } else if (error != undefined) {
+                            console.log('Error! ' + error['message']);
+                        } else {
+                            body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
+                            console.log('Error! ' + body);
+                        }
+                    }).bind(this, catastro));
+                }).bind(this, catastro), 1000);
             } else {
                 break;
             }
@@ -1475,31 +1479,38 @@ var v1Manager = {
             "headers": {"Content-Type": "application/json"}
         };
 
-        request(options, (function (buildingId, error, response, body) {
-            if (!error && response.statusCode == 200) {
-                body = JSON.parse(body);
-                var avg = 0;
-                var listings = body['response']['listings'];
-                if (listings != undefined) {
-                    var count = 0;
-                    var total = 0;
-                    for(var i = 0; i < listings.length; i++) {
-                        count++;
-                        if (listings[i]['size'] > 0) {
-                            total += listings[i]['price'] / listings[i]['size'];
-                        } else {
-                            total += 0;
+        setTimeout((function (buildingId) {
+            request(options, (function (buildingId, error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    body = JSON.parse(body);
+                    var avg = 0;
+                    var listings = body['response']['listings'];
+                    if (listings != undefined) {
+                        var count = 0;
+                        var total = 0;
+                        for(var i = 0; i < listings.length; i++) {
+                            count++;
+                            if (listings[i]['size'] > 0) {
+                                total += listings[i]['price'] / listings[i]['size'];
+                            } else {
+                                total += 0;
+                            }
+                        }
+
+                        if (count > 0) {
+                            avg = total / count;
                         }
                     }
 
-                    if (count > 0) {
-                        avg = total / count;
-                    }
+                    callback({'buildingId': buildingId, 'avg': avg});
+                } else if (error != undefined) {
+                    console.log('Error! ' + error['message']);
+                } else {
+                    body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
+                    console.log('Error! ' + body);
                 }
-
-                callback({'buildingId': buildingId, 'avg': avg});
-            }
-        }).bind(this, buildingId));
+            }).bind(this, buildingId));
+        }).bind(this, buildingId), 1000);
     },
 
     getIndexForBankBuilding: function (callback) {
