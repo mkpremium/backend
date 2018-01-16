@@ -2,6 +2,7 @@
 // get the packages we need ========================================
 // =================================================================
 var express 	= require('express');
+var fileUpload  = require('express-fileupload');
 var cors 		= require('cors');
 var app         = express();
 var bodyParser  = require('body-parser');
@@ -16,7 +17,7 @@ var port = process.env.PORT || 9080; // used to create, sign, and verify tokens
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
+app.use(fileUpload());
 
 // use morgan to log requests to the console
 app.use(morgan('dev'));
