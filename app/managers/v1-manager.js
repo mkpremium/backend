@@ -1448,7 +1448,7 @@ var v1Manager = {
                                     allowSendRequestCatastro = false;
                                     buildingIdNotSentOfCatastro = '';
 
-                                    console.log('Error! ' + error['message']);
+                                    console.log('Error on https://ovc.catastro.meh.es: ' + error['message']);
                                     console.log('Please wait for %s minutes...', minNumberWaitTimeout);
                                 }
 
@@ -1464,7 +1464,7 @@ var v1Manager = {
                                     buildingIdNotSentOfCatastro = '';
 
                                     body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
-                                    console.log('Error! ' + body);
+                                    console.log('Error on https://ovc.catastro.meh.es: ' + body);
                                     console.log('Please wait for %s minutes...', minNumberWaitBanIP);
                                 }
 
@@ -1561,7 +1561,7 @@ var v1Manager = {
                             allowSendRequestSearchListings = false;
                             buildingIdNotSentOfSearchListings = '';
 
-                            console.log('Error! ' + error['message']);
+                            console.log('Error on https://api.nestoria.es: ' + error['message']);
                             console.log('Please wait for %s minutes...', minNumberWaitTimeout);
                         }
 
@@ -1577,7 +1577,7 @@ var v1Manager = {
                             buildingIdNotSentOfSearchListings = '';
 
                             body = response.body.replace(/<\/?[^>]+(>|$)/g, "");
-                            console.log('Error! ' + body);
+                            console.log('Error on https://api.nestoria.es: ' + body);
                             console.log('Please wait for %s minutes...', minNumberWaitBanIP);
                         }
 
