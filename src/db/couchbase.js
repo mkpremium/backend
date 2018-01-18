@@ -1,5 +1,5 @@
 import Couchbase from 'couchbase';
-import {couchbase} from "../config";
+import {couchbase} from '../../config';
 
 const cluster = new Couchbase.Cluster(couchbase.uri);
 cluster.authenticate(couchbase.user, couchbase.pass);
