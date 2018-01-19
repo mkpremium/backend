@@ -3,6 +3,9 @@ import {jwt} from '../../config';
 
 export default () => {
   return jwtMiddleware(jwt).unless({
-    path: ['/operator/login']
+    path: [
+      '/operator/login',
+      '/webhooks/numintec'
+    ]
   });
 };
