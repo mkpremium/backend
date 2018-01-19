@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set -e
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+name=$(basename $0)
+deploy_dir=/home/centos/apps/numintec-webhook
+
+summary() {
+  cat <<EOH
+${bold}NAME${normal}
+  $name - Build and deploy the files to the <ssh-host>:${deploy_dir}
+
+${bold}SYNOPSIS${normal}
+  sh $name <ssh-host>
+
+${bold}DESCRIPTION${normal}
+  Build and deploy the files to the ssh-host that pass as first argument
+  should be a hostname that you have configure in your ~/.ssh/config that points to the correct instance
+  and have the correct credentials to successfully connect.
+
+  Example:
+
+    sh $name bitdistrict-m1
+
+  Exit Status:
+  Returns 0 unless the instructions cannot be completed
+EOH
+}
+
+if [ $# -eq 0 ]; then
+    summary
+    exit 1
+fi
+
+dist_file=$(mktemp --suffix=.tgz)
+dist_host=$1
+
+echo "Deploying..."
+echo -e "Root project                 \t: ${bold}$(pwd)${normal}"
+
+echo -en "Generating distribution file\t: "
+git archive -o ${dist_file} --format tgz HEAD
+echo -e "${bold}${dist_file}${normal}"
+
+echo -en "Uploading distribution file  \t: "
+rsync -arq ${dist_file} ${dist_host}:${dist_file}
+echo -e "${bold}OK${normal}"
+
+echo -en "Installing                   \t: "
+ssh ${dist_host} bash << EOF
+source ~/.nvm/nvm.sh
+tar xzf ${dist_file} -C ${deploy_dir} > dev/null
+nvm use
+cd ${deploy_dir}
+npm install
+EOF
