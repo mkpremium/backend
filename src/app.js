@@ -7,6 +7,8 @@ import couchbase from './db/couchbase';
 import jwt from './middleware/jwt';
 import numintec from './numintec';
 
+import migration from './migration';
+
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -15,8 +17,8 @@ app.use(fileUpload());
 app.use(morgan('dev'));
 app.use(cors());
 app.use(jwt());
+app.use(couchbase());
 app.use(numintec());
-
-Object.assign(app.locals, couchbase);
+app.use(migration());
 
 export default app;
