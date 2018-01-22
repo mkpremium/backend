@@ -29,3 +29,6 @@ node_modules
 
 # data files
 app/csv/*.csv
+
+# Environment values
+.env
