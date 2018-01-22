@@ -3,7 +3,8 @@
 module.exports = {
     "extends": "standard",
     "env": {
-        "node": true
+        "node": true,
+        "mocha": true
     },
     "rules": {
         "comma-dangle": [
