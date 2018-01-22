@@ -10,7 +10,11 @@ export default () => (req, res, next) => {
 
   morganBody(req.app);
 
-  router.use('/', loggerWebhook);
+  router.post('/', loggerWebhook);
+  router.put('/', loggerWebhook);
+  router.get('/', loggerWebhook);
+  router.options('/', loggerWebhook);
+  router.patch('/', loggerWebhook);
   req.app.use('/webhooks/numintec', router);
   next();
 };
