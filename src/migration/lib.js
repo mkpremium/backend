@@ -19,9 +19,18 @@ const defaultOptions = {
 export async function csvToJson(filepath, processFunc = noOp, options = defaultOptions) {
   await fs.ensureFile(filepath);
   return new Promise((resolve, reject) => {
+    const queue = [];
     csv(options)
       .fromFile(filepath)
-      .on('json', processFunc)
-      .on('done', err => err ? reject(err) : resolve());
+      .on('json', (row) => {
+        queue.push(processFunc(row));
+      })
+      .on('done', err => {
+        Promise.all(queue.filter(n => n))
+          .then(() => {})
+          .finally(() => {
+            err ? reject(err) : resolve();
+          });
+      });
   });
 }
