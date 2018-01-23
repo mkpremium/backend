@@ -1,6 +1,5 @@
 import t from 'tcomb';
-import modelHelper from './models-helpers';
-import {removeNullValues, cleanObjectKeys} from "./models-helper";
+import {removeNullValues, cleanObjectKeys} from './models-helper';
 
 // const Address = t.struct({
 //   type: t.Str,
