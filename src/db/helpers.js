@@ -3,9 +3,14 @@ import {couchbase} from '../../config';
 
 export async function getList(documentType) {
   const queryString = N1qlQuery.fromString('SELECT t.* FROM $1 t WHERE t._documentType = \'$2\' LIMIT 100');
-  const results = await this.query(queryString, [couchbase.bucket, documentType]);
 
-  return results;
+  return this.query(queryString, [couchbase.bucket, documentType]);
+}
+
+export async function upsertToDb(pk, data) {
+  await this.createPrimaryIndex();
+  await this.upsert(pk, data);
+  return this.get(pk);
 }
 
 export async function removeAll() {
@@ -16,6 +21,7 @@ export async function removeAll() {
 function attach(bucket) {
   bucket.getList = getList;
   bucket.removeAll = removeAll;
+  bucket.upsertToDb = upsertToDb;
 }
 
 export default attach;

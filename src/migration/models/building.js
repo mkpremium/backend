@@ -1,24 +1,60 @@
 import t from 'tcomb';
+import modelHelper from './models-helpers';
+import {removeNullValues, cleanObjectKeys} from "./models-helper";
 
-const Address = t.struct({
-  type: t.Str,
-  street: t.Str,
-  number: t.Str,
-  fullName: t.maybe(t.Str),
-  postalCode: t.maybe(t.Str)
-});
+// const Address = t.struct({
+//   type: t.Str,
+//   street: t.Str,
+//   number: t.Str,
+//   fullName: t.maybe(t.Str),
+//   postalCode: t.maybe(t.Str)
+// }, 'Address');
 
-export const BuildingDTO = t.struct(
-  {
-    _documentType: t.Str,
-    id: t.Str,
-    address: Address
-  },
-  {
-    defaultProps: {_documentType: 'building'}
-  }
-);
+export const BuildingDTO = t.struct({
+  _documentType: t.Str,
+  id: t.Str,
+  type: t.maybe(t.Str),
+  street: t.maybe(t.Str),
+  number: t.maybe(t.Str),
+  fullStreet: t.maybe(t.Str),
+  numbero: t.maybe(t.Str),
+  postalCode: t.maybe(t.Str),
+  build: t.maybe(t.Str),
+  reference: t.maybe(t.Str),
+  location: t.maybe(t.Str),
+  postalCode2: t.maybe(t.Str),
+  class: t.maybe(t.Str),
+  surfaceBuilded: t.maybe(t.Str),
+  surfaceTerrain: t.maybe(t.Str),
+  coefficient: t.maybe(t.Str),
+  use: t.maybe(t.Str),
+  propertyType: t.maybe(t.Str),
+  yearConstruction: t.maybe(t.Str),
+  owner: t.maybe(t.Str),
+  phone: t.maybe(t.Str),
+  elementsNumber: t.maybe(t.Str),
+  elementsAverage: t.maybe(t.Str),
+  commonsElements: t.maybe(t.Str),
+  municipality: t.maybe(t.Str),
+  province: t.maybe(t.Str),
+  ownerName: t.maybe(t.Str),
+  ownerStreet: t.maybe(t.Str),
+  ownerCity: t.maybe(t.Str),
+  numberPB: t.maybe(t.Str),
+  numberIB: t.maybe(t.Str),
+  numberBD: t.maybe(t.Str),
+  numberABC: t.maybe(t.Str),
+  number1: t.maybe(t.Str),
+  number2: t.maybe(t.Str),
+  number3: t.maybe(t.Str),
+  surfaceRoof: t.maybe(t.Str),
+  filter: t.maybe(t.Str)
 
+}, {defaultProps: {_documentType: 'building'}});
+
+// =================================================================
+// BuildingInput
+// =================================================================
 export const BuildingInputDTO = t.struct({
   id: t.Str,
   type: t.maybe(t.Str),
@@ -59,8 +95,45 @@ export const BuildingInputDTO = t.struct({
   filter: t.maybe(t.Str)
 });
 
-function map() {
-
+export default function toDatabase(data) {
+  const input = BuildingInputDTO(removeNullValues(cleanObjectKeys(data)));
+  return BuildingDTO({
+    id: `building:${input.id}`,
+    type: input.type,
+    street: input.street,
+    number: input.number,
+    fullStreet: input.fullStreet,
+    numbero: input.numbero,
+    postalCode: input.postalCode,
+    build: input.build,
+    reference: input.reference,
+    location: input.location,
+    postalCode2: input.postalCode2,
+    'class': input.classe,
+    surfaceBuilded: input.surfaceBuilded,
+    surfaceTerrain: input.surfaceTerrain,
+    coefficient: input.coefficient,
+    use: input.use,
+    propertyType: input.propertyType,
+    yearConstruction: input.yearConstruction,
+    owner: input.owner,
+    phone: input.phone,
+    elementsNumber: input.elementsNumber,
+    elementsAverage: input.elementsAverage,
+    commonsElements: input.commonsElements,
+    municipality: input.municipality,
+    province: input.province,
+    ownerName: input.ownerName,
+    ownerStreet: input.ownerStreet,
+    ownerCity: input.ownerCity,
+    numberPB: input.numero_pb,
+    numberIB: input.numero_ib,
+    numberBD: input.numero_bd,
+    numberABC: input.numero_abc,
+    number1: input.numero_1,
+    number2: input.numero_2,
+    number3: input.numero_3,
+    surfaceRoof: input.surfaceRoof,
+    filter: input.filter
+  });
 }
-
-BuildingDTO.prototype.map = map;
