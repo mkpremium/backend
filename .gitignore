@@ -32,3 +32,6 @@ app/csv/*.csv
 
 # Environment values
 .env
+
+# Mocha Reporter
+test-results.xml
