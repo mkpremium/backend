@@ -5,7 +5,8 @@
     "lint": "eslint .",
     "prestart": "npm run lint",
     "start": "better-npm-run start",
-    "test": "mocha --require babel-register --require babel-polyfill test/**/*.spec.js --spec"
+    "pretest": "npm run lint",
+    "test": "mocha --require test/setup.js --recursive -R spec"
   },
   "betterScripts": {
     "start": "nodemon bin/www.js --exec babel-node"

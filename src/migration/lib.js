@@ -17,7 +17,7 @@ const defaultOptions = {
  * @return {Promise<void>}
  */
 export async function csvToJson(filepath, processFunc = noOp, options = defaultOptions) {
-  await fs.ensureFile(filepath);
+  await fs.pathExists(filepath);
   return new Promise((resolve, reject) => {
     const queue = [];
     csv(options)
