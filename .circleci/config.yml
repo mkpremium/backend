@@ -3,11 +3,11 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
-machine:
-  environment:
-    MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
 jobs:
   test:
+    machine:
+      environment:
+        MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
     docker:
       - image: circleci/node:9.20
 
