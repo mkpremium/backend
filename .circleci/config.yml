@@ -6,7 +6,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/node:9.20
+      - image: circleci/node:9.2
     environment:
       - MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
 
