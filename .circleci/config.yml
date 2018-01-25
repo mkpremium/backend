@@ -5,11 +5,10 @@
 version: 2
 jobs:
   test:
-    machine:
-      environment:
-        MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
     docker:
       - image: circleci/node:9.20
+    environment:
+      - MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
 
     working_directory: ~/repo
 
