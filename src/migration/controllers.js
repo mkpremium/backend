@@ -4,19 +4,19 @@ import models from './models';
 import {csvToJson} from './lib';
 
 function createList(name) {
-  return async(req, res) => {
+  return wrap(async(req, res) => {
     const data = await req.app.locals.bucket.getList(name);
     res.json({data});
-  };
+  });
 }
 
-async function createImport(name) {
-  return async(req, res) => {
+function createImport(name) {
+  return wrap(async(req, res) => {
     const model = models[name](req.body);
     console.log('importing', name, model.id);
     await req.app.locals.bucket.upsertToDb(model.id, model);
     res.status(204).json();
-  };
+  });
 }
 
 const csvBasePath = resolve(__dirname, '../../test/fixtures');
@@ -30,8 +30,8 @@ const csvMapNames = {
   'housestate': 'SITARR.csv'
 };
 
-async function createBulkImport(name) {
-  return async(req, res) => {
+function createBulkImport(name) {
+  return wrap(async(req, res) => {
     if (csvMapNames[name]) {
       throw new Error(`${name} not found on csvMapNames`);
     }
@@ -43,9 +43,9 @@ async function createBulkImport(name) {
     const filename = join(csvBasePath, csvMapNames[name]);
     await csvToJson(filename, processFunc);
     res.status(204).json();
-  };
+  });
 }
 
-export const createListController = wrap(createList);
-export const createImportController = wrap(createImport);
-export const createBulkImportController = wrap(createBulkImport);
+export const createListController = createList;
+export const createImportController = createImport;
+export const createBulkImportController = createBulkImport;
