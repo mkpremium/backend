@@ -12,16 +12,25 @@ const defaultOpts = {
 let retries = 3;
 
 export default (opts = defaultOpts) => {
+  let resolve = null;
+  let reject = null;
+
   debugCouchbase(`initializing couchbase connection with "${couchbase.uri}"`);
   const cluster = new Couchbase.Cluster(couchbase.uri);
   cluster.authenticate(couchbase.user, couchbase.pass);
 
+  // http://bluebirdjs.com/docs/api/deferred-migration.html
+  const promise = new Promise(function() {
+    resolve = arguments[0];
+    reject = arguments[1];
+  });
+
   const bucket = cluster.openBucket(couchbase.bucket);
 
-  checkBucket(bucket);
+  checkBucket(bucket, cluster, resolve, reject);
 
   if (!opts.middleware) {
-    return {cluster, bucket};
+    return promise;
   }
 
   return (req, res, next) => {
@@ -30,10 +39,9 @@ export default (opts = defaultOpts) => {
   };
 };
 
-function checkBucket(bucket) {
+function checkBucket(bucket, cluster, resolve, reject) {
   if (retries <= 0) {
-    console.error(`It's possible a error trying to connect bucket ${bucket._name} check your setup`);
-    process.exit(1);
+    reject(new Error(`It's possible a error trying to connect bucket ${bucket._name} check your setup`));
   }
 
   debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`);
@@ -41,8 +49,9 @@ function checkBucket(bucket) {
   if (bucket.connected) {
     debugCouchbase(`bucket ${bucket._name} connected`);
     attachHelpers(bucket);
+    resolve(bucket);
   } else {
     retries--;
-    setTimeout(() => checkBucket(bucket), 1500);
+    setTimeout(() => checkBucket(bucket, cluster, resolve, reject), 1500);
   }
 }
