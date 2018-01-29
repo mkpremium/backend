@@ -19,7 +19,7 @@ function createImport(name) {
   });
 }
 
-const csvBasePath = resolve(__dirname, '../../test/fixtures');
+const csvBasePath = resolve(__dirname, '../../csv');
 const csvMapNames = {
   'building': 'EDIFICIOS.csv',
   'history': 'HISTORIAL.csv',
