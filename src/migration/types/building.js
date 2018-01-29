@@ -16,7 +16,7 @@ t.Elements = t.struct({
   commons: t.Number
 }, 'Elements');
 
-t.Owner = t.struct(
+t.BuildingOwner = t.struct(
   {
     name: t.String,
     address: t.SimpleAddress,
@@ -44,7 +44,7 @@ t.Building = t.struct(
     buildingDate: t.Number,
     location: t.Location,
     elements: t.Elements,
-    owner: t.Owner, // TODO: move to owners collection
+    owner: t.BuildingOwner, // TODO: move to owners collection
     state: t.BuildingState,
 
     _migrateId: t.String,
