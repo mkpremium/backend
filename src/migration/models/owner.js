@@ -89,6 +89,10 @@ export default function migrateFromCsv(data) {
   };
 
   const ownerType = () => {
+    if (isEmpty(input.codfis)) {
+      return 'NINGUNO';
+    }
+
     switch (input.codfis[0]) {
       case 'V':
         return 'VECINO';

@@ -33,5 +33,4 @@ function processFunc(data, row) {
 }
 
 importCsv(model, file)
-  .then(console.log.bind(console))
   .catch(console.error.bind(console));

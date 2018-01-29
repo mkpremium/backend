@@ -10,7 +10,7 @@ t.Owner = t.struct(
     note: t.maybe(t.String),
 
     _migrateId: t.list(t.String),
-    _relatedTo: t.String,
+    _relatedTo: t.maybe(t.String),
     _documentType: t.String
   },
   {
