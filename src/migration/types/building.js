@@ -39,8 +39,8 @@ t.Building = t.struct(
     landArea: t.Number,
     roofArea: t.Number,
     coefficient: t.Number,
-    use: t.String, // FIXME: define this as a t.enums
-    propertyType: t.String, // FIXME: define this as a t.enums
+    use: t.maybe(t.String), // FIXME: define this as a t.enums
+    propertyType: t.maybe(t.String), // FIXME: define this as a t.enums
     buildingDate: t.Number,
     location: t.Location,
     elements: t.Elements,

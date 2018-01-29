@@ -80,11 +80,18 @@ export default function migrateFromCsv(data) {
     name: input.proprietari,
     address: {
       fullAddress: input.domicili,
-      city: input.poblacio
+      city: input.poblacio || input.municipality
     },
     phones: ownerPhones()
   });
-  const number = value => Number(value || 0);
+
+  const number = value => {
+    if (value) {
+      return Number(value.replace(',', '.'));
+    }
+
+    return 0;
+  };
 
   return t.Building({
     id: uuid(),
