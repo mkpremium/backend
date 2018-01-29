@@ -1,3 +1,4 @@
 **/*.js
 !/src/**/*.js
 !/config.js
+!/bin/**/*.js
