@@ -1,5 +1,6 @@
 import {N1qlQuery} from 'couchbase';
 import {couchbase} from '../../config';
+import promises from './promises';
 
 export async function getList(documentType) {
   const queryString = N1qlQuery.fromString('SELECT t.* FROM $1 t WHERE t._documentType = \'$2\' LIMIT 100');
@@ -8,9 +9,8 @@ export async function getList(documentType) {
 }
 
 export async function upsertToDb(pk, data) {
-  await this.createPrimaryIndex();
-  await this.upsert(pk, data);
-  return this.get(pk);
+  await this.upsertAsync(pk, data);
+  return this.getAsync(pk);
 }
 
 export async function removeAll() {
@@ -19,6 +19,8 @@ export async function removeAll() {
 }
 
 function attach(bucket) {
+  // this is a naive support for promise of the couchbase
+  promises(bucket);
   bucket.getList = getList;
   bucket.removeAll = removeAll;
   bucket.upsertToDb = upsertToDb;
