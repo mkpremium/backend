@@ -2,7 +2,7 @@ export const port = parseInt(process.env.PORT || '9080');
 export const couchbase = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1',
   bucket: process.env.COUCHBASE_BUCKET || 'mkpremium',
-  user: process.env.COUCHBASE_USER || 'admin',
+  user: process.env.COUCHBASE_USER || 'Administrator',
   pass: process.env.COUCHBASE_PASS || 'password'
 };
 export const jwt = {
