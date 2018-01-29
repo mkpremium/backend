@@ -32,10 +32,11 @@ t.TypedContactInfo = t.struct(
   {
     type: t.TypeContact,
     value: t.String,
-    note: t.String
+    note: t.maybe(t.String)
   },
   {
-    name: 'TypedContactInfo'
+    name: 'TypedContactInfo',
+    type: 'TELEFONO'
   }
 );
 

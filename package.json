@@ -27,6 +27,7 @@
     "express-promise-wrap": "^0.2.2",
     "fs-extra": "^5.0.0",
     "jsonwebtoken": "^5.7.0",
+    "lodash": "^4.17.4",
     "morgan": "^1.7.0",
     "morgan-body": "^2.0.2",
     "request": "^2.83.0",
@@ -44,6 +45,7 @@
     "better-npm-run": "^0.1.0",
     "chai": "^4.1.2",
     "eslint": "^4.16.0",
+    "eslint-config-bixlabs": "^1.0.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-plugin-babel": "^4.1.2",
     "eslint-plugin-import": "^2.8.0",
@@ -55,5 +57,6 @@
     "nodemon": "^1.14.11",
     "sinon": "^4.2.0",
     "sinon-chai": "^2.14.0"
-  }
+  },
+  "private": true
 }
