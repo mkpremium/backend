@@ -1,7 +1,7 @@
 require('babel-register');
 require('babel-polyfill');
 
-require('../src/migration/types');
+require('../src/types');
 
 const chai = require('chai');
 const sc = require('sinon-chai');

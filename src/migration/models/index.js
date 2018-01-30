@@ -1,4 +1,4 @@
-import '../types';
+import '../../types';
 
 import building from './building';
 import owner from './owner';

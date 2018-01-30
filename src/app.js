@@ -6,6 +6,7 @@ import cors from 'cors';
 import couchbase from './db/couchbase';
 import jwt from './middleware/jwt';
 import numintec from './numintec';
+import operator from './operator';
 
 import migration from './migration';
 
@@ -20,5 +21,6 @@ app.use(jwt());
 app.use(couchbase());
 app.use(numintec());
 app.use(migration());
+app.use(operator());
 
 export default app;
