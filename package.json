@@ -33,6 +33,7 @@
     "morgan-body": "^2.0.2",
     "request": "^2.83.0",
     "soap": "^0.23.0",
+    "swagger-ui-dist": "^3.9.3",
     "tcomb": "^3.2.24",
     "utm-latlng": "^1.0.3",
     "uuid": "^3.2.1",
@@ -58,7 +59,8 @@
     "mocha-circleci-reporter": "0.0.2",
     "nodemon": "^1.14.11",
     "sinon": "^4.2.0",
-    "sinon-chai": "^2.14.0"
+    "sinon-chai": "^2.14.0",
+    "swagger-jsdoc": "^1.9.7"
   },
   "private": true
 }
