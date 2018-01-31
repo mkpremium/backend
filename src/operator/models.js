@@ -59,10 +59,13 @@ export class OperatorRepository extends Operator {
 
   async createToken(operator) {
     const payload = {
-      operator: operator.id,
-      expiresIn: jwt.expiresIn,
+      id: operator.id,
       permissions: operator.roles
     };
-    return sign(payload, jwt.secret);
+    const options = {
+      expiresIn: jwt.expiresIn
+    };
+
+    return sign(payload, jwt.secret, options);
   }
 }
