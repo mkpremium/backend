@@ -8,7 +8,8 @@ async function login(req, res) {
 
   res.json({
     token,
-    operator: operator
+    roles: operator.roles,
+    operator_id: operator.id
   });
 }
 
