@@ -49,12 +49,12 @@ echo -en "Uploading distribution file  \t: "
 rsync -arq ${dist_file} ${dist_host}:${dist_file}
 echo -e "${bold}OK${normal}"
 
-echo -en "Installing                   \t: "
+echo -e "Installing                   \t: "
 ssh ${dist_host} bash << EOF
 source ~/.nvm/nvm.sh
+mkdir -p ${deploy_dir}
 tar xzf ${dist_file} -C ${deploy_dir} > dev/null
 cd ${deploy_dir}
 nvm use
 npm install
-pm2 restart ${app_name}
 EOF
