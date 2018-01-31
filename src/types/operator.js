@@ -28,6 +28,10 @@ t.OperatorProfile = t.struct({
   city: t.maybe(t.String)
 }, 'OperatorProfile');
 
+t.OperatorProfile.prototype.fullName = function() {
+  return `${this.firstName} ${this.lastName}`.trim();
+};
+
 /**
  * @swagger
  * definitions:
@@ -55,6 +59,7 @@ t.OperatorProfile = t.struct({
  */
 t.Operator = t.struct(
   {
+    id: t.maybe(t.String),
     username: t.String,
     password: t.String,
     agentNumber: t.maybe(t.String),

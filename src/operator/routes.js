@@ -12,25 +12,6 @@ const router = Router();
 
 /**
  * @swagger
- * definitions:
- *   AuthenticatedResponse:
- *     properties:
- *       token:
- *        type: string
- *        description: Bearer token
- *       operator_id:
- *        type: string
- *        format: uuid/v4
- *        description: Id de operador
- *       roles:
- *        type: array
- *        items:
- *          type: string
- *        description: Roles que el operador tiene acceso
- */
-
-/**
- * @swagger
  * /operator/login:
  *   post:
  *     tags: [Operator]
@@ -82,7 +63,7 @@ router.post('/login', loginController);
  *           $ref: "#/definitions/Operator"
  *     responses:
  *       201:
- *         description: Operador creado exitosamente
+ *         description: Operador creado
  *         schema:
  *           $ref: "#/definitions/Operator"
  *       400:

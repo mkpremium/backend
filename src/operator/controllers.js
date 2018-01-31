@@ -1,3 +1,4 @@
+import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {Operator, OperatorRepository} from './models';
 
@@ -6,11 +7,15 @@ async function login(req, res) {
   const operator = await repo.findByCredential(req.body);
   const token = await repo.createToken(operator);
 
-  res.json({
+  res.json(t.AuthenticatedResponse({
     token,
     roles: operator.roles,
-    operator_id: operator.id
-  });
+    operator: {
+      id: operator.id,
+      name: operator.profile.fullName(),
+      username: operator.username
+    }
+  }));
 }
 
 async function createOperator(req, res) {

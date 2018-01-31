@@ -60,7 +60,7 @@ export class OperatorRepository extends Operator {
       throw errorInvalidCreds;
     }
 
-    return operator;
+    return new this.Struct(operator);
   }
 
   async createToken(operator) {
