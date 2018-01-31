@@ -21,6 +21,7 @@ export class CouchbaseModel {
   getQueryBuilder() {
     const qb = squel
       .select()
+      .field('t.`id`')
       .from(this._bucketName, 't')
       .where('t.`_documentType` = ?', this.Struct.meta.defaultProps._documentType);
 
