@@ -35,3 +35,6 @@ app/csv/*.csv
 
 # Mocha Reporter
 test-results.xml
+
+# Deployment builds
+/build

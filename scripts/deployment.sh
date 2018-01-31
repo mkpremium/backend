@@ -2,6 +2,8 @@
 
 set -e
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 bold=$(tput bold)
 normal=$(tput sgr0)
 name=$(basename $0)
@@ -38,11 +40,14 @@ dist_host=$1
 app_name=$2
 deploy_dir=/home/centos/apps/${app_name}
 
+echo -e "Building                     \t:"
+${DIR}/build.sh
+
 echo "Deploying..."
 echo -e "Root project                 \t: ${bold}$(pwd)${normal}"
 
 echo -en "Generating distribution file\t: "
-git archive -o ${dist_file} --format tgz HEAD
+tar czf ${dist_file} build
 echo -e "${bold}${dist_file}${normal}"
 
 echo -en "Uploading distribution file  \t: "
@@ -53,7 +58,7 @@ echo -e "Installing                   \t: "
 ssh ${dist_host} bash << EOF
 source ~/.nvm/nvm.sh
 mkdir -p ${deploy_dir}
-tar xzf ${dist_file} -C ${deploy_dir} > dev/null
+tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > dev/null
 cd ${deploy_dir}
 nvm use
 npm install
