@@ -1,8 +1,9 @@
 import debug from 'debug';
 import Couchbase from 'couchbase';
 import {couchbase} from '../../config';
-
 import attachHelpers from './helpers';
+
+import {CouchbaseModel} from './model';
 
 const debugCouchbase = debug('app:couchbase');
 const defaultOpts = {
@@ -11,7 +12,7 @@ const defaultOpts = {
 
 let retries = 3;
 
-export default (opts = defaultOpts) => {
+export default (app, opts = defaultOpts) => {
   let resolve = null;
   let reject = null;
 
@@ -33,10 +34,7 @@ export default (opts = defaultOpts) => {
     return promise;
   }
 
-  return (req, res, next) => {
-    Object.assign(req.app.locals, {cluster, bucket});
-    next();
-  };
+  Object.assign(app.locals, {cluster, bucket});
 };
 
 function checkBucket(bucket, cluster, resolve, reject) {
@@ -50,9 +48,16 @@ function checkBucket(bucket, cluster, resolve, reject) {
   if (bucket.connected) {
     debugCouchbase(`bucket ${bucket._name} connected`);
     attachHelpers(bucket);
+    attachModel(bucket, cluster);
     resolve(bucket);
   } else {
     retries--;
     setTimeout(() => checkBucket(bucket, cluster, resolve, reject), 1500);
   }
+}
+
+function attachModel(bucket, cluster) {
+  CouchbaseModel.prototype._bucket = bucket;
+  CouchbaseModel.prototype._bucketName = bucket._name;
+  CouchbaseModel.prototype._cluster = cluster;
 }

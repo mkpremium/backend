@@ -24,10 +24,8 @@ function apiJSON(req, res) {
   res.send(specs);
 }
 
-export default () => (req, res, next) => {
-  const app = req.app;
+export default (app) => {
   app.use('/docs', express.static(resolve(__dirname, 'public')));
   app.use('/docs', express.static(ui.getAbsoluteFSPath()));
   app.get('/docs/api.json', apiJSON);
-  next();
 };

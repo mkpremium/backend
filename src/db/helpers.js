@@ -1,16 +1,26 @@
 import {N1qlQuery} from 'couchbase';
+import debug from 'debug';
 import {couchbase} from '../../config';
 import promises from './promises';
+
+const debugHelper = debug('app:db:helpers');
 
 export async function getList(documentType) {
   const queryString = N1qlQuery.fromString('SELECT t.* FROM $1 t WHERE t._documentType = \'$2\' LIMIT 100');
 
-  return this.query(queryString, [couchbase.bucket, documentType]);
+  return this.queryAsync(queryString, [couchbase.bucket, documentType]);
 }
 
 export async function upsertToDb(pk, data) {
+  debugHelper('upsertToDb', pk, data._documentType);
   await this.upsertAsync(pk, data);
-  return this.getAsync(pk);
+  const result = await this.getAsync(pk);
+
+  if (result && result.value) {
+    return result.value;
+  }
+
+  return null;
 }
 
 export async function removeAll() {

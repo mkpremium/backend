@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
 import morgan from 'morgan';
 import cors from 'cors';
+
 import couchbase from './db/couchbase';
 // import jwt from './middleware/jwt';
 // import numintec from './numintec';
@@ -11,6 +12,10 @@ import swagger from './swagger';
 
 // import migration from './migration';
 
+// app aware types
+import './types';
+import appErrorHandler from './lib/error-handler';
+
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -18,11 +23,13 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(morgan('dev'));
 app.use(cors());
-app.use(swagger());
+swagger(app);
 // app.use(jwt());
-app.use(couchbase());
+couchbase(app);
 // app.use(numintec());
 // app.use(migration());
-app.use(operator());
+operator(app);
+
+app.use(appErrorHandler);
 
 export default app;

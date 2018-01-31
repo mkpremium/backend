@@ -40,6 +40,7 @@ function turnsAsync2(bucket, name) {
 }
 
 export default function promises(bucket) {
+  bucket.queryAsync = turnsAsync2(bucket, 'query');
   bucket.upsertAsync = turnsAsync2(bucket, 'upsert');
   bucket.getAsync = turnsAsync1(bucket, 'get');
 }
