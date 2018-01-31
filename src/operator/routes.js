@@ -47,11 +47,13 @@ const router = Router();
  *          $ref: "#/definitions/Credentials"
  *     responses:
  *       200:
- *         description: Exito
+ *         description: Authenticado exitosamente
  *         schema:
  *           $ref: "#/definitions/AuthenticatedResponse"
  *       401:
  *         description: Credenciales invalidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
  */
 router.post('/login', loginController);
 
@@ -79,8 +81,12 @@ router.post('/login', loginController);
  *         schema:
  *           $ref: "#/definitions/Operator"
  *     responses:
+ *       201:
+ *         description: Operador creado exitosamente
+ *         schema:
+ *           $ref: "#/definitions/Operator"
  *       400:
- *         summary: Solicitud invalida
+ *         description: Solicitud invalida
  *         schema:
  *           $ref: "#/definitions/Error"
  */
