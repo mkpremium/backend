@@ -1,15 +1,14 @@
-import {join} from "path";
-import sinon from "sinon";
+import {join} from 'path';
+import sinon from 'sinon';
 
-import {csvToJson} from "../../../src/migration/lib";
-import migrateFromCsv from "../../../src/migration/models/building";
+import {csvToJson} from '../../../src/migration/lib';
+import migrateFromCsv from '../../../src/migration/models/building';
 
 const filename = join(__dirname, '../../fixtures/sample_buildings.csv');
 
 describe('migration.models', () => {
   describe('building', () => {
-    it('migrateFromCsv()', async () => {
-
+    it('migrateFromCsv()', async() => {
       const migratedData = [];
 
       const spy = sinon.spy();
