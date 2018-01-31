@@ -62,4 +62,5 @@ tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > dev/null
 cd ${deploy_dir}
 nvm use
 npm install
+pm2 restart ${app_name}
 EOF
