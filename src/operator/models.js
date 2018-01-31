@@ -33,6 +33,11 @@ export class Operator extends CouchbaseModel {
   }
 }
 
+const errorInvalidCreds = new Error('Contraseña o usuario invalido');
+errorInvalidCreds.code = 401;
+const errorInactive = new Error('Cuenta desactivada, comuniquese con el administrador');
+errorInactive.code = 401;
+
 export class OperatorRepository extends Operator {
   async findByCredential(data) {
     const {username, password} = new t.Credentials(data);
@@ -41,17 +46,18 @@ export class OperatorRepository extends Operator {
       .limit(1);
     const [operator] = await this.query(qb);
 
-    const e = new Error('Contraseña o usuario invalido');
-    e.code = 401;
-
     if (!operator) {
-      throw e;
+      throw errorInvalidCreds;
+    }
+
+    if (!operator.enable) {
+      throw errorInactive;
     }
 
     const valid = await bcrypt.compare(password, operator.password);
 
     if (!valid) {
-      throw e;
+      throw errorInvalidCreds;
     }
 
     return operator;
