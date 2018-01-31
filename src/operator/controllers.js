@@ -15,6 +15,7 @@ async function login(req, res) {
 async function createOperator(req, res) {
   const model = new Operator();
   const result = await model.save(req.body);
+  res.status(201);
   res.json(result);
 }
 
