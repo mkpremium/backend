@@ -19,7 +19,6 @@ export class CouchbaseModel {
 
   // TODO: refactor to CouchbaseQuery
   getQueryBuilder(method = 'select') {
-
     let qb;
 
     switch (method) {
