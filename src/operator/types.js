@@ -17,24 +17,32 @@ t.Credentials = t.struct({
   username: t.String,
   password: t.String
 }, 'Credentials');
-
 /**
  * @swagger
  * definitions:
+ *   AuthenticatedResponseProfile:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *         description: ID del operador
+ *       name:
+ *         type: string
+ *         description: Nombre complete operador
+ *       username:
+ *         type: string
  *   AuthenticatedResponse:
  *     properties:
  *       token:
- *        type: string
- *        description: Bearer token
- *       operator_id:
- *        type: string
- *        format: uuid/v4
- *        description: Id de operador
+ *         type: string
+ *         description: Bearer token
+ *       operator:
+ *         $ref: "#/definitions/AuthenticatedResponseProfile"
  *       roles:
- *        type: array
- *        items:
- *          type: string
- *        description: Roles que el operador tiene acceso
+ *         type: array
+ *         items:
+ *           type: string
+ *         description: Roles que el operador tiene acceso
  */
 t.AuthenticatedResponse = t.struct({
   token: t.String,
