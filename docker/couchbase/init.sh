@@ -45,6 +45,6 @@ couchbase-cli \
 echo "Create bucket ${COUCHBASE_BUCKET} primary index"
 cbq \
   -c 127.0.0.1 -u ${COUCHBASE_USER} -p ${COUCHBASE_PASS} \
-  --script "CREATE PRIMARY `${COUCHBASE_BUCKET}_primary` INDEX ON `${COUCHBASE_BUCKET}`"
+  --script "CREATE PRIMARY INDEX \`${COUCHBASE_BUCKET}_primary\` ON \`${COUCHBASE_BUCKET}\`"
 
 wait
