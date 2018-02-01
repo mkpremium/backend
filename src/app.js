@@ -19,7 +19,9 @@ const app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
 app.use(cors());
 swagger(app);
 // app.use(jwt());

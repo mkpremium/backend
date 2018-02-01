@@ -28,7 +28,7 @@ const router = Router();
  *          $ref: "#/definitions/Credentials"
  *     responses:
  *       200:
- *         description: Authenticado exitosamente
+ *         description: Autenticado exitosamente
  *         schema:
  *           $ref: "#/definitions/AuthenticatedResponse"
  *       401:

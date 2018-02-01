@@ -18,14 +18,25 @@ export class CouchbaseModel {
   }
 
   // TODO: refactor to CouchbaseQuery
-  getQueryBuilder() {
-    const qb = squel
-      .select()
-      .field('t.`id`')
+  getQueryBuilder(method = 'select') {
+
+    let qb;
+
+    switch (method) {
+      case 'select':
+        qb = squel.select().field('t.`id`');
+        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`t.\`${key}\``));
+        break;
+      case 'delete':
+        qb = squel.delete();
+        break;
+      default:
+        throw new Error(`method ${method} not allowed (select, delete)`);
+    }
+
+    qb
       .from(this._bucketName, 't')
       .where('t.`_documentType` = ?', this.Struct.meta.defaultProps._documentType);
-
-    Object.keys(this.Struct.meta.props).forEach(key => qb.field(`t.\`${key}\``));
 
     return qb;
   }

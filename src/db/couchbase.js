@@ -34,7 +34,7 @@ export default (app, opts = defaultOpts) => {
     return promise;
   }
 
-  Object.assign(app.locals, {cluster, bucket});
+  Object.assign(app.locals, {cluster, bucket, bucketPromise: promise});
 };
 
 function checkBucket(bucket, cluster, resolve, reject) {

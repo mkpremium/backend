@@ -35,7 +35,7 @@ export class Operator extends CouchbaseModel {
 
 const errorInvalidCreds = new Error('Contraseña o usuario invalido');
 errorInvalidCreds.code = 401;
-const errorInactive = new Error('Cuenta desactivada, comuniquese con el administrador');
+const errorInactive = new Error('Cuenta desactivada, comuníquese con el administrador');
 errorInactive.code = 401;
 
 export class OperatorRepository extends Operator {
