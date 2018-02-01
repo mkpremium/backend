@@ -1,5 +1,5 @@
 FROM couchbase:enterprise-5.0.1
-MAINTAINER rkmax
+MAINTAINER Julian Reyes <jreyes@bixlabs.com>
 
 ENV \
   COUCHBASE_USER=Administrator \
