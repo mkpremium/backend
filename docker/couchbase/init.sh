@@ -42,4 +42,9 @@ couchbase-cli \
   --bucket-ramsize=${COUCHBASE_BUCKET_RAM_SIZE} \
   --wait
 
+echo "Create bucket ${COUCHBASE_BUCKET} primary index"
+cbq \
+  -c 127.0.0.1 -u ${COUCHBASE_USER} -p ${COUCHBASE_PASS} \
+  --script "CREATE PRIMARY `${COUCHBASE_BUCKET}_primary` INDEX ON `${COUCHBASE_BUCKET}`"
+
 wait
