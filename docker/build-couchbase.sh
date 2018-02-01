@@ -3,5 +3,5 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 docker build \
-  -t couchbase-bitdistrict \
+  -t couchbase \
   ${DIR}/couchbase

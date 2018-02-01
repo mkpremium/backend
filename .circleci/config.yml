@@ -15,6 +15,18 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: install dockerize
+          command: sh docker/install-dockerize.sh
+
+      - run:
+          name: Couchbase
+          command: sh docker/run-couchbase.sh
+
+      - run:
+          name: Wait for couchbase
+          command: dockerize -wait tcp://localhost:8091 -timeout 1m
+
       # Download and cache dependencies
       - restore_cache:
           keys:
