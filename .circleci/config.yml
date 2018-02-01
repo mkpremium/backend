@@ -7,6 +7,7 @@ jobs:
   test:
     docker:
       - image: circleci/node:9.2
+      - image: rkmax/couchbase:bitdistrict
     environment:
       - MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
 
@@ -18,10 +19,6 @@ jobs:
       - run:
           name: install dockerize
           command: sh docker/install-dockerize.sh
-
-      - run:
-          name: Couchbase
-          command: sh docker/run-couchbase.sh
 
       - run:
           name: Wait for couchbase
