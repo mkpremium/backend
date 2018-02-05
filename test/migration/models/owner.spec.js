@@ -68,6 +68,6 @@ describe('migration.models', () => {
 
       const combinedData = combineDuplicatesDocumentNumber(migratedData);
       combinedData.should.have.length(12280);
-    }).timeout(0);
+    });
   });
 });

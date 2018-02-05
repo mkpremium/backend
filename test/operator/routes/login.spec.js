@@ -5,8 +5,7 @@ import app from '../../../src/app';
 import {Operator} from '../../../src/operator/models';
 
 describe('operator.routes', () => {
-  before(async function() {
-    this.timeout(10000);
+  before(async() => {
     await app.locals.bucketPromise;
     const operator = new Operator();
     const qb = operator.getQueryBuilder('delete');
@@ -92,4 +91,4 @@ describe('operator.routes', () => {
       response.body.should.have.a.property('message');
     });
   });
-}).timeout(10000);
+});

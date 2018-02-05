@@ -6,8 +6,7 @@ import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 
 describe('worksheet.routes', () => {
   let worksheet;
-  before(async function() {
-    this.timeout(10000);
+  before(async() => {
     await app.locals.bucketPromise;
 
     const repo = new WorksheetRepository();
@@ -53,11 +52,21 @@ describe('worksheet.routes', () => {
     });
   });
 
-  it('GET /worksheets/:id @request', async() => {
-    const response = await request(app)
-      .get(`/worksheets/${worksheet.id}`)
-      .expect(200);
-    response.body.should.be.a('object');
-    response.body.toString().should.be.equal(worksheet.toString());
+  describe('GET /worksheets/:id @request', () => {
+    it('200 Obtiene la ficha', async() => {
+      const response = await request(app)
+        .get(`/worksheets/${worksheet.id}`)
+        .expect(200);
+      response.body.should.be.a('object');
+      response.body.toString().should.be.equal(worksheet.toString());
+    });
+
+    it('400 Ficha no encontrada', async() => {
+      const response = await request(app)
+        .get(`/worksheets/not-found`)
+        .expect(404);
+      response.body.should.be.a('object');
+      response.body.should.have.a.property('message');
+    });
   });
 });
