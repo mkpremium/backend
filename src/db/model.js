@@ -59,12 +59,21 @@ export class CouchbaseModel {
   }
 
   async findById(id) {
-    const result = await this._bucket.getAsync(id);
-    if (result && result.value) {
-      return result.value;
-    }
+    try {
+      const result = await this._bucket.getAsync(id);
+      if (result && result.value) {
+        return result.value;
+      }
 
-    return null;
+      return null;
+    } catch (e) {
+      switch (e.code) {
+        case 13: // Key does not exists on the server
+          return null;
+        default:
+          throw e;
+      }
+    }
   }
 
   async preSave(data) {
