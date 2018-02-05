@@ -2,4 +2,4 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-docker build -t rkmax/couchbase:bitdistrict ${DIR}/couchbase
+docker build --no-cache -t rkmax/couchbase:bitdistrict ${DIR}/couchbase
