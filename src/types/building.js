@@ -29,6 +29,15 @@ t.BuildingOwner = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   Building:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ */
 t.Building = t.struct(
   {
     id: t.String,

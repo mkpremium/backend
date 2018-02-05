@@ -7,6 +7,7 @@ import couchbase from './db/couchbase';
 // import jwt from './middleware/jwt';
 // import numintec from './numintec';
 import operator from './operator';
+import worksheet from './worksheet';
 import swagger from './swagger';
 
 // import migration from './migration';
@@ -29,7 +30,7 @@ couchbase(app);
 // app.use(numintec());
 // app.use(migration());
 operator(app);
-
+worksheet(app);
 app.use(appErrorHandler);
 
 export default app;

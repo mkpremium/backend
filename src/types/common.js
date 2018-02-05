@@ -28,6 +28,18 @@ t.SimplePhoneNumber = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   TypedContactInfo:
+ *     properties:
+ *       type:
+ *         type: string
+ *       value:
+ *         type: string
+ *       note:
+ *         type: string
+ */
 t.TypedContactInfo = t.struct(
   {
     type: t.TypeContact,

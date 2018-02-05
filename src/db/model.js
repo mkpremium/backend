@@ -40,7 +40,7 @@ export class CouchbaseModel {
     return qb;
   }
 
-  async query(_query) {
+  async query(_query = this.getQueryBuilder()) {
     const queryParam = _query.toParam();
     debugModel('query', queryParam);
     return this._bucket.queryAsync(N1qlQuery.fromString(queryParam.text), queryParam.values);
@@ -58,8 +58,18 @@ export class CouchbaseModel {
     }
   }
 
-  async preSave() {
+  async findById(id) {
+    const result = await this._bucket.getAsync(id);
+    if (result && result.value) {
+      return result.value;
+    }
+
+    return null;
+  }
+
+  async preSave(data) {
     // no pre-save operations on base model
+    return data;
   }
 
   async save(data) {
