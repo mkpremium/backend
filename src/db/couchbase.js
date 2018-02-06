@@ -1,8 +1,9 @@
 import debug from 'debug';
 import Couchbase from 'couchbase';
 import {couchbase} from '../../config';
-
 import attachHelpers from './helpers';
+
+import {CouchbaseModel} from './model';
 
 const debugCouchbase = debug('app:couchbase');
 const defaultOpts = {
@@ -11,7 +12,7 @@ const defaultOpts = {
 
 let retries = 3;
 
-export default (opts = defaultOpts) => {
+export default (app, opts = defaultOpts) => {
   let resolve = null;
   let reject = null;
 
@@ -33,15 +34,13 @@ export default (opts = defaultOpts) => {
     return promise;
   }
 
-  return (req, res, next) => {
-    Object.assign(req.app.locals, {cluster, bucket});
-    next();
-  };
+  Object.assign(app.locals, {cluster, bucket, bucketPromise: promise});
 };
 
 function checkBucket(bucket, cluster, resolve, reject) {
   if (retries <= 0) {
     reject(new Error(`It's possible a error trying to connect bucket ${bucket._name} check your setup`));
+    process.exit(1);
   }
 
   debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`);
@@ -49,9 +48,16 @@ function checkBucket(bucket, cluster, resolve, reject) {
   if (bucket.connected) {
     debugCouchbase(`bucket ${bucket._name} connected`);
     attachHelpers(bucket);
+    attachModel(bucket, cluster);
     resolve(bucket);
   } else {
     retries--;
     setTimeout(() => checkBucket(bucket, cluster, resolve, reject), 1500);
   }
+}
+
+function attachModel(bucket, cluster) {
+  CouchbaseModel.prototype._bucket = bucket;
+  CouchbaseModel.prototype._bucketName = bucket._name;
+  CouchbaseModel.prototype._cluster = cluster;
 }

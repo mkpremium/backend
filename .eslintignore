@@ -1,4 +1,4 @@
-**/*.js
-!/src/**/*.js
-!/config.js
-!/bin/**/*.js
+/mode_modules
+/scripts
+/csv
+/build
