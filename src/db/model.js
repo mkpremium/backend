@@ -40,6 +40,10 @@ export class CouchbaseModel {
     return qb;
   }
 
+  async deleteQuery(_query = this.getQueryBuilder('delete')) {
+    return this.query(_query);
+  }
+
   async query(_query = this.getQueryBuilder()) {
     const queryParam = _query.toParam();
     debugModel('query', queryParam);

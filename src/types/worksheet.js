@@ -91,6 +91,7 @@ t.WorksheetQueue = t.struct(
   {
     name: 'WorksheetQueue',
     defaultProps: {
+      worksheets: [],
       _documentType: 'worksheet-queue'
     }
   }

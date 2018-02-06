@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
+import {WorksheetQueueRepository} from './models/queue';
 
 async function list(req, res) {
   const params = new t.ListQuery(req.query || {});
@@ -26,5 +27,13 @@ async function findById(req, res) {
   throw e;
 }
 
+async function queueByCity(req, res) {
+  const cityName = req.params.city;
+  const repo = new WorksheetQueueRepository();
+  const queue = await repo.findByCity(cityName);
+  res.json(queue);
+}
+
 export const listController = wrap(list);
 export const findByIdController = wrap(findById);
+export const queueByCityController = wrap(queueByCity);

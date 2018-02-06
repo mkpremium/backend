@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {findByIdController, listController} from './controllers';
+import {findByIdController, listController, queueByCityController} from './controllers';
 
 const router = Router();
 const dummyController = (req, res) => res.send();
@@ -109,7 +109,7 @@ router.get('/:id', findByIdController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/queues/:city', dummyController);
+router.get('/queues/:city', queueByCityController);
 
 /**
  * @swagger
@@ -170,6 +170,6 @@ router.get('/queues', dummyController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/queues/:id', dummyController);
+router.post('/queues/:city', dummyController);
 
 export default router;

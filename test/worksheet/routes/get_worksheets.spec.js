@@ -11,8 +11,7 @@ describe('worksheet.routes', () => {
     await app.locals.bucketPromise;
 
     const repo = new WorksheetRepository();
-    const qb = repo.getQueryBuilder('delete');
-    await repo.query(qb);
+    await repo.deleteQuery();
     await Promise.all(times(49, () => repo.save({})));
     worksheet = await repo.save({});
     await Promise.delay(1000);
