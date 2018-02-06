@@ -19,38 +19,40 @@ describe('worksheet.routes', () => {
   });
 
   describe('GET /worksheets @request', () => {
-    it('returns by default 20 items max', async() => {
-      const response = await request(app)
-        .get('/worksheets')
-        .expect(200);
-      response.body.should.be.a('array');
-      response.body.should.have.length(20);
-    });
+    describe('200 Operación exitosa', () => {
+      it('returns by default 20 items max', async() => {
+        const response = await request(app)
+          .get('/worksheets')
+          .expect(200);
+        response.body.should.be.a('array');
+        response.body.should.have.length(20);
+      });
 
-    it('limit query param', async() => {
-      const response = await request(app)
-        .get('/worksheets')
-        .query({limit: 10})
-        .expect(200);
-      response.body.should.be.a('array');
-      response.body.should.have.length(10);
-    });
+      it('limit query param', async() => {
+        const response = await request(app)
+          .get('/worksheets')
+          .query({limit: 10})
+          .expect(200);
+        response.body.should.be.a('array');
+        response.body.should.have.length(10);
+      });
 
-    it('offset query param', async() => {
-      const responseLimit = await request(app)
-        .get('/worksheets')
-        .query({limit: 10})
-        .expect(200);
+      it('offset query param', async() => {
+        const responseLimit = await request(app)
+          .get('/worksheets')
+          .query({limit: 10})
+          .expect(200);
 
-      const responseOffsetLimit = await request(app)
-        .get('/worksheets')
-        .query({offset: 5, limit: 5})
-        .expect(200);
-      responseLimit.body.should.be.a('array');
-      responseLimit.body.should.have.length(10);
-      responseOffsetLimit.body.should.be.a('array');
-      responseOffsetLimit.body.should.have.length(5);
-      intersectionBy(responseLimit.body, responseOffsetLimit.body, 'id').should.have.length(5);
+        const responseOffsetLimit = await request(app)
+          .get('/worksheets')
+          .query({offset: 5, limit: 5})
+          .expect(200);
+        responseLimit.body.should.be.a('array');
+        responseLimit.body.should.have.length(10);
+        responseOffsetLimit.body.should.be.a('array');
+        responseOffsetLimit.body.should.have.length(5);
+        intersectionBy(responseLimit.body, responseOffsetLimit.body, 'id').should.have.length(5);
+      });
     });
   });
 
