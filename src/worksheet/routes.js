@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {findByIdController, listController, queueByCityController} from './controllers';
+import {worksheetFindByIdController, worksheetListController, queueByCityController, queueListController} from './controllers';
 
 const router = Router();
 const dummyController = (req, res) => res.send();
@@ -54,7 +54,27 @@ const dummyController = (req, res) => res.send();
  *           items:
  *             $ref: "#/definitions/Worksheet"
  */
-router.get('/', listController);
+router.get('/', worksheetListController);
+
+/**
+ * @swagger
+ * /queues:
+ *   get:
+ *     tags: [Queue, Admin]
+ *     summary: Lista todas las colas del sistema
+ *     responses:
+ *       200:
+ *         description: Lista las colas
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: "#/definitions/WorksheetQueue"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/queues', queueListController);
 
 /**
  * @swagger
@@ -81,7 +101,7 @@ router.get('/', listController);
  *       404:
  *         description: Ficha no encontrada
  */
-router.get('/:id', findByIdController);
+router.get('/:id', worksheetFindByIdController);
 
 /**
  * @swagger
@@ -110,26 +130,6 @@ router.get('/:id', findByIdController);
  *           $ref: "#/definitions/Error"
  */
 router.get('/queues/:city', queueByCityController);
-
-/**
- * @swagger
- * /queues:
- *   get:
- *     tags: [Queue, Admin]
- *     summary: Lista todas las colas del sistema
- *     responses:
- *       200:
- *         description: Lista las colas
- *         schema:
- *           type: array
- *           items:
- *             $ref: "#/definitions/WorksheetQueue"
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
- */
-router.get('/queues', dummyController);
 
 /**
  * @swagger

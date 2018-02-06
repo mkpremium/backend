@@ -3,7 +3,7 @@ import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
 
-async function list(req, res) {
+async function worksheetList(req, res) {
   const params = new t.ListQuery(req.query || {});
   const repo = new WorksheetRepository();
   const qb = repo.getQueryBuilder('select')
@@ -34,6 +34,18 @@ async function queueByCity(req, res) {
   res.json(queue);
 }
 
-export const listController = wrap(list);
-export const findByIdController = wrap(findById);
+async function queueList(req, res) {
+  const params = new t.ListQuery(req.query || {});
+  const repo = new WorksheetQueueRepository();
+  const qb = repo.getQueryBuilder('select')
+    .limit(params.limit)
+    .offset(params.offset);
+  const queues = await repo.query(qb);
+
+  res.json(queues);
+}
+
+export const worksheetListController = wrap(worksheetList);
+export const worksheetFindByIdController = wrap(findById);
 export const queueByCityController = wrap(queueByCity);
+export const queueListController = wrap(queueList);

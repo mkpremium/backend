@@ -28,7 +28,11 @@ describe('worksheet.routes', () => {
       });
     });
     describe('GET /worksheets/queues @request', () => {
-      it('200');
+      it('200 Lista las colas', async() => {
+        return request(app)
+          .get('/worksheets/queues')
+          .expect(200);
+      });
     });
   });
 });
