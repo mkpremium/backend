@@ -14,6 +14,9 @@ babel ./ \
   --copy-files \
   --ignore node_modules,development,test,docker,iml,lock
 
+# Node setup
+cp ./.nvmrc ./build/
+
 # Build the package.json
 ${DIR}/package.js
 

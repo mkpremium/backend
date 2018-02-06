@@ -7,8 +7,8 @@
     "start": "better-npm-run start",
     "pretest": "npm run lint",
     "test": "mocha --require test/setup.js --recursive --exit --timeout 10000",
-    "prebuild": "npm run test",
     "build": "sh scripts/build.sh",
+    "predeploy": "npm run build",
     "deploy": "sh scripts/deployment.sh"
   },
   "betterScripts": {
