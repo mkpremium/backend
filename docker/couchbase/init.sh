@@ -44,7 +44,9 @@ couchbase-cli \
 
 echo "Create bucket ${COUCHBASE_BUCKET} primary index"
 wait_for_start cbq \
-  -c 127.0.0.1 -u ${COUCHBASE_USER} -p ${COUCHBASE_PASS} \
-  --script "CREATE PRIMARY INDEX \`${COUCHBASE_BUCKET}_primary\` ON \`${COUCHBASE_BUCKET}\`"
+  -engine http://localhost:${COUCHBASE_PORT} \
+  -u ${COUCHBASE_USER} -p ${COUCHBASE_PASS} \
+  --script "CREATE PRIMARY INDEX \`${COUCHBASE_BUCKET}_primary\` ON \`${COUCHBASE_BUCKET}\`" \
+  -exit-on-error
 
 wait

@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import request from 'supertest';
 import times from 'lodash/times';
 import intersectionBy from 'lodash/intersectionBy';
@@ -14,6 +15,7 @@ describe('worksheet.routes', () => {
     await repo.query(qb);
     await Promise.all(times(49, () => repo.save({})));
     worksheet = await repo.save({});
+    await Promise.delay(1000);
   });
 
   describe('GET /worksheets @request', () => {
