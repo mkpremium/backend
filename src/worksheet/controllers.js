@@ -45,7 +45,17 @@ async function queueList(req, res) {
   res.json(queues);
 }
 
+async function openWorksheet(req, res) {
+  const cityName = req.params.city;
+  const params = t.QueueRequestParams(req.body);
+  const repo = new WorksheetQueueRepository();
+  const queue = await repo.findByCity(cityName);
+  await repo.openWorksheetInQueue(queue, params.queueItemId);
+  res.json({});
+}
+
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
 export const queueByCityController = wrap(queueByCity);
 export const queueListController = wrap(queueList);
+export const openWorksheetController = wrap(openWorksheet);

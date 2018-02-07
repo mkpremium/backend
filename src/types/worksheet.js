@@ -1,16 +1,13 @@
 import t from 'tcomb';
+import find from 'lodash/find';
+import {Queue} from './constants';
 
 t.WorkSheetStatus = t.enums.of([
   'OPEN',
   'CLOSED'
-]);
+], 'WorkSheetStatus');
 
-t.WorkSheetQueueStatus = t.enums.of([
-  'AVAILABLE',
-  'OPENED',
-  'SCHEDULED',
-  'CLOSED'
-]);
+t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
 
 /**
  * @swagger
@@ -22,8 +19,9 @@ t.WorkSheetQueueStatus = t.enums.of([
  *         format: uuid/v4
  *       owner:
  *         $ref: "#/definitions/Contact"
- *       lastContactedOwner:
- *         $ref: "#/definitions/Contact"
+ *       queueId:
+ *         type: string
+ *         format: uuid/v4
  *       relatedOwners:
  *         type: array
  *         items:
@@ -36,6 +34,7 @@ t.WorkSheet = t.struct({
     ownerId: t.String,
     realizedAt: t.Date
   })),
+  queueId: t.maybe(t.String),
   relatedOwnerIds: t.list(t.String),
   status: t.WorkSheetStatus,
 
@@ -60,14 +59,33 @@ t.WorkSheet = t.struct({
  *         format: uuid/v4
  *       operator:
  *         $ref: "#/definitions/Operator"
+ *       worksheet:
+ *         $ref: "#/definitions/Worksheet"
  *       status:
  *         type: string
  */
-t.QueueItem = t.struct({
-  id: t.String,
-  worksheetId: t.String,
-  status: t.WorkSheetQueueStatus
-});
+t.QueueItem = t.struct(
+  {
+    id: t.maybe(t.String),
+    worksheetId: t.String,
+    operatorId: t.maybe(t.String),
+    status: t.WorkSheetQueueStatus
+  },
+  {
+    name: 'QueueItem',
+    defaultProps: {
+      status: Queue.Status.AVAILABLE
+    }
+  }
+);
+
+t.QueueItem.prototype.canBeOpened = function() {
+  return Queue.StatusAvailable.indexOf(this.status) !== -1;
+};
+
+t.QueueItem.prototype.open = function() {
+  return t.update(this, {status: {$set: Queue.Status.OPENED}});
+};
 
 /**
  * @swagger
@@ -83,6 +101,7 @@ t.QueueItem = t.struct({
  */
 t.WorksheetQueue = t.struct(
   {
+    id: t.maybe(t.String),
     city: t.String,
     worksheets: t.list(t.QueueItem),
 
@@ -96,3 +115,7 @@ t.WorksheetQueue = t.struct(
     }
   }
 );
+
+t.WorksheetQueue.prototype.findItemById = function(id) {
+  return find(this.worksheets, {id});
+};

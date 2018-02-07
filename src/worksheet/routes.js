@@ -1,8 +1,10 @@
 import {Router} from 'express';
-import {worksheetFindByIdController, worksheetListController, queueByCityController, queueListController} from './controllers';
+import {
+  worksheetFindByIdController, worksheetListController, queueByCityController, queueListController,
+  openWorksheetController
+} from './controllers';
 
 const router = Router();
-const dummyController = (req, res) => res.send();
 
 /**
  * @swagger
@@ -14,7 +16,7 @@ const dummyController = (req, res) => res.send();
 /**
  * @swagger
  * tags:
- *   name: Queue
+ *   name: Worksheet Queue
  *   description: Cola de fichas de trabajo
  */
 
@@ -58,7 +60,7 @@ router.get('/', worksheetListController);
 
 /**
  * @swagger
- * /queues:
+ * /worksheets/queues:
  *   get:
  *     tags: [Queue, Admin]
  *     summary: Lista todas las colas del sistema
@@ -105,7 +107,7 @@ router.get('/:id', worksheetFindByIdController);
 
 /**
  * @swagger
- * /queues/{city}:
+ * /worksheets/queues/{city}:
  *   get:
  *     tags: [Queue, Operator, Manager]
  *     summary: Obtiene la cola de fichas de trabajo para una ciudad dada
@@ -133,7 +135,7 @@ router.get('/queues/:city', queueByCityController);
 
 /**
  * @swagger
- * /queues/{city}:
+ * /worksheets/queues/{city}:
  *   post:
  *     tags: [Queue, Operator]
  *     summary: Abre y Obtiene el detalle de una Ficha de trabajo para ser trabajada
@@ -147,11 +149,7 @@ router.get('/queues/:city', queueByCityController);
  *         in: body
  *         required: true
  *         schema:
- *           properties:
- *             queueItemId:
- *               description: Id del item de la cola *
- *               type: string
- *               format: uuid/v4
+ *           $ref: "#/definitions/QueueRequestParams"
  *     responses:
  *       200:
  *         description: Abre y Obtiene la ficha con exito
@@ -170,6 +168,6 @@ router.get('/queues/:city', queueByCityController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/queues/:city', dummyController);
+router.post('/queues/:city', openWorksheetController);
 
 export default router;

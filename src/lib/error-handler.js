@@ -19,12 +19,14 @@ function appErrorHandler(err, req, res, next) {
   }
 
   // error from couchbase are outside HTTP range
-  if (err.code < 400 || err.code > 599) {
+  if (!err.code || err.code < 400 || err.code > 599) {
     err.code = 500;
   }
 
   if (err.code === 500) {
     console.error(err);
+  } else {
+    console.error(err.message);
   }
 
   res.status(err.code || 500);
