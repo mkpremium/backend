@@ -12,6 +12,36 @@ class CouchbaseModelStruct {
   }
 }
 
+export class EmbeddedModel {
+  constructor() {
+    this.Struct = CouchbaseModelStruct;
+  }
+
+  getQueryBuilder() {
+    throw new Error('getQueryBuilder undefined for embedded models');
+  }
+
+  async query() {
+    throw new Error('query undefined for embedded models');
+  }
+
+  async preSave(data) {
+    // no pre-save operations on base model
+    return data;
+  }
+
+  async save(data) {
+    const struct = new this.Struct(data);
+    const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
+    const dataPreSaved = await this.preSave(dataWithId);
+    if (!dataPreSaved) {
+      throw new Error('it seems you forgot return the data on the preSave(data) method');
+    }
+
+    return dataPreSaved;
+  }
+}
+
 export class CouchbaseModel {
   constructor() {
     this.Struct = CouchbaseModelStruct;
@@ -55,7 +85,13 @@ export class CouchbaseModel {
     const query = this.getQueryBuilder().where(`${field} = ?`, value);
 
     const result = await this.query(query);
+
     if (result && result.length) {
+      // we can safely omit data with the same id
+      if (data.id && data.id === result[0].id) {
+        return;
+      }
+
       const e = new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`);
       e.code = 400;
       throw e;
