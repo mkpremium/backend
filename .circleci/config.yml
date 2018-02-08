@@ -9,7 +9,8 @@ jobs:
       - image: circleci/node:carbon
       - image: rkmax/couchbase:bitdistrict
     environment:
-      - MOCHA_FILE: "$CIRCLE_TEST_REPORTS/test-results.xml"
+      - MOCHA_FILE: ~/test-results/junit.xml
+      - NODE_ENV: test
 
     working_directory: ~/repo
 
@@ -35,6 +36,9 @@ jobs:
 
       # run tests!
       - run: npm test -- --reporter mocha-circleci-reporter
+
+      - store_test_results:
+        path: "$MOCHA_FILE"
 
   deploy:
     docker:
