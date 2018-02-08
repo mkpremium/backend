@@ -6,14 +6,14 @@ import cors from 'cors';
 import couchbase from './db/couchbase';
 // import jwt from './middleware/jwt';
 // import numintec from './numintec';
+// app aware types
+import './types';
 import operator from './operator';
 import worksheet from './worksheet';
 import swagger from './swagger';
 
 // import migration from './migration';
 
-// app aware types
-import './types';
 import appErrorHandler from './lib/error-handler';
 
 const app = express();
