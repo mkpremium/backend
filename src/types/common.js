@@ -64,31 +64,19 @@ t.TypedContactInfo = t.struct(
 
 t.TypedContactInfoUpdate = t.struct(
   {
-    type: t.maybe(t.TypeContact),
+    type: t.TypeContact,
     value: t.maybe(t.String),
     note: t.maybe(t.String),
-    status: t.maybe(t.TypedContactInfoStatus)
+    status: t.TypedContactInfoStatus
   },
   {
-    name: 'TypedContactInfoUpdate'
+    name: 'TypedContactInfo',
+    defaultProps: {
+      type: 'TELEFONO',
+      status: 'UNDEFINED'
+    }
   }
 );
-
-/**
- * @swagger
- * definitions:
- *   UpdateContactStatus:
- *     properties:
- *       id:
- *         type: string
- *         description: Número de teléfono a actualizar
- *       data:
- *         $ref: "#/definitions/TypedContactInfo"
- */
-t.UpdateContactStatus = t.struct({
-  id: t.String,
-  data: t.TypedContactInfoUpdate
-}, 'UpdateContactStatus');
 
 t.Address = t.struct(
   {
