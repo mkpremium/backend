@@ -62,6 +62,20 @@ t.TypedContactInfo = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   ContactValue:
+ *     properties:
+ *       value:
+ *         type: string
+ */
+t.ContactValue = t.struct(
+  {
+    value: t.maybe(t.String)
+  }
+);
+
 t.TypedContactInfoUpdate = t.struct(
   {
     type: t.TypeContact,

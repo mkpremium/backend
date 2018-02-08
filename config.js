@@ -14,6 +14,12 @@ export const jwt = {
   expiresIn: '1 day'
 };
 
+export const numintec = {
+  apiUrl: process.env.NUMINTEC_API_URL || 'http://api.invoxcontact.com',
+  apiKey: process.env.NUMINTEC_API_KEY,
+  serviceId: process.env.NUMINTEC_SERVICE_ID
+};
+
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10);
 
 export const reportDir = process.env.REPORT_DIR || 'app/csv';

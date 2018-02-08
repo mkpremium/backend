@@ -37,3 +37,9 @@ t.PersonType = t.enums({
   NATURAL: 'NATURAL',
   JURIDICA: 'JURIDICA'
 });
+
+t.CallStatus = t.enums({
+  INICIADA: 'Iniciada',
+  EN_PROGRESO: 'En progreso',
+  FINALIZADA: 'Finalizada'
+}, 'CallStatus');
