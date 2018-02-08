@@ -131,6 +131,7 @@ export class CouchbaseModel {
     if (!dataPreSaved) {
       throw new Error('it seems you forgot return the data on the preSave(data) method');
     }
+    await this._bucket._promise;
     return this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
   }
 }

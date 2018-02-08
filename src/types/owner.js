@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import find from 'lodash/find';
 
 /**
  * @swagger
@@ -15,7 +16,7 @@ import t from 'tcomb';
  */
 t.Owner = t.struct(
   {
-    id: t.String,
+    id: t.maybe(t.String),
     type: t.OwnerType,
 
     personId: t.String,
@@ -67,7 +68,7 @@ t.Owner = t.struct(
  */
 t.Person = t.struct(
   {
-    id: t.String,
+    id: t.maybe(t.String),
     name: t.String,
     firstName: t.maybe(t.String),
     firstSurname: t.maybe(t.String),
@@ -93,3 +94,7 @@ t.Person = t.struct(
     }
   }
 );
+
+t.Person.prototype.findContact = function({value}) {
+  return find(this.contacts, {value});
+};

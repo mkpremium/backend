@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
+import {updateList} from '../../lib/tcomb-utils';
 import {WorksheetRepository} from './worksheet';
 import {utc} from '../../lib/date';
 
@@ -80,9 +81,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheet = t.update(worksheet, {viewedAt: {$set: utc().toDate()}});
     await worksheetRepo.save(updatedWorksheet);
 
-    const itemIndex = queue.worksheets.indexOf(item);
     const updatedItem = item.open(operatorId);
-    const updatedWorksheets = t.update(queue.worksheets, {[itemIndex]: {$set: updatedItem}});
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
     return this.save(updatedQueue);

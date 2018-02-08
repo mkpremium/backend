@@ -4,15 +4,15 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 import couchbase from './db/couchbase';
-// import jwt from './middleware/jwt';
-// import numintec from './numintec';
+
 // app aware types
 import './types';
+
+// modules
 import operator from './operator';
 import worksheet from './worksheet';
+import owner from './owner';
 import swagger from './swagger';
-
-// import migration from './migration';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -25,12 +25,10 @@ if (process.env.NODE_ENV !== 'test') {
 }
 app.use(cors());
 swagger(app);
-// app.use(jwt());
 couchbase(app);
-// app.use(numintec());
-// app.use(migration());
 operator(app);
 worksheet(app);
+owner(app);
 app.use(appErrorHandler);
 
 export default app;

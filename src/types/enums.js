@@ -35,7 +35,3 @@ t.PersonType = t.enums({
   NATURAL: 'NATURAL',
   JURIDICA: 'JURIDICA'
 });
-
-t.TypedContactInfoStatus = t.enums({
-
-});

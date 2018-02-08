@@ -62,6 +62,22 @@ t.TypedContactInfo = t.struct(
   }
 );
 
+t.TypedContactInfoUpdate = t.struct(
+  {
+    type: t.TypeContact,
+    value: t.maybe(t.String),
+    note: t.maybe(t.String),
+    status: t.TypedContactInfoStatus
+  },
+  {
+    name: 'TypedContactInfo',
+    defaultProps: {
+      type: 'TELEFONO',
+      status: 'UNDEFINED'
+    }
+  }
+);
+
 t.Address = t.struct(
   {
     type: t.String,
