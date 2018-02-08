@@ -4,11 +4,16 @@ import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
 
 async function worksheetList(req, res) {
-  const params = new t.ListQuery(req.query || {});
+  const params = new t.WorksheetListQuery(req.query || {});
   const repo = new WorksheetRepository();
   const qb = repo.getQueryBuilder('select')
     .limit(params.limit)
     .offset(params.offset);
+
+  if (params.status) {
+    qb.where('status = ?', params.status);
+  }
+
   const worksheets = await repo.query(qb);
 
   res.json(worksheets);

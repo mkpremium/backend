@@ -48,6 +48,10 @@ const router = Router();
  *         type: number
  *         description: Numero de registros a saltar
  *         default: 0
+ *       - name: status
+ *         in: query
+ *         type: string
+ *         description: Estado de la worksheet
  *     responses:
  *       200:
  *         description: Operación exitosa
