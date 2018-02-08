@@ -28,6 +28,12 @@ t.SimplePhoneNumber = t.struct(
   }
 );
 
+t.TypedContactInfoStatus = t.enums({
+  UNDEFINED: 'UNDEFINED',
+  GOOD: 'GOOD',
+  BAD: 'BAD'
+});
+
 /**
  * @swagger
  * definitions:
@@ -44,11 +50,15 @@ t.TypedContactInfo = t.struct(
   {
     type: t.TypeContact,
     value: t.String,
-    note: t.maybe(t.String)
+    note: t.maybe(t.String),
+    status: t.TypedContactInfoStatus
   },
   {
     name: 'TypedContactInfo',
-    type: 'TELEFONO'
+    defaultProps: {
+      type: 'TELEFONO',
+      status: 'UNDEFINED'
+    }
   }
 );
 
