@@ -24,7 +24,7 @@ describe('owner.routes', () => {
     it('201 Operación exitosa', async() => {
       await request(app)
         .post('/owners')
-        .send({})
+        .send({}) // TODO: currently personId and buildingId are optional because the migration data
         .expect(201);
     });
   });
