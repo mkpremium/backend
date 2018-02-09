@@ -17,23 +17,16 @@ t.QueueRequestParams = t.struct({
   queueItemId: t.String
 }, 'QueueRequest');
 
-/**
- * @swagger
- * definitions:
- *   WorksheetListQuery:
- *     properties:
- *       date:
- *         type: string
- *         format: dd-MM-YYYY
- */
 t.WorksheetListQuery = t.ListQuery.extend(
   {
-    status: t.maybe(t.WorkSheetStatus)
+    status: t.maybe(t.WorkSheetStatus),
+    viewedAt: t.maybe(t.String),
+    viewedBetween: t.list(t.String)
   },
   {
     name: 'WorksheetListQuery',
     defaultProps: {
-      dateRange: []
+      viewedBetween: []
     }
   }
 );

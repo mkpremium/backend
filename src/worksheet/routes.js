@@ -52,6 +52,16 @@ const router = Router();
  *         in: query
  *         type: string
  *         description: Estado de la worksheet
+ *       - name: viewedAt
+ *         in: query
+ *         type: string
+ *         format: dd-mm-YYYY
+ *       - name: viewedBetween
+ *         in: query
+ *         type: array
+ *         items:
+ *           type: string
+ *           format: dd-mm-YYYY
  *     responses:
  *       200:
  *         description: Operación exitosa
