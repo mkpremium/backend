@@ -18,6 +18,7 @@ t.Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
+    status: t.maybe(t.OwnerStatus),
 
     personId: t.String,
 
@@ -37,6 +38,21 @@ t.Owner = t.struct(
     }
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   OwnerUpdate:
+ *     properties:
+ *       status:
+ *         type: string
+ *       note:
+ *         type: string
+ */
+t.OwnerUpdate = t.struct({
+  status: t.maybe(t.OwnerStatus),
+  note: t.maybe(t.String)
+}, 'OwnerUpdate');
 
 /**
  * @swagger

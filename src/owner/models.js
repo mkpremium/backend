@@ -19,16 +19,16 @@ export class PersonRepository extends Person {
     this.Struct = t.Person;
   }
 
-  async updateContactStatus(personId, contact) {
-    const updatedContact = new t.TypedContactInfoUpdate(contact);
+  async updateContactStatus(personId, body = {}) {
+    const {id, data} = new t.UpdateContactStatus(body);
     const person = await this.findById(personId);
-    const personContact = person.findContact(updatedContact);
+    const personContact = person.findContact({value: id});
 
     if (!personContact) {
-      throw newHttpError(400, `La información de contacto ${updatedContact.value} no fue encontrada y no pudo actualizarse`);
+      throw newHttpError(400, `La información de contacto ${id} no fue encontrada y no pudo actualizarse`);
     }
 
-    const updatedContacts = updateList(person.contacts, personContact, updatedContact);
+    const updatedContacts = updateList(person.contacts, personContact, data);
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
@@ -36,14 +36,28 @@ export class PersonRepository extends Person {
 }
 
 export class OwnerRepository extends Owner {
-  async updateContactStatus(ownerId, contact) {
-    const personRepo = new PersonRepository();
+  async findByIdOrThrow(ownerId) {
     const owner = await this.findById(ownerId);
 
     if (!owner) {
-      throw newHttpError(404, `El owner ${ownerId} no existe`);
+      throw newHttpError(404, `El propietario ${ownerId} no existe`);
     }
 
+    return owner;
+  }
+
+  async updateContactStatus(ownerId, contact) {
+    const personRepo = new PersonRepository();
+    const owner = await this.findByIdOrThrow(ownerId);
+
     return personRepo.updateContactStatus(owner.personId, contact);
+  }
+
+  async updateStatus(ownerId, data = {}) {
+    const changes = t.OwnerUpdate(data);
+    const owner = await this.findByIdOrThrow(ownerId);
+    const updatedOwner = t.update(owner, {$merge: changes});
+
+    return this.save(updatedOwner);
   }
 }

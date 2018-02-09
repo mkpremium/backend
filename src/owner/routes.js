@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {updateOwnerContactStatusController} from './controllers';
+import {updateOwnerContactStatusController, updateOwnerStatusController} from './controllers';
 
 const router = Router();
 
@@ -10,7 +10,38 @@ const router = Router();
  *   description: Propietarios
  */
 
-// router.put('/id');
+/**
+ * @swagger
+ * /owners/{id}
+ *   put:
+ *     tags: [Owner, Operator]
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del propietario
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/OwnerUpdate"
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       404:
+ *         description: Propietario no existe
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.put('/:id', updateOwnerStatusController);
 
 /**
  * @swagger
@@ -31,7 +62,7 @@ const router = Router();
  *       - name: body
  *         in: body
  *         schema:
- *           $ref: "#/definitions/TypedContactInfo"
+ *           $ref: "#/definitions/UpdateContactStatus"
  *     responses:
  *       204:
  *         description: Operación exitosa

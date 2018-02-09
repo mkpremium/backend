@@ -4,8 +4,16 @@ import {OwnerRepository} from './models';
 async function updateOwnerContactStatus(req, res) {
   const id = req.params.id;
   const repo = new OwnerRepository();
-  await repo.updateContactStatus(id, req.body || {});
+  await repo.updateContactStatus(id, req.body);
+  res.status(204).send();
+}
+
+async function updateOwnerStatus(req, res) {
+  const id = req.params.id;
+  const repo = new OwnerRepository();
+  await repo.updateStatus(id, req.body);
   res.status(204).send();
 }
 
 export const updateOwnerContactStatusController = wrap(updateOwnerContactStatus);
+export const updateOwnerStatusController = wrap(updateOwnerStatus);
