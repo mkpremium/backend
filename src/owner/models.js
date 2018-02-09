@@ -20,7 +20,7 @@ export class PersonRepository extends Person {
   }
 
   async updateContactStatus(personId, contact) {
-    const updatedContact = t.TypedContactInfoUpdate(contact);
+    const updatedContact = new t.TypedContactInfoUpdate(contact);
     const person = await this.findById(personId);
     const personContact = person.findContact(updatedContact);
 
@@ -41,7 +41,7 @@ export class OwnerRepository extends Owner {
     const owner = await this.findById(ownerId);
 
     if (!owner) {
-      throw newHttpError(400, `El owner ${ownerId} no existe`);
+      throw newHttpError(404, `El owner ${ownerId} no existe`);
     }
 
     return personRepo.updateContactStatus(owner.personId, contact);

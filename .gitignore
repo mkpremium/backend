@@ -37,4 +37,4 @@ app/csv/*.csv
 test-results.xml
 
 # Deployment builds
-/build
+build

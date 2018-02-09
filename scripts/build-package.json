@@ -1,8 +1,0 @@
-{
-  "devDependencies": null,
-  "main": "bin/www.js",
-  "scripts": {
-    "start": "node --require dotenv/config ."
-  },
-  "betterScripts": null
-}
