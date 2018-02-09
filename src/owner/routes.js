@@ -12,7 +12,7 @@ const router = Router();
 
 /**
  * @swagger
- * /owners/{id}
+ * /owners/{id}:
  *   put:
  *     tags: [Owner, Operator]
  *     consumes:
