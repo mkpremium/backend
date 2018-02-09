@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {
-  addOwnerContactController, updateOwnerContactStatusController,
+  addOwnerContactController, addOwnerController, updateOwnerContactStatusController,
   updateOwnerController
 } from './controllers';
 
@@ -12,6 +12,37 @@ const router = Router();
  *   name: Owner
  *   description: Propietarios
  */
+
+/**
+ * @swagger
+ * /owners:
+ *   post:
+ *     summary: Crea un nuevo propietario
+ *     tags: [Owner, Manager]
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/Owner"
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/Owner"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/', addOwnerController);
 
 /**
  * @swagger

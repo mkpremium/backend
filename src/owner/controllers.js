@@ -22,6 +22,13 @@ async function addOwnerContact(req, res) {
   res.status(204).send();
 }
 
+async function addOwner(req, res) {
+  const repo = new OwnerRepository();
+  const owner = await repo.save(req.body);
+  res.status(201).json(owner);
+}
+
 export const updateOwnerContactStatusController = wrap(updateOwnerContactStatus);
 export const updateOwnerController = wrap(updateOwner);
 export const addOwnerContactController = wrap(addOwnerContact);
+export const addOwnerController = wrap(addOwner);

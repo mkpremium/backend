@@ -20,6 +20,15 @@ describe('owner.routes', () => {
     owner = results.find(o => o.personId === person.id);
   });
 
+  describe('POST /owners @request', () => {
+    it('201 Operación exitosa', async() => {
+      await request(app)
+        .post('/owners')
+        .send({})
+        .expect(201);
+    });
+  });
+
   describe('PUT /owners/:id @request', () => {
     it('204 Operación exitosa', async() => {
       await request(app)
