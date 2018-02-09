@@ -21,7 +21,7 @@ t.WorksheetListQuery = t.ListQuery.extend(
   {
     status: t.maybe(t.WorkSheetStatus),
     viewedAt: t.maybe(t.String),
-    viewedBetween: t.list(t.String)
+    viewedBetween: t.maybe(t.StringSplitList)
   },
   {
     name: 'WorksheetListQuery',

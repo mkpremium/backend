@@ -2,32 +2,11 @@ import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
-import {utc} from '../lib/date';
 
 async function worksheetList(req, res) {
-  const params = new t.WorksheetListQuery(req.query || {});
   const repo = new WorksheetRepository();
-  const qb = repo.getQueryBuilder('select')
-    .limit(params.limit)
-    .offset(params.offset);
-
-  if (params.status) {
-    qb.where('status = ?', params.status);
-  }
-
-  if (params.viewedAt) {
-    const m = utc(params.viewedAt);
-    qb.where('viewedAt >= ?', m.clone().startOf('day').toDate());
-    qb.where('viewedAt <= ?', m.clone().endOf('day').toDate());
-  } else if (params.viewedBetween.length > 0) {
-    const [start, end] = params.viewedBetween.map(utc);
-    qb.where('viewedAt >= ?', start.startOf('day').toDate());
-    if (end) {
-      qb.where('viewedAt <= ?', end.endOf('day').toDate());
-    }
-  }
-
-  const worksheets = await repo.query(qb);
+  console.log('QQQ', req.query);
+  const worksheets = await repo.list(req.query);
 
   res.json(worksheets);
 }
