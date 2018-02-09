@@ -29,8 +29,8 @@ const webhookRouter = Router();
  *        description: Id del propietario a llamar
  *      - name: body
  *        in: body
- *         schema:
- *           $ref: "#/definitions/ContactValue"
+ *        schema:
+ *          $ref: "#/definitions/ContactValue"
  *     responses:
  *       200:
  *         description: Peticion de llamada exitosa

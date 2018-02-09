@@ -69,10 +69,11 @@ t.TypedContactInfo = t.struct(
  *     properties:
  *       value:
  *         type: string
+ *         required: true
  */
 t.ContactValue = t.struct(
   {
-    value: t.maybe(t.String)
+    value: t.String
   }
 );
 

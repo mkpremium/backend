@@ -10,7 +10,7 @@ import t from 'tcomb';
  *         format: uuid/v4
  *         description: Id de registro de llamada
  *       to:
- *         type: interger
+ *         type: integer
  *         description: Numero a quien se realizo la llamada
  *       data:
  *         type: object
@@ -37,31 +37,8 @@ t.Calls = t.struct({
     status: 'Iniciada',
     _documentType: 'calls'
   }
-}, 'Calls');
+});
 
-/**
- * @swagger
- * definitions:
- *  CallOptions:
- *     properties:
- *      service_id:
- *        type: interger
- *        description: Service id that applies to this call
- *      return_id:
- *        type: boolean
- *        description: Return the call id
- *  CallService:
- *     required:
- *      - from
- *      - to
- *     properties:
- *      from:
- *        type: string
- *      to:
- *        type: string
- *      options:
- *        $ref: "#/definitions/CallOptions"
- */
 t.CallService = t.struct({
   from: t.String,
   to: t.String,
@@ -71,21 +48,6 @@ t.CallService = t.struct({
   }, 'CallOptions')
 }, 'CallService');
 
-/**
- * @swagger
- * definitions:
- *  HangupOptions:
- *     properties:
- *      call_id:
- *        type: interger
- *        description: Numintec's Identity of call
- *  HangupService:
- *     required:
- *      - options
- *     properties:
- *      options:
- *        $ref: "#/definitions/HangupOptions"
- */
 t.HangupService = t.struct({
   options: t.struct({
     call_id: t.Integer
@@ -112,7 +74,7 @@ t.HangupSuccessResponse = t.struct({
  *      status:
  *        type: string
  *      error_code:
- *        type: interger
+ *        type: integer
  *      description:
  *        type: string
  */

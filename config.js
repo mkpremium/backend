@@ -16,7 +16,7 @@ export const jwt = {
 
 export const numintec = {
   apiUrl: process.env.NUMINTEC_API_URL || 'http://api.invoxcontact.com',
-  apiKey: process.env.NUMINTEC_API_KEY,
+  apiKey: process.env.NUMINTEC_API_LICENSE,
   serviceId: process.env.NUMINTEC_SERVICE_ID
 };
 
