@@ -6,9 +6,9 @@
     "prestart": "npm run lint",
     "start": "better-npm-run start",
     "pretest": "npm run lint",
-    "test": "mocha --require test/setup.js --recursive --exit",
-    "prebuild": "npm run test",
+    "test": "mocha --require test/setup.js --recursive --exit --timeout 10000",
     "build": "sh scripts/build.sh",
+    "predeploy": "npm run build",
     "deploy": "sh scripts/deployment.sh"
   },
   "betterScripts": {
@@ -30,6 +30,7 @@
     "fs-extra": "^5.0.0",
     "jsonwebtoken": "^5.7.0",
     "lodash": "^4.17.4",
+    "moment-timezone": "^0.5.14",
     "morgan": "^1.7.0",
     "morgan-body": "^2.0.2",
     "request": "^2.83.0",

@@ -32,7 +32,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/AuthenticatedResponse"
  *       401:
- *         description: Credenciales invalidos o cuenta deshabilitada
+ *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
  */
@@ -50,6 +50,8 @@ router.post('/login', loginController);
  * /operator:
  *   post:
  *     tags: [Manager]
+ *     security:
+ *       - bearerAuth: ["ADMIN"]
  *     summary: Crear operador
  *     consumes:
  *       - "application/json"
@@ -68,6 +70,10 @@ router.post('/login', loginController);
  *           $ref: "#/definitions/Operator"
  *       400:
  *         description: Solicitud invalida
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
  */

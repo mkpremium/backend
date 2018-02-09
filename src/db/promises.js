@@ -3,44 +3,24 @@
  * with Bluebird promisify functions
  */
 
-/**
- * Turns a function with one argument and callback to promises style
- * @param bucket
- * @param name
- * @return {function(*=): Promise<any>}
- */
-function turnsAsync1(bucket, name) {
-  return pk => new Promise((resolve, reject) => {
-    bucket[name](pk, (err, result) => {
+function turnsAsync(bucket, name) {
+  return (...args) => new Promise((resolve, reject) => {
+    const cb = (err, result) => {
       if (err) {
         reject(err);
       } else {
         resolve(result);
       }
-    });
-  });
-}
-
-/**
- * Turns a function with two arguments and callback to promises style
- * @param bucket
- * @param name
- * @return {function(*=): Promise<any>}
- */
-function turnsAsync2(bucket, name) {
-  return (pk, data) => new Promise((resolve, reject) => {
-    bucket[name](pk, data, (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    });
+    };
+    bucket[name].apply(bucket, args.concat([cb]));
   });
 }
 
 export default function promises(bucket) {
-  bucket.queryAsync = turnsAsync2(bucket, 'query');
-  bucket.upsertAsync = turnsAsync2(bucket, 'upsert');
-  bucket.getAsync = turnsAsync1(bucket, 'get');
+  const manager = bucket.manager();
+  bucket.createIndexAsync = turnsAsync(manager, 'createIndex');
+  bucket.flushAsync = turnsAsync(manager, 'flush');
+  bucket.queryAsync = turnsAsync(bucket, 'query');
+  bucket.upsertAsync = turnsAsync(bucket, 'upsert');
+  bucket.getAsync = turnsAsync(bucket, 'get');
 }

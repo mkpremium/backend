@@ -8,6 +8,19 @@ bold=$(tput bold)
 normal=$(tput sgr0)
 name=$(basename $0)
 
+validate_nvm() {
+  local host=$1
+  local remote_dir=$2
+
+  local local_file=`readlink -f ${DIR}/../build/.nvmrc`
+  local md5sum=`ssh bitdistrict-m1 "md5sum ${remote_dir}/.nvmrc" | awk '{print $1}'`
+  local md5file=${DIR}/../build/MD5SUM
+
+  echo "${local_file}  ${md5sum}" > ${md5file}
+
+  md5sum -c --quiet ${md5file} &> /dev/null
+}
+
 summary() {
   cat <<EOH
 ${bold}NAME${normal}
@@ -30,37 +43,44 @@ ${bold}DESCRIPTION${normal}
 EOH
 }
 
-if [ $# -ne 2 ]; then
-    summary
-    exit 1
-fi
+deploy() {
+  local dist_host=$1
+  local app_name=$2
 
-dist_file=$(mktemp --suffix=.tgz)
-dist_host=$1
-app_name=$2
-deploy_dir=/home/centos/apps/${app_name}
+  local dist_file=$(mktemp --suffix=.tgz)
+  local deploy_dir=/home/centos/apps/${app_name}
 
-echo -e "Building                     \t:"
-${DIR}/build.sh
+  echo -en "Checking node version         \t:"
+  remove_node_modules=`validate_nvm ${dist_host} ${deploy_dir} || echo rm -rf node_modules`
+  echo -e "${bold}OK${normal}"
 
-echo "Deploying..."
-echo -e "Root project                 \t: ${bold}$(pwd)${normal}"
+  echo "Deploying..."
+  echo -e "Root project                  \t: ${bold}$(pwd)${normal}"
 
-echo -en "Generating distribution file\t: "
-tar czf ${dist_file} build
-echo -e "${bold}${dist_file}${normal}"
+  echo -en "Generating distribution file \t: "
+  tar czf ${dist_file} build
+  echo -e "${bold}${dist_file}${normal}"
 
-echo -en "Uploading distribution file  \t: "
-rsync -arq ${dist_file} ${dist_host}:${dist_file}
-echo -e "${bold}OK${normal}"
+  echo -en "Uploading distribution file  \t: "
+  rsync -arq ${dist_file} ${dist_host}:${dist_file}
+  echo -e "${bold}OK${normal}"
 
-echo -e "Installing                   \t: "
-ssh ${dist_host} bash << EOF
+  echo -e "Installing on remote          \t: "
+  ssh ${dist_host} bash << EOF
 source ~/.nvm/nvm.sh
 mkdir -p ${deploy_dir}
 tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > dev/null
 cd ${deploy_dir}
 nvm use
+${remove_node_modules}
 npm install
 pm2 restart ${app_name}
 EOF
+}
+
+if [ $# -ne 2 ]; then
+    summary
+    exit 1
+fi
+
+deploy "$@"

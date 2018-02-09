@@ -29,6 +29,15 @@ t.BuildingOwner = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   Building:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ */
 t.Building = t.struct(
   {
     id: t.String,
@@ -44,6 +53,7 @@ t.Building = t.struct(
     buildingDate: t.Number,
     location: t.Location,
     elements: t.Elements,
+    ownerId: t.maybe(t.String),
     owner: t.BuildingOwner, // TODO: move to owners collection
     state: t.BuildingState,
 

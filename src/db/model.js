@@ -12,6 +12,36 @@ class CouchbaseModelStruct {
   }
 }
 
+export class EmbeddedModel {
+  constructor() {
+    this.Struct = CouchbaseModelStruct;
+  }
+
+  getQueryBuilder() {
+    throw new Error('getQueryBuilder undefined for embedded models');
+  }
+
+  async query() {
+    throw new Error('query undefined for embedded models');
+  }
+
+  async preSave(data) {
+    // no pre-save operations on base model
+    return data;
+  }
+
+  async save(data) {
+    const struct = new this.Struct(data);
+    const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
+    const dataPreSaved = await this.preSave(dataWithId);
+    if (!dataPreSaved) {
+      throw new Error('it seems you forgot return the data on the preSave(data) method');
+    }
+
+    return dataPreSaved;
+  }
+}
+
 export class CouchbaseModel {
   constructor() {
     this.Struct = CouchbaseModelStruct;
@@ -40,7 +70,11 @@ export class CouchbaseModel {
     return qb;
   }
 
-  async query(_query) {
+  async deleteQuery(_query = this.getQueryBuilder('delete')) {
+    return this.query(_query);
+  }
+
+  async query(_query = this.getQueryBuilder()) {
     const queryParam = _query.toParam();
     debugModel('query', queryParam);
     return this._bucket.queryAsync(N1qlQuery.fromString(queryParam.text), queryParam.values);
@@ -51,15 +85,40 @@ export class CouchbaseModel {
     const query = this.getQueryBuilder().where(`${field} = ?`, value);
 
     const result = await this.query(query);
+
     if (result && result.length) {
+      // we can safely omit data with the same id
+      if (data.id && data.id === result[0].id) {
+        return;
+      }
+
       const e = new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`);
       e.code = 400;
       throw e;
     }
   }
 
-  async preSave() {
+  async findById(id) {
+    try {
+      const result = await this._bucket.getAsync(id);
+      if (result && result.value) {
+        return result.value;
+      }
+
+      return null;
+    } catch (e) {
+      switch (e.code) {
+        case 13: // Key does not exists on the server
+          return null;
+        default:
+          throw e;
+      }
+    }
+  }
+
+  async preSave(data) {
     // no pre-save operations on base model
+    return data;
   }
 
   async save(data) {

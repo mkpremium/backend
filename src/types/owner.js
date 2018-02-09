@@ -1,5 +1,18 @@
 import t from 'tcomb';
 
+/**
+ * @swagger
+ * definitions:
+ *   Contact:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       person:
+ *         $ref: "#/definitions/Person"
+ *       relatedBuilding:
+ *         $ref: "#/definitions/Building"
+ */
 t.Owner = t.struct(
   {
     id: t.String,
@@ -16,7 +29,7 @@ t.Owner = t.struct(
   {
     name: 'Owner',
     defaultProps: {
-      type: t.OwnerType.NINGUNO,
+      type: 'NINGUNO',
 
       _documentType: 'owner',
       _migrateId: []
@@ -24,6 +37,34 @@ t.Owner = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   Person:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       name:
+ *         type: string
+ *         description: Nombre de organización
+ *       firstName:
+ *         type: string
+ *       firstSurname:
+ *         type: string
+ *       secondSurname:
+ *         type: string
+ *       documentNumber:
+ *         type: string
+ *       contacts:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/TypedContactInfo"
+ *       birthDate:
+ *         type: string
+ *         format: "DD-MM-YYYY"
+ *
+ */
 t.Person = t.struct(
   {
     id: t.String,

@@ -1,0 +1,124 @@
+import t from 'tcomb';
+import find from 'lodash/find';
+import {Queue} from './constants';
+
+t.WorkSheetStatus = t.enums.of([
+  'OPEN',
+  'CLOSED'
+], 'WorkSheetStatus');
+
+t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
+
+/**
+ * @swagger
+ * definitions:
+ *   Worksheet:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       owner:
+ *         $ref: "#/definitions/Contact"
+ *       queueId:
+ *         type: string
+ *         format: uuid/v4
+ *       relatedOwners:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/Contact"
+ *
+ */
+t.WorkSheet = t.struct({
+  id: t.maybe(t.String),
+  calls: t.list(t.struct({
+    ownerId: t.String,
+    realizedAt: t.Date
+  })),
+  queueId: t.maybe(t.String),
+  relatedOwnerIds: t.list(t.String),
+  status: t.WorkSheetStatus,
+
+  viewedAt: t.maybe(t.Date),
+  viewedBy: t.maybe(t.String),
+
+  _documentType: t.enums.of(['worksheet'])
+}, {
+  name: 'WorkSheet',
+  defaultProps: {
+    status: 'OPEN',
+    relatedOwnerIds: [],
+    calls: [],
+    _documentType: 'worksheet'
+  }
+});
+
+/**
+ * @swagger
+ * definitions:
+ *   QueueItem:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       operator:
+ *         $ref: "#/definitions/Operator"
+ *       worksheet:
+ *         $ref: "#/definitions/Worksheet"
+ *       status:
+ *         type: string
+ */
+t.QueueItem = t.struct(
+  {
+    id: t.maybe(t.String),
+    worksheetId: t.String,
+    operatorId: t.maybe(t.String),
+    status: t.WorkSheetQueueStatus
+  },
+  {
+    name: 'QueueItem',
+    defaultProps: {
+      status: Queue.Status.AVAILABLE
+    }
+  }
+);
+
+t.QueueItem.prototype.canBeOpened = function() {
+  return Queue.StatusAvailable.indexOf(this.status) !== -1;
+};
+
+t.QueueItem.prototype.open = function() {
+  return t.update(this, {status: {$set: Queue.Status.OPENED}});
+};
+
+/**
+ * @swagger
+ * definitions:
+ *   WorksheetQueue:
+ *     properties:
+ *       city:
+ *         type: string
+ *       worksheets:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/QueueItem"
+ */
+t.WorksheetQueue = t.struct(
+  {
+    id: t.maybe(t.String),
+    city: t.String,
+    worksheets: t.list(t.QueueItem),
+
+    _documentType: t.enums.of(['worksheet-queue'])
+  },
+  {
+    name: 'WorksheetQueue',
+    defaultProps: {
+      worksheets: [],
+      _documentType: 'worksheet-queue'
+    }
+  }
+);
+
+t.WorksheetQueue.prototype.findItemById = function(id) {
+  return find(this.worksheets, {id});
+};

@@ -65,7 +65,7 @@ export class MigrateModel {
       throw new Error(`Model ${this.name}.migrateFromCsv() not found nor correctly exported`);
     }
 
-    this.bucket = await couchbase({middleware: false});
+    this.bucket = await couchbase({}, {middleware: false});
     await this.importFileToModel();
     this.postImport();
     await this.pushToDatabase();
