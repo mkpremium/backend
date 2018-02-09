@@ -4,15 +4,19 @@ import find from 'lodash/find';
 /**
  * @swagger
  * definitions:
- *   Contact:
+ *   Owner:
  *     properties:
  *       id:
  *         type: string
  *         format: uuid/v4
  *       person:
  *         $ref: "#/definitions/Person"
- *       relatedBuilding:
+ *       building:
  *         $ref: "#/definitions/Building"
+ *       note:
+ *         type: string
+ *       type:
+ *         type: string
  */
 t.Owner = t.struct(
   {
@@ -21,6 +25,7 @@ t.Owner = t.struct(
     status: t.maybe(t.OwnerStatus),
 
     personId: t.String,
+    buildingId: t.String,
 
     note: t.maybe(t.String),
 
@@ -44,14 +49,28 @@ t.Owner = t.struct(
  * definitions:
  *   OwnerUpdate:
  *     properties:
+ *       type:
+ *         type: string
+ *         description: Tipo de propietario
  *       status:
  *         type: string
  *       note:
  *         type: string
+ *       buildingId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del edificio relacionado
+ *       personId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id de la persona relacionada
  */
 t.OwnerUpdate = t.struct({
+  type: t.maybe(t.OwnerType),
   status: t.maybe(t.OwnerStatus),
-  note: t.maybe(t.String)
+  note: t.maybe(t.String),
+  buildingId: t.maybe(t.String),
+  personId: t.maybe(t.String)
 }, 'OwnerUpdate');
 
 /**

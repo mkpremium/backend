@@ -18,14 +18,14 @@ t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
  *         type: string
  *         format: uuid/v4
  *       owner:
- *         $ref: "#/definitions/Contact"
+ *         $ref: "#/definitions/Owner"
  *       queueId:
  *         type: string
  *         format: uuid/v4
  *       relatedOwners:
  *         type: array
  *         items:
- *           $ref: "#/definitions/Contact"
+ *           $ref: "#/definitions/Owner"
  *
  */
 t.WorkSheet = t.struct({

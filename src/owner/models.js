@@ -33,6 +33,20 @@ export class PersonRepository extends Person {
 
     return this.save(updatedPerson);
   }
+
+  async addContact(personId, body = {}) {
+    const newContact = new t.TypedContactInfo(body);
+    const person = await this.findById(personId);
+
+    if (!person) {
+      throw newHttpError(400, `La persona ${personId} asociada al propietario no pudo ser encontrada`);
+    }
+
+    const updatedContacts = t.update(person.contacts, {$push: [newContact]});
+    const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
+
+    return this.save(updatedPerson);
+  }
 }
 
 export class OwnerRepository extends Owner {
@@ -53,11 +67,18 @@ export class OwnerRepository extends Owner {
     return personRepo.updateContactStatus(owner.personId, contact);
   }
 
-  async updateStatus(ownerId, data = {}) {
+  async update(ownerId, data = {}) {
     const changes = t.OwnerUpdate(data);
     const owner = await this.findByIdOrThrow(ownerId);
     const updatedOwner = t.update(owner, {$merge: changes});
 
     return this.save(updatedOwner);
+  }
+
+  async addContact(ownerId, body) {
+    const personRepo = new PersonRepository();
+    const owner = await this.findByIdOrThrow(ownerId);
+
+    return personRepo.addContact(owner.personId, body);
   }
 }

@@ -8,12 +8,20 @@ async function updateOwnerContactStatus(req, res) {
   res.status(204).send();
 }
 
-async function updateOwnerStatus(req, res) {
+async function updateOwner(req, res) {
   const id = req.params.id;
   const repo = new OwnerRepository();
-  await repo.updateStatus(id, req.body);
+  await repo.update(id, req.body);
+  res.status(204).send();
+}
+
+async function addOwnerContact(req, res) {
+  const id = req.params.id;
+  const repo = new OwnerRepository();
+  await repo.addContact(id, req.body);
   res.status(204).send();
 }
 
 export const updateOwnerContactStatusController = wrap(updateOwnerContactStatus);
-export const updateOwnerStatusController = wrap(updateOwnerStatus);
+export const updateOwnerController = wrap(updateOwner);
+export const addOwnerContactController = wrap(addOwnerContact);
