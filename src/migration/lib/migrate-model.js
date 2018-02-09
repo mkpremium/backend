@@ -9,7 +9,8 @@ import {csvToJson} from './index';
 const debugMigrate = debug('app:migration:migrate');
 
 export class MigrateModel {
-  constructor(name, filename) {
+  constructor(name, filename, app = {}) {
+    this.app = app;
     this.bucket = null;
     this.migratedData = [];
     this.processedData = [];
@@ -65,9 +66,12 @@ export class MigrateModel {
       throw new Error(`Model ${this.name}.migrateFromCsv() not found nor correctly exported`);
     }
 
-    this.bucket = await couchbase({}, {middleware: false});
+    this.bucket = this.app.locals
+      ? this.app.locals.bucket
+      : await couchbase({}, {middleware: false});
+
     await this.importFileToModel();
     this.postImport();
-    await this.pushToDatabase();
+    return this.pushToDatabase();
   }
 }

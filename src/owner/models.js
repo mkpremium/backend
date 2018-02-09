@@ -29,7 +29,7 @@ export class PersonRepository extends Person {
     }
 
     const updatedContacts = updateList(person.contacts, personContact, updatedContact);
-    const updatedPerson = t.update(person, {contacts: {$set: updatedContacts}});
+    const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
   }

@@ -10,6 +10,8 @@ const router = Router();
  *   description: Propietarios
  */
 
+// router.put('/id');
+
 /**
  * @swagger
  * /owners/{id}/contacts:

@@ -103,9 +103,10 @@ export class CouchbaseModel {
 
   async findById(id) {
     try {
+      debugModel('findById', this.Struct.meta.defaultProps._documentType, id);
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
-        return result.value;
+        return new this.Struct(result.value);
       }
 
       return null;
