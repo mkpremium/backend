@@ -24,8 +24,8 @@ t.Owner = t.struct(
     type: t.OwnerType,
     status: t.maybe(t.OwnerStatus),
 
-    personId: t.String,
-    buildingId: t.String,
+    personId: t.maybe(t.String), // FIXME: this is required
+    buildingId: t.maybe(t.String), // FIXME: this is required
 
     note: t.maybe(t.String),
 

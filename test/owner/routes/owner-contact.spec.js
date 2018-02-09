@@ -4,13 +4,14 @@ import app from '../../../src/app';
 import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 
+const personRepo = new PersonRepository();
+
 describe('owner.routes', () => {
   let owner;
   let person;
   before(async() => {
     await app.locals.bucketPromise;
     const ownerRepo = new OwnerRepository();
-    const personRepo = new PersonRepository();
     await ownerRepo.deleteQuery();
     await personRepo.deleteQuery();
 
@@ -22,7 +23,6 @@ describe('owner.routes', () => {
 
   describe('PUT /owners/:id/contacts @request', () => {
     it('204 Operación exitosa', async() => {
-      const personRepo = new PersonRepository();
       const {value} = person.contacts[0];
       await request(app)
         .put(`/owners/${owner.id}/contacts`)
@@ -48,6 +48,22 @@ describe('owner.routes', () => {
       return request(app)
         .put('/owners/blah-blah/contacts')
         .expect(404);
+    });
+  });
+
+  describe('POST /owners/:id/contacts @request', () => {
+    it('204 Operación exitosa', async() => {
+      await request(app)
+        .post(`/owners/${owner.id}/contacts`)
+        .send({
+          value: '1234567890',
+          status: 'GOOD'
+        })
+        .expect(204);
+
+      const updatedPerson = await personRepo.findById(person.id);
+
+      updatedPerson.contacts.should.have.length(2);
     });
   });
 });
