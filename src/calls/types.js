@@ -10,7 +10,7 @@ import t from 'tcomb';
  *         format: uuid/v4
  *         description: Id de registro de llamada
  *       to:
- *         type: integer
+ *         type: string
  *         description: Numero a quien se realizo la llamada
  *       data:
  *         type: object
@@ -25,7 +25,7 @@ import t from 'tcomb';
  */
 t.Calls = t.struct({
   id: t.maybe(t.String),
-  to: t.Number,
+  to: t.String,
   data: t.Object,
   date: t.Date,
   status: t.CallStatus,
@@ -34,7 +34,7 @@ t.Calls = t.struct({
 {
   name: 'Calls',
   defaultProps: {
-    status: 'Iniciada',
+    status: 'INICIADA',
     _documentType: 'calls'
   }
 });
@@ -47,12 +47,6 @@ t.CallService = t.struct({
     return_id: t.Boolean
   }, 'CallOptions')
 }, 'CallService');
-
-t.HangupService = t.struct({
-  options: t.struct({
-    call_id: t.Integer
-  }, 'HangupOptions')
-}, 'HangupService');
 
 /**
  * @swagger

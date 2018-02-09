@@ -1,7 +1,7 @@
 import t from 'tcomb';
-import { CouchbaseModel } from '../db/model';
-import { newHttpError } from '../lib/http-error';
-import { updateList } from '../lib/tcomb-utils';
+import {CouchbaseModel} from '../db/model';
+import {newHttpError} from '../lib/http-error';
+import {updateList} from '../lib/tcomb-utils';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -20,16 +20,16 @@ export class PersonRepository extends Person {
   }
 
   async updateContactStatus(personId, body = {}) {
-    const { id, data } = new t.UpdateContactStatus(body);
+    const {id, data} = new t.UpdateContactStatus(body);
     const person = await this.findById(personId);
-    const personContact = person.findContact({ value: id });
+    const personContact = person.findContact({value: id});
 
     if (!personContact) {
       throw newHttpError(400, `La información de contacto ${id} no fue encontrada y no pudo actualizarse`);
     }
 
     const updatedContacts = updateList(person.contacts, personContact, data);
-    const updatedPerson = t.update(person, { contacts: { $merge: updatedContacts } });
+    const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
   }
@@ -42,8 +42,8 @@ export class PersonRepository extends Person {
       throw newHttpError(400, `La persona ${personId} asociada al propietario no pudo ser encontrada`);
     }
 
-    const updatedContacts = t.update(person.contacts, { $push: [newContact] });
-    const updatedPerson = t.update(person, { contacts: { $merge: updatedContacts } });
+    const updatedContacts = t.update(person.contacts, {$push: [newContact]});
+    const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
   }
@@ -70,7 +70,7 @@ export class OwnerRepository extends Owner {
   async update(ownerId, data = {}) {
     const changes = t.OwnerUpdate(data);
     const owner = await this.findByIdOrThrow(ownerId);
-    const updatedOwner = t.update(owner, { $merge: changes });
+    const updatedOwner = t.update(owner, {$merge: changes});
 
     return this.save(updatedOwner);
   }
@@ -81,13 +81,17 @@ export class OwnerRepository extends Owner {
 
     return personRepo.addContact(owner.personId, body);
   }
+  
   async getContactPhoneNumber(ownerId, contact) {
+    const personRepo = new PersonRepository();
     const contactValue = t.ContactValue(contact);
     const owner = await this.findById(ownerId);
-    const ownerContactValue = owner.findContact(contactValue);
+    const person = await personRepo.findById(owner.personId);
 
-    if (!owner) {
-      throw newHttpError(404, `El owner ${ownerId} no existe`);
+    const ownerContactValue = person.findContact(contactValue);
+
+    if (!ownerContactValue) {
+      throw newHttpError(400, `El número de contacto para el owner ${ownerId} no existe`);
     }
 
     return ownerContactValue;

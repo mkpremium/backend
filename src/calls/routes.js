@@ -1,8 +1,7 @@
 import {Router} from 'express';
-import {callController, hangupController, webhookController} from './controllers';
+import {callController, hangupController} from './controllers';
 
-const callRouter = Router();
-const webhookRouter = Router();
+const router = Router();
 
 /**
  * @swagger
@@ -41,7 +40,7 @@ const webhookRouter = Router();
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-callRouter.post('/owner/:id', callController);
+router.post('/owner/:id', callController);
 
 /**
  * @swagger
@@ -65,12 +64,6 @@ callRouter.post('/owner/:id', callController);
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-callRouter.post('/hangup/:callId', hangupController);
+router.post('/hangup/:callId', hangupController);
 
-webhookRouter.post('/', webhookController);
-webhookRouter.put('/', webhookController);
-webhookRouter.get('/', webhookController);
-webhookRouter.options('/', webhookController);
-webhookRouter.patch('/', webhookController);
-
-export default {callRouter, webhookRouter};
+export default router;

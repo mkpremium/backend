@@ -21,18 +21,10 @@ function getFromNumber() {
 function getCallParams(to) {
   return t.CallService({
     from: getFromNumber(),
-    to: to,
+    to: to.value,
     options: {
-      service_id: numintec.serviceId,
+      service_id: parseInt(numintec.serviceId),
       return_id: true
-    }
-  });
-}
-
-function getHangupParams(callId) {
-  return t.HangupService({
-    options: {
-      call_id: callId
     }
   });
 }
@@ -41,12 +33,12 @@ async function call(phone) {
   const model = new Calls();
   try {
     const params = getCallParams(phone);
-    const result = await requester.get('/Call/rest/call/', t.Call(params));
-    if (!result.status) throw newHttpError(400, result);
+    const result = await requester.get('/Call/rest/call/', params);
+    if (!result.data.status) throw newHttpError(400, result.data.description);
     
     const call = model.save({
-      to: phone,
-      data: result,
+      to: phone.value,
+      data: result.data,
       date: new Date(),
       status: t.CallStatus.INICIADA
     });
@@ -58,10 +50,9 @@ async function call(phone) {
 
 async function hangup(id) {
   try {
-    const params = getHangupParams(id);
-    const result = await requester.get('/Call/rest/hangup/', t.Hangup(params));
-    if (!result.status) throw newHttpError(400, result);
-    return result;
+    const result = await requester.get(`/Call/rest/hangup/?options[call_id]=${id}`);
+    if (!result.data.status) throw newHttpError(400, result.data.description);
+    return result.data;
   } catch (e) {
     throw newHttpError(400, e);
   }

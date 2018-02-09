@@ -11,15 +11,10 @@ async function call(req, res) {
 };
 
 async function hangup(req, res) {
-  const id = req.params.id;
+  const id = req.params.callId;
   await requestHangup(id);
   res.status(204).send();
 };
 
-function loggerWebhook(req, res) {
-  res.status(204).send();
-}
-
 export const callController = wrap(call);
 export const hangupController = wrap(hangup);
-export const webhookController = loggerWebhook;

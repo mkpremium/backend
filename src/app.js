@@ -14,6 +14,7 @@ import worksheet from './worksheet';
 import owner from './owner';
 import swagger from './swagger';
 import calls from './calls';
+// import numintec from './numintec';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -31,6 +32,7 @@ operator(app);
 worksheet(app);
 owner(app);
 calls(app);
+// app.use(numintec);
 app.use(appErrorHandler);
 
 export default app;

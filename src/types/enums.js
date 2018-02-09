@@ -40,7 +40,7 @@ t.PersonType = t.enums({
 
 // TODO: Use real status from Numintec API
 t.CallStatus = t.enums({
-  INICIADA: 'Iniciada',
-  EN_PROGRESO: 'En progreso',
-  FINALIZADA: 'Finalizada'
+  INICIADA: 'INICIADA',
+  EN_PROGRESO: 'EN_PROGRESO',
+  FINALIZADA: 'FINALIZADA'
 }, 'CallStatus');
