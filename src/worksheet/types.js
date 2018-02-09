@@ -26,7 +26,7 @@ t.WorksheetListQuery = t.ListQuery.extend(
   {
     name: 'WorksheetListQuery',
     defaultProps: {
-      viewedBetween: []
+      viewedBetween: ','
     }
   }
 );
