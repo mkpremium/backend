@@ -8,6 +8,4 @@ async function updateOwnerContactStatus(req, res) {
   res.status(204).send();
 }
 
-//async function update
-
 export const updateOwnerContactStatusController = wrap(updateOwnerContactStatus);
