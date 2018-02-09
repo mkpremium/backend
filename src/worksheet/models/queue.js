@@ -1,6 +1,8 @@
 import t from 'tcomb';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
+import {WorksheetRepository} from './worksheet';
+import {utc} from '../../lib/date';
 
 export class WorksheetQueue extends CouchbaseModel {
   constructor() {
@@ -65,6 +67,18 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     if (!item.canBeOpened()) {
       throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`);
     }
+
+    // TODO: validate operator no have another item opened in the queue
+
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findById(item.worksheetId);
+
+    if (!worksheet) {
+      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`);
+    }
+
+    const updatedWorksheet = t.update(worksheet, {viewedAt: {$set: utc().toDate()}});
+    await worksheetRepo.save(updatedWorksheet);
 
     const itemIndex = queue.worksheets.indexOf(item);
     const updatedItem = item.open();

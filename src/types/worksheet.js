@@ -38,6 +38,9 @@ t.WorkSheet = t.struct({
   relatedOwnerIds: t.list(t.String),
   status: t.WorkSheetStatus,
 
+  viewedAt: t.maybe(t.Date),
+  viewedBy: t.maybe(t.String),
+
   _documentType: t.enums.of(['worksheet'])
 }, {
   name: 'WorkSheet',

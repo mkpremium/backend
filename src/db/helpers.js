@@ -12,7 +12,7 @@ export async function getList(documentType) {
 }
 
 export async function upsertToDb(pk, data) {
-  debugHelper('upsertToDb', pk, data._documentType);
+  debugHelper('upsertToDb', pk, data);
   await this.upsertAsync(pk, data);
   const result = await this.getAsync(pk);
 
