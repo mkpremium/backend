@@ -1,5 +1,19 @@
+import Promise from 'bluebird';
 import request from 'supertest';
 import {OperatorRepository} from '../src/operator/models';
+import {WorksheetRepository} from '../src/worksheet/models/worksheet';
+import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
+
+export async function deleteAll() {
+  const operator = new OperatorRepository();
+  const worksheet = new WorksheetRepository();
+  const queue = new WorksheetQueueRepository();
+  return Promise.all([
+    operator.deleteQuery(),
+    worksheet.deleteQuery(),
+    queue.deleteQuery()
+  ]);
+}
 
 export async function operatorLogin(app, credentials = {username: 'admin', password: 'password'}) {
   const response = await request(app)
@@ -8,6 +22,22 @@ export async function operatorLogin(app, credentials = {username: 'admin', passw
     .expect(200);
 
   return Object.assign({}, response.body, {authorization: `Bearer ${response.body.token}`});
+}
+
+export async function operatorCreate() {
+  const repo = new OperatorRepository();
+  return repo.save({
+    username: 'operator',
+    password: 'password',
+    agentNumber: 'operator',
+    roles: [
+      'OPERATOR'
+    ],
+    profile: {
+      firstName: 'operator',
+      lastName: 'operator'
+    }
+  });
 }
 
 export async function operatorCreateAdmin() {
@@ -26,17 +56,17 @@ export async function operatorCreateAdmin() {
   });
 }
 
-export async function operatorCreate() {
+export async function operatorCreateManager() {
   const repo = new OperatorRepository();
   return repo.save({
-    username: 'operator',
+    username: 'manager',
     password: 'password',
-    agentNumber: 'operator',
+    agentNumber: 'manager',
     roles: [
-      'OPERATOR'
+      'MANAGER'
     ],
     profile: {
-      firstName: 'operator',
+      firstName: 'manager',
       lastName: 'operator'
     }
   });

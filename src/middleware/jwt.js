@@ -14,5 +14,6 @@ const guard = jwtPermissions();
 
 export const permissions = {
   admin: guard.check('ADMIN'),
-  operator: guard.check('OPERATOR')
+  operator: guard.check('OPERATOR'),
+  manager: guard.check('MANAGER')
 };
