@@ -1,21 +1,14 @@
 import request from 'supertest';
-import squel from 'squel';
 
 import app from '../../../src/app';
-import {Operator} from '../../../src/operator/models';
+import {OperatorRepository} from '../../../src/operator/models';
 
 describe('operator.routes', () => {
   before(async() => {
     await app.locals.bucketPromise;
-    const operator = new Operator();
-    const qb = operator.getQueryBuilder('delete');
-    qb
-      .where(
-        squel.expr()
-          .or('username = ?', 'operator3')
-          .or('username = ?', 'operator4')
-      );
-    await operator.query(qb);
+    const operator = new OperatorRepository();
+    await operator.deleteQuery();
+
     await operator.save({
       username: 'operator3',
       password: 'Passw0rd',

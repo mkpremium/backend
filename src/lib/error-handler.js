@@ -18,6 +18,9 @@ function appErrorHandler(err, req, res, next) {
     err.message = err.message.replace('[tcomb] ', '');
   }
 
+  // some errors code is an string (jwt)
+  err.code = err.status || err.code;
+
   // error from couchbase are outside HTTP range
   if (!err.code || err.code < 400 || err.code > 599) {
     err.code = 500;
