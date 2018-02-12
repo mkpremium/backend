@@ -34,11 +34,21 @@ describe('worksheet.routes', () => {
   describe('queue.routes', () => {
     describe('POST /worksheets/queues/:city @request', () => {
       it('200 Abre y Obtiene la ficha con éxito', async() => {
-        return request(app)
+        await request(app)
           .post('/worksheets/queues/madrid')
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(200);
+
+        const response = await request(app)
+          .get('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
+          .expect(200);
+        const openedWorksheets = response.body.worksheets.filter(w => w.status === 'OPENED');
+        openedWorksheets.should.have.length(1);
+        const [openedWorksheet] = openedWorksheets;
+        openedWorksheet.should.have.a.property('operatorId');
+        openedWorksheet.operatorId.should.be.equal(authenticatedOperator.operator.id);
       });
       it('404 Ciudad no encontrada', async() => {
         return request(app)

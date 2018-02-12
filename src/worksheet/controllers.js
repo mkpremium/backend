@@ -46,7 +46,7 @@ async function openWorksheet(req, res) {
   const params = t.QueueRequestParams(req.body);
   const repo = new WorksheetQueueRepository();
   const queue = await repo.findByCity(cityName);
-  await repo.openWorksheetInQueue(queue, params.queueItemId);
+  await repo.openWorksheetInQueue(queue, params.queueItemId, req.user.id);
   res.json({});
 }
 
