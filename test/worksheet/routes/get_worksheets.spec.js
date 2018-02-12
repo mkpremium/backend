@@ -14,7 +14,6 @@ describe('worksheet.routes', () => {
     await repo.deleteQuery();
     await Promise.all(times(49, () => repo.save({})));
     worksheet = await repo.save({});
-    await Promise.delay(1000);
   });
 
   describe('GET /worksheets @request', () => {

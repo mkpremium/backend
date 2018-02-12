@@ -1,4 +1,3 @@
-import Promise from 'bluebird';
 import request from 'supertest';
 import app from '../../../src/app';
 import {WorksheetQueueRepository} from '../../../src/worksheet/models/queue';
@@ -11,7 +10,6 @@ describe('worksheet.routes', () => {
     await repo.save({
       city: 'barcelona'
     });
-    await Promise.delay(1000);
   });
   describe('queue.routes', () => {
     describe('GET /worksheets/queues/:city @request', () => {

@@ -25,8 +25,6 @@ describe('worksheet.routes', () => {
 
     const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
     await worksheetQueueRepo.save(updatedQueue);
-
-    return Promise.delay(1000);
   });
 
   describe('queue.routes', () => {
