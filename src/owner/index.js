@@ -1,7 +1,10 @@
 import routes from './routes';
 
 import './types';
+import jwt from '../middleware/jwt';
 
 export default (app) => {
-  app.use('/owners', routes);
+  const secured = jwt();
+
+  app.use('/owners', secured, routes);
 };

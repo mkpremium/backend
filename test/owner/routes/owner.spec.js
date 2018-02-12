@@ -1,19 +1,22 @@
 import request from 'supertest';
 import {resolve} from 'path';
 import app from '../../../src/app';
-import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
+import {OwnerRepository} from '../../../src/owner/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
+import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
 
 describe('owner.routes', () => {
   let owner;
   let person;
+  let authenticatedOperator;
+  let authenticatedManager;
   before(async() => {
     await app.locals.bucketPromise;
-    const ownerRepo = new OwnerRepository();
-    const personRepo = new PersonRepository();
-    await ownerRepo.deleteQuery();
-    await personRepo.deleteQuery();
-
+    await deleteAll();
+    await operatorCreate();
+    await operatorCreateManager();
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
     const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
     const results = await migrate.run();
     person = results.find(o => o.contacts && o.contacts.length > 0);
@@ -24,6 +27,7 @@ describe('owner.routes', () => {
     it('201 Operación exitosa', async() => {
       await request(app)
         .post('/owners')
+        .set('Authorization', authenticatedManager.authorization)
         .send({}) // TODO: currently personId and buildingId are optional because the migration data
         .expect(201);
     });
@@ -33,6 +37,7 @@ describe('owner.routes', () => {
     it('204 Operación exitosa', async() => {
       await request(app)
         .put(`/owners/${owner.id}`)
+        .set('Authorization', authenticatedOperator.authorization)
         .send({
           status: 'MALO',
           note: 'This is a sample note'
@@ -49,6 +54,7 @@ describe('owner.routes', () => {
     it('404 Propietario no existe', async() => {
       return request(app)
         .put('/owners/blah-blah')
+        .set('Authorization', authenticatedOperator.authorization)
         .expect(404);
     });
   });

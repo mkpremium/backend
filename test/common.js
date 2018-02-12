@@ -3,15 +3,20 @@ import request from 'supertest';
 import {OperatorRepository} from '../src/operator/models';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
+import {OwnerRepository, PersonRepository} from '../src/owner/models';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
   const worksheet = new WorksheetRepository();
   const queue = new WorksheetQueueRepository();
+  const people = new PersonRepository();
+  const owner = new OwnerRepository();
   return Promise.all([
     operator.deleteQuery(),
     worksheet.deleteQuery(),
-    queue.deleteQuery()
+    queue.deleteQuery(),
+    people.deleteQuery(),
+    owner.deleteQuery()
   ]);
 }
 

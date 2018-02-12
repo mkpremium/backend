@@ -3,6 +3,7 @@ import {
   addOwnerContactController, addOwnerController, updateOwnerContactStatusController,
   updateOwnerController
 } from './controllers';
+import {permissions} from '../middleware/jwt';
 
 const router = Router();
 
@@ -41,8 +42,12 @@ const router = Router();
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
  */
-router.post('/', addOwnerController);
+router.post('/', permissions.manager, addOwnerController);
 
 /**
  * @swagger
