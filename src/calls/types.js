@@ -42,10 +42,8 @@ t.Calls = t.struct({
 t.CallService = t.struct({
   from: t.String,
   to: t.String,
-  options: t.struct({
-    service_id: t.Integer,
-    return_id: t.Boolean
-  }, 'CallOptions')
+  service_id: t.Integer,
+  return_id: t.Boolean
 }, 'CallService');
 
 /**

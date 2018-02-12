@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {callController, hangupController} from './controllers';
+import {permissions} from '../middleware/jwt';
 
 const router = Router();
 
@@ -40,7 +41,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-router.post('/owner/:id', callController);
+router.post('/owner/:id', permissions.operator, callController);
 
 /**
  * @swagger
@@ -64,6 +65,6 @@ router.post('/owner/:id', callController);
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-router.post('/hangup/:callId', hangupController);
+router.post('/hangup/:callId', permissions.operator, hangupController);
 
 export default router;

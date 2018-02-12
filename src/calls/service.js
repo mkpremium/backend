@@ -13,29 +13,23 @@ const requester = axios.create({
   }
 });
 
-// TODO: get 'from' from context
-function getFromNumber() {
-  return '905';
-}
-
-function getCallParams(to) {
-  return t.CallService({
-    from: getFromNumber(),
+function getCallParams(from, to) {
+  const struct = t.CallService({
+    from: from.split('-')[1],
     to: to.value,
-    options: {
-      service_id: parseInt(numintec.serviceId),
-      return_id: true
-    }
+    service_id: parseInt(numintec.serviceId),
+    return_id: true
   });
+
+  return `?from=${struct.from}&to=${struct.to}&options[service_id]=${struct.service_id}&options[return_id]=${true}`;
 }
 
-async function call(phone) {
+async function call(from, phone) {
   const model = new Calls();
   try {
-    const params = getCallParams(phone);
-    const result = await requester.get('/Call/rest/call/', params);
+    let params = getCallParams(from, phone);
+    const result = await requester.get(`/Call/rest/call/${params}`);
     if (!result.data.status) throw newHttpError(400, result.data.description);
-    
     const call = model.save({
       to: phone.value,
       data: result.data,
