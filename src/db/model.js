@@ -70,14 +70,17 @@ export class CouchbaseModel {
     return qb;
   }
 
-  async deleteQuery(_query = this.getQueryBuilder('delete')) {
-    return this.query(_query);
+  async deleteQuery(queryBuilder = this.getQueryBuilder('delete')) {
+    return this.query(queryBuilder);
   }
 
-  async query(_query = this.getQueryBuilder()) {
-    const queryParam = _query.toParam();
+  async query(queryBuilder = this.getQueryBuilder(), consistency = N1qlQuery.Consistency.STATEMENT_PLUS) {
+    const queryParam = queryBuilder.toParam();
     debugModel('query', queryParam);
-    return this._bucket.queryAsync(N1qlQuery.fromString(queryParam.text), queryParam.values);
+    const n1ql = N1qlQuery.fromString(queryParam.text);
+    n1ql.consistency(consistency);
+
+    return this._bucket.queryAsync(n1ql, queryParam.values);
   }
 
   async unique(data, field) {
