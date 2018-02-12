@@ -5,7 +5,6 @@ import {WorksheetQueueRepository} from './models/queue';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
-  console.log('QQQ', req.query);
   const worksheets = await repo.list(req.query);
 
   res.json(worksheets);
