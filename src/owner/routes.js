@@ -20,6 +20,8 @@ const router = Router();
  *   post:
  *     summary: Crea un nuevo propietario
  *     tags: [Owner, Manager]
+ *     security:
+ *       - manager: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -55,6 +57,8 @@ router.post('/', permissions.manager, addOwnerController);
  *   put:
  *     summary: Actualiza un propietario
  *     tags: [Owner, Operator]
+ *     security:
+ *       - operator: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -89,6 +93,8 @@ router.put('/:id', updateOwnerController);
  *   put:
  *     tags: [Owner, Operator]
  *     summary: Actualiza un contacto de un propietario
+ *     security:
+ *       - operator: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -123,6 +129,8 @@ router.put('/:id/contacts', updateOwnerContactStatusController);
  *   post:
  *     tags: [Owner, Operator]
  *     summary: Agrega un contacto a un propietario
+ *     security:
+ *       - operator: []
  *     consumes:
  *       - "application/json"
  *     produces:

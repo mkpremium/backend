@@ -34,6 +34,8 @@ const router = Router();
  *   get:
  *     tags: [Worksheet, Manager]
  *     summary: Obtiene el listado de fichas de trabajo
+ *     security:
+ *       - manager: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -86,6 +88,8 @@ router.get('/', permissions.manager, worksheetListController);
  * /worksheets/queues:
  *   get:
  *     tags: [Queue, Admin]
+ *     security:
+ *       - admin: []
  *     summary: Lista todas las colas del sistema
  *     responses:
  *       200:
@@ -110,6 +114,9 @@ router.get('/queues', permissions.admin, queueListController);
  * /worksheets/{id}:
  *   get:
  *     tags: [Worksheet, Manager, Operator]
+ *     security:
+ *       - manager: []
+ *       - operator: []
  *     summary: Obtiene el detalle de una Ficha de trabajo
  *     parameters:
  *       - name: id
@@ -137,6 +144,9 @@ router.get('/:id', worksheetFindByIdController);
  * /worksheets/queues/{city}:
  *   get:
  *     tags: [Queue, Operator, Manager]
+ *     security:
+ *       - manager: []
+ *       - operator: []
  *     summary: Obtiene la cola de fichas de trabajo para una ciudad dada
  *     parameters:
  *       - name: city
@@ -165,6 +175,8 @@ router.get('/queues/:city', queueByCityController);
  * /worksheets/queues/{city}:
  *   post:
  *     tags: [Queue, Operator]
+ *     security:
+ *       - operator: []
  *     summary: Abre y Obtiene el detalle de una Ficha de trabajo para ser trabajada
  *     parameters:
  *       - name: city
