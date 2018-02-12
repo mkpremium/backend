@@ -5,7 +5,6 @@ import {WorksheetQueueRepository} from './models/queue';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
-  console.log('QQQ', req.query);
   const worksheets = await repo.list(req.query);
 
   res.json(worksheets);
@@ -47,7 +46,7 @@ async function openWorksheet(req, res) {
   const params = t.QueueRequestParams(req.body);
   const repo = new WorksheetQueueRepository();
   const queue = await repo.findByCity(cityName);
-  await repo.openWorksheetInQueue(queue, params.queueItemId);
+  await repo.openWorksheetInQueue(queue, params.queueItemId, req.user.id);
   res.json({});
 }
 

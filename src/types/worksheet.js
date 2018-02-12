@@ -86,8 +86,11 @@ t.QueueItem.prototype.canBeOpened = function() {
   return Queue.StatusAvailable.indexOf(this.status) !== -1;
 };
 
-t.QueueItem.prototype.open = function() {
-  return t.update(this, {status: {$set: Queue.Status.OPENED}});
+t.QueueItem.prototype.open = function(operatorId = null) {
+  return t.update(this, {
+    status: {$set: Queue.Status.OPENED},
+    operatorId: {$set: operatorId}
+  });
 };
 
 /**

@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {createOperatorController, loginController} from './controllers';
+import {permissions} from '../middleware/jwt';
 
 const router = Router();
 
@@ -76,7 +77,11 @@ router.post('/login', loginController);
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
  */
-router.post('/', createOperatorController);
+router.post('/', permissions.admin, createOperatorController);
 
 export default router;

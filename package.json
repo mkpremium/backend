@@ -7,9 +7,9 @@
     "start": "better-npm-run start",
     "pretest": "npm run lint",
     "test": "mocha --require test/setup.js --recursive --exit --timeout 10000",
-    "build": "sh scripts/build.sh",
+    "build": "scripts/build.sh",
     "predeploy": "npm run build",
-    "deploy": "sh scripts/deployment.sh"
+    "deploy": "scripts/deployment.sh"
   },
   "betterScripts": {
     "start": "nodemon bin/www.js --exec babel-node"
@@ -26,6 +26,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.13.4",
     "express-jwt": "^5.3.0",
+    "express-jwt-permissions": "^1.0.0",
     "express-promise-wrap": "^0.2.2",
     "fs-extra": "^5.0.0",
     "jsonwebtoken": "^5.7.0",

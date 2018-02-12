@@ -3,6 +3,7 @@ import {
   worksheetFindByIdController, worksheetListController, queueByCityController, queueListController,
   openWorksheetController
 } from './controllers';
+import {permissions} from '../middleware/jwt';
 
 const router = Router();
 
@@ -69,8 +70,16 @@ const router = Router();
  *           type: array
  *           items:
  *             $ref: "#/definitions/Worksheet"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
  */
-router.get('/', worksheetListController);
+router.get('/', permissions.manager, worksheetListController);
 
 /**
  * @swagger
@@ -89,8 +98,12 @@ router.get('/', worksheetListController);
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
  */
-router.get('/queues', queueListController);
+router.get('/queues', permissions.admin, queueListController);
 
 /**
  * @swagger

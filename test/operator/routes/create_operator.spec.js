@@ -1,14 +1,20 @@
 import request from 'supertest';
 
 import app from '../../../src/app';
-import {Operator} from '../../../src/operator/models';
+import {OperatorRepository} from '../../../src/operator/models';
+import {operatorCreate, operatorCreateAdmin, operatorLogin} from '../../common';
 
 describe('operator.routes', () => {
+  let authenticatedAdmin;
+  let authenticatedOperator;
   before(async() => {
     await app.locals.bucketPromise;
-    const operator = new Operator();
-    const qb = operator.getQueryBuilder('delete').where('username = ?', 'operator2');
-    await operator.query(qb);
+    const repo = new OperatorRepository();
+    await repo.deleteQuery();
+    await operatorCreateAdmin();
+    await operatorCreate();
+    authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
   });
 
   describe('POST /operator @request', () => {
@@ -16,6 +22,7 @@ describe('operator.routes', () => {
       const requester = request(app);
       const response = await requester
         .post('/operator')
+        .set('Authorization', authenticatedAdmin.authorization)
         .send({
           username: 'operator2',
           password: 'Passw0rd',
@@ -37,6 +44,7 @@ describe('operator.routes', () => {
       const requester = request(app);
       const response = await requester
         .post('/operator')
+        .set('Authorization', authenticatedAdmin.authorization)
         .send({
           username: 'operator1',
           password: 'Passw0rd1'
@@ -50,6 +58,7 @@ describe('operator.routes', () => {
       const requester = request(app);
       const response = await requester
         .post('/operator')
+        .set('Authorization', authenticatedAdmin.authorization)
         .send({
           username: 'operator2',
           password: 'Passw0rd',
@@ -63,6 +72,27 @@ describe('operator.routes', () => {
           }
         })
         .expect(400);
+      response.body.should.be.a('object');
+      response.body.should.have.a.property('message');
+    });
+
+    it('401 Permisos insuficientes', async() => {
+      const response = await request(app)
+        .post('/operator')
+        .set('Authorization', authenticatedOperator.authorization)
+        .send({
+          username: 'operator2',
+          password: 'Passw0rd',
+          agentNumber: 'operator2',
+          roles: [
+            'OPERATOR'
+          ],
+          profile: {
+            firstName: 'Operator',
+            lastName: 'Doe'
+          }
+        })
+        .expect(403);
       response.body.should.be.a('object');
       response.body.should.have.a.property('message');
     });

@@ -26,7 +26,9 @@ jobs:
           - v2-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v2-dependencies-
-      - run: npm install
+      - run:
+          name: Install dependencies
+          command: npm install
 
       - save_cache:
           paths:
@@ -35,8 +37,12 @@ jobs:
 
       # run tests!
       - run:
-          name: running testing
+          name: Running testing
           command: MOCHA_FILE=~/test-results/junit.xml npm test -- --reporter mocha-circleci-reporter
+
+      - run:
+          name: Testing build
+          command: npm run build
 
       - store_artifacts:
           path: ~/test-results/
@@ -62,7 +68,9 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v2-dependencies-
 
-      - run: npm install
+      - run:
+          name: Install dependencies
+          command: npm install
 
       - save_cache:
           paths:
@@ -71,11 +79,13 @@ jobs:
 
       - add_ssh_keys
 
-      - run: ssh-keyscan -H ec2-34-252-86-225.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
+      - run:
+          name: Adding deploy host keys to known hosts
+          command: ssh-keyscan -H ec2-34-252-86-225.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
 
-      - run: npm run build
-
-      - run: npm run deploy -- ubuntu@ec2-34-252-86-225.eu-west-1.compute.amazonaws.com mkpremium
+      - run:
+          name: Building & Deploying Files
+          command: npm run deploy -- ubuntu@ec2-34-252-86-225.eu-west-1.compute.amazonaws.com mkpremium
 
 workflows:
   version: 2

@@ -6,17 +6,19 @@ import app from '../../../src/app';
 
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../../../src/worksheet/models/queue';
+import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 
 describe('worksheet.routes', () => {
   let queueItems = [];
+  let authenticatedOperator;
   before(async() => {
     await app.locals.bucketPromise;
 
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
-    await worksheetRepo.deleteQuery();
-    await worksheetQueueRepo.deleteQuery();
+    await deleteAll();
+    await operatorCreate(app);
 
     const queue = await worksheetQueueRepo.save({city: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
@@ -26,20 +28,32 @@ describe('worksheet.routes', () => {
     const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
     await worksheetQueueRepo.save(updatedQueue);
 
-    return Promise.delay(1000);
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
   });
 
   describe('queue.routes', () => {
     describe('POST /worksheets/queues/:city @request', () => {
       it('200 Abre y Obtiene la ficha con éxito', async() => {
-        return request(app)
+        await request(app)
           .post('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(200);
+
+        const response = await request(app)
+          .get('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
+          .expect(200);
+        const openedWorksheets = response.body.worksheets.filter(w => w.status === 'OPENED');
+        openedWorksheets.should.have.length(1);
+        const [openedWorksheet] = openedWorksheets;
+        openedWorksheet.should.have.a.property('operatorId');
+        openedWorksheet.operatorId.should.be.equal(authenticatedOperator.operator.id);
       });
       it('404 Ciudad no encontrada', async() => {
         return request(app)
           .post('/worksheets/queues/barranquilla')
+          .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(404);
       });
@@ -47,6 +61,7 @@ describe('worksheet.routes', () => {
       it('400 El item no existe en la cola', async() => {
         return request(app)
           .post('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: 'no-existe'})
           .expect(400);
       });
@@ -54,6 +69,7 @@ describe('worksheet.routes', () => {
       it('409 El item no esta disponible para su apertura', async() => {
         return request(app)
           .post('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(409);
       });

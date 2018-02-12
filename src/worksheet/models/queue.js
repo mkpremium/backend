@@ -58,7 +58,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return itemRepo.save({worksheetId: worksheet.id});
   }
 
-  async openWorksheetInQueue(queue, itemId) {
+  async openWorksheetInQueue(queue, itemId, operatorId) {
     const item = queue.findItemById(itemId);
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
@@ -81,7 +81,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     await worksheetRepo.save(updatedWorksheet);
 
     const itemIndex = queue.worksheets.indexOf(item);
-    const updatedItem = item.open();
+    const updatedItem = item.open(operatorId);
     const updatedWorksheets = t.update(queue.worksheets, {[itemIndex]: {$set: updatedItem}});
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
