@@ -22,19 +22,19 @@ export async function deleteAll() {
 
 export async function operatorLogin(app, credentials = {username: 'admin', password: 'password'}) {
   const response = await request(app)
-    .post('/operator/login')
+    .post('/operators/login')
     .send(credentials)
     .expect(200);
 
   return Object.assign({}, response.body, {authorization: `Bearer ${response.body.token}`});
 }
 
-export async function operatorCreate() {
+export async function operatorCreate(index = '') {
   const repo = new OperatorRepository();
   return repo.save({
-    username: 'operator',
+    username: `operator${index}`,
     password: 'password',
-    agentNumber: 'operator',
+    agentNumber: `operator${index}`,
     roles: [
       'OPERATOR'
     ],

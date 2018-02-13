@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {createOperatorController, loginController} from './controllers';
+import {createOperatorController, listOperatorController, loginController} from './controllers';
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @swagger
- * /operator/login:
+ * /operators/login:
  *   post:
  *     tags: [Operator]
  *     summary: Iniciar sesion
@@ -48,12 +48,12 @@ router.post('/login', loginController);
 
 /**
  * @swagger
- * /operator:
+ * /operators:
  *   post:
- *     tags: [Manager]
+ *     tags: [Admin]
  *     summary: Crear operador
  *     security:
- *       - manager: []
+ *       - admin: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -83,5 +83,46 @@ router.post('/login', loginController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/', permissions.admin, createOperatorController);
+
+/**
+ * @swagger
+ * /operators:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Obtiene el listado de operadores
+ *     security:
+ *       - admin: []
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         type: number
+ *         description: Cantidad máxima a de registros a recibir
+ *         default: 20
+ *       - name: offset
+ *         in: query
+ *         type: number
+ *         description: Numero de registros a saltar
+ *         default: 0
+ *       - name: role
+ *         in: query
+ *         type: string
+ *         description: Rol del operador
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: "#/definitions/Operator"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/', permissions.admin, listOperatorController);
 
 export default router;

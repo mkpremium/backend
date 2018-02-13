@@ -74,4 +74,17 @@ export class OperatorRepository extends Operator {
 
     return sign(payload, jwt.secret, options);
   }
+
+  async list(query = {}) {
+    const params = t.OperatorListQuery(query);
+    const qb = this.getQueryBuilder('select')
+      .limit(params.limit)
+      .offset(params.offset);
+
+    if (params.role) {
+      qb.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
+    }
+
+    return this.query(qb);
+  }
 }

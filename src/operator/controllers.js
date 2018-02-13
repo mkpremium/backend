@@ -1,6 +1,6 @@
 import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
-import {Operator, OperatorRepository} from './models';
+import {OperatorRepository} from './models';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -19,11 +19,18 @@ async function login(req, res) {
 }
 
 async function createOperator(req, res) {
-  const model = new Operator();
-  const result = await model.save(req.body);
+  const repo = new OperatorRepository();
+  const result = await repo.save(req.body);
   res.status(201);
   res.json(result);
 }
 
+async function listOperator(req, res) {
+  const repo = new OperatorRepository();
+  const operators = await repo.list(req.query);
+  res.json(operators);
+}
+
 export const loginController = wrap(login);
 export const createOperatorController = wrap(createOperator);
+export const listOperatorController = wrap(listOperator);

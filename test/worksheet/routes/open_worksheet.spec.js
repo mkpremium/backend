@@ -12,13 +12,11 @@ describe('worksheet.routes', () => {
   let queueItems = [];
   let authenticatedOperator;
   before(async() => {
-    await app.locals.bucketPromise;
-
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
     await deleteAll();
-    await operatorCreate(app);
+    await operatorCreate();
 
     const queue = await worksheetQueueRepo.save({city: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));

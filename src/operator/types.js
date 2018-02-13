@@ -53,3 +53,7 @@ t.AuthenticatedResponse = t.struct({
   }, 'Operator'),
   roles: t.list(t.String)
 }, 'AuthenticatedResponse');
+
+t.OperatorListQuery = t.ListQuery.extend({
+  role: t.maybe(t.String)
+});

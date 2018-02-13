@@ -5,7 +5,6 @@ import {OperatorRepository} from '../../../src/operator/models';
 
 describe('operator.routes', () => {
   before(async() => {
-    await app.locals.bucketPromise;
     const operator = new OperatorRepository();
     await operator.deleteQuery();
 
@@ -37,11 +36,11 @@ describe('operator.routes', () => {
     });
   });
 
-  describe('POST /operator/login @request', () => {
+  describe('POST /operators/login @request', () => {
     it('200 Autenticado exitosamente', async() => {
       const requester = request(app);
       const response = await requester
-        .post('/operator/login')
+        .post('/operators/login')
         .send({
           username: 'operator3',
           password: 'Passw0rd'
@@ -61,7 +60,7 @@ describe('operator.routes', () => {
     it('401 Credenciales invalidos', async() => {
       const requester = request(app);
       const response = await requester
-        .post('/operator/login')
+        .post('/operators/login')
         .send({
           username: 'operator1',
           password: 'Passw0rd1'
@@ -74,7 +73,7 @@ describe('operator.routes', () => {
     it('401 Cuenta desactivada', async() => {
       const requester = request(app);
       const response = await requester
-        .post('/operator/login')
+        .post('/operators/login')
         .send({
           username: 'operator4',
           password: 'Passw0rd'

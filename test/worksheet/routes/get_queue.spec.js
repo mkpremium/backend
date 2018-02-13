@@ -7,15 +7,14 @@ describe('worksheet.routes', () => {
   let authenticatedOperator;
   let authenticatedAdmin;
   before(async() => {
-    await app.locals.bucketPromise;
     await deleteAll();
     const repo = new WorksheetQueueRepository();
     await repo.save({
       city: 'barcelona'
     });
-    await operatorCreate(app);
-    await operatorCreateManager(app);
-    await operatorCreateAdmin(app);
+    await operatorCreate();
+    await operatorCreateManager();
+    await operatorCreateAdmin();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
   });

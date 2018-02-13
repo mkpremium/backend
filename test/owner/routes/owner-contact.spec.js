@@ -12,7 +12,6 @@ describe('owner.routes', () => {
   let person;
   let authenticatedOperator;
   before(async() => {
-    await app.locals.bucketPromise;
     await deleteAll();
     await operatorCreate();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
