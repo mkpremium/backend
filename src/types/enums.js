@@ -44,3 +44,11 @@ t.CallStatus = t.enums({
   EN_PROGRESO: 'EN_PROGRESO',
   FINALIZADA: 'FINALIZADA'
 }, 'CallStatus');
+
+t.EventType = t.enums({
+  add: 'add',
+  update: 'update',
+  remove: 'revome',
+  read: 'read',
+  custom: 'custom'
+});

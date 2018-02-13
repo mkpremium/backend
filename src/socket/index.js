@@ -5,6 +5,14 @@ import socketJwt from '../middleware/socketJwt';
 const socketDebug = debug('app:socket');
 let io;
 
+function getEventName(event) {
+  const type = event.payload.type.split('-')[0];
+  if (type === 'add') {
+    return `${event.model}:new`;
+  }
+  return `${event.model}:${event.id}`;
+}
+
 function start(server) {
   io = socketIO(server, {
     serveClient: true,
@@ -22,7 +30,8 @@ function start(server) {
     socket.on('event', (data, ack) => {
       socketDebug('Sending event');
       const eventData = JSON.parse(data);
-      io.emit(eventData.name, data);
+      const eventName = getEventName(eventData);
+      io.emit(eventName, data);
       ack(true);
     });
 

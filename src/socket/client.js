@@ -43,15 +43,35 @@ function connectServer(serverUri) {
   });
 }
 
-function sendEvent(body) {
-  const socketEvent = t.SocketEvent(body);
+function getEventStruct(type, body) {
+  const documentType = body._documentType || body.model;
+  return t.SocketEvent({
+    model: documentType,
+    id: body.id,
+    payload: {
+      type: `${type}-${documentType}`,
+      data: body
+    },
+    timestamp: new Date()
+  });
+}
+
+function rejectIfNotConnected(reject) {
+  if (!socketClient || !socketClient.connected) {
+    return reject(new Error('SocketClient is not connected'));
+  }
+}
+
+function sendEvent(type, body) {
+  const socketEvent = getEventStruct(type, body);
   const stringEvent = JSON.stringify(socketEvent);
   return new Promise((resolve, reject) => {
+    rejectIfNotConnected(reject);
     socketClient.emit('event', stringEvent, (ack) => {
       if (!ack) reject(new Error('Event could not be sent'));
-      resolve(stringEvent);
+      resolve(ack);
     });
   });
 }
 
-export default {connectServer};
+export default {connectServer, sendEvent};

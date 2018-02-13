@@ -1,17 +1,33 @@
 import http from 'http';
 import express from 'express';
 import sinon from 'sinon';
+import t from 'tcomb';
 
 import socket from '../../src/socket';
 import socketClient from '../../src/socket/client';
 
-const port = process.env.SOCKET_PORT;
+const port = process.env.SOCKET_PORT || '9002';
 const socketServerUri = `http://localhost:${port}`;
 
-const eventMessage = {
-  name: 'event:test',
-  data: {},
-  timestamp: 'Tue Feb 06 2018 210:01:59 GMT-0300 (-03)'
+const modelStruct = t.Operator({
+  id: '5fe1d64e-9383-4483-9443-8a1ed79c2ba0',
+  username: 'test',
+  password: 'test',
+  enable: false,
+  roles: ['MANAGER'],
+  profile: {
+    firstName: 'test',
+    lastName: 'test',
+    city: 'test'
+  },
+  agentNumber: '4483-944'
+});
+
+const customEvent = {
+  id: 'custom',
+  model: 'custom',
+  type: 'custom',
+  data: 'custom'
 };
 
 describe('socket.server', () => {
@@ -32,14 +48,18 @@ describe('socket.server', () => {
 
   describe('event', () => {
     let client;
-
     beforeEach(async() => {
       client = await socketClient.connectServer(socketServerUri);
     });
     
     it('should emit an event', async() => {
-      const messageSent = await client.sendEvent(eventMessage);
-      sinon.assert.match(JSON.parse(messageSent), eventMessage);
+      const messageSent = await client.sendEvent('add', modelStruct);
+      sinon.assert.match(messageSent, true);
+    });
+
+    it('should emit a custom event', async() => {
+      const messageSent = await client.sendEvent('custom', customEvent);
+      sinon.assert.match(messageSent, true);
     });
   });
 });

@@ -3,13 +3,13 @@
 import express from 'express';
 import debug from 'debug';
 
-import {socketPort} from '../config';
+import {socket as socketConfig} from '../config';
 import socket from '../src/socket';
 
 const socketDebug = debug('app:socket');
 
 const app = express();
-const server = app.listen(socketPort, listenHandler);
+const server = app.listen(socketConfig.port, listenHandler);
 socket.start(server);
 
 server.on('error', errorHandler);
@@ -27,9 +27,9 @@ function errorHandler(error) {
     throw error;
   }
 
-  const bind = typeof socketPort === 'string'
-    ? 'Pipe ' + socketPort
-    : 'Port ' + socketPort;
+  const bind = typeof socketConfig.port === 'string'
+    ? 'Pipe ' + socketConfig.port
+    : 'Port ' + socketConfig.port;
 
   // handle specific listen errors with friendly messages
   // noinspection FallThroughInSwitchStatementJS
