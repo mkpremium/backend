@@ -10,7 +10,7 @@ rm -rf build/*
 # Build assets
 babel ./ \
   --out-dir ./build \
-  -s \
+  -s -q \
   --copy-files \
   --ignore node_modules,development,test,docker,iml,lock
 

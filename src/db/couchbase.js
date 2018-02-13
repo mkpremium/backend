@@ -27,6 +27,7 @@ export default (app, opts = defaultOpts) => {
   });
 
   const bucket = cluster.openBucket(couchbase.bucket);
+  bucket._promise = promise;
 
   checkBucket(bucket, cluster, resolve, reject);
 

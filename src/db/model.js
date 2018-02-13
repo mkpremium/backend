@@ -103,9 +103,10 @@ export class CouchbaseModel {
 
   async findById(id) {
     try {
+      debugModel('findById', this.Struct.meta.defaultProps._documentType, id);
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
-        return result.value;
+        return new this.Struct(result.value);
       }
 
       return null;
@@ -131,6 +132,7 @@ export class CouchbaseModel {
     if (!dataPreSaved) {
       throw new Error('it seems you forgot return the data on the preSave(data) method');
     }
+    await this._bucket._promise;
     return this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
   }
 }

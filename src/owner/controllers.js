@@ -1,0 +1,34 @@
+import {wrap} from 'express-promise-wrap';
+import {OwnerRepository} from './models';
+
+async function updateOwnerContactStatus(req, res) {
+  const id = req.params.id;
+  const repo = new OwnerRepository();
+  await repo.updateContactStatus(id, req.body);
+  res.status(204).send();
+}
+
+async function updateOwner(req, res) {
+  const id = req.params.id;
+  const repo = new OwnerRepository();
+  await repo.update(id, req.body);
+  res.status(204).send();
+}
+
+async function addOwnerContact(req, res) {
+  const id = req.params.id;
+  const repo = new OwnerRepository();
+  await repo.addContact(id, req.body);
+  res.status(204).send();
+}
+
+async function addOwner(req, res) {
+  const repo = new OwnerRepository();
+  const owner = await repo.save(req.body);
+  res.status(201).json(owner);
+}
+
+export const updateOwnerContactStatusController = wrap(updateOwnerContactStatus);
+export const updateOwnerController = wrap(updateOwner);
+export const addOwnerContactController = wrap(addOwnerContact);
+export const addOwnerController = wrap(addOwner);

@@ -81,11 +81,11 @@ jobs:
 
       - run:
           name: Adding deploy host keys to known hosts
-          command: ssh-keyscan -H ec2-34-252-86-225.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
+          command: ssh-keyscan -H ec2-34-248-103-55.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
 
       - run:
           name: Building & Deploying Files
-          command: npm run deploy -- ubuntu@ec2-34-252-86-225.eu-west-1.compute.amazonaws.com mkpremium
+          command: npm run deploy -- ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
 
 workflows:
   version: 2

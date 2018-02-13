@@ -6,16 +6,16 @@ t.BuildingType = t.enums({
 }, 'BuildingType');
 
 t.BuildingState = t.enums({
-  BUENO: 'bueno',
-  MALO: 'malo'
+  BUENO: 'BUENO',
+  MALO: 'MALO'
 }, 'BuildingState');
 
 t.TypeContact = t.enums({
-  TELEFONO: 'telefono',
-  FAX: 'fax',
-  CELULAR: 'celular',
-  EMAIL: 'email',
-  SITIO_WEB: 'sitio web'
+  TELEFONO: 'TELEFONO',
+  FAX: 'FAX',
+  CELULAR: 'CELULAR',
+  EMAIL: 'EMAIL',
+  SITIO_WEB: 'SITIO WEB'
 }, 'TypeContact');
 
 t.OwnerType = t.enums({
@@ -24,6 +24,8 @@ t.OwnerType = t.enums({
   SECUNDARIO: 'SECUNDARIO',
   VECINO: 'VECINO'
 }, 'OwnerType');
+
+t.OwnerStatus = t.enums.of(['BUENO', 'MALO'], 'OwnerStatus');
 
 t.Gender = t.enums({
   NINGUNO: 'NINGUNO',
@@ -34,8 +36,4 @@ t.Gender = t.enums({
 t.PersonType = t.enums({
   NATURAL: 'NATURAL',
   JURIDICA: 'JURIDICA'
-});
-
-t.TypedContactInfoStatus = t.enums({
-
 });

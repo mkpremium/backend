@@ -1,24 +1,31 @@
 import t from 'tcomb';
+import find from 'lodash/find';
 
 /**
  * @swagger
  * definitions:
- *   Contact:
+ *   Owner:
  *     properties:
  *       id:
  *         type: string
  *         format: uuid/v4
  *       person:
  *         $ref: "#/definitions/Person"
- *       relatedBuilding:
+ *       building:
  *         $ref: "#/definitions/Building"
+ *       note:
+ *         type: string
+ *       type:
+ *         type: string
  */
 t.Owner = t.struct(
   {
-    id: t.String,
+    id: t.maybe(t.String),
     type: t.OwnerType,
+    status: t.maybe(t.OwnerStatus),
 
-    personId: t.String,
+    personId: t.maybe(t.String), // FIXME: this is required
+    buildingId: t.maybe(t.String), // FIXME: this is required
 
     note: t.maybe(t.String),
 
@@ -36,6 +43,35 @@ t.Owner = t.struct(
     }
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   OwnerUpdate:
+ *     properties:
+ *       type:
+ *         type: string
+ *         description: Tipo de propietario
+ *       status:
+ *         type: string
+ *       note:
+ *         type: string
+ *       buildingId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del edificio relacionado
+ *       personId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id de la persona relacionada
+ */
+t.OwnerUpdate = t.struct({
+  type: t.maybe(t.OwnerType),
+  status: t.maybe(t.OwnerStatus),
+  note: t.maybe(t.String),
+  buildingId: t.maybe(t.String),
+  personId: t.maybe(t.String)
+}, 'OwnerUpdate');
 
 /**
  * @swagger
@@ -67,7 +103,7 @@ t.Owner = t.struct(
  */
 t.Person = t.struct(
   {
-    id: t.String,
+    id: t.maybe(t.String),
     name: t.String,
     firstName: t.maybe(t.String),
     firstSurname: t.maybe(t.String),
@@ -93,3 +129,7 @@ t.Person = t.struct(
     }
   }
 );
+
+t.Person.prototype.findContact = function({value}) {
+  return find(this.contacts, {value});
+};

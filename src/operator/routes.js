@@ -43,7 +43,7 @@ router.post('/login', loginController);
  * @swagger
  * tags:
  *   name: Manager
- *   description: Gestion de usuarios del sistema
+ *   description: Gestión de usuarios del sistema
  */
 
 /**
@@ -51,9 +51,9 @@ router.post('/login', loginController);
  * /operator:
  *   post:
  *     tags: [Manager]
- *     security:
- *       - bearerAuth: ["ADMIN"]
  *     summary: Crear operador
+ *     security:
+ *       - manager: []
  *     consumes:
  *       - "application/json"
  *     produces:
