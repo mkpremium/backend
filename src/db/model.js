@@ -81,7 +81,7 @@ export class CouchbaseModel {
     debugModel('query', queryParam);
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
-    await this._bucket._promise;
+    await this._promiseBucket;
     return this._bucket.queryAsync(n1ql, queryParam.values);
   }
 
@@ -106,7 +106,7 @@ export class CouchbaseModel {
   async findById(id) {
     try {
       debugModel('findById', this.Struct.meta.defaultProps._documentType, id);
-      await this._bucket._promise;
+      await this._promiseBucket;
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
         return new this.Struct(result.value);
@@ -135,7 +135,7 @@ export class CouchbaseModel {
     if (!dataPreSaved) {
       throw new Error('it seems you forgot return the data on the preSave(data) method');
     }
-    await this._bucket._promise;
+    await this._promiseBucket;
     return this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
   }
 }
