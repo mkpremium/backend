@@ -12,8 +12,8 @@ describe('operator.routes', () => {
 
     await Promise.all(times(50, (i) => operatorCreate(i)));
 
-    await operatorCreate(app);
-    await operatorCreateAdmin(app);
+    await operatorCreate();
+    await operatorCreateAdmin();
     authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
   });
 

@@ -16,7 +16,7 @@ describe('worksheet.routes', () => {
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
     await deleteAll();
-    await operatorCreate(app);
+    await operatorCreate();
 
     const queue = await worksheetQueueRepo.save({city: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));

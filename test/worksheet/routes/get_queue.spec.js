@@ -12,9 +12,9 @@ describe('worksheet.routes', () => {
     await repo.save({
       city: 'barcelona'
     });
-    await operatorCreate(app);
-    await operatorCreateManager(app);
-    await operatorCreateAdmin(app);
+    await operatorCreate();
+    await operatorCreateManager();
+    await operatorCreateAdmin();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
   });
