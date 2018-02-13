@@ -8,7 +8,6 @@ describe('operator.routes', () => {
   let authenticatedAdmin;
   let authenticatedOperator;
   before(async() => {
-    await app.locals.bucketPromise;
     const repo = new OperatorRepository();
     await repo.deleteQuery();
     await operatorCreateAdmin();

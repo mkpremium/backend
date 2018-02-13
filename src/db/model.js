@@ -4,6 +4,8 @@ import squel from 'squel';
 import {N1qlQuery} from 'couchbase';
 import debug from 'debug';
 
+import {couchbase} from '../../config';
+
 const debugModel = debug('app:db:model');
 
 class CouchbaseModelStruct {
@@ -64,7 +66,7 @@ export class CouchbaseModel {
     }
 
     qb
-      .from(this._bucketName, 't')
+      .from(couchbase.bucket, 't')
       .where('t.`_documentType` = ?', this.Struct.meta.defaultProps._documentType);
 
     return qb;
@@ -79,7 +81,7 @@ export class CouchbaseModel {
     debugModel('query', queryParam);
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
-
+    await this._bucket._promise;
     return this._bucket.queryAsync(n1ql, queryParam.values);
   }
 
@@ -104,6 +106,7 @@ export class CouchbaseModel {
   async findById(id) {
     try {
       debugModel('findById', this.Struct.meta.defaultProps._documentType, id);
+      await this._bucket._promise;
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
         return new this.Struct(result.value);

@@ -12,8 +12,6 @@ describe('worksheet.routes', () => {
   let queueItems = [];
   let authenticatedOperator;
   before(async() => {
-    await app.locals.bucketPromise;
-
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
 

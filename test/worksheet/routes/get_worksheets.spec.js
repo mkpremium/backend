@@ -11,7 +11,6 @@ describe('worksheet.routes', () => {
   let authenticatedManager;
   let worksheet;
   before(async() => {
-    await app.locals.bucketPromise;
     await deleteAll();
 
     const repo = new WorksheetRepository();

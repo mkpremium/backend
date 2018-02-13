@@ -7,7 +7,6 @@ describe('worksheet.routes', () => {
   let authenticatedOperator;
   let authenticatedAdmin;
   before(async() => {
-    await app.locals.bucketPromise;
     await deleteAll();
     const repo = new WorksheetQueueRepository();
     await repo.save({

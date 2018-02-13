@@ -5,7 +5,6 @@ import {OperatorRepository} from '../../../src/operator/models';
 
 describe('operator.routes', () => {
   before(async() => {
-    await app.locals.bucketPromise;
     const operator = new OperatorRepository();
     await operator.deleteQuery();
 
