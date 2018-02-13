@@ -4,7 +4,6 @@ import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
-import {utc} from '../lib/date';
 
 export class Operator extends CouchbaseModel {
   constructor() {
