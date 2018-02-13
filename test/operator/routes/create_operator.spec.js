@@ -20,7 +20,7 @@ describe('operator.routes', () => {
     it('201 Operador creado', async() => {
       const requester = request(app);
       const response = await requester
-        .post('/operator')
+        .post('/operators')
         .set('Authorization', authenticatedAdmin.authorization)
         .send({
           username: 'operator2',
@@ -42,7 +42,7 @@ describe('operator.routes', () => {
     it('400 Solicitud invalida', async() => {
       const requester = request(app);
       const response = await requester
-        .post('/operator')
+        .post('/operators')
         .set('Authorization', authenticatedAdmin.authorization)
         .send({
           username: 'operator1',
@@ -56,7 +56,7 @@ describe('operator.routes', () => {
     it('400 Solicitud invalida (username único)', async() => {
       const requester = request(app);
       const response = await requester
-        .post('/operator')
+        .post('/operators')
         .set('Authorization', authenticatedAdmin.authorization)
         .send({
           username: 'operator2',
@@ -77,7 +77,7 @@ describe('operator.routes', () => {
 
     it('401 Permisos insuficientes', async() => {
       const response = await request(app)
-        .post('/operator')
+        .post('/operators')
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           username: 'operator2',

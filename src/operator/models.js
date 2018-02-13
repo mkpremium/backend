@@ -4,6 +4,7 @@ import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
+import {utc} from '../lib/date';
 
 export class Operator extends CouchbaseModel {
   constructor() {
@@ -73,5 +74,18 @@ export class OperatorRepository extends Operator {
     };
 
     return sign(payload, jwt.secret, options);
+  }
+
+  async list(query = {}) {
+    const params = t.OperatorListQuery(query);
+    const qb = this.getQueryBuilder('select')
+      .limit(params.limit)
+      .offset(params.offset);
+
+    if (params.role) {
+      qb.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
+    }
+
+    return this.query(qb);
   }
 }

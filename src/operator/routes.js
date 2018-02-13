@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {createOperatorController, loginController} from './controllers';
+import {createOperatorController, listOperatorController, loginController} from './controllers';
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @swagger
- * /operator/login:
+ * /operators/login:
  *   post:
  *     tags: [Operator]
  *     summary: Iniciar sesion
@@ -48,7 +48,7 @@ router.post('/login', loginController);
 
 /**
  * @swagger
- * /operator:
+ * /operators:
  *   post:
  *     tags: [Manager]
  *     summary: Crear operador
@@ -83,5 +83,7 @@ router.post('/login', loginController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/', permissions.admin, createOperatorController);
+
+router.get('/', permissions.admin, listOperatorController);
 
 export default router;
