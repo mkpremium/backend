@@ -64,10 +64,9 @@ function rejectIfNotConnected(reject) {
 
 function sendEvent(type, body) {
   const socketEvent = getEventStruct(type, body);
-  const stringEvent = JSON.stringify(socketEvent);
   return new Promise((resolve, reject) => {
     rejectIfNotConnected(reject);
-    socketClient.emit('event', stringEvent, (ack) => {
+    socketClient.emit('event', socketEvent, (ack) => {
       if (!ack) reject(new Error('Event could not be sent'));
       resolve(ack);
     });

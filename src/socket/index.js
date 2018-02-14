@@ -29,8 +29,7 @@ function start(server) {
     
     socket.on('event', (data, ack) => {
       socketDebug('Sending event');
-      const eventData = JSON.parse(data);
-      const eventName = getEventName(eventData);
+      const eventName = getEventName(data);
       io.emit(eventName, data);
       ack(true);
     });
