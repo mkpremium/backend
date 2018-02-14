@@ -63,6 +63,7 @@ t.Operator = t.struct(
     username: t.String,
     password: t.String,
     agentNumber: t.maybe(t.String),
+    serviceId: t.maybe(t.String),
     enable: t.Bool,
     roles: t.list(t.OperatorRole),
 

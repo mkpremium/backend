@@ -22,6 +22,7 @@ describe('calls.routes', () => {
       username: 'callerOperator',
       password: 'password',
       agentNumber: '10106-903',
+      serviceId: '17146',
       roles: [
         'OPERATOR'
       ],

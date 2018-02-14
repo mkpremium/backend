@@ -9,5 +9,16 @@ export const getAgentNumber = async(req) => {
   if (operator) {
     return operator.agentNumber;
   }
-  throw newHttpError(401);
+  throw newHttpError(404);
+};
+
+export const getServiceId = async(req) => {
+  const repo = new Operator();
+  const id = req.user.id;
+  const operator = await repo.findById(id);
+
+  if (operator) {
+    return operator.serviceId;
+  }
+  throw newHttpError(404);
 };

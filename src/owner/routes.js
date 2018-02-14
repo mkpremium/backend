@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import {Router} from 'express';
 import {
   addOwnerContactController, addOwnerController, updateOwnerContactStatusController,
   updateOwnerController
 } from './controllers';
-import { permissions } from '../middleware/jwt';
+import {permissions} from '../middleware/jwt';
 
 const router = Router();
 

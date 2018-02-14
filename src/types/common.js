@@ -62,36 +62,33 @@ t.TypedContactInfo = t.struct(
   }
 );
 
-/**
- * @swagger
- * definitions:
- *   ContactValue:
- *     properties:
- *       value:
- *         type: string
- *         required: true
- */
-t.ContactValue = t.struct(
+t.TypedContactInfoUpdate = t.struct(
   {
-    value: t.String
+    type: t.maybe(t.TypeContact),
+    value: t.maybe(t.String),
+    note: t.maybe(t.String),
+    status: t.maybe(t.TypedContactInfoStatus)
+  },
+  {
+    name: 'TypedContactInfoUpdate'
   }
 );
 
-t.TypedContactInfoUpdate = t.struct(
-  {
-    type: t.TypeContact,
-    value: t.maybe(t.String),
-    note: t.maybe(t.String),
-    status: t.TypedContactInfoStatus
-  },
-  {
-    name: 'TypedContactInfo',
-    defaultProps: {
-      type: 'TELEFONO',
-      status: 'UNDEFINED'
-    }
-  }
-);
+/**
+ * @swagger
+ * definitions:
+ *   UpdateContactStatus:
+ *     properties:
+ *       id:
+ *         type: string
+ *         description: Número de teléfono a actualizar
+ *       data:
+ *         $ref: "#/definitions/TypedContactInfo"
+ */
+t.UpdateContactStatus = t.struct({
+  id: t.String,
+  data: t.TypedContactInfoUpdate
+}, 'UpdateContactStatus');
 
 t.Address = t.struct(
   {
@@ -107,5 +104,20 @@ t.Address = t.struct(
   },
   {
     name: 'Address'
+  }
+);
+
+/**
+ * @swagger
+ * definitions:
+ *   ContactValue:
+ *     properties:
+ *       value:
+ *         type: string
+ *         required: true
+ */
+t.ContactValue = t.struct(
+  {
+    value: t.String
   }
 );

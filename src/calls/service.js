@@ -13,21 +13,21 @@ const requester = axios.create({
   }
 });
 
-function getCallParams(from, to) {
+function getCallParams(from, to, serviceId) {
   const struct = t.CallService({
     from: from.split('-')[1],
     to: to.value,
-    service_id: parseInt(numintec.serviceId),
+    service_id: parseInt(serviceId),
     return_id: true
   });
 
   return `?from=${struct.from}&to=${struct.to}&options[service_id]=${struct.service_id}&options[return_id]=${true}`;
 }
 
-async function call(from, phone) {
+async function call(from, phone, serviceId) {
   const model = new Calls();
   try {
-    let params = getCallParams(from, phone);
+    let params = getCallParams(from, phone, serviceId);
     const result = await requester.get(`/Call/rest/call/${params}`);
     if (!result.data.status) throw newHttpError(400, result.data.description);
     const call = model.save({

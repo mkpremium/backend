@@ -52,7 +52,6 @@ export class PersonRepository extends Person {
 export class OwnerRepository extends Owner {
   async findByIdOrThrow(ownerId) {
     const owner = await this.findById(ownerId);
-
     if (!owner) {
       throw newHttpError(404, `El propietario ${ownerId} no existe`);
     }

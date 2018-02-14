@@ -10,6 +10,7 @@ jobs:
       - image: rkmax/couchbase:bitdistrict
     environment:
       - NODE_ENV: test
+      - NUMINTEC_API_LICENSE: "$NUMINTEC_API_LICENSE"
 
     working_directory: ~/repo
 
