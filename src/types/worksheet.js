@@ -36,6 +36,7 @@ t.WorkSheet = t.struct({
   })),
   queueId: t.maybe(t.String),
   relatedOwnerIds: t.list(t.String),
+  relatedOwners: t.maybe(t.list(t.Owner)),
   status: t.WorkSheetStatus,
 
   viewedAt: t.maybe(t.Date),
