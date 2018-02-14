@@ -10,7 +10,7 @@ const defaultOpts = {
   middleware: true
 };
 
-let retries = 3;
+let retries = couchbase.retries;
 
 export default (app, opts = defaultOpts) => {
   let resolve = null;
@@ -41,7 +41,6 @@ export default (app, opts = defaultOpts) => {
 function checkBucket(bucket, cluster, resolve, reject) {
   if (retries <= 0) {
     reject(new Error(`It's possible a error trying to connect bucket ${bucket._name} check your setup`));
-    process.exit(1);
   }
 
   debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`);
@@ -53,7 +52,7 @@ function checkBucket(bucket, cluster, resolve, reject) {
     resolve(bucket);
   } else {
     retries--;
-    setTimeout(() => checkBucket(bucket, cluster, resolve, reject), 1500);
+    setTimeout(() => checkBucket(bucket, cluster, resolve, reject), couchbase.timeout);
   }
 }
 

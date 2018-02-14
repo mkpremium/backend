@@ -76,9 +76,9 @@ export class CouchbaseModel {
     return this.query(queryBuilder);
   }
 
-  async query(queryBuilder = this.getQueryBuilder(), consistency = N1qlQuery.Consistency.STATEMENT_PLUS) {
+  async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
     const queryParam = queryBuilder.toParam();
-    debugModel('query', queryParam);
+    debugModel('query', `c(${consistency})`, queryParam);
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
     await this._promiseBucket;
@@ -87,7 +87,7 @@ export class CouchbaseModel {
 
   async unique(data, field) {
     const value = data[field];
-    const query = this.getQueryBuilder().where(`${field} = ?`, value);
+    const query = this.getQueryBuilder().where(`${field} = ?`, value).limit(1);
 
     const result = await this.query(query);
 
