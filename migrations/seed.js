@@ -6,7 +6,7 @@ import app from '../src/app';
 
 import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
-import {operatorCreateManager} from '../test/common';
+import {deleteAll, operatorCreate, operatorCreateAdmin, operatorCreateManager} from '../test/common';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {OwnerRepository} from '../src/owner/models';
@@ -14,6 +14,9 @@ import {BuildingRepository} from '../src/building/models';
 
 async function init() {
   await app.locals.bucketPromise;
+  await deleteAll();
+  await operatorCreate();
+  await operatorCreateAdmin();
   await operatorCreateManager();
   const migrateOwner = new MigrateModel('owner', resolve(__dirname, '../test/fixtures/sample_owners.csv'), app);
   await migrateOwner.run();

@@ -37,3 +37,32 @@ t.WorksheeQueueListQuery = t.ListQuery.extend({
   date: t.maybe(t.String),
   dateRange: t.list(t.String)
 });
+
+/**
+ * @swagger
+ * definitions:
+ *   WorksheetLitResponse:
+ *     required:
+ *       - total
+ *       - results
+ *     properties:
+ *       total:
+ *         type: number
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/Worksheet"
+ */
+t.WorkSheetLitResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(t.WorkSheet)
+  },
+  {
+    name: 'WorksheetLitResponse',
+    defaultProps: {
+      total: 0,
+      results: []
+    }
+  }
+);

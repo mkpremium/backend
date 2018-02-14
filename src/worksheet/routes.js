@@ -69,9 +69,7 @@ const router = Router();
  *       200:
  *         description: Operación exitosa
  *         schema:
- *           type: array
- *           items:
- *             $ref: "#/definitions/Worksheet"
+ *           $ref: "#/definitions/WorkSheetLitResponse"
  *       401:
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
