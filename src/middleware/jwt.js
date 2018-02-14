@@ -33,8 +33,8 @@ function getToken(req) {
   const [scheme, credentials] = authorization.split(' ');
   if (scheme && /^Bearer$/i.test(scheme)) {
     return credentials;
-  } else if (credentials) {
-    return credentials;
+  } else if (scheme) {
+    return scheme; // if it's a value the this is the credential
   } else {
     return null;
   }
