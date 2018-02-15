@@ -3,6 +3,7 @@
   "main": "server.js",
   "scripts": {
     "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
     "prestart": "npm run lint",
     "start": "better-npm-run start",
     "pretest": "npm run lint",
