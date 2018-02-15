@@ -31,12 +31,8 @@ async function queueByCity(req, res) {
 }
 
 async function queueList(req, res) {
-  const params = new t.ListQuery(req.query || {});
   const repo = new WorksheetQueueRepository();
-  const qb = repo.getQueryBuilder('select')
-    .limit(params.limit)
-    .offset(params.offset);
-  const queues = await repo.query(qb);
+  const queues = await repo.list(req.query);
 
   res.json(queues);
 }

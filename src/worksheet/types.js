@@ -66,3 +66,32 @@ t.WorkSheetLitResponse = t.struct(
     }
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   QueueListResponse:
+ *     required:
+ *       - total
+ *       - results
+ *     properties:
+ *       total:
+ *         type: number
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/WorksheetQueue"
+ */
+t.QueueListResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(t.WorksheetQueue)
+  },
+  {
+    name: 'QueueListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
+    }
+  }
+);
