@@ -41,7 +41,7 @@ t.WorksheeQueueListQuery = t.ListQuery.extend({
 /**
  * @swagger
  * definitions:
- *   WorksheetLitResponse:
+ *   WorkSheetLitResponse:
  *     required:
  *       - total
  *       - results
