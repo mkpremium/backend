@@ -80,11 +80,16 @@ export class OperatorRepository extends Operator {
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset);
+    const qbCount = this.getQueryBuilder('count');
 
     if (params.role) {
       qb.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
+      qbCount.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
     }
 
-    return this.query(qb);
+    const total = await this.countQuery(qbCount);
+    const results = await this.query(qb);
+
+    return t.OperatorListResponse({total, results});
   }
 }

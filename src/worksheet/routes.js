@@ -67,7 +67,7 @@ const router = Router();
  *           format: dd-mm-YYYY
  *     responses:
  *       200:
- *         description: Operación exitosa
+ *         description: Lista de hojas de trabajo
  *         schema:
  *           $ref: "#/definitions/WorkSheetLitResponse"
  *       401:

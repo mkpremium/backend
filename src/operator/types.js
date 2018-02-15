@@ -57,3 +57,32 @@ t.AuthenticatedResponse = t.struct({
 t.OperatorListQuery = t.ListQuery.extend({
   role: t.maybe(t.String)
 });
+
+/**
+ * @swagger
+ * definitions:
+ *   OperatorListResponse:
+ *     required:
+ *       - total
+ *       - results
+ *     properties:
+ *       total:
+ *         type: number
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/Operator"
+ */
+t.OperatorListResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(t.Operator)
+  },
+  {
+    name: 'OperatorListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
+    }
+  }
+);

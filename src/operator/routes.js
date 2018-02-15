@@ -109,11 +109,9 @@ router.post('/', permissions.admin, createOperatorController);
  *         description: Rol del operador
  *     responses:
  *       200:
- *         description: Operación exitosa
+ *         description: Lista de hojas de trabajo
  *         schema:
- *           type: array
- *           items:
- *             $ref: "#/definitions/Operator"
+ *           $ref: "#/definitions/OperatorListResponse"
  *       401:
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
