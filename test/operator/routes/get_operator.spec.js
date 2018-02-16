@@ -24,8 +24,10 @@ describe('operator.routes', () => {
           .get('/operators')
           .set('Authorization', authenticatedAdmin.authorization)
           .expect(200);
-        response.body.should.be.a('array');
-        response.body.should.have.length(20);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(52);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(20);
       });
 
       it('limit query param', async() => {
@@ -34,8 +36,10 @@ describe('operator.routes', () => {
           .set('Authorization', authenticatedAdmin.authorization)
           .query({limit: 10})
           .expect(200);
-        response.body.should.be.a('array');
-        response.body.should.have.length(10);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(52);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(10);
       });
 
       it('offset query param', async() => {
@@ -50,11 +54,16 @@ describe('operator.routes', () => {
           .set('Authorization', authenticatedAdmin.authorization)
           .query({offset: 5, limit: 5})
           .expect(200);
-        responseLimit.body.should.be.a('array');
-        responseLimit.body.should.have.length(10);
-        responseOffsetLimit.body.should.be.a('array');
-        responseOffsetLimit.body.should.have.length(5);
-        intersectionBy(responseLimit.body, responseOffsetLimit.body, 'id').should.have.length(5);
+        responseLimit.body.should.be.a('object');
+        responseLimit.body.total.should.equal(52);
+        responseLimit.body.results.should.be.a('array');
+        responseLimit.body.results.should.have.length(10);
+
+        responseOffsetLimit.body.should.be.a('object');
+        responseOffsetLimit.body.total.should.equal(52);
+        responseOffsetLimit.body.results.should.be.a('array');
+        responseOffsetLimit.body.results.should.have.length(5);
+        intersectionBy(responseLimit.body.results, responseOffsetLimit.body.results, 'id').should.have.length(5);
       });
 
       it('role query param', async() => {
@@ -64,29 +73,11 @@ describe('operator.routes', () => {
           .query({role: 'ADMIN'})
           .expect(200);
 
-        response.body.should.be.a('array');
-        response.body.should.have.length(1);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(1);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(1);
       });
     });
   });
-
-  // describe('GET /worksheets/:id @request', () => {
-  //   it('200 Obtiene la ficha', async() => {
-  //     const response = await request(app)
-  //       .get(`/worksheets/${worksheet.id}`)
-  //       .set('Authorization', authenticatedOperator.authorization)
-  //       .expect(200);
-  //     response.body.should.be.a('object');
-  //     response.body.toString().should.be.equal(worksheet.toString());
-  //   });
-  //
-  //   it('400 Ficha no encontrada', async() => {
-  //     const response = await request(app)
-  //       .get(`/worksheets/not-found`)
-  //       .set('Authorization', authenticatedOperator.authorization)
-  //       .expect(404);
-  //     response.body.should.be.a('object');
-  //     response.body.should.have.a.property('message');
-  //   });
-  // });
 });

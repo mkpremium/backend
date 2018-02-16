@@ -17,7 +17,7 @@ const router = Router();
 /**
  * @swagger
  * tags:
- *   name: Worksheet Queue
+ *   name: Queue
  *   description: Cola de fichas de trabajo
  */
 
@@ -67,11 +67,9 @@ const router = Router();
  *           format: dd-mm-YYYY
  *     responses:
  *       200:
- *         description: Operación exitosa
+ *         description: Lista de hojas de trabajo
  *         schema:
- *           type: array
- *           items:
- *             $ref: "#/definitions/Worksheet"
+ *           $ref: "#/definitions/WorkSheetLitResponse"
  *       401:
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
@@ -95,9 +93,7 @@ router.get('/', permissions.manager, worksheetListController);
  *       200:
  *         description: Lista las colas
  *         schema:
- *           type: array
- *           items:
- *             $ref: "#/definitions/WorksheetQueue"
+ *           $ref: "#/definitions/QueueListResponse"
  *       401:
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:

@@ -30,8 +30,10 @@ describe('worksheet.routes', () => {
           .get('/worksheets')
           .set('Authorization', authenticatedManager.authorization)
           .expect(200);
-        response.body.should.be.a('array');
-        response.body.should.have.length(20);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(50);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(20);
       });
 
       it('limit query param', async() => {
@@ -40,8 +42,10 @@ describe('worksheet.routes', () => {
           .set('Authorization', authenticatedManager.authorization)
           .query({limit: 10})
           .expect(200);
-        response.body.should.be.a('array');
-        response.body.should.have.length(10);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(50);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(10);
       });
 
       it('offset query param', async() => {
@@ -56,11 +60,18 @@ describe('worksheet.routes', () => {
           .set('Authorization', authenticatedManager.authorization)
           .query({offset: 5, limit: 5})
           .expect(200);
-        responseLimit.body.should.be.a('array');
-        responseLimit.body.should.have.length(10);
-        responseOffsetLimit.body.should.be.a('array');
-        responseOffsetLimit.body.should.have.length(5);
-        intersectionBy(responseLimit.body, responseOffsetLimit.body, 'id').should.have.length(5);
+
+        responseLimit.body.should.be.a('object');
+        responseLimit.body.total.should.equal(50);
+        responseLimit.body.results.should.be.a('array');
+        responseLimit.body.results.should.have.length(10);
+
+        responseOffsetLimit.body.should.be.a('object');
+        responseOffsetLimit.body.total.should.equal(50);
+        responseOffsetLimit.body.results.should.be.a('array');
+        responseOffsetLimit.body.results.should.have.length(5);
+
+        intersectionBy(responseLimit.body.results, responseOffsetLimit.body.results, 'id').should.have.length(5);
       });
     });
   });

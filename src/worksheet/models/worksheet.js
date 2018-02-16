@@ -15,25 +15,32 @@ export class WorksheetRepository extends Worksheet {
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset);
+    const qbCount = this.getQueryBuilder('count');
 
     if (params.status) {
       qb.where('status = ?', params.status);
+      qbCount.where('status = ?', params.status);
     }
 
     if (params.viewedAt) {
       const m = utc(params.viewedAt);
       qb.where('viewedAt >= ?', m.clone().startOf('day').toDate());
-      qb.where('viewedAt <= ?', m.clone().endOf('day').toDate());
+      qbCount.where('viewedAt <= ?', m.clone().endOf('day').toDate());
     } else {
       const [start, end] = params.viewedBetween.split(',').map(d => d ? utc(d) : d);
       if (start) {
         qb.where('viewedAt >= ?', start.startOf('day').toDate());
+        qbCount.where('viewedAt >= ?', start.startOf('day').toDate());
       }
       if (end) {
         qb.where('viewedAt <= ?', end.endOf('day').toDate());
+        qbCount.where('viewedAt <= ?', end.endOf('day').toDate());
       }
     }
 
-    return this.query(qb);
+    const total = await this.countQuery(qbCount);
+    const results = await this.query(qb);
+
+    return t.WorkSheetLitResponse({total, results});
   }
 }

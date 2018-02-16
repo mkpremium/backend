@@ -61,6 +61,9 @@ export class CouchbaseModel {
       case 'delete':
         qb = squel.delete();
         break;
+      case 'count':
+        qb = squel.select().field('COUNT(*) as count');
+        break;
       default:
         throw new Error(`method ${method} not allowed (select, delete)`);
     }
@@ -70,6 +73,11 @@ export class CouchbaseModel {
       .where('t.`_documentType` = ?', this.Struct.meta.defaultProps._documentType);
 
     return qb;
+  }
+
+  async countQuery(queryBuilder = this.getQueryBuilder('count')) {
+    const [{count}] = await this.query(queryBuilder);
+    return count;
   }
 
   async deleteQuery(queryBuilder = this.getQueryBuilder('delete')) {

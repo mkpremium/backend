@@ -43,6 +43,16 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return new this.Struct(city);
   }
 
+  async list(query = {}) {
+    const params = t.ListQuery(query);
+    const qb = this.getQueryBuilder('select')
+      .limit(params.limit)
+      .offset(params.offset);
+    const total = await this.countQuery();
+    const results = await this.query(qb);
+    return t.QueueListResponse({total, results});
+  }
+
   async addWorksheetAndSave(queue, worksheet) {
     const item = await this.addWorksheet(queue, worksheet);
     const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
