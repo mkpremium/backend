@@ -5,6 +5,7 @@ import {newHttpError} from '../lib/http-error';
 
 import {Calls} from './models';
 import {numintec} from '../../config';
+import {encodePlusSign} from './helper';
 
 const requester = axios.create({
   baseURL: numintec.apiUrl,
@@ -16,12 +17,12 @@ const requester = axios.create({
 function getCallParams(from, to, serviceId) {
   const struct = t.CallService({
     from: from.split('-')[1],
-    to: to.value,
+    to: encodePlusSign(to.value),
     service_id: parseInt(serviceId),
     return_id: true
   });
 
-  return `?from=${struct.from}&to=${struct.to}&options[service_id]=${struct.service_id}&options[return_id]=${true}`;
+  return `?from=${struct.from}&to=${struct.to}&options[service_id]=${struct.service_id}&options[return_id]=${true}&options[autoanswer]=1`;
 }
 
 async function call(from, phone, serviceId) {

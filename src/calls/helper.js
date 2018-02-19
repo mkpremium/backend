@@ -22,3 +22,7 @@ export const getServiceId = async(req) => {
   }
   throw newHttpError(404);
 };
+
+export const encodePlusSign = (string) => {
+  return string.replace(/\+/g, '%2B');
+};
