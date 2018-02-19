@@ -2,10 +2,11 @@ import io from 'socket.io-client';
 import {sign} from 'jsonwebtoken';
 import t from 'tcomb';
 
-import {jwt} from '../../config';
+import {jwt, socket as socketConfig} from '../../config';
 import './types';
 
 let socketClient;
+const serverUri = `${socketConfig.server}:${socketConfig.port}`;
 const options = {};
 
 function createToken() {
@@ -19,7 +20,7 @@ function createToken() {
   return sign(payload, jwt.secret, options);
 }
 
-function connectServer(serverUri) {
+function connectServer() {
   options.query = {token: createToken()};
 
   return new Promise((resolve, reject) => {

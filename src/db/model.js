@@ -158,8 +158,9 @@ export class CouchbaseModel {
     const result = this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
     
     if (result && sendEvent) {
+      this.socketClient = await socket.connectServer();
       const eventType = isNewData ? 'add' : 'update';
-      await socket.sendEvent(eventType, dataPreSaved);
+      await this.socketClient.sendEvent(eventType, dataPreSaved);
     }
 
     return result;

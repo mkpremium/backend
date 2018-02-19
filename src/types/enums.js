@@ -52,3 +52,27 @@ t.EventType = t.enums({
   read: 'read',
   custom: 'custom'
 });
+
+t.RecordAction = t.enums.of([
+  'Actualiza',
+  'Crea',
+  'Obtiene',
+  'Abre',
+  'Lista'
+]);
+
+t.RecordContext = t.enums({
+  OWNER: 'Propietario',
+  OWNERS: 'Propietarios',
+  OWNER_CONTACT: 'Contacto de propietario',
+  WORKSHEET: 'Ficha de trabajo',
+  WORKSHEETS: 'Fichas de trabajo',
+  OPERATOR: 'Operador',
+  OPERATORS: 'Operadores',
+  WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
+  SYSTEM_QUEUE: 'Colas del sistema'
+});
+
+t.getEnumMap = function(enumStruct) {
+  return enumStruct.meta.map;
+};

@@ -1,6 +1,6 @@
 import debug from 'debug';
 import socketIO from 'socket.io';
-import socketJwt from '../middleware/socketJwt';
+// import socketJwt from '../middleware/socketJwt';
 
 const socketDebug = debug('app:socket');
 let io;
@@ -22,7 +22,7 @@ function start(server) {
     cookie: false
   });
 
-  io.use(socketJwt(io.sockets));
+  // io.use(socketJwt(io.sockets));
   
   io.on('connection', (socket) => {
     socketDebug(`Socket connection for ${socket.id}`);

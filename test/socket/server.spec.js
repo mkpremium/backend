@@ -7,7 +7,6 @@ import socket from '../../src/socket';
 import socketClient from '../../src/socket/client';
 
 const port = process.env.SOCKET_PORT || '9002';
-const socketServerUri = `http://localhost:${port}`;
 
 const modelStruct = t.Operator({
   id: '5fe1d64e-9383-4483-9443-8a1ed79c2ba0',
@@ -49,7 +48,7 @@ describe('socket.server', () => {
   describe('event', () => {
     let client;
     beforeEach(async() => {
-      client = await socketClient.connectServer(socketServerUri);
+      client = await socketClient.connectServer();
     });
     
     it('should emit an event', async() => {
