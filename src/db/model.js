@@ -14,6 +14,23 @@ class CouchbaseModelStruct {
   }
 }
 
+function hydrate(struct, value) {
+  if (!value) {
+    return value;
+  }
+
+  const hydratedObject = {};
+  Object.keys(value).forEach(propName => {
+    const prop = struct.meta.props[propName];
+    // Date type
+    if (prop && /^\??Date$/.test(prop.displayName)) {
+      hydratedObject[propName] = new Date(value[propName]);
+    }
+  });
+
+  return Object.assign({}, value, hydratedObject);
+}
+
 export class EmbeddedModel {
   constructor() {
     this.Struct = CouchbaseModelStruct;
@@ -117,7 +134,8 @@ export class CouchbaseModel {
       await this._promiseBucket;
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
-        return new this.Struct(result.value);
+        const hydrated = hydrate(this.Struct, result.value);
+        return new this.Struct(hydrated);
       }
 
       return null;
