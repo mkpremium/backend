@@ -47,7 +47,8 @@ deploy() {
   local dist_host=$1
   local app_name=$2
 
-  local dist_file=$(mktemp --suffix=.tgz)
+  local temp_dist_file=$(mktemp)
+  local dist_file="${temp_dist_file}.tgz"
   local deploy_dir=/home/centos/apps/${app_name}
 
   echo -en "Checking node version         \t:"
