@@ -10,6 +10,7 @@ jobs:
       - image: rkmax/couchbase:bitdistrict
     environment:
       - NODE_ENV: test
+      - TERM: dumb
 
     working_directory: ~/repo
 
