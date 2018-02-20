@@ -39,6 +39,9 @@ async function call(from, phone, serviceId) {
     });
     return call;
   } catch (e) {
+    if (e.response && e.response.status === 401) {
+      throw newHttpError(500, 'Internal server error');
+    }
     throw newHttpError(400, e);
   }
 };
@@ -49,6 +52,9 @@ async function hangup(id) {
     if (!result.data.status) throw newHttpError(400, result.data.description);
     return result.data;
   } catch (e) {
+    if (e.response && e.response.status === 401) {
+      throw newHttpError(500, 'Internal server error');
+    }
     throw newHttpError(400, e);
   }
 };
