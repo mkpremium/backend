@@ -54,11 +54,12 @@ t.EventType = t.enums({
 });
 
 t.RecordAction = t.enums.of([
-  'Actualiza',
-  'Crea',
-  'Obtiene',
-  'Abre',
-  'Lista'
+  'UPDATE',
+  'CREATE',
+  'GET',
+  'OPEN',
+  'LIST',
+  'ERROR'
 ]);
 
 t.RecordContext = t.enums({
@@ -72,7 +73,3 @@ t.RecordContext = t.enums({
   WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
   SYSTEM_QUEUE: 'Colas del sistema'
 });
-
-t.getEnumMap = function(enumStruct) {
-  return enumStruct.meta.map;
-};

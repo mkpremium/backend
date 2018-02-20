@@ -23,13 +23,6 @@ const modelStruct = t.Operator({
   agentNumber: '4483-944'
 });
 
-const reqUser = {
-  id: 'test',
-  permissions: [
-    'MANAGER'
-  ]
-};
-
 describe('record.event', () => {
   const app = express();
   let server;
@@ -51,12 +44,17 @@ describe('record.event', () => {
     const spy = sinon.spy();
     let savedOperator;
     let record;
+    let reqUser;
 
     beforeEach(async() => {
       record = new Record(true);
       const operatorRepo = new OperatorRepository();
       await operatorRepo.deleteQuery();
       savedOperator = await operatorRepo.save(modelStruct);
+      reqUser = {
+        id: savedOperator.id,
+        permissions: savedOperator.roles
+      };
       socketClient = await socketioClient.connectServer();
 
       socketClient.on('record:new', (data) => {
@@ -65,20 +63,17 @@ describe('record.event', () => {
     });
     
     it('should register record', async() => {
-      const savedRecord = await record.register('Crea', savedOperator, reqUser);
+      const savedRecord = await record.register('CREATE', savedOperator, reqUser);
       savedRecord.model.should.be.equal('operator');
+    });
+
+    it('should register error if model is invalid', async() => {
+      const savedRecord = await record.register('CREATE', null, reqUser);
+      savedRecord.type.should.be.equal('ERROR');
     });
 
     it('should receive record event', async() => {
       await spy.should.have.been.callCount(1);
-    });
-
-    it('400 undefined contextmodel', async() => {
-      try {
-        await record.register('Crea', null, reqUser);
-      } catch (e) {
-        e.message.should.be.equal('Undefined context model');
-      }
     });
   });
 });

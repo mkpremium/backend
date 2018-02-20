@@ -12,6 +12,7 @@ describe('operator.routes', () => {
     await repo.deleteQuery();
     await operatorCreateAdmin();
     await operatorCreate();
+    await operatorCreate('test');
     authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
   });
@@ -59,7 +60,7 @@ describe('operator.routes', () => {
         .post('/operators')
         .set('Authorization', authenticatedAdmin.authorization)
         .send({
-          username: 'operator2',
+          username: 'operatortest',
           password: 'Passw0rd',
           agentNumber: 'operator2',
           roles: [

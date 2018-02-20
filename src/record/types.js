@@ -7,10 +7,8 @@ t.Record = t.struct({
     id: t.String,
     permissions: t.list(t.OperatorRole)
   }),
-  details: t.struct({
-    action: t.RecordAction,
-    context: t.String
-  }),
+  type: t.RecordAction,
+  description: t.String,
   timestamp: t.Date,
   _documentType: t.String
 },

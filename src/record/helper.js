@@ -1,85 +1,75 @@
 import t from 'tcomb';
+import {Operator} from '../operator/models';
 
-const recordActions = t.getEnumMap(t.RecordAction);
-const recordContexts = t.getEnumMap(t.RecordContext);
+const recordContexts = t.RecordContext.meta.map;
+
+async function getOperatorUsername(id) {
+  const repo = new Operator();
+  const operator = await repo.findById(id);
+
+  if (operator) {
+    return operator.username;
+  }
+  return '';
+};
 
 function getModelName(contextModel) {
+  if (!contextModel) return 'UNDEFINED';
   return contextModel._documentType || contextModel;
 }
 
-function getOperatorContext(type) {
-  switch (type) {
-    case recordActions.Lista:
-      return recordContexts.OPERATORS;
-    default:
-      return recordContexts.OPERATOR;
-  }
+function getModelId(contextModel) {
+  if (!contextModel) return 'UNDEFINED';
+  return contextModel.id || '-';
 }
 
-function getOwnerContext(type) {
-  switch (type) {
-    case recordActions.Lista:
-      return recordContexts.OWNERS;
-    default:
-      return recordContexts.OWNER;
-  }
-}
-
-function getOwnerContactContext(type) {
-  switch (type) {
-    default:
-      return recordContexts.OWNER_CONTACT;
-  }
-}
-
-function getWorkSheetContext(type) {
-  switch (type) {
-    case recordActions.Lista:
-      return recordContexts.WORKSHEETS;
-    default:
-      return recordContexts.WORKSHEET;
-  }
-}
-
-function getWorkSheetQueueContext(type) {
-  switch (type) {
-    case recordActions.Lista:
-      return recordContexts.SYSTEM_QUEUE;
-    default:
-      return recordContexts.WORKSHEET_QUEUE;
-  }
-}
-
-function getContextDetail(type, model) {
+function getRecordContext(model, plural = false) {
   switch (model) {
     case 'worksheet':
-      return getWorkSheetContext(type);
+      if (plural) return recordContexts.WORKSHEETS;
+      return recordContexts.WORKSHEET;
     case 'worksheet-queue':
-      return getWorkSheetQueueContext(type);
+      if (plural) return recordContexts.SYSTEM_QUEUE;
+      return recordContexts.WORKSHEET_QUEUE;
     case 'operator':
-      return getOperatorContext(type);
+      if (plural) return recordContexts.OPERATORS;
+      return recordContexts.OPERATOR;
     case 'owner':
-      return getOwnerContext(type);
+      if (plural) return recordContexts.OWNERS;
+      return recordContexts.OWNER;
     case 'owner-contact':
-      return getOwnerContactContext(type);
+      return recordContexts.OWNER_CONTACT;
     default:
-      break;
+      return 'UNDEFINED';
   }
 }
 
-export function getRecordStruct(type, contextModel, user) {
+function getRecordDescription(model, username) {
+  const recordContext = getRecordContext(model);
+  return {
+    CREATE: `${username} ha creado ${recordContext}`,
+    UPDATE: `${username} ha actualizado ${recordContext}`,
+    GET: `${username} ha obtenido ${recordContext}`,
+    OPEN: `${username} ha abierto ${recordContext}`,
+    LIST: `${username} ha listado ${getRecordContext(model, true)}`
+  };
+};
+
+export async function getRecordStruct(type, contextModel, user) {
   const model = getModelName(contextModel);
+  const username = await getOperatorUsername(user.id);
+  const recordType = contextModel ? type : 'ERROR';
+  const id = getModelId(contextModel);
+
   return {
     model,
-    id: contextModel.id || '-',
+    id,
     user: {
       id: user.id,
       permissions: user.permissions
     },
-    details: {
-      action: type,
-      context: getContextDetail(type, model)
-    },
+    type: recordType,
+    description: getRecordDescription(model, username)[type],
     timestamp: new Date()
   };
 }

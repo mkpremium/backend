@@ -109,6 +109,8 @@ export class CouchbaseModel {
 
     const result = await this.query(query);
 
+    debugModel('result unique query ', result);
+
     if (result && result.length) {
       // we can safely omit data with the same id
       if (data.id && data.id === result[0].id) {
