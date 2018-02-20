@@ -2,6 +2,7 @@ import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
+import {QueueRequestAction} from './types';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
@@ -37,17 +38,26 @@ async function queueList(req, res) {
   res.json(queues);
 }
 
-async function openWorksheet(req, res) {
+async function actionsOnWorksheetQueue(req, res) {
   const cityName = req.params.city;
   const params = t.QueueRequestParams(req.body);
   const repo = new WorksheetQueueRepository();
   const queue = await repo.findByCity(cityName);
-  await repo.openWorksheetInQueue(queue, params.queueItemId, req.user.id);
-  res.json({});
+
+  switch (params.action) {
+    case QueueRequestAction.TAKE:
+      await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      break;
+    case QueueRequestAction.RELEASE:
+      await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      break;
+  }
+
+  res.status(204).send();
 }
 
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
 export const queueByCityController = wrap(queueByCity);
 export const queueListController = wrap(queueList);
-export const openWorksheetController = wrap(openWorksheet);
+export const actionsOnWorksheetQueueController = wrap(actionsOnWorksheetQueue);

@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {
   worksheetFindByIdController, worksheetListController, queueByCityController, queueListController,
-  openWorksheetController
+  actionsOnWorksheetQueueController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -173,7 +173,8 @@ router.get('/queues/:city', queueByCityController);
  *     tags: [Queue, Operator]
  *     security:
  *       - operator: []
- *     summary: Abre y Obtiene el detalle de una Ficha de trabajo para ser trabajada
+ *     summary: Realiza acciones sobre el item de la cola
+ *     description: Permite realizar acciones como tomar o liberar el item de la cola
  *     parameters:
  *       - name: city
  *         in: path
@@ -203,6 +204,6 @@ router.get('/queues/:city', queueByCityController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/queues/:city', openWorksheetController);
+router.post('/queues/:city', actionsOnWorksheetQueueController);
 
 export default router;

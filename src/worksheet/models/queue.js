@@ -69,7 +69,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return itemRepo.save({worksheetId: worksheet.id});
   }
 
-  async openWorksheetInQueue(queue, itemId, operatorId) {
+  async takeWorksheetInQueue(queue, itemId, operatorId) {
     const item = queue.findItemById(itemId);
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
@@ -91,7 +91,24 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheet = t.update(worksheet, {viewedAt: {$set: utc().toDate()}});
     await worksheetRepo.save(updatedWorksheet);
 
-    const updatedItem = item.open(operatorId);
+    const updatedItem = item.take(operatorId);
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
+    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
+
+    return this.save(updatedQueue);
+  }
+
+  async releaseWorksheetInQueue(queue, itemId) {
+    const item = queue.findItemById(itemId);
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
+    }
+
+    if (item.canBeOpened()) {
+      throw newHttpError(409, `El ${itemId} (${item.status}) ya se encuentra abierto`);
+    }
+
+    const updatedItem = item.release();
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
