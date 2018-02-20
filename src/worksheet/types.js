@@ -21,7 +21,7 @@ t.QueueRequestAction = t.enums(QueueRequestAction);
  *       action:
  *         description: Acción a realizar en el item
  *         type: string
- *         default: open
+ *         default: TAKE
  */
 
 t.QueueRequestParams = t.struct(
