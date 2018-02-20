@@ -48,6 +48,15 @@ describe('worksheet.routes', () => {
         openedWorksheet.should.have.a.property('operatorId');
         openedWorksheet.operatorId.should.be.equal(authenticatedOperator.operator.id);
       });
+
+      it('200 Una hoja puede ser obtenida despues de abierta', async() => {
+        console.log(t.WorkSheet.meta.props.viewedAt.displayName);
+        await request(app)
+          .get(`/worksheets/${queueItems[0].worksheetId}`)
+          .set('Authorization', authenticatedOperator.authorization)
+          .expect(200);
+      });
+
       it('404 Ciudad no encontrada', async() => {
         return request(app)
           .post('/worksheets/queues/barranquilla')
