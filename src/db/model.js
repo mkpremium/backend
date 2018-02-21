@@ -51,13 +51,21 @@ export class CouchbaseModel {
   }
 
   // TODO: refactor to CouchbaseQuery
-  getQueryBuilder(method = 'select') {
+  getQueryBuilder(method = 'select', prefix = 't') {
     let qb;
 
     switch (method) {
+      case 'let':
+        qb = squel.let().field(`${prefix}.\`id\``);
+        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`${prefix}.\`${key}\``));
+        break;
+      case 'use':
+        qb = squel.useKey().field(`${prefix}.\`id\``);
+        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`${prefix}.\`${key}\``));
+        break;
       case 'select':
-        qb = squel.select().field('t.`id`');
-        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`t.\`${key}\``));
+        qb = squel.select().field(`${prefix}.\`id\``);
+        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`${prefix}.\`${key}\``));
         break;
       case 'delete':
         qb = squel.delete();
@@ -70,8 +78,8 @@ export class CouchbaseModel {
     }
 
     qb
-      .from(couchbase.bucket, 't')
-      .where('t.`_documentType` = ?', this.Struct.meta.defaultProps._documentType);
+      .from(couchbase.bucket, prefix)
+      .where(`${prefix}.\`_documentType\` = ?`, this.Struct.meta.defaultProps._documentType);
 
     return qb;
   }

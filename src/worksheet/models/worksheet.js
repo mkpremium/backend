@@ -1,6 +1,8 @@
 import t from 'tcomb';
 import {CouchbaseModel} from '../../db/model';
 import {utc} from '../../lib/date';
+import {newHttpError} from '../../lib/http-error';
+import {OwnerRepository} from '../../owner/models';
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -10,6 +12,26 @@ export class Worksheet extends CouchbaseModel {
 }
 
 export class WorksheetRepository extends Worksheet {
+  async findByIdOrThrow(worksheetId) {
+    const worksheet = await this.findById(worksheetId);
+    if (!worksheet) {
+      throw newHttpError(404, `La hoja de trabajo ${worksheetId} no existe`);
+    }
+
+    return worksheet;
+  }
+
+  async findByIdWIthIncludes(id, includes = ['relatedOwners']) {
+    const worksheet = await this.findByIdOrThrow(id);
+    if (includes.indexOf('relatedOwners') !== -1 && worksheet.relatedOwnerIds.length > 0) {
+      const ownerRepo = new OwnerRepository();
+      const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
+      return t.update(worksheet, {relatedOwners: {$set: relatedOwners}});
+    }
+
+    return worksheet;
+  }
+
   async list(query = {}) {
     const params = new t.WorksheetListQuery(query);
     const qb = this.getQueryBuilder('select')

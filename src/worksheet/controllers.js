@@ -14,14 +14,8 @@ async function worksheetList(req, res) {
 async function findById(req, res) {
   const id = req.params.id;
   const repo = new WorksheetRepository();
-  const worksheet = await repo.findById(id);
-  if (worksheet) {
-    return res.json(worksheet);
-  }
-
-  const e = new Error(`worksheet ${id} no encontrada`);
-  e.code = 404;
-  throw e;
+  const worksheet = await repo.findByIdWIthIncludes(id);
+  res.json(worksheet);
 }
 
 async function queueByCity(req, res) {

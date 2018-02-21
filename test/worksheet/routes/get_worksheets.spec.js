@@ -5,17 +5,29 @@ import intersectionBy from 'lodash/intersectionBy';
 import app from '../../../src/app';
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
+import {MigrateModel} from '../../../src/migration/lib/migrate-model';
+import {resolve} from 'path';
+import {OwnerRepository} from '../../../src/owner/models';
 
 describe('worksheet.routes', () => {
   let authenticatedOperator;
   let authenticatedManager;
   let worksheet;
+  let ownerIds;
   before(async() => {
     await deleteAll();
 
+    const migrateOwner = new MigrateModel('owner', resolve(__dirname, './../../fixtures/sample_owners.csv'), app);
+    await migrateOwner.run();
+
+    const ownerRepo = new OwnerRepository();
+    const owners = await ownerRepo.query();
+
+    ownerIds = owners.map(({id}) => id);
+
     const repo = new WorksheetRepository();
-    await Promise.all(times(49, () => repo.save({})));
-    worksheet = await repo.save({});
+    await Promise.all(times(49, () => repo.save({relatedOwnerIds: ownerIds})));
+    worksheet = await repo.save({relatedOwnerIds: ownerIds});
 
     await operatorCreate();
     await operatorCreateManager();
@@ -84,6 +96,9 @@ describe('worksheet.routes', () => {
         .expect(200);
       response.body.should.be.a('object');
       response.body.toString().should.be.equal(worksheet.toString());
+      response.body.should.have.a.property('relatedOwners');
+      response.body.relatedOwners.should.be.a('array');
+      response.body.relatedOwners.should.have.length(ownerIds.length);
     });
 
     it('400 Ficha no encontrada', async() => {

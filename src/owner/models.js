@@ -2,6 +2,8 @@ import t from 'tcomb';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {updateList} from '../lib/tcomb-utils';
+import {BuildingRepository} from '../building/models';
+import isArray from 'lodash/isArray';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -9,6 +11,7 @@ export class Owner extends CouchbaseModel {
     this.Struct = t.Owner;
   }
 }
+
 export class Person extends CouchbaseModel {
 
 }
@@ -58,6 +61,40 @@ export class OwnerRepository extends Owner {
     }
 
     return owner;
+  }
+
+  async findByIdWithIncludes(id, includes = ['building', 'person']) {
+    if (!id) {
+      throw new Error('id undefined, expected String or Array<String>');
+    }
+
+    const ids = isArray(id) ? id : [id];
+    const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`;
+    const qb = this.getQueryBuilder('let').where(`id IN ${idsText}`);
+
+    if (includes.indexOf('building') !== -1) {
+      const buildingRepo = new BuildingRepository();
+      const letBuildingQuery = buildingRepo
+        .getQueryBuilder('use', 'b')
+        .useKey('t.`buildingId`')
+        .where('t.`buildingId` = b.`id`');
+      qb
+        .letQuery('building', letBuildingQuery)
+        .field('building');
+    }
+
+    if (includes.indexOf('person') !== -1) {
+      const personRepo = new PersonRepository();
+      const letPersonQuery = personRepo
+        .getQueryBuilder('use', 'p')
+        .useKey('t.`personId`')
+        .where('t.`personId` = p.`id`');
+      qb
+        .letQuery('person', letPersonQuery)
+        .field('person');
+    }
+
+    return this.query(qb);
   }
 
   async updateContactStatus(ownerId, contact) {

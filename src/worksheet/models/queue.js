@@ -34,13 +34,13 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const qb = this.getQueryBuilder()
       .where('city = ?', name)
       .limit(1);
-    const [city] = await this.query(qb);
+    const [queue] = await this.query(qb);
 
-    if (!city) {
+    if (!queue) {
       throw newHttpError(404, `Cola para ciudad ${name} no encontrada`);
     }
 
-    return new this.Struct(city);
+    return new this.Struct(queue);
   }
 
   async list(query = {}) {
