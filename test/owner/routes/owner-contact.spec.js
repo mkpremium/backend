@@ -41,6 +41,7 @@ describe('owner.routes', () => {
       JSON.stringify(updatedPerson.contacts[0]).should.be.equal(JSON.stringify({
         type: 'TELEFONO',
         value: '1234567890',
+        note: null,
         status: 'GOOD'
       }));
     });

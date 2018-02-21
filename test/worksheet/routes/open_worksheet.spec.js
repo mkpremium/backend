@@ -50,7 +50,6 @@ describe('worksheet.routes', () => {
       });
 
       it('200 Una hoja puede ser obtenida despues de abierta', async() => {
-        console.log(t.WorkSheet.meta.props.viewedAt.displayName);
         await request(app)
           .get(`/worksheets/${queueItems[0].worksheetId}`)
           .set('Authorization', authenticatedOperator.authorization)

@@ -1,3 +1,4 @@
+import './default-types';
 import './enums';
 import './refinement';
 import './params';

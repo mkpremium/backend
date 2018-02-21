@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import uuid from 'uuid/v4';
 import squel from 'squel';
 import {N1qlQuery} from 'couchbase';
@@ -12,23 +13,6 @@ class CouchbaseModelStruct {
   constructor() {
     throw new Error('you should define this.Struct as a t.struct');
   }
-}
-
-function hydrate(struct, value) {
-  if (!value) {
-    return value;
-  }
-
-  const hydratedObject = {};
-  Object.keys(value).forEach(propName => {
-    const prop = struct.meta.props[propName];
-    // Date type
-    if (prop && /^\??Date$/.test(prop.displayName)) {
-      hydratedObject[propName] = new Date(value[propName]);
-    }
-  });
-
-  return Object.assign({}, value, hydratedObject);
 }
 
 export class EmbeddedModel {
@@ -134,8 +118,7 @@ export class CouchbaseModel {
       await this._promiseBucket;
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
-        const hydrated = hydrate(this.Struct, result.value);
-        return new this.Struct(hydrated);
+        return fromJSON(result.value, this.Struct);
       }
 
       return null;
