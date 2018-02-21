@@ -5,16 +5,22 @@ import {OperatorRepository} from './models';
 async function login(req, res) {
   const repo = new OperatorRepository();
   const operator = await repo.findByCredential(req.body);
-  const token = await repo.createToken(operator);
-
-  res.json(t.AuthenticatedResponse({
-    token,
-    roles: operator.roles,
+  const tokenPayload = {
+    id: operator.id,
+    permissions: operator.roles,
     operator: {
       id: operator.id,
       name: operator.profile.fullName(),
       username: operator.username
     }
+  };
+
+  const token = await OperatorRepository.createToken(tokenPayload);
+
+  res.json(t.AuthenticatedResponse({
+    token,
+    roles: operator.roles,
+    operator: tokenPayload.operator
   }));
 }
 

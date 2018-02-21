@@ -63,11 +63,7 @@ export class OperatorRepository extends Operator {
     return new this.Struct(operator);
   }
 
-  async createToken(operator) {
-    const payload = {
-      id: operator.id,
-      permissions: operator.roles
-    };
+  static async createToken(payload) {
     const options = {
       expiresIn: jwt.expiresIn
     };
