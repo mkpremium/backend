@@ -36,7 +36,7 @@ jobs:
       # run tests!
       - run:
           name: Running testing
-          command: MOCHA_FILE=~/test-results/junit.xml NODE_ENV=test npm test -- --reporter mocha-circleci-reporter
+          command: NODE_ENV=test npm test -- --reporter mocha-circleci-reporter
 
       - run:
           name: Testing build
@@ -88,7 +88,7 @@ jobs:
 
       - run:
           name: Building & Deploying Files
-          command: npm run deploy -- ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
+          command: npm run deploy -- centos@ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
 
 workflows:
   version: 2

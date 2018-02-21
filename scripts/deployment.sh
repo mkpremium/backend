@@ -13,7 +13,7 @@ validate_nvm() {
   local remote_dir=$2
 
   local local_file=`readlink -f ${DIR}/../build/.nvmrc`
-  local md5sum=`ssh bitdistrict-m1 "md5sum ${remote_dir}/.nvmrc" | awk '{print $1}'`
+  local md5sum=`ssh ${host} "md5sum ${remote_dir}/.nvmrc" | awk '{print $1}'`
   local md5file=${DIR}/../build/MD5SUM
 
   echo "${local_file}  ${md5sum}" > ${md5file}
