@@ -75,7 +75,7 @@ cd ${deploy_dir}
 nvm use
 ${remove_node_modules}
 npm install
-pm2 restart ${app_name}
+pm2 reload --update-env ${app_name}
 EOF
 }
 
