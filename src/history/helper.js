@@ -11,7 +11,7 @@ async function getOperatorUsername(id) {
     return operator.username;
   }
   return '';
-};
+}
 
 function getModelName(contextModel) {
   if (!contextModel) return 'UNDEFINED';
@@ -53,20 +53,21 @@ function getRecordDescription(model, username) {
     OPEN: `${username} ha abierto ${recordContext}`,
     LIST: `${username} ha listado ${getRecordContext(model, true)}`
   };
-};
+}
 
-export async function getRecordStruct(type, contextModel, user) {
+export async function getHistoryStruct({type, contextModel, user}) {
   const model = getModelName(contextModel);
   const username = await getOperatorUsername(user.id);
   const recordType = contextModel ? type : 'ERROR';
   const id = getModelId(contextModel);
 
   return {
-    model,
-    id,
+    model: {
+      name: model,
+      id
+    },
     user: {
-      id: user.id,
-      permissions: user.permissions
+      id: user.id
     },
     type: recordType,
     description: getRecordDescription(model, username)[type],

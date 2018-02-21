@@ -1,11 +1,12 @@
 import t from 'tcomb';
 
-t.Record = t.struct({
-  model: t.String,
-  id: t.String,
+t.History = t.struct({
+  model: t.struct({
+    name: t.String,
+    id: t.String
+  }),
   user: t.struct({
-    id: t.String,
-    permissions: t.list(t.OperatorRole)
+    id: t.String
   }),
   type: t.RecordAction,
   description: t.String,
@@ -13,8 +14,8 @@ t.Record = t.struct({
   _documentType: t.String
 },
 {
-  name: 'Record',
+  name: 'History',
   defaultProps: {
-    _documentType: 'record'
+    _documentType: 'history'
   }
 });
