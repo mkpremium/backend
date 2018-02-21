@@ -43,10 +43,11 @@ jobs:
           command: npm run build
 
       - store_artifacts:
-          path: ~/test-results/
+          path: ~/test-results/junit.xml
+          prefix: test
 
       - store_test_results:
-          path: ~/test-results/
+          path: junit.xml
 
   deploy:
     docker:
@@ -78,12 +79,16 @@ jobs:
       - add_ssh_keys
 
       - run:
+          name: install deps
+          command: sudo apt install -y rsync
+
+      - run:
           name: Adding deploy host keys to known hosts
           command: ssh-keyscan -H ec2-34-248-103-55.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
 
       - run:
           name: Building & Deploying Files
-          command: TERM=dumb npm run deploy -- ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
+          command: npm run deploy -- ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
 
 workflows:
   version: 2
