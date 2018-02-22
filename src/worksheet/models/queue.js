@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
@@ -40,7 +41,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(404, `Cola para ciudad ${name} no encontrada`);
     }
 
-    return new this.Struct(queue);
+    return fromJSON(queue, this.Struct);
   }
 
   async list(query = {}) {

@@ -17,3 +17,5 @@ export const jwt = {
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10);
 
 export const reportDir = process.env.REPORT_DIR || 'app/csv';
+
+export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);

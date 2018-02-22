@@ -1,3 +1,11 @@
+import {errorVerbosity} from '../../config';
+
+const level = {
+  NONE: 0,
+  MESSAGE: 1,
+  STACK: 2
+};
+
 /**
  * @swagger
  * definitions:
@@ -6,7 +14,6 @@
  *       message:
  *         type: string
  */
-
 function appErrorHandler(err, req, res, next) {
   if (res.headersSent) {
     return next(err);
@@ -26,10 +33,13 @@ function appErrorHandler(err, req, res, next) {
     err.code = 500;
   }
 
-  if (err.code === 500) {
-    console.error(err);
-  } else {
-    console.error(err.message);
+  switch (errorVerbosity) {
+    case level.MESSAGE:
+      console.error(err.message);
+      break;
+    case level.STACK:
+      console.error(err);
+      break;
   }
 
   res.status(err.code || 500);
