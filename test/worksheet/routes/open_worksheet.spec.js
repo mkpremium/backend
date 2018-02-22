@@ -31,12 +31,12 @@ describe('worksheet.routes', () => {
 
   describe('queue.routes', () => {
     describe('POST /worksheets/queues/:city @request', () => {
-      it('204 Toma el item de la cola', async() => {
+      it('200 Toma el item de la cola', async() => {
         await request(app)
           .post('/worksheets/queues/madrid')
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
-          .expect(204);
+          .expect(200);
 
         const response = await request(app)
           .get('/worksheets/queues/madrid')
@@ -91,14 +91,27 @@ describe('worksheet.routes', () => {
           .expect(204);
       });
 
-      it('204 Despues de liberarse puede tomarse de nuevo el item', async() => {
-        return request(app)
+      it('200 Despues de liberarse puede tomarse de nuevo el item', async() => {
+        const response = await request(app)
           .post('/worksheets/queues/madrid')
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             queueItemId: queueItems[0].id
           })
-          .expect(204);
+          .expect(200);
+        response.body.should.be.a('object');
+        response.body.should.have.a.property('relatedOwners');
+        response.body.relatedOwners.should.be.a('array');
+      });
+
+      it('409 No puede tomar mas de un item', async() => {
+        return request(app)
+          .post('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
+          .send({
+            queueItemId: queueItems[1].id
+          })
+          .expect(409);
       });
     });
   });

@@ -40,14 +40,12 @@ async function actionsOnWorksheetQueue(req, res) {
 
   switch (params.action) {
     case QueueRequestAction.TAKE:
-      await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id);
-      break;
+      const worksheet = await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      return res.json(worksheet);
     case QueueRequestAction.RELEASE:
       await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id);
-      break;
+      return res.status(204).send();
   }
-
-  res.status(204).send();
 }
 
 export const worksheetListController = wrap(worksheetList);

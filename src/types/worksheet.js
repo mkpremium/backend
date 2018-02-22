@@ -35,6 +35,7 @@ t.WorkSheet = t.struct({
     realizedAt: t.Date
   })),
   queueId: t.maybe(t.String),
+  buildingIds: t.list(String),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.maybe(t.list(t.Owner)),
   status: t.WorkSheetStatus,
@@ -48,6 +49,8 @@ t.WorkSheet = t.struct({
   defaultProps: {
     status: 'OPEN',
     relatedOwnerIds: [],
+    relatedOwners: [],
+    buildingIds: [],
     calls: [],
     _documentType: 'worksheet'
   }
@@ -73,12 +76,16 @@ t.QueueItem = t.struct(
     id: t.maybe(t.String),
     worksheetId: t.String,
     operatorId: t.maybe(t.String),
-    status: t.WorkSheetQueueStatus
+    status: t.WorkSheetQueueStatus,
+    addedAt: t.Date
   },
   {
     name: 'QueueItem',
     defaultProps: {
-      status: Queue.Status.AVAILABLE
+      status: Queue.Status.AVAILABLE,
+      get addedAt() {
+        return new Date();
+      }
     }
   }
 );
@@ -132,4 +139,8 @@ t.WorksheetQueue = t.struct(
 
 t.WorksheetQueue.prototype.findItemById = function(id) {
   return find(this.worksheets, {id});
+};
+
+t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
+  return find(this.worksheets, {operatorId});
 };

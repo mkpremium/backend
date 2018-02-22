@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
@@ -40,7 +41,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(404, `Cola para ciudad ${name} no encontrada`);
     }
 
-    return new this.Struct(queue);
+    return fromJSON(queue, this.Struct);
   }
 
   async list(query = {}) {
@@ -50,7 +51,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       .offset(params.offset);
     const total = await this.countQuery();
     const results = await this.query(qb);
-    return t.QueueListResponse({total, results});
+    return fromJSON({total, results}, t.QueueListResponse);
   }
 
   async addWorksheetAndSave(queue, worksheet) {
@@ -62,10 +63,13 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async addWorksheet(queue, worksheet) {
     const itemRepo = new QueueItemRepository();
-    if (worksheet.queue) {
-      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queue})`);
+    const worksheetRepo = new WorksheetRepository();
+
+    if (worksheet.queueId) {
+      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`);
     }
 
+    await worksheetRepo.save(t.update(worksheet, {queueId: {$set: queue.id}}));
     return itemRepo.save({worksheetId: worksheet.id});
   }
 
@@ -79,7 +83,11 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`);
     }
 
-    // TODO: validate operator no have another item opened in the queue
+    const operatorItem = queue.findItemByOperatorId(operatorId);
+
+    if (operatorItem) {
+      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente`);
+    }
 
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findById(item.worksheetId);
@@ -95,7 +103,9 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
-    return this.save(updatedQueue);
+    await this.save(updatedQueue);
+
+    return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
   }
 
   async releaseWorksheetInQueue(queue, itemId) {
