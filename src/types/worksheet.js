@@ -49,6 +49,7 @@ t.WorkSheet = t.struct({
   defaultProps: {
     status: 'OPEN',
     relatedOwnerIds: [],
+    relatedOwners: [],
     buildingIds: [],
     calls: [],
     _documentType: 'worksheet'

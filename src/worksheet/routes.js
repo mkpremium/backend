@@ -188,9 +188,11 @@ router.get('/queues/:city', queueByCityController);
  *           $ref: "#/definitions/QueueRequestParams"
  *     responses:
  *       200:
- *         description: Abre y Obtiene la ficha con exito
+ *         description: Toma el item de la cola
  *         schema:
  *           $ref: "#/definitions/Worksheet"
+ *       204:
+ *         description: Libera la cola correctamente
  *       401:
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:

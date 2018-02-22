@@ -103,7 +103,9 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
-    return this.save(updatedQueue);
+    await this.save(updatedQueue);
+
+    return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
   }
 
   async releaseWorksheetInQueue(queue, itemId) {
