@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../../db/model';
 import {utc} from '../../lib/date';
 import {newHttpError} from '../../lib/http-error';
@@ -63,6 +64,6 @@ export class WorksheetRepository extends Worksheet {
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);
 
-    return t.WorkSheetLitResponse({total, results});
+    return fromJSON({total, results}, t.WorkSheetLitResponse);
   }
 }

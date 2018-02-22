@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import bcrypt from 'bcrypt';
 import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
@@ -60,7 +61,7 @@ export class OperatorRepository extends Operator {
       throw errorInvalidCreds;
     }
 
-    return new this.Struct(operator);
+    return fromJSON(operator, this.Struct);
   }
 
   static async createToken(payload) {
@@ -86,6 +87,6 @@ export class OperatorRepository extends Operator {
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);
 
-    return t.OperatorListResponse({total, results});
+    return fromJSON({total, results}, t.OperatorListResponse);
   }
 }

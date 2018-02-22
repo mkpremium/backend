@@ -51,7 +51,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       .offset(params.offset);
     const total = await this.countQuery();
     const results = await this.query(qb);
-    return t.QueueListResponse({total, results});
+    return fromJSON({total, results}, t.QueueListResponse);
   }
 
   async addWorksheetAndSave(queue, worksheet) {
