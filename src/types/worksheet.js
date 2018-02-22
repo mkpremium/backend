@@ -133,3 +133,7 @@ t.WorksheetQueue = t.struct(
 t.WorksheetQueue.prototype.findItemById = function(id) {
   return find(this.worksheets, {id});
 };
+
+t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
+  return find(this.worksheets, {operatorId});
+};

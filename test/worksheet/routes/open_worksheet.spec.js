@@ -100,6 +100,16 @@ describe('worksheet.routes', () => {
           })
           .expect(204);
       });
+
+      it('409 No puede tomar mas de un item', async() => {
+        return request(app)
+          .post('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
+          .send({
+            queueItemId: queueItems[1].id
+          })
+          .expect(409);
+      });
     });
   });
 });

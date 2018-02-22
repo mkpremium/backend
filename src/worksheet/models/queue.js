@@ -79,7 +79,11 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`);
     }
 
-    // TODO: validate operator no have another item opened in the queue
+    const operatorItem = queue.findItemByOperatorId(operatorId);
+
+    if (operatorItem) {
+      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente`);
+    }
 
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findById(item.worksheetId);
