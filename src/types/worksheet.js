@@ -82,7 +82,7 @@ t.QueueItem = t.struct(
     name: 'QueueItem',
     defaultProps: {
       status: Queue.Status.AVAILABLE,
-      addedAt: function() {
+      get addedAt() {
         return new Date();
       }
     }
