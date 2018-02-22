@@ -106,3 +106,18 @@ t.Address = t.struct(
     name: 'Address'
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   ContactValue:
+ *     properties:
+ *       value:
+ *         type: string
+ *         required: true
+ */
+t.ContactValue = t.struct(
+  {
+    value: t.String
+  }
+);

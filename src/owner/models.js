@@ -55,7 +55,6 @@ export class PersonRepository extends Person {
 export class OwnerRepository extends Owner {
   async findByIdOrThrow(ownerId) {
     const owner = await this.findById(ownerId);
-
     if (!owner) {
       throw newHttpError(404, `El propietario ${ownerId} no existe`);
     }
@@ -117,5 +116,20 @@ export class OwnerRepository extends Owner {
     const owner = await this.findByIdOrThrow(ownerId);
 
     return personRepo.addContact(owner.personId, body);
+  }
+  
+  async getContactPhoneNumber(ownerId, contact) {
+    const personRepo = new PersonRepository();
+    const contactValue = t.ContactValue(contact);
+    const owner = await this.findById(ownerId);
+    const person = await personRepo.findById(owner.personId);
+
+    const ownerContactValue = person.findContact(contactValue);
+
+    if (!ownerContactValue) {
+      throw newHttpError(400, `El número de contacto para el owner ${ownerId} no existe`);
+    }
+
+    return ownerContactValue;
   }
 }

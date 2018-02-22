@@ -37,3 +37,10 @@ t.PersonType = t.enums({
   NATURAL: 'NATURAL',
   JURIDICA: 'JURIDICA'
 });
+
+// TODO: Use real status from Numintec API
+t.CallStatus = t.enums({
+  INICIADA: 'INICIADA',
+  EN_PROGRESO: 'EN_PROGRESO',
+  FINALIZADA: 'FINALIZADA'
+}, 'CallStatus');
