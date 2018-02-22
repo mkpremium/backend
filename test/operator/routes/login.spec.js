@@ -57,7 +57,7 @@ describe('operator.routes', () => {
       response.body.operator.should.have.a.property('username');
     });
 
-    it('401 Credenciales invalidos', async() => {
+    it('401 Credenciales inválidos', async() => {
       const requester = request(app);
       const response = await requester
         .post('/operators/login')

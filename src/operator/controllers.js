@@ -37,6 +37,11 @@ async function listOperator(req, res) {
   res.json(operators);
 }
 
+async function me(req, res) {
+  res.json(req.user);
+}
+
 export const loginController = wrap(login);
 export const createOperatorController = wrap(createOperator);
 export const listOperatorController = wrap(listOperator);
+export const meController = wrap(me);

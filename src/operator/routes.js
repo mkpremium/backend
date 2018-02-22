@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {createOperatorController, listOperatorController, loginController} from './controllers';
+import {createOperatorController, listOperatorController, loginController, meController} from './controllers';
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
@@ -122,5 +122,7 @@ router.post('/', permissions.admin, createOperatorController);
  *           $ref: "#/definitions/Error"
  */
 router.get('/', permissions.admin, listOperatorController);
+
+router.get('/me', meController);
 
 export default router;
