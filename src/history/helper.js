@@ -1,17 +1,6 @@
 import t from 'tcomb';
-import {Operator} from '../operator/models';
 
 const recordContexts = t.RecordContext.meta.map;
-
-async function getOperatorUsername(id) {
-  const repo = new Operator();
-  const operator = await repo.findById(id);
-
-  if (operator) {
-    return operator.username;
-  }
-  return '';
-}
 
 function getModelName(contextModel) {
   if (!contextModel) return 'UNDEFINED';
@@ -57,7 +46,7 @@ function getRecordDescription(model, username) {
 
 export async function getHistoryStruct({type, contextModel, user}) {
   const model = getModelName(contextModel);
-  const username = await getOperatorUsername(user.id);
+  const username = user.operator.username;
   const recordType = contextModel ? type : 'ERROR';
   const id = getModelId(contextModel);
 

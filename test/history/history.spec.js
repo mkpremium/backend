@@ -50,7 +50,12 @@ describe('history.register', () => {
       await operatorRepo.deleteQuery();
       savedOperator = await operatorRepo.save(modelStruct);
       reqUser = {
-        id: savedOperator.id
+        id: savedOperator.id,
+        operator: {
+          username: 'test',
+          agentNumber: '10106-905',
+          serviceId: '17146'
+        }
       };
       socketClient = await socketioClient.connectServer();
 
