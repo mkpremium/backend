@@ -44,7 +44,7 @@ async function call(from, phone, serviceId) {
     }
     throw newHttpError(400, e);
   }
-};
+}
 
 async function hangup(id) {
   try {
@@ -57,7 +57,7 @@ async function hangup(id) {
     }
     throw newHttpError(400, e);
   }
-};
+}
 
 export const requestCall = wrap(call);
 export const requestHangup = wrap(hangup);

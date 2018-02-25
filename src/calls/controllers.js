@@ -11,13 +11,13 @@ async function call(req, res) {
   const phoneValue = await owner.getContactPhoneNumber(id, req.body);
   const call = await requestCall(from, phoneValue, serviceId);
   res.status(200).send(call);
-};
+}
 
 async function hangup(req, res) {
   const id = req.params.callId;
   await requestHangup(id);
   res.status(204).send();
-};
+}
 
 export const callController = wrap(call);
 export const hangupController = wrap(hangup);

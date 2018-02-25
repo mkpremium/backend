@@ -26,6 +26,10 @@ t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
  *         type: array
  *         items:
  *           $ref: "#/definitions/Owner"
+ *       relatedBuildings:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/Building"
  *
  */
 t.WorkSheet = t.struct({
@@ -35,7 +39,7 @@ t.WorkSheet = t.struct({
     realizedAt: t.Date
   })),
   queueId: t.maybe(t.String),
-  buildingIds: t.list(String),
+  relatedBuildingIds: t.list(String),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.maybe(t.list(t.Owner)),
   status: t.WorkSheetStatus,
@@ -50,7 +54,7 @@ t.WorkSheet = t.struct({
     status: 'OPEN',
     relatedOwnerIds: [],
     relatedOwners: [],
-    buildingIds: [],
+    relatedBuildingIds: [],
     calls: [],
     _documentType: 'worksheet'
   }

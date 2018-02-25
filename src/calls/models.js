@@ -6,4 +6,4 @@ export class Calls extends CouchbaseModel {
     super();
     this.Struct = t.Calls;
   }
-};
+}
