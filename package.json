@@ -43,7 +43,7 @@
     "supertest": "^3.0.0",
     "swagger-jsdoc": "^1.9.7",
     "swagger-ui-dist": "^3.10.0",
-    "tcomb": "3.2.24",
+    "tcomb": "git://github.com/gcanti/tcomb.git#a5367d025a7b94a7a3ee7880de8f540f1434f784",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
