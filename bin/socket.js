@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import express from 'express';
+import {Server} from 'http';
 import debug from 'debug';
 
 import {socket as socketConfig} from '../config';
@@ -9,13 +10,14 @@ import socket from '../src/socket';
 const socketDebug = debug('app:socket');
 
 const app = express();
-const server = app.listen(socketConfig.port, listenHandler);
-socket.start(server);
+const httpServer = Server(app);
+const server = httpServer.listen(socketConfig.port, listenHandler);
+socket.start(httpServer);
 
 server.on('error', errorHandler);
 
 function listenHandler() {
-  const addr = server.address();
+  const addr = httpServer.address();
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;

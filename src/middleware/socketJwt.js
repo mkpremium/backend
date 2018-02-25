@@ -1,25 +1,31 @@
 import debug from 'debug';
-import jsonwebtoken from 'jsonwebtoken';
+import {verify} from 'jsonwebtoken';
+import _get from 'lodash/get';
 import {jwt} from '../../config';
 
 const socketJwtDebug = debug('app:socket:jwt');
 
-const verifyToken = (token) => {
-  return jsonwebtoken.verify(token, jwt.secret);
-};
+async function verifySocketToken(socket) {
+  const token = _get(socket, 'handshake.query.token', null);
+  try {
+    return verify(token, jwt.secret);
+  } catch (e) {
+    throw new Error(`[authentication error] ${e.message}`, e);
+  }
+}
 
 function socketJwt(sockets) {
   return (socket, next) => {
-    socketJwtDebug('verifying JWT');
-    const token = socket.handshake.query.token;
-    const decodedToken = verifyToken(token);
-
-    if (decodedToken) {
-      socket.decoded_token = decodedToken;
-      sockets[decodedToken.id] = socket;
-      return next();
-    }
-    return next(new Error('authentication error'));
+    verifySocketToken(socket)
+      .then(user => {
+        socket.user = user;
+        sockets[user.id] = socket;
+        next();
+      })
+      .catch(err => {
+        socketJwtDebug('error', err);
+        next(err);
+      });
   };
 }
 

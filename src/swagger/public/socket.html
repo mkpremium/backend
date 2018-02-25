@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Socket doc</title>
+</head>
+<body>
+<script src="http://localhost:9002/socket.io/socket.io.js"></script>
+<form id="connection">
+  <label for="authToken">JWT</label>
+  <input type="text" name="authToken" id="authToken">
+  <input type="submit" value="CONNECT">
+</form>
+<div id="console"></div>
+<script>
+  var socket;
+
+  function openConnection() {
+    closeConnection();
+    var authToken = document.getElementById('authToken').value;
+    socket = io('http://localhost:9002', {
+      query: 'token=' + authToken
+    });
+    attachListeners();
+  }
+
+  function attachListeners() {
+    if (!socket) {
+      return;
+    }
+    socket.on('welcome', (event) => {
+      const text = document.createTextNode(new Date() + ' : ' + JSON.stringify(event));
+      const p = document.createElement('p');
+      p.appendChild(text);
+      document.getElementById('console').appendChild(p);
+    })
+  }
+
+  function closeConnection() {
+    if (socket) {
+      socket.disconnect();
+    }
+  }
+
+  function init() {
+    document.getElementById('connection').addEventListener('submit', (event) => {
+      event.preventDefault();
+      openConnection();
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
