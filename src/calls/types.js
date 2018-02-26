@@ -9,12 +9,15 @@ import t from 'tcomb';
  *         type: string
  *         format: uuid/v4
  *         description: Id de registro de llamada
+*       from:
+ *         type: string
+ *         description: Extension que realiza la llamada
  *       to:
  *         type: string
  *         description: Numero a quien se realizo la llamada
- *       data:
- *         type: object
- *         descripcion: Detalles de peticion de llamada realizada
+ *       callId:
+ *         type: integer
+ *         descripcion: Identificador de llamada realizada
  *       date:
  *         type: string
  *         description: Fecha y hora del registro de llamada
@@ -25,17 +28,24 @@ import t from 'tcomb';
  */
 t.Calls = t.struct({
   id: t.maybe(t.String),
+  from: t.String,
   to: t.String,
-  data: t.Object,
+  callId: t.String,
+  events: t.Array,
   date: t.Date,
   status: t.CallStatus,
+  origin: t.String,
   _documentType: t.String
 },
 {
   name: 'Calls',
   defaultProps: {
     status: 'INICIADA',
-    _documentType: 'calls'
+    _documentType: 'calls',
+    origin: 'SYSTEM',
+    get date() {
+      return new Date();
+    }
   }
 });
 
@@ -75,3 +85,8 @@ t.CallErrorResponse = t.struct({
   error_code: t.maybe(t.Integer),
   description: t.String
 }, 'CallErrorResponse');
+
+t.CallsRawEvents = t.struct({
+  content: t.Object,
+  date: t.Date
+}, 'CallsRawEvents');
