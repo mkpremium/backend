@@ -123,6 +123,26 @@ router.post('/', permissions.admin, createOperatorController);
  */
 router.get('/', permissions.admin, listOperatorController);
 
+/**
+ * @swagger
+ * /operators/me:
+ *   get:
+ *     security:
+ *       - admin: []
+ *       - manager: []
+ *       - operator: []
+ *     tags: [Operator]
+ *     summary: Obtiene información acerca del operador actual
+ *     responses:
+ *       200:
+ *         description: Solicitud exitosa
+ *         schema:
+ *           $ref: "#/definitions/Operator"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
 router.get('/me', meController);
 
 export default router;
