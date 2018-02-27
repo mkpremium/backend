@@ -40,6 +40,7 @@ t.WorkSheet = t.struct({
   })),
   queueId: t.maybe(t.String),
   relatedBuildingIds: t.list(String),
+  relatedBuildings: t.list(t.Building),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.maybe(t.list(t.Owner)),
   status: t.WorkSheetStatus,
@@ -55,6 +56,7 @@ t.WorkSheet = t.struct({
     relatedOwnerIds: [],
     relatedOwners: [],
     relatedBuildingIds: [],
+    relatedBuildings: [],
     calls: [],
     _documentType: 'worksheet'
   }
