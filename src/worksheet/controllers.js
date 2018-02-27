@@ -3,6 +3,7 @@ import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
 import {QueueRequestAction} from './types';
+import {OperatorRoles} from '../types/operator';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
@@ -48,8 +49,26 @@ async function actionsOnWorksheetQueue(req, res) {
   }
 }
 
+function operatorIdByPermissions(req) {
+  const allowQuery = req.user.permissions.indexOf(OperatorRoles.MANAGER) !== -1;
+  return allowQuery
+    ? req.query.operationId || req.user.id
+    : req.user.id;
+}
+
+async function queueTakenFindByOperator(req, res) {
+  const operatorId = operatorIdByPermissions(req);
+  const cityName = req.params.city;
+  const repo = new WorksheetQueueRepository();
+  const queue = await repo.findByCity(cityName);
+
+  const queueItem = queue.findItemByOperatorId(operatorId);
+  res.json(queueItem || {});
+}
+
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
 export const queueByCityController = wrap(queueByCity);
 export const queueListController = wrap(queueList);
 export const actionsOnWorksheetQueueController = wrap(actionsOnWorksheetQueue);
+export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator);
