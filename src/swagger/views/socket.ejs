@@ -5,7 +5,7 @@
   <title>Socket doc</title>
 </head>
 <body>
-<script src="http://localhost:9002/socket.io/socket.io.js"></script>
+<script src="<%= socketServer %>:<%= socketPort%>/socket.io/socket.io.js"></script>
 <form id="connection">
   <label for="authToken">JWT</label>
   <input type="text" name="authToken" id="authToken">
@@ -18,7 +18,7 @@
   function openConnection() {
     closeConnection();
     var authToken = document.getElementById('authToken').value;
-    socket = io('http://localhost:9002', {
+    socket = io('<%= socketServer %>:<%= socketPort%>', {
       query: 'token=' + authToken
     });
     attachListeners();

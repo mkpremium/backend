@@ -43,7 +43,7 @@ class SocketServer {
     }
 
     socket.on('disconnect', () => {
-      socketDebug('good bye', msg);
+      socketDebug('goodbye', msg);
     });
   }
 }
