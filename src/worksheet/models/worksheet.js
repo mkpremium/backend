@@ -33,7 +33,7 @@ export class WorksheetRepository extends Worksheet {
 
     if (includes.indexOf('relatedBuildings') !== -1 && worksheet.relatedBuildingIds.length > 0) {
       const buildingRepo = new BuildingRepository();
-      const idsText = `[${worksheet.relatedBuildingIds.join(', ')}]`;
+      const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`;
       const rbQb = await buildingRepo.getQueryBuilder().where(`id IN ${idsText}`);
       const relatedBuildings = await buildingRepo.query(rbQb);
       worksheet = t.update(worksheet, {relatedBuildings: {$set: relatedBuildings}});
