@@ -4,7 +4,6 @@ import uuid from 'uuid/v4';
 import squel from 'squel';
 import {N1qlQuery} from 'couchbase';
 import debug from 'debug';
-import socket from '../socket/client';
 
 import {couchbase} from '../../config';
 
@@ -153,16 +152,18 @@ export class CouchbaseModel {
     const isNewData = !data.id;
     const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
     const dataPreSaved = await this.preSave(dataWithId);
+
     if (!dataPreSaved) {
       throw new Error('it seems you forgot return the data on the preSave(data) method');
     }
+
     await this._promiseBucket;
     const result = this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
-    
+
     if (result && sendEvent) {
-      this.socketClient = await socket.connectServer();
+      const socket = await this._socketPromise;
       const eventType = isNewData ? 'add' : 'update';
-      await this.socketClient.sendEvent(eventType, dataPreSaved);
+      await socket.sendEvent(eventType, dataPreSaved);
     }
 
     return result;
