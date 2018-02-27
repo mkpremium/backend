@@ -15,6 +15,8 @@ import worksheet from './worksheet';
 import owner from './owner';
 import swagger from './swagger';
 import calls from './calls';
+// import numintec from './numintec';
+import schesuledEvents from './scheduledEvents';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -36,6 +38,8 @@ operator(app);
 worksheet(app);
 owner(app);
 calls(app);
+// app.use(numintec);
+schesuledEvents(app);
 app.use(appErrorHandler);
 
 export default app;
