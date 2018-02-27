@@ -39,7 +39,7 @@ t.WorkSheet = t.struct({
     realizedAt: t.Date
   })),
   queueId: t.maybe(t.String),
-  relatedBuildingIds: t.list(String),
+  relatedBuildingIds: t.list(t.String),
   relatedBuildings: t.list(t.Building),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.maybe(t.list(t.Owner)),
