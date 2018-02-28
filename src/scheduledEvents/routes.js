@@ -1,20 +1,26 @@
 import {Router} from 'express';
 
 import {
-  createScheduledEventController,
-  getScheduledEventController,
+  addScheduledEventController,
+  findScheduledEventController,
   listScheduledEventController,
   updateScheduledEnventController,
-  removeScheduledEventController
+  deleteScheduledEventController
 } from './controllers';
 
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
+/**
+ * @swagger
+ * tags:
+ *   name: ScheduledEvents
+ *   description: Eventos Programdos
+ */
 
 /**
  * @swagger
- * /scheduled-events/{id}
+ * /scheduled-events/{id}:
  *  get:
  *    tags: [ScehduledEvents]
  *    summary: Obtiene detalle del evento programado
@@ -37,8 +43,7 @@ const router = Router();
  *      404:
  *        description: Evento no encontrada
  */
-
-router.get('/:id', permissions.operator, getScheduledEventController);
+router.get('/:id', permissions.operator, findScheduledEventController);
 
 /**
  * @swagger
@@ -72,19 +77,19 @@ router.get('/:id', permissions.operator, getScheduledEventController);
  *       - name: createdAt
  *         in: query
  *         type: string
- *         format: dd-mm-YYYY
+ *         format: YYYY-MM-DD
  *       - name: createdBetween
  *         in: query
  *         type: array
  *         items:
  *           type: string
- *           format: dd-mm-YYYY
+ *           format: YYYY-MM-DD
  *       - name: notifyBetween
  *         in: query
  *         type: array
  *         items:
  *           type: string
- *           format: dd-mm-YYYY
+ *           format: YYYY-MM-DD
  *     responses:
  *       200:
  *         description: Lista de eventos programados
@@ -99,57 +104,56 @@ router.get('/:id', permissions.operator, getScheduledEventController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-
 router.get('/', permissions.operator, listScheduledEventController);
 
 /**
  * @swagger
- * /scheduled-events
+ * /scheduled-events:
  *   post:
  *    tags: [ScehduledEvents]
  *    summary: Registra evento programado
  *    description: Permite programar un evento
- *     consumes:
- *       - "application/json"
- *     produces:
- *       - "application/json"
+ *    consumes:
+ *      - "application/json"
+ *    produces:
+ *      - "application/json"
  *    parameters:
  *      - name: body
  *        in: body
  *        required: true
  *        schema:
  *          $ref: "#/definitions/ScheduleEvent"
- *     responses:
- *       201:
- *         description: Operación exitosa
- *         schema:
- *           $ref: "#/definitions/ScheduleEvent"
- *       400:
- *         description: Solicitud incorrecta
- *         schema:
- *           $ref: "#/definitions/Error"
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
- *       403:
- *         description: Permisos insuficientes
- *         schema:
- *           $ref: "#/definitions/Error"
+ *    responses:
+ *      201:
+ *        description: Operación exitosa
+ *        schema:
+ *          $ref: "#/definitions/ScheduleEvent"
+ *      400:
+ *        description: Solicitud incorrecta
+ *        schema:
+ *          $ref: "#/definitions/Error"
+ *      401:
+ *        description: Credenciales inválidos o cuenta deshabilitada
+ *        schema:
+ *          $ref: "#/definitions/Error"
+ *      403:
+ *        description: Permisos insuficientes
+ *        schema:
+ *          $ref: "#/definitions/Error"
 */
-router.post('/', permissions.operator, createScheduledEventController);
+router.post('/', permissions.operator, addScheduledEventController);
 
 /**
  * @swagger
- * /scheduled-events
+ * /scheduled-events:
  *   put:
  *    tags: [ScehduledEvents]
  *    summary: Actualiza evento programado
  *    description: Permite actualizar un evento
- *     consumes:
- *       - "application/json"
- *     produces:
- *       - "application/json"
+ *    consumes:
+ *      - "application/json"
+ *    produces:
+ *      - "application/json"
  *    parameters:
  *      - name: id
  *        in: path
@@ -161,31 +165,31 @@ router.post('/', permissions.operator, createScheduledEventController);
  *        in: body
  *        schema:
  *        $ref: "#/definitions/UpdateScheduledEvent"
- *     responses:
- *       204:
- *         description: Operación exitosa
- *       404:
- *         description: Evento no existe
- *         schema:
- *           $ref: "#/definitions/Error"
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
+ *    responses:
+ *      204:
+ *        description: Operación exitosa
+ *      404:
+ *        description: Evento no existe
+ *        schema:
+ *          $ref: "#/definitions/Error"
+ *      401:
+ *        description: Credenciales inválidos o cuenta deshabilitada
+ *        schema:
+ *          $ref: "#/definitions/Error"
 */
 router.put('/:id', permissions.operator, updateScheduledEnventController);
 
 /**
  * @swagger
- * /scheduled-events
+ * /scheduled-events:
  *   delete:
  *    tags: [ScehduledEvents]
  *    summary: Elimina evento programado
  *    description: Permite eleiminar un evento programdo
- *     consumes:
- *       - "application/json"
- *     produces:
- *       - "application/json"
+ *    consumes:
+ *      - "application/json"
+ *    produces:
+ *      - "application/json"
  *    parameters:
  *      - name: id
  *        in: path
@@ -193,18 +197,18 @@ router.put('/:id', permissions.operator, updateScheduledEnventController);
  *        format: uuid/v4
  *        required: true
  *        description: Id del evento programado
- *     responses:
- *       204:
- *         description: Operación exitosa
- *       404:
- *         description: Evento no existe
- *         schema:
- *           $ref: "#/definitions/Error"
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
+ *    responses:
+ *      204:
+ *        description: Operación exitosa
+ *      404:
+ *        description: Evento no existe
+ *        schema:
+ *          $ref: "#/definitions/Error"
+ *      401:
+ *        description: Credenciales inválidos o cuenta deshabilitada
+ *        schema:
+ *          $ref: "#/definitions/Error"
 */
-router.delete('/:id', permissions.operator, removeScheduledEventController);
+router.delete('/:id', permissions.operator, deleteScheduledEventController);
 
 export default router;

@@ -2,30 +2,29 @@ import t from 'tcomb';
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
-  METTINGS: 'METTINGS'
+  MEETINGS: 'MEETINGS'
 };
 
-t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType));
+t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType');
 
 /**
  * @swagger
  * definitions:
- *   ScheduledEvent:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       userId:
- *         type: string
- *         format: uuid/v4
- *       type:
- *         $ref: "#/definitions/ScheduledEventType"
- *       data:
- *         type: object
- *       notifyAt:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *
+ *  ScheduledEvent:
+ *    properties:
+ *      id:
+ *        type: string
+ *        format: uuid/v4
+ *      userId:
+ *        type: string
+ *        format: uuid/v4
+ *      type:
+ *        $ref: "#/definitions/ScheduledEventType"
+ *      data:
+ *        type: object
+ *      notifyAt:
+ *        type: string
+ *        format: YYYY-MM-DDTHH:MM:SSZ
  */
 t.ScheduledEvent = t.struct(
   {
@@ -34,9 +33,19 @@ t.ScheduledEvent = t.struct(
     type: t.ScheduledEventType,
     data: t.Object,
     notifyAt: t.String,
-    date: t.Date
+    date: t.Date,
+    _documentType: t.String
   },
-  'ScheduledEvent');
+  {
+    name: 'ScheduledEvent',
+    defaultProps: {
+      _documentType: 'scheduledEvent',
+      get date() {
+        return new Date();
+      }
+    }
+  }
+);
 
 /**
  * @swagger
@@ -80,17 +89,16 @@ t.ScheduleEventsListResponse = t.struct(
  *         type: string
  *         format: YYYY-MM-DDTHH:MM:SSZ
  */
-t.UpdateScheduledEvent = t.struct(
-  {
-    type: t.ScheduledEventType,
-    data: t.Object,
-    notifyAt: t.String
-  },
-  'UpdateScheduledEvent');
+
+t.UpdateScheduledEvent = t.struct({
+  type: t.maybe(t.ScheduledEventType),
+  data: t.maybe(t.Object),
+  notifyAt: t.maybe(t.String)
+}, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(
   {
-    userId: t.String,
+    userId: t.maybe(t.String),
     notifyAt: t.maybe(t.String),
     createdAt: t.maybe(t.String),
     createdBetween: t.maybe(t.StringSplitList),
