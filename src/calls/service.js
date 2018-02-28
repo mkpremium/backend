@@ -59,5 +59,5 @@ async function hangup(id) {
   }
 }
 
-export const requestCall = wrap(call);
-export const requestHangup = wrap(hangup);
+export const requestCall = call;
+export const requestHangup = hangup;

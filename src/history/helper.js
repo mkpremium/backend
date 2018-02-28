@@ -44,7 +44,7 @@ function getRecordDescription(model, username) {
   };
 }
 
-export async function getHistoryStruct({type, contextModel, user}) {
+export function getHistoryStruct({type, contextModel, user}) {
   const model = getModelName(contextModel);
   const username = user.operator.username;
   const recordType = contextModel ? type : 'ERROR';

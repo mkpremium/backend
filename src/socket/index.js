@@ -24,20 +24,17 @@ class SocketServer {
     });
 
     this.io.use(socketJwt(this.io.sockets));
-
     this.io.on('connection', this.onConnection);
   }
 
   onConnection(socket) {
-    const msg = `user ${socket.user.id}/${socket.user.operator.name}`;
+    const msg = `user ${socket.id} ${socket.user.id}/${socket.user.operator.name}`;
     socketDebug('welcome', msg);
     this.io.emit('welcome', msg); // TODO: send to only users with role X
 
     if (socket.user.id === SYSTEM_ID) {
       socket.on('event', (data, ack) => {
-        socketDebug('Sending event');
-        const eventName = getEventName(data);
-        this.io.emit(eventName, data);
+        this.io.emit(data.payload.type, data);
         ack(true);
       });
     }
@@ -46,14 +43,6 @@ class SocketServer {
       socketDebug('goodbye', msg);
     });
   }
-}
-
-function getEventName(event) {
-  const type = event.payload.type.split('-')[0];
-  if (type === 'add') {
-    return `${event.model}:new`;
-  }
-  return `${event.model}:${event.id}`;
 }
 
 function start(server) {

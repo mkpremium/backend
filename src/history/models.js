@@ -11,49 +11,36 @@ export class History extends CouchbaseModel {
   }
 
   async register(eventData, sendEvent = true) {
-    const data = await getHistoryStruct(eventData);
-    const savedRecord = await this.save(data, sendEvent);
-
-    if (!savedRecord) {
-      console.error(`Error on saving record for ${eventData.contextModel}`);
-      return false;
-    }
-
-    return savedRecord;
+    return this.save(getHistoryStruct(eventData), sendEvent);
   }
 
   static async registerCreate(eventData, sendEvent = true) {
     const history = new History();
     eventData.type = 'CREATE';
-    const record = await history.register(eventData, sendEvent);
-    return record;
+    return history.register(eventData, sendEvent);
   }
 
   static async registerGet(eventData, sendEvent = true) {
     const history = new History();
     eventData.type = 'GET';
-    const record = await history.register(eventData, sendEvent);
-    return record;
+    return history.register(eventData, sendEvent);
   }
 
   static async registerUpdate(eventData, sendEvent = true) {
     const history = new History();
     eventData.type = 'UPDATE';
-    const record = await history.register(eventData, sendEvent);
-    return record;
+    return history.register(eventData, sendEvent);
   }
 
   static async registerOpen(eventData, sendEvent = true) {
     const history = new History();
     eventData.type = 'OPEN';
-    const record = await history.register(eventData, sendEvent);
-    return record;
+    return history.register(eventData, sendEvent);
   }
 
   static async registerList(eventData, sendEvent = true) {
     const history = new History();
     eventData.type = 'LIST';
-    const record = await history.register(eventData, sendEvent);
-    return record;
+    return history.register(eventData, sendEvent);
   }
 }

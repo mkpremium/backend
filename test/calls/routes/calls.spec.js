@@ -4,7 +4,7 @@ import app from '../../../src/app';
 import {OperatorRepository} from '../../../src/operator/models';
 import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
-import {operatorLogin} from '../../common';
+import {deleteAll, operatorLogin} from '../../common';
 
 describe('calls.routes', () => {
   let owner;
@@ -12,10 +12,7 @@ describe('calls.routes', () => {
   let authenticatedOperator;
   before(async() => {
     await app.locals.bucketPromise;
-    const ownerRepo = new OwnerRepository();
-    const personRepo = new PersonRepository();
-    await ownerRepo.deleteQuery();
-    await personRepo.deleteQuery();
+    await deleteAll();
 
     const operatorRepo = new OperatorRepository();
     await operatorRepo.save({

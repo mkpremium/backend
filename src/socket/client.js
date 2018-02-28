@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import t from 'tcomb';
+import debug from 'debug';
 
 import {socket as socketConfig} from '../../config';
 import './types';
@@ -7,10 +8,12 @@ import {OperatorRepository} from '../operator/models';
 import {defer} from '../lib/promise-util';
 
 const SYSTEM_ID = 'system';
+const debugClient = debug('app:socket:server-client');
 
 export class SocketClient {
   constructor(socket) {
     this.socket = socket;
+    this.on = this.socket.on;
   }
 
   static buildEvent(type, body) {
@@ -19,7 +22,7 @@ export class SocketClient {
       model: documentType,
       id: body.id,
       payload: {
-        type: `${type}-${documentType}`,
+        type: `${documentType}:${type}`,
         data: body
       },
       timestamp: new Date()
@@ -27,18 +30,20 @@ export class SocketClient {
   }
 
   async sendEvent(type, body) {
-    if (this.socket || !this.socket.connected) {
+    if (!this.socket || !this.socket.connected) {
       throw new Error('No conectado al servidor de sockets');
     }
 
     const event = SocketClient.buildEvent(type, body);
     const {promise, resolve, reject} = defer();
 
+    debugClient('emitting', event.payload.type);
+
     this.socket.emit('event', event, ack => {
       if (!ack) {
         reject(Error('Evento no pudo ser enviando'));
       } else {
-        resolve();
+        resolve(ack);
       }
     });
 
@@ -57,7 +62,7 @@ export async function connectServer() {
 
   const token = await OperatorRepository.createToken(payload);
   const options = {
-    transports: ['polling', 'websocket'],
+    transports: ['websocket'],
     query: {
       token
     }
@@ -72,12 +77,12 @@ export async function connectServer() {
     });
 
     socket.on('connect_error', (error) => {
+      debugClient('connect_error', error.message);
       reject(error);
     });
 
     socket.on('reconnect_attempt', () => {
-      socket.io.opts.transports = options.transports;
-      socket.io.opts.query = options.query;
+      debugClient('reconnect_attempt');
     });
   });
 }

@@ -158,11 +158,11 @@ export class CouchbaseModel {
     }
 
     await this._promiseBucket;
-    const result = this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+    const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
 
     if (result && sendEvent) {
       const socket = await this._socketPromise;
-      const eventType = isNewData ? 'add' : 'update';
+      const eventType = isNewData ? 'new' : data.id;
       await socket.sendEvent(eventType, dataPreSaved);
     }
 

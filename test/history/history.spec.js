@@ -4,9 +4,10 @@ import sinon from 'sinon';
 import t from 'tcomb';
 
 import socket from '../../src/socket';
-import socketioClient from '../../src/socket/client';
 import {OperatorRepository} from '../../src/operator/models';
 import {History} from '../../src/history/models';
+import {deleteAll} from '../common';
+import {defer} from '../../src/lib/promise-util';
 
 const port = process.env.SOCKET_PORT || '9002';
 
@@ -23,31 +24,30 @@ const modelStruct = t.Operator({
   agentNumber: '4483-944'
 });
 
+async function assertEventWasCalled(client, eventName, timeout = 500) {
+  const {promise, resolve, reject} = defer();
+  client.on(eventName, () => resolve());
+  setTimeout(() => reject(new Error(`assertEventWasCalled ${eventName} await timeout`)), timeout);
+
+  return promise;
+}
+
 describe('history.register', () => {
-  const app = express();
-  let server;
-  let socketClient;
-  
   before((done) => {
-    server = http.Server(app);
+    const app = express();
+    const server = http.Server(app);
+    server.listen(port, () => done());
     socket.start(server);
-    server.listen(port);
-    done();
   });
-  
-  after((done) => {
-    server.close();
-    done();
-  });
-  
+
   describe('event', () => {
-    const spy = sinon.spy();
     let savedOperator;
     let reqUser;
+    let client;
 
-    beforeEach(async() => {
+    before(async() => {
+      await deleteAll();
       const operatorRepo = new OperatorRepository();
-      await operatorRepo.deleteQuery();
       savedOperator = await operatorRepo.save(modelStruct);
       reqUser = {
         id: savedOperator.id,
@@ -57,19 +57,16 @@ describe('history.register', () => {
           serviceId: '17146'
         }
       };
-      socketClient = await socketioClient.connectServer();
-
-      socketClient.on('history:new', (data) => {
-        spy();
-      });
+      client = await socket();
     });
-    
+
     it('should register CREATE history', async() => {
       const savedRecord = await History.registerCreate({
         contextModel: savedOperator,
         user: reqUser
       }, true);
       savedRecord.description.should.be.equal('test ha creado Operador');
+      await assertEventWasCalled(client, 'history:new');
     });
 
     it('should register LIST history', async() => {
@@ -110,10 +107,6 @@ describe('history.register', () => {
         user: reqUser
       }, true);
       savedRecord.type.should.be.equal('ERROR');
-    });
-
-    it('should receive record event', async() => {
-      await sinon.assert.match(spy.called, true);
     });
   });
 });

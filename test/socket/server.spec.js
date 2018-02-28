@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import t from 'tcomb';
 
 import socket from '../../src/socket';
-import socketClient from '../../src/socket/client';
+import {connectServer} from '../../src/socket/client';
 
 const port = process.env.SOCKET_PORT || '9002';
 
@@ -35,9 +35,9 @@ describe('socket.server', () => {
 
   before((done) => {
     server = http.Server(app);
+    server.listen(port, () => done());
     socket.start(server);
-    server.listen(port);
-    done();
+    socket();
   });
 
   after((done) => {
@@ -48,9 +48,9 @@ describe('socket.server', () => {
   describe('event', () => {
     let client;
     beforeEach(async() => {
-      client = await socketClient.connectServer();
+      client = await connectServer();
     });
-    
+
     it('should emit an event', async() => {
       const messageSent = await client.sendEvent('add', modelStruct);
       sinon.assert.match(messageSent, true);
