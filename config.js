@@ -5,6 +5,7 @@ export const socket = {
   port: parseInt(process.env.SOCKET_PORT || '9002'),
   server: process.env.SOCKET_SERVER || 'http://localhost'
 };
+export const cronjobsPort = parseInt(process.env.CRONJOBS_PORT || '9003');
 export const couchbase = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
   bucket: process.env.COUCHBASE_BUCKET || 'mkpremium',

@@ -43,7 +43,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async list(query = {}) {
-    const params = new t.ScheduledEventListQuery(query);
+    const params = t.ScheduledEventListQuery(query);
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset);

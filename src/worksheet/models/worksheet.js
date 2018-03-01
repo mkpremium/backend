@@ -1,7 +1,10 @@
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../../db/model';
-import {utc} from '../../lib/date';
+import {
+  addDateQueryToBuilder,
+  addBetweenQueryToBuilder
+} from '../../lib/query/helpers';
 import {newHttpError} from '../../lib/http-error';
 import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
@@ -55,19 +58,11 @@ export class WorksheetRepository extends Worksheet {
     }
 
     if (params.viewedAt) {
-      const m = utc(params.viewedAt);
-      qb.where('viewedAt >= ?', m.clone().startOf('day').toDate());
-      qbCount.where('viewedAt <= ?', m.clone().endOf('day').toDate());
+      addDateQueryToBuilder(qb, 'viewedAt', params.viewedAt);
+      addDateQueryToBuilder(qbCount, 'viewedAt', params.viewedAt);
     } else {
-      const [start, end] = params.viewedBetween.split(',').map(d => d ? utc(d) : d);
-      if (start) {
-        qb.where('viewedAt >= ?', start.startOf('day').toDate());
-        qbCount.where('viewedAt >= ?', start.startOf('day').toDate());
-      }
-      if (end) {
-        qb.where('viewedAt <= ?', end.endOf('day').toDate());
-        qbCount.where('viewedAt <= ?', end.endOf('day').toDate());
-      }
+      addBetweenQueryToBuilder(qb, 'viewedAt', params.viewedBetween);
+      addBetweenQueryToBuilder(qbCount, 'viewedAt', params.viewedBetween);
     }
 
     const total = await this.countQuery(qbCount);
