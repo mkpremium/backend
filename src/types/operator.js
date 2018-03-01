@@ -1,11 +1,13 @@
 import t from 'tcomb';
 
-t.OperatorRole = t.enums({
+export const OperatorRoles = {
   OPERATOR: 'OPERATOR',
   MANAGER: 'MANAGER',
   BUSINESS: 'BUSINESS',
-  ADMIN: 'MANAGER'
-});
+  ADMIN: 'ADMIN'
+};
+
+t.OperatorRole = t.enums(OperatorRoles);
 
 /**
  * @swagger

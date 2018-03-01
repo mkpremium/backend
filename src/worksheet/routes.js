@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {
   worksheetFindByIdController, worksheetListController, queueByCityController, queueListController,
-  actionsOnWorksheetQueueController
+  actionsOnWorksheetQueueController, queueTakenFindByOperatorController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -165,6 +165,30 @@ router.get('/:id', worksheetFindByIdController);
  *           $ref: "#/definitions/Error"
  */
 router.get('/queues/:city', queueByCityController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{city}/taken:
+ *   get:
+ *     tags: [Manager, Operator]
+ *     security:
+ *       - manager: []
+ *       - operator: []
+ *     summary: Devuelve el item activo por el operador
+ *     parameters:
+ *       - name: city
+ *         in: path
+ *         description: Ciudad de la cola de trabajo
+ *         required: true
+ *         type: string
+ *       - name: operatorId
+ *         in: query
+ *         description: Especifica el operador a consultar (solo manager)
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ */
+router.get('/queues/:city/taken', queueTakenFindByOperatorController);
 
 /**
  * @swagger
