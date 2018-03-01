@@ -17,6 +17,7 @@ async function findByIdScheduledEvent(req, res) {
 
 async function addScheduledEvent(req, res) {
   const repo = new ScheduledEventsRepository();
+  req.body.notifyAt = new Date(req.body.notifyAt);
   const scheduledEvent = await repo.save(req.body);
   res.status(201).json(scheduledEvent);
 }

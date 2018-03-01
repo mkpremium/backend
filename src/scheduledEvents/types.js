@@ -32,7 +32,7 @@ t.ScheduledEvent = t.struct(
     userId: t.maybe(t.String),
     type: t.ScheduledEventType,
     data: t.Object,
-    notifyAt: t.String,
+    notifyAt: t.Date,
     date: t.Date,
     _documentType: t.String
   },
@@ -93,7 +93,7 @@ t.ScheduleEventsListResponse = t.struct(
 t.UpdateScheduledEvent = t.struct({
   type: t.maybe(t.ScheduledEventType),
   data: t.maybe(t.Object),
-  notifyAt: t.maybe(t.String)
+  notifyAt: t.maybe(t.Date)
 }, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(

@@ -20,8 +20,9 @@ describe('scheduledevents.routes', () => {
       userId: authenticatedOperator.operator.id,
       type: 'CALLS',
       data: {from: 'test', to: 'test'},
-      notifyAt: '2018-02-28T16:24:39Z'
+      notifyAt: new Date('2018-02-28T16:24:00Z')
     };
+
     await Promise.all(times(49, () => scheduledEventRepo.save(scheduledEventObject)));
     scheduledEventToBeUpdated = await scheduledEventRepo.save(scheduledEventObject);
   });
@@ -89,6 +90,18 @@ describe('scheduledevents.routes', () => {
         response.body.results.should.have.length(0);
       });
 
+      it('notifyAt query param', async() => {
+        const response = await request(app)
+          .get('/scheduled-events')
+          .set('Authorization', authenticatedOperator.authorization)
+          .query({notifyAt: '2018-02-28T16:24:00Z'})
+          .expect(200);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(50);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(20);
+      });
+
       it('createdBetween query param', async() => {
         const response = await request(app)
           .get('/scheduled-events')
@@ -133,7 +146,7 @@ describe('scheduledevents.routes', () => {
       await request(app)
         .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
         .set('Authorization', authenticatedOperator.authorization)
-        .send({type: 'MEETINGS', data: {}, notifyAt: '2018-02-28T16:24:39Z'})
+        .send({type: 'MEETINGS', data: {}, notifyAt: new Date('2018-02-28T16:24:39Z')})
         .expect(204);
     });
   });

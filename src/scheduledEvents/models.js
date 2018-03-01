@@ -3,6 +3,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
 import {
   addDateQueryToBuilder,
+  addMinuteDateQueryToBuilder,
   addBetweenQueryToBuilder
 } from '../lib/query/helpers';
 import {newHttpError} from '../lib/http-error';
@@ -25,7 +26,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async update(id, data = {}) {
-    const changes = t.UpdateScheduledEvent(data);
+    const updateData = data;
+    updateData.notifyAt = updateData.notifyAt ? new Date(updateData.notifyAt) : null;
+    const changes = t.UpdateScheduledEvent(updateData);
     const scheduleEvent = await this.findByIdOrThrow(id);
     const updatedscheduledEvent = t.update(scheduleEvent, {$merge: changes});
 
@@ -55,8 +58,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       addDateQueryToBuilder(qb, 'date', params.createdAt);
       addDateQueryToBuilder(qbCount, 'date', params.createdAt);
     } else if (params.notifyAt) {
-      addDateQueryToBuilder(qb, 'notifyAt', params.notifyAt);
-      addDateQueryToBuilder(qbCount, 'notifyAt', params.notifyAt);
+      addMinuteDateQueryToBuilder(qb, 'notifyAt', params.notifyAt);
+      addMinuteDateQueryToBuilder(qbCount, 'notifyAt', params.notifyAt);
     } else if (params.notifyBetween) {
       addBetweenQueryToBuilder(qb, 'date', params.notifyBetween);
       addBetweenQueryToBuilder(qbCount, 'date', params.notifyBetween);
