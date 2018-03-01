@@ -62,7 +62,6 @@ export async function connectServer() {
 
   const token = await OperatorRepository.createToken(payload);
   const options = {
-    transports: ['websocket'],
     query: {
       token
     }
@@ -72,6 +71,7 @@ export async function connectServer() {
     const socket = io(serverUri, options);
 
     socket.on('connect', () => {
+      debugClient('client connected');
       const client = new SocketClient(socket);
       resolve(client);
     });

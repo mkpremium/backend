@@ -2,7 +2,6 @@ import request from 'supertest';
 import {resolve} from 'path';
 import app from '../../../src/app';
 import {OperatorRepository} from '../../../src/operator/models';
-import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 import {deleteAll, operatorLogin} from '../../common';
 

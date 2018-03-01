@@ -1,6 +1,5 @@
 import axios from 'axios';
 import t from 'tcomb';
-import {wrap} from 'express-promise-wrap';
 import {newHttpError} from '../lib/http-error';
 
 import {Calls} from './models';

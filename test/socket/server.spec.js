@@ -35,9 +35,11 @@ describe('socket.server', () => {
 
   before((done) => {
     server = http.Server(app);
-    server.listen(port, () => done());
-    socket.start(server);
-    socket();
+    server.listen(port, () => {
+      socket.startServer(server);
+      socket.initModel();
+      done();
+    });
   });
 
   after((done) => {
@@ -46,14 +48,19 @@ describe('socket.server', () => {
   });
 
   describe('event', () => {
+    const spy = sinon.spy();
     let client;
-    beforeEach(async() => {
+    before(async() => {
       client = await connectServer();
+      client.socket.on('operator:add', (data) => {
+        spy();
+      });
     });
 
     it('should emit an event', async() => {
       const messageSent = await client.sendEvent('add', modelStruct);
       sinon.assert.match(messageSent, true);
+      await sinon.assert.match(spy.called, true);
     });
 
     it('should emit a custom event', async() => {

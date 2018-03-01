@@ -12,11 +12,12 @@ const socketDebug = debug('app:socket');
 const app = express();
 const httpServer = Server(app);
 const server = httpServer.listen(socketConfig.port, listenHandler);
-socket.start(httpServer);
 
 server.on('error', errorHandler);
 
 function listenHandler() {
+  socket.startServer(httpServer);
+  socket.initModel();
   const addr = httpServer.address();
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr

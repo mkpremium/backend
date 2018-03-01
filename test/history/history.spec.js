@@ -4,10 +4,11 @@ import sinon from 'sinon';
 import t from 'tcomb';
 
 import socket from '../../src/socket';
+import {connectServer} from '../../src/socket/client';
 import {OperatorRepository} from '../../src/operator/models';
 import {History} from '../../src/history/models';
 import {deleteAll} from '../common';
-import {defer} from '../../src/lib/promise-util';
+// import {defer} from '../../src/lib/promise-util';
 
 const port = process.env.SOCKET_PORT || '9002';
 
@@ -24,23 +25,25 @@ const modelStruct = t.Operator({
   agentNumber: '4483-944'
 });
 
-async function assertEventWasCalled(client, eventName, timeout = 500) {
-  const {promise, resolve, reject} = defer();
-  client.on(eventName, () => resolve());
-  setTimeout(() => reject(new Error(`assertEventWasCalled ${eventName} await timeout`)), timeout);
-
-  return promise;
-}
-
 describe('history.register', () => {
+  let server;
   before((done) => {
     const app = express();
-    const server = http.Server(app);
-    server.listen(port, () => done());
-    socket.start(server);
+    server = http.Server(app);
+    server.listen(port, () => {
+      socket.startServer(server);
+      socket.initModel();
+      done();
+    });
+  });
+
+  after((done) => {
+    server.close();
+    done();
   });
 
   describe('event', () => {
+    const spy = sinon.spy();
     let savedOperator;
     let reqUser;
     let client;
@@ -57,7 +60,11 @@ describe('history.register', () => {
           serviceId: '17146'
         }
       };
-      client = await socket();
+      client = await connectServer();
+
+      client.socket.on('history:new', (data) => {
+        spy();
+      });
     });
 
     it('should register CREATE history', async() => {
@@ -66,7 +73,7 @@ describe('history.register', () => {
         user: reqUser
       }, true);
       savedRecord.description.should.be.equal('test ha creado Operador');
-      await assertEventWasCalled(client, 'history:new');
+      await sinon.assert.match(spy.called, true);
     });
 
     it('should register LIST history', async() => {

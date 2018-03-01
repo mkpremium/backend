@@ -45,15 +45,13 @@ class SocketServer {
   }
 }
 
-function start(server) {
+function startServer(server) {
   return new SocketServer(server);
 }
 
-function Init() {
+function initModel() {
   CouchbaseModel.prototype._socketPromise = connectServer();
   return CouchbaseModel.prototype._socketPromise;
 }
 
-Init.start = start;
-
-export default Init;
+export default {startServer, initModel};
