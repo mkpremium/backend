@@ -1,6 +1,7 @@
 import {CronJob} from 'cron';
 import debug from 'debug';
 import {utc} from '../lib/date';
+import {connectServer} from '../../src/socket/client';
 
 import '../types';
 import './types';
@@ -13,16 +14,17 @@ const timeZone = 'UTC';
 const time = '*/1 * * * *';
 
 async function seekEventsToNotify() {
-  cronjobsDebug(`Seeking scheduled events at 2018-03-01T14:55:00.000Z`); // ${utc().startOf('minute').toISOString()}`);
+  cronjobsDebug(`Seeking scheduled events at ${utc().startOf('minute').toISOString()}`);
   const repo = new ScheduledEventsRepository();
   const query = {
-    notifyAt: '2018-03-01T14:55:00.000Z' // utc().startOf('minute').toISOString()
+    notifyAt: utc().startOf('minute').toISOString()
   };
   const events = await repo.list(query);
   cronjobsDebug(`Found ${events.total} events`);
   if (events.total > 0) {
-    events.results.map((scheduleEvent) => {
-      cronjobsDebug(`Emitting event for user ${scheduleEvent.userId}`);
+    events.results.map(async(scheduleEvent) => {
+      const socket = await connectServer();
+      await socket.sendEvent('notification', scheduleEvent);
     });
   }
 }

@@ -11,13 +11,14 @@
     "build": "scripts/build.sh",
     "predeploy": "npm run build",
     "socket": "better-npm-run socket",
-    "deploy": "scripts/deployment.sh"
+    "deploy": "scripts/deployment.sh",
+    "cronjobs": "better-npm-run cronjobs"
   },
   "betterScripts": {
     "start": "nodemon bin/www.js --exec babel-node",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "deploy": "scripts/deployment.sh",
-    "cronjobs": "better-npm-run cronjobs"
+    "cronjobs": "nodemon bin/cronjobs.js --exec babel-node"
   },
   "dependencies": {
     "axios": "^0.17.1",
