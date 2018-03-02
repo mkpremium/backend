@@ -52,6 +52,14 @@ export class Calls extends CouchbaseModel {
     return this.save(updatedCall);
   }
 
+  async updateNote(callId, note) {
+    const changes = t.UpdateCallNote({note});
+    const call = await this.findByCallId(callId);
+
+    const updatedCall = t.update(call, {$merge: changes});
+    return this.save(updatedCall);
+  }
+
   async findOrCreate(body) {
     const callId = getCallId(body);
     let call = await this.findByCallId(callId);

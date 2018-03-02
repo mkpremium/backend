@@ -33,9 +33,7 @@ async function call(from, phone, serviceId) {
     const call = model.save({
       from: from,
       to: phone.value,
-      callId: result.data.id,
-      events: [],
-      status: t.CallStatus.INICIADA
+      callId: result.data.id
     });
     return call;
   } catch (e) {

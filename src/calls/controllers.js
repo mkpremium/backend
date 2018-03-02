@@ -40,6 +40,14 @@ async function webhook(req, res) {
   res.status(200).send(updatedCall);
 }
 
+async function updateNote(req, res) {
+  const id = req.params.callId;
+  const model = new Calls();
+  await model.updateNote(id, req.body.note);
+  res.status(204).send();
+}
+
 export const callController = wrap(call);
 export const hangupController = wrap(hangup);
 export const webhookController = wrap(webhook);
+export const updateNoteController = wrap(updateNote);

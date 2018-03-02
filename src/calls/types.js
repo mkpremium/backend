@@ -18,6 +18,9 @@ import t from 'tcomb';
  *       callId:
  *         type: integer
  *         descripcion: Identificador de llamada realizada
+ *       note:
+ *         type: string
+ *         descripcion: Nota de llamada
  *       date:
  *         type: string
  *         description: Fecha y hora del registro de llamada
@@ -31,6 +34,7 @@ t.Calls = t.struct({
   from: t.String,
   to: t.String,
   callId: t.String,
+  note: t.String,
   events: t.Array,
   date: t.Date,
   status: t.CallStatus,
@@ -45,7 +49,9 @@ t.Calls = t.struct({
     origin: 'SYSTEM',
     get date() {
       return new Date();
-    }
+    },
+    events: [],
+    note: ''
   }
 });
 
@@ -90,3 +96,15 @@ t.CallsRawEvents = t.struct({
   content: t.Object,
   date: t.Date
 }, 'CallsRawEvents');
+
+/**
+ * @swagger
+ * definitions:
+ *   UpdateCallNote:
+ *     properties:
+ *       note:
+ *         type: string
+ */
+t.UpdateCallNote = t.struct({
+  note: t.maybe(t.String)
+}, 'UpdateCallNote');
