@@ -41,7 +41,6 @@ calls(app);
 scheduledEvents(app);
 webhooks(app);
 
-
 app.use(appErrorHandler);
 
 export default app;

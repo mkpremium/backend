@@ -1,5 +1,3 @@
-export const encodePlusSign = (string) => {
-  return string.replace(/\+/g, '%2B');
 import _get from 'lodash/get';
 import {CallsRawEvents} from './models';
 import {CallStatus} from '../types/enums';
