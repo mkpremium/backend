@@ -52,11 +52,13 @@ export class Calls extends CouchbaseModel {
     return this.save(updatedCall);
   }
 
-  async updateNote(callId, note) {
-    const changes = t.UpdateCallNote({note});
+  async addNote(callId, note) {
+    const newNote = t.AddCallNote({note});
     const call = await this.findByCallId(callId);
 
-    const updatedCall = t.update(call, {$merge: changes});
+    const updatedNotes = t.update(call.notes, {$push: [newNote]});
+    const updatedCall = t.update(call, {notes: {$merge: updatedNotes}});
+    
     return this.save(updatedCall);
   }
 

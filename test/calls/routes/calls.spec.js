@@ -20,6 +20,7 @@ describe('calls.routes', () => {
   let callObject;
   let webhookEventStartCall;
   let webhookEventToBeOmitted;
+  let callsModel;
 
   before(async() => {
     await app.locals.bucketPromise;
@@ -33,7 +34,7 @@ describe('calls.routes', () => {
     });
 
     const operatorRepo = new OperatorRepository();
-    const callsModel = new Calls();
+    callsModel = new Calls();
 
     await operatorRepo.save({
       username: 'callerOperator',
@@ -123,16 +124,18 @@ describe('calls.routes', () => {
     });
   });
 
-  describe('PUT /calls/note/:callId @request', () => {
-    it('204 Operación fallida', async() => {
+  describe('POST /calls/note/:callId @request', () => {
+    it('204 Operación exitosa', async() => {
       const callId = callObject.callId;
       await request(app)
-        .put(`/calls/note/${callId}`)
+        .post(`/calls/note/${callId}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           note: 'Test note'
         })
         .expect(204);
+      const call = await callsModel.findByCallId(callId);
+      call.notes.should.have.length(1);
     });
   });
 

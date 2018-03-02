@@ -1,5 +1,10 @@
 import {Router} from 'express';
-import {callController, hangupController, webhookController, updateNoteController} from './controllers';
+import {
+  callController,
+  hangupController,
+  webhookController,
+  addNoteController
+} from './controllers';
 import {permissions} from '../middleware/jwt';
 
 const call = Router();
@@ -84,14 +89,14 @@ call.post('/hangup/:callId', permissions.operator, hangupController);
  *      - name: body
  *        in: body
  *        schema:
- *          $ref: "#/definitions/UpdateCallNote"
+ *          $ref: "#/definitions/AddCallNote"
  *     responses:
  *       204:
  *         description: Peticion exitosa
  *       400:
  *         description: Error en la peticion
  */
-call.put('/note/:callId', permissions.operator, updateNoteController);
+call.post('/note/:callId', permissions.operator, addNoteController);
 
 webhook.post('/', webhookController);
 

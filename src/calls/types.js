@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import uuid from 'uuid/v4';
 
 /**
  * @swagger
@@ -34,7 +35,7 @@ t.Calls = t.struct({
   from: t.String,
   to: t.String,
   callId: t.String,
-  note: t.String,
+  notes: t.Array,
   events: t.Array,
   date: t.Date,
   status: t.CallStatus,
@@ -51,7 +52,7 @@ t.Calls = t.struct({
       return new Date();
     },
     events: [],
-    note: ''
+    notes: []
   }
 });
 
@@ -100,11 +101,17 @@ t.CallsRawEvents = t.struct({
 /**
  * @swagger
  * definitions:
- *   UpdateCallNote:
+ *   AddCallNote:
  *     properties:
  *       note:
  *         type: string
  */
-t.UpdateCallNote = t.struct({
+t.AddCallNote = t.struct({
+  id: t.maybe(t.String),
   note: t.maybe(t.String)
-}, 'UpdateCallNote');
+}, {
+  name: 'AddCallNote',
+  defaultProps: {
+    id: uuid()
+  }
+});
