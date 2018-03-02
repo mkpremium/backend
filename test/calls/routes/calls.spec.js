@@ -1,12 +1,19 @@
+import http from 'http';
+import express from 'express';
 import request from 'supertest';
 import {resolve} from 'path';
 import app from '../../../src/app';
+
+import socket from '../../../src/socket';
 import {OperatorRepository} from '../../../src/operator/models';
 import {Calls} from '../../../src/calls/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 import {deleteAll, operatorLogin} from '../../common';
 
+const port = process.env.SOCKET_PORT || '9002';
+
 describe('calls.routes', () => {
+  let server;
   let owner;
   let person;
   let authenticatedOperator;
@@ -16,6 +23,13 @@ describe('calls.routes', () => {
   before(async() => {
     await app.locals.bucketPromise;
     await deleteAll();
+
+    const socketApp = express();
+    server = http.Server(socketApp);
+    server.listen(port, () => {
+      socket.startServer(server);
+      socket.initModel();
+    });
 
     const operatorRepo = new OperatorRepository();
 
@@ -61,6 +75,11 @@ describe('calls.routes', () => {
         called: '10106-905'
       }
     };
+  });
+
+  after((done) => {
+    server.close();
+    done();
   });
 
   describe('POST /calls/owner/:id @request', () => {
