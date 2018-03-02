@@ -27,9 +27,10 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async update(id, data = {}) {
     const updateData = data;
-    updateData.notifyAt = updateData.notifyAt ? new Date(updateData.notifyAt) : null;
-    const changes = t.UpdateScheduledEvent(updateData);
     const scheduleEvent = await this.findByIdOrThrow(id);
+    updateData.notifyAt = updateData.notifyAt ? new Date(updateData.notifyAt) : scheduleEvent.notifyAt;
+    updateData.eventDate = updateData.eventDate ? new Date(updateData.eventDate) : scheduleEvent.eventDate;
+    const changes = t.UpdateScheduledEvent(updateData);
     const updatedscheduledEvent = t.update(scheduleEvent, {$merge: changes});
 
     return this.save(updatedscheduledEvent);
@@ -65,6 +66,12 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     } else if (params.notifyAt) {
       addMinuteDateQueryToBuilder(qb, 'notifyAt', params.notifyAt);
       addMinuteDateQueryToBuilder(qbCount, 'notifyAt', params.notifyAt);
+    } else if (params.eventDate) {
+      addDateQueryToBuilder(qb, 'eventDate', params.eventDate);
+      addDateQueryToBuilder(qbCount, 'eventDate', params.eventDate);
+    } else if (params.eventDateBetween) {
+      addBetweenQueryToBuilder(qb, 'eventDate', params.eventDateBetween);
+      addBetweenQueryToBuilder(qbCount, 'eventDate', params.eventDateBetween);
     } else if (params.notifyBetween) {
       addBetweenQueryToBuilder(qb, 'notifyAt', params.notifyBetween);
       addBetweenQueryToBuilder(qbCount, 'notifyAt', params.notifyBetween);

@@ -25,6 +25,9 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *      notifyAt:
  *        type: string
  *        format: YYYY-MM-DDTHH:MM:SSZ
+  *      eventDate:
+ *        type: string
+ *        format: YYYY-MM-DDTHH:MM:SSZ
  */
 t.ScheduledEvent = t.struct(
   {
@@ -33,6 +36,7 @@ t.ScheduledEvent = t.struct(
     type: t.ScheduledEventType,
     data: t.Object,
     notifyAt: t.Date,
+    eventDate: t.Date,
     date: t.Date,
     _documentType: t.String
   },
@@ -93,7 +97,8 @@ t.ScheduleEventsListResponse = t.struct(
 t.UpdateScheduledEvent = t.struct({
   type: t.maybe(t.ScheduledEventType),
   data: t.maybe(t.Object),
-  notifyAt: t.maybe(t.Date)
+  notifyAt: t.maybe(t.Date),
+  eventDate: t.maybe(t.Date)
 }, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(
@@ -102,6 +107,8 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
     notifyAt: t.maybe(t.String),
     type: t.maybe(t.ScheduledEventType),
     createdAt: t.maybe(t.String),
+    eventDate: t.maybe(t.String),
+    eventDateBetween: t.maybe(t.String),
     createdBetween: t.maybe(t.StringSplitList),
     notifyBetween: t.maybe(t.StringSplitList)
   },
@@ -109,7 +116,8 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
     name: 'ScheduledEventListQuery',
     defaultProps: {
       createdBetween: ',',
-      notifyBetween: ','
+      notifyBetween: ',',
+      eventDateBetween: ','
     }
   }
 );

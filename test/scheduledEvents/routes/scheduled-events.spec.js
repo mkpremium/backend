@@ -20,22 +20,24 @@ describe('scheduledevents.routes', () => {
     scheduledMeetingsEventObject = {
       userId: authenticatedOperator.operator.id,
       type: 'MEETINGS',
-      data: {from: 'test', to: 'test'}
+      data: {from: 'test', to: 'test'},
+      notifyAt: new Date('2018-05-28T16:24:00Z')
     };
 
     scheduledCallsEventObject = {
       userId: authenticatedOperator.operator.id,
       type: 'CALLS',
       data: {from: 'test', to: 'test'},
-      notifyAt: new Date('2018-02-28T16:24:00Z')
+      notifyAt: new Date('2018-02-28T16:24:00Z'),
+      eventDate: new Date('2018-02-29T16:24:00Z')
     };
 
     await Promise.all(times(49, () => scheduledEventRepo.save(scheduledCallsEventObject)));
     scheduledEventToBeUpdated = await scheduledEventRepo.save(scheduledCallsEventObject);
     
-    scheduledMeetingsEventObject.notifyAt = new Date('2018-01-05T16:00:00Z');
+    scheduledMeetingsEventObject.eventDate = new Date('2018-01-05T16:00:00Z');
     await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
-    scheduledMeetingsEventObject.notifyAt = new Date('2018-02-05T16:00:00Z');
+    scheduledMeetingsEventObject.eventDate = new Date('2018-02-05T16:00:00Z');
     await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
   });
 
@@ -142,7 +144,7 @@ describe('scheduledevents.routes', () => {
         const response = await request(app)
           .get('/scheduled-events')
           .set('Authorization', authenticatedOperator.authorization)
-          .query({type: 'MEETINGS', notifyBetween: '2018-01-01,2018-02-01'})
+          .query({type: 'MEETINGS', eventDateBetween: '2018-01-01,2018-02-01'})
           .expect(200);
         response.body.should.be.a('object');
         response.body.total.should.equal(3);

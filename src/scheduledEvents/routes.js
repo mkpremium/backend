@@ -82,18 +82,22 @@ router.get('/:id', permissions.operator, findScheduledEventController);
  *         in: query
  *         type: string
  *         format: YYYY-MM-DD
+ *       - name: eventDate
+ *         in: query
+ *         type: string
+ *         format: YYYY-MM-DD
+ *       - name: eventDateBetween
+ *         in: query
+ *         type: string
+ *         format: YYYY-MM-DD,YYYY-MM-DD
  *       - name: createdBetween
  *         in: query
- *         type: array
- *         items:
- *           type: string
- *           format: YYYY-MM-DD
+ *         type: string
+ *         format: YYYY-MM-DD,YYYY-MM-DD
  *       - name: notifyBetween
  *         in: query
- *         type: array
- *         items:
- *           type: string
- *           format: YYYY-MM-DD
+ *         type: string
+ *         format: YYYY-MM-DD,YYYY-MM-DD
  *     responses:
  *       200:
  *         description: Lista de eventos programados
