@@ -54,6 +54,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       qbCount.where('userId = ?', params.userId);
     }
 
+    if (params.type) {
+      qb.where('type = ?', params.type);
+      qbCount.where('type = ?', params.type);
+    }
+
     if (params.createdAt) {
       addDateQueryToBuilder(qb, 'date', params.createdAt);
       addDateQueryToBuilder(qbCount, 'date', params.createdAt);
@@ -61,11 +66,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       addMinuteDateQueryToBuilder(qb, 'notifyAt', params.notifyAt);
       addMinuteDateQueryToBuilder(qbCount, 'notifyAt', params.notifyAt);
     } else if (params.notifyBetween) {
-      addBetweenQueryToBuilder(qb, 'date', params.notifyBetween);
-      addBetweenQueryToBuilder(qbCount, 'date', params.notifyBetween);
+      addBetweenQueryToBuilder(qb, 'notifyAt', params.notifyBetween);
+      addBetweenQueryToBuilder(qbCount, 'notifyAt', params.notifyBetween);
     } else if (params.createdBetween) {
-      addBetweenQueryToBuilder(qb, 'notifyAt', params.createdBetween);
-      addBetweenQueryToBuilder(qbCount, 'notifyAt', params.createdBetween);
+      addBetweenQueryToBuilder(qb, 'date', params.createdBetween);
+      addBetweenQueryToBuilder(qbCount, 'date', params.createdBetween);
     }
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);

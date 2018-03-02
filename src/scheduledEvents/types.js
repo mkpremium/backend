@@ -100,6 +100,7 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
   {
     userId: t.maybe(t.String),
     notifyAt: t.maybe(t.String),
+    type: t.maybe(t.ScheduledEventType),
     createdAt: t.maybe(t.String),
     createdBetween: t.maybe(t.StringSplitList),
     notifyBetween: t.maybe(t.StringSplitList)

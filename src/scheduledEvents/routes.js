@@ -70,6 +70,10 @@ router.get('/:id', permissions.operator, findScheduledEventController);
  *         in: query
  *         type: string
  *         format: uuid/v4
+ *       - name: type
+ *         in: query
+ *         type: string
+ *         description: CALLS | MEETINGS
  *       - name: notifyAt
  *         in: query
  *         type: string

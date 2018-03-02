@@ -8,7 +8,8 @@ import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 
 describe('scheduledevents.routes', () => {
   let authenticatedOperator;
-  let scheduledEventObject;
+  let scheduledMeetingsEventObject;
+  let scheduledCallsEventObject;
   let scheduledEventToBeUpdated;
   before(async() => {
     await deleteAll();
@@ -16,15 +17,26 @@ describe('scheduledevents.routes', () => {
     const scheduledEventRepo = new ScheduledEventsRepository();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     
-    scheduledEventObject = {
+    scheduledMeetingsEventObject = {
+      userId: authenticatedOperator.operator.id,
+      type: 'MEETINGS',
+      data: {from: 'test', to: 'test'}
+    };
+
+    scheduledCallsEventObject = {
       userId: authenticatedOperator.operator.id,
       type: 'CALLS',
       data: {from: 'test', to: 'test'},
       notifyAt: new Date('2018-02-28T16:24:00Z')
     };
 
-    await Promise.all(times(49, () => scheduledEventRepo.save(scheduledEventObject)));
-    scheduledEventToBeUpdated = await scheduledEventRepo.save(scheduledEventObject);
+    await Promise.all(times(49, () => scheduledEventRepo.save(scheduledCallsEventObject)));
+    scheduledEventToBeUpdated = await scheduledEventRepo.save(scheduledCallsEventObject);
+    
+    scheduledMeetingsEventObject.notifyAt = new Date('2018-01-05T16:00:00Z');
+    await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
+    scheduledMeetingsEventObject.notifyAt = new Date('2018-02-05T16:00:00Z');
+    await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
   });
 
   describe('GET /scheduled-events @request', () => {
@@ -35,7 +47,7 @@ describe('scheduledevents.routes', () => {
           .set('Authorization', authenticatedOperator.authorization)
           .expect(200);
         response.body.should.be.a('object');
-        response.body.total.should.equal(50);
+        response.body.total.should.equal(56);
         response.body.results.should.be.a('array');
         response.body.results.should.have.length(20);
       });
@@ -47,7 +59,7 @@ describe('scheduledevents.routes', () => {
           .query({limit: 10})
           .expect(200);
         response.body.should.be.a('object');
-        response.body.total.should.equal(50);
+        response.body.total.should.equal(56);
         response.body.results.should.be.a('array');
         response.body.results.should.have.length(10);
       });
@@ -66,12 +78,12 @@ describe('scheduledevents.routes', () => {
           .expect(200);
 
         responseLimit.body.should.be.a('object');
-        responseLimit.body.total.should.equal(50);
+        responseLimit.body.total.should.equal(56);
         responseLimit.body.results.should.be.a('array');
         responseLimit.body.results.should.have.length(10);
 
         responseOffsetLimit.body.should.be.a('object');
-        responseOffsetLimit.body.total.should.equal(50);
+        responseOffsetLimit.body.total.should.equal(56);
         responseOffsetLimit.body.results.should.be.a('array');
         responseOffsetLimit.body.results.should.have.length(5);
 
@@ -109,9 +121,33 @@ describe('scheduledevents.routes', () => {
           .query({createdBetween: '1989-12-27,2018-12-31'})
           .expect(200);
         response.body.should.be.a('object');
-        response.body.total.should.equal(50);
+        response.body.total.should.equal(56);
         response.body.results.should.be.a('array');
         response.body.results.should.have.length(20);
+      });
+
+      it('get scheduled MEETINGS', async() => {
+        const response = await request(app)
+          .get('/scheduled-events')
+          .set('Authorization', authenticatedOperator.authorization)
+          .query({type: 'MEETINGS'})
+          .expect(200);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(6);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(6);
+      });
+
+      it('get scheduled MEETINGS between 2018-01-01 and 2018-02-01', async() => {
+        const response = await request(app)
+          .get('/scheduled-events')
+          .set('Authorization', authenticatedOperator.authorization)
+          .query({type: 'MEETINGS', notifyBetween: '2018-01-01,2018-02-01'})
+          .expect(200);
+        response.body.should.be.a('object');
+        response.body.total.should.equal(3);
+        response.body.results.should.be.a('array');
+        response.body.results.should.have.length(3);
       });
 
       it('Mixed query param', async() => {
@@ -119,14 +155,15 @@ describe('scheduledevents.routes', () => {
           .get('/scheduled-events')
           .set('Authorization', authenticatedOperator.authorization)
           .query({
+            type: 'MEETINGS',
             userId: authenticatedOperator.operator.id,
             createdBetween: '1989-12-27,2018-12-31'
           })
           .expect(200);
         response.body.should.be.a('object');
-        response.body.total.should.equal(50);
+        response.body.total.should.equal(6);
         response.body.results.should.be.a('array');
-        response.body.results.should.have.length(20);
+        response.body.results.should.have.length(6);
       });
     });
   });
@@ -136,7 +173,7 @@ describe('scheduledevents.routes', () => {
       await request(app)
         .post('/scheduled-events')
         .set('Authorization', authenticatedOperator.authorization)
-        .send(scheduledEventObject)
+        .send(scheduledCallsEventObject)
         .expect(201);
     });
   });
