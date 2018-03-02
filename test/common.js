@@ -8,6 +8,7 @@ import {Calls} from '../src/calls/models';
 import {History} from '../src/history/models';
 import {ScheduledEventsRepository} from '../src/scheduledEvents/models';
 
+
 export async function deleteAll() {
   const operator = new OperatorRepository();
   const worksheet = new WorksheetRepository();
@@ -26,7 +27,8 @@ export async function deleteAll() {
     owner.deleteQuery(),
     history.deleteQuery(),
     calls.deleteQuery(),
-    scheduledEvent.deleteQuery()
+    scheduledEvent.deleteQuery(),
+    calls.deleteQuery()
   ]);
 }
 

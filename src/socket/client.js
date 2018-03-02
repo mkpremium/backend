@@ -71,7 +71,7 @@ export async function connectServer() {
     const socket = io(serverUri, options);
 
     socket.on('connect', () => {
-      debugClient('client connected');
+      debugClient('Server client connected');
       const client = new SocketClient(socket);
       resolve(client);
     });

@@ -38,13 +38,6 @@ t.PersonType = t.enums({
   JURIDICA: 'JURIDICA'
 });
 
-// TODO: Use real status from Numintec API
-t.CallStatus = t.enums({
-  INICIADA: 'INICIADA',
-  EN_PROGRESO: 'EN_PROGRESO',
-  FINALIZADA: 'FINALIZADA'
-}, 'CallStatus');
-
 t.EventType = t.enums({
   add: 'add',
   update: 'update',
@@ -73,3 +66,12 @@ t.RecordContext = t.enums({
   WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
   SYSTEM_QUEUE: 'Colas del sistema'
 });
+
+export const CallStatus = {
+  early: 'INICIADA',
+  confirmed: 'EN_PROGRESO',
+  terminated: 'FINALIZADA',
+  unknown: 'DESCONOCIDO'
+};
+
+t.CallStatus = t.enums.of(Object.values(CallStatus), 'CallStatus');

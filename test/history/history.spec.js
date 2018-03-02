@@ -8,7 +8,6 @@ import {connectServer} from '../../src/socket/client';
 import {OperatorRepository} from '../../src/operator/models';
 import {History} from '../../src/history/models';
 import {deleteAll} from '../common';
-// import {defer} from '../../src/lib/promise-util';
 
 const port = process.env.SOCKET_PORT || '9002';
 
