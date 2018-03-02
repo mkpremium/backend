@@ -44,3 +44,32 @@ t.CallStatus = t.enums({
   EN_PROGRESO: 'EN_PROGRESO',
   FINALIZADA: 'FINALIZADA'
 }, 'CallStatus');
+
+t.EventType = t.enums({
+  add: 'add',
+  update: 'update',
+  remove: 'revome',
+  read: 'read',
+  custom: 'custom'
+});
+
+t.RecordAction = t.enums.of([
+  'UPDATE',
+  'CREATE',
+  'GET',
+  'OPEN',
+  'LIST',
+  'ERROR'
+]);
+
+t.RecordContext = t.enums({
+  OWNER: 'Propietario',
+  OWNERS: 'Propietarios',
+  OWNER_CONTACT: 'Contacto de propietario',
+  WORKSHEET: 'Ficha de trabajo',
+  WORKSHEETS: 'Fichas de trabajo',
+  OPERATOR: 'Operador',
+  OPERATORS: 'Operadores',
+  WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
+  SYSTEM_QUEUE: 'Colas del sistema'
+});

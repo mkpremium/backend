@@ -4,6 +4,7 @@ import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
 import {QueueRequestAction} from './types';
 import {OperatorRoles} from '../types/operator';
+import {History} from '../history/models';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
@@ -23,13 +24,20 @@ async function queueByCity(req, res) {
   const cityName = req.params.city;
   const repo = new WorksheetQueueRepository();
   const queue = await repo.findByCity(cityName);
+  await History.registerGet({
+    contextModel: queue,
+    user: req.user
+  }, false);
   res.json(queue);
 }
 
 async function queueList(req, res) {
   const repo = new WorksheetQueueRepository();
   const queues = await repo.list(req.query);
-
+  await History.registerList({
+    contextModel: 'worksheet-queue',
+    user: req.user
+  }, false);
   res.json(queues);
 }
 

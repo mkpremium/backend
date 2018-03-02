@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+
+import express from 'express';
+import {Server} from 'http';
+import debug from 'debug';
+
+import {socket as socketConfig} from '../config';
+import socket from '../src/socket';
+
+const socketDebug = debug('app:socket');
+
+const app = express();
+const httpServer = Server(app);
+const server = httpServer.listen(socketConfig.port, listenHandler);
+
+server.on('error', errorHandler);
+
+function listenHandler() {
+  socket.startServer(httpServer);
+  socket.initModel();
+  const addr = httpServer.address();
+  const bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  socketDebug('Listening on ' + bind);
+}
+
+function errorHandler(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  const bind = typeof socketConfig.port === 'string'
+    ? 'Pipe ' + socketConfig.port
+    : 'Port ' + socketConfig.port;
+
+  // handle specific listen errors with friendly messages
+  // noinspection FallThroughInSwitchStatementJS
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+    default:
+      throw error;
+  }
+}

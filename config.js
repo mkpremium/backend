@@ -1,5 +1,10 @@
 import {N1qlQuery} from 'couchbase';
 export const port = parseInt(process.env.PORT || '9001');
+export const sendRecordEvents = process.env.SEND_RECORD_EVENTS || false;
+export const socket = {
+  port: parseInt(process.env.SOCKET_PORT || '9002'),
+  server: process.env.SOCKET_SERVER || 'http://localhost'
+};
 export const couchbase = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
   bucket: process.env.COUCHBASE_BUCKET || 'mkpremium',

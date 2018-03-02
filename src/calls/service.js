@@ -1,6 +1,5 @@
 import axios from 'axios';
 import t from 'tcomb';
-import {wrap} from 'express-promise-wrap';
 import {newHttpError} from '../lib/http-error';
 
 import {Calls} from './models';
@@ -59,5 +58,5 @@ async function hangup(id) {
   }
 }
 
-export const requestCall = wrap(call);
-export const requestHangup = wrap(hangup);
+export const requestCall = call;
+export const requestHangup = hangup;

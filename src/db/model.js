@@ -108,6 +108,8 @@ export class CouchbaseModel {
 
     const result = await this.query(query);
 
+    debugModel('result unique query ', result);
+
     if (result && result.length) {
       // we can safely omit data with the same id
       if (data.id && data.id === result[0].id) {
@@ -145,14 +147,25 @@ export class CouchbaseModel {
     return data;
   }
 
-  async save(data) {
+  async save(data, sendEvent = false) {
     const struct = new this.Struct(data);
+    const isNewData = !data.id;
     const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
     const dataPreSaved = await this.preSave(dataWithId);
+
     if (!dataPreSaved) {
       throw new Error('it seems you forgot return the data on the preSave(data) method');
     }
+
     await this._promiseBucket;
-    return this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+    const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+
+    if (result && sendEvent) {
+      const socket = await this._socketPromise;
+      const eventType = isNewData ? 'new' : data.id;
+      await socket.sendEvent(eventType, dataPreSaved);
+    }
+
+    return result;
   }
 }

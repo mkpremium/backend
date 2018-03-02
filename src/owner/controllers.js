@@ -1,30 +1,37 @@
 import {wrap} from 'express-promise-wrap';
 import {OwnerRepository} from './models';
+import {History} from '../history/models';
 
 async function updateOwnerContactStatus(req, res) {
   const id = req.params.id;
+  const contextModel = {_documentType: 'owner-contact', id};
   const repo = new OwnerRepository();
   await repo.updateContactStatus(id, req.body);
+  await History.registerUpdate({contextModel, user: req.user}, false);
   res.status(204).send();
 }
 
 async function updateOwner(req, res) {
   const id = req.params.id;
+  const contextModel = {_documentType: 'owner', id};
   const repo = new OwnerRepository();
   await repo.update(id, req.body);
+  await History.registerUpdate({contextModel, user: req.user}, false);
   res.status(204).send();
 }
 
 async function addOwnerContact(req, res) {
   const id = req.params.id;
   const repo = new OwnerRepository();
-  await repo.addContact(id, req.body);
+  const contextModel = await repo.addContact(id, req.body);
+  await History.registerCreate({contextModel, user: req.user}, false);
   res.status(204).send();
 }
 
 async function addOwner(req, res) {
   const repo = new OwnerRepository();
   const owner = await repo.save(req.body);
+  await History.registerCreate({owner, user: req.user}, false);
   res.status(201).json(owner);
 }
 

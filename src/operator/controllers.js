@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {OperatorRepository} from './models';
+import {History} from '../history/models';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -27,6 +28,10 @@ async function login(req, res) {
 async function createOperator(req, res) {
   const repo = new OperatorRepository();
   const result = await repo.save(req.body);
+  await History.registerCreate({
+    contextModel: result,
+    user: req.user
+  }, false);
   res.status(201);
   res.json(result);
 }
@@ -34,6 +39,10 @@ async function createOperator(req, res) {
 async function listOperator(req, res) {
   const repo = new OperatorRepository();
   const operators = await repo.list(req.query);
+  await History.registerList({
+    contextModel: 'operator',
+    user: req.user
+  }, false);
   res.json(operators);
 }
 
