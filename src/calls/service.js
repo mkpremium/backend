@@ -31,9 +31,10 @@ async function call(from, phone, serviceId) {
     const result = await requester.get(`/Call/rest/call/${params}`);
     if (!result.data.status) throw newHttpError(400, result.data.description);
     const call = model.save({
+      from: from,
       to: phone.value,
-      data: result.data,
-      date: new Date(),
+      callId: result.data.id,
+      events: [],
       status: t.CallStatus.INICIADA
     });
     return call;

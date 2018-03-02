@@ -1,9 +1,9 @@
 import {Router} from 'express';
-import {callController, hangupController} from './controllers';
+import {callController, hangupController, webhookController} from './controllers';
 import {permissions} from '../middleware/jwt';
 
-const router = Router();
-
+const call = Router();
+const webhook = Router();
 /**
  * @swagger
  * tags:
@@ -41,7 +41,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-router.post('/owner/:id', permissions.operator, callController);
+call.post('/owner/:id', permissions.operator, callController);
 
 /**
  * @swagger
@@ -65,6 +65,9 @@ router.post('/owner/:id', permissions.operator, callController);
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-router.post('/hangup/:callId', permissions.operator, hangupController);
+call.post('/hangup/:callId', permissions.operator, hangupController);
 
-export default router;
+webhook.post('/', webhookController);
+
+export const callRouter = call;
+export const webhookCallsRouter = webhook;
