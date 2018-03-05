@@ -1,51 +1,39 @@
-import {resolve, join} from 'path';
+import Promise from 'bluebird';
+import {resolve} from 'path';
 import {wrap} from 'express-promise-wrap';
-import models from './models';
-import {csvToJson} from './lib';
+import _mapValues from 'lodash/mapValues';
 
-function createList(name) {
-  return wrap(async(req, res) => {
-    const data = await req.app.locals.bucket.getList(name);
-    res.json({data});
+import pkg from '../../package';
+
+import {uploadDir} from '../../config';
+
+export const migrationViewController = (req, res) => {
+  res.render('migration', {
+    submitted: false,
+    package: pkg
   });
-}
-
-function createImport(name) {
-  return wrap(async(req, res) => {
-    const model = models[name](req.body);
-    console.log('importing', name, model.id);
-    await req.app.locals.bucket.upsertToDb(model.id, model);
-    res.status(204).json();
-  });
-}
-
-const csvBasePath = resolve(__dirname, '../../csv');
-const csvMapNames = {
-  'building': 'EDIFICIOS.csv',
-  'history': 'HISTORIAL.csv',
-  'worksheet': 'LLAMADAS.csv',
-  'operator': 'OPERADORES.csv',
-  'person': 'PERSONAS.csv',
-  'owner': 'PROPIETARIOS.csv',
-  'housestate': 'SITARR.csv'
 };
 
-function createBulkImport(name) {
-  return wrap(async(req, res) => {
-    if (csvMapNames[name]) {
-      throw new Error(`${name} not found on csvMapNames`);
-    }
+async function uploadFiles(req, res) {
+  const files = await Promise.props(_mapValues(req.files, async(file, fileKey) => {
+    const name = resolve(uploadDir, `${fileKey}.csv`);
+    await file.mv(name);
+    return name;
+  }));
 
-    async function processFunc(data) {
+  const gearman = req.app.locals.gearman;
 
-    }
+  const job = gearman.submitJob('cross', JSON.stringify(files));
 
-    const filename = join(csvBasePath, csvMapNames[name]);
-    await csvToJson(filename, processFunc);
-    res.status(204).json();
+  job.on('complete', () => {
+    console.log('cross completed');
+    gearman.submitJob('seed', job.response);
+  });
+
+  res.render('migration', {
+    submitted: true,
+    package: pkg
   });
 }
 
-export const createListController = createList;
-export const createImportController = createImport;
-export const createBulkImportController = createBulkImport;
+export const uploadFilesController = wrap(uploadFiles);

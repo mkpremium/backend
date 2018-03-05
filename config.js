@@ -27,6 +27,11 @@ export const numintec = {
 
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10);
 
-export const reportDir = process.env.REPORT_DIR || 'app/csv';
+export const migrationEnabled = Boolean(process.env.MIGRATION_MODULE || false);
+export const uploadDir = process.env.REPORT_DIR || '/tmp';
+export const gearmanConfig = {
+  host: process.env.GERMAN_HOST || 'localhost',
+  port: parseInt(process.env.GEARMAN_PORT || 4730)
+};
 
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);

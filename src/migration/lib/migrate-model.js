@@ -55,10 +55,10 @@ export class MigrateModel {
     await csvToJson(this.filename, this.processFunc);
   }
 
-  async pushToDatabase() {
-    debugMigrate('importing to db', this.processedData.length, 'records');
+  async pushToDatabase(processedData) {
+    debugMigrate('importing to db', processedData.length, 'records');
     const push = migratedRecord => this.bucket.upsertToDb(migratedRecord.id, migratedRecord);
-    return Promise.mapSeries(this.processedData, push);
+    return Promise.mapSeries(processedData, push);
   }
 
   async run() {
@@ -72,6 +72,6 @@ export class MigrateModel {
 
     await this.importFileToModel();
     this.postImport();
-    return this.pushToDatabase();
+    return this.pushToDatabase(this.processedData);
   }
 }

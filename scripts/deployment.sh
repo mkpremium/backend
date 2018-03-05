@@ -70,7 +70,7 @@ deploy() {
   ssh ${dist_host} bash << EOF
 source ~/.nvm/nvm.sh
 mkdir -p ${deploy_dir}
-tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > dev/null
+tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > /dev/null
 cd ${deploy_dir}
 nvm use
 ${remove_node_modules}

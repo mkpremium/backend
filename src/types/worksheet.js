@@ -38,15 +38,25 @@ t.WorkSheet = t.struct({
     ownerId: t.String,
     realizedAt: t.Date
   })),
+
   queueId: t.maybe(t.String),
+
   relatedBuildingIds: t.list(t.String),
   relatedBuildings: t.list(t.Building),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.maybe(t.list(t.Owner)),
+
   status: t.WorkSheetStatus,
+
+  price: t.struct({
+    maximumToPay: t.Number,
+    askedByOwner: t.Number
+  }, 'WorkSheet/price'),
 
   viewedAt: t.maybe(t.Date),
   viewedBy: t.maybe(t.String),
+
+  _migrateId: t.String,
 
   _documentType: t.enums.of(['worksheet'])
 }, {
@@ -57,6 +67,10 @@ t.WorkSheet = t.struct({
     relatedOwners: [],
     relatedBuildingIds: [],
     relatedBuildings: [],
+    price: {
+      maximumToPay: 0,
+      askedByOwner: 0
+    },
     calls: [],
     _documentType: 'worksheet'
   }

@@ -122,6 +122,22 @@ export class CouchbaseModel {
     }
   }
 
+  async findByMigratedId(migratedId) {
+    const qb = this.getQueryBuilder();
+    const expr = squel.expr()
+      .or('ANY v IN t.`_migrateId` SATISFIES v = ? END', migratedId)
+      .or('t.`_migrateId` = ?', migratedId);
+
+    qb.where(expr);
+    const results = await this.query(qb);
+
+    if (!results || results.length === 0) {
+      throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by _migrateId: ${migratedId}`);
+    }
+
+    return results;
+  }
+
   async findById(id) {
     try {
       debugModel('findById', this.Struct.meta.defaultProps._documentType, id);
