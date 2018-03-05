@@ -56,7 +56,7 @@ t.WorkSheet = t.struct({
   viewedAt: t.maybe(t.Date),
   viewedBy: t.maybe(t.String),
 
-  _migrateId: t.String,
+  _migrateId: t.maybe(t.String),
 
   _documentType: t.enums.of(['worksheet'])
 }, {
