@@ -6,6 +6,7 @@ import app from '../../../src/app';
 
 import socket from '../../../src/socket';
 import {OperatorRepository} from '../../../src/operator/models';
+
 import {Calls} from '../../../src/calls/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 import {deleteAll, operatorLogin} from '../../common';

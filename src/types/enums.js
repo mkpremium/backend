@@ -66,6 +66,7 @@ t.RecordContext = t.enums({
   WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
   SYSTEM_QUEUE: 'Colas del sistema'
 });
+
 export const CallStatus = {
   early: 'INICIADA',
   confirmed: 'EN_PROGRESO',
