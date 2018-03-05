@@ -1,5 +1,10 @@
 import {Router} from 'express';
-import {callController, hangupController, webhookController} from './controllers';
+import {
+  callController,
+  hangupController,
+  webhookController,
+  addNoteController
+} from './controllers';
 import {permissions} from '../middleware/jwt';
 
 const call = Router();
@@ -53,6 +58,7 @@ call.post('/owner/:id', permissions.operator, callController);
  *      - "application/json"
  *     parameters:
  *      - name: callId
+ *        in: path
  *        type: string
  *        description: Id de la llamada registrada
  *     responses:
@@ -66,6 +72,31 @@ call.post('/owner/:id', permissions.operator, callController);
  *           $ref: "#/definitions/CallErrorResponse"
  */
 call.post('/hangup/:callId', permissions.operator, hangupController);
+
+/**
+ * @swagger
+ * /calls/note/{callId}:
+ *   post:
+ *     tags: [Calls]
+ *     summary: Agrega/Actualiza nota en llamada existente
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: callId
+ *        in: path
+ *        type: string
+ *        description: Id de la llamada registrada
+ *      - name: body
+ *        in: body
+ *        schema:
+ *          $ref: "#/definitions/AddCallNote"
+ *     responses:
+ *       204:
+ *         description: Peticion exitosa
+ *       400:
+ *         description: Error en la peticion
+ */
+call.post('/note/:callId', permissions.operator, addNoteController);
 
 webhook.post('/', webhookController);
 

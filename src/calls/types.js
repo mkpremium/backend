@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import uuid from 'uuid/v4';
 
 /**
  * @swagger
@@ -18,6 +19,9 @@ import t from 'tcomb';
  *       callId:
  *         type: integer
  *         descripcion: Identificador de llamada realizada
+ *       note:
+ *         type: string
+ *         descripcion: Nota de llamada
  *       date:
  *         type: string
  *         description: Fecha y hora del registro de llamada
@@ -31,6 +35,7 @@ t.Calls = t.struct({
   from: t.String,
   to: t.String,
   callId: t.String,
+  notes: t.Array,
   events: t.Array,
   date: t.Date,
   status: t.CallStatus,
@@ -45,7 +50,9 @@ t.Calls = t.struct({
     origin: 'SYSTEM',
     get date() {
       return new Date();
-    }
+    },
+    events: [],
+    notes: []
   }
 });
 
@@ -90,3 +97,21 @@ t.CallsRawEvents = t.struct({
   content: t.Object,
   date: t.Date
 }, 'CallsRawEvents');
+
+/**
+ * @swagger
+ * definitions:
+ *   AddCallNote:
+ *     properties:
+ *       note:
+ *         type: string
+ */
+t.AddCallNote = t.struct({
+  id: t.maybe(t.String),
+  note: t.maybe(t.String)
+}, {
+  name: 'AddCallNote',
+  defaultProps: {
+    id: uuid()
+  }
+});

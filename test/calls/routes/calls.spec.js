@@ -18,8 +18,10 @@ describe('calls.routes', () => {
   let owner;
   let person;
   let authenticatedOperator;
+  let callObject;
   let webhookEventStartCall;
   let webhookEventToBeOmitted;
+  let callsModel;
 
   before(async() => {
     await app.locals.bucketPromise;
@@ -33,6 +35,7 @@ describe('calls.routes', () => {
     });
 
     const operatorRepo = new OperatorRepository();
+    callsModel = new Calls();
 
     await operatorRepo.save({
       username: 'callerOperator',
@@ -76,6 +79,13 @@ describe('calls.routes', () => {
         called: '10106-905'
       }
     };
+
+    callObject = {
+      from: '905',
+      to: '+56949826553',
+      callId: '9151938902790598604'
+    };
+    await callsModel.save(callObject);
   });
 
   after((done) => {
@@ -112,6 +122,21 @@ describe('calls.routes', () => {
         .post(`/calls/hangup/${callId}`)
         .set('Authorization', authenticatedOperator.authorization)
         .expect(400);
+    });
+  });
+
+  describe('POST /calls/note/:callId @request', () => {
+    it('204 Operación exitosa', async() => {
+      const callId = callObject.callId;
+      await request(app)
+        .post(`/calls/note/${callId}`)
+        .set('Authorization', authenticatedOperator.authorization)
+        .send({
+          note: 'Test note'
+        })
+        .expect(204);
+      const call = await callsModel.findByCallId(callId);
+      call.notes.should.have.length(1);
     });
   });
 
