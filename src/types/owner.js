@@ -23,6 +23,7 @@ t.Owner = t.struct(
     id: t.maybe(t.String),
     type: t.OwnerType,
     status: t.maybe(t.OwnerStatus),
+    verified: t.Boolean,
 
     personId: t.maybe(t.String), // FIXME: this is required
     buildingId: t.maybe(t.String), // FIXME: this is required
@@ -37,7 +38,7 @@ t.Owner = t.struct(
     name: 'Owner',
     defaultProps: {
       type: 'NINGUNO',
-
+      verified: false,
       _documentType: 'owner',
       _migrateId: []
     }

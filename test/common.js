@@ -7,6 +7,7 @@ import {OwnerRepository, PersonRepository} from '../src/owner/models';
 import {Calls} from '../src/calls/models';
 import {History} from '../src/history/models';
 import {ScheduledEventsRepository} from '../src/scheduledEvents/models';
+import {BuildingRepository} from '../src/building/models';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -17,6 +18,7 @@ export async function deleteAll() {
   const history = new History();
   const calls = new Calls();
   const scheduledEvent = new ScheduledEventsRepository();
+  const building = new BuildingRepository();
 
   return Promise.all([
     operator.deleteQuery(),
@@ -24,6 +26,7 @@ export async function deleteAll() {
     queue.deleteQuery(),
     people.deleteQuery(),
     owner.deleteQuery(),
+    building.deleteQuery(),
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
