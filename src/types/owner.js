@@ -16,6 +16,9 @@ import find from 'lodash/find';
  *         type: string
  *       type:
  *         type: string
+ *       status:
+ *         type: string
+ *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
  */
 
 /**
@@ -36,13 +39,16 @@ import find from 'lodash/find';
  *         type: string
  *       type:
  *         type: string
+ *       status:
+ *         type: string
+ *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
  */
 t.Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
-    status: t.maybe(t.OwnerStatus),
     verified: t.Boolean,
+    status: t.OwnerStatus,
 
     person: t.Object,
     personId: t.maybe(t.String), // FIXME: this should be removed
@@ -59,6 +65,7 @@ t.Owner = t.struct(
     defaultProps: {
       type: 'NINGUNO',
       verified: false,
+      status: 'NO_VERIFICADO',
       _documentType: 'owner',
       _migrateId: [],
       _relatedTo: ''

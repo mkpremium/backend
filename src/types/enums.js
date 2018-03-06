@@ -25,7 +25,7 @@ t.OwnerType = t.enums({
   VECINO: 'VECINO'
 }, 'OwnerType');
 
-t.OwnerStatus = t.enums.of(['BUENO', 'MALO'], 'OwnerStatus');
+t.OwnerStatus = t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO'], 'OwnerStatus');
 
 t.Gender = t.enums({
   NINGUNO: 'NINGUNO',

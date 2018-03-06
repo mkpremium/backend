@@ -70,7 +70,6 @@ export class OwnerRepository extends Owner {
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`;
     const qb = this.getQueryBuilder()
       .where(`id IN ${idsText}`);
-    
     return this.query(qb);
   }
 

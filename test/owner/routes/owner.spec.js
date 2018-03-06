@@ -18,7 +18,7 @@ describe('owner.routes', () => {
 
     ownerToSave = {
       type: 'NINGUNO',
-      status: 'BUENO',
+      status: 'VERIFICADO',
       buildingId: '',
       note: '',
       person: {
@@ -46,14 +46,14 @@ describe('owner.routes', () => {
         .put(`/owners/${ownerToUpdate.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
-          status: 'MALO',
+          status: 'NO_VERIFICADO',
           note: 'This is a sample note'
         })
         .expect(204);
 
       const ownerRepo = new OwnerRepository();
       const updated = await ownerRepo.findById(ownerToUpdate.id);
-      updated.status.should.be.equal('MALO');
+      updated.status.should.be.equal('NO_VERIFICADO');
       updated.note.should.be.equal('This is a sample note');
     });
 
