@@ -18,24 +18,23 @@ const webhook = Router();
 
 /**
  * @swagger
- * /calls/owner/{id}:
+ * /calls/owner/{ownerId}/:contactId:
  *   post:
  *     tags: [Calls, Operator]
  *     summary: Iniciar llamada
- *     consumes:
- *       - "application/json"
  *     produces:
  *      - "application/json"
  *     parameters:
- *      - name: id
+ *      - name: ownerId
  *        in: path
  *        type: string
  *        format: uuid/v4
  *        description: Id del propietario a llamar
- *      - name: body
- *        in: body
- *        schema:
- *          $ref: "#/definitions/ContactValue"
+*      - name: contactId
+ *        in: path
+ *        type: string
+ *        format: uuid/v4
+ *        description: Id del contacto del propietario
  *     responses:
  *       200:
  *         description: Peticion de llamada exitosa
@@ -46,21 +45,16 @@ const webhook = Router();
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-call.post('/owner/:id', permissions.operator, callController);
+call.post('/owner/:ownerId/contact/:contactId', permissions.operator, callController);
 
 /**
  * @swagger
- * /calls/hangup/{callId}:
+ * /calls/hangup:
  *   post:
  *     tags: [Calls]
  *     summary: Colgar llamada
  *     produces:
  *      - "application/json"
- *     parameters:
- *      - name: callId
- *        in: path
- *        type: string
- *        description: Id de la llamada registrada
  *     responses:
  *       204:
  *         description: Peticion exitosa de fin de llamada
@@ -71,7 +65,7 @@ call.post('/owner/:id', permissions.operator, callController);
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-call.post('/hangup/:callId', permissions.operator, hangupController);
+call.post('/hangup', permissions.operator, hangupController);
 
 /**
  * @swagger

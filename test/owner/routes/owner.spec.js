@@ -1,25 +1,33 @@
 import request from 'supertest';
-import {resolve} from 'path';
 import app from '../../../src/app';
 import {OwnerRepository} from '../../../src/owner/models';
-import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
 
 describe('owner.routes', () => {
-  let owner;
-  let person;
   let authenticatedOperator;
   let authenticatedManager;
+  let ownerToSave;
+  let ownerToUpdate;
   before(async() => {
     await deleteAll();
     await operatorCreate();
     await operatorCreateManager();
+    const ownerRepo = new OwnerRepository();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
-    const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
-    const results = await migrate.run();
-    person = results.find(o => o.contacts && o.contacts.length > 0);
-    owner = results.find(o => o.personId === person.id);
+
+    ownerToSave = {
+      type: 'NINGUNO',
+      status: 'BUENO',
+      buildingId: '',
+      note: '',
+      person: {
+        name: 'person-test',
+        personType: 'NATURAL'
+      }
+    };
+    
+    ownerToUpdate = await ownerRepo.save(ownerToSave);
   });
 
   describe('POST /owners @request', () => {
@@ -27,7 +35,7 @@ describe('owner.routes', () => {
       await request(app)
         .post('/owners')
         .set('Authorization', authenticatedManager.authorization)
-        .send({}) // TODO: currently personId and buildingId are optional because the migration data
+        .send(ownerToSave) // TODO: currently buildingId are optional because the migration data
         .expect(201);
     });
   });
@@ -35,7 +43,7 @@ describe('owner.routes', () => {
   describe('PUT /owners/:id @request', () => {
     it('204 Operación exitosa', async() => {
       await request(app)
-        .put(`/owners/${owner.id}`)
+        .put(`/owners/${ownerToUpdate.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           status: 'MALO',
@@ -44,8 +52,7 @@ describe('owner.routes', () => {
         .expect(204);
 
       const ownerRepo = new OwnerRepository();
-      const updated = await ownerRepo.findById(owner.id);
-
+      const updated = await ownerRepo.findById(ownerToUpdate.id);
       updated.status.should.be.equal('MALO');
       updated.note.should.be.equal('This is a sample note');
     });

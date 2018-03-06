@@ -25,7 +25,7 @@ t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
  *       relatedOwners:
  *         type: array
  *         items:
- *           $ref: "#/definitions/Owner"
+ *           $ref: "#/definitions/RelatedOwner"
  *       relatedBuildings:
  *         type: array
  *         items:
@@ -75,6 +75,22 @@ t.WorkSheet = t.struct({
     _documentType: 'worksheet'
   }
 });
+
+/**
+ * @swagger
+ * definitions:
+ *   RelatedOwner:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       person:
+ *         $ref: "#/definitions/Person"
+ *       note:
+ *         type: string
+ *       type:
+ *         type: string
+ */
 
 /**
  * @swagger

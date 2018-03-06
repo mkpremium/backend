@@ -3,6 +3,7 @@ import {newHttpError} from '../lib/http-error';
 import _get from 'lodash/get';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
+import {CallStatus} from '../types/enums';
 import {
   getCallId,
   getCallStatus
@@ -17,6 +18,20 @@ export class Calls extends CouchbaseModel {
   async findByCallId(callId) {
     const qb = await this.getQueryBuilder()
       .where('callId = ?', callId)
+      .limit(1);
+
+    const [call] = await this.query(qb);
+    if (call) {
+      return fromJSON(call, this.Struct);
+    } else {
+      return null;
+    }
+  }
+
+  async findActiveCallByOperatorId(operatorId) {
+    const qb = await this.getQueryBuilder()
+      .where('userId = ?', operatorId)
+      .where('status = ?', CallStatus.confirmed)
       .limit(1);
 
     const [call] = await this.query(qb);

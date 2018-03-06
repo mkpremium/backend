@@ -2,7 +2,6 @@ import t from 'tcomb';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {updateList} from '../lib/tcomb-utils';
-import {BuildingRepository} from '../building/models';
 import isArray from 'lodash/isArray';
 
 export class Owner extends CouchbaseModel {
@@ -22,13 +21,13 @@ export class PersonRepository extends Person {
     this.Struct = t.Person;
   }
 
-  async updateContactStatus(personId, body = {}) {
-    const {id, data} = new t.UpdateContactStatus(body);
+  async updateContactStatus(personId, contactId, body = {}) {
+    const data = new t.TypedContactInfoUpdate(body);
     const person = await this.findById(personId);
-    const personContact = person.findContact({value: id});
+    const personContact = person.findContact(contactId);
 
     if (!personContact) {
-      throw newHttpError(400, `La información de contacto ${id} no fue encontrada y no pudo actualizarse`);
+      throw newHttpError(400, `La información de contacto ${contactId} no fue encontrada y no pudo actualizarse`);
     }
 
     const updatedContacts = updateList(person.contacts, personContact, data);
@@ -62,51 +61,39 @@ export class OwnerRepository extends Owner {
     return owner;
   }
 
-  async findByIdWithIncludes(id, includes = ['building', 'person']) {
+  async findByIds(id) {
     if (!id) {
       throw new Error('id undefined, expected String or Array<String>');
     }
 
     const ids = isArray(id) ? id : [id];
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`;
-    const qb = this.getQueryBuilder('let').where(`id IN ${idsText}`);
-
-    if (includes.indexOf('building') !== -1) {
-      const buildingRepo = new BuildingRepository();
-      const letBuildingQuery = buildingRepo
-        .getQueryBuilder('use', 'b')
-        .useKey('t.`buildingId`')
-        .where('t.`buildingId` = b.`id`');
-      qb
-        .letQuery('building', letBuildingQuery)
-        .field('building');
-    }
-
-    if (includes.indexOf('person') !== -1) {
-      const personRepo = new PersonRepository();
-      const letPersonQuery = personRepo
-        .getQueryBuilder('use', 'p')
-        .useKey('t.`personId`')
-        .where('t.`personId` = p.`id`');
-      qb
-        .letQuery('person', letPersonQuery)
-        .field('person');
-    }
-
+    const qb = this.getQueryBuilder()
+      .where(`id IN ${idsText}`);
+    
     return this.query(qb);
   }
 
-  async updateContactStatus(ownerId, contact) {
+  async updateContactStatus(ownerId, contactId, contact) {
     const personRepo = new PersonRepository();
     const owner = await this.findByIdOrThrow(ownerId);
 
-    return personRepo.updateContactStatus(owner.personId, contact);
+    return personRepo.updateContactStatus(owner.personId, contactId, contact);
+  }
+
+  async createOwnerAndPerson(body) {
+    const personRepo = new PersonRepository();
+    if (body.person && !body.person.id) {
+      const person = await personRepo.save(body.person);
+      body.personId = person.id;
+    }
+
+    return this.save(body);
   }
 
   async update(ownerId, data = {}) {
-    const changes = t.OwnerUpdate(data);
     const owner = await this.findByIdOrThrow(ownerId);
-    const updatedOwner = t.update(owner, {$merge: changes});
+    const updatedOwner = t.update(owner, {$merge: data});
 
     return this.save(updatedOwner);
   }
@@ -118,13 +105,12 @@ export class OwnerRepository extends Owner {
     return personRepo.addContact(owner.personId, body);
   }
   
-  async getContactPhoneNumber(ownerId, contact) {
+  async getContactPhoneNumber(ownerId, contactId) {
     const personRepo = new PersonRepository();
-    const contactValue = t.ContactValue(contact);
     const owner = await this.findById(ownerId);
     const person = await personRepo.findById(owner.personId);
 
-    const ownerContactValue = person.findContact(contactValue);
+    const ownerContactValue = person.findContact(contactId);
 
     if (!ownerContactValue) {
       throw newHttpError(400, `El número de contacto para el owner ${ownerId} no existe`);

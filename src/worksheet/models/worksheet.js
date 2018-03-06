@@ -30,7 +30,7 @@ export class WorksheetRepository extends Worksheet {
     let worksheet = await this.findByIdOrThrow(id);
     if (includes.indexOf('relatedOwners') !== -1 && worksheet.relatedOwnerIds.length > 0) {
       const ownerRepo = new OwnerRepository();
-      const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
+      const relatedOwners = await ownerRepo.findByIds(worksheet.relatedOwnerIds);
       worksheet = t.update(worksheet, {relatedOwners: {$set: relatedOwners}});
     }
 

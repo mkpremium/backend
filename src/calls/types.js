@@ -10,7 +10,11 @@ import uuid from 'uuid/v4';
  *         type: string
  *         format: uuid/v4
  *         description: Id de registro de llamada
-*       from:
+ *       userId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del usuario quien realiza la llamada
+ *       from:
  *         type: string
  *         description: Extension que realiza la llamada
  *       to:
@@ -32,6 +36,7 @@ import uuid from 'uuid/v4';
  */
 t.Calls = t.struct({
   id: t.maybe(t.String),
+  userId: t.String,
   from: t.String,
   to: t.String,
   callId: t.String,

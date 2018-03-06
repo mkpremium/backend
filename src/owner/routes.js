@@ -30,7 +30,7 @@ const router = Router();
  *       - name: body
  *         in: body
  *         schema:
- *           $ref: "#/definitions/Owner"
+ *           $ref: "#/definitions/OwnerBody"
  *     responses:
  *       201:
  *         description: Operación exitosa
@@ -89,7 +89,7 @@ router.put('/:id', updateOwnerController);
 
 /**
  * @swagger
- * /owners/{id}/contacts:
+ * /owners/{id}/contacts/{contactId}:
  *   put:
  *     tags: [Owner, Operator]
  *     summary: Actualiza un contacto de un propietario
@@ -105,10 +105,15 @@ router.put('/:id', updateOwnerController);
  *         type: string
  *         format: uuid/v4
  *         description: Id del propietario
+ *       - name: contacId
+ *         in: path
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del contacto de propietario
  *       - name: body
  *         in: body
  *         schema:
- *           $ref: "#/definitions/UpdateContactStatus"
+ *           $ref: "#/definitions/TypedContactInfoUpdate"
  *     responses:
  *       204:
  *         description: Operación exitosa
@@ -121,7 +126,7 @@ router.put('/:id', updateOwnerController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id/contacts', updateOwnerContactStatusController);
+router.put('/:id/contacts/:contactId', updateOwnerContactStatusController);
 
 /**
  * @swagger
@@ -144,7 +149,7 @@ router.put('/:id/contacts', updateOwnerContactStatusController);
  *       - name: body
  *         in: body
  *         schema:
- *           $ref: "#/definitions/TypedContactInfo"
+ *           $ref: "#/definitions/TypedContactInfoBody"
  *     responses:
  *       204:
  *         description: Operación exitosa

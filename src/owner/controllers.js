@@ -3,10 +3,11 @@ import {OwnerRepository} from './models';
 import {History} from '../history/models';
 
 async function updateOwnerContactStatus(req, res) {
-  const id = req.params.id;
-  const contextModel = {_documentType: 'owner-contact', id};
+  const ownerId = req.params.id;
+  const contactId = req.params.contactId;
+  const contextModel = {_documentType: 'owner-contact', contactId};
   const repo = new OwnerRepository();
-  await repo.updateContactStatus(id, req.body);
+  await repo.updateContactStatus(ownerId, contactId, req.body);
   await History.registerUpdate({contextModel, user: req.user}, false);
   res.status(204).send();
 }
@@ -30,7 +31,7 @@ async function addOwnerContact(req, res) {
 
 async function addOwner(req, res) {
   const repo = new OwnerRepository();
-  const owner = await repo.save(req.body);
+  const owner = await repo.createOwnerAndPerson(req.body);
   await History.registerCreate({owner, user: req.user}, false);
   res.status(201).json(owner);
 }

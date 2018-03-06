@@ -10,24 +10,46 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
 /**
  * @swagger
  * definitions:
- *  ScheduledEvent:
- *    properties:
- *      id:
+ *   ScheduledEventBody:
+ *     properties:
+ *       userId:
  *        type: string
  *        format: uuid/v4
- *      userId:
+ *       type:
+ *         type: string
+ *         enum: [CALLS, MEETINGS]
+ *       data:
+ *         type: object
+ *       notifyAt:
+ *         type: string
+ *         description: YYYY-MM-DDTHH:MM:SSZ
+ *       eventDate:
+ *         type: string
+ *         description: YYYY-MM-DDTHH:MM:SSZ
+ */
+
+/**
+ * @swagger
+ * definitions:
+ *   ScheduledEvent:
+ *     properties:
+ *       id:
  *        type: string
  *        format: uuid/v4
- *      type:
- *        $ref: "#/definitions/ScheduledEventType"
- *      data:
- *        type: object
- *      notifyAt:
+ *       userId:
  *        type: string
- *        format: YYYY-MM-DDTHH:MM:SSZ
-  *      eventDate:
- *        type: string
- *        format: YYYY-MM-DDTHH:MM:SSZ
+ *        format: uuid/v4
+ *       type:
+ *         type: string
+ *         enum: [CALLS, MEETINGS]
+ *       data:
+ *         type: object
+ *       notifyAt:
+ *         type: string
+ *         description: YYYY-MM-DDTHH:MM:SSZ
+ *       eventDate:
+ *         type: string
+ *         description: YYYY-MM-DDTHH:MM:SSZ
  */
 t.ScheduledEvent = t.struct(
   {
@@ -86,14 +108,14 @@ t.ScheduleEventsListResponse = t.struct(
  *   UpdateScheduledEvent:
  *     properties:
  *       type:
- *         $ref: "#/definitions/ScheduledEventType"
+ *         type: string
+ *         enum: [CALLS, MEETINGS]
  *       data:
  *         type: object
  *       notifyAt:
  *         type: string
  *         format: YYYY-MM-DDTHH:MM:SSZ
  */
-
 t.UpdateScheduledEvent = t.struct({
   type: t.maybe(t.ScheduledEventType),
   data: t.maybe(t.Object),
