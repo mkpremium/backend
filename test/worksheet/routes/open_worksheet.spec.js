@@ -113,6 +113,16 @@ describe('worksheet.routes', () => {
           })
           .expect(409);
       });
+
+      it('200 Toma el siguiente item', async() => {
+        const response = await request(app)
+          .post('/worksheets/queues/madrid')
+          .set('Authorization', authenticatedOperator.authorization)
+          .send({
+            action: 'NEXT'
+          });
+        response.status.should.equal(200);
+      });
     });
   });
 });

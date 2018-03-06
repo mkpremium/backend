@@ -180,3 +180,7 @@ t.WorksheetQueue.prototype.findItemById = function(id) {
 t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
   return find(this.worksheets, {operatorId});
 };
+
+t.WorksheetQueue.prototype.findNextAvailable = function() {
+  return find(this.worksheets, {status: Queue.Status.AVAILABLE});
+};

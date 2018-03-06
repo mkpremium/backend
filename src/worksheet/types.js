@@ -2,7 +2,8 @@ import t from 'tcomb';
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
-  RELEASE: 'RELEASE'
+  RELEASE: 'RELEASE',
+  NEXT: 'NEXT'
 };
 
 t.QueueRequestAction = t.enums(QueueRequestAction);
@@ -11,8 +12,6 @@ t.QueueRequestAction = t.enums(QueueRequestAction);
  * @swagger
  * definitions:
  *   QueueRequestParams:
- *     required:
- *       - queueItemId
  *     properties:
  *       queueItemId:
  *         description: Id del item de la cola *
@@ -24,9 +23,8 @@ t.QueueRequestAction = t.enums(QueueRequestAction);
  *         default: TAKE
  */
 
-t.QueueRequestParams = t.struct(
+const QueueRequestParams = t.struct(
   {
-    queueItemId: t.String,
     action: t.maybe(t.QueueRequestAction)
   },
   {
@@ -36,6 +34,22 @@ t.QueueRequestParams = t.struct(
     }
   }
 );
+
+const QueueRequestItemParams = QueueRequestParams.extend(
+  {
+    queueItemId: t.String
+  }
+);
+
+t.QueueRequestParams = t.union([QueueRequestParams, QueueRequestItemParams]);
+t.QueueRequestParams.dispatch = function(x) {
+  switch (x.action) {
+    case QueueRequestAction.NEXT:
+      return QueueRequestParams;
+    default:
+      return QueueRequestItemParams;
+  }
+};
 
 t.WorksheetListQuery = t.ListQuery.extend(
   {

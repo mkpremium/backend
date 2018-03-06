@@ -182,6 +182,6 @@ export class CouchbaseModel {
       await socket.sendEvent(eventType, dataPreSaved);
     }
 
-    return result;
+    return fromJSON(result, this.Struct);
   }
 }

@@ -124,4 +124,19 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     return this.save(updatedQueue);
   }
+
+  async nextWorksheetInQueue(queue, operatorId) {
+    const operatorItem = queue.findItemByOperatorId(operatorId);
+    const nextAvailableItem = queue.findNextAvailable();
+
+    if (!nextAvailableItem) {
+      throw newHttpError(422, 'No hay items disponibles en la lista');
+    }
+
+    const updatedQueue = operatorItem
+      ? await this.releaseWorksheetInQueue(queue, operatorItem.id)
+      : queue;
+
+    return this.takeWorksheetInQueue(updatedQueue, nextAvailableItem.id, operatorId);
+  }
 }

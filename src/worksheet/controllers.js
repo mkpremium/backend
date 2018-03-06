@@ -48,6 +48,9 @@ async function actionsOnWorksheetQueue(req, res) {
   const queue = await repo.findByCity(cityName);
 
   switch (params.action) {
+    case QueueRequestAction.NEXT:
+      const nextWorksheet = await repo.nextWorksheetInQueue(queue, req.user.id);
+      return res.json(nextWorksheet);
     case QueueRequestAction.TAKE:
       const worksheet = await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id);
       return res.json(worksheet);
