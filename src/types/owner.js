@@ -4,7 +4,26 @@ import find from 'lodash/find';
 /**
  * @swagger
  * definitions:
+ *   OwnerBody:
+ *     required:
+ *       - person
+ *     properties:
+ *       person:
+ *         $ref: "#/definitions/Person"
+ *       building:
+ *         $ref: "#/definitions/Building"
+ *       note:
+ *         type: string
+ *       type:
+ *         type: string
+ */
+
+/**
+ * @swagger
+ * definitions:
  *   Owner:
+ *     required:
+ *       - person
  *     properties:
  *       id:
  *         type: string
@@ -24,7 +43,8 @@ t.Owner = t.struct(
     type: t.OwnerType,
     status: t.maybe(t.OwnerStatus),
 
-    personId: t.maybe(t.String), // FIXME: this is required
+    person: t.Object,
+    personId: t.maybe(t.String), // FIXME: this should be removed
     buildingId: t.maybe(t.String), // FIXME: this is required
 
     note: t.maybe(t.String),
@@ -39,7 +59,8 @@ t.Owner = t.struct(
       type: 'NINGUNO',
 
       _documentType: 'owner',
-      _migrateId: []
+      _migrateId: [],
+      _relatedTo: ''
     }
   }
 );
@@ -70,7 +91,7 @@ t.OwnerUpdate = t.struct({
   status: t.maybe(t.OwnerStatus),
   note: t.maybe(t.String),
   buildingId: t.maybe(t.String),
-  personId: t.maybe(t.String)
+  person: t.maybe(t.Object)
 }, 'OwnerUpdate');
 
 /**
@@ -130,6 +151,6 @@ t.Person = t.struct(
   }
 );
 
-t.Person.prototype.findContact = function({value}) {
-  return find(this.contacts, {value});
+t.Person.prototype.findContact = function(id) {
+  return find(this.contacts, {id});
 };

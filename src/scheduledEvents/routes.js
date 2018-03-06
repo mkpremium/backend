@@ -22,7 +22,7 @@ const router = Router();
  * @swagger
  * /scheduled-events/{id}:
  *  get:
- *    tags: [ScehduledEvents]
+ *    tags: [ScheduledEvents]
  *    summary: Obtiene detalle del evento programado
  *    parameters:
  *      - name: id
@@ -35,7 +35,7 @@ const router = Router();
  *      200:
  *        description: Obtiene el evento programado
  *        schema:
- *           $ref: "#/definitions/ScheduledEvent
+ *          $ref: "#/definitions/ScheduledEvent"
  *      401:
  *        description: Credenciales inválidos o cuenta deshabilitada
  *        schema:
@@ -70,6 +70,7 @@ router.get('/:id', permissions.operator, findScheduledEventController);
  *         in: query
  *         type: string
  *         format: uuid/v4
+ *         description: Id de usuario
  *       - name: type
  *         in: query
  *         type: string
@@ -77,27 +78,27 @@ router.get('/:id', permissions.operator, findScheduledEventController);
  *       - name: notifyAt
  *         in: query
  *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Tiempo de notificación. (YYYY-MM-DDTHH:MM:SSZ)
  *       - name: createdAt
  *         in: query
  *         type: string
- *         format: YYYY-MM-DD
+ *         description: Fecha de creación del evento. (YYYY-MM-DD)
  *       - name: eventDate
  *         in: query
  *         type: string
- *         format: YYYY-MM-DD
+ *         description: Fecha del evento. (YYYY-MM-DD)
  *       - name: eventDateBetween
  *         in: query
  *         type: string
- *         format: YYYY-MM-DD,YYYY-MM-DD
+ *         description: Rango de fechas de evento. (YYYY-MM-DD,YYYY-MM-DD)
  *       - name: createdBetween
  *         in: query
  *         type: string
- *         format: YYYY-MM-DD,YYYY-MM-DD
+ *         description: Rango de fechas de creación. (YYYY-MM-DD,YYYY-MM-DD)
  *       - name: notifyBetween
  *         in: query
  *         type: string
- *         format: YYYY-MM-DD,YYYY-MM-DD
+ *         description: Rango de fechas de notificación. (YYYY-MM-DD,YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Lista de eventos programados
@@ -118,7 +119,7 @@ router.get('/', permissions.operator, listScheduledEventController);
  * @swagger
  * /scheduled-events:
  *   post:
- *    tags: [ScehduledEvents]
+ *    tags: [ScheduledEvents]
  *    summary: Registra evento programado
  *    description: Permite programar un evento
  *    consumes:
@@ -130,12 +131,12 @@ router.get('/', permissions.operator, listScheduledEventController);
  *        in: body
  *        required: true
  *        schema:
- *          $ref: "#/definitions/ScheduleEvent"
+ *          $ref: "#/definitions/ScheduledEventBody"
  *    responses:
  *      201:
  *        description: Operación exitosa
  *        schema:
- *          $ref: "#/definitions/ScheduleEvent"
+ *          $ref: "#/definitions/ScheduledEvent"
  *      400:
  *        description: Solicitud incorrecta
  *        schema:
@@ -155,7 +156,7 @@ router.post('/', permissions.operator, addScheduledEventController);
  * @swagger
  * /scheduled-events:
  *   put:
- *    tags: [ScehduledEvents]
+ *    tags: [ScheduledEvents]
  *    summary: Actualiza evento programado
  *    description: Permite actualizar un evento
  *    consumes:
@@ -191,7 +192,7 @@ router.put('/:id', permissions.operator, updateScheduledEnventController);
  * @swagger
  * /scheduled-events:
  *   delete:
- *    tags: [ScehduledEvents]
+ *    tags: [ScheduledEvents]
  *    summary: Elimina evento programado
  *    description: Permite eleiminar un evento programdo
  *    consumes:

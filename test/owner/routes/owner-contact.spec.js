@@ -21,29 +21,22 @@ describe('owner.routes', () => {
     owner = results.find(o => o.personId === person.id);
   });
 
-  describe('PUT /owners/:id/contacts @request', () => {
+  describe('PUT /owners/:id/contacts/:contactId @request', () => {
     it('204 Operación exitosa', async() => {
-      const {value} = person.contacts[0];
+      const contactId = person.contacts[0].id;
       await request(app)
-        .put(`/owners/${owner.id}/contacts`)
+        .put(`/owners/${owner.id}/contacts/${contactId}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
-          id: value,
-          data: {
-            value: '1234567890',
-            status: 'GOOD'
-          }
+          value: '1234567890',
+          status: 'GOOD',
+          note: 'test note'
         })
         .expect(204);
 
       const updatedPerson = await personRepo.findById(person.id);
 
-      JSON.stringify(updatedPerson.contacts[0]).should.be.equal(JSON.stringify({
-        type: 'TELEFONO',
-        value: '1234567890',
-        note: null,
-        status: 'GOOD'
-      }));
+      JSON.stringify(updatedPerson.contacts[0].value).should.be.equal(JSON.stringify('1234567890'));
     });
 
     it('404 Propietario no existe', async() => {

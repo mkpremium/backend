@@ -15,7 +15,7 @@ const requester = axios.create({
 
 function getCallParams(from, to, serviceId) {
   const struct = t.CallService({
-    from: from.split('-')[1],
+    from: from.agentNumber.split('-')[1],
     to: encodePlusSign(to.value),
     service_id: parseInt(serviceId),
     return_id: true
@@ -24,14 +24,15 @@ function getCallParams(from, to, serviceId) {
   return `?from=${struct.from}&to=${struct.to}&options[service_id]=${struct.service_id}&options[return_id]=${true}&options[autoanswer]=1`;
 }
 
-async function call(from, phone, serviceId) {
+async function call(from, phone) {
   const model = new Calls();
   try {
-    let params = getCallParams(from, phone, serviceId);
+    let params = getCallParams(from, phone, from.serviceId);
     const result = await requester.get(`/Call/rest/call/${params}`);
     if (!result.data.status) throw newHttpError(400, result.data.description);
     const call = model.save({
-      from: from,
+      userId: from.id,
+      from: from.agentNumber,
       to: phone.value,
       callId: result.data.id
     });
@@ -44,9 +45,11 @@ async function call(from, phone, serviceId) {
   }
 }
 
-async function hangup(id) {
+async function hangup(operatorId) {
+  const model = new Calls();
   try {
-    const result = await requester.get(`/Call/rest/hangup/?options[call_id]=${id}`);
+    const activeCall = await model.findActiveCallByOperatorId(operatorId);
+    const result = await requester.get(`/Call/rest/hangup/?options[call_id]=${activeCall.callId}`);
     if (!result.data.status) throw newHttpError(400, result.data.description);
     return result.data;
   } catch (e) {

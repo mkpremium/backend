@@ -1,21 +1,65 @@
 import t from 'tcomb';
 
+/**
+ * @swagger
+ * definitions:
+ *   Cadastre:
+ *     properties:
+ *       refenrece:
+ *         type: string
+ *       address:
+ *         type: string
+ */
 t.Cadastre = t.struct({
   reference: t.String,
   address: t.String
 }, 'Cadastre');
 
+/**
+ * @swagger
+ * definitions:
+ *   Location:
+ *     properties:
+ *       lat:
+ *         type: number
+ *       lng:
+ *         type: number
+ */
 t.Location = t.struct({
   lat: t.Number,
   lng: t.Number
 }, 'Location');
 
+/**
+ * @swagger
+ * definitions:
+ *   Elements:
+ *     properties:
+ *       number:
+ *         type: number
+ *       average:
+ *         type: number
+ *       commons:
+ *         type: number
+ */
 t.Elements = t.struct({
   number: t.Number,
   average: t.Number,
   commons: t.Number
 }, 'Elements');
 
+/**
+ * @swagger
+ * definitions:
+ *   BuildingOwner:
+ *     properties:
+ *       name:
+ *         type: number
+ *       address:
+ *         $ref: "#/definitions/SimpleAddress"
+ *       phones:
+ *          $ref: "#/definitions/SimplePhoneNumber"
+ */
 t.BuildingOwner = t.struct(
   {
     name: t.String,
@@ -23,6 +67,7 @@ t.BuildingOwner = t.struct(
     phones: t.list(t.SimplePhoneNumber)
   },
   {
+    name: 'BuildingOwner',
     defaultProps: {
       phones: []
     }
@@ -37,6 +82,38 @@ t.BuildingOwner = t.struct(
  *       id:
  *         type: string
  *         format: uuid/v4
+ *       address:
+ *         $ref: "#/definitions/Address"
+ *       buildingType:
+ *         type: string
+ *         enum: [VERTICAL, HORIZONTAL]
+ *       cadastre:
+ *         $ref: "#/definitions/Cadastre"
+ *       floorArea:
+ *         type: number
+ *       landArea:
+ *         type: number
+ *       roofArea:
+ *         type: number
+ *       coefficient:
+ *         type: number
+ *       use:
+ *         type: string
+ *       propertyType:
+ *         type: string
+ *       buildingDate:
+ *         type: number
+ *       location:
+ *         $ref: "#/definitions/Location"
+ *       elements:
+ *         $ref: "#/definitions/Elements"
+ *       ownerId:
+ *         type: string
+ *       owner:
+ *         $ref: "#/definitions/BuildingOwner"
+ *       state:
+ *         type: string
+ *         enum: [BUENO, MALO]
  */
 t.Building = t.struct(
   {
@@ -69,7 +146,7 @@ t.Building = t.struct(
       roofArea: 0,
       coefficient: 0,
       buildingDate: 0,
-
+      _migrateId: [],
       _documentType: 'building'
     }
   }

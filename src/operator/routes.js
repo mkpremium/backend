@@ -63,7 +63,7 @@ router.post('/login', loginController);
  *         in: body
  *         required: true
  *         schema:
- *           $ref: "#/definitions/Operator"
+ *           $ref: "#/definitions/OperatorBody"
  *     responses:
  *       201:
  *         description: Operador creado

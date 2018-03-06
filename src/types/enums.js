@@ -13,9 +13,9 @@ t.BuildingState = t.enums({
 t.TypeContact = t.enums({
   TELEFONO: 'TELEFONO',
   FAX: 'FAX',
-  CELULAR: 'CELULAR',
+  MOVIL: 'MOVIL',
   EMAIL: 'EMAIL',
-  SITIO_WEB: 'SITIO WEB'
+  SITIO_WEB: 'SITIO_WEB'
 }, 'TypeContact');
 
 t.OwnerType = t.enums({

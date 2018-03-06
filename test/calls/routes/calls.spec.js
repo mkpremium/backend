@@ -12,16 +12,17 @@ import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 import {deleteAll, operatorLogin} from '../../common';
 
 const port = process.env.SOCKET_PORT || '9002';
+let authenticatedOperator;
 
 describe('calls.routes', () => {
   let server;
   let owner;
   let person;
-  let authenticatedOperator;
   let callObject;
   let webhookEventStartCall;
   let webhookEventToBeOmitted;
   let callsModel;
+  let contactIdToBeCalled;
 
   before(async() => {
     await app.locals.bucketPromise;
@@ -56,6 +57,8 @@ describe('calls.routes', () => {
     person = results.find(o => o.contacts && o.contacts.length > 0);
     owner = results.find(o => o.personId === person.id);
 
+    contactIdToBeCalled = owner.person.contacts[0].id;
+
     webhookEventStartCall = {
       tag: 'dialog-info',
       data: {
@@ -81,6 +84,7 @@ describe('calls.routes', () => {
     };
 
     callObject = {
+      userId: authenticatedOperator.operator.id,
       from: '905',
       to: '+56949826553',
       callId: '9151938902790598604'
@@ -93,33 +97,29 @@ describe('calls.routes', () => {
     done();
   });
 
-  describe('POST /calls/owner/:id @request', () => {
+  describe('POST /calls/owner/:ownerId/contact/:contactId @request', () => {
     it('200 Operación exitosa', async() => {
       await request(app)
-        .post(`/calls/owner/${owner.id}`)
+        .post(`/calls/owner/${owner.id}/contact/${contactIdToBeCalled}`)
         .set('Authorization', authenticatedOperator.authorization)
-        .send({
-          value: '+56949826553'
-        }).expect(200);
+        .expect(200);
     });
   });
 
-  describe('POST /calls/owner/:id @request', () => {
+  describe('POST /calls/owner/:ownerId/contact/:contactId @request', () => {
+    const contactId = 'TEST';
     it('400 Operación fallida', async() => {
       await request(app)
-        .post(`/calls/owner/${owner.id}`)
+        .post(`/calls/owner/${owner.id}/contact/${contactId}`)
         .set('Authorization', authenticatedOperator.authorization)
-        .send({
-          value: 'TEST'
-        }).expect(400);
+        .expect(400);
     });
   });
 
-  describe('POST /calls/hangup/:callId @request', () => {
+  describe('POST /calls/hangup @request', () => {
     it('400 Operación fallida', async() => {
-      const callId = 1111;
       await request(app)
-        .post(`/calls/hangup/${callId}`)
+        .post(`/calls/hangup`)
         .set('Authorization', authenticatedOperator.authorization)
         .expect(400);
     });
@@ -170,6 +170,7 @@ describe('calls.model', () => {
     callsModel = new Calls();
     await callsModel.deleteQuery();
     await callsModel.save({
+      userId: authenticatedOperator.operator.id,
       from: '905',
       to: '+56949826553',
       callId: '9151938902790598604',

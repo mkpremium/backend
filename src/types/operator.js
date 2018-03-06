@@ -37,6 +37,27 @@ t.OperatorProfile.prototype.fullName = function() {
 /**
  * @swagger
  * definitions:
+ *  OperatorBody:
+ *    properties:
+ *      username:
+ *        type: string
+ *      password:
+ *        type: string
+ *      agentNumber:
+ *        type: string
+ *      enable:
+ *        type: boolean
+ *      profile:
+ *        $ref: "#/definitions/OperatorProfile"
+ *      roles:
+ *        type: array
+ *        items:
+ *          type: string
+ */
+
+/**
+ * @swagger
+ * definitions:
  *  Operator:
  *    required:
  *      - username
@@ -44,6 +65,9 @@ t.OperatorProfile.prototype.fullName = function() {
  *      - agentNumber
  *      - roles
  *    properties:
+ *      id:
+ *        type: string
+ *        format: uuid/v4
  *      username:
  *        type: string
  *      password:

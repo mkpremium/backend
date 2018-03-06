@@ -11,18 +11,18 @@ import {
 } from './helper';
 
 async function call(req, res) {
-  const id = req.params.id;
+  const ownerId = req.params.ownerId;
+  const contactId = req.params.contactId;
   const owner = new OwnerRepository();
-  const serviceId = req.user.operator.serviceId;
-  const from = req.user.operator.agentNumber;
-  const phoneValue = await owner.getContactPhoneNumber(id, req.body);
-  const call = await requestCall(from, phoneValue, serviceId);
+  const from = req.user.operator;
+  const phoneValue = await owner.getContactPhoneNumber(ownerId, contactId);
+  const call = await requestCall(from, phoneValue);
   res.status(200).send(call);
 }
 
 async function hangup(req, res) {
-  const id = req.params.callId;
-  await requestHangup(id);
+  const operatorId = req.user.operator.id;
+  await requestHangup(operatorId);
   res.status(204).send();
 }
 

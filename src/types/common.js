@@ -1,5 +1,16 @@
 import t from 'tcomb';
+import uuid from 'uuid/v4';
 
+/**
+ * @swagger
+ * definitions:
+ *   PostalCode:
+ *     properties:
+ *       number:
+ *         type: number
+ *       verified:
+ *         type: bool
+ */
 t.PostalCode = t.struct(
   {
     number: t.maybe(t.Number),
@@ -13,11 +24,31 @@ t.PostalCode = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   SimpleAddress:
+ *     properties:
+ *       fullAddress:
+ *         type: string
+ *       city:
+ *         type: string
+ */
 t.SimpleAddress = t.struct({
   fullAddress: t.String,
   city: t.String
 }, 'SimpleAddress');
 
+/**
+ * @swagger
+ * definitions:
+ *   SimplePhoneNumber:
+ *     properties:
+ *       number:
+ *         type: string
+ *       note:
+ *         type: string
+ */
 t.SimplePhoneNumber = t.struct(
   {
     number: t.String,
@@ -37,17 +68,50 @@ t.TypedContactInfoStatus = t.enums({
 /**
  * @swagger
  * definitions:
- *   TypedContactInfo:
+ *   TypedContactInfoBody:
+ *     required:
+ *       - type
+ *       - status
+ *       - value
  *     properties:
  *       type:
  *         type: string
+ *         enum: [TELEFONO, FAX, MOVIL, EMAIL, SITIO_WEB]
  *       value:
  *         type: string
  *       note:
  *         type: string
+ *       status:
+ *         type: string
+ *         enum: [UNDEFINED, GOOD, BAD]
+ */
+
+/**
+ * @swagger
+ * definitions:
+ *   TypedContactInfo:
+ *     required:
+ *       - type
+ *       - status
+ *       - value
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       type:
+ *         type: string
+ *         enum: [TELEFONO, FAX, MOVIL, EMAIL, SITIO_WEB]
+ *       value:
+ *         type: string
+ *       note:
+ *         type: string
+ *       status:
+ *         type: string
+ *         enum: [UNDEFINED, GOOD, BAD]
  */
 t.TypedContactInfo = t.struct(
   {
+    id: t.String,
     type: t.TypeContact,
     value: t.String,
     note: t.maybe(t.String),
@@ -56,12 +120,29 @@ t.TypedContactInfo = t.struct(
   {
     name: 'TypedContactInfo',
     defaultProps: {
+      id: uuid(),
       type: 'TELEFONO',
       status: 'UNDEFINED'
     }
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   TypedContactInfoUpdate:
+ *     properties:
+ *       type:
+ *         type: string
+ *         enum: [TELEFONO, FAX, MOVIL, EMAIL, SITIO_WEB]
+ *       value:
+ *         type: string
+ *       note:
+ *         type: string
+ *       status:
+ *         type: string
+ *         enum: [UNDEFINED, GOOD, BAD]
+ */
 t.TypedContactInfoUpdate = t.struct(
   {
     type: t.maybe(t.TypeContact),
@@ -77,19 +158,27 @@ t.TypedContactInfoUpdate = t.struct(
 /**
  * @swagger
  * definitions:
- *   UpdateContactStatus:
+ *   Address:
  *     properties:
- *       id:
+ *       type:
  *         type: string
- *         description: Número de teléfono a actualizar
- *       data:
- *         $ref: "#/definitions/TypedContactInfo"
+ *       street:
+ *         type: string
+ *       number:
+ *         type: number
+ *       fullAddress:
+ *         type: string
+ *       registerNumber:
+ *         type: number
+ *       postalCode:
+ *         $ref: "#/definitions/PostalCode"
+ *       city:
+ *         type: string
+ *       province:
+ *         type: string
+ *       zone:
+ *         type: string
  */
-t.UpdateContactStatus = t.struct({
-  id: t.String,
-  data: t.TypedContactInfoUpdate
-}, 'UpdateContactStatus');
-
 t.Address = t.struct(
   {
     type: t.String,
@@ -104,20 +193,5 @@ t.Address = t.struct(
   },
   {
     name: 'Address'
-  }
-);
-
-/**
- * @swagger
- * definitions:
- *   ContactValue:
- *     properties:
- *       value:
- *         type: string
- *         required: true
- */
-t.ContactValue = t.struct(
-  {
-    value: t.String
   }
 );
