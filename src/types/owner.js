@@ -6,17 +6,45 @@ import find from 'lodash/find';
  * definitions:
  *   OwnerBody:
  *     required:
- *       - person
+ *       - status
  *     properties:
  *       person:
- *         $ref: "#/definitions/Person"
- *       building:
- *         $ref: "#/definitions/Building"
+ *         $ref: "#/definitions/PersonBody"
+ *       personId:
+ *         type: string
+ *         fromat: uuid/v4
+ *       buildingId:
+ *         type: string
+ *         fromat: uuid/v4
  *       note:
  *         type: string
  *       type:
  *         type: string
+ *       status:
+ *         type: string
+ *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
  */
+t.OwnerBody = t.struct(
+  {
+    type: t.maybe(t.OwnerType),
+    verified: t.maybe(t.Boolean),
+    status: t.OwnerStatus,
+    person: t.maybe(t.Object),
+    personId: t.maybe(t.String),
+    buildingId: t.maybe(t.String),
+    note: t.maybe(t.String)
+  },
+  {
+    name: 'OwnerBody',
+    defaultProps: {
+      type: 'NINGUNO',
+      verified: false,
+      status: 'NO_VERIFICADO',
+      personId: '',
+      person: {}
+    }
+  }
+);
 
 /**
  * @swagger
@@ -28,25 +56,30 @@ import find from 'lodash/find';
  *       id:
  *         type: string
  *         format: uuid/v4
- *       person:
- *         $ref: "#/definitions/Person"
- *       building:
- *         $ref: "#/definitions/Building"
+ *       personId:
+ *         type: string
+ *         fromat: uuid/v4
+ *       buildingId:
+ *         type: string
+ *         fromat: uuid/v4
  *       note:
  *         type: string
  *       type:
  *         type: string
+ *       verified:
+ *         type: bool
+ *       status:
+ *         type: string
+ *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
  */
 t.Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
-    status: t.maybe(t.OwnerStatus),
     verified: t.Boolean,
-
-    person: t.Object,
-    personId: t.maybe(t.String), // FIXME: this should be removed
-    buildingId: t.maybe(t.String), // FIXME: this is required
+    status: t.OwnerStatus,
+    personId: t.maybe(t.String),
+    buildingId: t.maybe(t.String),
 
     note: t.maybe(t.String),
 
@@ -59,6 +92,7 @@ t.Owner = t.struct(
     defaultProps: {
       type: 'NINGUNO',
       verified: false,
+      status: 'NO_VERIFICADO',
       _documentType: 'owner',
       _migrateId: [],
       _relatedTo: ''
@@ -94,6 +128,32 @@ t.OwnerUpdate = t.struct({
   buildingId: t.maybe(t.String),
   person: t.maybe(t.Object)
 }, 'OwnerUpdate');
+
+/**
+ * @swagger
+ * definitions:
+ *   PersonBody:
+ *     properties:
+ *       name:
+ *         type: string
+ *         description: Nombre de organización
+ *       firstName:
+ *         type: string
+ *       firstSurname:
+ *         type: string
+ *       secondSurname:
+ *         type: string
+ *       documentNumber:
+ *         type: string
+ *       contacts:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/TypedContactInfo"
+ *       birthDate:
+ *         type: string
+ *         format: "DD-MM-YYYY"
+ *
+ */
 
 /**
  * @swagger

@@ -95,6 +95,7 @@ describe('worksheet.routes', () => {
         .set('Authorization', authenticatedOperator.authorization)
         .expect(200);
       response.body.should.be.a('object');
+      response.body.relatedOwners[0].person.should.be.a('object');
       response.body.toString().should.be.equal(worksheet.toString());
       response.body.should.have.a.property('relatedOwners');
       response.body.relatedOwners.should.be.a('array');

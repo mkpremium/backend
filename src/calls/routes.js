@@ -20,6 +20,9 @@ const webhook = Router();
  * @swagger
  * /calls/owner/{ownerId}/:contactId:
  *   post:
+ *     security:
+ *       - admin: []
+ *       - operator: []
  *     tags: [Calls, Operator]
  *     summary: Iniciar llamada
  *     produces:
@@ -51,6 +54,9 @@ call.post('/owner/:ownerId/contact/:contactId', permissions.operator, callContro
  * @swagger
  * /calls/hangup:
  *   post:
+ *     security:
+ *       - admin: []
+ *       - operator: []
  *     tags: [Calls]
  *     summary: Colgar llamada
  *     produces:
@@ -71,6 +77,9 @@ call.post('/hangup', permissions.operator, hangupController);
  * @swagger
  * /calls/note/{callId}:
  *   post:
+ *     security:
+ *       - admin: []
+ *       - operator: []
  *     tags: [Calls]
  *     summary: Agrega/Actualiza nota en llamada existente
  *     produces:

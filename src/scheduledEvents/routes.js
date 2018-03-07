@@ -22,6 +22,9 @@ const router = Router();
  * @swagger
  * /scheduled-events/{id}:
  *  get:
+ *    security:
+ *      - admin: []
+ *      - operator: []
  *    tags: [ScheduledEvents]
  *    summary: Obtiene detalle del evento programado
  *    parameters:
@@ -49,6 +52,9 @@ router.get('/:id', permissions.operator, findScheduledEventController);
  * @swagger
  * /scheduled-events:
  *   get:
+ *     security:
+ *       - admin: []
+ *       - operator: []
  *     tags: [ScheduledEvents]
  *     summary: Obtiene listado de eventos programados
  *     consumes:
@@ -119,6 +125,9 @@ router.get('/', permissions.operator, listScheduledEventController);
  * @swagger
  * /scheduled-events:
  *   post:
+ *    security:
+ *      - admin: []
+ *      - operator: []
  *    tags: [ScheduledEvents]
  *    summary: Registra evento programado
  *    description: Permite programar un evento
@@ -156,6 +165,9 @@ router.post('/', permissions.operator, addScheduledEventController);
  * @swagger
  * /scheduled-events:
  *   put:
+ *    security:
+ *      - admin: []
+ *      - operator: []
  *    tags: [ScheduledEvents]
  *    summary: Actualiza evento programado
  *    description: Permite actualizar un evento
@@ -192,6 +204,9 @@ router.put('/:id', permissions.operator, updateScheduledEnventController);
  * @swagger
  * /scheduled-events:
  *   delete:
+ *    security:
+ *      - admin: []
+ *      - operator: []
  *    tags: [ScheduledEvents]
  *    summary: Elimina evento programado
  *    description: Permite eleiminar un evento programdo
