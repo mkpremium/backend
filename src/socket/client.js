@@ -64,8 +64,11 @@ export async function connectServer() {
   const options = {
     query: {
       token
-    }
+    },
+    reconnectionAttempts: socketConfig.reconnectionAttempts
   };
+  let retries = options.reconnectionAttempts;
+
   return new Promise((resolve, reject) => {
     const serverUri = `${socketConfig.server}:${socketConfig.port}`;
     const socket = io(serverUri, options);
@@ -78,11 +81,14 @@ export async function connectServer() {
 
     socket.on('connect_error', (error) => {
       debugClient('connect_error', error.message);
-      reject(error);
+      if (retries <= 0) {
+        reject(new Error(`It's possible an error trying to connect socket service check your setup`));
+      }
     });
 
     socket.on('reconnect_attempt', () => {
       debugClient('reconnect_attempt');
+      retries--;
     });
   });
 }

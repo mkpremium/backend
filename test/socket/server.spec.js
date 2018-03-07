@@ -37,7 +37,6 @@ describe('socket.server', () => {
     server = http.Server(app);
     server.listen(port, () => {
       socket.startServer(server);
-      socket.initModel();
       done();
     });
   });

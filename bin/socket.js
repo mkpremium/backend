@@ -17,7 +17,6 @@ server.on('error', errorHandler);
 
 function listenHandler() {
   socket.startServer(httpServer);
-  socket.initModel();
   const addr = httpServer.address();
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr

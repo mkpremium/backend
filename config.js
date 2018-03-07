@@ -4,7 +4,8 @@ export const emitHistoryEvents = process.env.EMIT_HISTORY_EVENTS || false;
 export const emitModelEvents = process.env.EMIT_MODEL_EVENTS || false;
 export const socket = {
   port: parseInt(process.env.SOCKET_PORT || '9002'),
-  server: process.env.SOCKET_SERVER || 'http://localhost'
+  server: process.env.SOCKET_SERVER || 'http://localhost',
+  reconnectionAttempts: process.env.SOCKET_CONNECTION_RETRIES || 10
 };
 export const cronjobsPort = parseInt(process.env.CRONJOBS_PORT || '9003');
 export const couchbase = {
