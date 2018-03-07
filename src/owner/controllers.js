@@ -8,7 +8,7 @@ async function updateOwnerContactStatus(req, res) {
   const contextModel = {_documentType: 'owner-contact', contactId};
   const repo = new OwnerRepository();
   await repo.updateContactStatus(ownerId, contactId, req.body);
-  await History.registerUpdate({contextModel, user: req.user}, false);
+  await History.registerUpdate({contextModel, user: req.user});
   res.status(204).send();
 }
 
@@ -17,7 +17,7 @@ async function updateOwner(req, res) {
   const contextModel = {_documentType: 'owner', id};
   const repo = new OwnerRepository();
   await repo.update(id, req.body);
-  await History.registerUpdate({contextModel, user: req.user}, false);
+  await History.registerUpdate({contextModel, user: req.user});
   res.status(204).send();
 }
 
@@ -25,14 +25,14 @@ async function addOwnerContact(req, res) {
   const id = req.params.id;
   const repo = new OwnerRepository();
   const contextModel = await repo.addContact(id, req.body);
-  await History.registerCreate({contextModel, user: req.user}, false);
+  await History.registerCreate({contextModel, user: req.user});
   res.status(204).send();
 }
 
 async function addOwner(req, res) {
   const repo = new OwnerRepository();
   const owner = await repo.createOwnerAndPerson(req.body);
-  await History.registerCreate({contextModel: owner, user: req.user}, false);
+  await History.registerCreate({contextModel: owner, user: req.user});
   res.status(201).json(owner);
 }
 

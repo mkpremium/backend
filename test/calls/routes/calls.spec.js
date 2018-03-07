@@ -37,7 +37,7 @@ describe('calls.routes', () => {
 
     const operatorRepo = new OperatorRepository();
     callsModel = new Calls();
-
+    
     await operatorRepo.save({
       username: 'callerOperator',
       password: 'password',
@@ -167,8 +167,25 @@ describe('calls.routes', () => {
 describe('calls.model', () => {
   let callsModel;
   before(async() => {
+    await app.locals.bucketPromise;
+    await deleteAll();
+    const operatorRepo = new OperatorRepository();
     callsModel = new Calls();
-    await callsModel.deleteQuery();
+
+    await operatorRepo.save({
+      username: 'callerOperator',
+      password: 'password',
+      agentNumber: '10106-905',
+      serviceId: '17146',
+      roles: [
+        'OPERATOR'
+      ],
+      profile: {
+        firstName: 'operator',
+        lastName: 'operator'
+      }
+    });
+    authenticatedOperator = await operatorLogin(app, {username: 'callerOperator', password: 'password'});
     await callsModel.save({
       userId: authenticatedOperator.operator.id,
       from: '905',

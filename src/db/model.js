@@ -5,7 +5,7 @@ import squel from 'squel';
 import {N1qlQuery} from 'couchbase';
 import debug from 'debug';
 
-import {couchbase} from '../../config';
+import {couchbase, emitModelEvents} from '../../config';
 
 const debugModel = debug('app:db:model');
 
@@ -163,7 +163,7 @@ export class CouchbaseModel {
     return data;
   }
 
-  async save(data, sendEvent = false) {
+  async save(data, sendEvent = JSON.parse(emitModelEvents)) {
     const struct = new this.Struct(data);
     const isNewData = !data.id;
     const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
