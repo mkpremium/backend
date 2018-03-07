@@ -31,7 +31,7 @@ async function createOperator(req, res) {
   await History.registerCreate({
     contextModel: result,
     user: req.user
-  }, false);
+  });
   res.status(201);
   res.json(result);
 }
@@ -42,7 +42,7 @@ async function listOperator(req, res) {
   await History.registerList({
     contextModel: 'operator',
     user: req.user
-  }, false);
+  });
   res.json(operators);
 }
 

@@ -1,6 +1,7 @@
 import {N1qlQuery} from 'couchbase';
 export const port = parseInt(process.env.PORT || '9001');
-export const sendRecordEvents = process.env.SEND_RECORD_EVENTS || false;
+export const emitHistoryEvents = process.env.EMIT_HISTORY_EVENTS || true;
+export const emitModelEvents = process.env.EMIT_MODEL_EVENTS || true;
 export const socket = {
   port: parseInt(process.env.SOCKET_PORT || '9002'),
   server: process.env.SOCKET_SERVER || 'http://localhost'

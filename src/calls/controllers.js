@@ -36,7 +36,7 @@ async function webhook(req, res) {
   const call = await model.findOrCreate(req.body);
   await model.updateStatus(call.callId, status);
   const newCallEvent = buildCallEvent(req.body);
-  const updatedCall = await model.addEvent(call.callId, newCallEvent, true);
+  const updatedCall = await model.addEvent(call.callId, newCallEvent);
 
   res.status(200).send(updatedCall);
 }

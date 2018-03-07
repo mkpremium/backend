@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import {CouchbaseModel} from '../db/model';
 import {getHistoryStruct} from './helper';
+import {emitHistoryEvents} from '../../config';
 
 import './types';
 
@@ -10,35 +11,36 @@ export class History extends CouchbaseModel {
     this.Struct = t.History;
   }
 
-  async register(eventData, sendEvent = true) {
-    return this.save(getHistoryStruct(eventData), sendEvent);
+  async register(eventData, sendEvent) {
+    const emitEvent = sendEvent || JSON.parse(emitHistoryEvents);
+    return this.save(getHistoryStruct(eventData), emitEvent);
   }
 
-  static async registerCreate(eventData, sendEvent = true) {
+  static async registerCreate(eventData, sendEvent = false) {
     const history = new History();
     eventData.type = 'CREATE';
     return history.register(eventData, sendEvent);
   }
 
-  static async registerGet(eventData, sendEvent = true) {
+  static async registerGet(eventData, sendEvent = false) {
     const history = new History();
     eventData.type = 'GET';
     return history.register(eventData, sendEvent);
   }
 
-  static async registerUpdate(eventData, sendEvent = true) {
+  static async registerUpdate(eventData, sendEvent = false) {
     const history = new History();
     eventData.type = 'UPDATE';
     return history.register(eventData, sendEvent);
   }
 
-  static async registerOpen(eventData, sendEvent = true) {
+  static async registerOpen(eventData, sendEvent = false) {
     const history = new History();
     eventData.type = 'OPEN';
     return history.register(eventData, sendEvent);
   }
 
-  static async registerList(eventData, sendEvent = true) {
+  static async registerList(eventData, sendEvent = false) {
     const history = new History();
     eventData.type = 'LIST';
     return history.register(eventData, sendEvent);
