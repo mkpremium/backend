@@ -17,6 +17,7 @@ import calls from './calls';
 import scheduledEvents from './scheduledEvents';
 import migration from './migration';
 import webhooks from './webhooks';
+import socket from './socket';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -30,7 +31,8 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(cors());
 swagger(app);
 Promise.all([
-  couchbase(app)
+  couchbase(app),
+  socket.initModel()
 ]).catch(err => {
   console.error(err);
 });

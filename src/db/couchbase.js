@@ -44,7 +44,7 @@ export default (app, opts = defaultOpts) => {
 
 function checkBucket(bucket, cluster, resolve, reject) {
   if (retries <= 0) {
-    reject(new Error(`It's possible a error trying to connect bucket ${bucket._name} check your setup`));
+    reject(new Error(`It's possible an error trying to connect bucket ${bucket._name} check your setup`));
   }
 
   debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`);

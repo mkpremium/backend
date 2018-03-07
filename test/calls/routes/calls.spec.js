@@ -32,7 +32,6 @@ describe('calls.routes', () => {
     server = http.Server(socketApp);
     server.listen(port, () => {
       socket.startServer(server);
-      socket.initModel();
     });
 
     const operatorRepo = new OperatorRepository();
