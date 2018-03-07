@@ -32,7 +32,7 @@ async function addOwnerContact(req, res) {
 async function addOwner(req, res) {
   const repo = new OwnerRepository();
   const owner = await repo.createOwnerAndPerson(req.body);
-  await History.registerCreate({owner, user: req.user}, false);
+  await History.registerCreate({contextModel: owner, user: req.user}, false);
   res.status(201).json(owner);
 }
 

@@ -57,7 +57,7 @@ describe('calls.routes', () => {
     person = results.find(o => o.contacts && o.contacts.length > 0);
     owner = results.find(o => o.personId === person.id);
 
-    contactIdToBeCalled = owner.person.contacts[0].id;
+    contactIdToBeCalled = person.contacts[0].id;
 
     webhookEventStartCall = {
       tag: 'dialog-info',

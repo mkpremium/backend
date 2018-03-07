@@ -2,7 +2,9 @@ import t from 'tcomb';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {updateList} from '../lib/tcomb-utils';
+import {BuildingRepository} from '../building/models';
 import isArray from 'lodash/isArray';
+import isEmpty from 'lodash/isEmpty';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -61,16 +63,47 @@ export class OwnerRepository extends Owner {
     return owner;
   }
 
-  async findByIds(id) {
+  // TODO: .map() should not be used for convert owner.person in object
+  async findByIdWithIncludes(id, includes = ['person']) {
     if (!id) {
       throw new Error('id undefined, expected String or Array<String>');
     }
 
     const ids = isArray(id) ? id : [id];
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`;
-    const qb = this.getQueryBuilder()
-      .where(`id IN ${idsText}`);
-    return this.query(qb);
+    const qb = this.getQueryBuilder('let').where(`id IN ${idsText}`);
+
+    if (includes.indexOf('building') !== -1) {
+      const buildingRepo = new BuildingRepository();
+      const letBuildingQuery = buildingRepo
+        .getQueryBuilder('use', 'b')
+        .useKey('t.`buildingId`')
+        .where('t.`buildingId` = b.`id`');
+      qb
+        .letQuery('building', letBuildingQuery)
+        .field('building');
+    }
+
+    if (includes.indexOf('person') !== -1) {
+      const personRepo = new PersonRepository();
+      const letPersonQuery = personRepo
+        .getQueryBuilder('use', 'p')
+        .useKey('t.`personId`')
+        .where('t.`personId` = p.`id`');
+      qb
+        .letQuery('person', letPersonQuery)
+        .field('person');
+    }
+
+    const result = await this.query(qb);
+    result.map((owner) => {
+      if (owner.person.length > 0) {
+        owner.person = owner.person[0];
+      }
+      return owner;
+    });
+
+    return result;
   }
 
   async updateContactStatus(ownerId, contactId, contact) {
@@ -81,10 +114,13 @@ export class OwnerRepository extends Owner {
   }
 
   async createOwnerAndPerson(body) {
-    const personRepo = new PersonRepository();
-    if (body.person && !body.person.id) {
-      const person = await personRepo.save(body.person);
+    const ownerBody = t.OwnerBody(body);
+
+    if (!isEmpty(ownerBody.person)) {
+      const personRepo = new PersonRepository();
+      const person = await personRepo.save(ownerBody.person);
       body.personId = person.id;
+      delete body.person;
     }
 
     return this.save(body);
