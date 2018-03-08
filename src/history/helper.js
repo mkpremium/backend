@@ -51,13 +51,9 @@ export function getHistoryStruct({type, contextModel, user}) {
   const id = getModelId(contextModel);
 
   return {
-    model: {
-      name: model,
-      id
-    },
-    user: {
-      id: user.id
-    },
+    modelName: model,
+    modelId: id,
+    operatorId: user.id,
     type: recordType,
     description: getRecordDescription(model, username)[type],
     timestamp: new Date()

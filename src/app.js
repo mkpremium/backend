@@ -18,6 +18,7 @@ import scheduledEvents from './scheduledEvents';
 import migration from './migration';
 import webhooks from './webhooks';
 import socket from './socket';
+import history from './history';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -41,6 +42,7 @@ worksheet(app);
 owner(app);
 calls(app);
 scheduledEvents(app);
+history(app);
 migration(app);
 webhooks(app);
 
