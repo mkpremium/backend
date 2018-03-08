@@ -19,11 +19,6 @@ function socketJwt(sockets) {
     verifySocketToken(socket)
       .then(user => {
         socket.user = user;
-        // TODO: create connectServer() helper for test, remove  user.id !== 'system'
-        if (user.id in sockets && user.id !== 'system') {
-          sockets[user.id].disconnect();
-        }
-        sockets[user.id] = socket;
         next();
       })
       .catch(err => {
