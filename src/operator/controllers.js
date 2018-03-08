@@ -12,7 +12,8 @@ async function login(req, res) {
     operator: {
       id: operator.id,
       name: operator.profile.fullName(),
-      username: operator.username
+      username: operator.username,
+      city: operator.profile.city
     }
   };
 
