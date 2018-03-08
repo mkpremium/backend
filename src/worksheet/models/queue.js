@@ -127,7 +127,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async nextWorksheetInQueue(queue, operatorId) {
     const operatorItem = queue.findItemByOperatorId(operatorId);
-    const nextAvailableItem = queue.findNextAvailable();
+    const nextAvailableItem = queue.findNextAvailable(operatorItem);
 
     if (!nextAvailableItem) {
       throw newHttpError(422, 'No hay items disponibles en la lista');

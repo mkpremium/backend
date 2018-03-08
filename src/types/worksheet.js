@@ -1,5 +1,6 @@
 import t from 'tcomb';
-import find from 'lodash/find';
+import _find from 'lodash/find';
+import _findIndex from 'lodash/findIndex';
 import {Queue} from './constants';
 
 t.WorkSheetStatus = t.enums.of([
@@ -174,13 +175,21 @@ t.WorksheetQueue = t.struct(
 );
 
 t.WorksheetQueue.prototype.findItemById = function(id) {
-  return find(this.worksheets, {id});
+  return _find(this.worksheets, {id});
 };
 
 t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
-  return find(this.worksheets, {operatorId});
+  return _find(this.worksheets, {operatorId});
 };
 
-t.WorksheetQueue.prototype.findNextAvailable = function() {
-  return find(this.worksheets, {status: Queue.Status.AVAILABLE});
+t.WorksheetQueue.prototype.findNextAvailable = function(currentItem = null) {
+  const currentItemId = currentItem ? currentItem.id : -1;
+  const currentIndex = _findIndex(this.worksheets, {id: currentItemId});
+  const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets;
+  const nextItem = _find(worksheets, {status: Queue.Status.AVAILABLE});
+  if (!nextItem && currentIndex === this.worksheets.length - 1) {
+    return this.findNextAvailable();
+  }
+
+  return nextItem;
 };
