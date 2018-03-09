@@ -9,10 +9,6 @@ import {History} from '../history/models';
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
   const worksheets = await repo.list(req.query);
-  History.registerList({
-    contextModel: 'worksheet',
-    user: req.user
-  });
   res.json(worksheets);
 }
 
@@ -20,10 +16,6 @@ async function findById(req, res) {
   const id = req.params.id;
   const repo = new WorksheetRepository();
   const worksheet = await repo.findByIdWIthIncludes(id);
-  History.registerGet({
-    contextModel: worksheet,
-    user: req.user
-  });
   res.json(worksheet);
 }
 
@@ -31,20 +23,12 @@ async function queueByCity(req, res) {
   const cityName = req.params.city;
   const repo = new WorksheetQueueRepository();
   const queue = await repo.findByCity(cityName);
-  History.registerGet({
-    contextModel: queue,
-    user: req.user
-  });
   res.json(queue);
 }
 
 async function queueList(req, res) {
   const repo = new WorksheetQueueRepository();
   const queues = await repo.list(req.query);
-  History.registerList({
-    contextModel: 'worksheet-queue',
-    user: req.user
-  });
   res.json(queues);
 }
 
@@ -60,14 +44,14 @@ async function actionsOnWorksheetQueue(req, res) {
       return res.json(nextWorksheet);
     case QueueRequestAction.TAKE:
       const worksheet = await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id);
-      History.registerTake({
+      await History.registerTake({
         contextModel: worksheet,
         user: req.user
       });
       return res.json(worksheet);
     case QueueRequestAction.RELEASE:
       const releasedWorksheet = await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id);
-      History.registerRelease({
+      await History.registerRelease({
         contextModel: releasedWorksheet,
         user: req.user
       });
@@ -89,7 +73,7 @@ async function queueTakenFindByOperator(req, res) {
   const queue = await repo.findByCity(cityName);
 
   const queueItem = queue.findItemByOperatorId(operatorId);
-  History.registerGet({
+  await History.registerGet({
     contextModel: queue,
     user: req.user
   });
