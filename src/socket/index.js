@@ -3,7 +3,6 @@ import socketIO from 'socket.io';
 import socketJwt from '../middleware/socketJwt';
 import {connectServer} from './client';
 import _get from 'lodash/get';
-import _includes from 'lodash/includes';
 
 import {CouchbaseModel} from '../db/model';
 import {WorksheetQueueRepository} from '../worksheet/models/queue';
@@ -41,7 +40,7 @@ class SocketServer {
 
     this.io.sockets[socket.user.id] = socket;
 
-    if (_includes(socket.user.permissions, SYSTEM_ID)) {
+    if (socket.user.permissions.indexOf(SYSTEM_ID) !== -1) {
       socket.on('event', (data, ack) => {
         this.io.emit(data.payload.type, data);
         ack(true);
