@@ -71,6 +71,18 @@ t.CallService = t.struct({
 /**
  * @swagger
  * definitions:
+ *   CallBody:
+ *     properties:
+ *       contactId:
+ *         type: string
+ */
+t.CallBody = t.struct({
+  contactId: t.maybe(t.String)
+}, 'CallBody');
+
+/**
+ * @swagger
+ * definitions:
  *  HangupSuccessResponse:
  *     properties:
  *      status:

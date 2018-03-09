@@ -12,7 +12,7 @@ import {
 
 async function call(req, res) {
   const ownerId = req.params.ownerId;
-  const contactId = req.params.contactId;
+  const {contactId} = req.body;
   const owner = new OwnerRepository();
   const from = req.user.operator;
   const phoneValue = await owner.getContactPhoneNumber(ownerId, contactId);
