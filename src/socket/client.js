@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 import t from 'tcomb';
 import debug from 'debug';
+import uuid from 'uuid/v4';
 
 import {socket as socketConfig} from '../../config';
 import './types';
@@ -52,10 +53,14 @@ export class SocketClient {
 }
 
 export async function connectServer() {
+  const id = uuid();
   const payload = {
-    id: SYSTEM_ID,
+    id,
+    permissions: [
+      SYSTEM_ID
+    ],
     operator: {
-      id: SYSTEM_ID,
+      id,
       name: 'mkpremium'
     }
   };

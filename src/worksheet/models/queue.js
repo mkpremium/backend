@@ -139,4 +139,13 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     return this.takeWorksheetInQueue(updatedQueue, nextAvailableItem.id, operatorId);
   }
+
+  async releaseTakenWorksheetInQueue(cityName, operatorId) {
+    const queue = await this.findByCity(cityName);
+    const operatorItem = queue.findItemByOperatorId(operatorId);
+
+    if (operatorItem) {
+      await this.releaseWorksheetInQueue(queue, operatorItem.id);
+    }
+  }
 }
