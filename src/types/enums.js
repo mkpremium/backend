@@ -52,6 +52,8 @@ t.RecordAction = t.enums.of([
   'GET',
   'OPEN',
   'LIST',
+  'RELEASE',
+  'TAKE',
   'ERROR'
 ]);
 

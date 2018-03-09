@@ -120,7 +120,7 @@ describe('scheduledevents.routes', () => {
         const response = await request(app)
           .get('/scheduled-events')
           .set('Authorization', authenticatedOperator.authorization)
-          .query({createdBetween: '1989-12-27,2018-12-31'})
+          .query({createdBetween: '1989-12-27,2030-12-31'})
           .expect(200);
         response.body.should.be.a('object');
         response.body.total.should.equal(56);
