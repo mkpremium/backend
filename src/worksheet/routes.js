@@ -148,6 +148,11 @@ router.get('/:id', worksheetFindByIdController);
  *       - admin: []
  *     summary: Obtiene la cola de fichas de trabajo para una ciudad dada
  *     parameters:
+ *       - name: extra
+ *         in: query
+ *         description: Incluye información adicional a los items de la cola
+ *         default: false
+ *         type: boolean
  *       - name: city
  *         in: path
  *         description: Ciudad de la cola de trabajo

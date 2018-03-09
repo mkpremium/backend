@@ -43,9 +43,13 @@ export async function operatorLogin(app, credentials = {username: 'admin', passw
   return Object.assign({}, response.body, {authorization: `Bearer ${response.body.token}`});
 }
 
-export async function operatorCreate(index = '') {
+export async function createFullOperator(object) {
   const repo = new OperatorRepository();
-  return repo.save({
+  return repo.save(object);
+}
+
+export async function operatorCreate(index = '') {
+  return createFullOperator({
     username: `operator${index}`,
     password: 'password',
     agentNumber: `operator${index}`,
@@ -54,14 +58,14 @@ export async function operatorCreate(index = '') {
     ],
     profile: {
       firstName: 'operator',
-      lastName: 'operator'
+      lastName: 'operator',
+      city: 'barcelona'
     }
   });
 }
 
 export async function operatorCreateAdmin() {
-  const repo = new OperatorRepository();
-  return repo.save({
+  return createFullOperator({
     username: 'admin',
     password: 'password',
     agentNumber: 'admin',
@@ -70,14 +74,14 @@ export async function operatorCreateAdmin() {
     ],
     profile: {
       firstName: 'admin',
-      lastName: 'operator'
+      lastName: 'operator',
+      city: 'barcelona'
     }
   });
 }
 
 export async function operatorCreateManager() {
-  const repo = new OperatorRepository();
-  return repo.save({
+  return createFullOperator({
     username: 'manager',
     password: 'password',
     agentNumber: 'manager',
@@ -86,7 +90,8 @@ export async function operatorCreateManager() {
     ],
     profile: {
       firstName: 'manager',
-      lastName: 'operator'
+      lastName: 'operator',
+      city: 'barcelona'
     }
   });
 }

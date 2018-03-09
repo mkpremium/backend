@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import _get from 'lodash/get';
 import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
 import {WorksheetQueueRepository} from './models/queue';
@@ -19,10 +20,22 @@ async function findById(req, res) {
   res.json(worksheet);
 }
 
+function bool(value) {
+  return value === 'true';
+}
+
 async function queueByCity(req, res) {
+  const extra = bool(_get(req.query, 'extra', false));
   const cityName = req.params.city;
   const repo = new WorksheetQueueRepository();
-  const queue = await repo.findByCity(cityName);
+  let queue;
+
+  if (extra) {
+    queue = await repo.findByCityExtra(cityName);
+  } else {
+    queue = await repo.findByCity(cityName);
+  }
+
   res.json(queue);
 }
 

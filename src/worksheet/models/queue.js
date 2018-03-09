@@ -1,5 +1,8 @@
+import Promise from 'bluebird';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
+import _map from 'lodash/map';
+import _set from 'lodash/set';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
@@ -31,6 +34,47 @@ export class QueueItemRepository extends QueueItem {
 }
 
 export class WorksheetQueueRepository extends WorksheetQueue {
+  async getExtraInfo(queue) {
+    const worksheetIds = _map(queue.worksheets, 'worksheetId');
+    const worksheetRepo = new WorksheetRepository();
+    const worksheets = await Promise
+      .map(worksheetIds, (worksheetId) => worksheetRepo.findByIdWIthIncludes(worksheetId));
+
+    return worksheets.map(worksheet => {
+      const info = {};
+      const item = queue.findItemByWorksheetId(worksheet.id);
+
+      _set(info, 'totalContacts', worksheet.relatedOwners.length);
+      _set(info, 'totalBuildings', worksheet.relatedBuildings.length);
+
+      const [owner] = worksheet.relatedOwners;
+      if (owner) {
+        _set(info, 'ownerName', owner.person.name);
+        _set(info, 'ownerType', owner.type);
+      }
+
+      const [building] = worksheet.relatedBuildings;
+      if (building) {
+        _set(info, 'buildingAddress', building.address.fullAddress);
+      }
+
+      const [call] = worksheet.calls;
+      if (call) {
+        _set(info, 'lastCall', call);
+      }
+
+      return Object.assign({}, JSON.parse(JSON.stringify(item)), info);
+    });
+  }
+
+  async findByCityExtra(name) {
+    const queue = await this.findByCity(name);
+    const worksheets = await this.getExtraInfo(queue);
+    const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), {worksheets});
+
+    return fromJSON(queueExtraInfo, t.WorksheetQueueExtraInfo);
+  }
+
   async findByCity(name) {
     const qb = this.getQueryBuilder()
       .where('city = ?', name)

@@ -139,7 +139,7 @@ export class OwnerRepository extends Owner {
 
     return personRepo.addContact(owner.personId, body);
   }
-  
+
   async getContactPhoneNumber(ownerId, contactId) {
     const personRepo = new PersonRepository();
     const owner = await this.findById(ownerId);

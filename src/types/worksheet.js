@@ -10,6 +10,11 @@ t.WorkSheetStatus = t.enums.of([
 
 t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
 
+t.WorkSheetCall = t.struct({
+  ownerId: t.String,
+  realizedAt: t.Date
+}, 'WorkSheetCall');
+
 /**
  * @swagger
  * definitions:
@@ -35,10 +40,7 @@ t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
  */
 t.WorkSheet = t.struct({
   id: t.maybe(t.String),
-  calls: t.list(t.struct({
-    ownerId: t.String,
-    realizedAt: t.Date
-  })),
+  calls: t.list(t.WorkSheetCall),
 
   queueId: t.maybe(t.String),
 
@@ -127,6 +129,16 @@ t.QueueItem = t.struct(
   }
 );
 
+t.QueueItemExtraInfo = t.QueueItem.extend({
+  totalContacts: t.Number,
+  totalBuildings: t.Number,
+  ownerName: t.maybe(t.String),
+  ownerType: t.maybe(t.String),
+  buildingAddress: t.maybe(t.String),
+  note: t.maybe(t.String),
+  lastCall: t.maybe(t.WorkSheetCall)
+});
+
 t.QueueItem.prototype.canBeOpened = function() {
   return Queue.StatusAvailable.indexOf(this.status) !== -1;
 };
@@ -174,8 +186,28 @@ t.WorksheetQueue = t.struct(
   }
 );
 
+t.WorksheetQueueExtraInfo = t.struct({
+  id: t.maybe(t.String),
+  city: t.String,
+  worksheets: t.list(t.QueueItemExtraInfo),
+
+  _documentType: t.enums.of(['worksheet-queue'])
+},
+{
+  name: 'WorksheetQueue',
+  defaultProps: {
+    worksheets: [],
+    _documentType: 'worksheet-queue'
+  }
+}
+);
+
 t.WorksheetQueue.prototype.findItemById = function(id) {
   return _find(this.worksheets, {id});
+};
+
+t.WorksheetQueue.prototype.findItemByWorksheetId = function(worksheetId) {
+  return _find(this.worksheets, {worksheetId});
 };
 
 t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {

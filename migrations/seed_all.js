@@ -2,13 +2,29 @@ import app from '../src/app';
 
 import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
-import {deleteAll, operatorCreate, operatorCreateAdmin, operatorCreateManager} from '../test/common';
+import {
+  createFullOperator, deleteAll, operatorCreateAdmin,
+  operatorCreateManager
+} from '../test/common';
 import {RelatedModel} from '../src/migration/lib/related-model';
 
 export async function seed(files) {
   await app.locals.bucketPromise;
   await deleteAll();
-  await operatorCreate();
+  await createFullOperator({
+    username: `operator`,
+    password: 'operator',
+    agentNumber: `10106-905`,
+    serviceId: '17146',
+    roles: [
+      'OPERATOR'
+    ],
+    profile: {
+      firstName: 'Operador',
+      lastName: 'Prueba',
+      city: 'barcelona'
+    }
+  });
   await operatorCreateAdmin();
   await operatorCreateManager();
 
