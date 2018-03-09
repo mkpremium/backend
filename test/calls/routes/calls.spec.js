@@ -96,20 +96,22 @@ describe('calls.routes', () => {
     done();
   });
 
-  describe('POST /calls/owner/:ownerId/contact/:contactId @request', () => {
+  describe('POST /calls/owner/:ownerId @request', () => {
     it('200 Operación exitosa', async() => {
       await request(app)
-        .post(`/calls/owner/${owner.id}/contact/${contactIdToBeCalled}`)
+        .post(`/calls/owner/${owner.id}`)
+        .send({contactId: contactIdToBeCalled})
         .set('Authorization', authenticatedOperator.authorization)
         .expect(200);
     });
   });
 
-  describe('POST /calls/owner/:ownerId/contact/:contactId @request', () => {
+  describe('POST /calls/owner/:ownerId @request', () => {
     const contactId = 'TEST';
     it('400 Operación fallida', async() => {
       await request(app)
-        .post(`/calls/owner/${owner.id}/contact/${contactId}`)
+        .post(`/calls/owner/${owner.id}`)
+        .send({contactId})
         .set('Authorization', authenticatedOperator.authorization)
         .expect(400);
     });

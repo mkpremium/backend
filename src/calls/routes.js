@@ -18,13 +18,15 @@ const webhook = Router();
 
 /**
  * @swagger
- * /calls/owner/{ownerId}/:contactId:
+ * /calls/owner/{ownerId}:
  *   post:
  *     security:
  *       - admin: []
  *       - operator: []
  *     tags: [Calls, Operator]
  *     summary: Iniciar llamada
+ *     consumes:
+ *       - "application/json"
  *     produces:
  *      - "application/json"
  *     parameters:
@@ -33,11 +35,11 @@ const webhook = Router();
  *        type: string
  *        format: uuid/v4
  *        description: Id del propietario a llamar
-*      - name: contactId
- *        in: path
- *        type: string
- *        format: uuid/v4
- *        description: Id del contacto del propietario
+ *      - name: body
+ *        in: body
+ *        required: true
+ *        schema:
+ *          $ref: "#/definitions/CallBody"
  *     responses:
  *       200:
  *         description: Peticion de llamada exitosa
@@ -48,7 +50,7 @@ const webhook = Router();
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-call.post('/owner/:ownerId/contact/:contactId', permissions.operator, callController);
+call.post('/owner/:ownerId', permissions.operator, callController);
 
 /**
  * @swagger
@@ -82,6 +84,8 @@ call.post('/hangup', permissions.operator, hangupController);
  *       - operator: []
  *     tags: [Calls]
  *     summary: Agrega/Actualiza nota en llamada existente
+ *     consumes:
+ *       - "application/json"
  *     produces:
  *      - "application/json"
  *     parameters:
