@@ -32,7 +32,7 @@ const router = Router();
  *       - name: actionType
  *         in: query
  *         type: string
- *         enum: [UPDATE, CREATE, GET, OPEN, LIST, ERROR]
+ *         enum: [UPDATE, CREATE, GET, OPEN, LIST, RELEASE, TAKE, ERROR]
  *         description: Tipo de accion
  *       - name: modelName
  *         in: query

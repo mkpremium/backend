@@ -13,23 +13,29 @@ import t from 'tcomb';
  *         type: string
  *       type:
  *         type: string
- *         enum: [UPDATE, CREATE, GET, OPEN, LIST, ERROR]
+ *         enum: [UPDATE, CREATE, GET, OPEN, LIST, RELEASE, TAKE, ERROR]
  *       description:
+ *         type: string
+ *       createdAt:
  *         type: string
  */
 t.History = t.struct({
+  id: t.maybe(t.String),
   modelName: t.String,
   modelId: t.String,
   operatorId: t.String,
   type: t.RecordAction,
   description: t.String,
-  timestamp: t.Date,
+  createdAt: t.Date,
   _documentType: t.String
 },
 {
   name: 'History',
   defaultProps: {
-    _documentType: 'history'
+    _documentType: 'history',
+    get createdAt() {
+      return new Date();
+    }
   }
 });
 

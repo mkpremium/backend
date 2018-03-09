@@ -40,7 +40,9 @@ function getRecordDescription(model, username) {
     UPDATE: `${username} ha actualizado ${recordContext}`,
     GET: `${username} ha obtenido ${recordContext}`,
     OPEN: `${username} ha abierto ${recordContext}`,
-    LIST: `${username} ha listado ${getRecordContext(model, true)}`
+    LIST: `${username} ha listado ${getRecordContext(model, true)}`,
+    TAKE: `${username} ha tomado ${recordContext}`,
+    RELEASE: `${username} ha liberado ${recordContext}`
   };
 }
 
@@ -55,7 +57,6 @@ export function getHistoryStruct({type, contextModel, user}) {
     modelId: id,
     operatorId: user.id,
     type: recordType,
-    description: getRecordDescription(model, username)[type],
-    timestamp: new Date()
+    description: getRecordDescription(model, username)[type]
   };
 }

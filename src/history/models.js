@@ -47,6 +47,18 @@ export class History extends CouchbaseModel {
     eventData.type = 'LIST';
     return history.register(eventData, sendEvent);
   }
+
+  static async registerTake(eventData, sendEvent = false) {
+    const history = new History();
+    eventData.type = 'TAKE';
+    return history.register(eventData, sendEvent);
+  }
+
+  static async registerRelease(eventData, sendEvent = false) {
+    const history = new History();
+    eventData.type = 'RELEASE';
+    return history.register(eventData, sendEvent);
+  }
 }
 
 export class HistoryRepository extends History {
@@ -58,8 +70,8 @@ export class HistoryRepository extends History {
     const qbCount = this.getQueryBuilder('count');
 
     if (params.operatorId) {
-      qb.where('operatorId = ?', params.userId);
-      qbCount.where('operatorId = ?', params.userId);
+      qb.where('operatorId = ?', params.operatorId);
+      qbCount.where('operatorId = ?', params.operatorId);
     }
 
     if (params.actionType) {
@@ -73,11 +85,11 @@ export class HistoryRepository extends History {
     }
 
     if (params.createdAt) {
-      addDateQueryToBuilder(qb, 'timestamp', params.createdAt);
-      addDateQueryToBuilder(qbCount, 'timestamp', params.createdAt);
+      addDateQueryToBuilder(qb, 'createdAt', params.createdAt);
+      addDateQueryToBuilder(qbCount, 'createdAt', params.createdAt);
     } else if (params.createdBetween) {
-      addBetweenQueryToBuilder(qb, 'timestamp', params.createdBetween);
-      addBetweenQueryToBuilder(qbCount, 'timestamp', params.createdBetween);
+      addBetweenQueryToBuilder(qb, 'createdAt', params.createdBetween);
+      addBetweenQueryToBuilder(qbCount, 'createdAt', params.createdBetween);
     }
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);

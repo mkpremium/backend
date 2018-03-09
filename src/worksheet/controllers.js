@@ -60,9 +60,17 @@ async function actionsOnWorksheetQueue(req, res) {
       return res.json(nextWorksheet);
     case QueueRequestAction.TAKE:
       const worksheet = await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      await History.registerTake({
+        contextModel: worksheet,
+        user: req.user
+      });
       return res.json(worksheet);
     case QueueRequestAction.RELEASE:
-      await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      const releasedWorksheet = await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      await History.registerRelease({
+        contextModel: releasedWorksheet,
+        user: req.user
+      });
       return res.status(204).send();
   }
 }
