@@ -17,7 +17,7 @@ async function updateOwner(req, res) {
   const id = req.params.id;
   const contextModel = {_documentType: 'owner', id};
   const repo = new OwnerRepository();
-  await repo.update(id, req.body);
+  await repo.update(id, Object.assign({}, req.body, {id}));
   await History.registerUpdate({contextModel, user: req.user});
 
   res.status(204).send();
