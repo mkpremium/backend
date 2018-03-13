@@ -1,5 +1,5 @@
 import t from 'tcomb';
-import find from 'lodash/find';
+import _find from 'lodash/find';
 
 /**
  * @swagger
@@ -212,6 +212,6 @@ t.Person = t.struct(
   }
 );
 
-t.Person.prototype.findContact = function(id) {
-  return find(this.contacts, {id});
+t.Person.prototype.findContactById = function(id) {
+  return _find(this.contacts, {id});
 };

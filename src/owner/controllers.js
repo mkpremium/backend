@@ -2,12 +2,13 @@ import {wrap} from 'express-promise-wrap';
 import {OwnerRepository} from './models';
 import {History} from '../history/models';
 
-async function updateOwnerContactStatus(req, res) {
+async function updateOwnerContact(req, res) {
   const ownerId = req.params.id;
   const contactId = req.params.contactId;
   const contextModel = {_documentType: 'owner-contact', contactId};
+
   const repo = new OwnerRepository();
-  await repo.updateContactStatus(ownerId, contactId, req.body);
+  await repo.updateContact(ownerId, contactId, req.body);
   await History.registerUpdate({contextModel, user: req.user});
   res.status(204).send();
 }
@@ -18,15 +19,17 @@ async function updateOwner(req, res) {
   const repo = new OwnerRepository();
   await repo.update(id, req.body);
   await History.registerUpdate({contextModel, user: req.user});
+
   res.status(204).send();
 }
 
 async function addOwnerContact(req, res) {
-  const id = req.params.id;
+  const ownerId = req.params.id;
   const repo = new OwnerRepository();
-  const contextModel = await repo.addContact(id, req.body);
+  const contextModel = await repo.addContact(ownerId, req.body);
   await History.registerCreate({contextModel, user: req.user});
-  res.status(204).send();
+  const updatedOwner = await repo.findByIdWithIncludes(ownerId);
+  res.json(updatedOwner);
 }
 
 async function addOwner(req, res) {
@@ -36,7 +39,7 @@ async function addOwner(req, res) {
   res.status(201).json(owner);
 }
 
-export const updateOwnerContactStatusController = wrap(updateOwnerContactStatus);
+export const updateOwnerContactController = wrap(updateOwnerContact);
 export const updateOwnerController = wrap(updateOwner);
 export const addOwnerContactController = wrap(addOwnerContact);
 export const addOwnerController = wrap(addOwner);

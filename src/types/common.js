@@ -120,7 +120,9 @@ t.TypedContactInfo = t.struct(
   {
     name: 'TypedContactInfo',
     defaultProps: {
-      id: uuid(),
+      get id() {
+        return uuid();
+      },
       type: 'TELEFONO',
       status: 'UNDEFINED'
     }

@@ -23,6 +23,7 @@ describe('owner.routes', () => {
 
   describe('PUT /owners/:id/contacts/:contactId @request', () => {
     it('204 Operación exitosa', async() => {
+      console.log(person.contacts);
       const contactId = person.contacts[0].id;
       await request(app)
         .put(`/owners/${owner.id}/contacts/${contactId}`)
@@ -56,10 +57,11 @@ describe('owner.routes', () => {
           value: '1234567890',
           status: 'GOOD'
         })
-        .expect(204);
+        .expect(200);
 
       const updatedPerson = await personRepo.findById(person.id);
 
+      updatedPerson.contacts[0].id.should.not.equal(updatedPerson.contacts[1]);
       updatedPerson.contacts.should.have.length(2);
     });
   });

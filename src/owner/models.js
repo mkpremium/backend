@@ -23,16 +23,23 @@ export class PersonRepository extends Person {
     this.Struct = t.Person;
   }
 
-  async updateContactStatus(personId, contactId, body = {}) {
-    const data = new t.TypedContactInfoUpdate(body);
-    const person = await this.findById(personId);
-    const personContact = person.findContact(contactId);
+  async findByIdOrThrow(ownerId) {
+    const owner = await this.findById(ownerId);
+    if (!owner) {
+      throw newHttpError(404, `El propietario ${ownerId} no existe`);
+    }
 
-    if (!personContact) {
+    return owner;
+  }
+
+  async updateContact(personId, contactId, data) {
+    const person = await this.findById(personId);
+    const contact = person.findContactById(contactId);
+    if (!contact) {
       throw newHttpError(400, `La información de contacto ${contactId} no fue encontrada y no pudo actualizarse`);
     }
 
-    const updatedContacts = updateList(person.contacts, personContact, data);
+    const updatedContacts = updateList(person.contacts, contact, data);
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
@@ -106,11 +113,10 @@ export class OwnerRepository extends Owner {
     return result;
   }
 
-  async updateContactStatus(ownerId, contactId, contact) {
+  async updateContact(ownerId, contactId, data) {
+    const {personId} = await this.findByIdOrThrow(ownerId);
     const personRepo = new PersonRepository();
-    const owner = await this.findByIdOrThrow(ownerId);
-
-    return personRepo.updateContactStatus(owner.personId, contactId, contact);
+    return personRepo.updateContact(personId, contactId, data);
   }
 
   async createOwnerAndPerson(body) {
@@ -145,7 +151,7 @@ export class OwnerRepository extends Owner {
     const owner = await this.findById(ownerId);
     const person = await personRepo.findById(owner.personId);
 
-    const ownerContactValue = person.findContact(contactId);
+    const ownerContactValue = person.findContactById(contactId);
 
     if (!ownerContactValue) {
       throw newHttpError(400, `El número de contacto para el owner ${ownerId} no existe`);

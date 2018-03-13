@@ -129,6 +129,8 @@ t.AddCallNote = t.struct({
 }, {
   name: 'AddCallNote',
   defaultProps: {
-    id: uuid()
+    get id() {
+      return uuid();
+    }
   }
 });

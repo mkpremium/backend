@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {
-  addOwnerContactController, addOwnerController, updateOwnerContactStatusController,
+  addOwnerContactController, addOwnerController, updateOwnerContactController,
   updateOwnerController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
@@ -118,8 +118,9 @@ router.put('/:id', updateOwnerController);
  *         schema:
  *           $ref: "#/definitions/TypedContactInfoUpdate"
  *     responses:
- *       204:
- *         description: Operación exitosa
+ *       200:
+ *         schema:
+ *           $ref: "#/definitions/Owner"
  *       404:
  *         description: Propietario no existe
  *         schema:
@@ -129,7 +130,7 @@ router.put('/:id', updateOwnerController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id/contacts/:contactId', updateOwnerContactStatusController);
+router.put('/:id/contacts/:contactId', updateOwnerContactController);
 
 /**
  * @swagger
