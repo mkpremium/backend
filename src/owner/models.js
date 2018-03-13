@@ -33,14 +33,13 @@ export class PersonRepository extends Person {
   }
 
   async updateContact(personId, contactId, data) {
-    const concatData = t.TypedContactInfoUpdate(data);
     const person = await this.findByIdOrThrow(personId);
     const contact = person.findContactById(contactId);
     if (!contact) {
       throw newHttpError(400, `La información de contacto ${contactId} no fue encontrada y no pudo actualizarse`);
     }
 
-    const updatedContacts = updateList(person.contacts, contact, concatData);
+    const updatedContacts = updateList(person.contacts, contact, Object.assign({}, data, {id: contactId}));
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
