@@ -4,11 +4,7 @@ import './types';
 import jwt from '../middleware/jwt';
 
 export default (app) => {
-  const secured = jwt().unless({
-    path: [
-      '/operator/login'
-    ]
-  });
+  const secured = jwt();
 
   app.use('/worksheets', secured, routes);
 };
