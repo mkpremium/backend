@@ -23,23 +23,24 @@ export class PersonRepository extends Person {
     this.Struct = t.Person;
   }
 
-  async findByIdOrThrow(ownerId) {
-    const owner = await this.findById(ownerId);
-    if (!owner) {
-      throw newHttpError(404, `El propietario ${ownerId} no existe`);
+  async findByIdOrThrow(personId) {
+    const person = await this.findById(personId);
+    if (!person) {
+      throw newHttpError(404, `La persona ${personId} no existe`);
     }
 
-    return owner;
+    return person;
   }
 
   async updateContact(personId, contactId, data) {
-    const person = await this.findById(personId);
+    const concatData = t.TypedContactInfoUpdate(data);
+    const person = await this.findByIdOrThrow(personId);
     const contact = person.findContactById(contactId);
     if (!contact) {
       throw newHttpError(400, `La información de contacto ${contactId} no fue encontrada y no pudo actualizarse`);
     }
 
-    const updatedContacts = updateList(person.contacts, contact, data);
+    const updatedContacts = updateList(person.contacts, contact, concatData);
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
