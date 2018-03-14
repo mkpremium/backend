@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import Promise from 'bluebird';
 import express from 'express';
 import {Server} from 'http';
 import debug from 'debug';
@@ -13,7 +14,10 @@ const app = express();
 const httpServer = Server(app);
 const server = httpServer.listen(socketConfig.port, listenHandler);
 
-couchbase(app)
+Promise.all([
+  socket.initModel(),
+  couchbase(app)
+])
   .catch(err => {
     console.error(err);
   });
