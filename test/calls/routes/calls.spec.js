@@ -36,11 +36,11 @@ describe('calls.routes', () => {
 
     const operatorRepo = new OperatorRepository();
     callsModel = new Calls();
-    
+
     await operatorRepo.save({
       username: 'callerOperator',
       password: 'password',
-      agentNumber: '10106-905',
+      agentNumber: '10106-919',
       serviceId: '17146',
       roles: [
         'OPERATOR'
@@ -62,11 +62,11 @@ describe('calls.routes', () => {
       tag: 'dialog-info',
       data: {
         remoteidentity: '0056949826553',
-        localidentity: '10106-905',
+        localidentity: '10106-919',
         state: 'early',
         fromuser: '0056949826553',
         ServiceData: '0056949826553#17146#9151938902790598604###1',
-        called: '10106-905'
+        called: '10106-919'
       }
     };
 
@@ -74,17 +74,17 @@ describe('calls.routes', () => {
       tag: 'dialog-info',
       data: {
         remoteidentity: '0056949826553',
-        localidentity: '10106-905',
+        localidentity: '10106-919',
         state: 'early',
         fromuser: '934922728',
         ServiceData: '0056949826553#17146#9151938902790598604###1',
-        called: '10106-905'
+        called: '10106-919'
       }
     };
 
     callObject = {
       userId: authenticatedOperator.operator.id,
-      from: '905',
+      from: '919',
       to: '+56949826553',
       callId: '9151938902790598604'
     };
@@ -176,7 +176,7 @@ describe('calls.model', () => {
     await operatorRepo.save({
       username: 'callerOperator',
       password: 'password',
-      agentNumber: '10106-905',
+      agentNumber: '10106-919',
       serviceId: '17146',
       roles: [
         'OPERATOR'
@@ -189,7 +189,7 @@ describe('calls.model', () => {
     authenticatedOperator = await operatorLogin(app, {username: 'callerOperator', password: 'password'});
     await callsModel.save({
       userId: authenticatedOperator.operator.id,
-      from: '905',
+      from: '919',
       to: '+56949826553',
       callId: '9151938902790598604',
       events: [],

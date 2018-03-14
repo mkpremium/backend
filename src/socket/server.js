@@ -47,15 +47,17 @@ export class SocketServer {
       });
     }
 
-    socket.on('disconnect', async() => {
-      const cityName = _get(socket, 'user.operator.profile.city', null);
+    socket.on('disconnect', () => {
+      const cityName = _get(socket, 'user.operator.city', null);
       const operatorId = _get(socket, 'user.operator.id', null);
 
       if (!isSystem && this.io.sockets[socket.user.id].id === socket.id && cityName) {
+        socketDebug('releasing taken worksheets for', socket.user.id);
         const queueRepo = new WorksheetQueueRepository();
-        await queueRepo.releaseTakenWorksheetInQueue(cityName, operatorId);
+        queueRepo.releaseTakenWorksheetInQueue(cityName, operatorId).catch(err => {
+          console.error(err);
+        });
       }
-      socketDebug('goodbye', msg);
     });
   }
 }

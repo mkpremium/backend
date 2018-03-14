@@ -1,17 +1,22 @@
 #!/usr/bin/env node
-
 import express from 'express';
 import {Server} from 'http';
 import debug from 'debug';
 
 import {socket as socketConfig} from '../config';
 import socket from '../src/socket';
+import couchbase from '../src/db/couchbase';
 
 const socketDebug = debug('app:socket');
 
 const app = express();
 const httpServer = Server(app);
 const server = httpServer.listen(socketConfig.port, listenHandler);
+
+couchbase(app)
+  .catch(err => {
+    console.error(err);
+  });
 
 server.on('error', errorHandler);
 

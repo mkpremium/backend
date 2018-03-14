@@ -60,7 +60,7 @@ describe('history.register', () => {
         id: savedOperator.id,
         operator: {
           username: 'test',
-          agentNumber: '10106-905',
+          agentNumber: '10106-919',
           serviceId: '17146'
         }
       };
@@ -137,7 +137,7 @@ describe('history:routes', () => {
       id: savedOperator.id,
       operator: {
         username: 'test',
-        agentNumber: '10106-905',
+        agentNumber: '10106-919',
         serviceId: '17146'
       }
     };

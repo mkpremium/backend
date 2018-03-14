@@ -14,7 +14,7 @@ export async function seed(files) {
   await createFullOperator({
     username: `operator`,
     password: 'operator',
-    agentNumber: `10106-905`,
+    agentNumber: `10106-919`,
     serviceId: '17146',
     roles: [
       'OPERATOR'

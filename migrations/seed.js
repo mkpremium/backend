@@ -21,7 +21,7 @@ async function init() {
   await createFullOperator({
     username: `bitdistrict`,
     password: 'bitdistrict',
-    agentNumber: `10106-905`,
+    agentNumber: `10106-919`,
     serviceId: '17146',
     roles: [
       'OPERATOR'

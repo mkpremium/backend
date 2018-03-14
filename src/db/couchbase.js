@@ -3,6 +3,7 @@ import Couchbase from 'couchbase';
 import {couchbase} from '../../config';
 import attachHelpers from './helpers';
 
+import '../types';
 import '../lib/squel/let';
 
 import {CouchbaseModel} from './model';
