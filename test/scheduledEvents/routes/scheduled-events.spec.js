@@ -16,25 +16,32 @@ describe('scheduledevents.routes', () => {
     await operatorCreate();
     const scheduledEventRepo = new ScheduledEventsRepository();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
-    
+
     scheduledMeetingsEventObject = {
-      userId: authenticatedOperator.operator.id,
       type: 'MEETINGS',
-      data: {from: 'test', to: 'test'},
-      notifyAt: new Date('2018-05-28T16:24:00Z')
+      notifyAt: new Date('2018-05-28T16:24:00Z'),
+      notifyTo: authenticatedOperator.operator.id,
+      event: {
+        ownerId: 'not-exist-in-db',
+        buildingId: 'not-exist-in-db'
+      }
     };
 
     scheduledCallsEventObject = {
-      userId: authenticatedOperator.operator.id,
+      notifyTo: authenticatedOperator.operator.id,
       type: 'CALLS',
-      data: {from: 'test', to: 'test'},
       notifyAt: new Date('2018-02-28T16:24:00Z'),
-      eventDate: new Date('2018-02-29T16:24:00Z')
+      eventDate: new Date('2018-02-29T16:24:00Z'),
+      event: {
+        contactId: 'not-exist-in-db',
+        worksheetId: 'not-exist-in-db',
+        buildingId: 'not-exist-in-db'
+      }
     };
 
     await Promise.all(times(49, () => scheduledEventRepo.save(scheduledCallsEventObject)));
     scheduledEventToBeUpdated = await scheduledEventRepo.save(scheduledCallsEventObject);
-    
+
     scheduledMeetingsEventObject.eventDate = new Date('2018-01-05T16:00:00Z');
     await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
     scheduledMeetingsEventObject.eventDate = new Date('2018-02-05T16:00:00Z');
@@ -172,11 +179,12 @@ describe('scheduledevents.routes', () => {
 
   describe('POST /scheduled-events @request', () => {
     it('201 Operación exitosa', async() => {
-      await request(app)
-        .post('/scheduled-events')
+      const response = await request(app)
+        .post('/scheduled-events/call')
         .set('Authorization', authenticatedOperator.authorization)
-        .send(scheduledCallsEventObject)
-        .expect(201);
+        .send(scheduledCallsEventObject);
+      console.log(response.body);
+      response.status.should.equal(201);
     });
   });
 

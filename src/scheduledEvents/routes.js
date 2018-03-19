@@ -1,7 +1,8 @@
 import {Router} from 'express';
 
 import {
-  addScheduledEventController,
+  addScheduledCallEventController,
+  addScheduledMeetingEventController,
   findScheduledEventController,
   listScheduledEventController,
   updateScheduledEnventController,
@@ -123,13 +124,13 @@ router.get('/', permissions.operator, listScheduledEventController);
 
 /**
  * @swagger
- * /scheduled-events:
+ * /scheduled-events/meeting:
  *   post:
  *    security:
  *      - admin: []
  *      - operator: []
  *    tags: [ScheduledEvents]
- *    summary: Registra evento programado
+ *    summary: Registra evento de cita programada
  *    description: Permite programar un evento
  *    consumes:
  *      - "application/json"
@@ -140,7 +141,7 @@ router.get('/', permissions.operator, listScheduledEventController);
  *        in: body
  *        required: true
  *        schema:
- *          $ref: "#/definitions/ScheduledEventBody"
+ *          $ref: "#/definitions/ScheduledMeetingEventBody"
  *    responses:
  *      201:
  *        description: Operación exitosa
@@ -159,7 +160,47 @@ router.get('/', permissions.operator, listScheduledEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.post('/', permissions.operator, addScheduledEventController);
+router.post('/meeting', permissions.operator, addScheduledMeetingEventController);
+
+/**
+ * @swagger
+ * /scheduled-events/call:
+ *   post:
+ *    security:
+ *      - admin: []
+ *      - operator: []
+ *    tags: [ScheduledEvents]
+ *    summary: Registra evento de llamada programada
+ *    description: Permite programar un evento
+ *    consumes:
+ *      - "application/json"
+ *    produces:
+ *      - "application/json"
+ *    parameters:
+ *      - name: body
+ *        in: body
+ *        required: true
+ *        schema:
+ *          $ref: "#/definitions/ScheduledCallEventBody"
+ *    responses:
+ *      201:
+ *        description: Operación exitosa
+ *        schema:
+ *          $ref: "#/definitions/ScheduledEvent"
+ *      400:
+ *        description: Solicitud incorrecta
+ *        schema:
+ *          $ref: "#/definitions/Error"
+ *      401:
+ *        description: Credenciales inválidos o cuenta deshabilitada
+ *        schema:
+ *          $ref: "#/definitions/Error"
+ *      403:
+ *        description: Permisos insuficientes
+ *        schema:
+ *          $ref: "#/definitions/Error"
+*/
+router.post('/call', permissions.operator, addScheduledCallEventController);
 
 /**
  * @swagger

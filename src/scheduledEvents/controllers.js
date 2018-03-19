@@ -1,5 +1,6 @@
 import {wrap} from 'express-promise-wrap';
 import {ScheduledEventsRepository} from './models';
+import {getScheduledCallStruct, getScheduledMeetingStruct} from './helper';
 
 async function listScheduledEvent(req, res) {
   const repo = new ScheduledEventsRepository();
@@ -15,11 +16,23 @@ async function findByIdScheduledEvent(req, res) {
   res.json(scheduleEvent);
 }
 
-async function addScheduledEvent(req, res) {
-  const repo = new ScheduledEventsRepository();
+async function addScheduledCallEvent(req, res) {
   req.body.notifyAt = new Date(req.body.notifyAt);
   req.body.eventDate = new Date(req.body.eventDate);
-  const scheduledEvent = await repo.save(req.body);
+
+  const repo = new ScheduledEventsRepository();
+  const scheduledEventBody = await getScheduledCallStruct(Object.assign({}, req.body, {type: 'CALLS'}));
+  const scheduledEvent = await repo.save(scheduledEventBody);
+  res.status(201).json(scheduledEvent);
+}
+
+async function addScheduledMeetingEvent(req, res) {
+  req.body.notifyAt = new Date(req.body.notifyAt);
+  req.body.eventDate = new Date(req.body.eventDate);
+
+  const repo = new ScheduledEventsRepository();
+  const scheduledEventBody = await getScheduledMeetingStruct(Object.assign({}, req.body, {type: 'MEETINGS'}));
+  const scheduledEvent = await repo.save(scheduledEventBody);
   res.status(201).json(scheduledEvent);
 }
 
@@ -39,6 +52,7 @@ async function deleteScheduledEvent(req, res) {
 
 export const listScheduledEventController = wrap(listScheduledEvent);
 export const findScheduledEventController = wrap(findByIdScheduledEvent);
-export const addScheduledEventController = wrap(addScheduledEvent);
+export const addScheduledCallEventController = wrap(addScheduledCallEvent);
+export const addScheduledMeetingEventController = wrap(addScheduledMeetingEvent);
 export const updateScheduledEnventController = wrap(updateScheduledEvent);
 export const deleteScheduledEventController = wrap(deleteScheduledEvent);

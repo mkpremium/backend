@@ -10,16 +10,41 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
 /**
  * @swagger
  * definitions:
- *   ScheduledEventBody:
+ *   ScheduledCallEventBody:
  *     properties:
- *       userId:
+ *       createdBy:
  *        type: string
  *        format: uuid/v4
- *       type:
- *         type: string
- *         enum: [CALLS, MEETINGS]
- *       data:
+ *       notifyTo:
+ *        type: string
+ *        format: uuid/v4
+ *        description: Id del operator a notificar
+ *       event:
  *         type: object
+ *         $ref: "#/definitions/ScheduledCallEvent"
+ *       notifyAt:
+ *         type: string
+ *         description: YYYY-MM-DDTHH:MM:SSZ
+ *       eventDate:
+ *         type: string
+ *         description: YYYY-MM-DDTHH:MM:SSZ
+ */
+
+/**
+ * @swagger
+ * definitions:
+ *   ScheduledMeetingEventBody:
+ *     properties:
+ *       createdBy:
+ *        type: string
+ *        format: uuid/v4
+ *       notifyTo:
+ *        type: string
+ *        format: uuid/v4
+ *        description: Id del operator a notificar
+ *       event:
+ *         type: object
+ *         $ref: "#/definitions/ScheduledMeetingEvent"
  *       notifyAt:
  *         type: string
  *         description: YYYY-MM-DDTHH:MM:SSZ
@@ -36,42 +61,87 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *       id:
  *        type: string
  *        format: uuid/v4
- *       userId:
+ *       createdBy:
  *        type: string
  *        format: uuid/v4
+ *       ownerId:
+ *        type: string
+ *        format: uuid/v4
+ *       notifyTo:
+ *        type: string
+ *        format: uuid/v4
+ *       event:
+ *        type: object
+ *        description: Puede contener ScheduledCallEvent o ScheduledMeetingEvent
  *       type:
  *         type: string
  *         enum: [CALLS, MEETINGS]
- *       data:
- *         type: object
  *       notifyAt:
  *         type: string
  *         description: YYYY-MM-DDTHH:MM:SSZ
  *       eventDate:
  *         type: string
  *         description: YYYY-MM-DDTHH:MM:SSZ
+ *       createdAt:
+ *         type: string
+ *         description: YYYY-MM-DD
  */
 t.ScheduledEvent = t.struct(
   {
     id: t.maybe(t.String),
-    userId: t.maybe(t.String),
     type: t.ScheduledEventType,
-    data: t.Object,
+    notifyTo: t.String,
     notifyAt: t.Date,
     eventDate: t.Date,
-    date: t.Date,
-    _documentType: t.String
+    createdBy: t.maybe(t.String),
+    createdAt: t.Date,
+    _documentType: t.String,
+    event: t.struct({
+      contactId: t.maybe(t.String),
+      worksheetId: t.maybe(t.String),
+      buildingId: t.maybe(t.String),
+      ownerId: t.maybe(t.String)
+    }, 'event')
   },
   {
     name: 'ScheduledEvent',
     defaultProps: {
-      _documentType: 'scheduledEvent',
-      get date() {
+      _documentType: 'scheduled-event',
+      get createdAt() {
         return new Date();
       }
     }
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   ScheduledCallEvent:
+ *     properties:
+ *       ownerId:
+ *        type: string
+ *        format: uuid/v4
+ *       contactId:
+ *        type: string
+ *        format: uuid/v4
+ *       worksheetId:
+ *        type: string
+ *        format: uuid/v4
+ */
+
+/**
+ * @swagger
+ * definitions:
+ *   ScheduledMeetingEvent:
+ *     properties:
+ *       buildingId:
+ *        type: string
+ *        format: uuid/v4
+ *       worksheetId:
+ *        type: string
+ *        format: uuid/v4
+ */
 
 /**
  * @swagger
@@ -110,22 +180,19 @@ t.ScheduleEventsListResponse = t.struct(
  *       type:
  *         type: string
  *         enum: [CALLS, MEETINGS]
- *       data:
- *         type: object
  *       notifyAt:
  *         type: string
  *         format: YYYY-MM-DDTHH:MM:SSZ
  */
 t.UpdateScheduledEvent = t.struct({
   type: t.maybe(t.ScheduledEventType),
-  data: t.maybe(t.Object),
   notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date)
 }, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(
   {
-    userId: t.maybe(t.String),
+    createdBy: t.maybe(t.String),
     notifyAt: t.maybe(t.String),
     type: t.maybe(t.ScheduledEventType),
     createdAt: t.maybe(t.String),
