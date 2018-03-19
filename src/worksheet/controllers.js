@@ -99,7 +99,7 @@ async function addOwnerToWorksheet(req, res) {
   const ownerRepo = new OwnerRepository();
   const worksheet = await worksheetRepo.findByIdOrThrow(req.params.id);
   const owner = await ownerRepo.createOwnerAndPerson(req.body);
-  await worksheet.addOwner(worksheet, owner);
+  await worksheetRepo.addOwner(worksheet, owner);
   await History.registerCreate({contextModel: owner, user: req.user});
   await History.registerUpdate({contextModel: worksheet, user: req.user});
   res.status(201).json(owner);
