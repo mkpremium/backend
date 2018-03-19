@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {
   worksheetFindByIdController, worksheetListController, queueByCityController, queueListController,
-  actionsOnWorksheetQueueController, queueTakenFindByOperatorController
+  actionsOnWorksheetQueueController, queueTakenFindByOperatorController, addOwnerToWorksheetController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -136,6 +136,54 @@ router.get('/queues', permissions.admin, queueListController);
  *         description: Ficha no encontrada
  */
 router.get('/:id', worksheetFindByIdController);
+/**
+ * @swagger
+ * /worksheets/{id}/owners:
+ *   post:
+ *     summary: Crea un nuevo propietario relacionado a la hoja de trabajo
+ *     tags: [Worksheet, Manager, Operator]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la ficha de trabajo
+ *         required: true
+ *         type: string
+ *         format: uuid/v4
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/OwnerBody"
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/Owner"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       404:
+ *         description: Hoja de trabajo no encontrada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/:id/owners', addOwnerToWorksheetController);
 
 /**
  * @swagger

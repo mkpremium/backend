@@ -8,6 +8,7 @@ import {
 import {newHttpError} from '../../lib/http-error';
 import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
+import _uniq from 'lodash/uniq';
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -43,6 +44,19 @@ export class WorksheetRepository extends Worksheet {
     }
 
     return worksheet;
+  }
+
+  async addOwner(worksheet, owner) {
+    const updatedWorksheet = t.update(worksheet, {
+      relatedBuildingIds: {
+        $set: _uniq(worksheet.relatedBuildingIds.concat([owner.buildingId]))
+      },
+      relatedOwnerIds: {
+        $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
+      }
+    });
+
+    return this.save(updatedWorksheet);
   }
 
   async list(query = {}) {

@@ -6,6 +6,7 @@ import {WorksheetQueueRepository} from './models/queue';
 import {QueueRequestAction} from './types';
 import {OperatorRoles} from '../types/operator';
 import {History} from '../history/models';
+import {OwnerRepository} from '../owner/models';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
@@ -93,6 +94,18 @@ async function queueTakenFindByOperator(req, res) {
   res.json(queueItem || {});
 }
 
+async function addOwnerToWorksheet(req, res) {
+  const worksheetRepo = new WorksheetRepository();
+  const ownerRepo = new OwnerRepository();
+  const worksheet = await worksheetRepo.findByIdOrThrow(req.params.id);
+  const owner = await ownerRepo.createOwnerAndPerson(req.body);
+  await worksheet.addOwner(worksheet, owner);
+  await History.registerCreate({contextModel: owner, user: req.user});
+  await History.registerUpdate({contextModel: worksheet, user: req.user});
+  res.status(201).json(owner);
+}
+
+export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet);
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
 export const queueByCityController = wrap(queueByCity);
