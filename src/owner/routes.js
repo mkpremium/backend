@@ -3,7 +3,6 @@ import {
   addOwnerContactController, addOwnerController, updateOwnerContactController,
   updateOwnerController
 } from './controllers';
-import {permissions} from '../middleware/jwt';
 
 const router = Router();
 
@@ -19,8 +18,9 @@ const router = Router();
  * /owners:
  *   post:
  *     summary: Crea un nuevo propietario
- *     tags: [Owner, Manager]
+ *     tags: [Owner, Manager, Operator]
  *     security:
+ *       - operator: []
  *       - manager: []
  *       - admin: []
  *     consumes:
@@ -50,7 +50,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/', permissions.manager, addOwnerController);
+router.post('/', addOwnerController);
 
 /**
  * @swagger

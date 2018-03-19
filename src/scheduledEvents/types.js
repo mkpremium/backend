@@ -15,19 +15,23 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *       createdBy:
  *        type: string
  *        format: uuid/v4
+ *        description: Id del operador que crea la cita
  *       notifyTo:
  *        type: string
  *        format: uuid/v4
- *        description: Id del operator a notificar
+ *        description: Id del operador a notificar
  *       event:
  *         type: object
  *         $ref: "#/definitions/ScheduledCallEvent"
+ *         description: Contexto de la llamada
  *       notifyAt:
  *         type: string
- *         description: YYYY-MM-DDTHH:MM:SSZ
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Fecha de envío de la notificación
  *       eventDate:
  *         type: string
- *         description: YYYY-MM-DDTHH:MM:SSZ
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Fecha de la cita
  */
 
 /**
@@ -38,19 +42,23 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *       createdBy:
  *        type: string
  *        format: uuid/v4
+ *        description: Id del operador que crea la cita
  *       notifyTo:
  *        type: string
  *        format: uuid/v4
- *        description: Id del operator a notificar
+ *        description: Id del operador a notificar
  *       event:
  *         type: object
  *         $ref: "#/definitions/ScheduledMeetingEvent"
+ *         description: Contexto de la cita
  *       notifyAt:
  *         type: string
- *         description: YYYY-MM-DDTHH:MM:SSZ
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Fecha de envío de la notificación
  *       eventDate:
  *         type: string
- *         description: YYYY-MM-DDTHH:MM:SSZ
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Fecha de la cita
  */
 
 /**
@@ -62,9 +70,6 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *        type: string
  *        format: uuid/v4
  *       createdBy:
- *        type: string
- *        format: uuid/v4
- *       ownerId:
  *        type: string
  *        format: uuid/v4
  *       notifyTo:
@@ -133,14 +138,25 @@ t.ScheduledEvent = t.struct(
 /**
  * @swagger
  * definitions:
+ *   ScheduledMeetingEventLocation:
+ *     properties:
+ *       lat:
+ *         type: number
+ *       long:
+ *         type: number
  *   ScheduledMeetingEvent:
  *     properties:
  *       buildingId:
- *        type: string
- *        format: uuid/v4
+ *         type: string
+ *         format: uuid/v4
  *       worksheetId:
- *        type: string
- *        format: uuid/v4
+ *         type: string
+ *         format: uuid/v4
+ *       eventAddress:
+ *         type: string
+ *       eventLocation:
+ *         type: object
+ *         $ref: "#/definitions/ScheduledMeetingEventLocation"
  */
 
 /**
