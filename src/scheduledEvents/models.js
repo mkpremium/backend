@@ -7,6 +7,8 @@ import {
   addBetweenQueryToBuilder
 } from '../lib/query/helpers';
 import {newHttpError} from '../lib/http-error';
+import {buildRangeFromWeek, utc} from '../lib/date';
+import {buildDistanceCalculator} from '../lib/geo';
 
 export class ScheduledEvents extends CouchbaseModel {
   constructor() {
@@ -39,7 +41,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async delete(id) {
     const qb = this.getQueryBuilder('delete')
       .where('id = ?', id);
-      
+
     return this.query(qb);
   }
 
@@ -83,5 +85,23 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const results = await this.query(qb);
 
     return fromJSON({total, results}, t.ScheduleEventsListResponse);
+  }
+
+  async weekScheduleEventMeetings(week, year, location) {
+    const now = utc();
+    const y = year || now.year();
+    const w = week || now.week();
+    const rangeWeek = buildRangeFromWeek(w, y);
+
+    const qb = this.getQueryBuilder();
+    addBetweenQueryToBuilder(qb, rangeWeek);
+    qb.where('type = ?', 'MEETINGS');
+
+    const results = await this.query(qb);
+    if (location) {
+      return results.map(buildDistanceCalculator(location, 'event.eventLocation'));
+    } else {
+      return results;
+    }
   }
 }

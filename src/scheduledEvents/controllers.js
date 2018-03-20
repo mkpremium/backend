@@ -9,6 +9,13 @@ async function listScheduledEvent(req, res) {
   res.json(scheduledEvents);
 }
 
+async function weekScheduleEventMeetings(req, res) {
+  const repo = new ScheduledEventsRepository();
+  const {week, year} = req.query;
+  const scheduledEventMeetings = await repo.weekScheduleEventMeetings(week, year, req.query);
+  res.json(scheduledEventMeetings);
+}
+
 async function findByIdScheduledEvent(req, res) {
   const id = req.params.id;
   const repo = new ScheduledEventsRepository();
@@ -51,6 +58,7 @@ async function deleteScheduledEvent(req, res) {
 }
 
 export const listScheduledEventController = wrap(listScheduledEvent);
+export const weekScheduleEventMeetingsController = wrap(weekScheduleEventMeetings);
 export const findScheduledEventController = wrap(findByIdScheduledEvent);
 export const addScheduledCallEventController = wrap(addScheduledCallEvent);
 export const addScheduledMeetingEventController = wrap(addScheduledMeetingEvent);
