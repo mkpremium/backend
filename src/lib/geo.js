@@ -1,4 +1,5 @@
 import _get from 'lodash/get';
+import _set from 'lodash/set';
 import geo from 'geolib';
 
 function parseLatLong(obj) {
@@ -17,9 +18,12 @@ export function buildDistanceCalculator(location, from) {
     const refLocation = parseLatLong(location);
 
     if (!refLocation || !objLocation) {
-      return 0;
+      return obj;
     }
 
-    return geo.getDistance(refLocation, objLocation);
+    const json = JSON.parse(JSON.stringify(obj));
+    _set(json, 'event.distance', geo.getDistance(refLocation, objLocation));
+
+    return json;
   };
 }
