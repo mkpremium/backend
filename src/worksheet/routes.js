@@ -30,6 +30,13 @@ const router = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Comercial
+ *   description: Comerciales
+ */
+
+/**
+ * @swagger
  * /worksheets:
  *   get:
  *     tags: [Worksheet, Manager]

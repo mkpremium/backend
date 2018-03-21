@@ -22,7 +22,8 @@ t.OwnerType = t.enums({
   NINGUNO: 'NINGUNO',
   PRINCIPAL: 'PRINCIPAL',
   SECUNDARIO: 'SECUNDARIO',
-  VECINO: 'VECINO'
+  VECINO: 'VECINO',
+  FAMILIAR: 'FAMILIAR'
 }, 'OwnerType');
 
 t.OwnerStatus = t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO'], 'OwnerStatus');

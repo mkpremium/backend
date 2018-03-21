@@ -31,6 +31,14 @@ t.Credentials = t.struct({
  *         description: Nombre complete operador
  *       username:
  *         type: string
+ *   FirebaseConfig:
+ *     properties:
+ *       token:
+ *         type: string
+ *         description: Firebase token
+ *       databaseURL:
+ *         type: string
+ *         description: Firebase database url
  *   AuthenticatedResponse:
  *     properties:
  *       token:
@@ -43,6 +51,8 @@ t.Credentials = t.struct({
  *         items:
  *           type: string
  *         description: Roles que el operador tiene acceso
+ *       firebase:
+ *         $ref: "#/definitions/FirebaseConfig"
  */
 t.AuthenticatedResponse = t.struct({
   token: t.String,
@@ -51,6 +61,10 @@ t.AuthenticatedResponse = t.struct({
     name: t.String,
     username: t.String
   }, 'Operator'),
+  firebase: t.maybe(t.struct({
+    token: t.String,
+    databaseURL: t.String
+  }, 'firebase')),
   roles: t.list(t.String)
 }, 'AuthenticatedResponse');
 

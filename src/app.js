@@ -19,6 +19,7 @@ import migration from './migration';
 import webhooks from './webhooks';
 import socket from './socket';
 import history from './history';
+import notes from './notes';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -45,6 +46,7 @@ scheduledEvents(app);
 history(app);
 migration(app);
 webhooks(app);
+notes(app);
 
 app.use(appErrorHandler);
 

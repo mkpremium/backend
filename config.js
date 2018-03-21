@@ -1,4 +1,6 @@
+import {join} from 'path';
 import {N1qlQuery} from 'couchbase';
+
 export const port = parseInt(process.env.PORT || '9001');
 export const emitHistoryEvents = process.env.EMIT_HISTORY_EVENTS || false;
 export const emitModelEvents = process.env.EMIT_MODEL_EVENTS || false;
@@ -34,6 +36,12 @@ export const uploadDir = process.env.REPORT_DIR || '/tmp';
 export const gearmanConfig = {
   host: process.env.GERMAN_HOST || 'localhost',
   port: parseInt(process.env.GEARMAN_PORT || 4730)
+};
+
+const defaultFirebaseServiceAccount = join(__dirname, 'firebase.json');
+export const firebase = {
+  serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
+  databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://mkpremiumcomerciales.firebaseio.com'
 };
 
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);

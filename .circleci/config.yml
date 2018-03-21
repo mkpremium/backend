@@ -33,6 +33,15 @@ jobs:
             - node_modules
           key: v2-dependencies-{{ checksum "package.json" }}
 
+      - run:
+          name: Firebase setup
+          command: >-
+              sudo apt-get update && sudo apt-get install -y python-dev &&
+              curl -O https://bootstrap.pypa.io/get-pip.py &&
+              sudo python get-pip.py &&
+              sudo pip install awscli --upgrade &&
+              aws s3 cp --region eu-west-3 s3://mkpremium/config/firebase.json firebase.json
+
       # run tests!
       - run:
           name: Running testing
@@ -77,6 +86,15 @@ jobs:
           key: v2-dependencies-{{ checksum "package.json" }}
 
       - add_ssh_keys
+
+      - run:
+          name: Firebase setup
+          command: >-
+              sudo apt-get update && sudo apt-get install -y python-dev &&
+              curl -O https://bootstrap.pypa.io/get-pip.py &&
+              sudo python get-pip.py &&
+              sudo pip install awscli --upgrade &&
+              aws s3 cp --region eu-west-3 s3://mkpremium/config/firebase.json firebase.json
 
       - run:
           name: install deps
