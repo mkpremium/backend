@@ -6,7 +6,7 @@ import {
   findScheduledEventController,
   listScheduledEventController,
   updateScheduledEnventController,
-  deleteScheduledEventController
+  deleteScheduledEventController, weekScheduleEventMeetingsController
 } from './controllers';
 
 import {permissions} from '../middleware/jwt';
@@ -18,6 +18,59 @@ const router = Router();
  *   name: ScheduledEvents
  *   description: Eventos Programdos
  */
+
+/**
+ * @swagger
+ * /scheduled-events/week:
+ *   get:
+ *     security:
+ *       - admin: []
+ *       - manager: []
+ *       - operator: []
+ *     tags: [ScheduledEvents]
+ *     summary: Obtiene los eventos programados (meetings) de la semana
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         type: number
+ *         description: Cantidad máxima a de registros a recibir
+ *         default: 20
+ *       - name: offset
+ *         in: query
+ *         type: number
+ *         description: Numero de registros a saltar
+ *         default: 0
+ *       - name: week
+ *         in: query
+ *         type: number
+ *         description: Numero de la semana en el año
+ *       - name: year
+ *         in: query
+ *         type: number
+ *         description: Año
+ *       - name: location
+ *         in: query
+ *         type: object
+ *         description: {lat, long} Ubicación de la cita
+ *     responses:
+ *       200:
+ *         description: Citas programadas
+ *         schema:
+ *           $ref: "#/definitions/ScheduleEventsListResponse"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/week', weekScheduleEventMeetingsController);
 
 /**
  * @swagger
