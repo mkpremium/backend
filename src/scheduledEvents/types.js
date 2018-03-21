@@ -12,10 +12,6 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  * definitions:
  *   ScheduledCallEventBody:
  *     properties:
- *       createdBy:
- *        type: string
- *        format: uuid/v4
- *        description: Id del operador que crea la cita
  *       notifyTo:
  *        type: string
  *        format: uuid/v4
@@ -102,16 +98,22 @@ t.ScheduledEvent = t.struct(
     createdAt: t.Date,
     _documentType: t.String,
     event: t.struct({
+      ownerId: t.maybe(t.String),
       contactId: t.maybe(t.String),
       worksheetId: t.maybe(t.String),
       buildingId: t.maybe(t.String),
-      ownerId: t.maybe(t.String)
+      eventAddress: t.maybe(t.String),
+      eventLocation: t.struct({
+        lat: t.Number,
+        long: t.Number
+      }, 'eventLocation')
     }, 'event')
   },
   {
     name: 'ScheduledEvent',
     defaultProps: {
       _documentType: 'scheduled-event',
+      event: {},
       get createdAt() {
         return new Date();
       }
@@ -146,6 +148,12 @@ t.ScheduledEvent = t.struct(
  *         type: number
  *   ScheduledMeetingEvent:
  *     properties:
+ *       contactId:
+ *         type: string
+ *         format: uuid/v4
+ *       ownerId:
+ *         type: string
+ *         format: uuid/v4
  *       buildingId:
  *         type: string
  *         format: uuid/v4
