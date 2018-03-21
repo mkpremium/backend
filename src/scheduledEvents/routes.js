@@ -55,7 +55,7 @@ const router = Router();
  *       - name: location
  *         in: query
  *         type: object
- *         description: {lat, long} Ubicación de la cita
+ *         description: "{lat, long} Ubicación de la cita"
  *     responses:
  *       200:
  *         description: Citas programadas
