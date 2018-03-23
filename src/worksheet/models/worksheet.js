@@ -55,7 +55,9 @@ export class WorksheetRepository extends Worksheet {
   static async notifyWorksheetUpdateByOwner(ownerId) {
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findWorksheetByOwner(ownerId);
-    await worksheetRepo.sendWorksheetEvent(worksheet);
+    if (worksheet) {
+      await worksheetRepo.sendWorksheetEvent(worksheet);
+    }
   }
 
   static async notifyWorksheetUpdate(worksheetId) {
