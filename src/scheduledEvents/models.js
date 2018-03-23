@@ -8,7 +8,7 @@ import {
   addBetweenQueryToBuilder
 } from '../lib/query/helpers';
 import {newHttpError} from '../lib/http-error';
-import {buildRangeFromWeek, firebaseTimestampFormat, meetingDayFormat, utc} from '../lib/date';
+import {buildRangeFromWeek, firebaseTimestampFormat, meetingDayFormat, meetingWeekFormat, utc} from '../lib/date';
 import {buildDistanceCalculator} from '../lib/geo';
 import {getScheduledMeetingStruct} from './helper';
 import firebase from '../firebase';
@@ -54,13 +54,26 @@ async function relateMeetingToBuilding(db, {id, building}) {
   db.ref(`Buildings/${building.id}/Meetings`).update({[id]: true});
 }
 
+async function deleteMeetingToBuilding(db, {id, building}) {
+  db.ref(`Buildings/${building.id}/Meetings/${id}`).set(null);
+}
+
 async function saveMeetingToFirebase(db, meeting) {
   db.ref(`Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
+}
+
+async function deleteMeetingToFirebase(db, meeting) {
+  db.ref(`Meetings/${meeting.id}`).set(null);
 }
 
 async function relateMeetingToOperator(db, meeting, operatorId) {
   const meetingDay = meetingDayFormat(meeting.eventDate);
   db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
+}
+
+async function deleteMeetingToOperator(db, meeting, operatorId) {
+  const meetingDay = meetingDayFormat(meeting.eventDate);
+  db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
 }
 
 export class ScheduledEventsRepository extends ScheduledEvents {
@@ -112,6 +125,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);
   }
 
+  async deleteFirebaseMeeting(scheduleEvent) {
+    const db = firebase.database();
+    const meeting = await this.findMeeting(scheduleEvent);
+    await deleteMeetingToFirebase(db, meeting);
+    await deleteMeetingToBuilding(db, meeting);
+    await deleteMeetingToOperator(db, meeting, meeting.notifyTo);
+  }
+
   async addScheduledMeetingEvent(data = {}) {
     const scheduledEventBody = await getScheduledMeetingStruct(Object.assign({}, data, {type: 'MEETINGS'}));
     const scheduledEvent = await this.save(scheduledEventBody);
@@ -128,13 +149,17 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const changes = t.UpdateScheduledEvent(updateData);
     const updatedScheduledEvent = t.update(scheduleEvent, {$merge: changes});
 
+    await this.deleteFirebaseMeeting(scheduleEvent);
+    await this.firebaseMeeting(updatedScheduledEvent);
+
     return this.save(updatedScheduledEvent);
   }
 
   async delete(id) {
-    const qb = this.getQueryBuilder('delete')
-      .where('id = ?', id);
-
+    const scheduleEvent = await this.findByIdOrThrow(id);
+    await this.deleteFirebaseMeeting(scheduleEvent);
+    const qb = this.getQueryBuilder('delete').where('id = ?', id);
+    await this.sendWeekEvent(scheduleEvent);
     return this.query(qb);
   }
 
@@ -196,5 +221,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     } else {
       return results;
     }
+  }
+
+  async sendWeekEvent(scheduleEvent) {
+    const week = meetingWeekFormat(scheduleEvent.eventDate);
+    return this.sendEvent(`${scheduleEvent._documentType}:${week}`, scheduleEvent.id);
+  }
+
+  async postSave(scheduleEvent) {
+    return this.sendWeekEvent(scheduleEvent);
   }
 }

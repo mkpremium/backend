@@ -163,6 +163,15 @@ export class CouchbaseModel {
     return data;
   }
 
+  async postSave(data) {
+    // no post-save events operations on base model
+  }
+
+  async sendEvent(eventName, data) {
+    const socket = await this._socketPromise;
+    return socket.sendEvent(eventName, data);
+  }
+
   async save(data, sendEvent = JSON.parse(emitModelEvents)) {
     const struct = fromJSON(data, this.Struct);
     const isNewData = !data.id;
@@ -177,9 +186,9 @@ export class CouchbaseModel {
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
 
     if (result && sendEvent) {
-      const socket = await this._socketPromise;
       const eventType = isNewData ? 'new' : data.id;
-      await socket.sendEvent(eventType, dataPreSaved);
+      await this.sendEvent(eventType, dataPreSaved);
+      await this.postSave(result);
     }
 
     return fromJSON(result, this.Struct);

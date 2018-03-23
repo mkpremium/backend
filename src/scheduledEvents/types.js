@@ -87,6 +87,17 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *         type: string
  *         description: YYYY-MM-DD
  */
+const Event = t.struct({
+  ownerId: t.maybe(t.String),
+  contactId: t.maybe(t.String),
+  worksheetId: t.maybe(t.String),
+  buildingId: t.maybe(t.String),
+  eventAddress: t.maybe(t.String),
+  eventLocation: t.maybe(t.struct({
+    lat: t.Number,
+    long: t.Number
+  }, 'eventLocation'))
+}, 'event');
 t.ScheduledEvent = t.struct(
   {
     id: t.maybe(t.String),
@@ -97,17 +108,7 @@ t.ScheduledEvent = t.struct(
     createdBy: t.maybe(t.String),
     createdAt: t.Date,
     _documentType: t.String,
-    event: t.struct({
-      ownerId: t.maybe(t.String),
-      contactId: t.maybe(t.String),
-      worksheetId: t.maybe(t.String),
-      buildingId: t.maybe(t.String),
-      eventAddress: t.maybe(t.String),
-      eventLocation: t.maybe(t.struct({
-        lat: t.Number,
-        long: t.Number
-      }, 'eventLocation'))
-    }, 'event')
+    event: Event
   },
   {
     name: 'ScheduledEvent',
@@ -210,8 +211,10 @@ t.ScheduleEventsListResponse = t.struct(
  */
 t.UpdateScheduledEvent = t.struct({
   type: t.maybe(t.ScheduledEventType),
+  notifyTo: t.String,
   notifyAt: t.maybe(t.Date),
-  eventDate: t.maybe(t.Date)
+  eventDate: t.maybe(t.Date),
+  event: Event
 }, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(
