@@ -225,7 +225,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async sendWeekEvent(scheduleEvent) {
     const week = meetingWeekFormat(scheduleEvent.eventDate);
-    return this.sendEvent(`${scheduleEvent._documentType}:${week}`, scheduleEvent.id);
+    return this.sendEvent(`${scheduleEvent._documentType}:${week}`, scheduleEvent);
   }
 
   async postSave(scheduleEvent) {
