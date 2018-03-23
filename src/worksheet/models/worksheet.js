@@ -49,7 +49,7 @@ export class WorksheetRepository extends Worksheet {
   }
 
   async sendWorksheetEvent(worksheet) {
-    return this.sendEvent(`${worksheet._documentType}:${worksheet.id}`);
+    return this.sendEvent(`${worksheet.id}`, worksheet);
   }
 
   static async notifyWorksheetUpdateByOwner(ownerId) {
