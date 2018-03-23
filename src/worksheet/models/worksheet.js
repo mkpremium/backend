@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import _head from 'lodash/head';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../../db/model';
 import {
@@ -72,20 +73,7 @@ export class WorksheetRepository extends Worksheet {
       throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by relatedOwnerIds: ${ownerId}`);
     }
 
-    return results;
-  }
-
-  async findWorksheetByBuilding(buildingId) {
-    const qb = this.getQueryBuilder()
-      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId);
-
-    const results = await this.query(qb);
-
-    if (!results || results.length === 0) {
-      throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by relatedBuildingIds: ${buildingId}`);
-    }
-
-    return results;
+    return _head(results);
   }
 
   async addOwner(worksheet, owner) {
