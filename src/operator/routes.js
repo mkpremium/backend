@@ -121,7 +121,7 @@ router.post('/', permissions.admin, createOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.admin, listOperatorController);
+router.get('/', listOperatorController);
 
 /**
  * @swagger
