@@ -9,6 +9,7 @@ import {newHttpError} from '../../lib/http-error';
 import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
+import squel from 'squel/dist/squel';
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -44,6 +45,47 @@ export class WorksheetRepository extends Worksheet {
     }
 
     return worksheet;
+  }
+
+  async sendWorksheetEvent(worksheet) {
+    return this.sendEvent(`${worksheet._documentType}:${worksheet.id}`);
+  }
+
+  static async notifyWorksheetUpdateByOwner(ownerId) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findWorksheetByOwner(ownerId);
+    await worksheetRepo.sendWorksheetEvent(worksheet);
+  }
+
+  static async notifyWorksheetUpdate(worksheetId) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
+    await worksheetRepo.sendWorksheetEvent(worksheet);
+  }
+
+  async findWorksheetByOwner(ownerId) {
+    const qb = this.getQueryBuilder()
+      .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId);
+
+    const results = await this.query(qb);
+    if (!results || results.length === 0) {
+      throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by relatedOwnerIds: ${ownerId}`);
+    }
+
+    return results;
+  }
+
+  async findWorksheetByBuilding(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId);
+
+    const results = await this.query(qb);
+
+    if (!results || results.length === 0) {
+      throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by relatedBuildingIds: ${buildingId}`);
+    }
+
+    return results;
   }
 
   async addOwner(worksheet, owner) {
