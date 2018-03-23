@@ -8,7 +8,7 @@ import {
   addBetweenQueryToBuilder
 } from '../lib/query/helpers';
 import {newHttpError} from '../lib/http-error';
-import {buildRangeFromWeek, firebaseTimestampFormat, meetingDayFormat, utc} from '../lib/date';
+import {buildRangeFromWeek, firebaseTimestampFormat, meetingDayFormat, meetingWeekFormat, utc} from '../lib/date';
 import {buildDistanceCalculator} from '../lib/geo';
 import {getScheduledMeetingStruct} from './helper';
 import firebase from '../firebase';
@@ -158,9 +158,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async delete(id) {
     const scheduleEvent = await this.findByIdOrThrow(id);
     await this.deleteFirebaseMeeting(scheduleEvent);
-    const qb = this.getQueryBuilder('delete')
-      .where('id = ?', id);
-
+    const qb = this.getQueryBuilder('delete').where('id = ?', id);
+    await this.sendWeekEvent(scheduleEvent);
     return this.query(qb);
   }
 
@@ -222,5 +221,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     } else {
       return results;
     }
+  }
+
+  async sendWeekEvent(scheduleEvent) {
+    const week = meetingWeekFormat(scheduleEvent.eventDate);
+    return this.sendEvent(`${scheduleEvent._documentType}:${week}`, scheduleEvent.id);
+  }
+
+  async postSave(scheduleEvent) {
+    return this.sendWeekEvent(scheduleEvent);
   }
 }
