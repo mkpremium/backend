@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import _head from 'lodash/head';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {updateList} from '../lib/tcomb-utils';
@@ -103,14 +104,11 @@ export class OwnerRepository extends Owner {
     }
 
     const result = await this.query(qb);
-    result.map((owner) => {
-      if (owner.person.length > 0) {
-        owner.person = owner.person[0];
-      }
-      return owner;
-    });
 
-    return result;
+    return result.map((owner) => Object.assign({}, owner, {
+      person: _head(owner.person || []),
+      building: _head(owner.building || [])
+    }));
   }
 
   async updateContact(ownerId, contactId, data) {

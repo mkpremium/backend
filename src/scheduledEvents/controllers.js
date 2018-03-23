@@ -1,6 +1,6 @@
 import {wrap} from 'express-promise-wrap';
 import {ScheduledEventsRepository} from './models';
-import {getScheduledCallStruct, getScheduledMeetingStruct} from './helper';
+import {getScheduledCallStruct} from './helper';
 
 async function listScheduledEvent(req, res) {
   const repo = new ScheduledEventsRepository();
@@ -24,9 +24,6 @@ async function findByIdScheduledEvent(req, res) {
 }
 
 async function addScheduledCallEvent(req, res) {
-  req.body.notifyAt = new Date(req.body.notifyAt);
-  req.body.eventDate = new Date(req.body.eventDate);
-
   const repo = new ScheduledEventsRepository();
   const scheduledEventBody = await getScheduledCallStruct(Object.assign({}, req.body, {type: 'CALLS'}));
   const scheduledEvent = await repo.save(scheduledEventBody);
@@ -34,12 +31,9 @@ async function addScheduledCallEvent(req, res) {
 }
 
 async function addScheduledMeetingEvent(req, res) {
-  req.body.notifyAt = new Date(req.body.notifyAt);
-  req.body.eventDate = new Date(req.body.eventDate);
-
   const repo = new ScheduledEventsRepository();
-  const scheduledEventBody = await getScheduledMeetingStruct(Object.assign({}, req.body, {type: 'MEETINGS'}));
-  const scheduledEvent = await repo.save(scheduledEventBody);
+  const scheduledEvent = await repo
+    .addScheduledMeetingEvent(Object.assign({}, req.body, {createdBy: req.user.id}));
   res.status(201).json(scheduledEvent);
 }
 

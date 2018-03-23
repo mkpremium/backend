@@ -103,10 +103,10 @@ t.ScheduledEvent = t.struct(
       worksheetId: t.maybe(t.String),
       buildingId: t.maybe(t.String),
       eventAddress: t.maybe(t.String),
-      eventLocation: t.struct({
+      eventLocation: t.maybe(t.struct({
         lat: t.Number,
         long: t.Number
-      }, 'eventLocation')
+      }, 'eventLocation'))
     }, 'event')
   },
   {
@@ -234,3 +234,50 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
     }
   }
 );
+
+t.Meeting = t.struct({
+  notifyTo: t.String,
+  address: t.String,
+  contact: t.struct({
+    name: t.String,
+    email: t.maybe(t.String),
+    phone: t.maybe(t.String)
+  }, 'contact'),
+  id: t.String,
+  building: t.Building,
+  createdAt: t.Date,
+  eventDate: t.Date,
+  createdBy: t.String
+}, 'Meeting');
+
+t.FirebaseMeeting = t.struct(
+  {
+    Aspiration: t.Number,
+    Email: t.maybe(t.String),
+    Favourite: t.Boolean,
+    Name: t.String,
+    PhoneNumber: t.maybe(t.String),
+    Proposal: t.Number,
+    Street: t.String,
+    buildingID: t.String,
+    dateCreation: t.Number,
+    dateMeeting: t.Number
+  },
+  {
+    name: 'FirebaseMeeting',
+    defaultProps: {
+      Favourite: false,
+      Proposal: 0,
+      Aspiration: 0
+    }
+  }
+);
+
+t.FirebaseBuildingData = t.struct({
+  Aspiration: t.Number,
+  Proposal: t.Number,
+  State: t.maybe(t.String),
+  Street: t.String,
+  lat: t.Number,
+  lng: t.Number
+}, 'FirebaseBuildingData');

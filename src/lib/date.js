@@ -9,3 +9,9 @@ export const buildRangeFromWeek = (week, year) => {
     date.clone().endOf('week').toDate()
   ].join(',');
 };
+
+export const meetingDayFormat = date => m(date).format('DD-MM-YYYY');
+
+export function firebaseTimestampFormat(date) {
+  return date.valueOf();
+}

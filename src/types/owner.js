@@ -49,60 +49,6 @@ t.OwnerBody = t.struct(
 /**
  * @swagger
  * definitions:
- *   Owner:
- *     required:
- *       - person
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       personId:
- *         type: string
- *         fromat: uuid/v4
- *       buildingId:
- *         type: string
- *         fromat: uuid/v4
- *       note:
- *         type: string
- *       type:
- *         type: string
- *       verified:
- *         type: bool
- *       status:
- *         type: string
- *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
- */
-t.Owner = t.struct(
-  {
-    id: t.maybe(t.String),
-    type: t.OwnerType,
-    verified: t.Boolean,
-    status: t.OwnerStatus,
-    personId: t.maybe(t.String),
-    buildingId: t.maybe(t.String),
-
-    note: t.maybe(t.String),
-
-    _migrateId: t.list(t.String),
-    _relatedTo: t.maybe(t.String),
-    _documentType: t.String
-  },
-  {
-    name: 'Owner',
-    defaultProps: {
-      type: 'NINGUNO',
-      verified: false,
-      status: 'NO_VERIFICADO',
-      _documentType: 'owner',
-      _migrateId: [],
-      _relatedTo: ''
-    }
-  }
-);
-
-/**
- * @swagger
- * definitions:
  *   OwnerUpdate:
  *     properties:
  *       type:
@@ -215,3 +161,66 @@ t.Person = t.struct(
 t.Person.prototype.findContactById = function(id) {
   return _find(this.contacts, {id});
 };
+
+t.Person.prototype.findContactValueById = function(id) {
+  const contact = this.findContactById(id);
+  return contact ? contact.value : null;
+};
+
+t.Person.prototype.fullName = function() {
+  return `${this.name}`.trim();
+};
+
+/**
+ * @swagger
+ * definitions:
+ *   Owner:
+ *     required:
+ *       - person
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       personId:
+ *         type: string
+ *         fromat: uuid/v4
+ *       buildingId:
+ *         type: string
+ *         fromat: uuid/v4
+ *       note:
+ *         type: string
+ *       type:
+ *         type: string
+ *       verified:
+ *         type: bool
+ *       status:
+ *         type: string
+ *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
+ */
+t.Owner = t.struct(
+  {
+    id: t.maybe(t.String),
+    type: t.OwnerType,
+    verified: t.Boolean,
+    status: t.OwnerStatus,
+    personId: t.maybe(t.String),
+    buildingId: t.maybe(t.String),
+
+    note: t.maybe(t.String),
+
+    _migrateId: t.list(t.String),
+    _relatedTo: t.maybe(t.String),
+    _documentType: t.String
+  },
+  {
+    name: 'Owner',
+    defaultProps: {
+      type: 'NINGUNO',
+      verified: false,
+      status: 'NO_VERIFICADO',
+      _documentType: 'owner',
+      _migrateId: [],
+      _relatedTo: ''
+    }
+  }
+);

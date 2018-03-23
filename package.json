@@ -17,7 +17,7 @@
     "cronjobs": "better-npm-run cronjobs"
   },
   "betterScripts": {
-    "start": "nodemon bin/www.js --exec babel-node",
+    "start": "nodemon $NODE_DEBUG_OPTION bin/www.js --exec babel-node",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "deploy": "scripts/deployment.sh",
     "cronjobs": "nodemon bin/cronjobs.js --exec babel-node",

@@ -4,6 +4,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 
 import firebase from '../firebase';
 import {addBetweenQueryToBuilder, addDateQueryToBuilder} from '../lib/query/helpers';
+import {firebaseTimestampFormat} from '../lib/date';
 
 export class Note extends CouchbaseModel {
   constructor() {
@@ -14,7 +15,7 @@ export class Note extends CouchbaseModel {
 
 function noteWithTimestamp(note) {
   const json = JSON.parse(JSON.stringify(note));
-  const timestamp = note.createdAt.valueOf();
+  const timestamp = firebaseTimestampFormat(note.createdAt);
   return Object.assign({}, json, {timestamp});
 }
 

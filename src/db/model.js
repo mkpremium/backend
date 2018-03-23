@@ -164,7 +164,7 @@ export class CouchbaseModel {
   }
 
   async save(data, sendEvent = JSON.parse(emitModelEvents)) {
-    const struct = new this.Struct(data);
+    const struct = fromJSON(data, this.Struct);
     const isNewData = !data.id;
     const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
     const dataPreSaved = await this.preSave(dataWithId);

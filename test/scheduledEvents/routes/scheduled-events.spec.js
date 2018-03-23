@@ -23,7 +23,14 @@ describe('scheduledevents.routes', () => {
       notifyTo: authenticatedOperator.operator.id,
       event: {
         ownerId: 'not-exist-in-db',
-        buildingId: 'not-exist-in-db'
+        contactId: 'not-exist-in-db',
+        worksheetId: 'not-exist-in-db',
+        buildingId: 'not-exist-in-db',
+        eventLocation: {
+          lat: 0,
+          long: 0
+        },
+        eventAddress: 'no exists'
       }
     };
 
