@@ -43,6 +43,7 @@ async function call(from, phone) {
     });
     return call;
   } catch (e) {
+    debugService('call error', e.response);
     if (e.response && e.response.status === 401) {
       throw newHttpError(500, 'Internal server error');
     }
@@ -60,6 +61,7 @@ async function hangup(operatorId) {
     if (!result.data.status) throw newHttpError(400, result.data.description);
     return result.data;
   } catch (e) {
+    debugService('call error', e.response);
     if (e.response && e.response.status === 401) {
       throw newHttpError(500, 'Internal server error');
     }
