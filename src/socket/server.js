@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import debug from 'debug';
 import socketJwt from '../middleware/socketJwt';
 import socketIO from 'socket.io';
@@ -31,7 +32,12 @@ export class SocketServer {
     this.io.emit('welcome', msg); // TODO: send to only users with role X
 
     if (this.io.sockets[socket.user.id]) {
-      this.io.sockets[socket.user.id].disconnect();
+      this.io.sockets[socket.user.id].emit('forced-disconnect');
+      Promise
+        .delay(500)
+        .then(() => {
+          this.io.sockets[socket.user.id].disconnect();
+        });
     }
 
     this.io.sockets[socket.user.id] = socket;
