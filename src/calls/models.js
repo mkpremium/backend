@@ -31,7 +31,7 @@ export class Calls extends CouchbaseModel {
   async findActiveCallByOperatorId(operatorId) {
     const qb = await this.getQueryBuilder()
       .where('userId = ?', operatorId)
-      .where('status = ?', CallStatus.confirmed)
+      .where('status != ?', CallStatus.terminated)
       .limit(1);
 
     const [call] = await this.query(qb);
@@ -63,7 +63,7 @@ export class Calls extends CouchbaseModel {
     }
 
     const updatedCall = t.update(call, {status: {$set: status}});
-    
+
     return this.save(updatedCall);
   }
 
@@ -73,7 +73,7 @@ export class Calls extends CouchbaseModel {
 
     const updatedNotes = t.update(call.notes, {$push: [newNote]});
     const updatedCall = t.update(call, {notes: {$merge: updatedNotes}});
-    
+
     return this.save(updatedCall);
   }
 
