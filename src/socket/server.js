@@ -32,11 +32,12 @@ export class SocketServer {
     this.io.emit('welcome', msg); // TODO: send to only users with role X
 
     if (this.io.sockets[socket.user.id]) {
-      this.io.sockets[socket.user.id].emit('forced-disconnect');
+      const oldSocket = this.io.sockets[socket.user.id];
+      oldSocket.emit('forced-disconnect');
       Promise
         .delay(500)
         .then(() => {
-          this.io.sockets[socket.user.id].disconnect();
+          oldSocket.disconnect();
         });
     }
 
