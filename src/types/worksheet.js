@@ -36,6 +36,10 @@ t.WorkSheetCall = t.struct({
  *         type: array
  *         items:
  *           $ref: "#/definitions/Building"
+ *       ownerContacts:
+ *         type: array
+ *         items:
+ *           $ref: "3/definitions/"
  *
  */
 t.WorkSheet = t.struct({

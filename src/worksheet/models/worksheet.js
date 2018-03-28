@@ -10,7 +10,7 @@ import {newHttpError} from '../../lib/http-error';
 import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
-import {ownerContactsView} from '../../owner/types';
+import {ownersContactViews} from '../../owner/types';
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -43,7 +43,7 @@ export class WorksheetRepository extends Worksheet {
       const ownerRepo = new OwnerRepository();
       const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
       worksheet = t.update(worksheet, {relatedOwners: {$set: relatedOwners}});
-      worksheet = Object.assign({ownerContacts: relatedOwners.map(ownerContactsView), worksheet});
+      worksheet = Object.assign({ownerContacts: ownersContactViews(relatedOwners), worksheet});
     }
 
     return worksheet;
