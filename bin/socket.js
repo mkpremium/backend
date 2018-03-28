@@ -4,6 +4,8 @@ import express from 'express';
 import {Server} from 'http';
 import debug from 'debug';
 
+import '../src/types';
+
 import {socket as socketConfig} from '../config';
 import socket from '../src/socket';
 import couchbase from '../src/db/couchbase';

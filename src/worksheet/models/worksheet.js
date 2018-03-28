@@ -10,7 +10,7 @@ import {newHttpError} from '../../lib/http-error';
 import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
-import squel from 'squel/dist/squel';
+import {ownerContactsView} from '../../owner/types';
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -31,18 +31,19 @@ export class WorksheetRepository extends Worksheet {
 
   async findByIdWIthIncludes(id, includes = ['relatedOwners', 'relatedBuildings']) {
     let worksheet = await this.findByIdOrThrow(id);
-    if (includes.indexOf('relatedOwners') !== -1 && worksheet.relatedOwnerIds.length > 0) {
-      const ownerRepo = new OwnerRepository();
-      const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
-      worksheet = t.update(worksheet, {relatedOwners: {$set: relatedOwners}});
-    }
-
     if (includes.indexOf('relatedBuildings') !== -1 && worksheet.relatedBuildingIds.length > 0) {
       const buildingRepo = new BuildingRepository();
       const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`;
       const rbQb = await buildingRepo.getQueryBuilder().where(`id IN ${idsText}`);
       const relatedBuildings = await buildingRepo.query(rbQb);
       worksheet = t.update(worksheet, {relatedBuildings: {$set: relatedBuildings}});
+    }
+
+    if (includes.indexOf('relatedOwners') !== -1 && worksheet.relatedOwnerIds.length > 0) {
+      const ownerRepo = new OwnerRepository();
+      const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
+      worksheet = t.update(worksheet, {relatedOwners: {$set: relatedOwners}});
+      worksheet = Object.assign({ownerContacts: relatedOwners.map(ownerContactsView), worksheet});
     }
 
     return worksheet;
