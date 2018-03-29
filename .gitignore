@@ -44,3 +44,4 @@ build
 
 # Firebase
 firebase.json
+mkpremium-pm2.json

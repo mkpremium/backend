@@ -20,6 +20,8 @@ import webhooks from './webhooks';
 import socket from './socket';
 import history from './history';
 import notes from './notes';
+import building from './building';
+import metadata from './metadata';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -47,6 +49,8 @@ history(app);
 migration(app);
 webhooks(app);
 notes(app);
+building(app);
+metadata(app);
 
 app.use(appErrorHandler);
 

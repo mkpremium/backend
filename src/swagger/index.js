@@ -4,14 +4,7 @@ import ui from 'swagger-ui-dist';
 import {resolve} from 'path';
 import {socket} from '../../config';
 
-const swaggerDefinition = {
-  swagger: '2.0',
-  info: {
-    title: 'MK Premium',
-    version: '1.0.0',
-    description: 'MK Premium for call center API'
-  }
-};
+const swaggerDefinition = require('./swaggerDef');
 const options = {
   swaggerDefinition,
   apis: [

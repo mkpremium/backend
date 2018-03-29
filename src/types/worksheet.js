@@ -39,7 +39,7 @@ t.WorkSheetCall = t.struct({
  *       ownerContacts:
  *         type: array
  *         items:
- *           $ref: "3/definitions/"
+ *           $ref: "#/definitions/OwnerCompactView"
  *
  */
 t.WorkSheet = t.struct({

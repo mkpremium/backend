@@ -97,6 +97,10 @@ jobs:
               aws s3 cp --region eu-west-3 s3://mkpremium/config/firebase.json firebase.json
 
       - run:
+          name: PM2 Setup
+          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/dev/mkpremium-pm2.json mkpremium-pm2.json
+
+      - run:
           name: install deps
           command: sudo apt install -y rsync
 

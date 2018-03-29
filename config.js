@@ -21,7 +21,7 @@ export const couchbase = {
 };
 export const jwt = {
   secret: process.env.JWT_SECRET || 'Bitdistrict1sGreat',
-  expiresIn: '1 day'
+  expiresIn: process.env.JWT_EXPIRES || '1 day'
 };
 
 export const numintec = {
@@ -45,3 +45,11 @@ export const firebase = {
 };
 
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);
+
+export const awsConfig = {
+  region: process.env.AWS_REGION || 'eu-west-3',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+  bucket: process.env.S3_BUCKET_NAME || 'mkpremium',
+  prefix: process.env.S3_METADATA_PREFIX || 'dev'
+};

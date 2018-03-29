@@ -114,6 +114,10 @@ t.BuildingOwner = t.struct(
  *       state:
  *         type: string
  *         enum: [BUENO, MALO]
+ *       metadata:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/BuildingMetadataPreview"
  */
 t.Building = t.struct(
   {

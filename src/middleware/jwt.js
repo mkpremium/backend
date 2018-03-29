@@ -1,4 +1,3 @@
-import debug from 'debug';
 import {compose} from 'compose-middleware';
 import {wrap} from 'express-promise-wrap';
 import jwtMiddleware from 'express-jwt';
@@ -6,8 +5,6 @@ import jwtPermissions from 'express-jwt-permissions';
 import _get from 'lodash/get';
 import {jwt} from '../../config';
 import {OperatorRepository} from '../operator/models';
-
-const jwtDebug = debug('app:jwt');
 
 /**
  * @swagger
@@ -27,7 +24,6 @@ const jwtDebug = debug('app:jwt');
  */
 
 export default () => {
-  jwtDebug('initialized JWT');
   const jwtInstance = jwtMiddleware(Object.assign({}, jwt, {getToken}));
   const composedJwt = compose(jwtInstance, wrap(addUserInfo));
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError;
