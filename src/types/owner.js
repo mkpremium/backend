@@ -12,10 +12,10 @@ import _find from 'lodash/find';
  *         $ref: "#/definitions/PersonBody"
  *       personId:
  *         type: string
- *         fromat: uuid/v4
+ *         format: uuid/v4
  *       buildingId:
  *         type: string
- *         fromat: uuid/v4
+ *         format: uuid/v4
  *       note:
  *         type: string
  *       type:
@@ -183,10 +183,10 @@ t.Person.prototype.fullName = function() {
  *         format: uuid/v4
  *       personId:
  *         type: string
- *         fromat: uuid/v4
+ *         format: uuid/v4
  *       buildingId:
  *         type: string
- *         fromat: uuid/v4
+ *         format: uuid/v4
  *       note:
  *         type: string
  *       type:

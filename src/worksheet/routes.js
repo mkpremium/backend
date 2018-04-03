@@ -247,6 +247,8 @@ router.get('/queues/:city', queueByCityController);
  *         type: string
  *       - name: operatorId
  *         in: query
+ *         type: string
+ *         format: uuid/v4
  *         description: Especifica el operador a consultar (solo manager)
  *     responses:
  *       200:
