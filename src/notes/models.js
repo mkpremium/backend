@@ -43,7 +43,6 @@ export class NoteRepository extends Note {
   }
 
   async listNotes(query = {}) {
-    console.log(query);
     const params = fromJSON(query, t.NoteListQuery);
     const qb = this.getQueryBuilder()
       .limit(params.limit)
@@ -64,6 +63,7 @@ export class NoteRepository extends Note {
     }
 
     if (params.context) {
+      const context = JSON.parse(params.context);
       Object.keys(context).forEach(key => {
         qb.where(`context.${key} = ?`, context[key]);
         qbCount.where(`context.${key} = ?`, context[key]);

@@ -43,7 +43,7 @@ export class WorksheetRepository extends Worksheet {
       const ownerRepo = new OwnerRepository();
       const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
       worksheet = t.update(worksheet, {relatedOwners: {$set: relatedOwners}});
-      worksheet = Object.assign({ownerContacts: ownersContactViews(relatedOwners), worksheet});
+      worksheet = t.update(worksheet, {ownerContacts: {$set: ownersContactViews(relatedOwners)}});
     }
 
     return worksheet;
@@ -63,8 +63,10 @@ export class WorksheetRepository extends Worksheet {
 
   static async notifyWorksheetUpdate(worksheetId) {
     const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
-    await worksheetRepo.sendWorksheetEvent(worksheet);
+    const worksheet = await worksheetRepo.findById(worksheetId);
+    if (worksheet) {
+      await worksheetRepo.sendWorksheetEvent(worksheet);
+    }
   }
 
   async findWorksheetByOwner(ownerId) {
@@ -90,6 +92,11 @@ export class WorksheetRepository extends Worksheet {
     });
 
     return this.save(updatedWorksheet);
+  }
+
+  async preSave(data) {
+    // never store this
+    return t.update(data, {ownerContacts: {$set: []}});
   }
 
   async list(query = {}) {

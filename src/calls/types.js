@@ -22,10 +22,10 @@ import uuid from 'uuid/v4';
  *         description: Numero a quien se realizo la llamada
  *       callId:
  *         type: integer
- *         descripcion: Identificador de llamada realizada
+ *         description: Identificador de llamada realizada
  *       note:
  *         type: string
- *         descripcion: Nota de llamada
+ *         description: Nota de llamada
  *       date:
  *         type: string
  *         description: Fecha y hora del registro de llamada

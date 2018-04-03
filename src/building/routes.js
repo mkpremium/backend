@@ -19,6 +19,7 @@ const router = Router();
  *         description: Url PUT de subida de amazon s3
  * /buildings/create-url:
  *   post:
+ *     description: Genera una url de subida de amazon S3
  *     security:
  *       - admin: []
  *       - operator: []
@@ -37,9 +38,11 @@ const router = Router();
  *          $ref: "#/definitions/SignedUrlRequest"
  *     responses:
  *       200:
+ *         description: url generada
  *         schema:
  *           $ref: "#/definitions/CreateUrlResponse"
  *       400:
+ *         description: solicitud invalida
  *         schema:
  *           $ref: "#/definitions/ErrorResponse"
  *
@@ -79,11 +82,13 @@ router.post('/create-url', createMetadataUploadUrlController);
  *          $ref: "#/definitions/BuildingMetadataBody"
  *     responses:
  *       200:
+ *         description: Operación exitosa
  *         schema:
  *           $ref: "#/definitions/BuildingMetadata"
  *       400:
+ *         description: Solicitud incorrecta
  *         schema:
- *           $ref: "#/definitions/ErrorResponse"
+ *           $ref: "#/definitions/Error"
  *
  */
 router.post('/:id/metadata', addMetadataToBuildingController);

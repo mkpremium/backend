@@ -40,6 +40,10 @@ const router = Router();
  *         in: query
  *         type: string
  *         description: Id del operador que creo la nota
+ *       - name: context
+ *         in: query
+ *         type: string
+ *         description: JSON object con el contexto
  *       - name: createdAt
  *         in: query
  *         type: string

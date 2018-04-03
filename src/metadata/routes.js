@@ -18,7 +18,8 @@ const router = Router();
  *         type: string
  *         description: Url PUT de subida de amazon s3
  * /metadata/{metadataId}/download:
- *   post:
+ *   get:
+ *     description: Redirige a la url temporal de amazon s3 del meta dato indicado
  *     security:
  *       - admin: []
  *       - operator: []
@@ -35,9 +36,9 @@ const router = Router();
  *       302:
  *         description: Redirige a la url temporal de amazon s3
  *       404:
- *         description:
+ *         description: Meta dato no encontrado
  *         schema:
- *           $ref: "#/definitions/ErrorResponse"
+ *           $ref: "#/definitions/Error"
  *
  */
 router.get('/:id/download', downloadMetadataFileController);
