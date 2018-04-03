@@ -3,6 +3,8 @@ import _find from 'lodash/find';
 import _findIndex from 'lodash/findIndex';
 import {Queue} from './constants';
 
+import '../owner/types';
+
 t.WorkSheetStatus = t.enums.of([
   'OPEN',
   'CLOSED'
@@ -75,6 +77,7 @@ t.WorkSheet = t.struct({
     status: 'OPEN',
     relatedOwnerIds: [],
     relatedOwners: [],
+    ownerContacts: [],
     relatedBuildingIds: [],
     relatedBuildings: [],
     price: {
