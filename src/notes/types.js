@@ -26,7 +26,7 @@ t.NoteListQuery = t.ListQuery.extend(
     createdBy: t.maybe(t.String),
     createdAt: t.maybe(t.Date),
     createdBetween: t.maybe(t.StringSplitList),
-    context: t.maybe(t.Object)
+    context: t.maybe(t.String)
   },
   {
     name: 'NoteListQuery',
