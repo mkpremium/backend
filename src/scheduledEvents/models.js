@@ -8,10 +8,19 @@ import {
   addBetweenQueryToBuilder
 } from '../lib/query/helpers';
 import {newHttpError} from '../lib/http-error';
-import {buildRangeFromWeek, firebaseTimestampFormat, meetingDayFormat, meetingWeekFormat, utc} from '../lib/date';
+import {buildRangeFromWeek, meetingWeekFormat, utc} from '../lib/date';
 import {buildDistanceCalculator} from '../lib/geo';
 import {getScheduledMeetingStruct} from './helper';
 import firebase from '../firebase';
+import {
+  deleteMeetingToBuilding,
+  deleteMeetingToFirebase,
+  deleteMeetingToOperator,
+  relateMeetingToBuilding,
+  relateMeetingToOperator,
+  saveBuildingToFirebase,
+  saveMeetingToFirebase
+} from '../firebase/lib';
 import {OwnerRepository} from '../owner/models';
 
 export class ScheduledEvents extends CouchbaseModel {
@@ -19,71 +28,6 @@ export class ScheduledEvents extends CouchbaseModel {
     super();
     this.Struct = t.ScheduledEvent;
   }
-}
-
-function toFirebaseMeeting(meeting) {
-  return t.FirebaseMeeting({
-    Aspiration: 0,
-    Street: meeting.address,
-    Email: _get(meeting, 'contact.email', ''),
-    Name: _get(meeting, 'contact.name', ''),
-    PhoneNumber: _get(meeting, 'contact.phone', ''),
-    buildingID: _get(meeting, 'building.id', ''),
-    dateCreation: firebaseTimestampFormat(meeting.createdAt),
-    dateMeeting: firebaseTimestampFormat(meeting.eventDate)
-  });
-}
-
-function toFirebaseBuilding(building) {
-  const {lat, lng} = building.location;
-  return t.FirebaseBuildingData({
-    Street: _get(building, 'address.fullAddress'),
-    Aspiration: 0,
-    Proposal: 0,
-    State: '',
-    lat,
-    lng
-  });
-}
-
-async function saveBuildingToFirebase(db, building) {
-  if (firebase.enabled) {
-    db.ref(`Buildings/${building.id}/Data`).set(toFirebaseBuilding(building));
-  }
-}
-
-async function relateMeetingToBuilding(db, {id, building}) {
-  if (firebase.enabled) {
-    db.ref(`Buildings/${building.id}/Meetings`).update({[id]: true});
-  }
-}
-
-async function deleteMeetingToBuilding(db, {id, building}) {
-  if (firebase.enabled) {
-    db.ref(`Buildings/${building.id}/Meetings/${id}`).set(null);
-  }
-}
-
-async function saveMeetingToFirebase(db, meeting) {
-  if (firebase.enabled) {
-    db.ref(`Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
-  }
-}
-
-async function deleteMeetingToFirebase(db, meeting) {
-  if (firebase.enabled) {
-    db.ref(`Meetings/${meeting.id}`).set(null);
-  }
-}
-
-async function relateMeetingToOperator(db, meeting, operatorId) {
-  const meetingDay = meetingDayFormat(meeting.eventDate);
-  db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
-}
-
-async function deleteMeetingToOperator(db, meeting, operatorId) {
-  const meetingDay = meetingDayFormat(meeting.eventDate);
-  db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
 }
 
 export class ScheduledEventsRepository extends ScheduledEvents {

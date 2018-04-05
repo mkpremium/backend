@@ -2,6 +2,7 @@ import t from 'tcomb';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
+import {saveMetadataToFirebase} from '../firebase/lib';
 
 export class Building extends CouchbaseModel {
   constructor() {
@@ -55,7 +56,7 @@ export class BuildingRepository extends Building {
     const updatedBuilding = t.update(building, {metadata: {$merge: updatedMetadata}});
 
     await this.save(updatedBuilding);
-
+    await saveMetadataToFirebase(metadata);
     return metadata;
   }
 }

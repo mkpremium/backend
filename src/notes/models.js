@@ -2,9 +2,8 @@ import t from 'tcomb';
 import {CouchbaseModel} from '../db/model';
 import fromJSON from 'tcomb/lib/fromJSON';
 
-import firebase from '../firebase';
 import {addBetweenQueryToBuilder, addDateQueryToBuilder} from '../lib/query/helpers';
-import {firebaseTimestampFormat} from '../lib/date';
+import {saveNoteToFirebase} from '../firebase/lib';
 
 export class Note extends CouchbaseModel {
   constructor() {
@@ -13,32 +12,11 @@ export class Note extends CouchbaseModel {
   }
 }
 
-function noteWithTimestamp(note) {
-  const json = JSON.parse(JSON.stringify(note));
-  const timestamp = firebaseTimestampFormat(note.createdAt);
-  return Object.assign({}, json, {timestamp});
-}
-
 export class NoteRepository extends Note {
-  async firebaseNote(note) {
-    const buildingId = note.context.buildingId;
-    if (!buildingId) {
-      return;
-    }
-
-    const db = firebase.database();
-    const noteRef = db.ref(`Notes/${note.id}`);
-    noteRef.set(noteWithTimestamp(note));
-
-    const buildingNotesRef = db.ref(`Buildings/${buildingId}/Notes`);
-    buildingNotesRef.child('LastNote').set(note.note);
-    buildingNotesRef.child('ids').update({[note.id]: true});
-  }
-
   async createNote(params = {}, createdBy) {
     const noteBody = t.NoteBody(params);
     const note = await this.save(t.update(noteBody, {$merge: {createdBy}}));
-    await this.firebaseNote(note);
+    await saveNoteToFirebase(note);
     return note;
   }
 
