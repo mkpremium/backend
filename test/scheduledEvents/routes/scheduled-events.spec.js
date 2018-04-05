@@ -190,7 +190,6 @@ describe('scheduledevents.routes', () => {
         .post('/scheduled-events/call')
         .set('Authorization', authenticatedOperator.authorization)
         .send(scheduledCallsEventObject);
-      console.log(response.body);
       response.status.should.equal(201);
     });
   });
@@ -200,7 +199,7 @@ describe('scheduledevents.routes', () => {
       await request(app)
         .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
         .set('Authorization', authenticatedOperator.authorization)
-        .send({type: 'MEETINGS', data: {}, notifyAt: new Date('2018-02-28T16:24:39Z')})
+        .send({type: 'MEETINGS', data: {}, notifyAt: new Date('2018-02-28T16:24:39Z'), notifyTo: 'test', event: {}})
         .expect(204);
     });
   });

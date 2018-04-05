@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import {isMaybeTesting} from '../../config';
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -238,19 +239,21 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
   }
 );
 
+const MeetingContact = t.struct({
+  name: t.String,
+  email: t.maybe(t.String),
+  phone: t.maybe(t.String)
+}, 'contact');
+
 t.Meeting = t.struct({
   notifyTo: t.String,
-  address: t.String,
-  contact: t.struct({
-    name: t.String,
-    email: t.maybe(t.String),
-    phone: t.maybe(t.String)
-  }, 'contact'),
+  address: isMaybeTesting(t.String),
+  contact: isMaybeTesting(MeetingContact),
   id: t.String,
-  building: t.Building,
+  building: isMaybeTesting(t.Building),
   createdAt: t.Date,
   eventDate: t.Date,
-  createdBy: t.String
+  createdBy: isMaybeTesting(t.String)
 }, 'Meeting');
 
 t.FirebaseMeeting = t.struct(

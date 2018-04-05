@@ -23,7 +23,6 @@ describe('owner.routes', () => {
 
   describe('PUT /owners/:id/contacts/:contactId @request', () => {
     it('204 Operación exitosa', async() => {
-      console.log(person.contacts);
       const contactId = person.contacts[0].id;
       await request(app)
         .put(`/owners/${owner.id}/contacts/${contactId}`)

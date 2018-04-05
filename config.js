@@ -1,9 +1,10 @@
+import t from 'tcomb';
 import {join} from 'path';
 import {N1qlQuery} from 'couchbase';
 
 export const port = parseInt(process.env.PORT || '9001');
-export const emitHistoryEvents = process.env.EMIT_HISTORY_EVENTS || false;
-export const emitModelEvents = process.env.EMIT_MODEL_EVENTS || false;
+export const emitHistoryEvents = Boolean(process.env.EMIT_HISTORY_EVENTS || false);
+export const emitModelEvents = Boolean(process.env.EMIT_MODEL_EVENTS || false);
 export const socket = {
   port: parseInt(process.env.SOCKET_PORT || '9002'),
   server: process.env.SOCKET_SERVER || 'http://localhost',
@@ -39,10 +40,6 @@ export const gearmanConfig = {
 };
 
 const defaultFirebaseServiceAccount = join(__dirname, 'firebase.json');
-export const firebase = {
-  serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
-  databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://mkpremiumcomerciales.firebaseio.com'
-};
 
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);
 
@@ -52,4 +49,17 @@ export const awsConfig = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
   bucket: process.env.S3_BUCKET_NAME || 'mkpremium',
   prefix: process.env.S3_METADATA_PREFIX || 'dev'
+};
+
+export const tests = {
+  skipCalls: Boolean(process.env.TEST_SKIP_CALLS || false)
+};
+
+export const isTest = () => process.env.NODE_ENV === 'test';
+export const isMaybeTesting = v => isTest() ? t.maybe(v) : v;
+
+export const firebase = {
+  enabled: !isTest(),
+  serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
+  databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://mkpremiumcomerciales.firebaseio.com'
 };

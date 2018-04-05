@@ -47,23 +47,33 @@ function toFirebaseBuilding(building) {
 }
 
 async function saveBuildingToFirebase(db, building) {
-  db.ref(`Buildings/${building.id}/Data`).set(toFirebaseBuilding(building));
+  if (firebase.enabled) {
+    db.ref(`Buildings/${building.id}/Data`).set(toFirebaseBuilding(building));
+  }
 }
 
 async function relateMeetingToBuilding(db, {id, building}) {
-  db.ref(`Buildings/${building.id}/Meetings`).update({[id]: true});
+  if (firebase.enabled) {
+    db.ref(`Buildings/${building.id}/Meetings`).update({[id]: true});
+  }
 }
 
 async function deleteMeetingToBuilding(db, {id, building}) {
-  db.ref(`Buildings/${building.id}/Meetings/${id}`).set(null);
+  if (firebase.enabled) {
+    db.ref(`Buildings/${building.id}/Meetings/${id}`).set(null);
+  }
 }
 
 async function saveMeetingToFirebase(db, meeting) {
-  db.ref(`Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
+  if (firebase.enabled) {
+    db.ref(`Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
+  }
 }
 
 async function deleteMeetingToFirebase(db, meeting) {
-  db.ref(`Meetings/${meeting.id}`).set(null);
+  if (firebase.enabled) {
+    db.ref(`Meetings/${meeting.id}`).set(null);
+  }
 }
 
 async function relateMeetingToOperator(db, meeting, operatorId) {
@@ -101,7 +111,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
     const ownerRepo = new OwnerRepository();
 
-    const [owner] = await ownerRepo.findByIdWithIncludes(ownerId, ['person', 'building']);
+    const [owner] = ownerId
+      ? await ownerRepo.findByIdWithIncludes(ownerId, ['person', 'building'])
+      : [];
     if (owner) {
       const person = t.Person(owner.person);
       meetingObj['contact'] = {

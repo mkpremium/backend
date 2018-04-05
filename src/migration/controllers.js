@@ -26,7 +26,6 @@ async function uploadFiles(req, res) {
   const job = gearman.submitJob('cross', JSON.stringify(files));
 
   job.on('complete', () => {
-    console.log('cross completed');
     gearman.submitJob('seed', job.response);
   });
 

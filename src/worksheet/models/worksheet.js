@@ -1,6 +1,10 @@
 import t from 'tcomb';
 import _head from 'lodash/head';
+import _some from 'lodash/some';
+import _every from 'lodash/every';
+import _find from 'lodash/find';
 import fromJSON from 'tcomb/lib/fromJSON';
+
 import {CouchbaseModel} from '../../db/model';
 import {
   addDateQueryToBuilder,
@@ -11,6 +15,9 @@ import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
+import {WorkSheetStatus} from '../../types/worksheet';
+import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified} from '../../types/owner';
+import {ScheduledEvents} from '../../scheduledEvents/models';
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -51,23 +58,57 @@ export class WorksheetRepository extends Worksheet {
     return worksheet;
   }
 
-  async sendWorksheetEvent(worksheet) {
-    return this.sendEvent(`${worksheet.id}`, worksheet);
+  // noinspection JSMethodCanBeStatic
+  async findMeetings(worksheetId) {
+    const meetingRepo = new ScheduledEvents();
+    const qb = meetingRepo.getQueryBuilder();
+    qb.where('context.worksheetId = ?', worksheetId);
+    return meetingRepo.query(qb);
   }
 
-  static async notifyWorksheetUpdateByOwner(ownerId) {
-    const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findWorksheetByOwner(ownerId);
-    if (worksheet) {
-      await worksheetRepo.sendWorksheetEvent(worksheet);
+  async calculateNewStatus(worksheet) {
+    switch (worksheet.status) {
+      case WorkSheetStatus.DEFAULT:
+        const someValidOwner = _some(worksheet.relatedOwners, isPrimaryVerified);
+        const everyInvalidOwner = _every(worksheet.relatedOwners, isInvalidVerified);
+        if (someValidOwner) {
+          return WorkSheetStatus.WITH_OWNER;
+        }
+        if (everyInvalidOwner) {
+          return WorkSheetStatus.INVALID;
+        }
+        return WorkSheetStatus.DEFAULT;
+      case WorkSheetStatus.WITH_OWNER:
+        const noVende = _find(worksheet.relatedOwners, isPrimaryNoVende);
+        if (noVende) {
+          return WorkSheetStatus.NO_SALE;
+        }
+        const meetings = await this.findMeetings(worksheet.id);
+        return meetings.length > 0
+          ? WorkSheetStatus.MEETING
+          : WorkSheetStatus.WITH_OWNER;
     }
   }
 
-  static async notifyWorksheetUpdate(worksheetId) {
-    const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findById(worksheetId);
+  async updateStatus(worksheetId) {
+    const worksheet = await this.findByIdWIthIncludes(worksheetId);
+    const newStatus = await this.calculateNewStatus(worksheet);
+    const updatedWorksheet = worksheet.setStatus(newStatus);
+    return this.save(updatedWorksheet);
+  }
+
+  async sendWorksheetEvent(worksheetId) {
+    const worksheet = await this.findById(worksheetId);
     if (worksheet) {
-      await worksheetRepo.sendWorksheetEvent(worksheet);
+      return this.sendEvent(`${worksheet.id}`, worksheet);
+    }
+  }
+
+  static async updateWorkSheetStatusByOwner(ownerId) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findWorksheetByOwner(ownerId);
+    if (worksheet) {
+      await worksheetRepo.updateStatus(worksheet.id);
     }
   }
 
@@ -76,9 +117,6 @@ export class WorksheetRepository extends Worksheet {
       .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId);
 
     const results = await this.query(qb);
-    if (!results || results.length === 0) {
-      throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by relatedOwnerIds: ${ownerId}`);
-    }
 
     return _head(results);
   }

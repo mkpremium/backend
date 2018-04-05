@@ -108,7 +108,7 @@ router.put('/:id', updateOwnerController);
  *         type: string
  *         format: uuid/v4
  *         description: Id del propietario
- *       - name: contacId
+ *       - name: contactId
  *         in: path
  *         type: string
  *         format: uuid/v4

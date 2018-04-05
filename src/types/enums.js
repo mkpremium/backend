@@ -18,15 +18,23 @@ t.TypeContact = t.enums({
   SITIO_WEB: 'SITIO_WEB'
 }, 'TypeContact');
 
-t.OwnerType = t.enums({
+export const OwnerType = {
   NINGUNO: 'NINGUNO',
   PRINCIPAL: 'PRINCIPAL',
   SECUNDARIO: 'SECUNDARIO',
   VECINO: 'VECINO',
   FAMILIAR: 'FAMILIAR'
-}, 'OwnerType');
+};
 
-t.OwnerStatus = t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO'], 'OwnerStatus');
+export const OwnerStatus = {
+  NO_VERIFICADO: 'NO_VERIFICADO',
+  VERIFICADO: 'VERIFICADO',
+  NO_VENDE: 'NO_VENDE',
+  ERRONEO: 'ERRONEO'
+};
+
+t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType');
+t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus');
 
 t.Gender = t.enums({
   NINGUNO: 'NINGUNO',

@@ -17,6 +17,5 @@ describe('JWT middleware', () => {
       .expect(200);
 
     response.body.should.be.a('object');
-    console.log(response.body);
   });
 });

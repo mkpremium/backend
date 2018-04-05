@@ -2,13 +2,48 @@ import t from 'tcomb';
 import _find from 'lodash/find';
 import _findIndex from 'lodash/findIndex';
 import {Queue} from './constants';
+import debug from 'debug';
 
 import '../owner/types';
 
-t.WorkSheetStatus = t.enums.of([
-  'OPEN',
-  'CLOSED'
-], 'WorkSheetStatus');
+const debugWorksheet = debug('app:worksheet');
+
+export const WorkSheetStatus = {
+  DEFAULT: 'OPEN',
+  WITH_OWNER: 'LOOKING_MEETING',
+  INVALID: 'INVALID',
+  NO_SALE: 'NO_SALE',
+  MEETING: 'MEETING',
+  CLOSE: 'CLOSE'
+};
+
+export const workSheetStatusTransition = function(status) {
+  switch (status) {
+    case WorkSheetStatus.DEFAULT:
+      return [
+        status,
+        WorkSheetStatus.WITH_OWNER,
+        WorkSheetStatus.INVALID
+      ];
+    case WorkSheetStatus.WITH_OWNER:
+      return [
+        status,
+        WorkSheetStatus.NO_SALE,
+        WorkSheetStatus.MEETING
+      ];
+    // end status
+    case WorkSheetStatus.INVALID:
+    case WorkSheetStatus.NO_SALE:
+    case WorkSheetStatus.MEETING:
+      return [
+        status
+      ];
+    default:
+      throw new Error(`Unknown worksheet transition status "${status}"`);
+  }
+};
+
+t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus');
 
 t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
 
@@ -88,6 +123,18 @@ t.WorkSheet = t.struct({
     _documentType: 'worksheet'
   }
 });
+
+t.WorkSheet.prototype.setStatus = function(newStatus) {
+  if (workSheetStatusTransition(this.status).indexOf(newStatus) === -1) {
+    throw new Error(`worksheet ${this.id} cannot transition from ${this.status} to ${newStatus}`);
+  }
+
+  if (newStatus === this.status) {
+    debugWorksheet(`worksheet ${this.id} status "${this.status}" remains equals`);
+  }
+
+  return t.update(this, {status: {$set: newStatus}});
+};
 
 /**
  * @swagger
@@ -196,20 +243,21 @@ t.WorksheetQueue = t.struct(
   }
 );
 
-t.WorksheetQueueExtraInfo = t.struct({
-  id: t.maybe(t.String),
-  city: t.String,
-  worksheets: t.list(t.QueueItemExtraInfo),
+t.WorksheetQueueExtraInfo = t.struct(
+  {
+    id: t.maybe(t.String),
+    city: t.String,
+    worksheets: t.list(t.QueueItemExtraInfo),
 
-  _documentType: t.enums.of(['worksheet-queue'])
-},
-{
-  name: 'WorksheetQueue',
-  defaultProps: {
-    worksheets: [],
-    _documentType: 'worksheet-queue'
+    _documentType: t.enums.of(['worksheet-queue'])
+  },
+  {
+    name: 'WorksheetQueue',
+    defaultProps: {
+      worksheets: [],
+      _documentType: 'worksheet-queue'
+    }
   }
-}
 );
 
 t.WorksheetQueue.prototype.findItemById = function(id) {

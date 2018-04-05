@@ -1,5 +1,6 @@
 import t from 'tcomb';
 import _find from 'lodash/find';
+import {OwnerStatus, OwnerType} from './enums';
 
 /**
  * @swagger
@@ -195,7 +196,7 @@ t.Person.prototype.fullName = function() {
  *         type: bool
  *       status:
  *         type: string
- *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
+ *         enum: [NO_VERIFICADO, VERIFICADO, NO_VENDE, ERRONEO]
  */
 t.Owner = t.struct(
   {
@@ -224,3 +225,20 @@ t.Owner = t.struct(
     }
   }
 );
+
+export function isPrimaryVerified(owner) {
+  return owner.verified &&
+    owner.status === OwnerStatus.VERIFICADO &&
+    owner.type === OwnerType.PRINCIPAL;
+}
+
+export function isInvalidVerified(owner) {
+  return owner.verified &&
+    owner.status === OwnerStatus.ERRONEO;
+}
+
+export function isPrimaryNoVende(owner) {
+  return owner.verified &&
+    owner.status === OwnerStatus.NO_VENDE &&
+    owner.type === OwnerType.PRINCIPAL;
+}

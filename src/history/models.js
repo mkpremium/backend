@@ -14,7 +14,7 @@ export class History extends CouchbaseModel {
   }
 
   async register(eventData, sendEvent) {
-    const emitEvent = sendEvent || JSON.parse(emitHistoryEvents);
+    const emitEvent = sendEvent || emitHistoryEvents;
     return this.save(getHistoryStruct(eventData), emitEvent);
   }
 

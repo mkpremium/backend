@@ -52,8 +52,6 @@ function buildHeaders() {
 
 function cross(job) {
   const input = JSON.parse(job.payload);
-  console.log('cross INPUT', input);
-
   const base = dirname(input.calls);
   const output = resolve(base, 'cross_table.csv');
   const query = buildQuery(input);

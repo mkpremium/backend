@@ -1,5 +1,6 @@
 import t from 'tcomb';
 import _flatten from 'lodash/flatten';
+import {isTest} from '../../config';
 
 /**
  * @swagger
@@ -39,7 +40,7 @@ t.OwnerCompactView = t.struct(
     id: t.String,
     type: t.OwnerType,
     status: t.OwnerStatus,
-    buildingId: t.String,
+    buildingId: isTest() ? t.maybe(t.String) : t.String,
     verified: t.Boolean,
     person: t.struct({
       id: t.String,

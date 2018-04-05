@@ -16,7 +16,7 @@ describe('LET Query for Couchbase', () => {
       .field('p.*')
       .from('mkpremium AS p')
       .where('t.`worksheetId` = p.`id`');
-    const query = squel
+    squel
       .let()
       .letQuery('leta', letQuery)
       .letQuery('letb', letPerson)
@@ -25,7 +25,5 @@ describe('LET Query for Couchbase', () => {
       .field('letb')
       .from('mkpremium AS t')
       .where('t.id IN ?', [111]).toString();
-    console.log(letQuery.toString());
-    console.log(query);
   });
 });
