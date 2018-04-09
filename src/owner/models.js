@@ -24,6 +24,15 @@ export class PersonRepository extends Person {
     this.Struct = t.Person;
   }
 
+  async searchPeople(query) {
+    const params = t.PeopleSearchQuery(query);
+    const qs = this.getSearchBuilder(params.query);
+    qs.highlight();
+    qs.fields('*');
+
+    return this.search(qs);
+  }
+
   async findByIdOrThrow(personId) {
     const person = await this.findById(personId);
     if (!person) {

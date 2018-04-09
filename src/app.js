@@ -22,6 +22,7 @@ import history from './history';
 import notes from './notes';
 import building from './building';
 import metadata from './metadata';
+import people from './person';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -51,6 +52,7 @@ webhooks(app);
 notes(app);
 building(app);
 metadata(app);
+people(app);
 
 app.use(appErrorHandler);
 

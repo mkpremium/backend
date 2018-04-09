@@ -2,7 +2,7 @@ import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import uuid from 'uuid/v4';
 import squel from 'squel';
-import {N1qlQuery} from 'couchbase';
+import {N1qlQuery, SearchQuery} from 'couchbase';
 import debug from 'debug';
 
 import {couchbase, emitModelEvents} from '../../config';
@@ -79,9 +79,13 @@ export class CouchbaseModel {
 
     qb
       .from(couchbase.bucket, prefix)
-      .where(`${prefix}.\`_documentType\` = ?`, this.Struct.meta.defaultProps._documentType);
+      .where(`${prefix}.\`_documentType\` = ?`, this.getType());
 
     return qb;
+  }
+
+  getType() {
+    return this.Struct.meta.defaultProps._documentType;
   }
 
   async countQuery(queryBuilder = this.getQueryBuilder('count')) {
@@ -91,6 +95,18 @@ export class CouchbaseModel {
 
   async deleteQuery(queryBuilder = this.getQueryBuilder('delete')) {
     return this.query(queryBuilder);
+  }
+
+  getSearchBuilder(queryString, indexName) {
+    const name = indexName || this.getType();
+    return SearchQuery.new(name, SearchQuery.queryString(queryString));
+  }
+
+  async search(searchBuilder) {
+    debugModel('search', JSON.stringify(searchBuilder));
+    await this._promiseBucket;
+
+    return this._bucket.queryAsync(searchBuilder);
   }
 
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
