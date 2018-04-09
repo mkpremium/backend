@@ -48,4 +48,20 @@ t.FirebaseDocument = t.struct(
   }
 );
 
+t.FirebaseBuildingProposal = t.struct(
+  {
+    Accepted: t.Boolean,
+    Aspiration: t.struct({
+      Value: t.Number,
+      ReceptionDate: t.Number
+    }, 'aspiration'),
+    LastDate: t.Number,
+    SendDate: t.Number,
+    Value: t.Number
+  },
+  {
+    name: 'FirebaseBuildingProposal'
+  }
+);
+
 export default t;

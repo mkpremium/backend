@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import uuid from 'uuid/v4';
 
 /**
  * @swagger
@@ -74,6 +75,98 @@ t.BuildingOwner = t.struct(
   }
 );
 
+const BuildingProposalStatus = {
+  DEAL: 'aceptada',
+  SENT: 'enviada',
+  PENDING: 'pendiente'
+};
+
+t.BuildingProposalStatus = t.enums.of(Object.values(BuildingProposalStatus));
+
+/**
+ * @swagger
+ * definitions:
+ *   BuildingProposalBody:
+ *     properties:
+ *       ownerId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del Propietario a quien se realizó la propuesta
+ *       state:
+ *         type: string
+ *         enum: [aceptada, enviada, pendiente]
+ *       aspiration:
+ *         type: number
+ *       proposal:
+ *         type: number
+ *   BuildingProposal:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4 (asignado por el sistema)
+ *       ownerId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del Propietario a quien se realizó la propuesta
+ *       buildingId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del edificio (asignado por el sistema)
+ *       createdBy:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del operator que realizo la propuesta  (asignado por el sistema)
+ *       createdAt:
+ *         type: string
+ *         description: Fecha de creación de la propuesta *  (asignado por el sistema)
+ *       updatedBy:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del operator que actualizó  (asignado por el sistema)
+ *       updatedAt:
+ *         type: string
+ *         description: Fecha de actualización de la propuesta  (asignado por el sistema)
+ *       state:
+ *         type: string
+ *         enum: [aceptada, enviada, pendiente]
+ *       aspiration:
+ *         type: number
+ *       proposal:
+ *         type: number
+ */
+t.BuildingProposal = t.struct(
+  {
+    id: t.String,
+    ownerId: t.maybe(t.String),
+    buildingId: t.String,
+    accepted: t.Boolean,
+    createdAt: t.Date,
+    createdBy: t.String,
+    updatedAt: t.maybe(t.Date),
+    updateBy: t.maybe(t.String),
+
+    aspiration: t.maybe(t.Number),
+    proposal: t.maybe(t.Number),
+    state: t.BuildingProposalStatus,
+
+    _documentType: t.enums.of(['building-proposal'])
+  },
+  {
+    name: 'BuildingProposal',
+    defaultProps: {
+      state: BuildingProposalStatus.PENDING,
+      accepted: false,
+      get id() {
+        return uuid();
+      },
+      get createdBy() {
+        return new Date();
+      },
+      _documentType: 'building-proposal'
+    }
+  }
+);
+
 /**
  * @swagger
  * definitions:
@@ -137,9 +230,10 @@ t.Building = t.struct(
     ownerId: t.maybe(t.String),
     owner: t.BuildingOwner, // TODO: move to owners collection
     state: t.BuildingState,
+    proposals: t.list(t.BuildingProposal),
+    recentProposal: t.maybe(t.BuildingProposal),
 
     _migrateId: t.String,
-
     _documentType: t.String
   },
   {
@@ -150,6 +244,7 @@ t.Building = t.struct(
       roofArea: 0,
       coefficient: 0,
       buildingDate: 0,
+      proposals: [],
       _migrateId: [],
       _documentType: 'building'
     }

@@ -81,6 +81,37 @@ export async function saveNoteToFirebase(note) {
   buildingNotesRef.child('ids').update({[note.id]: true});
 }
 
+export async function saveProposal(proposal) {
+  if (!firebase.enabled) {
+    return;
+  }
+
+  const {buildingId} = proposal;
+  const firebaseProposal = toFirebaseProposal(proposal);
+
+  const db = firebase.database();
+  const proposalRef = db(`Proposes/${proposal.id}`);
+  proposalRef.set(firebaseProposal);
+
+  const buildingProposalsRef = db.ref(`Buildings/${buildingId}/Proposes`);
+  buildingProposalsRef.child('ids').update({[proposal.id]: true});
+  buildingProposalsRef.child('LastPropose').set(firebaseProposal);
+}
+
+function toFirebaseProposal(proposal) {
+  const timestamp = firebaseTimestampFormat(proposal.updateAt || proposal.createdAt);
+  return t.FirebaseBuildingProposal({
+    Accepted: proposal.accepted,
+    Aspiration: {
+      Value: proposal.aspiration,
+      ReceptionDate: timestamp
+    },
+    LastDate: timestamp,
+    SendDate: timestamp,
+    Value: proposal.proposal
+  });
+}
+
 function noteWithTimestamp(note) {
   const json = JSON.parse(JSON.stringify(note));
   const timestamp = firebaseTimestampFormat(note.createdAt);

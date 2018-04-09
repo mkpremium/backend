@@ -1,5 +1,9 @@
 import {Router} from 'express';
-import {addMetadataToBuildingController, createMetadataUploadUrlController} from './controllers';
+import {
+  addMetadataToBuildingController,
+  addNegotiationProposalController,
+  createMetadataUploadUrlController, updateNegotiationProposalController
+} from './controllers';
 
 const router = Router();
 /**
@@ -92,5 +96,92 @@ router.post('/create-url', createMetadataUploadUrlController);
  *
  */
 router.post('/:id/metadata', addMetadataToBuildingController);
+
+/**
+ * @swagger
+ * tags:
+ *   name: Negotiation
+ *   description: Negociaciones
+ * /buildings/{buildingId}/negotiation:
+ *   post:
+ *     summary: Crea una nueva negociación
+ *     tags: [Negotiation, Comercial, Building]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - admin: []
+ *       - comercial: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/BuildingProposalBody"
+ *       - name: buildingId
+ *         in: path
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BuildingProposal"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/:id/negotiation', addNegotiationProposalController);
+
+/**
+ * @swagger
+ * tags:
+ *   name: Negotiation
+ *   description: Negociaciones
+ * /buildings/{buildingId}/negotiation/{negotiationId}:
+ *   put:
+ *     summary: Crea una nueva negociación
+ *     tags: [Negotiation, Comercial, Building]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - admin: []
+ *       - comercial: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/BuildingProposalBody"
+ *       - name: buildingId
+ *         in: path
+ *         type: string
+ *       - name: negotiationId
+ *         in: path
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BuildingProposal"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.put('/:building_id/negotiation/:id', updateNegotiationProposalController);
 
 export default router;
