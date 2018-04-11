@@ -3,6 +3,7 @@ import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
 import {saveMetadataToFirebase, saveProposal} from '../firebase/lib';
+import {updateList} from '../lib/tcomb-utils';
 
 export class Building extends CouchbaseModel {
   constructor() {
@@ -117,4 +118,48 @@ export class BuildingRepository extends Building {
 
     return proposal;
   }
+
+  async addEntity(building, params) {
+    const entity = t.BuildingEntity(params);
+    const updatedEntities = t.update(building.entities, {$push: [entity]});
+    await this.updateEntities(building, updatedEntities);
+
+    return entity;
+  }
+
+  async updateEntity(building, entityId, params) {
+    const entity = building.entities.find(({id}) => id === entityId);
+    if (!entity) {
+      throw newHttpError(
+        404,
+        `No se puede encontrar la entidad ${entityId} para el edificio ${building.id}`
+      );
+    }
+    const updatedEntity = t.update(entity, {$merge: params});
+    const updatedEntities = updateList(building.entities, entity, updatedEntity);
+    await this.updateEntities(building, updatedEntities);
+
+    return updatedEntity;
+  }
+
+  async updateEntities(building, updatedEntities) {
+    const updateBuilding = t.update(building, {
+      entities: {$set: updatedEntities},
+      elements: {$set: calculateElements(building.elements, updatedEntities)}
+    });
+
+    return this.save(updateBuilding);
+  }
+}
+
+function calculateElements({commons}, entities) {
+  const number = entities.length;
+  const sumSurface = entities.reduce((acc, {surface}) => acc + surface);
+  const average = sumSurface / (number > 0 ? number : 1);
+
+  return {
+    number,
+    average,
+    commons
+  };
 }

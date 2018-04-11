@@ -167,6 +167,88 @@ t.BuildingProposal = t.struct(
   }
 );
 
+const BuildingEntityStatus = {
+  EMPTY: 'vacio',
+  UNDEFINED: 'indefinido',
+  SALE: 'venta',
+  RENT: 'arriendo',
+  NO_SALE: 'no vende',
+  OKUPAS: 'okupas'
+};
+
+t.BuildingEntityStatus = t.enums.of(Object.values(BuildingEntityStatus));
+
+/**
+ * @swagger
+ * definitions:
+ *   BuildingEntityBody:
+ *     properties:
+ *       status:
+ *         type: string
+ *         enum: [vacio, indefinido, venta arriendo, no vende, okupas]
+ *         description: "Estado de la situación arrendataria"
+ *       name:
+ *         type: string
+ *         description: Nombre o identificador
+ *       type:
+ *         type: string
+ *       surface:
+ *         type: number
+ *         description: Area en metros
+ *       rent:
+ *         type: number
+ *       expiration:
+ *         type: string
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ *   BuildingEntity:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       status:
+ *         type: string
+ *         enum: [vacio, indefinido, venta arriendo, no vende, okupas]
+ *         description: "Estado de la situación arrendataria"
+ *       name:
+ *         type: string
+ *         description: Nombre o identificador
+ *       type:
+ *         type: string
+ *       surface:
+ *         type: number
+ *         description: Area en metros
+ *       rent:
+ *         type: number
+ *       expiration:
+ *         type: string
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ */
+t.BuildingEntity = t.struct(
+  {
+    id: t.String,
+    status: t.BuildingEntityStatus,
+    name: t.String,
+    type: t.String,
+    surface: t.Number,
+    rent: t.Number,
+    expiration: t.maybe(t.Date)
+  },
+  {
+    name: 'BuildingEntity',
+    defaultProps: {
+      status: BuildingEntityStatus.UNDEFINED,
+      surface: 0,
+      rent: 0,
+      get id() {
+        return uuid();
+      },
+      get createdBy() {
+        return new Date();
+      }
+    }
+  }
+);
+
 /**
  * @swagger
  * definitions:
@@ -227,6 +309,7 @@ t.Building = t.struct(
     buildingDate: t.Number,
     location: t.Location,
     elements: t.Elements,
+    entities: t.list(t.BuildingEntity),
     ownerId: t.maybe(t.String),
     owner: t.BuildingOwner, // TODO: move to owners collection
     state: t.BuildingState,
@@ -245,6 +328,7 @@ t.Building = t.struct(
       coefficient: 0,
       buildingDate: 0,
       proposals: [],
+      entities: [],
       _migrateId: [],
       _documentType: 'building'
     }

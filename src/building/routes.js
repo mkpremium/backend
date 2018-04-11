@@ -1,8 +1,9 @@
 import {Router} from 'express';
 import {
+  addEntityController,
   addMetadataToBuildingController,
   addNegotiationProposalController,
-  createMetadataUploadUrlController, updateNegotiationProposalController
+  createMetadataUploadUrlController, updateEntityController, updateNegotiationProposalController
 } from './controllers';
 
 const router = Router();
@@ -183,5 +184,86 @@ router.post('/:id/negotiation', addNegotiationProposalController);
  *           $ref: "#/definitions/Error"
  */
 router.put('/:building_id/negotiation/:id', updateNegotiationProposalController);
+
+/**
+ * @swagger
+ * /buildings/{buildingId}/entities:
+ *   post:
+ *     summary: Crea una nueva entidad (situación arrendataria) del edificio
+ *     tags: [Building, Operator]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - admin: []
+ *       - comercial: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/BuildingEntityBody"
+ *       - name: buildingId
+ *         in: path
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BuildingEntity"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/:id/entities', addEntityController);
+
+/**
+ * @swagger
+ * /buildings/{buildingId}/entities/{entityId}:
+ *   put:
+ *     summary: "Actualiza una entidad (situación arrendataria) de un edificio"
+ *     tags: [Building, Operator]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - admin: []
+ *       - comercial: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/BuildingEntityBody"
+ *       - name: buildingId
+ *         in: path
+ *         type: string
+ *       - name: entityId
+ *         in: path
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BuildingEntity"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.put('/:id/entities/:entityId', updateEntityController);
 
 export default router;
