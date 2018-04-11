@@ -19,21 +19,17 @@ export const isUnknownEvent = async(body) => {
   if (!callId) {
     const modelRawEvents = new CallsRawEvents();
     await modelRawEvents.save({
-      content: body,
-      date: new Date()
+      content: body
     });
+    return true;
   }
-  return !callId;
+  return false;
 };
 
 export const shouldOmitEvent = (body) => {
   const fromUser = _get(body, 'data.fromuser', null);
-  let fromUserServiceData = _get(body, 'data.ServiceData', null);
-  
-  if (fromUserServiceData) {
-    fromUserServiceData = fromUserServiceData.split('#')[0];
-  }
-  
+  const [fromUserServiceData] = _get(body, 'data.ServiceData', '').split('#');
+
   return fromUser !== fromUserServiceData;
 };
 
@@ -49,7 +45,7 @@ export const buildCallEvent = (body) => {
   const originalStatus = _get(body, 'data.state', null);
   const callStatus = getCallStatus(body);
   const processed = callStatus !== CallStatus.unknown;
-  
+
   return {
     processed,
     status: originalStatus,

@@ -29,16 +29,17 @@ async function hangup(req, res) {
 async function webhook(req, res) {
   const model = new Calls();
   const unknownEvent = await isUnknownEvent(req.body);
-  if (unknownEvent) return res.status(204).send();
-  if (shouldOmitEvent(req.body)) return res.status(204).send();
+  if (unknownEvent || shouldOmitEvent(req.body)) {
+    res.status(204).send();
+  } else {
+    const status = getCallStatus(req.body);
+    const call = await model.findOrCreate(req.body);
+    await model.updateStatus(call.callId, status);
+    const newCallEvent = buildCallEvent(req.body);
+    const updatedCall = await model.addEvent(call.callId, newCallEvent, true);
 
-  const status = getCallStatus(req.body);
-  const call = await model.findOrCreate(req.body);
-  await model.updateStatus(call.callId, status);
-  const newCallEvent = buildCallEvent(req.body);
-  const updatedCall = await model.addEvent(call.callId, newCallEvent, true);
-
-  res.status(200).send(updatedCall);
+    res.status(200).send(updatedCall);
+  }
 }
 
 async function addNote(req, res) {

@@ -9,7 +9,7 @@ async function updateOwnerContact(req, res) {
   const contextModel = {_documentType: 'owner-contact', contactId};
 
   const repo = new OwnerRepository();
-  await WorksheetRepository.updateWorkSheetStatusByOwner(ownerId);
+  await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId);
   await repo.updateContact(ownerId, contactId, req.body);
   await History.registerUpdate({contextModel, user: req.user});
   res.status(204).send();
@@ -19,8 +19,8 @@ async function updateOwner(req, res) {
   const id = req.params.id;
   const contextModel = {_documentType: 'owner', id};
   const repo = new OwnerRepository();
-  await WorksheetRepository.updateWorkSheetStatusByOwner(id);
-  await repo.update(id, Object.assign({}, req.body, {id}));
+  await WorksheetRepository.notifyWorkSheetChangeByOwner(id);
+  await repo.update(id, req.body);
   await History.registerUpdate({contextModel, user: req.user});
 
   res.status(204).send();
@@ -31,7 +31,7 @@ async function addOwnerContact(req, res) {
   const repo = new OwnerRepository();
   const contextModel = await repo.addContact(ownerId, req.body);
   await History.registerCreate({contextModel, user: req.user});
-  await WorksheetRepository.updateWorkSheetStatusByOwner(ownerId);
+  await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId);
   const updatedOwner = await repo.findByIdWithIncludes(ownerId);
   res.json(updatedOwner);
 }

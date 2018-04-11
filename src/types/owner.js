@@ -194,20 +194,27 @@ t.Person.prototype.fullName = function() {
  *         type: string
  *       verified:
  *         type: bool
+ *         description: "Verifica la información por un operador humano"
  *       status:
  *         type: string
  *         enum: [NO_VERIFICADO, VERIFICADO, NO_VENDE, ERRONEO]
  */
+t.OwnerConfirmed = t.struct({
+  value: t.Boolean,
+  confirmedBy: t.maybe(t.String),
+  confirmedAt: t.maybe(t.Date)
+}, 'confirmed');
 t.Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
-    verified: t.Boolean,
     status: t.OwnerStatus,
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
 
     note: t.maybe(t.String),
+
+    confirmedByOperator: t.OwnerConfirmed,
 
     _migrateId: t.list(t.String),
     _relatedTo: t.maybe(t.String),
@@ -216,8 +223,10 @@ t.Owner = t.struct(
   {
     name: 'Owner',
     defaultProps: {
+      confirmedByOperator: {
+        value: false
+      },
       type: 'NINGUNO',
-      verified: false,
       status: 'NO_VERIFICADO',
       _documentType: 'owner',
       _migrateId: [],
@@ -226,19 +235,35 @@ t.Owner = t.struct(
   }
 );
 
+t.Owner.prototype.verifyOwner = function(confirmedBy, value = true) {
+  return t.update(this, {
+    $merge: {
+      confirmedByOperator: {
+        value,
+        confirmedBy,
+        confirmedAt: new Date()
+      }
+    }
+  });
+};
+
+t.Owner.prototype.isPrimaryVerified = function() {
+  return isPrimaryVerified(this);
+};
+
 export function isPrimaryVerified(owner) {
-  return owner.verified &&
+  return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFICADO &&
     owner.type === OwnerType.PRINCIPAL;
 }
 
 export function isInvalidVerified(owner) {
-  return owner.verified &&
+  return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ERRONEO;
 }
 
 export function isPrimaryNoVende(owner) {
-  return owner.verified &&
+  return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.NO_VENDE &&
     owner.type === OwnerType.PRINCIPAL;
 }

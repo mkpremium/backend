@@ -5,6 +5,7 @@ import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
+import {newHttpError} from '../lib/http-error';
 
 export class Operator extends CouchbaseModel {
   constructor() {
@@ -34,11 +35,6 @@ export class Operator extends CouchbaseModel {
   }
 }
 
-const errorInvalidCreds = new Error('Contraseña o usuario invalido');
-errorInvalidCreds.code = 401;
-const errorInactive = new Error('Cuenta desactivada, comuníquese con el administrador');
-errorInactive.code = 401;
-
 export class OperatorRepository extends Operator {
   async findByCredential(data) {
     const {username, password} = new t.Credentials(data);
@@ -48,17 +44,17 @@ export class OperatorRepository extends Operator {
     const [operator] = await this.query(qb);
 
     if (!operator) {
-      throw errorInvalidCreds;
+      throw newHttpError(401, 'Contraseña o usuario incorrecto');
     }
 
     if (!operator.enable) {
-      throw errorInactive;
+      throw newHttpError(401, 'Cuenta desactivada, comuníquese con el administrador');
     }
 
     const valid = await bcrypt.compare(password, operator.password);
 
     if (!valid) {
-      throw errorInvalidCreds;
+      throw newHttpError(401, 'Contraseña o usuario incorrecto');
     }
 
     return fromJSON(operator, this.Struct);

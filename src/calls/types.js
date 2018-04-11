@@ -34,32 +34,33 @@ import uuid from 'uuid/v4';
  *         description: Estado de la llamada
  *
  */
-t.Calls = t.struct({
-  id: t.maybe(t.String),
-  userId: t.String,
-  from: t.String,
-  to: t.String,
-  callId: t.String,
-  notes: t.Array,
-  events: t.Array,
-  date: t.Date,
-  status: t.CallStatus,
-  origin: t.String,
-  _documentType: t.String
-},
-{
-  name: 'Calls',
-  defaultProps: {
-    status: 'INICIADA',
-    _documentType: 'calls',
-    origin: 'SYSTEM',
-    get date() {
-      return new Date();
-    },
-    events: [],
-    notes: []
-  }
-});
+t.Calls = t.struct(
+  {
+    id: t.maybe(t.String),
+    userId: t.String,
+    from: t.String,
+    to: t.String,
+    callId: t.String,
+    notes: t.Array,
+    events: t.Array,
+    date: t.Date,
+    status: t.CallStatus,
+    origin: t.String,
+    _documentType: t.String
+  },
+  {
+    name: 'Calls',
+    defaultProps: {
+      status: 'INICIADA',
+      _documentType: 'calls',
+      origin: 'SYSTEM',
+      get date() {
+        return new Date();
+      },
+      events: [],
+      notes: []
+    }
+  });
 
 t.CallService = t.struct({
   from: t.String,
@@ -110,10 +111,25 @@ t.CallErrorResponse = t.struct({
   description: t.String
 }, 'CallErrorResponse');
 
-t.CallsRawEvents = t.struct({
-  content: t.Object,
-  date: t.Date
-}, 'CallsRawEvents');
+t.CallsRawEvents = t.struct(
+  {
+    content: t.Object,
+    date: t.Date,
+
+    _documentType: t.enums.of(['calls-raw-events'])
+  }
+  , {
+    name: 'CallsRawEvents',
+    defaultProps: {
+      get id() {
+        return uuid();
+      },
+      get date() {
+        return new Date();
+      },
+      _documentType: 'calls-raw-events'
+    }
+  });
 
 /**
  * @swagger

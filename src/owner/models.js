@@ -6,6 +6,7 @@ import {updateList} from '../lib/tcomb-utils';
 import {BuildingRepository} from '../building/models';
 import isArray from 'lodash/isArray';
 import isEmpty from 'lodash/isEmpty';
+import {WorksheetRepository} from '../worksheet/models/worksheet';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -139,9 +140,15 @@ export class OwnerRepository extends Owner {
     return this.save(body);
   }
 
-  async update(ownerId, data = {}) {
+  async update(ownerId, data = {}, operatorId) {
     const owner = await this.findByIdOrThrow(ownerId);
-    const updatedOwner = t.update(owner, {$merge: data});
+    let updatedOwner = t.update(owner, {$merge: Object.assign({}, data, {id: ownerId})});
+
+    await WorksheetRepository.canUpdateOwner(owner);
+
+    if (typeof data.verified !== 'undefined') {
+      updatedOwner = updatedOwner.verifyOwner(operatorId, data.verified);
+    }
 
     return this.save(updatedOwner);
   }

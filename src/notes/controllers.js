@@ -13,14 +13,10 @@ export async function addNote(req, res) {
   const repo = new NoteRepository();
   const note = await repo.createNote(req.body, req.user.id);
   if (note.context.worksheetId) {
-    const worksheetRepo = new WorksheetRepository();
-    await worksheetRepo.sendWorksheetEvent(note.context.worksheetId);
+    await WorksheetRepository.notifyWorksheetByOwner(note.context.worksheetId);
   }
 
-  History.registerCreate({
-    contextModel: note,
-    user: req.user
-  });
+  await History.registerCreate({contextModel: note, user: req.user});
   res.status(201).json(note);
 }
 

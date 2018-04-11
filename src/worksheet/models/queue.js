@@ -1,5 +1,6 @@
 import Promise from 'bluebird';
 import t from 'tcomb';
+import debug from 'debug';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _map from 'lodash/map';
 import _set from 'lodash/set';
@@ -8,6 +9,11 @@ import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
 import {WorksheetRepository} from './worksheet';
 import {utc} from '../../lib/date';
+import {WorkSheetStatus} from '../../types/worksheet';
+import {OperatorStats} from '../../stats/models';
+import {OperatorActions} from '../../stats/types';
+
+const queueDebug = debug('app:model:queue');
 
 export class WorksheetQueue extends CouchbaseModel {
   constructor() {
@@ -113,8 +119,31 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`);
     }
 
+    queueDebug('addWorksheet', worksheet.id, 'to queue', queue.id);
+
     await worksheetRepo.save(t.update(worksheet, {queueId: {$set: queue.id}}));
     return itemRepo.save({worksheetId: worksheet.id});
+  }
+
+  async removeWorksheet(queue, worksheet) {
+    const worksheetRepo = new WorksheetRepository();
+    if (worksheet.queueId !== queue.id) {
+      throw newHttpError(409, `Worksheet ${worksheet.id} no se encuentra en otra cola (${worksheet.queueId})`);
+    }
+
+    const updatedWorksheet = t.update(worksheet, {$remove: ['queueId']});
+    await worksheetRepo.save(updatedWorksheet);
+  }
+
+  async removeWorksheetAndSave(queue, worksheetId) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
+
+    await this.removeWorksheet(queue, worksheet);
+    const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheetId);
+    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheetItems}});
+
+    await this.save(updatedQueue);
   }
 
   async takeWorksheetInQueue(queue, itemId, operatorId) {
@@ -147,6 +176,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
+    queueDebug('takeWorksheetInQueue', worksheet.id, 'from queue', queue.id);
+
     await this.save(updatedQueue);
 
     return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
@@ -162,9 +193,18 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${itemId} (${item.status}) ya se encuentra abierto`);
     }
 
+    const operatorId = item.operatorId;
     const updatedItem = item.release();
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
+
+    queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
+
+    const worksheetStateUpdated = await WorksheetRepository.updateWorkSheetStatus(item.worksheetId);
+
+    if (worksheetStateUpdated === WorkSheetStatus.WITH_OWNER) {
+      await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER);
+    }
 
     return this.save(updatedQueue);
   }

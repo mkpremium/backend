@@ -8,6 +8,8 @@ import {
   getCallId,
   getCallStatus
 } from './helper';
+import {OperatorStats} from '../stats/models';
+import {OperatorActions} from '../stats/types';
 
 export class Calls extends CouchbaseModel {
   constructor() {
@@ -51,6 +53,10 @@ export class Calls extends CouchbaseModel {
 
     const updatedEvents = t.update(call.events, {$push: [newEvent]});
     const updatedCall = t.update(call, {events: {$merge: updatedEvents}});
+
+    if (newEvent.status === CallStatus.confirmed && call.userId) {
+      await OperatorStats.registerAction(call.userId, OperatorActions.CALL_ANSWERED);
+    }
 
     return this.save(updatedCall, sendEvent);
   }

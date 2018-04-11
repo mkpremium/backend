@@ -4,7 +4,7 @@ import {OperatorRepository} from '../src/operator/models';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
-import {Calls} from '../src/calls/models';
+import {Calls, CallsRawEvents} from '../src/calls/models';
 import {History} from '../src/history/models';
 import {ScheduledEventsRepository} from '../src/scheduledEvents/models';
 import {BuildingRepository} from '../src/building/models';
@@ -17,6 +17,7 @@ export async function deleteAll() {
   const owner = new OwnerRepository();
   const history = new History();
   const calls = new Calls();
+  const callUnknownEvents = new CallsRawEvents();
   const scheduledEvent = new ScheduledEventsRepository();
   const building = new BuildingRepository();
 
@@ -30,7 +31,8 @@ export async function deleteAll() {
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
-    calls.deleteQuery()
+    calls.deleteQuery(),
+    callUnknownEvents.deleteQuery()
   ]);
 }
 

@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import debug from 'debug';
 import _head from 'lodash/head';
 import _some from 'lodash/some';
 import _every from 'lodash/every';
@@ -18,6 +19,8 @@ import {ownersContactViews} from '../../owner/types';
 import {WorkSheetStatus} from '../../types/worksheet';
 import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified} from '../../types/owner';
 import {ScheduledEvents} from '../../scheduledEvents/models';
+
+const worksheetDebug = debug('app:model:worksheet');
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -87,7 +90,28 @@ export class WorksheetRepository extends Worksheet {
         return meetings.length > 0
           ? WorkSheetStatus.MEETING
           : WorkSheetStatus.WITH_OWNER;
+      case WorkSheetStatus.INVALID:
+        return _every(worksheet.relatedOwners, isInvalidVerified)
+          ? WorkSheetStatus.INVALID
+          : WorkSheetStatus.DEFAULT;
+      default:
+        worksheetDebug(`the status ${worksheet.status} dont have planned behavior`);
+        return worksheet.status;
     }
+  }
+
+  static async canUpdateOwner(owner) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findWorksheetByOwner(owner.id);
+
+    if (worksheet && worksheet.status === WorkSheetStatus.WITH_OWNER && owner.isPrimaryVerified()) {
+      throw newHttpError(
+        422,
+        `No se puede actualizar el owner. Es "${owner.type}" y fue verificado (${owner.confirmedByOperator})`
+      );
+    }
+
+    return true;
   }
 
   async updateStatus(worksheetId) {
@@ -104,11 +128,21 @@ export class WorksheetRepository extends Worksheet {
     }
   }
 
-  static async updateWorkSheetStatusByOwner(ownerId) {
+  static async notifyWorkSheetChange(worksheetId) {
+    const worksheetRepo = new WorksheetRepository();
+    await worksheetRepo.sendWorksheetEvent(worksheetId);
+  }
+
+  static async updateWorkSheetStatus(worksheetId) {
+    const worksheetRepo = new WorksheetRepository();
+    return worksheetRepo.updateStatus(worksheetId);
+  }
+
+  static async notifyWorkSheetChangeByOwner(ownerId) {
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findWorksheetByOwner(ownerId);
     if (worksheet) {
-      await worksheetRepo.updateStatus(worksheet.id);
+      await WorksheetRepository.notifyWorkSheetChange(worksheet.id);
     }
   }
 
