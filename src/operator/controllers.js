@@ -54,6 +54,12 @@ async function listOperator(req, res) {
   res.json(operators);
 }
 
+async function limitedListOperator(req, res) {
+  const repo = new OperatorRepository();
+  const operators = await repo.listView(req.query);
+  res.json(operators);
+}
+
 async function me(req, res) {
   res.json(req.user.operator);
 }
@@ -61,4 +67,5 @@ async function me(req, res) {
 export const loginController = wrap(login);
 export const createOperatorController = wrap(createOperator);
 export const listOperatorController = wrap(listOperator);
+export const limitedListOperatorController = wrap(limitedListOperator);
 export const meController = wrap(me);

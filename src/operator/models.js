@@ -78,8 +78,16 @@ export class OperatorRepository extends Operator {
     return sign(payload, jwt.secret, options);
   }
 
-  async list(query = {}) {
-    const params = t.OperatorListQuery(query);
+  async listView(query) {
+    const queryWithRole = Object.assign({}, query, {
+      role: 'BUSINESS',
+      enable: true
+    });
+    return this.list(queryWithRole, t.OperatorListViewResponse, t.OperatorLimitedListQuery);
+  }
+
+  async list(query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {
+    const params = queryStruct(query);
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset);
@@ -90,10 +98,14 @@ export class OperatorRepository extends Operator {
       qbCount.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
     }
 
+    if (typeof params.enable !== 'undefined') {
+      qb.where('enable = ?', params.enable);
+    }
+
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);
 
-    return fromJSON({total, results}, t.OperatorListResponse);
+    return fromJSON({total, results}, responseStruct);
   }
 
   async listWithStats() {

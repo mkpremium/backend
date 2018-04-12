@@ -17,6 +17,7 @@ t.Credentials = t.struct({
   username: t.String,
   password: t.String
 }, 'Credentials');
+
 /**
  * @swagger
  * definitions:
@@ -69,8 +70,21 @@ t.AuthenticatedResponse = t.struct({
 }, 'AuthenticatedResponse');
 
 t.OperatorListQuery = t.ListQuery.extend({
+  enable: t.maybe(t.Boolean),
   role: t.maybe(t.String)
 });
+
+t.OperatorLimitedListQuery = t.ListQuery.extend(
+  {
+    role: t.String,
+    enable: t.maybe(t.Boolean)
+  },
+  {
+    defaultProps: {
+      role: 'BUSINESS'
+    }
+  }
+);
 
 /**
  * @swagger
@@ -91,6 +105,69 @@ t.OperatorListResponse = t.struct(
   {
     total: t.Number,
     results: t.list(t.Operator)
+  },
+  {
+    name: 'OperatorListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
+    }
+  }
+);
+
+/**
+ * @swagger
+ * definitions:
+ *  OperatorView:
+ *    properties:
+ *      id:
+ *        type: string
+ *        format: uuid/v4
+ *      username:
+ *        type: string
+ *      profile:
+ *        $ref: "#/definitions/OperatorProfile"
+ *      roles:
+ *        type: array
+ *        items:
+ *          type: string
+ */
+t.OperatorView = t.struct(
+  {
+    id: t.maybe(t.String),
+    username: t.String,
+    roles: t.list(t.OperatorRole),
+    profile: t.OperatorProfile
+  },
+  {
+    name: 'Operator',
+    defaultProps: {
+      enable: true,
+      roles: [],
+      profile: {}
+    }
+  }
+);
+
+/**
+ * @swagger
+ * definitions:
+ *   OperatorListViewResponse:
+ *     required:
+ *       - total
+ *       - results
+ *     properties:
+ *       total:
+ *         type: number
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/OperatorView"
+ */
+t.OperatorListViewResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(t.OperatorView)
   },
   {
     name: 'OperatorListResponse',

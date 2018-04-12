@@ -105,4 +105,5 @@ t.Operator = t.struct(
       profile: {},
       _documentType: 'operator'
     }
-  });
+  }
+);

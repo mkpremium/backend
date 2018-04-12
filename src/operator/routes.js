@@ -1,5 +1,11 @@
 import {Router} from 'express';
-import {createOperatorController, listOperatorController, loginController, meController} from './controllers';
+import {
+  createOperatorController,
+  limitedListOperatorController,
+  listOperatorController,
+  loginController,
+  meController
+} from './controllers';
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
@@ -109,7 +115,7 @@ router.post('/', permissions.admin, createOperatorController);
  *         description: Rol del operador
  *     responses:
  *       200:
- *         description: Lista de hojas de trabajo
+ *         description: Lista de operadores
  *         schema:
  *           $ref: "#/definitions/OperatorListResponse"
  *       401:
@@ -121,7 +127,42 @@ router.post('/', permissions.admin, createOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', listOperatorController);
+router.get('/', permissions.admin, listOperatorController);
+
+/**
+ * @swagger
+ * /operators/business:
+ *   get:
+ *     tags: [Operator]
+ *     summary: Obtiene el listado de comerciales
+ *     security:
+ *       - operator: []
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         type: number
+ *         description: Cantidad máxima a de registros a recibir
+ *         default: 20
+ *       - name: offset
+ *         in: query
+ *         type: number
+ *         description: Numero de registros a saltar
+ *         default: 0
+ *     responses:
+ *       200:
+ *         description: Lista de comerciales
+ *         schema:
+ *           $ref: "#/definitions/OperatorListResponse"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/business', limitedListOperatorController);
 
 /**
  * @swagger
