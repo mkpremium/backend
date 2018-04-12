@@ -1,11 +1,21 @@
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
+import _find from 'lodash/find';
+import _filter from 'lodash/filter';
 import bcrypt from 'bcrypt';
 import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
 import {newHttpError} from '../lib/http-error';
+import {OperatorRoles} from '../types/operator';
+import {OperatorStatsRepository} from '../stats/models';
+import {OperatorActions} from '../stats/types';
+
+function findOrZero(counters, action) {
+  const result = _find(counters, {action});
+  return result ? result.count : 0;
+}
 
 export class Operator extends CouchbaseModel {
   constructor() {
@@ -84,5 +94,23 @@ export class OperatorRepository extends Operator {
     const results = await this.query(qb);
 
     return fromJSON({total, results}, t.OperatorListResponse);
+  }
+
+  async listWithStats() {
+    const operators = await this.list({role: OperatorRoles.OPERATOR});
+    const statsRepo = new OperatorStatsRepository();
+
+    const results = await statsRepo.getOverAll();
+
+    return operators.results.map(operator => {
+      const stats = _filter(results, {operatorId: operator.id});
+      const counters = {
+        callsMade: findOrZero(stats, OperatorActions.CALL),
+        callsAnswered: findOrZero(stats, OperatorActions.CALL_ANSWERED),
+        verifiedOwners: findOrZero(stats, OperatorActions.VERIFIED_OWNER),
+        meetingsMade: findOrZero(stats, OperatorActions.MEETING)
+      };
+      return t.OperatorResults({operator, counters});
+    });
   }
 }

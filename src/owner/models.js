@@ -1,11 +1,11 @@
 import t from 'tcomb';
 import _head from 'lodash/head';
+import _isArray from 'lodash/isArray';
+import _isEmpty from 'lodash/isEmpty';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {updateList} from '../lib/tcomb-utils';
 import {BuildingRepository} from '../building/models';
-import isArray from 'lodash/isArray';
-import isEmpty from 'lodash/isEmpty';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
 
 export class Owner extends CouchbaseModel {
@@ -87,7 +87,7 @@ export class OwnerRepository extends Owner {
       throw new Error('id undefined, expected String or Array<String>');
     }
 
-    const ids = isArray(id) ? id : [id];
+    const ids = _isArray(id) ? id : [id];
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`;
     const qb = this.getQueryBuilder('let').where(`id IN ${idsText}`);
 
@@ -130,7 +130,7 @@ export class OwnerRepository extends Owner {
   async createOwnerAndPerson(body) {
     const ownerBody = t.OwnerBody(body);
 
-    if (!isEmpty(ownerBody.person)) {
+    if (!_isEmpty(ownerBody.person)) {
       const personRepo = new PersonRepository();
       const person = await personRepo.save(ownerBody.person);
       body.personId = person.id;
@@ -147,7 +147,8 @@ export class OwnerRepository extends Owner {
     await WorksheetRepository.canUpdateOwner(owner);
 
     if (typeof data.verified !== 'undefined') {
-      updatedOwner = updatedOwner.verifyOwner(operatorId, data.verified);
+      const owner = t.Owner(updatedOwner);
+      updatedOwner = owner.verifyOwner(operatorId, data.verified);
     }
 
     return this.save(updatedOwner);

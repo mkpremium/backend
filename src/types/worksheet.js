@@ -6,7 +6,7 @@ import debug from 'debug';
 
 import '../owner/types';
 
-const debugWorksheet = debug('app:worksheet');
+const debugWorksheet = debug('app:types:worksheet');
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -130,7 +130,9 @@ t.WorkSheet.prototype.setStatus = function(newStatus) {
   }
 
   if (newStatus === this.status) {
-    debugWorksheet(`worksheet ${this.id} status "${this.status}" remains equals`);
+    debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`);
+  } else {
+    debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`);
   }
 
   return t.update(this, {status: {$set: newStatus}});

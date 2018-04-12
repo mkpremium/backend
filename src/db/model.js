@@ -184,8 +184,9 @@ export class CouchbaseModel {
   }
 
   async sendEvent(eventName, data, sendEvent = emitModelEvents) {
-    const socket = await this._socketPromise;
+    debugModel('event', eventName, data, 'will be emitted', sendEvent);
     if (sendEvent) {
+      const socket = await this._socketPromise;
       return socket.sendEvent(eventName, data);
     }
   }

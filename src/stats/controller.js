@@ -1,10 +1,10 @@
 import {wrap} from 'express-promise-wrap';
 
-import {StatsRepository} from './models';
+import {OperatorRepository} from '../operator/models';
 
 async function overAll(req, res) {
-  const statsRepo = new StatsRepository();
-  const results = await statsRepo.getOverAll();
+  const operatorRepo = new OperatorRepository();
+  const results = await operatorRepo.listWithStats();
   res.json(results);
 }
 

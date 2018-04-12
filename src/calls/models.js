@@ -99,7 +99,6 @@ export class Calls extends CouchbaseModel {
         events: [],
         status: getCallStatus(body)
       });
-      call = fromJSON(call, this.Struct);
     }
 
     return call;

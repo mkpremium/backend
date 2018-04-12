@@ -8,6 +8,7 @@ import {Calls, CallsRawEvents} from '../src/calls/models';
 import {History} from '../src/history/models';
 import {ScheduledEventsRepository} from '../src/scheduledEvents/models';
 import {BuildingRepository} from '../src/building/models';
+import {OperatorStats} from '../src/stats/models';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -20,6 +21,7 @@ export async function deleteAll() {
   const callUnknownEvents = new CallsRawEvents();
   const scheduledEvent = new ScheduledEventsRepository();
   const building = new BuildingRepository();
+  const stats = new OperatorStats();
 
   return Promise.all([
     operator.deleteQuery(),
@@ -32,7 +34,8 @@ export async function deleteAll() {
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
     calls.deleteQuery(),
-    callUnknownEvents.deleteQuery()
+    callUnknownEvents.deleteQuery(),
+    stats.deleteQuery()
   ]);
 }
 

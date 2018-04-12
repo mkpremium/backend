@@ -19,8 +19,26 @@ import {ownersContactViews} from '../../owner/types';
 import {WorkSheetStatus} from '../../types/worksheet';
 import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified} from '../../types/owner';
 import {ScheduledEvents} from '../../scheduledEvents/models';
+import {OperatorActions} from '../../stats/types';
+import {OperatorStats} from '../../stats/models';
 
 const worksheetDebug = debug('app:model:worksheet');
+
+function canRegisterVerified(worksheet, newStatus, operatorId) {
+  if (!operatorId) {
+    return false;
+  }
+
+  if (worksheet.status === newStatus) {
+    return false;
+  }
+
+  if (newStatus !== WorkSheetStatus.WITH_OWNER) {
+    return false;
+  }
+
+  return true;
+}
 
 export class Worksheet extends CouchbaseModel {
   constructor() {
@@ -114,10 +132,14 @@ export class WorksheetRepository extends Worksheet {
     return true;
   }
 
-  async updateStatus(worksheetId) {
-    const worksheet = await this.findByIdWIthIncludes(worksheetId);
+  async updateStatus(worksheetId, operatorId) {
+    const worksheetData = await this.findByIdWIthIncludes(worksheetId);
+    const worksheet = fromJSON(worksheetData, t.WorkSheet);
     const newStatus = await this.calculateNewStatus(worksheet);
     const updatedWorksheet = worksheet.setStatus(newStatus);
+    if (canRegisterVerified(worksheet, newStatus, operatorId)) {
+      await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER);
+    }
     return this.save(updatedWorksheet);
   }
 
@@ -133,9 +155,9 @@ export class WorksheetRepository extends Worksheet {
     await worksheetRepo.sendWorksheetEvent(worksheetId);
   }
 
-  static async updateWorkSheetStatus(worksheetId) {
+  static async updateWorkSheetStatus(worksheetId, operatorId) {
     const worksheetRepo = new WorksheetRepository();
-    return worksheetRepo.updateStatus(worksheetId);
+    return worksheetRepo.updateStatus(worksheetId, operatorId);
   }
 
   static async notifyWorkSheetChangeByOwner(ownerId) {

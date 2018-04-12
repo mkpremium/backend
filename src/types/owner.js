@@ -251,18 +251,21 @@ t.Owner.prototype.isPrimaryVerified = function() {
   return isPrimaryVerified(this);
 };
 
-export function isPrimaryVerified(owner) {
+export function isPrimaryVerified(data) {
+  const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFICADO &&
     owner.type === OwnerType.PRINCIPAL;
 }
 
-export function isInvalidVerified(owner) {
+export function isInvalidVerified(data) {
+  const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ERRONEO;
 }
 
-export function isPrimaryNoVende(owner) {
+export function isPrimaryNoVende(data) {
+  const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.NO_VENDE &&
     owner.type === OwnerType.PRINCIPAL;

@@ -9,9 +9,6 @@ import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
 import {WorksheetRepository} from './worksheet';
 import {utc} from '../../lib/date';
-import {WorkSheetStatus} from '../../types/worksheet';
-import {OperatorStats} from '../../stats/models';
-import {OperatorActions} from '../../stats/types';
 
 const queueDebug = debug('app:model:queue');
 
@@ -200,11 +197,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
 
-    const worksheetStateUpdated = await WorksheetRepository.updateWorkSheetStatus(item.worksheetId);
-
-    if (worksheetStateUpdated === WorkSheetStatus.WITH_OWNER) {
-      await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER);
-    }
+    await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
 
     return this.save(updatedQueue);
   }

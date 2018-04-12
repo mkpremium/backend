@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import _flatten from 'lodash/flatten';
 import {isTest} from '../../config';
 
@@ -49,7 +50,12 @@ t.OwnerCompactView = t.struct(
     contact: t.TypedContactInfo
   },
   {
-    name: 'OwnerView'
+    name: 'OwnerView',
+    defaultProps: {
+      confirmedByOperator: {
+        value: false
+      }
+    }
   }
 );
 
@@ -59,10 +65,10 @@ export function ownersContactViews(owners) {
 
 export function ownerContactsView(owner) {
   return owner.person.contacts
-    .map((contact) => t.OwnerCompactView(Object.assign({}, owner, {
+    .map((contact) => fromJSON(Object.assign({}, owner, {
       person: owner.person,
       contact
-    })));
+    }), t.OwnerCompactView));
 }
 
 export default t;

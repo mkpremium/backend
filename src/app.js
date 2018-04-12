@@ -23,6 +23,7 @@ import notes from './notes';
 import building from './building';
 import metadata from './metadata';
 import people from './person';
+import stats from './stats';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -53,6 +54,7 @@ notes(app);
 building(app);
 metadata(app);
 people(app);
+stats(app);
 
 app.use(appErrorHandler);
 

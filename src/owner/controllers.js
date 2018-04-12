@@ -20,7 +20,7 @@ async function updateOwner(req, res) {
   const contextModel = {_documentType: 'owner', id};
   const repo = new OwnerRepository();
   await WorksheetRepository.notifyWorkSheetChangeByOwner(id);
-  await repo.update(id, req.body);
+  await repo.update(id, req.body, req.user.id);
   await History.registerUpdate({contextModel, user: req.user});
 
   res.status(204).send();

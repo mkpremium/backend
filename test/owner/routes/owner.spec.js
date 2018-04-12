@@ -20,7 +20,7 @@ describe('owner.routes', () => {
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
 
     ownerWithPersonToSave = {
-      type: 'NINGUNO',
+      type: 'PRINCIPAL',
       status: 'VERIFICADO',
       buildingId: '',
       note: '',
@@ -29,7 +29,7 @@ describe('owner.routes', () => {
         personType: 'NATURAL'
       }
     };
-    
+
     savedPerson = await personRepo.save(ownerWithPersonToSave.person);
     ownerToUpdate = await ownerRepo.save(ownerWithPersonToSave);
   });
@@ -67,6 +67,23 @@ describe('owner.routes', () => {
       const ownerRepo = new OwnerRepository();
       const updated = await ownerRepo.findById(ownerToUpdate.id);
       updated.status.should.be.equal('NO_VERIFICADO');
+      updated.note.should.be.equal('This is a sample note');
+    });
+
+    it('204 Verificar un propietario', async() => {
+      await request(app)
+        .put(`/owners/${ownerToUpdate.id}`)
+        .set('Authorization', authenticatedOperator.authorization)
+        .send({
+          status: 'VERIFICADO',
+          verified: true,
+          note: 'This is a sample note'
+        })
+        .expect(204);
+
+      const ownerRepo = new OwnerRepository();
+      const updated = await ownerRepo.findById(ownerToUpdate.id);
+      updated.status.should.be.equal('VERIFICADO');
       updated.note.should.be.equal('This is a sample note');
     });
 
