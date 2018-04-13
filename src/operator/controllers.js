@@ -4,6 +4,7 @@ import {compose} from 'compose-middleware';
 import {OperatorRepository} from './models';
 import {History} from '../history/models';
 import {firebaseSetup} from '../firebase';
+import {OperatorFirebaseStates} from '../types/operator';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -63,10 +64,19 @@ async function me(req, res) {
 
 async function updateNeighborhood(req, res, next) {
   const repo = new OperatorRepository();
-  const params = t.t.ChangeUserNeighborhoodBody(req.body);
+  const params = t.ChangeUserNeighborhoodBody(req.body);
   const operator = await repo.findByIdOrThrow(params.userId);
   const updatedOperator = await repo.updateProfile(operator, params.toParams());
   req.message = `Set user to new neighborhood ${updatedOperator.profile.neighborhood}`;
+  next();
+}
+
+async function updateOperatorState(req, res, next) {
+  const repo = new OperatorRepository();
+  const params = t.ChangeUserStateBody(req.body);
+  const operator = await repo.findByIdOrThrow(params.userId);
+  const updatedOperator = await repo.update(operator, params.toParams());
+  req.message = `Usuario ${updatedOperator.id} ${updatedOperator.profile.getStateMessage()} `;
   next();
 }
 
@@ -84,3 +94,4 @@ export const limitedListOperatorController = wrap(limitedListOperator);
 export const meController = wrap(me);
 
 export const updateNeighborhoodController = compose([wrap(updateNeighborhood), oldAppResponse]);
+export const updateOperatorStateController = compose([wrap(updateOperatorState), oldAppResponse]);

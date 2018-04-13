@@ -8,7 +8,14 @@ export const OperatorRoles = {
   STREET: 'STREET'
 };
 
+export const OperatorFirebaseStates = {
+  ENABLED: 'A',
+  BLOCKED: 'B',
+  PAUSED: 'P'
+};
+
 t.OperatorRole = t.enums.of(Object.values(OperatorRoles));
+t.OperatorFirebaseStates = t.enums.of(Object.values(OperatorFirebaseStates));
 
 /**
  * @swagger
@@ -29,11 +36,25 @@ t.OperatorProfile = t.struct({
   firstName: t.String,
   lastName: t.String,
   city: t.maybe(t.String),
-  neighborhood: t.maybe(t.String)
+  neighborhood: t.maybe(t.String),
+  state: t.maybe(t.OperatorFirebaseStates)
 }, 'OperatorProfile');
 
 t.OperatorProfile.prototype.fullName = function() {
   return `${this.firstName} ${this.lastName}`.trim();
+};
+
+t.OperatorProfile.prototype.getStateMessage = function() {
+  switch (this.state) {
+    case OperatorFirebaseStates.BLOCKED:
+      return 'bloqueado';
+    case OperatorFirebaseStates.ENABLED:
+      return 'activo';
+    case OperatorFirebaseStates.PAUSED:
+      return 'en pausa';
+    default:
+      return 'error de estado';
+  }
 };
 
 /**

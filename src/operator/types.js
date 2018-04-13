@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import {OperatorFirebaseStates} from '../types/operator';
 
 /**
  * @swagger
@@ -187,4 +188,19 @@ t.ChangeUserNeighborhoodBody = t.struct({
 t.ChangeUserNeighborhoodBody.prototype.toParams = function() {
   const {neighborhood, city} = this;
   return {neighborhood, city};
+};
+
+t.ChangeUserStateBody = t.struct({
+  userId: t.String,
+  state: t.OperatorFirebaseStates
+});
+
+t.ChangeUserStateBody.prototype.toParams = function() {
+  const {state} = this;
+  const enable = state !== OperatorFirebaseStates.BLOCKED;
+
+  return {
+    enable,
+    profile: {state}
+  };
 };
