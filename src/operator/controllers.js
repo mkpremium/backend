@@ -4,7 +4,6 @@ import {compose} from 'compose-middleware';
 import {OperatorRepository} from './models';
 import {History} from '../history/models';
 import {firebaseSetup} from '../firebase';
-import {OperatorFirebaseStates} from '../types/operator';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
