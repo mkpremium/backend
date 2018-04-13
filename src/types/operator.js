@@ -28,7 +28,8 @@ t.OperatorRole = t.enums.of(Object.values(OperatorRoles));
 t.OperatorProfile = t.struct({
   firstName: t.String,
   lastName: t.String,
-  city: t.maybe(t.String)
+  city: t.maybe(t.String),
+  neighborhood: t.maybe(t.String)
 }, 'OperatorProfile');
 
 t.OperatorProfile.prototype.fullName = function() {

@@ -3,7 +3,7 @@ import {wrap} from 'express-promise-wrap';
 import jwtMiddleware from 'express-jwt';
 import jwtPermissions from 'express-jwt-permissions';
 import _get from 'lodash/get';
-import {jwt} from '../../config';
+import {jwt as jwtConfig} from '../../config';
 import {OperatorRepository} from '../operator/models';
 
 /**
@@ -23,13 +23,17 @@ import {OperatorRepository} from '../operator/models';
  *     in: header
  */
 
-export default () => {
-  const jwtInstance = jwtMiddleware(Object.assign({}, jwt, {getToken}));
+export const jwt = (getToken = bearerTokenExtractor) => {
+  const jwtInstance = jwtMiddleware(Object.assign({}, jwtConfig, {getToken}));
   const composedJwt = compose(jwtInstance, wrap(addUserInfo));
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError;
   composedJwt.unless = jwtInstance.unless;
   return composedJwt;
 };
+
+export const jwtAppToken = () => jwt(appTokenExtractor);
+
+export default jwt;
 
 async function addUserInfo(req, res, next) {
   const id = req.user.id;
@@ -38,7 +42,7 @@ async function addUserInfo(req, res, next) {
   next();
 }
 
-function getToken(req) {
+function bearerTokenExtractor(req) {
   const authorization = _get(req, 'headers.authorization', '');
   const [scheme, credentials] = authorization.split(' ');
   if (scheme && /^Bearer$/i.test(scheme)) {
@@ -48,6 +52,10 @@ function getToken(req) {
   } else {
     return null;
   }
+}
+
+function appTokenExtractor(req) {
+  return _get(req, 'body.appToken');
 }
 
 const guard = jwtPermissions();

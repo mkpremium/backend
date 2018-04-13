@@ -86,6 +86,12 @@ export class OperatorRepository extends Operator {
     return this.list(queryWithRole, t.OperatorListViewResponse, t.OperatorLimitedListQuery);
   }
 
+  async updateProfile(operator, params) {
+    const updatedProfile = t.update(operator.profile, {$merge: params});
+    const updateOperator = t.update(operator, {profile: {$set: updatedProfile}});
+    return this.save(updateOperator);
+  }
+
   async list(query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {
     const params = queryStruct(query);
     const qb = this.getQueryBuilder('select')

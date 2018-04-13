@@ -6,20 +6,7 @@ const level = {
   STACK: 2
 };
 
-/**
- * @swagger
- * definitions:
- *   Error:
- *     properties:
- *       message:
- *         type: string
- */
-function appErrorHandler(err, req, res, next) {
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  // tcomb error handler
+function prepareErrorCode(err) {
   if (/^\[tcomb\]/.test(err.message)) {
     err.code = err.code || 400;
     err.message = err.message.replace('[tcomb] ', '');
@@ -33,6 +20,9 @@ function appErrorHandler(err, req, res, next) {
     err.code = 500;
   }
 
+  // for any reason not listed before
+  err.code = err.code || 500;
+
   switch (errorVerbosity) {
     case level.MESSAGE:
       console.error(err.message);
@@ -41,9 +31,39 @@ function appErrorHandler(err, req, res, next) {
       console.error(err);
       break;
   }
+}
 
-  res.status(err.code || 500);
+/**
+ * @swagger
+ * definitions:
+ *   Error:
+ *     properties:
+ *       message:
+ *         type: string
+ */
+export function appErrorHandler(err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  prepareErrorCode(err);
+
+  res.status(err.code);
   res.json({message: err.message});
+}
+
+export function oldAppErrorHandler(err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  prepareErrorCode(err);
+
+  res.status(err.code);
+  res.json({
+    Error: true,
+    Message: err.message
+  });
 }
 
 export default appErrorHandler;

@@ -177,3 +177,14 @@ t.OperatorListViewResponse = t.struct(
     }
   }
 );
+
+t.ChangeUserNeighborhoodBody = t.struct({
+  userId: t.String,
+  neighborhood: t.String,
+  city: t.String
+}, 'ChangeUserNeighborhoodBody');
+
+t.ChangeUserNeighborhoodBody.prototype.toParams = function() {
+  const {neighborhood, city} = this;
+  return {neighborhood, city};
+};
