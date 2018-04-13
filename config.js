@@ -39,8 +39,6 @@ export const gearmanConfig = {
   port: parseInt(process.env.GEARMAN_PORT || 4730)
 };
 
-const defaultFirebaseServiceAccount = join(__dirname, 'firebase.json');
-
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);
 
 export const awsConfig = {
@@ -58,8 +56,17 @@ export const tests = {
 export const isTest = () => process.env.NODE_ENV === 'test';
 export const isMaybeTesting = v => isTest() ? t.maybe(v) : v;
 
-export const firebase = {
+const defaultFirebaseServiceAccount = join(__dirname, 'firebaseComerciales.json');
+const defaultFirebaseServiceAccountInformadores = join(__dirname, 'firebaseInformadores.json');
+
+export const firebaseComerciales = {
   enabled: !isTest(),
-  serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
-  databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://mkpremiumcomerciales.firebaseio.com'
+  serviceAccount: process.env.FIREBASE_COMERCIALES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
+  databaseURL: process.env.FIREBASE_COMERCIALES_DATABASE_URL || 'https://mkpremiumcomerciales.firebaseio.com'
+};
+
+export const firebaseInformadores = {
+  enabled: !isTest(),
+  serviceAccount: process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores,
+  databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || 'https://mkpremiumstreet.firebaseio.com/'
 };

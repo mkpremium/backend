@@ -4,10 +4,11 @@ export const OperatorRoles = {
   OPERATOR: 'OPERATOR',
   MANAGER: 'MANAGER',
   BUSINESS: 'BUSINESS',
-  ADMIN: 'ADMIN'
+  ADMIN: 'ADMIN',
+  STREET: 'STREET'
 };
 
-t.OperatorRole = t.enums(OperatorRoles);
+t.OperatorRole = t.enums.of(Object.values(OperatorRoles));
 
 /**
  * @swagger
