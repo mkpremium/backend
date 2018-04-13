@@ -1,10 +1,10 @@
 import routes from './routes';
 
 import './types';
-import {jwtAppToken} from '../middleware/jwt';
+import jwt from '../middleware/jwt';
 
 export default (app) => {
-  const secured = jwtAppToken();
+  const secured = jwt();
 
   app.use('/', secured, routes);
 };

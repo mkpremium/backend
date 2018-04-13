@@ -1,3 +1,4 @@
+import debug from 'debug';
 import {compose} from 'compose-middleware';
 import {wrap} from 'express-promise-wrap';
 import jwtMiddleware from 'express-jwt';
@@ -5,6 +6,8 @@ import jwtPermissions from 'express-jwt-permissions';
 import _get from 'lodash/get';
 import {jwt as jwtConfig} from '../../config';
 import {OperatorRepository} from '../operator/models';
+
+const debugJwt = debug('app:middleware:jwt');
 
 /**
  * @swagger
@@ -23,7 +26,7 @@ import {OperatorRepository} from '../operator/models';
  *     in: header
  */
 
-export const jwt = (getToken = bearerTokenExtractor) => {
+export const jwt = (getToken) => {
   const jwtInstance = jwtMiddleware(Object.assign({}, jwtConfig, {getToken}));
   const composedJwt = compose(jwtInstance, wrap(addUserInfo));
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError;
@@ -31,11 +34,10 @@ export const jwt = (getToken = bearerTokenExtractor) => {
   return composedJwt;
 };
 
-export const jwtAppToken = () => jwt(appTokenExtractor);
-
-export default jwt;
+export default () => jwt(bearerTokenExtractor);
 
 async function addUserInfo(req, res, next) {
+  debugJwt('addUserInfo', req.user.id);
   const id = req.user.id;
   const userRepo = new OperatorRepository();
   req.user.operator = await userRepo.findById(id);
@@ -50,7 +52,7 @@ function bearerTokenExtractor(req) {
   } else if (scheme) {
     return scheme; // if it's a value the this is the credential
   } else {
-    return null;
+    return appTokenExtractor(req);
   }
 }
 
