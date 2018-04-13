@@ -80,7 +80,6 @@ describe('operator.routes', () => {
       response.body.should.be.a('object');
       response.body.should.have.a.property('token');
       response.body.should.have.a.property('roles');
-      response.body.should.not.exist('firebase');
       response.body.roles.should.be.a('array');
       response.body.should.have.a.property('operator');
       response.body.operator.should.be.a('object');

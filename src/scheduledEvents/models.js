@@ -11,7 +11,7 @@ import {newHttpError} from '../lib/http-error';
 import {buildRangeFromWeek, meetingWeekFormat, utc} from '../lib/date';
 import {buildDistanceCalculator} from '../lib/geo';
 import {getScheduledMeetingStruct} from './helper';
-import firebase from '../firebase';
+import {fbComerciales} from '../firebase';
 import {
   deleteMeetingToBuilding,
   deleteMeetingToFirebase,
@@ -72,7 +72,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async firebaseMeeting(scheduleEvent) {
-    const db = firebase.database();
+    const db = fbComerciales.database();
     const meeting = await this.findMeeting(scheduleEvent);
     const {building} = meeting;
 
@@ -83,7 +83,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async deleteFirebaseMeeting(scheduleEvent) {
-    const db = firebase.database();
+    const db = fbComerciales.database();
     const meeting = await this.findMeeting(scheduleEvent);
     await deleteMeetingToFirebase(db, meeting);
     await deleteMeetingToBuilding(db, meeting);
