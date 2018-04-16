@@ -1,6 +1,5 @@
 import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
-import {compose} from 'compose-middleware';
 import {OperatorRepository} from './models';
 import {History} from '../history/models';
 import {firebaseSetup} from '../firebase';
@@ -61,36 +60,8 @@ async function me(req, res) {
   res.json(req.user.operator);
 }
 
-async function updateNeighborhood(req, res, next) {
-  const repo = new OperatorRepository();
-  const params = t.ChangeUserNeighborhoodBody(req.body);
-  const operator = await repo.findByIdOrThrow(params.userId);
-  const updatedOperator = await repo.updateProfile(operator, params.toParams());
-  req.message = `Set user to new neighborhood ${updatedOperator.profile.neighborhood}`;
-  next();
-}
-
-async function updateOperatorState(req, res, next) {
-  const repo = new OperatorRepository();
-  const params = t.ChangeUserStateBody(req.body);
-  const operator = await repo.findByIdOrThrow(params.userId);
-  const updatedOperator = await repo.update(operator, params.toParams());
-  req.message = `Usuario ${updatedOperator.id} ${updatedOperator.profile.getStateMessage()} `;
-  next();
-}
-
-function oldAppResponse(req, res) {
-  res.json({
-    Error: false,
-    Message: req.message
-  });
-}
-
 export const loginController = wrap(login);
 export const createOperatorController = wrap(createOperator);
 export const listOperatorController = wrap(listOperator);
 export const limitedListOperatorController = wrap(limitedListOperator);
 export const meController = wrap(me);
-
-export const updateNeighborhoodController = compose([wrap(updateNeighborhood), oldAppResponse]);
-export const updateOperatorStateController = compose([wrap(updateOperatorState), oldAppResponse]);

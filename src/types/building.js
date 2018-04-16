@@ -339,6 +339,8 @@ t.Building = t.struct(
 
     metadata: t.list(t.BuildingMetadataPreview),
 
+    Id_Estado: t.maybe(t.String), // Use to sync firebase informadores
+
     _migrateId: t.String,
     _documentType: t.String
   },
@@ -354,6 +356,7 @@ t.Building = t.struct(
       metadata: [],
       entities: [],
       _migrateId: [],
+      Id_Estado: null,
       _documentType: 'building'
     }
   }

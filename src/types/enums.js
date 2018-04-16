@@ -5,10 +5,12 @@ t.BuildingType = t.enums({
   HORIZONTAL: 'horizontal'
 }, 'BuildingType');
 
-t.BuildingState = t.enums({
+export const BuildingState = {
   BUENO: 'BUENO',
   MALO: 'MALO'
-}, 'BuildingState');
+};
+
+t.BuildingState = t.enums(BuildingState, 'BuildingState');
 
 t.TypeContact = t.enums({
   TELEFONO: 'TELEFONO',

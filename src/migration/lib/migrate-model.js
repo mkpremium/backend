@@ -9,13 +9,14 @@ import {csvToJson} from './index';
 const debugMigrate = debug('app:migration:migrate');
 
 export class MigrateModel {
-  constructor(name, filename, app = {}) {
+  constructor(name, filename, app = {}, opt) {
     this.app = app;
     this.bucket = null;
     this.migratedData = [];
     this.processedData = [];
     this.name = name;
     this.filename = filename;
+    this.csvOpt = opt;
 
     this.postImport = this.postImport.bind(this);
     this.processFunc = this.processFunc.bind(this);
@@ -52,7 +53,7 @@ export class MigrateModel {
 
   async importFileToModel() {
     debugMigrate('importing', this.filename, 'into', this.name);
-    await csvToJson(this.filename, this.processFunc);
+    await csvToJson(this.filename, this.processFunc, this.csvOpt);
   }
 
   async pushToDatabase(processedData) {

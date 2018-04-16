@@ -9,6 +9,7 @@ import {History} from '../src/history/models';
 import {ScheduledEventsRepository} from '../src/scheduledEvents/models';
 import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
+import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -22,6 +23,8 @@ export async function deleteAll() {
   const scheduledEvent = new ScheduledEventsRepository();
   const building = new BuildingRepository();
   const stats = new OperatorStats();
+  const neighborhood = new NeighborhoodRepository();
+  const city = new CityRepository();
 
   return Promise.all([
     operator.deleteQuery(),
@@ -35,7 +38,9 @@ export async function deleteAll() {
     scheduledEvent.deleteQuery(),
     calls.deleteQuery(),
     callUnknownEvents.deleteQuery(),
-    stats.deleteQuery()
+    stats.deleteQuery(),
+    neighborhood.deleteQuery(),
+    city.deleteQuery()
   ]);
 }
 
