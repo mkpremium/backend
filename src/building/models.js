@@ -8,7 +8,7 @@ import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../f
 import {updateList} from '../lib/tcomb-utils';
 import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
-import {locationPointView} from '../street/views';
+import {locationPointView, toGeoJSON} from '../street/views';
 
 const debugBuilding = debug('app:model:building');
 
@@ -168,7 +168,7 @@ export class BuildingRepository extends Building {
 
     const buildings = await this.query(qb);
 
-    return buildings.map(locationPointView);
+    return toGeoJSON(buildings);
   }
 
   async findWrongStateBuildingsStatsByCity(city) {
