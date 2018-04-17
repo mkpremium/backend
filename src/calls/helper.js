@@ -30,7 +30,7 @@ export const shouldOmitEvent = (body) => {
   const fromUser = _get(body, 'data.fromuser', null);
   const [fromUserServiceData] = _get(body, 'data.ServiceData', '').split('#');
 
-  return fromUser !== fromUserServiceData;
+  return fromUser === fromUserServiceData;
 };
 
 export const getCallStatus = (body) => {
