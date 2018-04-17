@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
@@ -120,7 +121,7 @@ export class BuildingRepository extends Building {
   }
 
   async addEntity(building, params) {
-    const entity = t.BuildingEntity(params);
+    const entity = fromJSON(params, t.BuildingEntity);
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     await this.updateEntities(building, updatedEntities);
 
