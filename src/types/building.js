@@ -252,6 +252,27 @@ t.BuildingEntity = t.struct(
 /**
  * @swagger
  * definitions:
+ *   BuildingMetadataPreview:
+ *     properties:
+ *         id:
+ *           type: string
+ *           format: uuid/v4
+ *         name:
+ *           type: string
+ *           description: Nombre a mostrar
+ *         previewUrl:
+ *           type: string
+ *           description: "Url publica de amazon con un thumbnail del archivo (images, pdf)"
+ */
+t.BuildingMetadataPreview = t.struct({
+  id: t.String,
+  name: t.maybe(t.String),
+  previewUrl: t.maybe(t.String)
+});
+
+/**
+ * @swagger
+ * definitions:
  *   Building:
  *     properties:
  *       id:
@@ -316,6 +337,8 @@ t.Building = t.struct(
     proposals: t.list(t.BuildingProposal),
     recentProposal: t.maybe(t.BuildingProposal),
 
+    metadata: t.list(t.BuildingMetadataPreview),
+
     _migrateId: t.String,
     _documentType: t.String
   },
@@ -328,6 +351,7 @@ t.Building = t.struct(
       coefficient: 0,
       buildingDate: 0,
       proposals: [],
+      metadata: [],
       entities: [],
       _migrateId: [],
       _documentType: 'building'

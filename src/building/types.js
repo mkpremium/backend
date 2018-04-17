@@ -63,35 +63,3 @@ t.BuildingMetadata = t.struct(
     }
   }
 );
-
-/**
- * @swagger
- * definitions:
- *   BuildingMetadataPreview:
- *     properties:
- *         id:
- *           type: string
- *           format: uuid/v4
- *         name:
- *           type: string
- *           description: Nombre a mostrar
- *         previewUrl:
- *           type: string
- *           description: "Url publica de amazon con un thumbnail del archivo (images, pdf)"
- */
-t.BuildingMetadataPreview = t.struct({
-  id: t.String,
-  name: t.maybe(t.String),
-  previewUrl: t.maybe(t.String)
-});
-
-t.Building = t.Building.extend(
-  {
-    metadata: t.list(t.BuildingMetadataPreview)
-  },
-  {
-    defaultProps: {
-      metadata: []
-    }
-  }
-);

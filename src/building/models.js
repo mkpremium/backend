@@ -1,3 +1,4 @@
+import debug from 'debug';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
@@ -5,6 +6,8 @@ import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
 import {saveMetadataToFirebase, saveProposal} from '../firebase/lib';
 import {updateList} from '../lib/tcomb-utils';
+
+const debugBuilding = debug('app:model:building');
 
 export class Building extends CouchbaseModel {
   constructor() {
@@ -155,8 +158,10 @@ export class BuildingRepository extends Building {
 
 function calculateElements({commons}, entities) {
   const number = entities.length;
-  const sumSurface = entities.reduce((acc, {surface}) => acc + surface);
+  const sumSurface = entities.reduce((acc, {surface}) => acc + surface, 0);
   const average = sumSurface / (number > 0 ? number : 1);
+
+  debugBuilding('calculateElements', {number, average, commons});
 
   return {
     number,
