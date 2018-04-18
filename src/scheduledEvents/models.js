@@ -60,7 +60,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       : [];
     if (owner) {
       meetingObj['owner'] = owner;
-      const person = t.Person(owner.person);
+      const person = fromJSON(owner.person, t.Person);
       meetingObj['contact'] = {
         name: person.fullName(),
         phone: person.findContactValueById(contactId)
@@ -68,7 +68,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       meetingObj['building'] = owner.building;
     }
 
-    return t.Meeting(meetingObj);
+    return fromJSON(meetingObj, t.Meeting);
   }
 
   async firebaseMeeting(scheduleEvent) {
