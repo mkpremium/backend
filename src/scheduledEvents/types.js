@@ -89,6 +89,7 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *         description: YYYY-MM-DD
  */
 const Event = t.struct({
+  owner: t.maybe(t.Owner),
   ownerId: t.maybe(t.String),
   contactId: t.maybe(t.String),
   worksheetId: t.maybe(t.String),
