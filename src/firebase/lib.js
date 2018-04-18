@@ -11,21 +11,19 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
-async function _saveBuldingEntity(db) {
-  return async(entity) => {
-    db.ref(`Entities/${entity.id}`).update(toFirebaseEntity(entity));
-  };
-}
-
 export async function saveBuildingToFirebase(db, building) {
   if (!firebase.enabled) {
     return;
   }
   const buildingRef = db.ref(`Buildings/${building.id}`);
 
+  const saveBuildingEntity = (entity) => {
+    db.ref(`Entities/${entity.id}`).update(toFirebaseEntity(entity));
+  };
+
   buildingRef.child('Data').set(toFirebaseBuilding(building));
   buildingRef.child('Entities').set(arrayToObjectIds(building.entities));
-  building.entities.map(_saveBuldingEntity(db));
+  building.entities.forEach(saveBuildingEntity);
 }
 
 export async function relateMeetingToBuilding(db, {id, building}) {
