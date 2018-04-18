@@ -240,6 +240,7 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
 );
 
 t.Meeting = t.struct({
+  owner: isMaybeTesting(t.Object),
   notifyTo: t.String,
   address: isMaybeTesting(t.String),
   contact: isMaybeTesting(t.struct({

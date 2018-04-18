@@ -64,4 +64,13 @@ t.FirebaseBuildingProposal = t.struct(
   }
 );
 
+t.FirebaseBuildingEntity = t.struct({
+  Entity: t.String,
+  Expiration: t.Number,
+  Rent: t.Number,
+  Situation: t.String,
+  Surface: t.Number,
+  Type: t.String
+});
+
 export default t;

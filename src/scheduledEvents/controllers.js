@@ -35,7 +35,7 @@ async function addScheduledCallEvent(req, res) {
 async function addScheduledMeetingEvent(req, res) {
   const repo = new ScheduledEventsRepository();
   const scheduledEvent = await repo
-    .addScheduledMeetingEvent(Object.assign({}, req.body, {createdBy: req.user.id}));
+    .addScheduledMeetingEvent(req.body, req.user.id);
   await OperatorStats.registerAction(req.user.id, OperatorActions.MEETING);
   res.status(201).json(scheduledEvent);
 }

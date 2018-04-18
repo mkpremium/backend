@@ -59,6 +59,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       ? await ownerRepo.findByIdWithIncludes(ownerId, ['person', 'building'])
       : [];
     if (owner) {
+      meetingObj['owner'] = owner;
       const person = t.Person(owner.person);
       meetingObj['contact'] = {
         name: person.fullName(),
@@ -89,8 +90,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await deleteMeetingToOperator(db, meeting, meeting.notifyTo);
   }
 
-  async addScheduledMeetingEvent(data = {}) {
-    const scheduledEventBody = await getScheduledMeetingStruct(Object.assign({}, data, {type: 'MEETINGS'}));
+  async addScheduledMeetingEvent(data = {}, createdBy) {
+    const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
+    const scheduledEventBody = await getScheduledMeetingStruct(params);
     const scheduledEvent = await this.save(scheduledEventBody);
     await this.firebaseMeeting(scheduledEvent);
 

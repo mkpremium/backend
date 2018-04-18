@@ -9,8 +9,6 @@ import {
   deleteScheduledEventController, weekScheduleEventMeetingsController
 } from './controllers';
 
-import {permissions} from '../middleware/jwt';
-
 const router = Router();
 /**
  * @swagger
@@ -24,9 +22,10 @@ const router = Router();
  * /scheduled-events/week:
  *   get:
  *     security:
- *       - admin: []
- *       - manager: []
- *       - operator: []
+ *      - admin: []
+ *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *     tags: [ScheduledEvents]
  *     summary: Obtiene los eventos programados (meetings) de la semana
  *     consumes:
@@ -79,6 +78,8 @@ router.get('/week', weekScheduleEventMeetingsController);
  *    security:
  *      - admin: []
  *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *    tags: [ScheduledEvents]
  *    summary: Obtiene detalle del evento programado
  *    parameters:
@@ -100,15 +101,17 @@ router.get('/week', weekScheduleEventMeetingsController);
  *      404:
  *        description: Evento no encontrada
  */
-router.get('/:id', permissions.operator, findScheduledEventController);
+router.get('/:id', findScheduledEventController);
 
 /**
  * @swagger
  * /scheduled-events:
  *   get:
  *     security:
- *       - admin: []
- *       - operator: []
+ *      - admin: []
+ *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *     tags: [ScheduledEvents]
  *     summary: Obtiene listado de eventos programados
  *     consumes:
@@ -173,7 +176,7 @@ router.get('/:id', permissions.operator, findScheduledEventController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.operator, listScheduledEventController);
+router.get('/', listScheduledEventController);
 
 /**
  * @swagger
@@ -182,6 +185,8 @@ router.get('/', permissions.operator, listScheduledEventController);
  *    security:
  *      - admin: []
  *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *    tags: [ScheduledEvents]
  *    summary: Registra evento de cita programada
  *    description: Permite programar un evento
@@ -213,7 +218,7 @@ router.get('/', permissions.operator, listScheduledEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.post('/meeting', permissions.operator, addScheduledMeetingEventController);
+router.post('/meeting', addScheduledMeetingEventController);
 
 /**
  * @swagger
@@ -222,6 +227,8 @@ router.post('/meeting', permissions.operator, addScheduledMeetingEventController
  *    security:
  *      - admin: []
  *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *    tags: [ScheduledEvents]
  *    summary: Registra evento de llamada programada
  *    description: Permite programar un evento
@@ -253,7 +260,7 @@ router.post('/meeting', permissions.operator, addScheduledMeetingEventController
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.post('/call', permissions.operator, addScheduledCallEventController);
+router.post('/call', addScheduledCallEventController);
 
 /**
  * @swagger
@@ -262,6 +269,8 @@ router.post('/call', permissions.operator, addScheduledCallEventController);
  *    security:
  *      - admin: []
  *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *    tags: [ScheduledEvents]
  *    summary: Actualiza evento programado
  *    description: Permite actualizar un evento
@@ -292,7 +301,7 @@ router.post('/call', permissions.operator, addScheduledCallEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.put('/:id', permissions.operator, updateScheduledEnventController);
+router.put('/:id', updateScheduledEnventController);
 
 /**
  * @swagger
@@ -301,6 +310,8 @@ router.put('/:id', permissions.operator, updateScheduledEnventController);
  *    security:
  *      - admin: []
  *      - operator: []
+ *      - comercial: []
+ *      - business: []
  *    tags: [ScheduledEvents]
  *    summary: Elimina evento programado
  *    description: Permite eleiminar un evento programdo
@@ -327,6 +338,6 @@ router.put('/:id', permissions.operator, updateScheduledEnventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.delete('/:id', permissions.operator, deleteScheduledEventController);
+router.delete('/:id', deleteScheduledEventController);
 
 export default router;

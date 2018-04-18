@@ -3,11 +3,29 @@ import firebase from './index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../lib/date';
 import t from './types';
 
+function arrayToObjectIds(collection) {
+  const objectIds = {};
+  collection.forEach(item => {
+    objectIds[item.id] = true;
+  });
+  return objectIds;
+}
+
+async function _saveBuldingEntity(db) {
+  return async(entity) => {
+    db.ref(`Entities/${entity.id}`).update(toFirebaseEntity(entity));
+  };
+}
+
 export async function saveBuildingToFirebase(db, building) {
   if (!firebase.enabled) {
     return;
   }
-  db.ref(`Buildings/${building.id}/Data`).set(toFirebaseBuilding(building));
+  const buildingRef = db.ref(`Buildings/${building.id}`);
+
+  buildingRef.child('Data').set(toFirebaseBuilding(building));
+  buildingRef.child('Entities').set(arrayToObjectIds(building.entities));
+  building.entities.map(_saveBuldingEntity(db));
 }
 
 export async function relateMeetingToBuilding(db, {id, building}) {
@@ -120,6 +138,7 @@ function noteWithTimestamp(note) {
 
 function toFirebaseMeeting(meeting) {
   return t.FirebaseMeeting({
+    Owner: meeting.owner,
     Aspiration: 0,
     Street: meeting.address,
     Email: _get(meeting, 'contact.email', ''),
@@ -149,5 +168,16 @@ function toFirebaseDocument(metadata) {
     Url: metadata.url,
     Thumbnail: metadata.previewUrl,
     date: firebaseTimestampFormat(metadata.createdAt)
+  });
+}
+
+function toFirebaseEntity(entity) {
+  return t.FirebaseBuildingEntity({
+    Entity: entity.name,
+    Expiration: firebaseTimestampFormat(entity.expiration),
+    Rent: entity.rent,
+    Situation: entity.status,
+    Surface: entity.surface,
+    Type: entity.type
   });
 }

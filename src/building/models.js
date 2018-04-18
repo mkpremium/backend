@@ -4,8 +4,9 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
-import {saveMetadataToFirebase, saveProposal} from '../firebase/lib';
+import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib';
 import {updateList} from '../lib/tcomb-utils';
+import firebase from '../firebase';
 
 const debugBuilding = debug('app:model:building');
 
@@ -126,7 +127,10 @@ export class BuildingRepository extends Building {
   async addEntity(building, params) {
     const entity = fromJSON(params, t.BuildingEntity);
     const updatedEntities = t.update(building.entities, {$push: [entity]});
-    await this.updateEntities(building, updatedEntities);
+    const updatedBuilding = await this.updateEntities(building, updatedEntities);
+
+    const db = firebase.database();
+    await saveBuildingToFirebase(db, updatedBuilding);
 
     return entity;
   }
