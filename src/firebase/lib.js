@@ -22,7 +22,7 @@ export async function saveBuildingToFirebase(db, building) {
   };
 
   buildingRef.child('Data').set(toFirebaseBuilding(building));
-  buildingRef.child('Entities').set(arrayToObjectIds(building.entities));
+  buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
 }
 
