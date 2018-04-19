@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import debug from 'debug';
 import fromJSON from 'tcomb/lib/fromJSON';
+import _get from 'lodash/get';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
@@ -8,7 +9,8 @@ import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../f
 import {updateList} from '../lib/tcomb-utils';
 import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
-import {locationPointView, toGeoJSON} from '../street/views';
+import {toGeoJSON} from '../street/views';
+import {NeighborhoodRepository} from '../street/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -171,9 +173,9 @@ export class BuildingRepository extends Building {
     return toGeoJSON(buildings);
   }
 
-  async findWrongStateBuildingsStatsByCity(city) {
+  async calculateStatsByCity(city) {
     const qb = this.getQueryBuilder('count');
-    // qb.where('address.city = ?', city);
+    qb.where('address.city = ?', city);
 
     qb
       .field('state')
@@ -183,43 +185,38 @@ export class BuildingRepository extends Building {
       .group('address.city')
       .group('address.neighborhood');
 
-    const results = await this.query(qb);
-    return calculeStateTotals(results);
+    return this.query(qb);
+  }
+
+  async findWrongStateBuildingsStatsByCity(city) {
+    const neighborhoodRepo = new NeighborhoodRepository();
+    const neighborhoods = await neighborhoodRepo.findByCity(city);
+    const results = await this.calculateStatsByCity(city);
+    return calculeStateTotals(results, neighborhoods);
   }
 }
 
-function calculeStateTotals(results) {
+function calculeStateTotals(results, neighborhoods) {
   const bad = results.filter(r => r.state === BuildingState.MALO);
   const good = results.filter(r => r.state === BuildingState.BUENO);
   const completeResults = [];
 
-  results.forEach(r => {
-    let rBad = bad.find(filterStateByNeighborhood(r, BuildingState.MALO));
-    let rGood = good.find(filterStateByNeighborhood(r, BuildingState.BUENO));
-    if (!rBad) {
-      rBad = Object.assign({}, r, {
-        state: BuildingState.MALO,
-        count: 0
-      });
-    }
-    if (!rGood) {
-      rGood = Object.assign({}, r, {
-        state: BuildingState.BUENO,
-        count: 0
-      });
-    }
+  neighborhoods.forEach(neighborhood => {
+    let rBad = bad.find(filterStateByNeighborhood(neighborhood, BuildingState.MALO));
+    let rGood = good.find(filterStateByNeighborhood(neighborhood, BuildingState.BUENO));
+
     completeResults.push({
-      [`C-${r.neighborhood}`]: rGood.count,
-      [`D-${r.neighborhood}`]: rBad.count
+      [`C-${neighborhood.name}`]: _get(rGood, 'count', 0),
+      [`D-${neighborhood.name}`]: _get(rBad, 'count', 0)
     });
   });
 
   return completeResults;
 }
 
-function filterStateByNeighborhood(r, state) {
+function filterStateByNeighborhood(neighborhood, state) {
   return (rb) =>
-    rb.neighborhood === r.neighborhood &&
+    rb.neighborhood === neighborhood.name &&
     rb.state === state;
 }
 

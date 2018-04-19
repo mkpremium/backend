@@ -25,6 +25,13 @@ export class NeighborhoodRepository extends Neighborhood {
 
     return result.map(locationPointView);
   }
+
+  async findByCity(city) {
+    const qb = this.getQueryBuilder();
+    qb.where('city = ?', city);
+
+    return this.query(qb);
+  }
 }
 
 export class City extends CouchbaseModel {
