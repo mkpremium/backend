@@ -5,14 +5,19 @@ import {firebaseInformadores} from '../../../config';
 import {isStreetManager} from '../index';
 import {OperatorFeatures} from '../../types/operator';
 
-export async function saveStreetUserToFirebase(operator) {
+export async function saveStreetUserToFirebase(operator, newCity = true) {
   if (!firebaseInformadores.enabled) {
     return;
   }
 
   const db = firebaseInformadores.database();
-  db.ref(`Usuarios/${operator.id}/Datos`).set(toFirebaseStreetUser(operator));
   const adminRef = db.ref(`AdminUsers/${operator.id}`);
+  const userRef = db.ref(`Usuarios/${operator.id}`);
+  userRef.child('Datos').set(toFirebaseStreetUser(operator));
+  if (newCity) {
+    userRef.child('Edificio_Default').set(null);
+  }
+
   adminRef.child('Permisos').set({
     Ciudades: stringToFirebasePreferences(operator.profile.city),
     Funciones: arrayToFirebasePreference(operator.features),

@@ -3,6 +3,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import _find from 'lodash/find';
 import _filter from 'lodash/filter';
 import _omit from 'lodash/omit';
+import _get from 'lodash/get';
 import bcrypt from 'bcrypt';
 import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
@@ -46,9 +47,9 @@ export class Operator extends CouchbaseModel {
     });
   }
 
-  async save(data, sendEvent) {
-    const operator = await super.save(data, sendEvent);
-    await firebaseUserAccount(operator);
+  async save(data, newCity) {
+    const operator = await super.save(data);
+    await firebaseUserAccount(operator, newCity);
     return operator;
   }
 }
@@ -95,9 +96,10 @@ export class OperatorRepository extends Operator {
   }
 
   async updateProfile(operator, params) {
+    const newCity = _get(operator, 'profile.city') !== _get(params, 'profile.city');
     const updatedProfile = t.update(operator.profile, {$merge: params});
     const updateOperator = t.update(operator, {profile: {$set: updatedProfile}});
-    return this.save(updateOperator);
+    return this.save(updateOperator, newCity);
   }
 
   async update(operator, params) {

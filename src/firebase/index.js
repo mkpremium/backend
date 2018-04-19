@@ -68,8 +68,8 @@ export async function firebaseSetup(operator) {
   };
 }
 
-export async function firebaseUserAccount(operator) {
+export async function firebaseUserAccount(operator, newCity) {
   if (isStreet(operator.roles)) {
-    await saveStreetUserToFirebase(operator);
+    await saveStreetUserToFirebase(operator, newCity);
   }
 }
