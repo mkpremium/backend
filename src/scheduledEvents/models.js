@@ -22,6 +22,7 @@ import {
   saveMeetingToFirebase
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
+import {saveStreetBuildingToFirebase} from '../firebase/lib/street';
 
 export class ScheduledEvents extends CouchbaseModel {
   constructor() {
@@ -72,11 +73,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async firebaseMeeting(scheduleEvent) {
+    const ownerRepo = new OwnerRepository();
     const db = fbComerciales.database();
     const meeting = await this.findMeeting(scheduleEvent);
+    const [owner] = await ownerRepo.findByIdWithIncludes(scheduleEvent.event.ownerId);
     const {building} = meeting;
 
     await saveBuildingToFirebase(db, building);
+    await saveStreetBuildingToFirebase(building, owner);
     await saveMeetingToFirebase(db, meeting);
     await relateMeetingToBuilding(db, meeting);
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);
