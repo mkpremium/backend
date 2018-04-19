@@ -12,6 +12,7 @@ import {newHttpError} from '../lib/http-error';
 import {OperatorRoles} from '../types/operator';
 import {OperatorStatsRepository} from '../stats/models';
 import {OperatorActions} from '../stats/types';
+import {firebaseUserAccount} from '../firebase';
 
 function findOrZero(counters, action) {
   const result = _find(counters, {action});
@@ -43,6 +44,12 @@ export class Operator extends CouchbaseModel {
         $set: password
       }
     });
+  }
+
+  async save(data, sendEvent) {
+    const operator = await super.save(data, sendEvent);
+    await firebaseUserAccount(operator);
+    return operator;
   }
 }
 

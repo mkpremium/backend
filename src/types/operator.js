@@ -5,7 +5,8 @@ export const OperatorRoles = {
   MANAGER: 'MANAGER',
   BUSINESS: 'BUSINESS',
   ADMIN: 'ADMIN',
-  STREET: 'STREET'
+  STREET: 'STREET',
+  STREET_MANAGER: 'STREET_MANAGER'
 };
 
 export const OperatorFirebaseStates = {
@@ -14,8 +15,15 @@ export const OperatorFirebaseStates = {
   PAUSED: 'P'
 };
 
+export const OperatorFeatures = {
+  CHAT: 'Chat',
+  STATS: 'Estadísticas',
+  ALL: 'Todas'
+};
+
 t.OperatorRole = t.enums.of(Object.values(OperatorRoles));
 t.OperatorFirebaseStates = t.enums.of(Object.values(OperatorFirebaseStates));
+t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures));
 
 /**
  * @swagger
@@ -28,6 +36,14 @@ t.OperatorFirebaseStates = t.enums.of(Object.values(OperatorFirebaseStates));
  *         type: string
  *       city:
  *         type: string
+ *       neighborhood:
+ *         type: string
+ *       zone:
+ *         type: string
+ *         description: Distrito en Firebase
+ *       state:
+ *         type: string
+ *         description: Estado en Firebase [A P B]
  *     required:
  *       - firstName
  *       - lastName
@@ -37,6 +53,7 @@ t.OperatorProfile = t.struct({
   lastName: t.String,
   city: t.maybe(t.String),
   neighborhood: t.maybe(t.String),
+  zone: t.maybe(t.String),
   state: t.maybe(t.OperatorFirebaseStates)
 }, 'OperatorProfile');
 
@@ -61,13 +78,23 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  * @swagger
  * definitions:
  *  OperatorBody:
+ *    required:
+ *      - username
+ *      - password
+ *      - agentNumber
+ *      - roles
+ *      - profile
  *    properties:
  *      username:
  *        type: string
  *      password:
  *        type: string
+ *      email:
+ *        type: string
+ *        description: Email para uso en firebase
  *      agentNumber:
  *        type: string
+ *        description: "Numero de Agente en Firebase, código y extension en call center"
  *      enable:
  *        type: boolean
  *      profile:
@@ -76,6 +103,14 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  *        type: array
  *        items:
  *          type: string
+ *      level:
+ *        type: Number
+ *        description: Nivel en Firebase
+ *      features:
+ *        type: array
+ *        items:
+ *          type: string
+ *        description: "Funciones o Permisos en Firebase"
  */
 
 /**
@@ -93,10 +128,17 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  *        format: uuid/v4
  *      username:
  *        type: string
+ *      email:
+ *        type: string
+ *        description: Email para uso en firebase
  *      password:
  *        type: string
  *      agentNumber:
  *        type: string
+ *        description: "Numero de Agente en Firebase, código y extension en call center"
+ *      level:
+ *        type: Number
+ *        description: Nivel en Firebase
  *      enable:
  *        type: boolean
  *      profile:
@@ -105,19 +147,33 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  *        type: array
  *        items:
  *          type: string
+ *      features:
+ *        type: array
+ *        items:
+ *          type: string
+ *        description: "Funciones o Permisos en Firebase"
+ *      createdAt:
+ *        type: string
+ *      disabledAt:
+ *        type: string
  */
 t.Operator = t.struct(
   {
     id: t.maybe(t.String),
     username: t.String,
     password: t.String,
+    email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
+    level: t.maybe(t.Number),
+    features: t.list(t.OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
     enable: t.Bool,
     roles: t.list(t.OperatorRole),
 
     profile: t.OperatorProfile,
 
+    createdAt: t.Date,
+    disabledAt: t.maybe(t.Date),
     _documentType: t.String
   },
   {
@@ -125,7 +181,11 @@ t.Operator = t.struct(
     defaultProps: {
       enable: true,
       roles: [],
+      features: [],
       profile: {},
+      get createdAt() {
+        return new Date();
+      },
       _documentType: 'operator'
     }
   }
