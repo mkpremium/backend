@@ -1,7 +1,7 @@
 import _get from 'lodash/get';
-import {fbComerciales} from './index';
-import {firebaseTimestampFormat, meetingDayFormat} from '../lib/date';
-import t from './types';
+import t from '../types';
+import {fbComerciales} from '../index';
+import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 
 function arrayToObjectIds(collection) {
   const objectIds = {};

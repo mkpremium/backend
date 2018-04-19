@@ -3,7 +3,7 @@ import {CouchbaseModel} from '../db/model';
 import fromJSON from 'tcomb/lib/fromJSON';
 
 import {addBetweenQueryToBuilder, addDateQueryToBuilder} from '../lib/query/helpers';
-import {saveNoteToFirebase} from '../firebase/lib';
+import {saveNoteToFirebase} from '../firebase/lib/business';
 
 export class Note extends CouchbaseModel {
   constructor() {

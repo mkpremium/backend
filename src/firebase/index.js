@@ -16,15 +16,25 @@ export const fbInformadores = admin.initializeApp({
 
 fbInformadores.enabled = firebaseInformadores.enabled;
 
+function isBusiness(roles) {
+  const {BUSINESS} = OperatorRoles;
+  return roles.indexOf(BUSINESS) !== -1;
+}
+
+function isStreet(roles) {
+  const {STREET} = OperatorRoles;
+  return roles.indexOf(STREET) !== -1;
+}
+
 function choseFirebaseSetup(roles) {
-  const {BUSINESS, STREET} = OperatorRoles;
-  if (roles.indexOf(BUSINESS) !== -1) {
+  if (isBusiness(roles)) {
     return {
       fb: fbComerciales,
       databaseURL: firebaseComerciales.databaseURL
     };
   }
-  if (roles.indexOf(STREET) !== -1) {
+
+  if (isStreet(roles)) {
     return {
       fb: fbInformadores,
       databaseURL: firebaseInformadores.databaseURL
@@ -45,4 +55,12 @@ export async function firebaseSetup(operator) {
     token: await fb.auth().createCustomToken(operator.id),
     databaseURL
   };
+}
+
+export async function firebaseUserAccount(operator) {
+  // if (!isStreet(operator.roles)) {
+  //   return;
+  // }
+  //
+  // return;
 }

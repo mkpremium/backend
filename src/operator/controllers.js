@@ -2,7 +2,7 @@ import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {OperatorRepository} from './models';
 import {History} from '../history/models';
-import {firebaseSetup} from '../firebase';
+import {firebaseSetup, firebaseUserAccount} from '../firebase';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -31,13 +31,14 @@ async function login(req, res) {
 
 async function createOperator(req, res) {
   const repo = new OperatorRepository();
-  const result = await repo.save(req.body);
+  const operator = await repo.save(req.body);
+  await firebaseUserAccount(operator);
   await History.registerCreate({
-    contextModel: result,
+    contextModel: operator,
     user: req.user
   });
   res.status(201);
-  res.json(result);
+  res.json(operator);
 }
 
 async function listOperator(req, res) {

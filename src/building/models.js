@@ -5,7 +5,7 @@ import _get from 'lodash/get';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
-import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib';
+import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
 import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';

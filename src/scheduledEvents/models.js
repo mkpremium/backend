@@ -20,7 +20,7 @@ import {
   relateMeetingToOperator,
   saveBuildingToFirebase,
   saveMeetingToFirebase
-} from '../firebase/lib';
+} from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
 
 export class ScheduledEvents extends CouchbaseModel {
