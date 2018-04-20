@@ -30,6 +30,33 @@ export class ScheduledEvents extends CouchbaseModel {
   }
 }
 
+export class ScheduledTask extends CouchbaseModel {
+  constructor() {
+    super();
+    this.Struct = t.ScheduledTask;
+  }
+}
+
+export class ScheduledTaskRepository extends ScheduledTask {
+  static async scheduleNewTask(when, type, context) {
+    const [amount, units] = when.split(' ');
+    const executeAt = utc().add(Number(amount), units);
+    const newTask = {
+      type,
+      context,
+      executeAt
+    };
+    const repo = new ScheduledTaskRepository();
+    return repo.save(newTask);
+  }
+
+  async findTasksToExecute(executeAt) {
+    const qb = this.getQueryBuilder();
+    addMinuteDateQueryToBuilder(qb, 'executeAt', executeAt);
+    return this.query(qb);
+  }
+}
+
 export class ScheduledEventsRepository extends ScheduledEvents {
   async findByIdOrThrow(id) {
     const scheduledEvent = await this.findById(id);

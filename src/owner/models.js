@@ -71,6 +71,37 @@ export class PersonRepository extends Person {
   }
 }
 
+function ownerIncludes(qb, includes) {
+  if (includes.indexOf('building') !== -1) {
+    const buildingRepo = new BuildingRepository();
+    const letBuildingQuery = buildingRepo
+      .getQueryBuilder('use', 'b')
+      .useKey('t.`buildingId`')
+      .where('t.`buildingId` = b.`id`');
+    qb
+      .letQuery('building', letBuildingQuery)
+      .field('building');
+  }
+
+  if (includes.indexOf('person') !== -1) {
+    const personRepo = new PersonRepository();
+    const letPersonQuery = personRepo
+      .getQueryBuilder('use', 'p')
+      .useKey('t.`personId`')
+      .where('t.`personId` = p.`id`');
+    qb
+      .letQuery('person', letPersonQuery)
+      .field('person');
+  }
+}
+
+function mapOwnerIncludes(owner) {
+  return Object.assign({}, owner, {
+    person: _head(owner.person || []),
+    building: _head(owner.building || [])
+  });
+}
+
 export class OwnerRepository extends Owner {
   async findByIdOrThrow(ownerId) {
     const owner = await this.findById(ownerId);
@@ -79,6 +110,13 @@ export class OwnerRepository extends Owner {
     }
 
     return owner;
+  }
+
+  async findByBuildingWithIncludes(buildingId, includes = ['person', 'building']) {
+    const qb = this.getQueryBuilder('let').where('buildingId = ?', buildingId);
+    ownerIncludes(qb, includes);
+    const result = await this.query(qb);
+    return result.map(mapOwnerIncludes);
   }
 
   // TODO: .map() should not be used for convert owner.person in object
@@ -91,34 +129,10 @@ export class OwnerRepository extends Owner {
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`;
     const qb = this.getQueryBuilder('let').where(`id IN ${idsText}`);
 
-    if (includes.indexOf('building') !== -1) {
-      const buildingRepo = new BuildingRepository();
-      const letBuildingQuery = buildingRepo
-        .getQueryBuilder('use', 'b')
-        .useKey('t.`buildingId`')
-        .where('t.`buildingId` = b.`id`');
-      qb
-        .letQuery('building', letBuildingQuery)
-        .field('building');
-    }
-
-    if (includes.indexOf('person') !== -1) {
-      const personRepo = new PersonRepository();
-      const letPersonQuery = personRepo
-        .getQueryBuilder('use', 'p')
-        .useKey('t.`personId`')
-        .where('t.`personId` = p.`id`');
-      qb
-        .letQuery('person', letPersonQuery)
-        .field('person');
-    }
-
+    ownerIncludes(qb, includes);
     const result = await this.query(qb);
 
-    return result.map((owner) => Object.assign({}, owner, {
-      person: _head(owner.person || []),
-      building: _head(owner.building || [])
-    }));
+    return result.map(mapOwnerIncludes);
   }
 
   async updateContact(ownerId, contactId, data) {
