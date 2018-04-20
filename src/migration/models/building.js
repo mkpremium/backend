@@ -93,6 +93,14 @@ export default function migrateFromCsv(data) {
     return 0;
   };
 
+  const neighborhood = value => {
+    if (/#/.test(value)) {
+      return value.split('#')[0].trim();
+    } else {
+      return null;
+    }
+  };
+
   return t.Building({
     id: uuid(),
     _migrateId: input.id,
@@ -105,7 +113,8 @@ export default function migrateFromCsv(data) {
       postalCode: postalCode(),
       city: input.municipality,
       province: input.province,
-      zone: input.numero_3
+      zone: input.numero_3,
+      neighborhood: neighborhood(input.numero_3)
     },
     buildingType: input.build,
     cadastre: {

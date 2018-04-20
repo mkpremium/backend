@@ -41,6 +41,11 @@ async function init() {
   const migrateBuildings = new MigrateModel('building', resolve(__dirname, '../test/fixtures/sample_buildings.csv'), app);
   await migrateBuildings.run();
 
+  const migrateNeighborhoods = new MigrateModel('neighborhood', resolve(__dirname, '../csv/Barrios.csv'), app, {delimiter: ','});
+  await migrateNeighborhoods.run();
+  const migrateCity = new MigrateModel('city', resolve(__dirname, '../csv/Ciudad.csv'), app, {delimiter: ','});
+  await migrateCity.run();
+
   const personRepo = new PersonRepository();
   const ownerRepo = new OwnerRepository();
   const buildingRepo = new BuildingRepository();

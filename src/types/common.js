@@ -191,7 +191,8 @@ t.Address = t.struct(
     postalCode: t.PostalCode,
     city: t.String,
     province: t.String,
-    zone: t.String
+    zone: t.String,
+    neighborhood: t.String
   },
   {
     name: 'Address'

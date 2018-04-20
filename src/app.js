@@ -24,6 +24,7 @@ import building from './building';
 import metadata from './metadata';
 import people from './person';
 import stats from './stats';
+import street from './street';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -55,6 +56,7 @@ building(app);
 metadata(app);
 people(app);
 stats(app);
+street(app);
 
 app.use(appErrorHandler);
 

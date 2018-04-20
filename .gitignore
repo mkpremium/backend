@@ -43,5 +43,5 @@ build
 .vscode
 
 # Firebase
-firebase.json
+firebase*.json
 mkpremium-pm2.json

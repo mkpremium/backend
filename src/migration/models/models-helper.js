@@ -54,3 +54,17 @@ function removeNullValue(value) {
 
   return value;
 }
+
+function cleanValue(value) {
+  return value ? value.trim() : value;
+}
+
+export function cleanValues(object) {
+  const keys = Object.keys(object);
+  const newObject = {};
+  keys.forEach(key => {
+    newObject[key] = cleanValue(object[key]);
+  });
+
+  return newObject;
+}

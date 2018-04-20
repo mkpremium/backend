@@ -1,7 +1,7 @@
 import _get from 'lodash/get';
-import firebase from './index';
-import {firebaseTimestampFormat, meetingDayFormat} from '../lib/date';
-import t from './types';
+import t from '../types';
+import {fbComerciales} from '../index';
+import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 
 function arrayToObjectIds(collection) {
   const objectIds = {};
@@ -12,7 +12,7 @@ function arrayToObjectIds(collection) {
 }
 
 export async function saveBuildingToFirebase(db, building) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   const buildingRef = db.ref(`Buildings/${building.id}`);
@@ -27,35 +27,35 @@ export async function saveBuildingToFirebase(db, building) {
 }
 
 export async function relateMeetingToBuilding(db, {id, building}) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   db.ref(`Buildings/${building.id}/Meetings/ids/${id}`).set(true);
 }
 
 export async function deleteMeetingToBuilding(db, {id, building}) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   db.ref(`Buildings/${building.id}/Meetings/ids/${id}`).set(null);
 }
 
 export async function saveMeetingToFirebase(db, meeting) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   db.ref(`Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
 }
 
 export async function deleteMeetingToFirebase(db, meeting) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   db.ref(`Meetings/${meeting.id}`).set(null);
 }
 
 export async function relateMeetingToOperator(db, meeting, operatorId) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
@@ -63,7 +63,7 @@ export async function relateMeetingToOperator(db, meeting, operatorId) {
 }
 
 export async function deleteMeetingToOperator(db, meeting, operatorId) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
@@ -71,16 +71,16 @@ export async function deleteMeetingToOperator(db, meeting, operatorId) {
 }
 
 export async function saveMetadataToFirebase(metadata) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
-  const db = firebase.database();
+  const db = fbComerciales.database();
   db.ref(`Documents/${metadata.id}`).set(toFirebaseDocument(metadata));
   db.ref(`Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true);
 }
 
 export async function saveNoteToFirebase(note) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
   const buildingId = note.context.buildingId;
@@ -88,7 +88,7 @@ export async function saveNoteToFirebase(note) {
     return;
   }
 
-  const db = firebase.database();
+  const db = fbComerciales.database();
   const noteRef = db.ref(`Notes/${note.id}`);
   noteRef.set(noteWithTimestamp(note));
 
@@ -98,14 +98,14 @@ export async function saveNoteToFirebase(note) {
 }
 
 export async function saveProposal(proposal) {
-  if (!firebase.enabled) {
+  if (!fbComerciales.enabled) {
     return;
   }
 
   const {buildingId} = proposal;
   const firebaseProposal = toFirebaseProposal(proposal);
 
-  const db = firebase.database();
+  const db = fbComerciales.database();
   const proposalRef = db(`Proposes/${proposal.id}`);
   proposalRef.set(firebaseProposal);
 

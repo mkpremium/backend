@@ -1,5 +1,6 @@
 import t from 'tcomb';
 import _find from 'lodash/find';
+import _get from 'lodash/get';
 import {OwnerStatus, OwnerType} from './enums';
 
 /**
@@ -159,6 +160,11 @@ t.Person = t.struct(
   }
 );
 
+t.Person.prototype.findFirstGoodContact = function() {
+  const contact = _find(this.contacts, {status: 'GOOD'}, {});
+  return _get(contact, 'value');
+};
+
 t.Person.prototype.findContactById = function(id) {
   return _find(this.contacts, {id});
 };
@@ -234,6 +240,18 @@ t.Owner = t.struct(
     }
   }
 );
+
+t.Owner.prototype.fullName = function() {
+  if (this.person) {
+    return this.person.fullName();
+  }
+};
+
+t.Owner.prototype.findFirstGoodContact = function() {
+  if (this.person) {
+    return this.person.prototype.findFirstGoodContact();
+  }
+};
 
 t.Owner.prototype.verifyOwner = function(confirmedBy, value = true) {
   return t.update(this, {

@@ -1,12 +1,16 @@
-import debug from 'debug';
 import t from 'tcomb';
+import debug from 'debug';
 import fromJSON from 'tcomb/lib/fromJSON';
+import _get from 'lodash/get';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
-import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib';
+import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
-import firebase from '../firebase';
+import {fbComerciales} from '../firebase';
+import {BuildingState} from '../types/enums';
+import {toGeoJSON} from '../street/views';
+import {NeighborhoodRepository} from '../street/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -129,7 +133,7 @@ export class BuildingRepository extends Building {
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const db = firebase.database();
+    const db = fbComerciales.database();
     await saveBuildingToFirebase(db, updatedBuilding);
 
     return entity;
@@ -158,6 +162,62 @@ export class BuildingRepository extends Building {
 
     return this.save(updateBuilding);
   }
+
+  async findWrongStateBuildingsByCity(city) {
+    const qb = this.getQueryBuilder();
+    qb.where('address.city = ?', city);
+    qb.where('state = ?', BuildingState.MALO);
+
+    const buildings = await this.query(qb);
+
+    return toGeoJSON(buildings);
+  }
+
+  async calculateStatsByCity(city) {
+    const qb = this.getQueryBuilder('count');
+    qb.where('address.city = ?', city);
+
+    qb
+      .field('state')
+      .field('address.city')
+      .field('address.neighborhood')
+      .group('state')
+      .group('address.city')
+      .group('address.neighborhood');
+
+    return this.query(qb);
+  }
+
+  async findWrongStateBuildingsStatsByCity(city) {
+    const neighborhoodRepo = new NeighborhoodRepository();
+    const neighborhoods = await neighborhoodRepo.findByCity(city);
+    const results = await this.calculateStatsByCity(city);
+    return calculeStateTotals(results, neighborhoods);
+  }
+}
+
+function calculeStateTotals(results, neighborhoods) {
+  const bad = results.filter(r => r.state === BuildingState.MALO);
+  const good = results.filter(r => r.state === BuildingState.BUENO);
+  const completeResults = [];
+
+  neighborhoods.forEach(neighborhood => {
+    let rBad = bad.find(filterStateByNeighborhood(neighborhood, BuildingState.MALO));
+    let rGood = good.find(filterStateByNeighborhood(neighborhood, BuildingState.BUENO));
+
+    completeResults.push({
+      [`C-${neighborhood.name}`]: _get(rGood, 'count', 0),
+      [`D-${neighborhood.name}`]: _get(rBad, 'count', 0)
+    });
+  });
+
+  return completeResults;
+}
+
+function filterStateByNeighborhood(neighborhood, state) {
+  return (rb) =>
+    rb.neighborhood === neighborhood.name &&
+    rb.state === state;
 }
 
 function calculateElements({commons}, entities) {

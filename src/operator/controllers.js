@@ -2,8 +2,7 @@ import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
 import {OperatorRepository} from './models';
 import {History} from '../history/models';
-import firebaseAdmin from '../firebase';
-import {firebase} from '../../config';
+import {firebaseSetup} from '../firebase';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -20,28 +19,25 @@ async function login(req, res) {
   };
 
   const token = await OperatorRepository.createToken(tokenPayload);
-  const firebaseToken = await firebaseAdmin.auth().createCustomToken(operator.id);
+  const firebase = await firebaseSetup(operator);
 
   res.json(t.AuthenticatedResponse({
     token,
     roles: operator.roles,
     operator: tokenPayload.operator,
-    firebase: {
-      token: firebaseToken,
-      databaseURL: firebase.databaseURL
-    }
+    firebase
   }));
 }
 
 async function createOperator(req, res) {
   const repo = new OperatorRepository();
-  const result = await repo.save(req.body);
+  const operator = await repo.save(req.body);
   await History.registerCreate({
-    contextModel: result,
+    contextModel: operator,
     user: req.user
   });
   res.status(201);
-  res.json(result);
+  res.json(operator);
 }
 
 async function listOperator(req, res) {

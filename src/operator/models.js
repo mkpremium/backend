@@ -2,6 +2,8 @@ import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _find from 'lodash/find';
 import _filter from 'lodash/filter';
+import _omit from 'lodash/omit';
+import _get from 'lodash/get';
 import bcrypt from 'bcrypt';
 import {sign} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
@@ -11,6 +13,7 @@ import {newHttpError} from '../lib/http-error';
 import {OperatorRoles} from '../types/operator';
 import {OperatorStatsRepository} from '../stats/models';
 import {OperatorActions} from '../stats/types';
+import {firebaseUserAccount} from '../firebase';
 
 function findOrZero(counters, action) {
   const result = _find(counters, {action});
@@ -42,6 +45,12 @@ export class Operator extends CouchbaseModel {
         $set: password
       }
     });
+  }
+
+  async save(data, newCity) {
+    const operator = await super.save(data);
+    await firebaseUserAccount(operator, newCity);
+    return operator;
   }
 }
 
@@ -84,6 +93,25 @@ export class OperatorRepository extends Operator {
       enable: true
     });
     return this.list(queryWithRole, t.OperatorListViewResponse, t.OperatorLimitedListQuery);
+  }
+
+  async updateProfile(operator, params) {
+    const newCity = _get(operator, 'profile.city') !== _get(params, 'profile.city');
+    const updatedProfile = t.update(operator.profile, {$merge: params});
+    const updateOperator = t.update(operator, {profile: {$set: updatedProfile}});
+    return this.save(updateOperator, newCity);
+  }
+
+  async update(operator, params) {
+    const updatedProfile = t.update(operator.profile, {
+      $merge: Object.assign(operator.profile, params.profile)
+    });
+    const updateOperator = t.update(operator, {
+      $merge: _omit(params, ['profile']),
+      profile: {$set: updatedProfile}
+    });
+
+    return this.save(updateOperator);
   }
 
   async list(query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {
