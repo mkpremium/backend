@@ -30,14 +30,14 @@ export async function relateMeetingToBuilding(db, {id, building}) {
   if (!firebase.enabled) {
     return;
   }
-  db.ref(`Buildings/${building.id}/Meetings`).update({[id]: true});
+  db.ref(`Buildings/${building.id}/Meetings/ids/${id}`).set(true);
 }
 
 export async function deleteMeetingToBuilding(db, {id, building}) {
   if (!firebase.enabled) {
     return;
   }
-  db.ref(`Buildings/${building.id}/Meetings/${id}`).set(null);
+  db.ref(`Buildings/${building.id}/Meetings/ids/${id}`).set(null);
 }
 
 export async function saveMeetingToFirebase(db, meeting) {
@@ -76,7 +76,7 @@ export async function saveMetadataToFirebase(metadata) {
   }
   const db = firebase.database();
   db.ref(`Documents/${metadata.id}`).set(toFirebaseDocument(metadata));
-  db.ref(`Buildings/${metadata.buildingId}/Documents`).update({[metadata.id]: true});
+  db.ref(`Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true);
 }
 
 export async function saveNoteToFirebase(note) {
