@@ -111,7 +111,7 @@ describe('worksheet.routes', () => {
             }
           },
           'notifyAt': new Date().toJSON(),
-          'eventDate': new Date().toJSON()
+          'eventDate': new Date('2018-02-28T16:30:00Z').toJSON()
         })
         .expect(201);
     });
@@ -134,7 +134,7 @@ describe('worksheet.routes', () => {
             }
           },
           'notifyAt': new Date().toJSON(),
-          'eventDate': new Date().toJSON()
+          'eventDate': new Date('2018-02-28T19:30:00Z').toJSON()
         })
         .expect(201);
     });

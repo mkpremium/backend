@@ -133,6 +133,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const m = utc(data.eventDate);
     const start = m.clone().subtract(1.5, 'hours').toISOString();
     const end = m.clone().add(1.5, 'hours').toISOString();
+    console.log('areAllowedMeetingInRange', data.eventDate, start, end);
     const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end);
     if (meetingsInRange && meetingsInRange.length > 0) {
       throw newHttpError(
@@ -146,7 +147,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async findMeetingInRange(notifyTo, start, end) {
     const qb = this.getQueryBuilder();
     const eventDate = [start, end].join(',');
-    addBetweenQueryToBuilder(qb, 'eventDate', eventDate);
+    addMinuteDateQueryToBuilder(qb, 'eventDate', eventDate);
     qb.where('notifyTo = ?', notifyTo);
     qb.where('type = ?', ScheduledEventType.MEETINGS);
     return this.query(qb);
