@@ -1,16 +1,15 @@
 import t from 'tcomb';
 import _find from 'lodash/find';
 import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
-import {firebaseInformadores} from '../../../config';
-import {isStreetManager} from '../index';
+import {isStreetManager, fbInformadores} from '../';
 import {OperatorFeatures} from '../../types/operator';
 
 export async function saveStreetUserToFirebase(operator, newCity = true) {
-  if (!firebaseInformadores.enabled) {
+  if (!fbInformadores.enabled) {
     return;
   }
 
-  const db = firebaseInformadores.database();
+  const db = fbInformadores.database();
   const adminRef = db.ref(`AdminUsers/${operator.id}`);
   const userRef = db.ref(`Usuarios/${operator.id}`);
   userRef.child('Datos').set(toFirebaseStreetUser(operator));
@@ -28,7 +27,7 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
 }
 
 export async function saveStreetBuildingToFirebase(building, owner) {
-  const db = firebaseInformadores.database();
+  const db = fbInformadores.database();
   db.ref(`Edificios_Data/${building.id}`).update(toFirebaseStreetBuilding(building, owner));
 }
 
