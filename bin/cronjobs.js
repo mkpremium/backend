@@ -8,6 +8,7 @@ import appErrorHandler from '../src/lib/error-handler';
 import couchbase from '../src/db/couchbase';
 
 import scheduledEventCronJob from '../src/scheduledEvents/cron';
+import scheduledTasksCronJob from '../src/firebase/cron';
 
 const app = express();
 const server = http.createServer(app);
@@ -54,5 +55,6 @@ if (process.env.NODE_ENV !== 'test') {
 
 couchbase(app);
 scheduledEventCronJob.start();
+scheduledTasksCronJob.start();
 
 app.use(appErrorHandler);

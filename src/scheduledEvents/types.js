@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import uuid from 'uuid/v4';
 import {isMaybeTesting} from '../../config';
 
 export const ScheduledEventType = {
@@ -100,6 +101,35 @@ const Event = t.struct({
     long: t.Number
   }, 'eventLocation'))
 }, 'event');
+
+export const ScheduleTaskType = {
+  UPDATE_BUILDING: 'update-building'
+};
+
+t.ScheduleTaskType = t.enums.of(Object.values(ScheduleTaskType));
+t.ScheduledTask = t.struct(
+  {
+    id: t.String,
+    type: t.ScheduleTaskType,
+    context: t.Object,
+    executeAt: t.Date,
+    createdAt: t.Date,
+    _documentType: t.enums.of(['scheduled-task'])
+  },
+  {
+    name: 'ScheduledTask',
+    defaultProps: {
+      get id() {
+        return uuid();
+      },
+      get createdAt() {
+        return new Date();
+      },
+      _documentType: 'scheduled-task'
+    }
+  }
+);
+
 t.ScheduledEvent = t.struct(
   {
     id: t.maybe(t.String),
