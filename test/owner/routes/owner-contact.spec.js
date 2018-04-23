@@ -53,7 +53,7 @@ describe('owner.routes', () => {
         .post(`/owners/${owner.id}/contacts`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
-          value: '1234567890',
+          value: '1234567891',
           status: 'GOOD'
         })
         .expect(200);

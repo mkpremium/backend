@@ -178,6 +178,10 @@ t.Person.prototype.fullName = function() {
   return `${this.name}`.trim();
 };
 
+t.Person.prototype.contactValueExists = function(value) {
+  return !!_find(this.contacts, {value});
+};
+
 /**
  * @swagger
  * definitions:

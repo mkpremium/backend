@@ -64,6 +64,10 @@ export class PersonRepository extends Person {
       throw newHttpError(400, `La persona ${personId} asociada al propietario no pudo ser encontrada`);
     }
 
+    if (person.contactValueExists(newContact.value)) {
+      throw newHttpError(400, `La persona ${personId} asociada al propietario ya tiene un contacto con el mismo valor`);
+    }
+
     const updatedContacts = t.update(person.contacts, {$push: [newContact]});
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
