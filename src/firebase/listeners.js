@@ -54,7 +54,7 @@ async function updateBuildingFrom(streetBuilding) {
 }
 
 async function createNewOwner(building, owner) {
-  throw w
+  throw new Error('Not defined');
 }
 
 async function updateBuildingOwner(foundOwner, building, owner) {
