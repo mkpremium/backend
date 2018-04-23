@@ -52,14 +52,13 @@ function arrayToFirebasePreference(value) {
 }
 
 function toFirebaseStreetUser(operator) {
-  const {firstName, lastName, neighborhood, zone, city, state} = operator.profile;
+  const {firstName, lastName, neighborhood, city, state} = operator.profile;
   return t.FirebaseUserStreet({
     Datos: {
       Nombre: firstName,
       Apellido: lastName,
       Barrio: neighborhood,
       Ciudad: city,
-      Distrito: zone,
       Estado: state,
       Fecha_Alta: firebaseTimestampFormat(operator.createdAt),
       Fecha_Baja: firebaseTimestampFormat(operator.disabledAt),
