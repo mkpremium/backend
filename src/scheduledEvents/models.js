@@ -119,7 +119,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async validateMeeting(data) {
-    console.log('validateMeeting', data);
     if (data.type !== ScheduledEventType.MEETINGS) {
       return true;
     }
