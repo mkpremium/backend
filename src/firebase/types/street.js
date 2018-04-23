@@ -6,7 +6,6 @@ t.FirebaseUserStreet = t.struct({
     Apellido: t.String,
     Barrio: t.String,
     Ciudad: t.String,
-    Distrito: t.String,
     Estado: t.String,
     Fecha_Alta: t.Number,
     Fecha_Baja: t.Number,

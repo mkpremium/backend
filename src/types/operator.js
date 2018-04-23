@@ -38,9 +38,6 @@ t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures));
  *         type: string
  *       neighborhood:
  *         type: string
- *       zone:
- *         type: string
- *         description: Distrito en Firebase
  *       state:
  *         type: string
  *         description: Estado en Firebase [A P B]
@@ -53,7 +50,6 @@ t.OperatorProfile = t.struct({
   lastName: t.String,
   city: t.maybe(t.String),
   neighborhood: t.maybe(t.String),
-  zone: t.maybe(t.String),
   state: t.maybe(t.OperatorFirebaseStates)
 }, 'OperatorProfile');
 

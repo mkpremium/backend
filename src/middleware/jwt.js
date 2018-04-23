@@ -44,7 +44,7 @@ async function addUserInfo(req, res, next) {
   next();
 }
 
-function bearerTokenExtractor(req) {
+export function bearerTokenExtractor(req) {
   const authorization = _get(req, 'headers.authorization', '');
   const [scheme, credentials] = authorization.split(' ');
   if (scheme && /^Bearer$/i.test(scheme)) {

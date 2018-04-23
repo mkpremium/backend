@@ -6,7 +6,8 @@ import jwt from '../middleware/jwt';
 export default (app) => {
   const secured = jwt().unless({
     path: [
-      '/operators/login'
+      '/operators/login',
+      '/operators/refresh-token'
     ]
   });
 

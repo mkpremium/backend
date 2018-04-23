@@ -7,6 +7,20 @@ import {firebaseSetup} from '../firebase';
 async function login(req, res) {
   const repo = new OperatorRepository();
   const operator = await repo.findByCredential(req.body);
+  const response = await createAuthenticatedResponse(operator);
+
+  res.json(response);
+}
+
+async function refreshToken(req, res) {
+  const repo = new OperatorRepository();
+  const payload = await OperatorRepository.decodeToken(req);
+  const operator = await repo.findByIdOrThrow(payload.id);
+  const response = await createAuthenticatedResponse(operator);
+  res.json(response);
+}
+
+async function createAuthenticatedResponse(operator) {
   const tokenPayload = {
     id: operator.id,
     permissions: operator.roles,
@@ -21,12 +35,12 @@ async function login(req, res) {
   const token = await OperatorRepository.createToken(tokenPayload);
   const firebase = await firebaseSetup(operator);
 
-  res.json(t.AuthenticatedResponse({
+  return t.AuthenticatedResponse({
     token,
     roles: operator.roles,
     operator: tokenPayload.operator,
     firebase
-  }));
+  });
 }
 
 async function createOperator(req, res) {
@@ -65,3 +79,4 @@ export const createOperatorController = wrap(createOperator);
 export const listOperatorController = wrap(listOperator);
 export const limitedListOperatorController = wrap(limitedListOperator);
 export const meController = wrap(me);
+export const refreshTokenController = wrap(refreshToken);
