@@ -210,22 +210,22 @@ describe('scheduledevents.routes', () => {
         .expect(204);
     });
 
-    it('400 Operación no exitosa', async() => {
+    it('400 Operación no exitosa a la misma hora', async() => {
       await request(app)
         .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           type: 'MEETINGS',
           data: {},
-          notifyAt: new Date('2018-02-28T16:24:39Z'),
-          eventDate: new Date('2018-02-28T16:24:39Z'),
+          notifyAt: new Date('2018-02-28T16:24:00.000Z'),
+          eventDate: new Date('2018-02-28T16:24:00.000Z'),
           notifyTo: 'test',
           event: {}
         })
         .expect(400);
     });
 
-    it('400 Operación no exitosa', async() => {
+    it('400 Operación no exitosa si los minutos no son 00/30', async() => {
       await request(app)
         .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
         .set('Authorization', authenticatedOperator.authorization)

@@ -5,7 +5,8 @@ import {CouchbaseModel} from '../db/model';
 import {
   addDateQueryToBuilder,
   addMinuteDateQueryToBuilder,
-  addBetweenQueryToBuilder
+  addBetweenQueryToBuilder,
+  addMinuteBetweenQueryToBuilder
 } from '../lib/query/helpers';
 import {newHttpError} from '../lib/http-error';
 import {buildRangeFromWeek, meetingWeekFormat, utc} from '../lib/date';
@@ -147,7 +148,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async findMeetingInRange(notifyTo, start, end) {
     const qb = this.getQueryBuilder();
     const eventDate = [start, end].join(',');
-    addMinuteDateQueryToBuilder(qb, 'eventDate', eventDate);
+    addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate);
     qb.where('notifyTo = ?', notifyTo);
     qb.where('type = ?', ScheduledEventType.MEETINGS);
     return this.query(qb);
