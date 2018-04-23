@@ -4,7 +4,7 @@ import {
   limitedListOperatorController,
   listOperatorController,
   loginController,
-  meController
+  meController, refreshTokenController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -44,6 +44,50 @@ const router = Router();
  *           $ref: "#/definitions/Error"
  */
 router.post('/login', loginController);
+
+/**
+ * @swagger
+ * definitions:
+ *   AppRefreshToken:
+ *     properties:
+ *      appToken:
+ *        type: string
+ * /operators/refresh-token:
+ *   post:
+ *     tags: [Operator]
+ *     summary: Refrescar token
+ *     security:
+ *       - operator: []
+ *       - admin: []
+ *       - manager: []
+ *       - business: []
+ *       - street: []
+ *       - street_manager: []
+ *     consumes:
+ *      - "application/json"
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: body
+ *        in: body
+ *        required: false
+ *        schema:
+ *          $ref: "#/definitions/AppRefreshToken"
+ *     responses:
+ *       200:
+ *         description: Autenticado exitosamente
+ *         schema:
+ *           $ref: "#/definitions/AuthenticatedResponse"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       404:
+ *         description: Operator inexistente
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/refresh-token', refreshTokenController);
 
 /**
  * @swagger

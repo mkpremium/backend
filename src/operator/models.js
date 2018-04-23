@@ -5,7 +5,7 @@ import _filter from 'lodash/filter';
 import _omit from 'lodash/omit';
 import _get from 'lodash/get';
 import bcrypt from 'bcrypt';
-import {sign} from 'jsonwebtoken';
+import {sign, verify} from 'jsonwebtoken';
 import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
@@ -14,6 +14,7 @@ import {OperatorRoles} from '../types/operator';
 import {OperatorStatsRepository} from '../stats/models';
 import {OperatorActions} from '../stats/types';
 import {firebaseUserAccount} from '../firebase';
+import {bearerTokenExtractor} from '../middleware/jwt';
 
 function findOrZero(counters, action) {
   const result = _find(counters, {action});
@@ -55,6 +56,15 @@ export class Operator extends CouchbaseModel {
 }
 
 export class OperatorRepository extends Operator {
+  async findByIdOrThrow(operatorId) {
+    const owner = await this.findById(operatorId);
+    if (!owner) {
+      throw newHttpError(404, `El operator ${operatorId} no existe`);
+    }
+
+    return owner;
+  }
+
   async findByCredential(data) {
     const {username, password} = new t.Credentials(data);
     const qb = this.getQueryBuilder()
@@ -85,6 +95,15 @@ export class OperatorRepository extends Operator {
     };
 
     return sign(payload, jwt.secret, options);
+  }
+
+  static async decodeToken(req) {
+    const token = bearerTokenExtractor(req);
+    const options = {
+      ignoreExpiration: true
+    };
+
+    return verify(token, jwt.secret, options);
   }
 
   async listView(query) {
