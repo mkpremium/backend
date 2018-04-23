@@ -199,8 +199,45 @@ describe('scheduledevents.routes', () => {
       await request(app)
         .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
         .set('Authorization', authenticatedOperator.authorization)
-        .send({type: 'MEETINGS', data: {}, notifyAt: new Date('2018-02-28T16:24:39Z'), notifyTo: 'test', event: {}})
+        .send({
+          type: 'MEETINGS',
+          data: {},
+          notifyAt: new Date('2018-02-28T16:24:39Z'),
+          eventDate: new Date('2018-02-28T16:30:39Z'),
+          notifyTo: 'test',
+          event: {}
+        })
         .expect(204);
+    });
+
+    it('400 Operación no exitosa', async() => {
+      await request(app)
+        .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
+        .set('Authorization', authenticatedOperator.authorization)
+        .send({
+          type: 'MEETINGS',
+          data: {},
+          notifyAt: new Date('2018-02-28T16:24:39Z'),
+          eventDate: new Date('2018-02-28T16:24:39Z'),
+          notifyTo: 'test',
+          event: {}
+        })
+        .expect(400);
+    });
+
+    it('400 Operación no exitosa', async() => {
+      await request(app)
+        .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
+        .set('Authorization', authenticatedOperator.authorization)
+        .send({
+          type: 'MEETINGS',
+          data: {},
+          notifyAt: new Date('2018-02-28T16:24:39Z'),
+          eventDate: new Date('2018-02-28T16:30:39Z'),
+          notifyTo: 'test',
+          event: {}
+        })
+        .expect(400);
     });
   });
 

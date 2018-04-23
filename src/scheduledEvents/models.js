@@ -22,6 +22,7 @@ import {
   saveMeetingToFirebase
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
+import {ScheduledEventType} from './types';
 
 export class ScheduledEvents extends CouchbaseModel {
   constructor() {
@@ -115,6 +116,41 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await deleteMeetingToFirebase(db, meeting);
     await deleteMeetingToBuilding(db, meeting);
     await deleteMeetingToOperator(db, meeting, meeting.notifyTo);
+  }
+
+  async validateMeeting(data) {
+    console.log('validateMeeting', data);
+    if (data.type !== ScheduledEventType.MEETINGS) {
+      return true;
+    }
+
+    if (!areAllowedMeetingMins(data.eventDate)) {
+      throw newHttpError(
+        400,
+        `Las reuniones solo puede empezar a los 00 minutos o 30 minutos UTC: ${data.eventDate}|${data.eventDate.toISOString()}`
+      );
+    }
+
+    const m = utc(data.eventDate);
+    const start = m.clone().subtract(1.5, 'hours').toISOString();
+    const end = m.clone().add(1.5, 'hours').toISOString();
+    const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end);
+    if (meetingsInRange && meetingsInRange.length > 0) {
+      throw newHttpError(
+        400,
+        'Las reuniones no pueden solaparse, tiene una duración de 1h y deben tener 30 minutos entre ellas'
+      );
+    }
+    return true;
+  }
+
+  async findMeetingInRange(notifyTo, start, end) {
+    const qb = this.getQueryBuilder();
+    const eventDate = [start, end].join(',');
+    addBetweenQueryToBuilder(qb, 'eventDate', eventDate);
+    qb.where('notifyTo = ?', notifyTo);
+    qb.where('type = ?', ScheduledEventType.MEETINGS);
+    return this.query(qb);
   }
 
   async addScheduledMeetingEvent(data = {}, createdBy) {
@@ -214,6 +250,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async preSave(scheduleEvent) {
+    await this.validateMeeting(scheduleEvent);
     const ownerId = _get(scheduleEvent, 'event.ownerId');
     if (ownerId) {
       const ownerRepo = new OwnerRepository();
@@ -229,4 +266,18 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async postSave(scheduleEvent) {
     return this.sendWeekEvent(scheduleEvent);
   }
+}
+
+function areAllowedMeetingMins(time) {
+  const min = time.getMinutes();
+
+  if (min === 0) {
+    return true;
+  }
+
+  if (min === 30) {
+    return true;
+  }
+
+  return false;
 }
