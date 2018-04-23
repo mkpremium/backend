@@ -192,7 +192,10 @@ export class WorksheetRepository extends Worksheet {
 
   async preSave(data) {
     // never store this
-    return t.update(data, {ownerContacts: {$set: [], relatedBuildings: {set: []}}});
+    return t.update(data, {
+      ownerContacts: {$set: []},
+      relatedBuildings: {$set: []}
+    });
   }
 
   async list(query = {}) {
