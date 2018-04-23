@@ -100,7 +100,7 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  *        items:
  *          type: string
  *      level:
- *        type: Number
+ *        type: number
  *        description: Nivel en Firebase
  *      features:
  *        type: array
@@ -170,7 +170,7 @@ t.Operator = t.struct(
 
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
-    _documentType: t.String
+    _documentType: t.enums.of(['operator'])
   },
   {
     name: 'Operator',
