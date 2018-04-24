@@ -84,5 +84,5 @@ export const updateOperatorStateController = compose([wrap(updateOperatorState),
 export const getNeighborhoodCenterController = compose([wrap(getNeighborhoodCenter), oldAppResponse]);
 export const getBuildingsLocationController = compose([wrap(getBuildingsLocation), oldAppResponse]);
 export const getCityInfoController = compose([wrap(getCityInfo), oldAppResponse]);
-export const oldLoginController = compose([wrap(oldLogin), oldLoginResponse])
+export const oldLoginController = compose([wrap(oldLogin), oldLoginResponse]);
 export const getLocationsAtDayController = compose([wrap(getLocationsAtDay), oldAppResponse]);

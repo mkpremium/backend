@@ -31,5 +31,4 @@ t.FirebaseStreetBuildingData = t.struct({
   Timestamp: t.Number
 }, 'FirebaseStreetBuildingData');
 
-
 export default t;

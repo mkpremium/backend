@@ -46,7 +46,6 @@ export class BuildingProposal extends CouchbaseModel {
 }
 
 export class BuildingProposalRepository extends BuildingProposal {
-
   async save(data, sendEvent) {
     const proposal = await super.save(data, sendEvent);
     await saveProposal(proposal);
