@@ -22,7 +22,7 @@ async function addNegotiationProposal(req, res) {
   const buildingRepo = new BuildingRepository();
   const buildingId = req.params.id;
   const building = await buildingRepo.findByIdOrThrow(buildingId);
-  const proposal = buildingRepo.addNegotiationProposal(building, req.user.id, req.body);
+  const proposal = await buildingRepo.addNegotiationProposal(building, req.user.id, req.body);
   res.status(201).json(proposal);
 }
 

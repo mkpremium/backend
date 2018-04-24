@@ -13,7 +13,7 @@ import {newHttpError} from '../lib/http-error';
 import {OperatorRoles} from '../types/operator';
 import {OperatorStatsRepository} from '../stats/models';
 import {OperatorActions} from '../stats/types';
-import {firebaseUserAccount} from '../firebase';
+import {firebaseSetup, firebaseUserAccount} from '../firebase';
 import {bearerTokenExtractor} from '../middleware/jwt';
 
 function findOrZero(counters, action) {
@@ -52,6 +52,31 @@ export class Operator extends CouchbaseModel {
     const operator = await super.save(data);
     await firebaseUserAccount(operator, newCity);
     return operator;
+  }
+
+  async createAuthenticatedResponse(operator) {
+    const tokenPayload = {
+      id: operator.id,
+      permissions: operator.roles,
+      operator: {
+        id: operator.id,
+        name: operator.profile.fullName(),
+        username: operator.username,
+        city: operator.profile.city
+      }
+    };
+
+    const {refreshToken} = await OperatorRefreshTokenRepository.createToken(operator);
+    const token = await OperatorRepository.createToken(tokenPayload);
+    const firebase = await firebaseSetup(operator);
+
+    return t.AuthenticatedResponse({
+      refreshToken,
+      token,
+      roles: operator.roles,
+      operator: tokenPayload.operator,
+      firebase
+    });
   }
 }
 
@@ -95,15 +120,6 @@ export class OperatorRepository extends Operator {
     };
 
     return sign(payload, jwt.secret, options);
-  }
-
-  static async decodeToken(req) {
-    const token = bearerTokenExtractor(req);
-    const options = {
-      ignoreExpiration: true
-    };
-
-    return verify(token, jwt.secret, options);
   }
 
   async listView(query) {
@@ -171,5 +187,57 @@ export class OperatorRepository extends Operator {
       };
       return t.OperatorResults({operator, counters});
     });
+  }
+}
+
+export class OperatorRefreshTokenRepository extends CouchbaseModel {
+  constructor() {
+    super();
+    this.Struct = t.OperatorRefreshToken;
+  }
+
+  static async createRefreshToken(payload) {
+    const options = {
+      expiresIn: jwt.refreshTokenExpiresIn
+    };
+
+    return sign(payload, jwt.secret, options);
+  }
+
+  static async decodeToken(req) {
+    const repo = new OperatorRefreshTokenRepository();
+    const token = bearerTokenExtractor(req);
+    const options = {};
+
+    await verify(token, jwt.secret, options);
+    return repo.findOrThrow(token);
+  }
+
+  async findOrThrow(rawToken) {
+    const qb = this.getQueryBuilder();
+    qb.where('refreshToken = ?', rawToken)
+      .limit(1);
+    const [refreshToken] = await this.query(qb);
+    if (!refreshToken) {
+      throw newHttpError(401, 'El token es invalido');
+    }
+    return refreshToken;
+  }
+
+  static async createToken(operator) {
+    const repo = new OperatorRefreshTokenRepository();
+    const operatorId = operator.id;
+    const refreshToken = await OperatorRefreshTokenRepository.createRefreshToken({id: operatorId});
+    return repo.save({
+      operatorId,
+      refreshToken
+    }, false);
+  }
+
+  static async consume(id) {
+    const repo = new OperatorRefreshTokenRepository();
+    const qb = repo.getQueryBuilder('delete');
+    qb.where('id = ?', id);
+    return repo.deleteQuery(qb);
   }
 }

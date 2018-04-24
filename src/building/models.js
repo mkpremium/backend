@@ -11,6 +11,7 @@ import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
+import {OwnerRepository} from '../owner/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -45,8 +46,10 @@ export class BuildingProposal extends CouchbaseModel {
 }
 
 export class BuildingProposalRepository extends BuildingProposal {
-  async postSave(proposal) {
+  async save(data, sendEvent) {
+    const proposal = await super.save(data, sendEvent);
     await saveProposal(proposal);
+    return proposal;
   }
 
   async findByIdOrThrow(proposalId) {
@@ -102,7 +105,7 @@ export class BuildingRepository extends Building {
     const updateProposals = t.update(building.proposals, {$push: [proposal.id]});
     const updatedBuilding = t.update(building, {
       proposals: {$set: updateProposals},
-      recentProposal: proposal
+      recentProposal: {$set: proposal}
     });
 
     await this.save(updatedBuilding);
@@ -129,17 +132,21 @@ export class BuildingRepository extends Building {
   }
 
   async addEntity(building, params) {
+    const ownerRepo = new OwnerRepository();
     const entity = fromJSON(params, t.BuildingEntity);
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
+    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
+
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding);
+    await saveBuildingToFirebase(db, updatedBuilding, owner);
 
     return entity;
   }
 
   async updateEntity(building, entityId, params) {
+    const ownerRepo = new OwnerRepository();
     const entity = building.entities.find(({id}) => id === entityId);
     if (!entity) {
       throw newHttpError(
@@ -149,7 +156,12 @@ export class BuildingRepository extends Building {
     }
     const updatedEntity = t.update(entity, {$merge: params});
     const updatedEntities = updateList(building.entities, entity, updatedEntity);
-    await this.updateEntities(building, updatedEntities);
+    const updatedBuilding = await this.updateEntities(building, updatedEntities);
+
+    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
+
+    const db = fbComerciales.database();
+    await saveBuildingToFirebase(db, updatedBuilding, owner);
 
     return updatedEntity;
   }

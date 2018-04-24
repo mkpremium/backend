@@ -234,19 +234,23 @@ t.ScheduleEventsListResponse = t.struct(
  * definitions:
  *   UpdateScheduledEvent:
  *     properties:
- *       type:
- *         type: string
- *         enum: [CALLS, MEETINGS]
+ *       event:
+ *         type: object
+ *         $ref: "#/definitions/ScheduledMeetingEvent"
+ *         description: Contexto de la cita
  *       notifyAt:
  *         type: string
  *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Fecha de envío de la notificación
+ *       eventDate:
+ *         type: string
+ *         format: YYYY-MM-DDTHH:MM:SSZ
+ *         description: Fecha de la cita
  */
 t.UpdateScheduledEvent = t.struct({
-  type: t.maybe(t.ScheduledEventType),
-  notifyTo: t.String,
   notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date),
-  event: Event
+  event: t.maybe(Event)
 }, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(

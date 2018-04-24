@@ -4,6 +4,7 @@ import {wrap} from 'express-promise-wrap';
 import {NeighborhoodRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import {OperatorRepository} from '../operator/models';
+import {fbInformadores} from '../firebase';
 
 async function updateOperatorState(req, res, next) {
   const repo = new OperatorRepository();
@@ -45,10 +46,36 @@ async function getCityInfo(req, res, next) {
   next();
 }
 
+async function oldLogin(req, res, next) {
+  const repo = new OperatorRepository();
+  const params = t.QueryLoginCredentials(req.body);
+  const operator = await repo.findByCredential(params.toParams());
+  const response = await repo.createAuthenticatedResponse(operator);
+  res.message = `Usuario ${operator.username} activo`;
+  res.token = response.token;
+  next();
+}
+
+async function getLocationsAtDay(req, res, next) {
+  const db = fbInformadores.database();
+  const params = t.QueryLocationsAtDay(req.body);
+  const snapshot = await db.ref(`Locations/${params.date}`).once('value');
+  res.message = snapshot.val();
+  next();
+}
+
 function oldAppResponse(req, res) {
   res.json({
     Error: false,
     Message: res.message
+  });
+}
+
+function oldLoginResponse(req, res) {
+  res.json({
+    Error: false,
+    Message: res.message,
+    Token: res.token
   });
 }
 
@@ -57,3 +84,5 @@ export const updateOperatorStateController = compose([wrap(updateOperatorState),
 export const getNeighborhoodCenterController = compose([wrap(getNeighborhoodCenter), oldAppResponse]);
 export const getBuildingsLocationController = compose([wrap(getBuildingsLocation), oldAppResponse]);
 export const getCityInfoController = compose([wrap(getCityInfo), oldAppResponse]);
+export const oldLoginController = compose([wrap(oldLogin), oldLoginResponse]);
+export const getLocationsAtDayController = compose([wrap(getLocationsAtDay), oldAppResponse]);

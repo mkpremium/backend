@@ -20,7 +20,7 @@ export function firebaseTimestampFormat(date) {
 export function firebaseStringToNumber(number) {
   const n = Number(number || 0);
   if (isNaN(n)) {
-    return null;
+    return 0;
   } else {
     return n;
   }

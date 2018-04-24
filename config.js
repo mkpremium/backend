@@ -22,7 +22,8 @@ export const couchbase = {
 };
 export const jwt = {
   secret: process.env.JWT_SECRET || 'Bitdistrict1sGreat',
-  expiresIn: process.env.JWT_EXPIRES || '1 day'
+  expiresIn: process.env.JWT_EXPIRES || '3 day',
+  refreshTokenExpiresIn: process.env.REFRESH_TOKEN_JWT_EXPIRES || '10 days'
 };
 
 export const numintec = {

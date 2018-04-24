@@ -1,5 +1,5 @@
-import t from 'tcomb';
 import _find from 'lodash/find';
+import t from './../types/street';
 import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
 import {isStreetManager, fbInformadores} from '../';
 import {OperatorFeatures} from '../../types/operator';
@@ -53,18 +53,16 @@ function arrayToFirebasePreference(value) {
 function toFirebaseStreetUser(operator) {
   const {firstName, lastName, neighborhood, city, state} = operator.profile;
   return t.FirebaseUserStreet({
-    Datos: {
-      Nombre: firstName,
-      Apellido: lastName,
-      Barrio: neighborhood,
-      Ciudad: city,
-      Estado: state,
-      Fecha_Alta: firebaseTimestampFormat(operator.createdAt),
-      Fecha_Baja: firebaseTimestampFormat(operator.disabledAt),
-      Numero_Agente: firebaseStringToNumber(operator.agentNumber),
-      Numero_Nivel: firebaseStringToNumber(operator.level),
-      Timestamp: firebaseTimestampFormat(new Date())
-    }
+    Nombre: firstName,
+    Apellido: lastName,
+    Barrio: neighborhood,
+    Ciudad: city,
+    Estado: state,
+    Fecha_Alta: firebaseTimestampFormat(operator.createdAt),
+    Fecha_Baja: firebaseTimestampFormat(operator.disabledAt),
+    Numero_Agente: firebaseStringToNumber(operator.agentNumber),
+    Numero_Nivel: firebaseStringToNumber(operator.level),
+    Timestamp: firebaseTimestampFormat(new Date())
   });
 }
 

@@ -56,6 +56,7 @@ t.Credentials = t.struct({
  *         $ref: "#/definitions/FirebaseConfig"
  */
 t.AuthenticatedResponse = t.struct({
+  refreshToken: t.String,
   token: t.String,
   operator: t.struct({
     id: t.String,

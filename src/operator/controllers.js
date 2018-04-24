@@ -1,46 +1,22 @@
-import t from 'tcomb';
 import {wrap} from 'express-promise-wrap';
-import {OperatorRepository} from './models';
+import {OperatorRefreshTokenRepository, OperatorRepository} from './models';
 import {History} from '../history/models';
-import {firebaseSetup} from '../firebase';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
   const operator = await repo.findByCredential(req.body);
-  const response = await createAuthenticatedResponse(operator);
+  const response = await repo.createAuthenticatedResponse(operator);
 
   res.json(response);
 }
 
 async function refreshToken(req, res) {
   const repo = new OperatorRepository();
-  const payload = await OperatorRepository.decodeToken(req);
-  const operator = await repo.findByIdOrThrow(payload.id);
-  const response = await createAuthenticatedResponse(operator);
+  const refreshToken = await OperatorRefreshTokenRepository.decodeToken(req);
+  const operator = await repo.findByIdOrThrow(refreshToken.operatorId);
+  const response = await repo.createAuthenticatedResponse(operator);
+  await OperatorRefreshTokenRepository.consume(refreshToken.id);
   res.json(response);
-}
-
-async function createAuthenticatedResponse(operator) {
-  const tokenPayload = {
-    id: operator.id,
-    permissions: operator.roles,
-    operator: {
-      id: operator.id,
-      name: operator.profile.fullName(),
-      username: operator.username,
-      city: operator.profile.city
-    }
-  };
-
-  const token = await OperatorRepository.createToken(tokenPayload);
-  const firebase = await firebaseSetup(operator);
-
-  return t.AuthenticatedResponse({
-    token,
-    roles: operator.roles,
-    operator: tokenPayload.operator,
-    firebase
-  });
 }
 
 async function createOperator(req, res) {

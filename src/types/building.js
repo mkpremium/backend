@@ -159,7 +159,7 @@ t.BuildingProposal = t.struct(
       get id() {
         return uuid();
       },
-      get createdBy() {
+      get createdAt() {
         return new Date();
       },
       _documentType: 'building-proposal'
@@ -334,7 +334,7 @@ t.Building = t.struct(
     ownerId: t.maybe(t.String),
     owner: t.BuildingOwner, // TODO: move to owners collection
     state: t.BuildingState,
-    proposals: t.list(t.BuildingProposal),
+    proposals: t.list(t.String),
     recentProposal: t.maybe(t.BuildingProposal),
 
     metadata: t.list(t.BuildingMetadataPreview),
