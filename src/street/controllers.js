@@ -4,7 +4,6 @@ import {wrap} from 'express-promise-wrap';
 import {NeighborhoodRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import {OperatorRepository} from '../operator/models';
-import {createAuthenticatedResponse} from '../operator/controllers';
 import {fbInformadores} from '../firebase';
 
 async function updateOperatorState(req, res, next) {
@@ -51,7 +50,7 @@ async function oldLogin(req, res, next) {
   const repo = new OperatorRepository();
   const params = t.QueryLoginCredentials(req.body);
   const operator = await repo.findByCredential(params.toParams());
-  const response = await createAuthenticatedResponse(operator);
+  const response = await repo.createAuthenticatedResponse(operator);
   res.message = `Usuario ${operator.username} activo`;
   res.token = response.token;
   next();

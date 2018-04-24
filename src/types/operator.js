@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import uuid from 'uuid/v4';
 
 export const OperatorRoles = {
   OPERATOR: 'OPERATOR',
@@ -183,6 +184,24 @@ t.Operator = t.struct(
         return new Date();
       },
       _documentType: 'operator'
+    }
+  }
+);
+
+t.OperatorRefreshToken = t.struct(
+  {
+    id: t.String,
+    operatorId: t.String,
+    refreshToken: t.String,
+    _documentType: t.enums.of(['operator-refresh_token'])
+  },
+  {
+    name: 'OperatorRefreshToken',
+    defaultProps: {
+      get id() {
+        return uuid();
+      },
+      _documentType: 'operator-refresh_token'
     }
   }
 );
