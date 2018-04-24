@@ -1,6 +1,4 @@
 import t from 'tcomb';
-import _pick from 'lodash/pick';
-import _identity from 'lodash/identity';
 import uuid from 'uuid/v4';
 import {isMaybeTesting} from '../../config';
 
