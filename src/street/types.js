@@ -75,4 +75,20 @@ t.QueryBuildingsLocation = t.struct({
   city: t.String
 });
 
+t.QueryLoginCredentials = t.struct({
+  name: t.String,
+  password: t.String
+});
+
+t.QueryLoginCredentials.prototype.toParams = function() {
+  return {
+    username: this.name,
+    password: this.password
+  };
+};
+
+t.QueryLocationsAtDay = t.struct({
+  date: t.String
+});
+
 export default t;

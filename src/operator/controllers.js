@@ -20,7 +20,7 @@ async function refreshToken(req, res) {
   res.json(response);
 }
 
-async function createAuthenticatedResponse(operator) {
+export async function createAuthenticatedResponse(operator) {
   const tokenPayload = {
     id: operator.id,
     permissions: operator.roles,
