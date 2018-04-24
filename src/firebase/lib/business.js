@@ -107,16 +107,16 @@ export async function saveProposal(proposal) {
   const firebaseProposal = toFirebaseProposal(proposal);
 
   const db = fbComerciales.database();
-  const proposalRef = db(`Proposes/${proposal.id}`);
-  proposalRef.set(firebaseProposal);
+  const proposalRef = db.ref(`Proposes/${proposal.id}`);
+  await proposalRef.set(firebaseProposal);
 
   const buildingProposalsRef = db.ref(`Buildings/${buildingId}/Proposes`);
-  buildingProposalsRef.child('ids').update({[proposal.id]: true});
-  buildingProposalsRef.child('LastPropose').set(firebaseProposal);
+  await buildingProposalsRef.child('ids').update({[proposal.id]: true});
+  await buildingProposalsRef.child('LastPropose').set(firebaseProposal);
 }
 
 function toFirebaseProposal(proposal) {
-  const timestamp = firebaseTimestampFormat(proposal.updateAt || proposal.createdAt);
+  const timestamp = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
   return t.FirebaseBuildingProposal({
     Accepted: proposal.accepted,
     Aspiration: {

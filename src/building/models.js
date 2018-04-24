@@ -46,8 +46,11 @@ export class BuildingProposal extends CouchbaseModel {
 }
 
 export class BuildingProposalRepository extends BuildingProposal {
-  async postSave(proposal) {
+
+  async save(data, sendEvent) {
+    const proposal = await super.save(data, sendEvent);
     await saveProposal(proposal);
+    return proposal;
   }
 
   async findByIdOrThrow(proposalId) {
@@ -103,7 +106,7 @@ export class BuildingRepository extends Building {
     const updateProposals = t.update(building.proposals, {$push: [proposal.id]});
     const updatedBuilding = t.update(building, {
       proposals: {$set: updateProposals},
-      recentProposal: proposal
+      recentProposal: {$set: proposal}
     });
 
     await this.save(updatedBuilding);
