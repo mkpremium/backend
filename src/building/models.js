@@ -147,6 +147,7 @@ export class BuildingRepository extends Building {
   }
 
   async updateEntity(building, entityId, params) {
+    const ownerRepo = new OwnerRepository();
     const entity = building.entities.find(({id}) => id === entityId);
     if (!entity) {
       throw newHttpError(
@@ -156,7 +157,12 @@ export class BuildingRepository extends Building {
     }
     const updatedEntity = t.update(entity, {$merge: params});
     const updatedEntities = updateList(building.entities, entity, updatedEntity);
-    await this.updateEntities(building, updatedEntities);
+    const updatedBuilding = await this.updateEntities(building, updatedEntities);
+
+    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
+
+    const db = fbComerciales.database();
+    await saveBuildingToFirebase(db, updatedBuilding, owner);
 
     return updatedEntity;
   }
