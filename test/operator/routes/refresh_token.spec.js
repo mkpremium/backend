@@ -16,7 +16,7 @@ describe('operator.routes', () => {
       const requester = request(app);
       const response = await requester
         .post('/operators/refresh-token')
-        .set('Authorization', authenticatedOperator.authorization)
+        .set('Authorization', authenticatedOperator.refreshToken)
         .send()
         .expect(200);
       response.body.should.be.a('object');
