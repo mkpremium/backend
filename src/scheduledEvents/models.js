@@ -1,6 +1,8 @@
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
+import _pick from 'lodash/pick';
+import _identity from 'lodash/identity';
 import {CouchbaseModel} from '../db/model';
 import {
   addDateQueryToBuilder,
@@ -24,6 +26,10 @@ import {
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
 import {ScheduledEventType} from './types';
+
+function onlyWithValues(obj) {
+  return _pick(obj, _identity);
+}
 
 export class ScheduledEvents extends CouchbaseModel {
   constructor() {
@@ -164,10 +170,18 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async update(id, data = {}) {
-    const updateData = data;
     const scheduleEvent = await this.findByIdOrThrow(id);
-    const changes = fromJSON(updateData, t.UpdateScheduledEvent);
-    const updatedScheduledEvent = t.update(scheduleEvent, {$merge: changes});
+    const changes = fromJSON(data, t.UpdateScheduledEvent);
+    const updatedEvent = t.update(scheduleEvent.event, {
+      $merge: onlyWithValues(changes.event)
+    });
+    const updatedScheduledEvent = t.update(scheduleEvent, {
+      $merge: onlyWithValues({
+        notifyAt: changes.notifyAt,
+        eventDate: changes.eventDate,
+        event: updatedEvent
+      })
+    });
 
     await this.deleteFirebaseMeeting(scheduleEvent);
     await this.firebaseMeeting(updatedScheduledEvent);

@@ -1,4 +1,6 @@
 import t from 'tcomb';
+import _pick from 'lodash/pick';
+import _identity from 'lodash/identity';
 import uuid from 'uuid/v4';
 import {isMaybeTesting} from '../../config';
 
@@ -250,7 +252,7 @@ t.ScheduleEventsListResponse = t.struct(
 t.UpdateScheduledEvent = t.struct({
   notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date),
-  event: Event
+  event: t.maybe(Event)
 }, 'UpdateScheduledEvent');
 
 t.ScheduledEventListQuery = t.ListQuery.extend(
