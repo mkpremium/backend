@@ -264,7 +264,7 @@ router.post('/call', addScheduledCallEventController);
 
 /**
  * @swagger
- * /scheduled-events:
+ * /scheduled-events/{id}:
  *   put:
  *    security:
  *      - admin: []
@@ -288,7 +288,7 @@ router.post('/call', addScheduledCallEventController);
  *      - name: body
  *        in: body
  *        schema:
- *        $ref: "#/definitions/UpdateScheduledEvent"
+ *          $ref: "#/definitions/UpdateScheduledEvent"
  *    responses:
  *      204:
  *        description: Operación exitosa
