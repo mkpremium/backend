@@ -166,9 +166,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async update(id, data = {}) {
     const updateData = data;
     const scheduleEvent = await this.findByIdOrThrow(id);
-    updateData.notifyAt = updateData.notifyAt ? new Date(updateData.notifyAt) : scheduleEvent.notifyAt;
-    updateData.eventDate = updateData.eventDate ? new Date(updateData.eventDate) : scheduleEvent.eventDate;
-    const changes = t.UpdateScheduledEvent(updateData);
+    const changes = fromJSON(updateData, t.UpdateScheduledEvent);
     const updatedScheduledEvent = t.update(scheduleEvent, {$merge: changes});
 
     await this.deleteFirebaseMeeting(scheduleEvent);
