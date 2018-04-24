@@ -11,7 +11,7 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
-export async function saveBuildingToFirebase(db, building) {
+export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
     return;
   }
@@ -22,6 +22,7 @@ export async function saveBuildingToFirebase(db, building) {
   };
 
   buildingRef.child('Data').set(toFirebaseBuilding(building));
+  buildingRef.child('Owner').set(owner);
   buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
 }

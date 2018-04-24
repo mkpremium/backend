@@ -103,9 +103,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async firebaseMeeting(scheduleEvent) {
     const db = fbComerciales.database();
     const meeting = await this.findMeeting(scheduleEvent);
-    const {building} = meeting;
+    const {building, owner} = meeting;
 
-    await saveBuildingToFirebase(db, building);
+    await saveBuildingToFirebase(db, building, owner);
     await saveMeetingToFirebase(db, meeting);
     await relateMeetingToBuilding(db, meeting);
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);

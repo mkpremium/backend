@@ -11,6 +11,7 @@ import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
+import {OwnerRepository} from '../owner/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -129,12 +130,15 @@ export class BuildingRepository extends Building {
   }
 
   async addEntity(building, params) {
+    const ownerRepo = new OwnerRepository();
     const entity = fromJSON(params, t.BuildingEntity);
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
+    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
+
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding);
+    await saveBuildingToFirebase(db, updatedBuilding, owner);
 
     return entity;
   }
