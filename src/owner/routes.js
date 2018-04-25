@@ -119,6 +119,7 @@ router.put('/:id', updateOwnerController);
  *           $ref: "#/definitions/TypedContactInfoUpdate"
  *     responses:
  *       200:
+ *         description: "Operación exitosa"
  *         schema:
  *           $ref: "#/definitions/Owner"
  *       404:
