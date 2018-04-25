@@ -9,7 +9,7 @@ import uuid from 'uuid/v4';
  *       number:
  *         type: number
  *       verified:
- *         type: bool
+ *         type: boolean
  */
 t.PostalCode = t.struct(
   {
