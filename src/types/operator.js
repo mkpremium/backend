@@ -134,7 +134,7 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  *        type: string
  *        description: "Numero de Agente en Firebase, código y extension en call center"
  *      level:
- *        type: Number
+ *        type: number
  *        description: Nivel en Firebase
  *      enable:
  *        type: boolean
