@@ -49,7 +49,7 @@ const router = Router();
  *       400:
  *         description: solicitud invalida
  *         schema:
- *           $ref: "#/definitions/ErrorResponse"
+ *           $ref: "#/definitions/Error"
  *
  */
 router.post('/create-url', createMetadataUploadUrlController);
