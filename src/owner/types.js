@@ -31,7 +31,7 @@ import {isTest} from '../../config';
  *       type:
  *         type: string
  *       verified:
- *         type: bool
+ *         type: boolean
  *       status:
  *         type: string
  *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]

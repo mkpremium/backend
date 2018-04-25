@@ -203,7 +203,7 @@ t.Person.prototype.contactValueExists = function(value) {
  *       type:
  *         type: string
  *       verified:
- *         type: bool
+ *         type: boolean
  *         description: "Verifica la información por un operador humano"
  *       status:
  *         type: string
