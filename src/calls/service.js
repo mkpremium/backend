@@ -1,5 +1,6 @@
 import axios from 'axios';
 import t from 'tcomb';
+import _get from 'lodash/get';
 import {newHttpError} from '../lib/http-error';
 
 import {Calls} from './models';
@@ -27,45 +28,56 @@ function getCallParams(from, to, serviceId) {
   return `?from=${struct.from}&to=${struct.to}&options[service_id]=${struct.service_id}&options[return_id]=${true}&options[autoanswer]=1`;
 }
 
+async function doCall(from, phone) {
+  let params = getCallParams(from, phone, from.serviceId);
+  const url = `/Call/rest/call/${params}`;
+  debugService('doCall', 'requester GET', url);
+  try {
+    const result = await requester.get(url);
+    debugService('doCall', 'requester OK', result.data);
+    return result.data;
+  } catch (e) {
+    debugService('doCall', 'requester error', JSON.stringify(e));
+    return _get(e, 'response.data', {status: false});
+  }
+}
+
 async function call(from, phone) {
   const model = new Calls();
-  try {
-    let params = getCallParams(from, phone, from.serviceId);
-    const url = `/Call/rest/call/${params}`;
-    debugService('requester GET', url);
-    const result = await requester.get(url);
-    if (!result.data.status) throw newHttpError(400, result.data.description);
-    const call = model.save({
+  const result = await doCall(from, phone);
+  if (result.status) {
+    return model.save({
       userId: from.id,
       from: from.agentNumber,
       to: phone.value,
-      callId: result.data.id
+      callId: result.id
     });
-    return call;
+  } else {
+    throw newHttpError(500, 'Internal server error');
+  }
+}
+
+async function doHangUp(activeCall) {
+  const url = `/Call/rest/hangup/?options[call_id]=${activeCall.callId}`;
+  debugService('doHangUp', 'requester GET', url);
+  try {
+    const result = await requester.get(url);
+    debugService('doHangUp', 'requester OK', result.data);
+    return result.data;
   } catch (e) {
-    debugService('call error', e.response, e);
-    if (e.response && e.response.status === 401) {
-      throw newHttpError(500, 'Internal server error');
-    }
-    throw newHttpError(400, e);
+    debugService('doHangUp', 'requester error', JSON.stringify(e));
+    return _get(e, 'response.data', {status: false});
   }
 }
 
 async function hangup(operatorId) {
   const model = new Calls();
-  try {
-    const activeCall = await model.findActiveCallByOperatorId(operatorId);
-    const url = `/Call/rest/hangup/?options[call_id]=${activeCall.callId}`;
-    debugService('requester GET', url);
-    const result = await requester.get(url);
-    if (!result.data.status) throw newHttpError(400, result.data.description);
-    return result.data;
-  } catch (e) {
-    debugService('call error', e.response, e);
-    if (e.response && e.response.status === 401) {
-      throw newHttpError(500, 'Internal server error');
-    }
-    throw newHttpError(400, e);
+  const activeCall = await model.findActiveCallByOperatorId(operatorId);
+  const result = await doHangUp(activeCall);
+  if (result.status) {
+    return result;
+  } else {
+    throw newHttpError(500, 'Internal server error');
   }
 }
 
