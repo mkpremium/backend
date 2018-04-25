@@ -125,7 +125,7 @@ export class BuildingRepository extends Building {
     await proposalRepo.save(updatedProposal);
 
     const building = await this.findByIdOrThrow(proposal.buildingId);
-    const updatedBuilding = t.update(building, {recentProposal: proposal});
+    const updatedBuilding = t.update(building, {recentProposal: {$set: proposal}});
     await this.save(updatedBuilding);
 
     return proposal;
