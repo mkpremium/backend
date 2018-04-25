@@ -130,6 +130,16 @@ export class BuildingRepository extends Building {
 
     return proposal;
   }
+  async removeEntity(building, entityId) {
+    const updatedEntities = building.entities.filter(i => i.id !== entityId);
+    const updatedBuilding = await this.updateEntities(building, updatedEntities);
+
+    const ownerRepo = new OwnerRepository();
+    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
+
+    const db = fbComerciales.database();
+    await saveBuildingToFirebase(db, updatedBuilding, owner);
+  }
 
   async addEntity(building, params) {
     const ownerRepo = new OwnerRepository();

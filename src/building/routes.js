@@ -3,7 +3,7 @@ import {
   addEntityController,
   addMetadataToBuildingController,
   addNegotiationProposalController,
-  createMetadataUploadUrlController, updateEntityController, updateNegotiationProposalController
+  createMetadataUploadUrlController, removeEntityController, updateEntityController, updateNegotiationProposalController
 } from './controllers';
 
 const router = Router();
@@ -265,5 +265,41 @@ router.post('/:id/entities', addEntityController);
  *           $ref: "#/definitions/Error"
  */
 router.put('/:id/entities/:entityId', updateEntityController);
+
+/**
+ * @swagger
+ * /buildings/{buildingId}/entities/{entityId}:
+ *   delete:
+ *     summary: "Elimina una entidad (situación arrendataria) de un edificio"
+ *     tags: [Building, Operator]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - admin: []
+ *       - comercial: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: buildingId
+ *         in: path
+ *         type: string
+ *       - name: entityId
+ *         in: path
+ *         type: string
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.delete('/:id/entities/:entityId', removeEntityController);
 
 export default router;
