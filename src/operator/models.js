@@ -139,7 +139,7 @@ export class OperatorRepository extends Operator {
 
   async update(operator, params) {
     const updatedProfile = t.update(operator.profile, {
-      $merge: Object.assign(operator.profile, params.profile)
+      $merge: params.profile
     });
     const updateOperator = t.update(operator, {
       $merge: _omit(params, ['profile']),

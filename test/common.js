@@ -90,6 +90,22 @@ export async function operatorCreateAdmin() {
   });
 }
 
+export async function operatorCreateStreet() {
+  return createFullOperator({
+    username: 'street',
+    password: 'password',
+    agentNumber: 'street',
+    roles: [
+      'STREET'
+    ],
+    profile: {
+      firstName: 'street',
+      lastName: 'operator',
+      city: 'barcelona'
+    }
+  });
+}
+
 export async function operatorCreateManager() {
   return createFullOperator({
     username: 'manager',
@@ -100,6 +116,22 @@ export async function operatorCreateManager() {
     ],
     profile: {
       firstName: 'manager',
+      lastName: 'operator',
+      city: 'barcelona'
+    }
+  });
+}
+
+export async function operatorCreateStreetManager() {
+  return createFullOperator({
+    username: 'street_manager',
+    password: 'password',
+    agentNumber: 'street_manager',
+    roles: [
+      'STREET_MANAGER'
+    ],
+    profile: {
+      firstName: 'street_manager',
       lastName: 'operator',
       city: 'barcelona'
     }

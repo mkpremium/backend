@@ -1,8 +1,7 @@
 import admin from 'firebase-admin';
-import _intersection from 'lodash/intersection';
 import {firebaseComerciales, firebaseInformadores} from '../../config';
-import {OperatorRoles} from '../types/operator';
 import {saveStreetUserToFirebase} from './lib/street';
+import {isBusiness, isStreet} from '../lib/role-operators';
 
 export const fbComerciales = admin.initializeApp({
   credential: admin.credential.cert(firebaseComerciales.serviceAccount),
@@ -17,25 +16,6 @@ export const fbInformadores = admin.initializeApp({
 }, 'informadores');
 
 fbInformadores.enabled = firebaseInformadores.enabled;
-
-function isBusiness(roles) {
-  const {BUSINESS} = OperatorRoles;
-  return roles.indexOf(BUSINESS) !== -1;
-}
-
-function isStreet(roles) {
-  const {STREET, STREET_MANAGER} = OperatorRoles;
-  return _intersection(roles, [STREET, STREET_MANAGER]).length > 0;
-}
-
-export function isStreetManager(roles) {
-  const {STREET_MANAGER} = OperatorRoles;
-  return _intersection(roles, [STREET_MANAGER]) === 1;
-}
-export function isAdmin(roles) {
-  const {ADMIN} = OperatorRoles;
-  return _intersection(roles, [ADMIN]) === 1;
-}
 
 function choseFirebaseSetup(roles) {
   if (isBusiness(roles)) {
