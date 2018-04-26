@@ -112,7 +112,7 @@ export async function operatorCreateStreetManager() {
     password: 'password',
     agentNumber: 'street_manager',
     roles: [
-      'STREET'
+      'STREET_MANAGER'
     ],
     profile: {
       firstName: 'street_manager',
