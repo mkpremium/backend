@@ -58,6 +58,22 @@ export async function createFullOperator(object) {
   return repo.save(object);
 }
 
+export async function operatorCreate(index = '') {
+  return createFullOperator({
+    username: `operator${index}`,
+    password: 'password',
+    agentNumber: `operator${index}`,
+    roles: [
+      'OPERATOR'
+    ],
+    profile: {
+      firstName: 'operator',
+      lastName: 'operator',
+      city: 'barcelona'
+    }
+  });
+}
+
 export async function operatorCreateAdmin() {
   return createFullOperator({
     username: 'admin',
