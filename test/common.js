@@ -58,22 +58,6 @@ export async function createFullOperator(object) {
   return repo.save(object);
 }
 
-export async function operatorCreate(index = '') {
-  return createFullOperator({
-    username: `operator${index}`,
-    password: 'password',
-    agentNumber: `operator${index}`,
-    roles: [
-      'OPERATOR'
-    ],
-    profile: {
-      firstName: 'operator',
-      lastName: 'operator',
-      city: 'barcelona'
-    }
-  });
-}
-
 export async function operatorCreateAdmin() {
   return createFullOperator({
     username: 'admin',
@@ -90,6 +74,22 @@ export async function operatorCreateAdmin() {
   });
 }
 
+export async function operatorCreateStreet() {
+  return createFullOperator({
+    username: 'street',
+    password: 'password',
+    agentNumber: 'street',
+    roles: [
+      'STREET'
+    ],
+    profile: {
+      firstName: 'street',
+      lastName: 'operator',
+      city: 'barcelona'
+    }
+  });
+}
+
 export async function operatorCreateManager() {
   return createFullOperator({
     username: 'manager',
@@ -100,6 +100,22 @@ export async function operatorCreateManager() {
     ],
     profile: {
       firstName: 'manager',
+      lastName: 'operator',
+      city: 'barcelona'
+    }
+  });
+}
+
+export async function operatorCreateStreetManager() {
+  return createFullOperator({
+    username: 'street_manager',
+    password: 'password',
+    agentNumber: 'street_manager',
+    roles: [
+      'STREET'
+    ],
+    profile: {
+      firstName: 'street_manager',
       lastName: 'operator',
       city: 'barcelona'
     }

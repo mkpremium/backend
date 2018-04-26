@@ -11,7 +11,7 @@ async function updateOperatorState(req, res, next) {
   const params = t.ChangeUserStateBody(req.body);
   const operator = await repo.findByIdOrThrow(params.userId);
   const updatedOperator = await repo.update(operator, params.toParams());
-  req.message = `Usuario ${updatedOperator.id} ${updatedOperator.profile.getStateMessage()} `;
+  res.message = `Usuario ${updatedOperator.id} ${updatedOperator.profile.getStateMessage()}`;
   next();
 }
 
@@ -20,7 +20,7 @@ async function updateNeighborhood(req, res, next) {
   const params = t.ChangeUserNeighborhoodBody(req.body);
   const operator = await repo.findByIdOrThrow(params.userId);
   const updatedOperator = await repo.updateProfile(operator, params.toParams());
-  req.message = `Set user to new neighborhood ${updatedOperator.profile.neighborhood}`;
+  res.message = `Set user to new neighborhood ${updatedOperator.profile.neighborhood}`;
   next();
 }
 
@@ -28,7 +28,7 @@ async function getNeighborhoodCenter(req, res, next) {
   const repo = new NeighborhoodRepository();
   const params = t.QueryNeighborhoodCenter(req.body);
   const results = await repo.listFiltered(params.Ciudad, params.Barrio);
-  req.message = JSON.stringify(results);
+  res.message = JSON.stringify(results);
   next();
 }
 
