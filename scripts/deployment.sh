@@ -53,7 +53,8 @@ deploy() {
 
   echo -en "Checking node version         \t:"
   remove_node_modules=`validate_nvm ${dist_host} ${deploy_dir} || echo rm -rf node_modules`
-  echo -e "${bold}OK${normal}"
+  remove_node_modules_msg=`validate_nvm ${dist_host} ${deploy_dir} && echo OK || echo Reinstalling`
+  echo -e "${bold}${remove_node_modules_msg}${normal}"
 
   echo "Deploying..."
   echo -e "Root project                  \t: ${bold}$(pwd)${normal}"
@@ -72,7 +73,7 @@ source ~/.nvm/nvm.sh
 mkdir -p ${deploy_dir}
 tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > /dev/null
 cd ${deploy_dir}
-nvm use
+nvm install
 ${remove_node_modules}
 npm install
 pm2 reload --update-env ${app_name}-pm2.json
