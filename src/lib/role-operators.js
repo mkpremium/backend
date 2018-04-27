@@ -17,6 +17,11 @@ export function isStreetManager(roles) {
   return _intersection(roles, [STREET_MANAGER]).length === 1;
 }
 
+export function canManageStreet(roles) {
+  const {STREET_MANAGER, STREET_ADMIN} = OperatorRoles;
+  return _intersection(roles, [STREET_MANAGER, STREET_ADMIN]).length === 1;
+}
+
 export function isOnlyStreet(roles) {
   const {STREET} = OperatorRoles;
   return _intersection(roles, [STREET]).length === 1;
@@ -33,7 +38,7 @@ export function isBusiness(roles) {
 }
 
 export function allowToStreetManagerChangeStreet(manager, operator) {
-  if (isStreetManager(manager.roles) && isOnlyStreet(operator.roles)) {
+  if (canManageStreet(manager.roles) && isOnlyStreet(operator.roles)) {
     return true;
   }
 
