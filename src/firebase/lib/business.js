@@ -11,6 +11,19 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
+export async function updateBuildingToFirebase(building, owner) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  const db = fbComerciales.database();
+
+  const snapshot = await db.ref(`Buildings/${building.id}`).once('value');
+  if (snapshot.exists()) {
+    return saveBuildingToFirebase(db, building, owner);
+  }
+}
+
 export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
     return;

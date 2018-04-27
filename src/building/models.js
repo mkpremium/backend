@@ -5,7 +5,11 @@ import _get from 'lodash/get';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
-import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib/business';
+import {
+  saveMetadataToFirebase,
+  saveProposal,
+  updateBuildingToFirebase
+} from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
 import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
@@ -138,7 +142,7 @@ export class BuildingRepository extends Building {
     const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
 
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding, owner);
+    await updateBuildingToFirebase(db, updatedBuilding, owner);
   }
 
   async addEntity(building, params) {
@@ -150,7 +154,7 @@ export class BuildingRepository extends Building {
     const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
 
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding, owner);
+    await updateBuildingToFirebase(db, updatedBuilding, owner);
 
     return entity;
   }
@@ -171,7 +175,7 @@ export class BuildingRepository extends Building {
     const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
 
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding, owner);
+    await updateBuildingToFirebase(db, updatedBuilding, owner);
 
     return updatedEntity;
   }
