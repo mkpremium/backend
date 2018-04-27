@@ -4,7 +4,7 @@ import {
   limitedListOperatorController,
   listOperatorController,
   loginController,
-  meController, refreshTokenController
+  meController, refreshTokenController, updateOperatorController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -104,6 +104,9 @@ router.post('/refresh-token', refreshTokenController);
  *     summary: Crear operador
  *     security:
  *       - admin: []
+ *       - manager: []
+ *       - street_manager: []
+ *       - street_admin: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -132,7 +135,9 @@ router.post('/refresh-token', refreshTokenController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/', permissions.admin, createOperatorController);
+router.post('/', permissions.allManagers, createOperatorController);
+
+router.put('/', permissions.allManagers, updateOperatorController);
 
 /**
  * @swagger

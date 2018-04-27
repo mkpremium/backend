@@ -22,6 +22,11 @@ export function canManageStreet(roles) {
   return _intersection(roles, [STREET_MANAGER, STREET_ADMIN]).length === 1;
 }
 
+export function nonAdminStreet(roles) {
+  const {STREET_MANAGER, STREET} = OperatorRoles;
+  return _intersection(roles, [STREET_MANAGER, STREET]).length === 1;
+}
+
 export function isOnlyStreet(roles) {
   const {STREET} = OperatorRoles;
   return _intersection(roles, [STREET]).length === 1;
@@ -37,10 +42,38 @@ export function isBusiness(roles) {
   return _intersection(roles, [BUSINESS]).length === 1;
 }
 
-export function allowToStreetManagerChangeStreet(manager, operator) {
+export function isManager(roles) {
+  const {MANAGER} = OperatorRoles;
+  return _intersection(roles, [MANAGER]).length === 1;
+}
+
+export function isOperator(roles) {
+  const {OPERATOR} = OperatorRoles;
+  return _intersection(roles, [OPERATOR]).length === 1;
+}
+
+export function allowManageOperator(manager, operator) {
+  if (isAdmin(manager.roles)) {
+    return true;
+  }
+
   if (canManageStreet(manager.roles) && isOnlyStreet(operator.roles)) {
     return true;
   }
 
-  throw newHttpError(403, 'Esta Operación no esta permitida');
+  if (isStreetAdmin(manager.roles) && nonAdminStreet(operator.roles)) {
+    return true;
+  }
+
+  if (isManager(manager.roles) && isOperator(operator.roles)) {
+    return true;
+  }
+
+  return false;
+}
+
+export function canManageOperator(manager, operator) {
+  if (!allowManageOperator(manager, operator)) {
+    throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
+  }
 }

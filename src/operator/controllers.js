@@ -1,6 +1,7 @@
 import {wrap} from 'express-promise-wrap';
 import {OperatorRefreshTokenRepository, OperatorRepository} from './models';
 import {History} from '../history/models';
+import {canManageOperator} from '../lib/role-operators';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -21,6 +22,9 @@ async function refreshToken(req, res) {
 
 async function createOperator(req, res) {
   const repo = new OperatorRepository();
+
+  canManageOperator(req.user.operator, req.body);
+
   const operator = await repo.save(req.body);
   await History.registerCreate({
     contextModel: operator,
@@ -28,6 +32,17 @@ async function createOperator(req, res) {
   });
   res.status(201);
   res.json(operator);
+}
+
+async function updateOperator(req, res) {
+  const repo = new OperatorRepository();
+  const operatorId = req.params.id;
+  const operator = await repo.findByIdOrThrow(operatorId);
+
+  canManageOperator(req.user.operator, operator);
+
+  const updatedOperator = await repo.update(operator, req.body);
+  res.json(updatedOperator);
 }
 
 async function listOperator(req, res) {
@@ -56,3 +71,4 @@ export const listOperatorController = wrap(listOperator);
 export const limitedListOperatorController = wrap(limitedListOperator);
 export const meController = wrap(me);
 export const refreshTokenController = wrap(refreshToken);
+export const updateOperatorController = wrap(updateOperator);

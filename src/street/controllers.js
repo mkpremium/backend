@@ -5,13 +5,13 @@ import {NeighborhoodRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import {OperatorRepository} from '../operator/models';
 import {fbInformadores} from '../firebase';
-import {allowToStreetManagerChangeStreet} from '../lib/role-operators';
+import {canManageOperator} from '../lib/role-operators';
 
 async function updateOperatorState(req, res, next) {
   const repo = new OperatorRepository();
   const params = t.ChangeUserStateBody(req.body);
   const operator = await repo.findByIdOrThrow(params.userId);
-  allowToStreetManagerChangeStreet(req.user.operator, operator);
+  canManageOperator(req.user.operator, operator);
   const updatedOperator = await repo.update(operator, params.toParams());
   res.message = `Usuario ${updatedOperator.id} ${updatedOperator.profile.getStateMessage()}`;
   next();
