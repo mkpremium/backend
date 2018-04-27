@@ -3,8 +3,13 @@ import _intersection from 'lodash/intersection';
 import {newHttpError} from './http-error';
 
 export function isStreet(roles) {
-  const {STREET, STREET_MANAGER} = OperatorRoles;
-  return _intersection(roles, [STREET, STREET_MANAGER]).length > 0;
+  const {STREET, STREET_MANAGER, STREET_ADMIN} = OperatorRoles;
+  return _intersection(roles, [STREET, STREET_MANAGER, STREET_ADMIN]).length > 0;
+}
+
+export function isStreetAdmin(roles) {
+  const {STREET_ADMIN} = OperatorRoles;
+  return _intersection(roles, [STREET_ADMIN]).length === 1;
 }
 
 export function isStreetManager(roles) {
