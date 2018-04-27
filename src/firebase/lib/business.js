@@ -35,7 +35,10 @@ export async function saveBuildingToFirebase(db, building, owner) {
   };
 
   buildingRef.child('Data').set(toFirebaseBuilding(building));
-  buildingRef.child('Owner').set(owner);
+  if (owner) {
+    buildingRef.child('Owner').set(owner);
+  }
+
   buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
 }
