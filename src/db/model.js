@@ -6,8 +6,6 @@ import {N1qlQuery, SearchQuery} from 'couchbase';
 import debug from 'debug';
 
 import {couchbase, emitModelEvents} from '../../config';
-import {allowManageOperator} from '../lib/role-operators';
-import {newHttpError} from '../lib/http-error';
 
 const debugModel = debug('app:db:model');
 
