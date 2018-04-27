@@ -3,13 +3,28 @@ import _intersection from 'lodash/intersection';
 import {newHttpError} from './http-error';
 
 export function isStreet(roles) {
-  const {STREET, STREET_MANAGER} = OperatorRoles;
-  return _intersection(roles, [STREET, STREET_MANAGER]).length > 0;
+  const {STREET, STREET_MANAGER, STREET_ADMIN} = OperatorRoles;
+  return _intersection(roles, [STREET, STREET_MANAGER, STREET_ADMIN]).length > 0;
+}
+
+export function isStreetAdmin(roles) {
+  const {STREET_ADMIN} = OperatorRoles;
+  return _intersection(roles, [STREET_ADMIN]).length === 1;
 }
 
 export function isStreetManager(roles) {
   const {STREET_MANAGER} = OperatorRoles;
   return _intersection(roles, [STREET_MANAGER]).length === 1;
+}
+
+export function canManageStreet(roles) {
+  const {STREET_MANAGER, STREET_ADMIN} = OperatorRoles;
+  return _intersection(roles, [STREET_MANAGER, STREET_ADMIN]).length === 1;
+}
+
+export function nonAdminStreet(roles) {
+  const {STREET_MANAGER, STREET} = OperatorRoles;
+  return _intersection(roles, [STREET_MANAGER, STREET]).length === 1;
 }
 
 export function isOnlyStreet(roles) {
@@ -27,10 +42,38 @@ export function isBusiness(roles) {
   return _intersection(roles, [BUSINESS]).length === 1;
 }
 
-export function allowToStreetManagerChangeStreet(manager, operator) {
-  if (isStreetManager(manager.roles) && isOnlyStreet(operator.roles)) {
+export function isManager(roles) {
+  const {MANAGER} = OperatorRoles;
+  return _intersection(roles, [MANAGER]).length === 1;
+}
+
+export function isOperator(roles) {
+  const {OPERATOR} = OperatorRoles;
+  return _intersection(roles, [OPERATOR]).length === 1;
+}
+
+export function allowManageOperator(manager, operator) {
+  if (isAdmin(manager.roles)) {
     return true;
   }
 
-  throw newHttpError(403, 'Esta Operación no esta permitida');
+  if (canManageStreet(manager.roles) && isOnlyStreet(operator.roles)) {
+    return true;
+  }
+
+  if (isStreetAdmin(manager.roles) && nonAdminStreet(operator.roles)) {
+    return true;
+  }
+
+  if (isManager(manager.roles) && isOperator(operator.roles)) {
+    return true;
+  }
+
+  return false;
+}
+
+export function canManageOperator(manager, operator) {
+  if (!allowManageOperator(manager, operator)) {
+    throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
+  }
 }

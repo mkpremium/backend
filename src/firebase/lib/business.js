@@ -11,6 +11,19 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
+export async function updateBuildingToFirebase(building, owner) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  const db = fbComerciales.database();
+
+  const snapshot = await db.ref(`Buildings/${building.id}`).once('value');
+  if (snapshot.exists()) {
+    return saveBuildingToFirebase(db, building, owner);
+  }
+}
+
 export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
     return;
@@ -22,7 +35,10 @@ export async function saveBuildingToFirebase(db, building, owner) {
   };
 
   buildingRef.child('Data').set(toFirebaseBuilding(building));
-  buildingRef.child('Owner').set(owner);
+  if (owner) {
+    buildingRef.child('Owner').set(owner);
+  }
+
   buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
 }

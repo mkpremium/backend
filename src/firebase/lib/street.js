@@ -1,8 +1,9 @@
 import _find from 'lodash/find';
 import t from './../types/street';
 import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
-import {isStreetManager, fbInformadores} from '../';
+import {fbInformadores} from '../';
 import {OperatorFeatures} from '../../types/operator';
+import {isOnlyStreet, isStreetAdmin} from '../../lib/role-operators';
 
 export async function saveStreetUserToFirebase(operator, newCity = true) {
   if (!fbInformadores.enabled) {
@@ -10,20 +11,23 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
   }
 
   const db = fbInformadores.database();
-  const adminRef = db.ref(`AdminUsers/${operator.id}`);
-  const userRef = db.ref(`Usuarios/${operator.id}`);
-  userRef.child('Datos').set(toFirebaseStreetUser(operator));
-  if (newCity) {
-    userRef.child('Edificio_Default').set(null);
-  }
 
-  adminRef.child('Permisos').set({
-    Ciudades: stringToFirebasePreferences(operator.profile.city),
-    Funciones: arrayToFirebasePreference(operator.features),
-    Name: operator.profile.fullName(),
-    Mail: operator.email,
-    SuperSU: isStreetManager(operator.roles)
-  });
+  if (isOnlyStreet(operator.roles)) {
+    const userRef = db.ref(`Usuarios/${operator.id}`);
+    userRef.child('Datos').set(toFirebaseStreetUser(operator));
+    if (newCity) {
+      userRef.child('Edificio_Default').set(null);
+    }
+  } else {
+    const adminRef = db.ref(`AdminUsers/${operator.id}`);
+    adminRef.child('Permisos').set({
+      Ciudades: stringToFirebasePreferences(operator.profile.city),
+      Funciones: arrayToFirebasePreference(operator.features),
+      Name: operator.profile.fullName(),
+      Mail: operator.email,
+      SuperSU: isStreetAdmin(operator.roles)
+    });
+  }
 }
 
 export async function saveStreetBuildingToFirebase(building, owner) {

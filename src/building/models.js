@@ -5,13 +5,16 @@ import _get from 'lodash/get';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
-import {saveBuildingToFirebase, saveMetadataToFirebase, saveProposal} from '../firebase/lib/business';
+import {
+  saveMetadataToFirebase,
+  saveProposal,
+  updateBuildingToFirebase
+} from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
 import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
-import {OwnerRepository} from '../owner/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -134,29 +137,22 @@ export class BuildingRepository extends Building {
     const updatedEntities = building.entities.filter(i => i.id !== entityId);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const ownerRepo = new OwnerRepository();
-    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
-
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding, owner);
+    await updateBuildingToFirebase(db, updatedBuilding);
   }
 
   async addEntity(building, params) {
-    const ownerRepo = new OwnerRepository();
     const entity = fromJSON(params, t.BuildingEntity);
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
-
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding, owner);
+    await updateBuildingToFirebase(db, updatedBuilding);
 
     return entity;
   }
 
   async updateEntity(building, entityId, params) {
-    const ownerRepo = new OwnerRepository();
     const entity = building.entities.find(({id}) => id === entityId);
     if (!entity) {
       throw newHttpError(
@@ -168,10 +164,8 @@ export class BuildingRepository extends Building {
     const updatedEntities = updateList(building.entities, entity, updatedEntity);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const owner = await ownerRepo.findByBuildingWithIncludes(updatedBuilding.id);
-
     const db = fbComerciales.database();
-    await saveBuildingToFirebase(db, updatedBuilding, owner);
+    await updateBuildingToFirebase(db, updatedBuilding);
 
     return updatedEntity;
   }

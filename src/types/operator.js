@@ -7,7 +7,8 @@ export const OperatorRoles = {
   BUSINESS: 'BUSINESS',
   ADMIN: 'ADMIN',
   STREET: 'STREET',
-  STREET_MANAGER: 'STREET_MANAGER'
+  STREET_MANAGER: 'STREET_MANAGER',
+  STREET_ADMIN: 'STREET_ADMIN'
 };
 
 export const OperatorFirebaseStates = {
