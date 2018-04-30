@@ -17,7 +17,6 @@ describe('worksheet.routes', () => {
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
     await deleteAll();
-    await operatorCreate();
 
     const queue = await worksheetQueueRepo.save({name: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
@@ -26,12 +25,12 @@ describe('worksheet.routes', () => {
 
     const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
     _queue = await worksheetQueueRepo.save(updatedQueue);
-
+    await operatorCreate('', _queue.id);
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
   });
 
   describe('queue.routes', () => {
-    describe('POST /worksheets/queues/:city @request', () => {
+    describe('POST /worksheets/queues/:id @request', () => {
       it('200 Toma el item de la cola', async() => {
         await request(app)
           .post(`/worksheets/queues/${_queue.id}`)

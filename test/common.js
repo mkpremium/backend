@@ -58,7 +58,7 @@ export async function createFullOperator(object) {
   return repo.save(object);
 }
 
-export async function operatorCreate(index = '') {
+export async function operatorCreate(index = '', queueId) {
   return createFullOperator({
     username: `operator${index}`,
     password: 'password',
@@ -67,6 +67,7 @@ export async function operatorCreate(index = '') {
       'OPERATOR'
     ],
     profile: {
+      queueId,
       firstName: 'operator',
       lastName: 'operator',
       city: ['barcelona']

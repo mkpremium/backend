@@ -73,8 +73,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     });
   }
 
-  async findWithExtra(queueId) {
-    const queue = await this.findByIdOrThrow(queueId);
+  async findWithExtra(queue) {
     const worksheets = await this.getExtraInfo(queue);
     const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), {worksheets});
 

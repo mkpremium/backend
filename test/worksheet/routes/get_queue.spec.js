@@ -13,14 +13,15 @@ describe('worksheet.routes', () => {
     queue = await repo.save({
       name: 'barcelona'
     });
-    await operatorCreate();
+
     await operatorCreateManager();
     await operatorCreateAdmin();
+    await operatorCreate('', queue.id);
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
   });
   describe('queue.routes', () => {
-    describe('GET /worksheets/queues/:city @request', () => {
+    describe('GET /worksheets/queues/:id @request', () => {
       it('200 Devuelve cola de fichas de trabajo', async() => {
         return request(app)
           .get(`/worksheets/queues/${queue.id}`)

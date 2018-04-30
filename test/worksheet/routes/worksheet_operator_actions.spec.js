@@ -20,7 +20,6 @@ describe('worksheet.routes', () => {
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
     await deleteAll();
-    await operatorCreate();
     await operatorCreateManager();
 
     const queue = await worksheetQueueRepo.save({name: 'madrid'});
@@ -31,6 +30,7 @@ describe('worksheet.routes', () => {
     const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
     _queue = await worksheetQueueRepo.save(updatedQueue);
 
+    await operatorCreate('', _queue.id);
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
   });

@@ -8,6 +8,7 @@ import {QueueRequestAction} from './types';
 import {OperatorRoles} from '../types/operator';
 import {History} from '../history/models';
 import {OwnerRepository} from '../owner/models';
+import {canOperatorHandleQueue} from '../lib/role-operators';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
@@ -66,11 +67,13 @@ async function getQueue(req, res) {
   const extra = bool(_get(req.query, 'extra', false));
   const queueId = req.params.id;
 
+  const queue = await repo.findByIdOrThrow(queueId);
+  canOperatorHandleQueue(req.user.operator, queueId);
+
   if (extra) {
-    const queueWithExtraInfo = await repo.findWithExtra(queueId);
+    const queueWithExtraInfo = await repo.findWithExtra(queue);
     res.json(queueWithExtraInfo);
   } else {
-    const queue = await repo.findByIdOrThrow(queueId);
     res.json(queue);
   }
 }
@@ -82,10 +85,11 @@ async function queueList(req, res) {
 }
 
 async function actionsOnWorksheetQueue(req, res) {
+  const repo = new WorksheetQueueRepository();
   const queueId = req.params.id;
   const params = t.QueueRequestParams(req.body);
-  const repo = new WorksheetQueueRepository();
   const queue = await repo.findByIdOrThrow(queueId);
+  canOperatorHandleQueue(req.user.operator, queueId);
 
   switch (params.action) {
     case QueueRequestAction.NEXT:
@@ -120,6 +124,7 @@ async function queueTakenFindByOperator(req, res) {
   const queueId = req.params.id;
   const repo = new WorksheetQueueRepository();
   const queue = await repo.findByIdOrThrow(queueId);
+  canOperatorHandleQueue(req.user.operator, queueId);
 
   const queueItem = queue.findItemByOperatorId(operatorId);
   await History.registerGet({
