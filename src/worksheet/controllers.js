@@ -53,7 +53,7 @@ async function deleteQueue(req, res) {
   const repo = new WorksheetQueueRepository();
   const queueId = req.params.id;
   const queue = await repo.findByIdOrThrow(queueId);
-  await repo.delete(queue);
+  await repo.deleteQueue(queue);
   await History.registerDelete({
     contextModel: queue,
     user: req.user
