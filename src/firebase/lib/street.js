@@ -35,14 +35,6 @@ export async function saveStreetBuildingToFirebase(building, owner) {
   db.ref(`Edificios_Data/${building.id}`).update(toFirebaseStreetBuilding(building, owner));
 }
 
-function stringToFirebasePreferences(string) {
-  if (OperatorFeatures.ALL === string) {
-    return OperatorFeatures.ALL;
-  } else {
-    return {[string]: true};
-  }
-}
-
 function arrayToFirebasePreference(value) {
   if (_find(value, OperatorFeatures.ALL)) {
     return OperatorFeatures.ALL;
