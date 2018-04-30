@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
 import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
@@ -23,6 +24,41 @@ async function findById(req, res) {
 
 function bool(value) {
   return value === 'true';
+}
+
+async function createQueue(req, res) {
+  const params = fromJSON(req.body, t.WorksheetQueueBody);
+  const repo = new WorksheetQueueRepository();
+  const queue = await repo.save(params);
+  await History.registerCreate({
+    contextModel: queue,
+    user: req.user
+  });
+  res.status(201).json(queue);
+}
+
+async function updateQueue(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const queueId = req.params.id;
+  const queue = await repo.findByIdOrThrow(queueId);
+  const updatedQueue = await repo.update(queue, req.body);
+  await History.registerUpdate({
+    contextModel: updatedQueue,
+    user: req.user
+  });
+  res.json(updatedQueue);
+}
+
+async function deleteQueue(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const queueId = req.params.id;
+  const queue = await repo.findByIdOrThrow(queueId);
+  await repo.delete(queue);
+  await History.registerDelete({
+    contextModel: queue,
+    user: req.user
+  });
+  res.status(204).send();
 }
 
 async function getQueue(req, res) {
@@ -111,3 +147,6 @@ export const getQueueController = wrap(getQueue);
 export const queueListController = wrap(queueList);
 export const actionsOnWorksheetQueueController = wrap(actionsOnWorksheetQueue);
 export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator);
+export const createQueueController = wrap(createQueue);
+export const updateQueueController = wrap(updateQueue);
+export const deleteQueueController = wrap(deleteQueue);

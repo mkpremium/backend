@@ -6,7 +6,7 @@ import {
   actionsOnWorksheetQueueController,
   queueTakenFindByOperatorController,
   addOwnerToWorksheetController,
-  getQueueController
+  getQueueController, createQueueController, updateQueueController, deleteQueueController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -98,9 +98,9 @@ router.get('/', permissions.manager, worksheetListController);
  * @swagger
  * /worksheets/queues:
  *   get:
- *     tags: [Queue, Admin]
+ *     tags: [Queue, Manager]
  *     security:
- *       - admin: []
+ *       - manager: []
  *     summary: Lista todas las colas del sistema
  *     responses:
  *       200:
@@ -116,7 +116,46 @@ router.get('/', permissions.manager, worksheetListController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/queues', permissions.admin, queueListController);
+router.get('/queues', permissions.manager, queueListController);
+
+/**
+ * @swagger
+ * /worksheets/queues:
+ *   post:
+ *     tags: [Queue, Manager]
+ *     summary: Crea una cola de trabajo
+ *     security:
+ *       - manager: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueueBody"
+ *     responses:
+ *       201:
+ *         description: Cola creada
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueue"
+ *       400:
+ *         description: Solicitud invalida
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.post('/queues', permissions.manager, createQueueController);
 
 /**
  * @swagger
@@ -224,6 +263,85 @@ router.get('/queues/:id/taken', queueTakenFindByOperatorController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/queues/:id', actionsOnWorksheetQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}:
+ *   put:
+ *     tags: [Queue, Manager]
+ *     summary: Actualiza la cola de trabajo
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueueBody"
+ *     responses:
+ *       201:
+ *         description: Cola creada
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueue"
+ *       400:
+ *         description: Solicitud invalida
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.put('/queues/:id', permissions.manager, updateQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}:
+ *   delete:
+ *     tags: [Queue, Manager]
+ *     summary: Elimina la cola de trabajo
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.delete('/queues/:id', permissions.manager, deleteQueueController);
 
 /**
  * @swagger

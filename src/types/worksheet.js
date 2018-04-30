@@ -216,6 +216,20 @@ t.QueueItem.prototype.release = function() {
   });
 };
 
+/**
+ * @swagger
+ * definitions:
+ *   WorksheetQueueSource:
+ *     properties:
+ *       city:
+ *         type: string
+ *       province:
+ *         type: string
+ *       zone:
+ *         type: string
+ *       neighborhood:
+ *         type: string
+ */
 const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
   province: t.maybe(t.String),
@@ -226,10 +240,40 @@ const WorksheetQueueSource = t.struct({
 /**
  * @swagger
  * definitions:
+ *   WorksheetQueueBody:
+ *     required:
+ *       - name
+ *       - source
+ *     properties:
+ *       name:
+ *         type: string
+ *       source:
+ *         $ref: "#/definitions/WorksheetQueueSource"
+ */
+t.WorksheetQueueBody = t.struct(
+  {
+    name: t.String,
+    source: WorksheetQueueSource
+  }, {
+    name: 'WorksheetQueueBody',
+    defaultProps: {
+      source: {}
+    }
+  }
+);
+
+/**
+ * @swagger
+ * definitions:
  *   WorksheetQueue:
  *     properties:
- *       city:
+ *       id:
  *         type: string
+ *         format: uuid/v4
+ *       name:
+ *         type: string
+ *       source:
+ *         $ref: "#/definitions/WorksheetQueueSource"
  *       worksheets:
  *         type: array
  *         items:

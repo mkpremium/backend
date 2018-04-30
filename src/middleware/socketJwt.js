@@ -11,7 +11,7 @@ async function verifySocketToken(socket) {
   try {
     const user = await verify(token, jwt.secret);
     const repo = new OperatorRepository();
-    const operator = await repo.findByIdOrThrow(user.id);
+    const operator = await repo.findById(user.id);
     return {user, operator};
   } catch (e) {
     throw new Error(`[authentication error] ${e.message}`);
@@ -23,7 +23,7 @@ function socketJwt() {
     verifySocketToken(socket)
       .then(({operator, user}) => {
         socket.user = user;
-        socket.operator = operator;
+        socket.operator = operator || user.operator;
         next();
       })
       .catch(err => {

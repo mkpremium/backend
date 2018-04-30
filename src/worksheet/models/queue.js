@@ -171,6 +171,18 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
   }
 
+  async update(queue, params) {
+    const $merge = fromJSON(params, t.WorksheetQueueBody);
+    const updatedQueue = t.update(queue, {$merge});
+    return this.save(updatedQueue);
+  }
+
+  async deleteQueue(queue) {
+    const qb = this.getQueryBuilder('delete');
+    qb.where('id = ?', queue.id);
+    return this.deleteQuery(qb);
+  }
+
   async releaseWorksheetInQueue(queue, itemId) {
     const item = queue.findItemById(itemId);
     if (!item) {
