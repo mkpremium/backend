@@ -119,7 +119,7 @@ async function queueTakenFindByOperator(req, res) {
   const operatorId = operatorIdByPermissions(req);
   const queueId = req.params.id;
   const repo = new WorksheetQueueRepository();
-  const queue = await repo.findByIdOrThrow(queueId)
+  const queue = await repo.findByIdOrThrow(queueId);
 
   const queueItem = queue.findItemByOperatorId(operatorId);
   await History.registerGet({

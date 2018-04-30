@@ -31,7 +31,6 @@ export class QueueItemRepository extends QueueItem {
 }
 
 export class WorksheetQueueRepository extends WorksheetQueue {
-
   async findByIdOrThrow(queueId) {
     const queue = await this.findById(queueId);
     if (!queue) {
