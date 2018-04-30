@@ -37,7 +37,9 @@ t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures));
  *       lastName:
  *         type: string
  *       city:
- *         type: string
+ *         type: array
+ *         items:
+ *           type: string
  *       neighborhood:
  *         type: string
  *       state:
@@ -50,14 +52,22 @@ t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures));
  *       - firstName
  *       - lastName
  */
-t.OperatorProfile = t.struct({
-  firstName: t.String,
-  lastName: t.String,
-  city: t.maybe(t.String),
-  neighborhood: t.maybe(t.String),
-  state: t.maybe(t.OperatorFirebaseStates),
-  queueId: t.maybe(t.String)
-}, 'OperatorProfile');
+t.OperatorProfile = t.struct(
+  {
+    firstName: t.String,
+    lastName: t.String,
+    city: t.list(t.String),
+    neighborhood: t.maybe(t.String),
+    state: t.maybe(t.OperatorFirebaseStates),
+    queueId: t.maybe(t.String)
+  },
+  {
+    name: 'OperatorProfile',
+    defaultProps: {
+      city: []
+    }
+  }
+);
 
 t.OperatorProfile.prototype.fullName = function() {
   return `${this.firstName} ${this.lastName}`.trim();

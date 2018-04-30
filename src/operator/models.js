@@ -131,7 +131,7 @@ export class OperatorRepository extends Operator {
   }
 
   async updateProfile(operator, params) {
-    const newCity = _get(operator, 'profile.city') !== _get(params, 'profile.city');
+    const newCity = JSON.stringify(_get(operator, 'profile.city')) !== JSON.stringify(_get(params, 'profile.city'));
     const updatedProfile = t.update(operator.profile, {$merge: params});
     const updateOperator = t.update(operator, {profile: {$set: updatedProfile}});
     return this.save(updateOperator, newCity);

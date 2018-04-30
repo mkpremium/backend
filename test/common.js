@@ -69,7 +69,7 @@ export async function operatorCreate(index = '') {
     profile: {
       firstName: 'operator',
       lastName: 'operator',
-      city: 'barcelona'
+      city: ['barcelona']
     }
   });
 }
@@ -85,7 +85,7 @@ export async function operatorCreateAdmin() {
     profile: {
       firstName: 'admin',
       lastName: 'operator',
-      city: 'barcelona'
+      city: ['barcelona']
     }
   });
 }
@@ -101,7 +101,7 @@ export async function operatorCreateStreet() {
     profile: {
       firstName: 'street',
       lastName: 'operator',
-      city: 'barcelona'
+      city: ['barcelona']
     }
   });
 }
@@ -117,7 +117,7 @@ export async function operatorCreateManager() {
     profile: {
       firstName: 'manager',
       lastName: 'operator',
-      city: 'barcelona'
+      city: ['barcelona']
     }
   });
 }
@@ -133,7 +133,7 @@ export async function operatorCreateStreetManager() {
     profile: {
       firstName: 'street_manager',
       lastName: 'operator',
-      city: 'barcelona'
+      city: ['barcelona']
     }
   });
 }

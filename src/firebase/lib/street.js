@@ -21,7 +21,7 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
   } else {
     const adminRef = db.ref(`AdminUsers/${operator.id}`);
     adminRef.child('Permisos').set({
-      Ciudades: stringToFirebasePreferences(operator.profile.city),
+      Ciudades: arrayToFirebasePreference(operator.profile.city),
       Funciones: arrayToFirebasePreference(operator.features),
       Name: operator.profile.fullName(),
       Mail: operator.email,

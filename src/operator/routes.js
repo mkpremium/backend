@@ -19,10 +19,17 @@ const router = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Account
+ *   description: Cuentas de usuario
+ */
+
+/**
+ * @swagger
  * /operators/login:
  *   post:
- *     tags: [Operator]
- *     summary: Iniciar sesion
+ *     tags: [Operator, Account]
+ *     summary: Iniciar sesión
  *     consumes:
  *      - "application/json"
  *     produces:
@@ -54,7 +61,7 @@ router.post('/login', loginController);
  *        type: string
  * /operators/refresh-token:
  *   post:
- *     tags: [Operator]
+ *     tags: [Operator, Account]
  *     summary: Refrescar token
  *     security:
  *       - operator: []
