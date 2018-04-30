@@ -25,19 +25,18 @@ function bool(value) {
   return value === 'true';
 }
 
-async function queueByCity(req, res) {
-  const extra = bool(_get(req.query, 'extra', false));
-  const cityName = req.params.city;
+async function getQueue(req, res) {
   const repo = new WorksheetQueueRepository();
-  let queue;
+  const extra = bool(_get(req.query, 'extra', false));
+  const queueId = req.params.id;
 
   if (extra) {
-    queue = await repo.findByCityExtra(cityName);
+    const queueWithExtraInfo = await repo.findWithExtra(queueId);
+    res.json(queueWithExtraInfo);
   } else {
-    queue = await repo.findByCity(cityName);
+    const queue = await repo.findByIdOrThrow(queueId);
+    res.json(queue);
   }
-
-  res.json(queue);
 }
 
 async function queueList(req, res) {
@@ -47,10 +46,10 @@ async function queueList(req, res) {
 }
 
 async function actionsOnWorksheetQueue(req, res) {
-  const cityName = req.params.city;
+  const queueId = req.params.id;
   const params = t.QueueRequestParams(req.body);
   const repo = new WorksheetQueueRepository();
-  const queue = await repo.findByCity(cityName);
+  const queue = await repo.findByIdOrThrow(queueId);
 
   switch (params.action) {
     case QueueRequestAction.NEXT:
@@ -82,9 +81,9 @@ function operatorIdByPermissions(req) {
 
 async function queueTakenFindByOperator(req, res) {
   const operatorId = operatorIdByPermissions(req);
-  const cityName = req.params.city;
+  const queueId = req.params.id;
   const repo = new WorksheetQueueRepository();
-  const queue = await repo.findByCity(cityName);
+  const queue = await repo.findByIdOrThrow(queueId)
 
   const queueItem = queue.findItemByOperatorId(operatorId);
   await History.registerGet({
@@ -108,7 +107,7 @@ async function addOwnerToWorksheet(req, res) {
 export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet);
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
-export const queueByCityController = wrap(queueByCity);
+export const getQueueController = wrap(getQueue);
 export const queueListController = wrap(queueList);
 export const actionsOnWorksheetQueueController = wrap(actionsOnWorksheetQueue);
 export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator);

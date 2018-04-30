@@ -43,6 +43,9 @@ t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures));
  *       state:
  *         type: string
  *         description: Estado en Firebase [A P B]
+ *       queueId:
+ *         type: string
+ *         description: Id de la cola al cual ha sido asignado el operador
  *     required:
  *       - firstName
  *       - lastName
@@ -52,7 +55,8 @@ t.OperatorProfile = t.struct({
   lastName: t.String,
   city: t.maybe(t.String),
   neighborhood: t.maybe(t.String),
-  state: t.maybe(t.OperatorFirebaseStates)
+  state: t.maybe(t.OperatorFirebaseStates),
+  queueId: t.maybe(t.String)
 }, 'OperatorProfile');
 
 t.OperatorProfile.prototype.fullName = function() {

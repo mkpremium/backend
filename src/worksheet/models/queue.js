@@ -17,12 +17,6 @@ export class WorksheetQueue extends CouchbaseModel {
     super();
     this.Struct = t.WorksheetQueue;
   }
-
-  async preSave(data) {
-    await this.unique(data, 'city');
-
-    return data;
-  }
 }
 
 export class QueueItem extends EmbeddedModel {
@@ -37,6 +31,16 @@ export class QueueItemRepository extends QueueItem {
 }
 
 export class WorksheetQueueRepository extends WorksheetQueue {
+
+  async findByIdOrThrow(queueId) {
+    const queue = await this.findById(queueId);
+    if (!queue) {
+      throw newHttpError(404, `La cola ${queueId} no existe`);
+    }
+
+    return queue;
+  }
+
   async getExtraInfo(queue) {
     const worksheetIds = _map(queue.worksheets, 'worksheetId');
     const worksheetRepo = new WorksheetRepository();
@@ -70,25 +74,12 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     });
   }
 
-  async findByCityExtra(name) {
-    const queue = await this.findByCity(name);
+  async findWithExtra(queueId) {
+    const queue = await this.findByIdOrThrow(queueId);
     const worksheets = await this.getExtraInfo(queue);
     const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), {worksheets});
 
     return fromJSON(queueExtraInfo, t.WorksheetQueueExtraInfo);
-  }
-
-  async findByCity(name) {
-    const qb = this.getQueryBuilder()
-      .where('city = ?', name)
-      .limit(1);
-    const [queue] = await this.query(qb);
-
-    if (!queue) {
-      throw newHttpError(404, `Cola para ciudad ${name} no encontrada`);
-    }
-
-    return fromJSON(queue, this.Struct);
   }
 
   async list(query = {}) {
@@ -217,8 +208,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.takeWorksheetInQueue(updatedQueue, nextAvailableItem.id, operatorId);
   }
 
-  async releaseTakenWorksheetInQueue(cityName, operatorId) {
-    const queue = await this.findByCity(cityName);
+  async releaseTakenWorksheetInQueue(queueId, operatorId) {
+    const queue = await this.findByIdOrThrow(queueId);
     const operatorItem = queue.findItemByOperatorId(operatorId);
 
     if (operatorItem) {

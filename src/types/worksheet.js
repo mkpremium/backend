@@ -216,6 +216,13 @@ t.QueueItem.prototype.release = function() {
   });
 };
 
+const WorksheetQueueSource = t.struct({
+  city: t.maybe(t.String),
+  province: t.maybe(t.String),
+  zone: t.maybe(t.String),
+  neighborhood: t.maybe(t.String)
+}, 'source');
+
 /**
  * @swagger
  * definitions:
@@ -231,7 +238,8 @@ t.QueueItem.prototype.release = function() {
 t.WorksheetQueue = t.struct(
   {
     id: t.maybe(t.String),
-    city: t.String,
+    name: t.String,
+    source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItem),
 
     _documentType: t.enums.of(['worksheet-queue'])
@@ -240,6 +248,7 @@ t.WorksheetQueue = t.struct(
     name: 'WorksheetQueue',
     defaultProps: {
       worksheets: [],
+      source: {},
       _documentType: 'worksheet-queue'
     }
   }
@@ -248,7 +257,8 @@ t.WorksheetQueue = t.struct(
 t.WorksheetQueueExtraInfo = t.struct(
   {
     id: t.maybe(t.String),
-    city: t.String,
+    name: t.String,
+    source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItemExtraInfo),
 
     _documentType: t.enums.of(['worksheet-queue'])
@@ -257,6 +267,7 @@ t.WorksheetQueueExtraInfo = t.struct(
     name: 'WorksheetQueue',
     defaultProps: {
       worksheets: [],
+      source: {},
       _documentType: 'worksheet-queue'
     }
   }
