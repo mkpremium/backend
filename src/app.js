@@ -25,6 +25,7 @@ import metadata from './metadata';
 import people from './person';
 import stats from './stats';
 import street from './street';
+import autocomplete from './autocomplete';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -57,6 +58,7 @@ metadata(app);
 people(app);
 stats(app);
 street(app);
+autocomplete(app);
 
 app.use(appErrorHandler);
 
