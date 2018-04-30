@@ -6,11 +6,12 @@ import {deleteAll, operatorCreate, operatorCreateAdmin, operatorCreateManager, o
 describe('worksheet.routes', () => {
   let authenticatedOperator;
   let authenticatedAdmin;
+  let queue;
   before(async() => {
     await deleteAll();
     const repo = new WorksheetQueueRepository();
-    await repo.save({
-      city: 'barcelona'
+    queue = await repo.save({
+      name: 'barcelona'
     });
     await operatorCreate();
     await operatorCreateManager();
@@ -22,7 +23,7 @@ describe('worksheet.routes', () => {
     describe('GET /worksheets/queues/:city @request', () => {
       it('200 Devuelve cola de fichas de trabajo', async() => {
         return request(app)
-          .get('/worksheets/queues/barcelona')
+          .get(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .expect(200);
       });

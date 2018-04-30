@@ -8,7 +8,7 @@ import {CouchbaseModel} from '../../../src/db/model';
 const operatorId = 'operator';
 let queue = fromJSON({
   '_documentType': 'worksheet-queue',
-  'city': 'madrid',
+  'name': 'madrid',
   'id': 'd057309b-3b2f-4d42-b0ed-74bde6183839',
   'worksheets': [
     {
@@ -82,7 +82,7 @@ describe('WorksheetQueueRepository', () => {
     beforeEach(() => {
       queue = fromJSON({
         '_documentType': 'worksheet-queue',
-        'city': 'madrid',
+        'name': 'madrid',
         'id': 'd057309b-3b2f-4d42-b0ed-74bde6183839',
         'worksheets': [
           {

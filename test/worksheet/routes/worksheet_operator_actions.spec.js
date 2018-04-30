@@ -14,6 +14,7 @@ describe('worksheet.routes', () => {
   let authenticatedOperator;
   let authenticatedManager;
   let owner;
+  let _queue;
   before(async() => {
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
@@ -22,13 +23,13 @@ describe('worksheet.routes', () => {
     await operatorCreate();
     await operatorCreateManager();
 
-    const queue = await worksheetQueueRepo.save({city: 'madrid'});
+    const queue = await worksheetQueueRepo.save({name: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
 
     queueItems = await Promise.map(worksheets, async(worksheet) => worksheetQueueRepo.addWorksheet(queue, worksheet));
 
     const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
-    await worksheetQueueRepo.save(updatedQueue);
+    _queue = await worksheetQueueRepo.save(updatedQueue);
 
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
@@ -37,13 +38,13 @@ describe('worksheet.routes', () => {
   describe('Worksheet Operator actions', () => {
     it('Toma el item de la cola', async() => {
       await request(app)
-        .post('/worksheets/queues/madrid')
+        .post(`/worksheets/queues/${_queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({queueItemId: queueItems[0].id})
         .expect(200);
 
       const response = await request(app)
-        .get('/worksheets/queues/madrid')
+        .get(`/worksheets/queues/${_queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .expect(200);
       const openedWorksheets = response.body.worksheets.filter(w => w.status === 'OPENED');
@@ -141,7 +142,7 @@ describe('worksheet.routes', () => {
 
     it('Libera un item abierto', async() => {
       return request(app)
-        .post('/worksheets/queues/madrid')
+        .post(`/worksheets/queues/${_queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           queueItemId: queueItems[0].id,

@@ -11,6 +11,7 @@ import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 describe('worksheet.routes', () => {
   let queueItems = [];
   let authenticatedOperator;
+  let _queue;
   before(async() => {
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
@@ -18,13 +19,13 @@ describe('worksheet.routes', () => {
     await deleteAll();
     await operatorCreate();
 
-    const queue = await worksheetQueueRepo.save({city: 'madrid'});
+    const queue = await worksheetQueueRepo.save({name: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
 
     queueItems = await Promise.map(worksheets, async(worksheet) => worksheetQueueRepo.addWorksheet(queue, worksheet));
 
     const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
-    await worksheetQueueRepo.save(updatedQueue);
+    _queue = await worksheetQueueRepo.save(updatedQueue);
 
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
   });
@@ -33,13 +34,13 @@ describe('worksheet.routes', () => {
     describe('POST /worksheets/queues/:city @request', () => {
       it('200 Toma el item de la cola', async() => {
         await request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(200);
 
         const response = await request(app)
-          .get('/worksheets/queues/madrid')
+          .get(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .expect(200);
         const openedWorksheets = response.body.worksheets.filter(w => w.status === 'OPENED');
@@ -56,7 +57,7 @@ describe('worksheet.routes', () => {
           .expect(200);
       });
 
-      it('404 Ciudad no encontrada', async() => {
+      it('404 Cola no encontrada', async() => {
         return request(app)
           .post('/worksheets/queues/barranquilla')
           .set('Authorization', authenticatedOperator.authorization)
@@ -66,7 +67,7 @@ describe('worksheet.routes', () => {
 
       it('400 El item no existe en la cola', async() => {
         return request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: 'no-existe'})
           .expect(400);
@@ -74,7 +75,7 @@ describe('worksheet.routes', () => {
 
       it('409 El item no esta disponible para ser tomado', async() => {
         return request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(409);
@@ -82,7 +83,7 @@ describe('worksheet.routes', () => {
 
       it('204 Libera un item abierto', async() => {
         return request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             queueItemId: queueItems[0].id,
@@ -93,7 +94,7 @@ describe('worksheet.routes', () => {
 
       it('200 Despues de liberarse puede tomarse de nuevo el item', async() => {
         const response = await request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             queueItemId: queueItems[0].id
@@ -106,7 +107,7 @@ describe('worksheet.routes', () => {
 
       it('409 No puede tomar mas de un item', async() => {
         return request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             queueItemId: queueItems[1].id
@@ -116,7 +117,7 @@ describe('worksheet.routes', () => {
 
       it('200 Toma el siguiente item', async() => {
         const response = await request(app)
-          .post('/worksheets/queues/madrid')
+          .post(`/worksheets/queues/${_queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             action: 'NEXT'
