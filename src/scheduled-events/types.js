@@ -89,18 +89,28 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  *         type: string
  *         description: YYYY-MM-DD
  */
-const Event = t.struct({
-  owner: t.maybe(t.Owner),
-  ownerId: t.maybe(t.String),
-  contactId: t.maybe(t.String),
-  worksheetId: t.maybe(t.String),
-  buildingId: t.maybe(t.String),
-  eventAddress: t.maybe(t.String),
-  eventLocation: t.maybe(t.struct({
-    lat: t.Number,
-    long: t.Number
-  }, 'eventLocation'))
-}, 'event');
+const Event = t.struct(
+  {
+    owner: t.maybe(t.Owner),
+    ownerId: t.maybe(t.String),
+    queueId: t.maybe(t.String),
+    itemId: t.maybe(t.String),
+    contactId: t.maybe(t.String),
+    worksheetId: t.maybe(t.String),
+    buildingId: t.maybe(t.String),
+    eventAddress: t.maybe(t.String),
+    eventLocation: t.maybe(t.struct({
+      lat: t.Number,
+      long: t.Number
+    }, 'eventLocation')),
+    inPerson: t.Boolean
+  },
+  {
+    name: 'event',
+    defaultProps: {
+      inPerson: true
+    }
+  });
 
 export const ScheduleTaskType = {
   UPDATE_BUILDING: 'update-building'
@@ -159,15 +169,22 @@ t.ScheduledEvent = t.struct(
  * definitions:
  *   ScheduledCallEvent:
  *     properties:
- *       ownerId:
- *        type: string
- *        format: uuid/v4
+ *       queueId:
+ *         type: string
+ *         format: uuid/v4
+ *       itemId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Item de la llamada programada
  *       contactId:
- *        type: string
- *        format: uuid/v4
+ *         type: string
+ *         format: uuid/v4
+ *       ownerId:
+ *         type: string
+ *         format: uuid/v4
  *       worksheetId:
- *        type: string
- *        format: uuid/v4
+ *         type: string
+ *         format: uuid/v4
  */
 
 /**
@@ -198,6 +215,10 @@ t.ScheduledEvent = t.struct(
  *       eventLocation:
  *         type: object
  *         $ref: "#/definitions/ScheduledMeetingEventLocation"
+ *       inPerson:
+ *         type: boolean
+ *         description: Indica si la cita es presencial. cuando los es, esta cita no envía eventos de recordatorio
+ *         default: true
  */
 
 /**

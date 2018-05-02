@@ -1,8 +1,9 @@
 import {wrap} from 'express-promise-wrap';
 import {ScheduledEventsRepository} from './models';
-import {getScheduledCallStruct} from './helper';
 import {OperatorStats} from '../stats/models';
 import {OperatorActions} from '../stats/types';
+import {WorksheetQueueRepository} from '../worksheet/models/queue';
+import {canScheduleCall, canScheduleMeeting} from '../lib/role-operators';
 
 async function listScheduledEvent(req, res) {
   const repo = new ScheduledEventsRepository();
@@ -27,15 +28,26 @@ async function findByIdScheduledEvent(req, res) {
 
 async function addScheduledCallEvent(req, res) {
   const repo = new ScheduledEventsRepository();
-  const scheduledEventBody = await getScheduledCallStruct(Object.assign({}, req.body, {type: 'CALLS'}));
-  const scheduledEvent = await repo.save(scheduledEventBody);
+  const queueRepo = new WorksheetQueueRepository();
+
+  canScheduleCall(req.user.operator, req.body.notifyTo);
+
+  const scheduledEvent = await repo.addScheduleCallEvent(req.body, req.user.id);
+
+  const queue = await queueRepo.findByIdOrThrow(req.user.operator.profile.queueId);
+  await queueRepo.scheduleWorksheetInQueue(queue, scheduledEvent.event.itemId, scheduledEvent.notifyTo);
+
+  await OperatorStats.registerAction(req.user.id, OperatorActions.SCHEDULE_CALL);
   res.status(201).json(scheduledEvent);
 }
 
 async function addScheduledMeetingEvent(req, res) {
   const repo = new ScheduledEventsRepository();
-  const scheduledEvent = await repo
-    .addScheduledMeetingEvent(req.body, req.user.id);
+
+  canScheduleMeeting(req.user.operator, req.body.notifyTo);
+
+  const scheduledEvent = await repo.addScheduledMeetingEvent(req.body, req.user.id);
+
   await OperatorStats.registerAction(req.user.id, OperatorActions.MEETING);
   res.status(201).json(scheduledEvent);
 }

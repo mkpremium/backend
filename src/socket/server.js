@@ -55,13 +55,13 @@ export class SocketServer {
     }
 
     socket.on('disconnect', () => {
-      const cityName = _get(socket, 'user.operator.city', null);
+      const queueId = _get(socket, 'operator.profile.queueId', null);
       const operatorId = _get(socket, 'user.operator.id', null);
 
-      if (!isSystem && this.io.sockets[socket.user.id].id === socket.id && cityName) {
+      if (!isSystem && this.io.sockets[socket.user.id].id === socket.id && queueId) {
         socketDebug('releasing taken worksheets for', socket.user.id);
         const queueRepo = new WorksheetQueueRepository();
-        queueRepo.releaseTakenWorksheetInQueue(cityName, operatorId).catch(err => {
+        queueRepo.releaseTakenWorksheetInQueue(queueId, operatorId).catch(err => {
           console.error(err);
         });
       }

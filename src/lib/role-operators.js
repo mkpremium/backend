@@ -1,3 +1,4 @@
+import _get from 'lodash/get';
 import {OperatorRoles} from '../types/operator';
 import _intersection from 'lodash/intersection';
 import {newHttpError} from './http-error';
@@ -43,8 +44,8 @@ export function isBusiness(roles) {
 }
 
 export function isManager(roles) {
-  const {MANAGER} = OperatorRoles;
-  return _intersection(roles, [MANAGER]).length === 1;
+  const {MANAGER, ADMIN} = OperatorRoles;
+  return _intersection(roles, [MANAGER, ADMIN]).length === 1;
 }
 
 export function isOperator(roles) {
@@ -76,4 +77,42 @@ export function canManageOperator(manager, operator) {
   if (!allowManageOperator(manager, operator)) {
     throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
   }
+}
+
+export function canOperatorHandleQueue(operator, queueId) {
+  if (isManager(operator.roles)) {
+    return true;
+  }
+
+  const canHandlerQueue = _get(operator, 'profile.queueId') === queueId;
+
+  if (!canHandlerQueue) {
+    throw newHttpError(403, 'No parece que tenga asociada esta cola en su perfil. Solicite al administrador que lo asigne');
+  }
+
+  return true;
+}
+
+export function canScheduleCall(operator, operatorId) {
+  if (isManager(operator.roles)) {
+    return true;
+  }
+
+  if (!isOperator(operator.roles) || operator.id !== operatorId) {
+    throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
+  }
+
+  return true;
+}
+
+export function canScheduleMeeting(operator, operatorId) {
+  if (isManager(operator.roles)) {
+    return true;
+  }
+
+  if ((isBusiness(operator.roles) && operator.id !== operatorId) || !isOperator(operator.roles)) {
+    throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
+  }
+
+  return true;
 }

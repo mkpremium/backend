@@ -2,7 +2,7 @@ import t from 'tcomb';
 import {join} from 'path';
 import {N1qlQuery} from 'couchbase';
 
-export const port = parseInt(process.env.PORT || '9001');
+export const port = parseInt(process.env.APP_PORT || '9001');
 export const emitHistoryEvents = Boolean(process.env.EMIT_HISTORY_EVENTS || false);
 export const emitModelEvents = Boolean(process.env.EMIT_MODEL_EVENTS || false);
 export const socket = {
@@ -10,7 +10,6 @@ export const socket = {
   server: process.env.SOCKET_SERVER || 'http://localhost',
   reconnectionAttempts: process.env.SOCKET_CONNECTION_RETRIES || 10
 };
-export const cronjobsPort = parseInt(process.env.CRONJOBS_PORT || '9003');
 export const couchbase = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
   bucket: process.env.COUCHBASE_BUCKET || 'mkpremium',

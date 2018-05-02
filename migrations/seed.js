@@ -70,7 +70,12 @@ async function init() {
 
   const worksheetRepo = new WorksheetRepository();
   const worksheetQueueRepo = new WorksheetQueueRepository();
-  const queue = await worksheetQueueRepo.save({city: 'barcelona'});
+  const queue = await worksheetQueueRepo.save({
+    name: 'barcelona',
+    source: {
+      city: 'BARCELONA'
+    }
+  });
   const people = await personRepo.query();
   const worksheets = await Promise
     .all(times(ownersWithBuildings.length, () => {

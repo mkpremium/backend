@@ -1,7 +1,12 @@
 import {Router} from 'express';
 import {
-  worksheetFindByIdController, worksheetListController, queueByCityController, queueListController,
-  actionsOnWorksheetQueueController, queueTakenFindByOperatorController, addOwnerToWorksheetController
+  worksheetFindByIdController,
+  worksheetListController,
+  queueListController,
+  actionsOnWorksheetQueueController,
+  queueTakenFindByOperatorController,
+  addOwnerToWorksheetController,
+  getQueueController, createQueueController, updateQueueController, deleteQueueController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -93,9 +98,9 @@ router.get('/', permissions.manager, worksheetListController);
  * @swagger
  * /worksheets/queues:
  *   get:
- *     tags: [Queue, Admin]
+ *     tags: [Queue, Manager]
  *     security:
- *       - admin: []
+ *       - manager: []
  *     summary: Lista todas las colas del sistema
  *     responses:
  *       200:
@@ -111,7 +116,232 @@ router.get('/', permissions.manager, worksheetListController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/queues', permissions.admin, queueListController);
+router.get('/queues', permissions.manager, queueListController);
+
+/**
+ * @swagger
+ * /worksheets/queues:
+ *   post:
+ *     tags: [Queue, Manager]
+ *     summary: Crea una cola de trabajo
+ *     security:
+ *       - manager: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueueBody"
+ *     responses:
+ *       201:
+ *         description: Cola creada
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueue"
+ *       400:
+ *         description: Solicitud invalida
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.post('/queues', permissions.manager, createQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}:
+ *   get:
+ *     tags: [Queue, Operator, Manager]
+ *     security:
+ *       - manager: []
+ *       - operator: []
+ *       - admin: []
+ *     summary: Obtiene la cola de fichas de trabajo
+ *     parameters:
+ *       - name: extra
+ *         in: query
+ *         description: Incluye información adicional a los items de la cola
+ *         default: false
+ *         type: boolean
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Devuelve cola de fichas de trabajo
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueue"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       404:
+ *         description: Ciudad no encontrada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/queues/:id', getQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}/taken:
+ *   get:
+ *     tags: [Manager, Operator]
+ *     security:
+ *       - manager: []
+ *       - operator: []
+ *       - admin: []
+ *     summary: Devuelve el item activo por el operador
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *       - name: operatorId
+ *         in: query
+ *         type: string
+ *         format: uuid/v4
+ *         description: Especifica el operador a consultar (solo manager)
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ */
+router.get('/queues/:id/taken', queueTakenFindByOperatorController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}:
+ *   post:
+ *     tags: [Queue, Operator]
+ *     security:
+ *       - operator: []
+ *       - admin: []
+ *     summary: Realiza acciones sobre el item de la cola
+ *     description: Permite realizar acciones como tomar o liberar el item de la cola
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/QueueRequestParams"
+ *     responses:
+ *       200:
+ *         description: Toma el item de la cola
+ *         schema:
+ *           $ref: "#/definitions/Worksheet"
+ *       204:
+ *         description: Libera la cola correctamente
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       404:
+ *         description: Ciudad no encontrada o Item no encontrado en cola
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       409:
+ *         description: El item no esta disponible para su apertura
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/queues/:id', actionsOnWorksheetQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}:
+ *   put:
+ *     tags: [Queue, Manager]
+ *     summary: Actualiza la cola de trabajo
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueueBody"
+ *     responses:
+ *       201:
+ *         description: Cola creada
+ *         schema:
+ *           $ref: "#/definitions/WorksheetQueue"
+ *       400:
+ *         description: Solicitud invalida
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.put('/queues/:id', permissions.manager, updateQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}:
+ *   delete:
+ *     tags: [Queue, Manager]
+ *     summary: Elimina la cola de trabajo
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.delete('/queues/:id', permissions.manager, deleteQueueController);
 
 /**
  * @swagger
@@ -143,6 +373,7 @@ router.get('/queues', permissions.admin, queueListController);
  *         description: Ficha no encontrada
  */
 router.get('/:id', worksheetFindByIdController);
+
 /**
  * @swagger
  * /worksheets/{id}/owners:
@@ -191,112 +422,5 @@ router.get('/:id', worksheetFindByIdController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/:id/owners', addOwnerToWorksheetController);
-
-/**
- * @swagger
- * /worksheets/queues/{city}:
- *   get:
- *     tags: [Queue, Operator, Manager]
- *     security:
- *       - manager: []
- *       - operator: []
- *       - admin: []
- *     summary: Obtiene la cola de fichas de trabajo para una ciudad dada
- *     parameters:
- *       - name: extra
- *         in: query
- *         description: Incluye información adicional a los items de la cola
- *         default: false
- *         type: boolean
- *       - name: city
- *         in: path
- *         description: Ciudad de la cola de trabajo
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: Devuelve cola de fichas de trabajo
- *         schema:
- *           $ref: "#/definitions/WorksheetQueue"
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
- *       404:
- *         description: Ciudad no encontrada
- *         schema:
- *           $ref: "#/definitions/Error"
- */
-router.get('/queues/:city', queueByCityController);
-
-/**
- * @swagger
- * /worksheets/queues/{city}/taken:
- *   get:
- *     tags: [Manager, Operator]
- *     security:
- *       - manager: []
- *       - operator: []
- *       - admin: []
- *     summary: Devuelve el item activo por el operador
- *     parameters:
- *       - name: city
- *         in: path
- *         description: Ciudad de la cola de trabajo
- *         required: true
- *         type: string
- *       - name: operatorId
- *         in: query
- *         type: string
- *         format: uuid/v4
- *         description: Especifica el operador a consultar (solo manager)
- *     responses:
- *       200:
- *         description: Operación exitosa
- */
-router.get('/queues/:city/taken', queueTakenFindByOperatorController);
-
-/**
- * @swagger
- * /worksheets/queues/{city}:
- *   post:
- *     tags: [Queue, Operator]
- *     security:
- *       - operator: []
- *       - admin: []
- *     summary: Realiza acciones sobre el item de la cola
- *     description: Permite realizar acciones como tomar o liberar el item de la cola
- *     parameters:
- *       - name: city
- *         in: path
- *         description: Ciudad de la cola de trabajo
- *         required: true
- *         type: string
- *       - name: body
- *         in: body
- *         required: true
- *         schema:
- *           $ref: "#/definitions/QueueRequestParams"
- *     responses:
- *       200:
- *         description: Toma el item de la cola
- *         schema:
- *           $ref: "#/definitions/Worksheet"
- *       204:
- *         description: Libera la cola correctamente
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
- *       404:
- *         description: Ciudad no encontrada o Item no encontrado en cola
- *         schema:
- *           $ref: "#/definitions/Error"
- *       409:
- *         description: El item no esta disponible para su apertura
- *         schema:
- *           $ref: "#/definitions/Error"
- */
-router.post('/queues/:city', actionsOnWorksheetQueueController);
 
 export default router;

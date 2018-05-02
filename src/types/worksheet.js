@@ -216,13 +216,74 @@ t.QueueItem.prototype.release = function() {
   });
 };
 
+t.QueueItem.prototype.schedule = function(operatorId) {
+  return t.update(this, {
+    status: {$set: Queue.Status.SCHEDULED},
+    operatorId: {$set: operatorId}
+  });
+};
+
+/**
+ * @swagger
+ * definitions:
+ *   WorksheetQueueSource:
+ *     properties:
+ *       city:
+ *         type: string
+ *       province:
+ *         type: string
+ *       zone:
+ *         type: string
+ *       neighborhood:
+ *         type: string
+ */
+const WorksheetQueueSource = t.struct({
+  city: t.maybe(t.String),
+  province: t.maybe(t.String),
+  zone: t.maybe(t.String),
+  neighborhood: t.maybe(t.String)
+}, 'source');
+
+/**
+ * @swagger
+ * definitions:
+ *   WorksheetQueueBody:
+ *     required:
+ *       - name
+ *       - source
+ *     properties:
+ *       name:
+ *         type: string
+ *       size:
+ *         type: number
+ *       source:
+ *         $ref: "#/definitions/WorksheetQueueSource"
+ */
+t.WorksheetQueueBody = t.struct(
+  {
+    name: t.String,
+    size: t.maybe(t.Number),
+    source: WorksheetQueueSource
+  }, {
+    name: 'WorksheetQueueBody',
+    defaultProps: {
+      source: {}
+    }
+  }
+);
+
 /**
  * @swagger
  * definitions:
  *   WorksheetQueue:
  *     properties:
- *       city:
+ *       id:
  *         type: string
+ *         format: uuid/v4
+ *       name:
+ *         type: string
+ *       source:
+ *         $ref: "#/definitions/WorksheetQueueSource"
  *       worksheets:
  *         type: array
  *         items:
@@ -231,7 +292,8 @@ t.QueueItem.prototype.release = function() {
 t.WorksheetQueue = t.struct(
   {
     id: t.maybe(t.String),
-    city: t.String,
+    name: t.String,
+    source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItem),
 
     _documentType: t.enums.of(['worksheet-queue'])
@@ -240,6 +302,7 @@ t.WorksheetQueue = t.struct(
     name: 'WorksheetQueue',
     defaultProps: {
       worksheets: [],
+      source: {},
       _documentType: 'worksheet-queue'
     }
   }
@@ -248,7 +311,9 @@ t.WorksheetQueue = t.struct(
 t.WorksheetQueueExtraInfo = t.struct(
   {
     id: t.maybe(t.String),
-    city: t.String,
+    name: t.String,
+    size: t.Number,
+    source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItemExtraInfo),
 
     _documentType: t.enums.of(['worksheet-queue'])
@@ -257,6 +322,8 @@ t.WorksheetQueueExtraInfo = t.struct(
     name: 'WorksheetQueue',
     defaultProps: {
       worksheets: [],
+      source: {},
+      size: 100,
       _documentType: 'worksheet-queue'
     }
   }

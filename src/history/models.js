@@ -36,6 +36,12 @@ export class History extends CouchbaseModel {
     return history.register(eventData, sendEvent);
   }
 
+  static async registerDelete(eventData, sendEvent = false) {
+    const history = new History();
+    eventData.type = 'DELETE';
+    return history.register(eventData, sendEvent);
+  }
+
   static async registerOpen(eventData, sendEvent = false) {
     const history = new History();
     eventData.type = 'OPEN';

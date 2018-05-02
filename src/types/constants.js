@@ -1,4 +1,4 @@
-const Status = {
+export const Status = {
   AVAILABLE: 'AVAILABLE',
   OPENED: 'OPENED',
   SCHEDULED: 'SCHEDULED',

@@ -13,7 +13,6 @@ import {
 import {newHttpError} from '../lib/http-error';
 import {buildRangeFromWeek, meetingWeekFormat, utc} from '../lib/date';
 import {buildDistanceCalculator} from '../lib/geo';
-import {getScheduledMeetingStruct} from './helper';
 import {fbComerciales} from '../firebase';
 import {
   deleteMeetingToBuilding,
@@ -141,7 +140,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const start = m.clone().subtract(1.5, 'hours').toISOString();
     const end = m.clone().add(1.5, 'hours').toISOString();
     console.log('areAllowedMeetingInRange', data.eventDate, start, end);
-    const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end);
+    const meetingsInRange = await this.findMeetingInRange(data.eventDate, start, end);
     if (meetingsInRange && meetingsInRange.length > 0) {
       throw newHttpError(
         400,
@@ -155,18 +154,21 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const qb = this.getQueryBuilder();
     const eventDate = [start, end].join(',');
     addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate);
-    qb.where('notifyTo = ?', notifyTo);
     qb.where('type = ?', ScheduledEventType.MEETINGS);
     return this.query(qb);
   }
 
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
-    const scheduledEventBody = await getScheduledMeetingStruct(params);
-    const scheduledEvent = await this.save(scheduledEventBody);
+    const scheduledEvent = await this.save(params);
     await this.firebaseMeeting(scheduledEvent);
 
     return scheduledEvent;
+  }
+
+  async addScheduleCallEvent(data = {}, createdBy) {
+    const params = Object.assign({}, data, {createdBy, type: 'CALLS'});
+    return this.save(params);
   }
 
   async update(id, data = {}) {

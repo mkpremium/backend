@@ -133,6 +133,7 @@ export class BuildingRepository extends Building {
 
     return proposal;
   }
+
   async removeEntity(building, entityId) {
     const updatedEntities = building.entities.filter(i => i.id !== entityId);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
@@ -209,6 +210,14 @@ export class BuildingRepository extends Building {
     const neighborhoods = await neighborhoodRepo.findByCity(city);
     const results = await this.calculateStatsByCity(city);
     return calculeStateTotals(results, neighborhoods);
+  }
+
+  async searchBuilding(query) {
+    const qs = this.getSearchBuilder(query);
+    qs.highlight();
+    qs.fields('*');
+
+    return this.search(qs);
   }
 }
 

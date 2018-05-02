@@ -7,7 +7,7 @@ const level = {
 };
 
 function prepareErrorCode(err) {
-  if (/^\[tcomb\]/.test(err.message)) {
+  if (/^\[tcomb/.test(err.message)) {
     err.code = err.code || 400;
     err.message = err.message.replace('[tcomb] ', '');
   }

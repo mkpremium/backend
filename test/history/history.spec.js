@@ -24,7 +24,7 @@ const modelStruct = t.Operator({
   profile: {
     firstName: 'test',
     lastName: 'test',
-    city: 'test'
+    city: ['test']
   },
   agentNumber: '4483-944'
 });
@@ -66,7 +66,7 @@ describe('history.register', () => {
       };
       client = await connectServer();
 
-      client.socket.on('history:new', (data) => {
+      client.socket.on('history:new', () => {
         spy();
       });
     });

@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
 import {wrap} from 'express-promise-wrap';
 import {WorksheetRepository} from './models/worksheet';
@@ -7,6 +8,7 @@ import {QueueRequestAction} from './types';
 import {OperatorRoles} from '../types/operator';
 import {History} from '../history/models';
 import {OwnerRepository} from '../owner/models';
+import {canOperatorHandleQueue} from '../lib/role-operators';
 
 async function worksheetList(req, res) {
   const repo = new WorksheetRepository();
@@ -25,19 +27,55 @@ function bool(value) {
   return value === 'true';
 }
 
-async function queueByCity(req, res) {
-  const extra = bool(_get(req.query, 'extra', false));
-  const cityName = req.params.city;
+async function createQueue(req, res) {
+  const params = fromJSON(req.body, t.WorksheetQueueBody);
   const repo = new WorksheetQueueRepository();
-  let queue;
+  const queue = await repo.save(params);
+  await History.registerCreate({
+    contextModel: queue,
+    user: req.user
+  });
+  res.status(201).json(queue);
+}
+
+async function updateQueue(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const queueId = req.params.id;
+  const queue = await repo.findByIdOrThrow(queueId);
+  const updatedQueue = await repo.update(queue, req.body);
+  await History.registerUpdate({
+    contextModel: updatedQueue,
+    user: req.user
+  });
+  res.json(updatedQueue);
+}
+
+async function deleteQueue(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const queueId = req.params.id;
+  const queue = await repo.findByIdOrThrow(queueId);
+  await repo.deleteQueue(queue);
+  await History.registerDelete({
+    contextModel: queue,
+    user: req.user
+  });
+  res.status(204).send();
+}
+
+async function getQueue(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const extra = bool(_get(req.query, 'extra', false));
+  const queueId = req.params.id;
+
+  const queue = await repo.findByIdOrThrow(queueId);
+  canOperatorHandleQueue(req.user.operator, queueId);
 
   if (extra) {
-    queue = await repo.findByCityExtra(cityName);
+    const queueWithExtraInfo = await repo.findWithExtra(queue);
+    res.json(queueWithExtraInfo);
   } else {
-    queue = await repo.findByCity(cityName);
+    res.json(queue);
   }
-
-  res.json(queue);
 }
 
 async function queueList(req, res) {
@@ -47,10 +85,11 @@ async function queueList(req, res) {
 }
 
 async function actionsOnWorksheetQueue(req, res) {
-  const cityName = req.params.city;
-  const params = t.QueueRequestParams(req.body);
   const repo = new WorksheetQueueRepository();
-  const queue = await repo.findByCity(cityName);
+  const queueId = req.params.id;
+  const params = t.QueueRequestParams(req.body);
+  const queue = await repo.findByIdOrThrow(queueId);
+  canOperatorHandleQueue(req.user.operator, queueId);
 
   switch (params.action) {
     case QueueRequestAction.NEXT:
@@ -82,9 +121,10 @@ function operatorIdByPermissions(req) {
 
 async function queueTakenFindByOperator(req, res) {
   const operatorId = operatorIdByPermissions(req);
-  const cityName = req.params.city;
+  const queueId = req.params.id;
   const repo = new WorksheetQueueRepository();
-  const queue = await repo.findByCity(cityName);
+  const queue = await repo.findByIdOrThrow(queueId);
+  canOperatorHandleQueue(req.user.operator, queueId);
 
   const queueItem = queue.findItemByOperatorId(operatorId);
   await History.registerGet({
@@ -108,7 +148,10 @@ async function addOwnerToWorksheet(req, res) {
 export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet);
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
-export const queueByCityController = wrap(queueByCity);
+export const getQueueController = wrap(getQueue);
 export const queueListController = wrap(queueList);
 export const actionsOnWorksheetQueueController = wrap(actionsOnWorksheetQueue);
 export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator);
+export const createQueueController = wrap(createQueue);
+export const updateQueueController = wrap(updateQueue);
+export const deleteQueueController = wrap(deleteQueue);

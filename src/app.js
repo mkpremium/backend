@@ -14,7 +14,7 @@ import worksheet from './worksheet';
 import owner from './owner';
 import swagger from './swagger';
 import calls from './calls';
-import scheduledEvents from './scheduledEvents';
+import scheduledEvents from './scheduled-events';
 import migration from './migration';
 import webhooks from './webhooks';
 import socket from './socket';
@@ -25,6 +25,7 @@ import metadata from './metadata';
 import people from './person';
 import stats from './stats';
 import street from './street';
+import autocomplete from './autocomplete';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -57,6 +58,7 @@ metadata(app);
 people(app);
 stats(app);
 street(app);
+autocomplete(app);
 
 app.use(appErrorHandler);
 

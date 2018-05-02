@@ -1,0 +1,109 @@
+{
+  "name": "building",
+  "type": "fulltext-index",
+  "params": {
+    "doc_config": {
+      "mode": "type_field",
+      "type_field": "_documentType"
+    },
+    "mapping": {
+      "default_analyzer": "standard",
+      "default_datetime_parser": "dateTimeOptional",
+      "default_field": "_all",
+      "default_mapping": {
+        "dynamic": true,
+        "enabled": false
+      },
+      "default_type": "_default",
+      "index_dynamic": true,
+      "store_dynamic": false,
+      "types": {
+        "building": {
+          "default_analyzer": "ar",
+          "dynamic": true,
+          "enabled": true,
+          "properties": {
+            "address": {
+              "dynamic": true,
+              "enabled": true,
+              "properties": {
+                "city": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "city",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                },
+                "neighborhood": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "neighborhood",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                },
+                "province": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "province",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                },
+                "zone": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "zone",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "store": {
+      "kvStoreName": "mossStore"
+    }
+  },
+  "sourceType": "couchbase",
+  "sourceName": "mkpremium",
+  "sourceUUID": "e22ed3c5e5ad70a247a36f7c756e4a89",
+  "sourceParams": {},
+  "planParams": {
+    "maxPartitionsPerPIndex": 171,
+    "numReplicas": 0
+  },
+  "uuid": "7942779740cf46e0"
+}

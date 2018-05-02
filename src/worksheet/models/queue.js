@@ -17,12 +17,6 @@ export class WorksheetQueue extends CouchbaseModel {
     super();
     this.Struct = t.WorksheetQueue;
   }
-
-  async preSave(data) {
-    await this.unique(data, 'city');
-
-    return data;
-  }
 }
 
 export class QueueItem extends EmbeddedModel {
@@ -37,6 +31,15 @@ export class QueueItemRepository extends QueueItem {
 }
 
 export class WorksheetQueueRepository extends WorksheetQueue {
+  async findByIdOrThrow(queueId) {
+    const queue = await this.findById(queueId);
+    if (!queue) {
+      throw newHttpError(404, `La cola ${queueId} no existe`);
+    }
+
+    return queue;
+  }
+
   async getExtraInfo(queue) {
     const worksheetIds = _map(queue.worksheets, 'worksheetId');
     const worksheetRepo = new WorksheetRepository();
@@ -70,25 +73,11 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     });
   }
 
-  async findByCityExtra(name) {
-    const queue = await this.findByCity(name);
+  async findWithExtra(queue) {
     const worksheets = await this.getExtraInfo(queue);
     const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), {worksheets});
 
     return fromJSON(queueExtraInfo, t.WorksheetQueueExtraInfo);
-  }
-
-  async findByCity(name) {
-    const qb = this.getQueryBuilder()
-      .where('city = ?', name)
-      .limit(1);
-    const [queue] = await this.query(qb);
-
-    if (!queue) {
-      throw newHttpError(404, `Cola para ciudad ${name} no encontrada`);
-    }
-
-    return fromJSON(queue, this.Struct);
   }
 
   async list(query = {}) {
@@ -105,7 +94,9 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const item = await this.addWorksheet(queue, worksheet);
     const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
-    return this.save(updatedQueue);
+    await this.save(updatedQueue);
+
+    return item;
   }
 
   async addWorksheet(queue, worksheet) {
@@ -141,6 +132,30 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheetItems}});
 
     await this.save(updatedQueue);
+  }
+
+  async scheduleWorksheetInQueue(queue, itemId, operatorId) {
+    const item = queue.findItemById(itemId);
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
+    }
+
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findById(item.worksheetId);
+
+    if (!worksheet) {
+      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`);
+    }
+
+    const updatedItem = item.schedule(operatorId);
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
+    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
+
+    queueDebug('scheduleWorksheetInQueue', worksheet.id, 'scheduled from queue ', queue.id);
+
+    await this.save(updatedQueue);
+
+    return updatedItem;
   }
 
   async takeWorksheetInQueue(queue, itemId, operatorId) {
@@ -180,6 +195,18 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
   }
 
+  async update(queue, params) {
+    const $merge = fromJSON(params, t.WorksheetQueueBody);
+    const updatedQueue = t.update(queue, {$merge});
+    return this.save(updatedQueue);
+  }
+
+  async deleteQueue(queue) {
+    const qb = this.getQueryBuilder('delete');
+    qb.where('id = ?', queue.id);
+    return this.deleteQuery(qb);
+  }
+
   async releaseWorksheetInQueue(queue, itemId) {
     const item = queue.findItemById(itemId);
     if (!item) {
@@ -217,8 +244,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.takeWorksheetInQueue(updatedQueue, nextAvailableItem.id, operatorId);
   }
 
-  async releaseTakenWorksheetInQueue(cityName, operatorId) {
-    const queue = await this.findByCity(cityName);
+  async releaseTakenWorksheetInQueue(queueId, operatorId) {
+    const queue = await this.findByIdOrThrow(queueId);
     const operatorItem = queue.findItemByOperatorId(operatorId);
 
     if (operatorItem) {

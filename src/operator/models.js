@@ -131,7 +131,7 @@ export class OperatorRepository extends Operator {
   }
 
   async updateProfile(operator, params) {
-    const newCity = _get(operator, 'profile.city') !== _get(params, 'profile.city');
+    const newCity = JSON.stringify(_get(operator, 'profile.city')) !== JSON.stringify(_get(params, 'profile.city'));
     const updatedProfile = t.update(operator.profile, {$merge: params});
     const updateOperator = t.update(operator, {profile: {$set: updatedProfile}});
     return this.save(updateOperator, newCity);
@@ -183,7 +183,8 @@ export class OperatorRepository extends Operator {
         callsMade: findOrZero(stats, OperatorActions.CALL),
         callsAnswered: findOrZero(stats, OperatorActions.CALL_ANSWERED),
         verifiedOwners: findOrZero(stats, OperatorActions.VERIFIED_OWNER),
-        meetingsMade: findOrZero(stats, OperatorActions.MEETING)
+        meetingsMade: findOrZero(stats, OperatorActions.MEETING),
+        scheduledCalls: findOrZero(stats, OperatorActions.SCHEDULE_CALL)
       };
       return t.OperatorResults({operator, counters});
     });
