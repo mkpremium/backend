@@ -1,6 +1,5 @@
 import {wrap} from 'express-promise-wrap';
 import {ScheduledEventsRepository} from './models';
-import {getScheduledCallStruct} from './helper';
 import {OperatorStats} from '../stats/models';
 import {OperatorActions} from '../stats/types';
 
