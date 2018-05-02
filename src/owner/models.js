@@ -126,6 +126,7 @@ export class OwnerRepository extends Owner {
   // TODO: .map() should not be used for convert owner.person in object
   async findByIdWithIncludes(id, includes = ['person']) {
     if (!id) {
+      // noinspection HtmlUnknownTag
       throw new Error('id undefined, expected String or Array<String>');
     }
 
