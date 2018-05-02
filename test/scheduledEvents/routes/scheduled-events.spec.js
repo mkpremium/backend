@@ -5,12 +5,14 @@ import intersectionBy from 'lodash/intersectionBy';
 import times from 'lodash/times';
 import app from '../../../src/app';
 import {ScheduledEventsRepository} from '../../../src/scheduled-events/models';
-import {deleteAll, operatorCreate, operatorLogin} from '../../common';
+import {deleteAll, operatorCreate, operatorCreateBusiness, operatorLogin} from '../../common';
 import {WorksheetQueueRepository} from '../../../src/worksheet/models/queue';
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
+import {utc} from '../../../src/lib/date';
 
 describe('scheduledevents.routes', () => {
   let authenticatedOperator;
+  let authenticatedBusiness;
   let scheduledMeetingsEventObject;
   let scheduledCallsEventObject;
   let scheduledEventToBeUpdated;
@@ -31,11 +33,14 @@ describe('scheduledevents.routes', () => {
     await worksheetQueueRepo.save(queueWithItems);
 
     await operatorCreate('', queue.id);
+    await operatorCreateBusiness();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedBusiness = await operatorLogin(app, {username: 'business', password: 'password'});
 
     scheduledMeetingsEventObject = {
       type: 'MEETINGS',
-      notifyAt: new Date('2018-05-28T16:24:00Z'),
+      notifyAt: new Date('2018-05-28T06:30:00Z'),
+      eventDate: new Date('2018-05-28T06:30:00Z'),
       notifyTo: authenticatedOperator.operator.id,
       event: {
         ownerId: 'not-exist-in-db',
@@ -65,10 +70,12 @@ describe('scheduledevents.routes', () => {
     await Promise.all(times(49, () => scheduledEventRepo.save(scheduledCallsEventObject)));
     scheduledEventToBeUpdated = await scheduledEventRepo.save(scheduledCallsEventObject);
 
-    scheduledMeetingsEventObject.eventDate = new Date('2018-01-05T16:00:00Z');
-    await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
-    scheduledMeetingsEventObject.eventDate = new Date('2018-02-05T16:00:00Z');
-    await Promise.all(times(3, () => scheduledEventRepo.save(scheduledMeetingsEventObject)));
+    await Promise.mapSeries(times(6), (i) => {
+      const params = Object.assign({}, scheduledMeetingsEventObject, {
+        eventDate: utc(scheduledMeetingsEventObject.eventDate).add(i * 2, 'hours').toDate()
+      });
+      return scheduledEventRepo.save(params);
+    });
   });
 
   describe('GET /scheduled-events @request', () => {
@@ -170,16 +177,16 @@ describe('scheduledevents.routes', () => {
         response.body.results.should.have.length(6);
       });
 
-      it('get scheduled MEETINGS between 2018-01-01 and 2018-02-01', async() => {
+      it('get scheduled MEETINGS between 2018-05-28 and 2018-05-29', async() => {
         const response = await request(app)
           .get('/scheduled-events')
           .set('Authorization', authenticatedOperator.authorization)
-          .query({type: 'MEETINGS', eventDateBetween: '2018-01-01,2018-02-01'})
+          .query({type: 'MEETINGS', eventDateBetween: '2018-05-28,2018-05-29'})
           .expect(200);
         response.body.should.be.a('object');
-        response.body.total.should.equal(3);
+        response.body.total.should.equal(6);
         response.body.results.should.be.a('array');
-        response.body.results.should.have.length(3);
+        response.body.results.should.have.length(6);
       });
 
       it('Mixed query param', async() => {
@@ -201,17 +208,40 @@ describe('scheduledevents.routes', () => {
   });
 
   describe('POST /scheduled-events @request', () => {
-    it('201 Operación exitosa', async() => {
-      const response = await request(app)
+    it('Create call 201Operación exitosa', async() => {
+      await request(app)
         .post('/scheduled-events/call')
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           notifyTo: authenticatedOperator.operator.id,
-          notifyAt: new Date('2018-05-28T16:24:00Z'),
-          eventDate: new Date('2018-05-28T16:24:00Z'),
+          notifyAt: new Date('2018-05-30T16:30:00Z'),
+          eventDate: new Date('2018-05-30T16:30:00Z'),
           event: {
             itemId: items[0].id,
             queueId: queue.id
+          }
+        })
+        .expect(201);
+    });
+
+    it('Create meeting 201 Operación exitosa', async() => {
+      const response = await request(app)
+        .post('/scheduled-events/meeting')
+        .set('Authorization', authenticatedBusiness.authorization)
+        .send({
+          notifyTo: authenticatedBusiness.operator.id,
+          notifyAt: new Date('2018-07-01T16:30:00Z'),
+          eventDate: new Date('2018-07-01T16:30:00Z'),
+          event: {
+            ownerId: 'not-exist-in-db',
+            contactId: 'not-exist-in-db',
+            worksheetId: 'not-exist-in-db',
+            buildingId: 'not-exist-in-db',
+            eventLocation: {
+              lat: 0,
+              long: 0
+            },
+            eventAddress: 'no exists'
           }
         });
       response.status.should.equal(201);

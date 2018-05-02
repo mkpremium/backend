@@ -107,6 +107,22 @@ export async function operatorCreateStreet() {
   });
 }
 
+export async function operatorCreateBusiness() {
+  return createFullOperator({
+    username: 'business',
+    password: 'password',
+    agentNumber: 'business',
+    roles: [
+      'BUSINESS'
+    ],
+    profile: {
+      firstName: 'business',
+      lastName: 'operator',
+      city: ['barcelona']
+    }
+  });
+}
+
 export async function operatorCreateManager() {
   return createFullOperator({
     username: 'manager',

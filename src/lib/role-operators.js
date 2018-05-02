@@ -106,13 +106,12 @@ export function canScheduleCall(operator, operatorId) {
 }
 
 export function canScheduleMeeting(operator, operatorId) {
-  if (isManager(operator.roles)) {
-    return true;
+  if (!isManager(operator.roles)) {
+    if (!isOperator(operator.roles)) {
+      if (isBusiness(operator.roles) && operator.id !== operatorId) {
+        throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
+      }
+    }
   }
-
-  if ((isBusiness(operator.roles) && operator.id !== operatorId) || !isOperator(operator.roles)) {
-    throw newHttpError(403, 'No tiene los permisos suficientes para esta operación');
-  }
-
   return true;
 }
