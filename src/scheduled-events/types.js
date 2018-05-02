@@ -94,6 +94,7 @@ const Event = t.struct(
     owner: t.maybe(t.Owner),
     ownerId: t.maybe(t.String),
     queueId: t.maybe(t.String),
+    itemId: t.maybe(t.String),
     contactId: t.maybe(t.String),
     worksheetId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
@@ -169,8 +170,21 @@ t.ScheduledEvent = t.struct(
  *   ScheduledCallEvent:
  *     properties:
  *       queueId:
- *        type: string
- *        format: uuid/v4
+ *         type: string
+ *         format: uuid/v4
+ *       itemId:
+ *         type: string
+ *         format: uuid/v4
+ *         description: Item de la llamada programada
+ *       contactId:
+ *         type: string
+ *         format: uuid/v4
+ *       ownerId:
+ *         type: string
+ *         format: uuid/v4
+ *       worksheetId:
+ *         type: string
+ *         format: uuid/v4
  */
 
 /**

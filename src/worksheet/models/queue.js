@@ -94,7 +94,9 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const item = await this.addWorksheet(queue, worksheet);
     const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
-    return this.save(updatedQueue);
+    await this.save(updatedQueue);
+
+    return item;
   }
 
   async addWorksheet(queue, worksheet) {
@@ -130,6 +132,30 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheetItems}});
 
     await this.save(updatedQueue);
+  }
+
+  async scheduleWorksheetInQueue(queue, itemId, operatorId) {
+    const item = queue.findItemById(itemId);
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
+    }
+
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findById(item.worksheetId);
+
+    if (!worksheet) {
+      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`);
+    }
+
+    const updatedItem = item.schedule(operatorId);
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
+    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
+
+    queueDebug('scheduleWorksheetInQueue', worksheet.id, 'scheduled from queue ', queue.id);
+
+    await this.save(updatedQueue);
+
+    return updatedItem;
   }
 
   async takeWorksheetInQueue(queue, itemId, operatorId) {

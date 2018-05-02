@@ -1,3 +1,4 @@
+import t from 'tcomb';
 import request from 'supertest';
 import Promise from 'bluebird';
 import intersectionBy from 'lodash/intersectionBy';
@@ -5,16 +6,31 @@ import times from 'lodash/times';
 import app from '../../../src/app';
 import {ScheduledEventsRepository} from '../../../src/scheduled-events/models';
 import {deleteAll, operatorCreate, operatorLogin} from '../../common';
+import {WorksheetQueueRepository} from '../../../src/worksheet/models/queue';
+import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 
 describe('scheduledevents.routes', () => {
   let authenticatedOperator;
   let scheduledMeetingsEventObject;
   let scheduledCallsEventObject;
   let scheduledEventToBeUpdated;
+  let items;
+  let queue;
   before(async() => {
     await deleteAll();
-    await operatorCreate();
+    const worksheetQueueRepo = new WorksheetQueueRepository();
+    const worksheetRepo = new WorksheetRepository();
     const scheduledEventRepo = new ScheduledEventsRepository();
+    const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
+
+    queue = await worksheetQueueRepo.save({name: 'madrid'});
+    items = await Promise
+      .mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue, worksheet));
+
+    const queueWithItems = t.update(queue, {worksheets: {$set: items}});
+    await worksheetQueueRepo.save(queueWithItems);
+
+    await operatorCreate('', queue.id);
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
 
     scheduledMeetingsEventObject = {
@@ -189,7 +205,15 @@ describe('scheduledevents.routes', () => {
       const response = await request(app)
         .post('/scheduled-events/call')
         .set('Authorization', authenticatedOperator.authorization)
-        .send(scheduledCallsEventObject);
+        .send({
+          notifyTo: authenticatedOperator.operator.id,
+          notifyAt: new Date('2018-05-28T16:24:00Z'),
+          eventDate: new Date('2018-05-28T16:24:00Z'),
+          event: {
+            itemId: items[0].id,
+            queueId: queue.id
+          }
+        });
       response.status.should.equal(201);
     });
   });
