@@ -27,8 +27,8 @@ async function findByIdScheduledEvent(req, res) {
 
 async function addScheduledCallEvent(req, res) {
   const repo = new ScheduledEventsRepository();
-  const scheduledEventBody = await getScheduledCallStruct(Object.assign({}, req.body, {type: 'CALLS'}));
-  const scheduledEvent = await repo.save(scheduledEventBody);
+  const scheduledEvent = await repo.addScheduleCallEvent(req.body, req.user.id);
+  await OperatorStats.registerAction(req.user.id, OperatorActions.SCHEDULE_CALL);
   res.status(201).json(scheduledEvent);
 }
 

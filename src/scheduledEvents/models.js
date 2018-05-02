@@ -13,7 +13,6 @@ import {
 import {newHttpError} from '../lib/http-error';
 import {buildRangeFromWeek, meetingWeekFormat, utc} from '../lib/date';
 import {buildDistanceCalculator} from '../lib/geo';
-import {getScheduledMeetingStruct} from './helper';
 import {fbComerciales} from '../firebase';
 import {
   deleteMeetingToBuilding,
@@ -162,11 +161,15 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
-    const scheduledEventBody = await getScheduledMeetingStruct(params);
-    const scheduledEvent = await this.save(scheduledEventBody);
+    const scheduledEvent = await this.save(params);
     await this.firebaseMeeting(scheduledEvent);
 
     return scheduledEvent;
+  }
+
+  async addScheduleCallEvent(data = {}, createdBy) {
+    const params = Object.assign({}, data, {createdBy, type: 'CALLS'});
+    return this.save(params);
   }
 
   async update(id, data = {}) {

@@ -183,7 +183,8 @@ export class OperatorRepository extends Operator {
         callsMade: findOrZero(stats, OperatorActions.CALL),
         callsAnswered: findOrZero(stats, OperatorActions.CALL_ANSWERED),
         verifiedOwners: findOrZero(stats, OperatorActions.VERIFIED_OWNER),
-        meetingsMade: findOrZero(stats, OperatorActions.MEETING)
+        meetingsMade: findOrZero(stats, OperatorActions.MEETING),
+        scheduledCalls: findOrZero(stats, OperatorActions.SCHEDULE_CALL)
       };
       return t.OperatorResults({operator, counters});
     });

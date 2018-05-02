@@ -216,6 +216,13 @@ t.QueueItem.prototype.release = function() {
   });
 };
 
+t.QueueItem.prototype.schedule = function(operatorId) {
+  return t.update(this, {
+    status: {$set: Queue.Status.SCHEDULED},
+    operatorId: {set: operatorId}
+  });
+};
+
 /**
  * @swagger
  * definitions:
