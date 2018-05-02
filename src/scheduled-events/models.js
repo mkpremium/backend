@@ -143,7 +143,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const start = m.clone().subtract(1.5, 'hours').toISOString();
     const end = m.clone().add(1.5, 'hours').toISOString();
     console.log('areAllowedMeetingInRange', data.eventDate, start, end);
-    const meetingsInRange = await this.findMeetingInRange(data.eventDate, start, end);
+    const meetingsInRange = await this.findMeetingInRange(data.eventDate, start, end, data.id);
     if (meetingsInRange && meetingsInRange.length > 0) {
       throw newHttpError(
         400,
@@ -153,11 +153,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     return true;
   }
 
-  async findMeetingInRange(notifyTo, start, end) {
+  async findMeetingInRange(notifyTo, start, end, scheduleId) {
     const qb = this.getQueryBuilder();
     const eventDate = [start, end].join(',');
     addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate);
     qb.where('type = ?', ScheduledEventType.MEETINGS);
+    if (scheduleId) {
+      qb.where('id != ?', scheduleId);
+    }
     return this.query(qb);
   }
 
@@ -176,12 +179,12 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async update(id, data = {}) {
     debugModel('update', id, data);
-    const scheduleEvent = await this.findByIdOrThrow(id);
+    const scheduledEvent = await this.findByIdOrThrow(id);
     const changes = fromJSON(data, t.UpdateScheduledEvent);
-    const updatedEvent = t.update(scheduleEvent.event, {
+    const updatedEvent = t.update(scheduledEvent.event, {
       $merge: onlyWithValues(changes.event)
     });
-    const updatedScheduledEvent = t.update(scheduleEvent, {
+    const updatedScheduledEventData = t.update(scheduledEvent, {
       $merge: onlyWithValues({
         notifyAt: changes.notifyAt,
         eventDate: changes.eventDate,
@@ -189,10 +192,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       })
     });
 
-    await this.deleteFirebaseMeeting(scheduleEvent);
+    const updatedScheduledEvent = await this.save(updatedScheduledEventData);
+    await this.deleteFirebaseMeeting(scheduledEvent);
     await this.firebaseMeeting(updatedScheduledEvent);
 
-    return this.save(updatedScheduledEvent);
+    return updatedScheduledEvent;
   }
 
   async delete(id) {
