@@ -62,7 +62,8 @@ export class Operator extends CouchbaseModel {
         id: operator.id,
         name: operator.profile.fullName(),
         username: operator.username,
-        city: operator.profile.city
+        city: operator.profile.city,
+        queueId: operator.profile.queueId
       }
     };
 
