@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import _get from 'lodash/get';
 import t from '../types';
 import {fbComerciales} from '../index';
@@ -68,7 +69,7 @@ export async function deleteMeetingToFirebase(db, meeting) {
   if (!fbComerciales.enabled) {
     return;
   }
-  db.ref(`Meetings/${meeting.id}`).set(null);
+  return db.ref(`Meetings/${meeting.id}`).set(null);
 }
 
 export async function relateMeetingToOperator(db, meeting, operatorId) {
@@ -76,7 +77,7 @@ export async function relateMeetingToOperator(db, meeting, operatorId) {
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
-  db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
+  return db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
 }
 
 export async function deleteMeetingToOperator(db, meeting, operatorId) {
@@ -84,7 +85,7 @@ export async function deleteMeetingToOperator(db, meeting, operatorId) {
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
-  db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
+  return db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
 }
 
 export async function saveMetadataToFirebase(metadata) {
@@ -92,8 +93,10 @@ export async function saveMetadataToFirebase(metadata) {
     return;
   }
   const db = fbComerciales.database();
-  db.ref(`Documents/${metadata.id}`).set(toFirebaseDocument(metadata));
-  db.ref(`Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true);
+  return Promise.all([
+    db.ref(`Documents/${metadata.id}`).set(toFirebaseDocument(metadata)),
+    db.ref(`Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true)
+  ]);
 }
 
 export async function saveNoteToFirebase(note) {
@@ -107,11 +110,14 @@ export async function saveNoteToFirebase(note) {
 
   const db = fbComerciales.database();
   const noteRef = db.ref(`Notes/${note.id}`);
-  noteRef.set(noteWithTimestamp(note));
 
   const buildingNotesRef = db.ref(`Buildings/${buildingId}/Notes`);
-  buildingNotesRef.child('LastNote').set(note.note);
-  buildingNotesRef.child('ids').update({[note.id]: true});
+
+  return Promise.all([
+    noteRef.set(noteWithTimestamp(note)),
+    buildingNotesRef.child('LastNote').set(note.note),
+    buildingNotesRef.child('ids').update({[note.id]: true})
+  ]);
 }
 
 export async function saveProposal(proposal) {
@@ -124,11 +130,13 @@ export async function saveProposal(proposal) {
 
   const db = fbComerciales.database();
   const proposalRef = db.ref(`Proposes/${proposal.id}`);
-  await proposalRef.set(firebaseProposal);
-
   const buildingProposalsRef = db.ref(`Buildings/${buildingId}/Proposes`);
-  await buildingProposalsRef.child('ids').update({[proposal.id]: true});
-  await buildingProposalsRef.child('LastPropose').set(firebaseProposal);
+
+  return Promise.all([
+    proposalRef.set(firebaseProposal),
+    buildingProposalsRef.child('ids').update({[proposal.id]: true}),
+    buildingProposalsRef.child('LastPropose').set(firebaseProposal)
+  ]);
 }
 
 function toFirebaseProposal(proposal) {

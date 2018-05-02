@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import _find from 'lodash/find';
 import t from './../types/street';
 import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
@@ -11,28 +12,31 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
   }
 
   const db = fbInformadores.database();
+  const ops = [];
 
   if (isOnlyStreet(operator.roles)) {
     const userRef = db.ref(`Usuarios/${operator.id}`);
-    userRef.child('Datos').set(toFirebaseStreetUser(operator));
+    ops.push(userRef.child('Datos').set(toFirebaseStreetUser(operator)));
     if (newCity) {
-      userRef.child('Edificio_Default').set(null);
+      ops.push(userRef.child('Edificio_Default').set(null));
     }
   } else {
     const adminRef = db.ref(`AdminUsers/${operator.id}`);
-    adminRef.child('Permisos').set({
+    ops.push(adminRef.child('Permisos').set({
       Ciudades: arrayToFirebasePreference(operator.profile.city),
       Funciones: arrayToFirebasePreference(operator.features),
       Name: operator.profile.fullName(),
       Mail: operator.email,
       SuperSU: isStreetAdmin(operator.roles)
-    });
+    }));
   }
+
+  return Promise.all(ops);
 }
 
 export async function saveStreetBuildingToFirebase(building, owner) {
   const db = fbInformadores.database();
-  db.ref(`Edificios_Data/${building.id}`).update(toFirebaseStreetBuilding(building, owner));
+  return db.ref(`Edificios_Data/${building.id}`).update(toFirebaseStreetBuilding(building, owner));
 }
 
 function arrayToFirebasePreference(value) {
