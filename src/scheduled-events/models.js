@@ -2,8 +2,6 @@ import debug from 'debug';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
-import _pick from 'lodash/pick';
-import _identity from 'lodash/identity';
 import {CouchbaseModel} from '../db/model';
 import {
   addDateQueryToBuilder,
@@ -26,10 +24,6 @@ import {
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
 import {ScheduledEventType} from './types';
-
-function onlyWithValues(obj) {
-  return _pick(obj, _identity);
-}
 
 const debugModel = debug('app:model:scheduled-events');
 
@@ -183,14 +177,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const scheduledEvent = await this.findByIdOrThrow(id);
     const changes = fromJSON(data, t.UpdateScheduledEvent);
     const updatedEvent = t.update(scheduledEvent.event, {
-      $merge: onlyWithValues(changes.event)
+      $merge: changes.event
     });
     const updatedScheduledEventData = t.update(scheduledEvent, {
-      $merge: onlyWithValues({
+      $merge: {
         notifyAt: changes.notifyAt,
         eventDate: changes.eventDate,
         event: updatedEvent
-      })
+      }
     });
 
     const updatedScheduledEvent = await this.save(updatedScheduledEventData);
