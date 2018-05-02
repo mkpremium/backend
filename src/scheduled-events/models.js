@@ -1,3 +1,4 @@
+import debug from 'debug';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
@@ -29,6 +30,8 @@ import {ScheduledEventType} from './types';
 function onlyWithValues(obj) {
   return _pick(obj, _identity);
 }
+
+const debugModel = debug('app:model:scheduled-events');
 
 export class ScheduledEvents extends CouchbaseModel {
   constructor() {
@@ -172,6 +175,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async update(id, data = {}) {
+    debugModel('update', id, data);
     const scheduleEvent = await this.findByIdOrThrow(id);
     const changes = fromJSON(data, t.UpdateScheduledEvent);
     const updatedEvent = t.update(scheduleEvent.event, {
