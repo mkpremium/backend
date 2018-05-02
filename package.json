@@ -7,7 +7,7 @@
     "prestart": "npm run lint",
     "start": "better-npm-run start",
     "prestart_migration": "npm run lint",
-    "start_migration": "better-npm-run start:migration",
+    "start_all": "better-npm-run start:all",
     "pretest": "npm run lint",
     "test": "mocha --require test/setup.js --recursive --exit --timeout 10000",
     "build": "scripts/build.sh",
@@ -21,7 +21,7 @@
     "socket": "nodemon bin/socket.js --exec babel-node",
     "deploy": "scripts/deployment.sh",
     "cronjobs": "nodemon bin/cronjobs.js --exec babel-node",
-    "start:migration": "nf start"
+    "start:all": "nf start"
   },
   "dependencies": {
     "aws-sdk": "^2.229.1",
