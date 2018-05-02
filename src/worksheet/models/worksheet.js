@@ -18,7 +18,7 @@ import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
 import {WorkSheetStatus} from '../../types/worksheet';
 import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified} from '../../types/owner';
-import {ScheduledEvents} from '../../scheduledEvents/models';
+import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 

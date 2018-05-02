@@ -6,9 +6,9 @@ import debug from 'debug';
 import '../types';
 import './types';
 
-import {ScheduledTaskRepository} from '../scheduledEvents/models';
+import {ScheduledTaskRepository} from '../scheduled-events/models';
 import {utc} from '../lib/date';
-import {ScheduleTaskType} from '../scheduledEvents/types';
+import {ScheduleTaskType} from '../scheduled-events/types';
 import {BuildingRepository} from '../building/models';
 
 const cronDebug = debug('app:cron:firebase');

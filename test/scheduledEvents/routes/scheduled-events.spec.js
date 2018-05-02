@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import intersectionBy from 'lodash/intersectionBy';
 import times from 'lodash/times';
 import app from '../../../src/app';
-import {ScheduledEventsRepository} from '../../../src/scheduledEvents/models';
+import {ScheduledEventsRepository} from '../../../src/scheduled-events/models';
 import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 
 describe('scheduledevents.routes', () => {

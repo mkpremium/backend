@@ -3,8 +3,8 @@ import debug from 'debug';
 import _isNil from 'lodash/isNil';
 import {fbInformadores} from './';
 import {fromFirebaseStreetBuilding} from './lib/street';
-import {ScheduledTaskRepository} from '../scheduledEvents/models';
-import {ScheduleTaskType} from '../scheduledEvents/types';
+import {ScheduledTaskRepository} from '../scheduled-events/models';
+import {ScheduleTaskType} from '../scheduled-events/types';
 import {OwnerRepository} from '../owner/models';
 import {BuildingRepository} from '../building/models';
 

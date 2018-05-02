@@ -7,7 +7,7 @@ import {cronjobsPort} from '../config';
 import appErrorHandler from '../src/lib/error-handler';
 import couchbase from '../src/db/couchbase';
 
-import scheduledEventCronJob from '../src/scheduledEvents/cron';
+import scheduledEventCronJob from '../src/scheduled-events/cron';
 import scheduledTasksCronJob from '../src/firebase/cron';
 
 const app = express();

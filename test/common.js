@@ -6,7 +6,7 @@ import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
 import {Calls, CallsRawEvents} from '../src/calls/models';
 import {History} from '../src/history/models';
-import {ScheduledEventsRepository} from '../src/scheduledEvents/models';
+import {ScheduledEventsRepository} from '../src/scheduled-events/models';
 import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
