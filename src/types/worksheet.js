@@ -247,12 +247,15 @@ const WorksheetQueueSource = t.struct({
  *     properties:
  *       name:
  *         type: string
+ *       size:
+ *         type: number
  *       source:
  *         $ref: "#/definitions/WorksheetQueueSource"
  */
 t.WorksheetQueueBody = t.struct(
   {
     name: t.String,
+    size: t.maybe(t.Number),
     source: WorksheetQueueSource
   }, {
     name: 'WorksheetQueueBody',
@@ -302,6 +305,7 @@ t.WorksheetQueueExtraInfo = t.struct(
   {
     id: t.maybe(t.String),
     name: t.String,
+    size: t.Number,
     source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItemExtraInfo),
 
@@ -312,6 +316,7 @@ t.WorksheetQueueExtraInfo = t.struct(
     defaultProps: {
       worksheets: [],
       source: {},
+      size: 100,
       _documentType: 'worksheet-queue'
     }
   }
