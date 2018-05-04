@@ -9,6 +9,8 @@ import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
 import {WorksheetRepository} from './worksheet';
 import {utc} from '../../lib/date';
+import {WorkSheetStatus} from '../../types/worksheet';
+import {Queue} from '../../types/constants';
 
 const queueDebug = debug('app:model:queue');
 
@@ -217,14 +219,27 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${itemId} (${item.status}) ya se encuentra abierto`);
     }
 
+    queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
     const operatorId = item.operatorId;
     const updatedItem = item.release();
-    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
+    const worksheet = await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
+
+    let itemNewStatus = updatedItem.status;
+
+    switch (worksheet.status) {
+      case WorkSheetStatus.INVALID:
+      case WorkSheetStatus.NO_SALE:
+      case WorkSheetStatus.MEETING:
+      case WorkSheetStatus.CLOSE:
+        itemNewStatus = Queue.Status.CLOSED;
+        break;
+      default:
+        break;
+    }
+
+    const updatedItemStatus = t.update(updatedItem, {$set: itemNewStatus});
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItemStatus);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
-
-    queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
-
-    await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
 
     return this.save(updatedQueue);
   }
