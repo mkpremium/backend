@@ -24,8 +24,8 @@ t.FirebaseStreetBuildingData = t.struct({
   Barrio: t.String,
   Distrito: t.String,
   Foto: t.maybe(t.String),
-  Propietario: t.String,
-  Telefono: t.String,
+  Propietario: t.maybe(t.String),
+  Telefono: t.maybe(t.String),
   Gps_Lat: t.Number,
   Gps_Lon: t.Number,
   Timestamp: t.Number

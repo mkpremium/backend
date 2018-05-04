@@ -1,8 +1,8 @@
 import debug from 'debug';
 import Promise from 'bluebird';
 import _find from 'lodash/find';
+import _get from 'lodash/get';
 import t from './../types/street';
-import fromJSON from 'tcomb/lib/fromJSON';
 import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
 import {fbInformadores} from '../';
 import {OperatorFeatures} from '../../types/operator';
@@ -76,9 +76,8 @@ function toFirebaseStreetUser(operator) {
   });
 }
 
-function toFirebaseStreetBuilding(building, ownerData) {
-  const owner = ownerData && fromJSON(ownerData, t.Owner);
-  debugStreet('toFirebaseStreetBuilding', building, owner);
+function toFirebaseStreetBuilding(building) {
+  debugStreet('toFirebaseStreetBuilding', building);
   return t.FirebaseStreetBuildingData({
     Id_Estado: building.Id_Estado,
     Id_Edificio: building.id,
@@ -90,8 +89,8 @@ function toFirebaseStreetBuilding(building, ownerData) {
     Barrio: building.address.neighborhood,
     Distrito: building.address.zone,
     Foto: null,
-    Propietario: owner && owner.fullName(),
-    Telefono: owner && owner.findFirstGoodContact(),
+    Propietario: _get(building, 'owner.name'),
+    Telefono: _get(building, 'owner.phones.0.value'),
     Gps_Lat: building.location.lat,
     Gps_Lon: building.location.lng,
     Timestamp: firebaseTimestampFormat(new Date())
