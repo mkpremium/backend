@@ -3,8 +3,8 @@ import t from 'tcomb';
 t.FirebaseUserStreet = t.struct({
   Nombre: t.String,
   Apellido: t.String,
-  Barrio: t.String,
-  Ciudad: t.String,
+  Barrio: t.maybe(t.String),
+  Ciudad: t.Any,
   Estado: t.String,
   Fecha_Alta: t.Number,
   Fecha_Baja: t.Number,

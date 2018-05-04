@@ -103,7 +103,8 @@ export async function operatorCreateStreet() {
     profile: {
       firstName: 'street',
       lastName: 'operator',
-      city: ['barcelona']
+      city: ['barcelona'],
+      neighborhood: 'VALLCARCA I ELS PENITENTS'
     }
   });
 }
