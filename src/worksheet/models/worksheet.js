@@ -144,12 +144,10 @@ export class WorksheetRepository extends Worksheet {
       await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER);
     }
 
-    return this.save(updatedWorksheet);
-  }
+    const savedWorksheet = await this.save(updatedWorksheet);
+    await this.shouldMarkBuildingAndRequestMoreInfo(savedWorksheet);
 
-  async postSave(worksheet) {
-    worksheetDebug('postSave', worksheet.id);
-    return this.shouldMarkBuildingAndRequestMoreInfo(worksheet);
+    return savedWorksheet;
   }
 
   async shouldMarkBuildingAndRequestMoreInfo(worksheet) {
