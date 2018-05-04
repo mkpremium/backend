@@ -75,7 +75,7 @@ export async function operatorCreate(index = '', queueId) {
   });
 }
 
-export async function operatorCreateAdmin() {
+export async function operatorCreateAdmin(queueId) {
   return createFullOperator({
     username: 'admin',
     password: 'password',
@@ -84,6 +84,7 @@ export async function operatorCreateAdmin() {
       'ADMIN'
     ],
     profile: {
+      queueId,
       firstName: 'admin',
       lastName: 'operator',
       city: ['barcelona']
@@ -123,7 +124,7 @@ export async function operatorCreateBusiness() {
   });
 }
 
-export async function operatorCreateManager() {
+export async function operatorCreateManager(queueId) {
   return createFullOperator({
     username: 'manager',
     password: 'password',
@@ -132,6 +133,7 @@ export async function operatorCreateManager() {
       'MANAGER'
     ],
     profile: {
+      queueId,
       firstName: 'manager',
       lastName: 'operator',
       city: ['barcelona']

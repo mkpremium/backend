@@ -98,12 +98,10 @@
     }
   },
   "sourceType": "couchbase",
-  "sourceName": "mkpremium",
-  "sourceUUID": "e22ed3c5e5ad70a247a36f7c756e4a89",
+  "sourceName": "mkpremium_staging",
   "sourceParams": {},
   "planParams": {
     "maxPartitionsPerPIndex": 171,
     "numReplicas": 0
-  },
-  "uuid": "7942779740cf46e0"
+  }
 }

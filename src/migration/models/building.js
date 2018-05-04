@@ -41,7 +41,7 @@ export const BuildingInputDTO = t.struct({
   numero_3: t.maybe(t.Str),
   surfaceroof: t.maybe(t.Str),
   filter: t.maybe(t.Str)
-});
+}, 'BuildingInputDTO');
 
 export default function migrateFromCsv(data) {
   const input = BuildingInputDTO(removeNullValues(cleanObjectKeys(data)));

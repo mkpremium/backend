@@ -18,23 +18,6 @@ import {BuildingRepository} from '../src/building/models';
 async function init() {
   await app.locals.bucketPromise;
   await deleteAll();
-  await createFullOperator({
-    username: `bitdistrict`,
-    password: 'bitdistrict',
-    agentNumber: `10106-919`,
-    serviceId: '17146',
-    roles: [
-      'OPERATOR'
-    ],
-    profile: {
-      firstName: 'Bitdistrict',
-      lastName: 'dev',
-      city: 'barcelona'
-    }
-  });
-  await operatorCreate();
-  await operatorCreateAdmin();
-  await operatorCreateManager();
   const migrateOwner = new MigrateModel('owner', resolve(__dirname, '../test/fixtures/sample_owners.csv'), app);
   await migrateOwner.run();
 
@@ -110,6 +93,25 @@ async function init() {
     const personWithContacts = t.update(person, {contacts: {$set: contacts}});
     return personRepo.save(personWithContacts);
   });
+
+  await createFullOperator({
+    username: `bitdistrict`,
+    password: 'bitdistrict',
+    agentNumber: `10106-919`,
+    serviceId: '17146',
+    roles: [
+      'OPERATOR'
+    ],
+    profile: {
+      firstName: 'Bitdistrict',
+      lastName: 'dev',
+      city: ['barcelona'],
+      queueId: queue.id
+    }
+  });
+  await operatorCreate('', queue.id);
+  await operatorCreateAdmin(queue.id);
+  await operatorCreateManager(queue.id);
 }
 
 init()
