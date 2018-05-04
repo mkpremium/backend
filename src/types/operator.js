@@ -64,7 +64,8 @@ t.OperatorProfile = t.struct(
   {
     name: 'OperatorProfile',
     defaultProps: {
-      city: []
+      city: [],
+      state: OperatorFirebaseStates.ENABLED
     }
   }
 );
