@@ -154,7 +154,7 @@ export class BuildingRepository extends Building {
   }
 
   async update(building, $merge) {
-    const updatedBuilding = t.update(building, $merge);
+    const updatedBuilding = t.update(building, {$merge});
     return this.save(updatedBuilding);
   }
 
