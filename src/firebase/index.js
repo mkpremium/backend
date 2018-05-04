@@ -51,10 +51,10 @@ export async function firebaseSetup(operator) {
 
 export async function firebaseUserAccount(operator, newCity) {
   if (isStreet(operator.roles)) {
-    await saveStreetUserToFirebase(operator, newCity);
+    return saveStreetUserToFirebase(operator, newCity);
   }
 
   if (isBusiness(operator.roles)) {
-    await saveBusinessUserToFirebase(operator);
+    return saveBusinessUserToFirebase(operator);
   }
 }

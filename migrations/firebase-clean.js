@@ -6,6 +6,7 @@ async function cleanStreet() {
 
   return Promise.all([
     db.ref('AdminUsers').set(null),
+    db.ref('Usuarios').set(null),
     db.ref('Chat_Answer').set(null),
     db.ref('Chat_Content').set(null),
     db.ref('Ciudad').set(null),
