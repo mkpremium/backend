@@ -7,8 +7,8 @@ import app from '../src/app';
 import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
 import {
-  createFullOperator, deleteAll, operatorCreate, operatorCreateAdmin,
-  operatorCreateManager
+  createFullOperator, deleteAll, operatorCreate, operatorCreateAdmin, operatorCreateBusiness,
+  operatorCreateManager, operatorCreateStreet, operatorCreateStreetManager
 } from '../test/common';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
@@ -112,6 +112,9 @@ async function init() {
   await operatorCreate('', queue.id);
   await operatorCreateAdmin(queue.id);
   await operatorCreateManager(queue.id);
+  await operatorCreateBusiness();
+  await operatorCreateStreet();
+  await operatorCreateStreetManager();
 }
 
 init()
