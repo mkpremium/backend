@@ -77,7 +77,7 @@ function toFirebaseStreetUser(operator) {
 }
 
 function toFirebaseStreetBuilding(building) {
-  debugStreet('toFirebaseStreetBuilding', building);
+  debugStreet('toFirebaseStreetBuilding', building, building.owner);
   return t.FirebaseStreetBuildingData({
     Id_Estado: building.Id_Estado,
     Id_Edificio: building.id,
@@ -89,8 +89,8 @@ function toFirebaseStreetBuilding(building) {
     Barrio: building.address.neighborhood,
     Distrito: building.address.zone,
     Foto: null,
-    Propietario: _get(building, 'owner.name'),
-    Telefono: _get(building, 'owner.phones.0.value'),
+    Propietario: _get(building, 'owner.name', ''),
+    Telefono: _get(building, 'owner.phones.0.value', ''),
     Gps_Lat: building.location.lat,
     Gps_Lon: building.location.lng,
     Timestamp: firebaseTimestampFormat(new Date())
