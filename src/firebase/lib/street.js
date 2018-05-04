@@ -85,7 +85,7 @@ function toFirebaseStreetBuilding(building, ownerData) {
     Tipo_Calle: building.address.type,
     Ciudad: building.address.city,
     Nombre_Calle: building.address.street,
-    Numero_Calle: building.address.number,
+    Numero_Calle: String(building.address.number),
     Barrio: building.address.neighborhood,
     Distrito: building.address.zone,
     Foto: null,
