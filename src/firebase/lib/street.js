@@ -1,6 +1,7 @@
 import debug from 'debug';
 import Promise from 'bluebird';
 import _find from 'lodash/find';
+import _get from 'lodash/get';
 import t from './../types/street';
 import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
 import {fbInformadores} from '../';
@@ -87,7 +88,7 @@ function toFirebaseStreetBuilding(building, owner) {
     Barrio: building.address.neighborhood,
     Distrito: building.address.zone,
     Foto: null,
-    Propietario: owner && owner.fullName(),
+    Propietario: owner && _get(owner, 'person.name', ''),
     Telefono: owner && owner.findFirstGoodContact(),
     Gps_Lat: building.address.location.lat,
     Gps_Lon: building.address.location.lng,
