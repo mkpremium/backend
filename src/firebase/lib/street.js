@@ -1,3 +1,4 @@
+import debug from 'debug';
 import Promise from 'bluebird';
 import _find from 'lodash/find';
 import t from './../types/street';
@@ -5,6 +6,8 @@ import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
 import {fbInformadores} from '../';
 import {OperatorFeatures} from '../../types/operator';
 import {isOnlyStreet, isStreetAdmin} from '../../lib/role-operators';
+
+const debugStreet = debug('app:firebase:street');
 
 export async function saveStreetUserToFirebase(operator, newCity = true) {
   if (!fbInformadores.enabled) {
@@ -15,12 +18,14 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
   const ops = [];
 
   if (isOnlyStreet(operator.roles)) {
+    debugStreet('saveStreetUserToFirebase', 'street', operator.id);
     const userRef = db.ref(`Usuarios/${operator.id}`);
     ops.push(userRef.child('Datos').set(toFirebaseStreetUser(operator)));
     if (newCity) {
       ops.push(userRef.child('Edificio_Default').set(null));
     }
   } else {
+    debugStreet('saveStreetUserToFirebase', 'admin', operator.id);
     const adminRef = db.ref(`AdminUsers/${operator.id}`);
     ops.push(adminRef.child('Permisos').set({
       Ciudades: arrayToFirebasePreference(operator.profile.city),
@@ -38,6 +43,7 @@ export async function saveStreetBuildingToFirebase(building, owner) {
   if (!fbInformadores.enabled) {
     return;
   }
+  debugStreet('saveStreetBuildingToFirebase', building.id);
   const db = fbInformadores.database();
   return db.ref(`Edificios_Data/${building.id}`).update(toFirebaseStreetBuilding(building, owner));
 }
