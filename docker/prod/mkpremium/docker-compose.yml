@@ -11,18 +11,6 @@ services:
       - "4730:4730"
     networks:
       - mkpremium
-  application:
-    build: ./docker/application
-    restart: always
-    networks:
-      - mkpremium
-    ports:
-      - "9001:9002"
-      - "9002:9002"
-    volumes:
-      - ./app/data:/app
-    depends_on:
-      - queue
   web:
     image: nginx:alpine
     restart: always
