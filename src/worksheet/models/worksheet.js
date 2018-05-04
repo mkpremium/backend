@@ -219,7 +219,8 @@ export class WorksheetRepository extends Worksheet {
     // never store this
     return t.update(data, {
       ownerContacts: {$set: []},
-      relatedBuildings: {$set: []}
+      relatedBuildings: {$set: []},
+      relatedOwners: {$set: []}
     });
   }
 
