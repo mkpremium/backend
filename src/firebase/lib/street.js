@@ -78,6 +78,7 @@ function toFirebaseStreetUser(operator) {
 
 function toFirebaseStreetBuilding(building, ownerData) {
   const owner = ownerData && fromJSON(ownerData, t.Owner);
+  debugStreet('toFirebaseStreetBuilding', building, owner);
   return t.FirebaseStreetBuildingData({
     Id_Estado: building.Id_Estado,
     Id_Edificio: building.id,
