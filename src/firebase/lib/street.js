@@ -80,7 +80,7 @@ function toFirebaseStreetBuilding(building, ownerData) {
   const owner = ownerData && fromJSON(ownerData, t.Owner);
   return t.FirebaseStreetBuildingData({
     Id_Estado: building.Id_Estado,
-    Id_building: building.id,
+    Id_Edificio: building.id,
     Calle_Completa: building.address.fullAddress,
     Tipo_Calle: building.address.type,
     Ciudad: building.address.city,
