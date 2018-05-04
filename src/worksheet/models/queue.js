@@ -237,7 +237,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
         break;
     }
 
-    const updatedItemStatus = t.update(updatedItem, {$set: itemNewStatus});
+    const updatedItemStatus = t.update(updatedItem, {status: {$set: itemNewStatus}});
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItemStatus);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 

@@ -1,3 +1,4 @@
+import _get from 'lodash/get';
 import {N1qlQuery} from 'couchbase';
 import debug from 'debug';
 import {couchbase} from '../../config';
@@ -12,7 +13,8 @@ export async function getList(documentType) {
 }
 
 export async function upsertToDb(pk, data) {
-  debugHelper('upsertToDb', pk, data);
+  const name = _get(data, '_documentType', '');
+  debugHelper('upsertToDb', name, pk, data);
   await this.upsertAsync(pk, data);
   const result = await this.getAsync(pk);
 
