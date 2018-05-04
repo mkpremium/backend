@@ -148,6 +148,7 @@ export class WorksheetRepository extends Worksheet {
   }
 
   async postSave(worksheet) {
+    worksheetDebug('postSave', worksheet.id);
     await this.shouldMarkBuildingAndRequestMoreInfo(worksheet);
   }
 
