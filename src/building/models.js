@@ -153,6 +153,11 @@ export class BuildingRepository extends Building {
     return entity;
   }
 
+  async update(building, $merge) {
+    const updatedBuilding = t.update(building, $merge);
+    return this.save(updatedBuilding);
+  }
+
   async updateEntity(building, entityId, params) {
     const entity = building.entities.find(({id}) => id === entityId);
     if (!entity) {
