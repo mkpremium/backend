@@ -149,18 +149,20 @@ export class WorksheetRepository extends Worksheet {
 
   async postSave(worksheet) {
     worksheetDebug('postSave', worksheet.id);
-    await this.shouldMarkBuildingAndRequestMoreInfo(worksheet);
+    return this.shouldMarkBuildingAndRequestMoreInfo(worksheet);
   }
 
   async shouldMarkBuildingAndRequestMoreInfo(worksheet) {
-    if (worksheet.status !== WorkSheetStatus.INVALID) {
+    const shouldContinue = worksheet.status === WorkSheetStatus.INVALID;
+    worksheetDebug('shouldMarkBuildingAndRequestMoreInfo', worksheet.id, shouldContinue);
+    if (!shouldContinue) {
       return;
     }
 
     const buildingRepo = new BuildingRepository();
 
     const wo = await this.findByIdWIthIncludes(worksheet.id);
-    await Promise.map(wo.relatedBuildings, (building) => {
+    return Promise.map(wo.relatedBuildings, (building) => {
       const owner = _find(wo.relatedOwners, {buildingId: building.id});
       return Promise.all([
         saveStreetBuildingToFirebase(building, owner),
