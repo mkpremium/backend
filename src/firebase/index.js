@@ -2,6 +2,7 @@ import admin from 'firebase-admin';
 import {firebaseComerciales, firebaseInformadores} from '../../config';
 import {saveStreetUserToFirebase} from './lib/street';
 import {isBusiness, isStreet} from '../lib/role-operators';
+import {saveBusinessUserToFirebase} from './lib/business';
 
 export const fbComerciales = admin.initializeApp({
   credential: admin.credential.cert(firebaseComerciales.serviceAccount),
@@ -51,5 +52,9 @@ export async function firebaseSetup(operator) {
 export async function firebaseUserAccount(operator, newCity) {
   if (isStreet(operator.roles)) {
     await saveStreetUserToFirebase(operator, newCity);
+  }
+
+  if (isBusiness(operator.roles)) {
+    await saveBusinessUserToFirebase(operator);
   }
 }

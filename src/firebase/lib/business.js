@@ -72,6 +72,21 @@ export async function deleteMeetingToFirebase(db, meeting) {
   return db.ref(`Meetings/${meeting.id}`).set(null);
 }
 
+export async function saveBusinessUserToFirebase(operator) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+  const db = fbComerciales.database();
+  return db.ref(`Users${operator.id}`).set({
+    Meetings: {},
+    RemindersMeetings: {},
+    RemindersProposes: {},
+    UserData: {
+      Name: operator.profile.fullName()
+    }
+  });
+}
+
 export async function relateMeetingToOperator(db, meeting, operatorId) {
   if (!fbComerciales.enabled) {
     return;
