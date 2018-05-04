@@ -35,6 +35,9 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
 }
 
 export async function saveStreetBuildingToFirebase(building, owner) {
+  if (!fbInformadores.enabled) {
+    return;
+  }
   const db = fbInformadores.database();
   return db.ref(`Edificios_Data/${building.id}`).update(toFirebaseStreetBuilding(building, owner));
 }
