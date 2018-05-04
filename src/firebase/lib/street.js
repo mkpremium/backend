@@ -91,8 +91,8 @@ function toFirebaseStreetBuilding(building, ownerData) {
     Foto: null,
     Propietario: owner && owner.fullName(),
     Telefono: owner && owner.findFirstGoodContact(),
-    Gps_Lat: building.address.location.lat,
-    Gps_Lon: building.address.location.lng,
+    Gps_Lat: building.location.lat,
+    Gps_Lon: building.location.lng,
     Timestamp: firebaseTimestampFormat(new Date())
   });
 }
