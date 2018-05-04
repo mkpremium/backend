@@ -77,7 +77,7 @@ export async function saveBusinessUserToFirebase(operator) {
     return;
   }
   const db = fbComerciales.database();
-  return db.ref(`Users${operator.id}`).set({
+  return db.ref(`Users/${operator.id}`).set({
     Meetings: {},
     RemindersMeetings: {},
     RemindersProposes: {},
