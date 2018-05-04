@@ -203,13 +203,14 @@ export class CouchbaseModel {
 
     await this._promiseBucket;
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+    const model = fromJSON(result, this.Struct);
 
     if (result && sendEvent) {
       const eventType = isNewData ? 'new' : data.id;
       await this.sendEvent(eventType, dataPreSaved, sendEvent);
-      await this.postSave(result);
+      await this.postSave(model);
     }
 
-    return fromJSON(result, this.Struct);
+    return model;
   }
 }

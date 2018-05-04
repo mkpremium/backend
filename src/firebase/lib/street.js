@@ -78,8 +78,8 @@ function toFirebaseStreetBuilding(building, owner) {
     Barrio: building.address.neighborhood,
     Distrito: building.address.zone,
     Foto: null,
-    Propietario: owner.fullName(),
-    Telefono: owner.findFirstGoodContact(),
+    Propietario: owner && owner.fullName(),
+    Telefono: owner && owner.findFirstGoodContact(),
     Gps_Lat: building.address.location.lat,
     Gps_Lon: building.address.location.lng,
     Timestamp: firebaseTimestampFormat(new Date())

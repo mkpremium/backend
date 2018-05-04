@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import t from 'tcomb';
 import debug from 'debug';
 import _head from 'lodash/head';
@@ -21,6 +22,8 @@ import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified} from '../../type
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
+import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
+import {BuildingState} from '../../types/enums';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -140,7 +143,29 @@ export class WorksheetRepository extends Worksheet {
     if (canRegisterVerified(worksheet, newStatus, operatorId)) {
       await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER);
     }
+
     return this.save(updatedWorksheet);
+  }
+
+  async postSave(worksheet) {
+    await this.shouldMarkBuildingAndRequestMoreInfo(worksheet);
+  }
+
+  async shouldMarkBuildingAndRequestMoreInfo(worksheet) {
+    if (worksheet.status !== WorkSheetStatus.INVALID) {
+      return;
+    }
+
+    const buildingRepo = new BuildingRepository();
+
+    const wo = await this.findByIdWIthIncludes(worksheet.id);
+    await Promise.map(wo.relatedBuildings, (building) => {
+      const owner = _find(wo.relatedOwners, {buildingId: building.id});
+      return Promise.all([
+        saveStreetBuildingToFirebase(building, owner),
+        buildingRepo.update(building, {state: BuildingState.MALO})
+      ]);
+    });
   }
 
   async sendWorksheetEvent(worksheetId) {
