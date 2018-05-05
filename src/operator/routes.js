@@ -144,7 +144,50 @@ router.post('/refresh-token', refreshTokenController);
  */
 router.post('/', permissions.allManagers, createOperatorController);
 
-router.put('/', permissions.allManagers, updateOperatorController);
+/**
+ * @swagger
+ * /operators/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Actualiza un operador
+ *     security:
+ *       - admin: []
+ *       - manager: []
+ *       - street_manager: []
+ *       - street_admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/OperatorBody"
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/Operator"
+ *       400:
+ *         description: Solicitud invalida
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.put('/:id', permissions.allManagers, updateOperatorController);
 
 /**
  * @swagger

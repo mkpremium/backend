@@ -143,7 +143,7 @@ export class OperatorRepository extends Operator {
       $merge: params.profile
     });
     const updateOperator = t.update(operator, {
-      $merge: _omit(params, ['profile']),
+      $merge: _omit(params, ['profile', 'id']),
       profile: {$set: updatedProfile}
     });
 

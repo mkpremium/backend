@@ -41,8 +41,8 @@ async function updateOperator(req, res) {
 
   canManageOperator(req.user.operator, operator);
 
-  const updatedOperator = await repo.update(operator, req.body);
-  res.json(updatedOperator);
+  await repo.update(operator, req.body);
+  res.status(204).send();
 }
 
 async function listOperator(req, res) {
