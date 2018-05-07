@@ -1,6 +1,6 @@
 import t from 'tcomb';
 import Promise from 'bluebird';
-import times from 'lodash/times';
+import _times from 'lodash/times';
 
 import app from '../src/app';
 
@@ -63,7 +63,7 @@ async function init() {
   });
   const people = await personRepo.query();
   const worksheets = await Promise
-    .all(times(ownersWithBuildings.length, () => {
+    .all(_times(ownersWithBuildings.length, () => {
       const owner = getOneOwner();
       return worksheetRepo.save({
         relatedOwnerIds: owner.map(({id}) => id),

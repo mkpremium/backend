@@ -14,14 +14,16 @@
     "predeploy": "npm run build",
     "socket": "better-npm-run socket",
     "deploy": "scripts/deployment.sh",
-    "cronjobs": "better-npm-run cronjobs"
+    "cronjobs": "better-npm-run cronjobs",
+    "seed": "better-npm-run seed"
   },
   "betterScripts": {
     "start": "nodemon $NODE_DEBUG_OPTION bin/www.js --exec babel-node",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "deploy": "scripts/deployment.sh",
     "cronjobs": "nodemon bin/cronjobs.js --exec babel-node",
-    "start:all": "nf start"
+    "start:all": "nf start",
+    "seed": "babel-node migrations/seed.js"
   },
   "dependencies": {
     "aws-sdk": "^2.229.1",
