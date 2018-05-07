@@ -10,6 +10,7 @@ export const fbComerciales = admin.initializeApp({
 }, 'comerciales');
 
 fbComerciales.enabled = firebaseComerciales.enabled;
+fbComerciales.prefixURL = firebaseComerciales.prefixURL;
 
 export const fbInformadores = admin.initializeApp({
   credential: admin.credential.cert(firebaseInformadores.serviceAccount),
@@ -17,6 +18,7 @@ export const fbInformadores = admin.initializeApp({
 }, 'informadores');
 
 fbInformadores.enabled = firebaseInformadores.enabled;
+fbInformadores.prefixURL = firebaseInformadores.prefixURL;
 
 function choseFirebaseSetup(roles) {
   if (isBusiness(roles)) {
