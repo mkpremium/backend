@@ -91,20 +91,20 @@ export class WorksheetRepository extends Worksheet {
   }
 
   async calculateNewStatus(worksheet) {
+    const isValidLength = worksheet.relatedOwners.length > 0;
+    const someValidOwner = isValidLength && _some(worksheet.relatedOwners, isPrimaryVerified);
+    const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
+    const noVende = isValidLength && _find(worksheet.relatedOwners, isPrimaryNoVende);
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
-        const isValidLength = worksheet.relatedOwners.length > 0;
-        const someValidOwner = _some(worksheet.relatedOwners, isPrimaryVerified);
-        const everyInvalidOwner = _every(worksheet.relatedOwners, isInvalidVerified);
         if (someValidOwner) {
           return WorkSheetStatus.WITH_OWNER;
         }
-        if (everyInvalidOwner && isValidLength) {
+        if (everyInvalidOwner) {
           return WorkSheetStatus.INVALID;
         }
         return WorkSheetStatus.DEFAULT;
       case WorkSheetStatus.WITH_OWNER:
-        const noVende = _find(worksheet.relatedOwners, isPrimaryNoVende);
         if (noVende) {
           return WorkSheetStatus.NO_SALE;
         }
@@ -112,12 +112,8 @@ export class WorksheetRepository extends Worksheet {
         return meetings.length > 0
           ? WorkSheetStatus.MEETING
           : WorkSheetStatus.WITH_OWNER;
-      case WorkSheetStatus.INVALID:
-        return _every(worksheet.relatedOwners, isInvalidVerified)
-          ? WorkSheetStatus.INVALID
-          : WorkSheetStatus.DEFAULT;
       default:
-        worksheetDebug(`the status ${worksheet.status} dont have planned behavior`);
+        worksheetDebug(`the status ${worksheet.status} don't have planned behavior`);
         return worksheet.status;
     }
   }
