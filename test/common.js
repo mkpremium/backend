@@ -26,6 +26,8 @@ export async function deleteAll() {
   const neighborhood = new NeighborhoodRepository();
   const city = new CityRepository();
 
+  await OperatorRepository._promiseBucket;
+
   return Promise.all([
     operator.deleteQuery(),
     worksheet.deleteQuery(),
