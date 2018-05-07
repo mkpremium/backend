@@ -15,7 +15,7 @@ export const couchbase = {
   bucket: process.env.COUCHBASE_BUCKET || 'mkpremium',
   user: process.env.COUCHBASE_USER || 'Administrator',
   pass: process.env.COUCHBASE_PASS || 'password',
-  timeout: parseInt(process.env.COUCHBASE_TIMEOUT || 1500),
+  timeout: parseInt(process.env.COUCHBASE_TIMEOUT || 2500),
   retries: parseInt(process.env.COUCHBASE_TIMEOUT_RETRIES || 3),
   consistency: parseInt(process.env.COUCHBASE_CONSISTENCY || N1qlQuery.Consistency.STATEMENT_PLUS)
 };
