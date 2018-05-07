@@ -1,4 +1,3 @@
-import t from 'tcomb';
 import Promise from 'bluebird';
 import request from 'supertest';
 import times from 'lodash/times';
@@ -11,21 +10,23 @@ import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 describe('worksheet.routes', () => {
   let queueItems = [];
   let authenticatedOperator;
-  let _queue;
+  let queue;
   before(async() => {
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
     await deleteAll();
 
-    const queue = await worksheetQueueRepo.save({name: 'madrid'});
+    queue = await worksheetQueueRepo.save({name: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
 
-    queueItems = await Promise.map(worksheets, async(worksheet) => worksheetQueueRepo.addWorksheet(queue, worksheet));
+    await Promise
+      .mapSeries(worksheets, (worksheet) => worksheetQueueRepo.addWorksheetAndSave(queue.id, worksheet.id));
 
-    const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
-    _queue = await worksheetQueueRepo.save(updatedQueue);
-    await operatorCreate('', _queue.id);
+    queue = await worksheetQueueRepo.findByIdOrThrow(queue.id);
+    queueItems = queue.worksheets;
+
+    await operatorCreate('', queue.id);
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
   });
 
@@ -33,13 +34,13 @@ describe('worksheet.routes', () => {
     describe('POST /worksheets/queues/:id @request', () => {
       it('200 Toma el item de la cola', async() => {
         await request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(200);
 
         const response = await request(app)
-          .get(`/worksheets/queues/${_queue.id}`)
+          .get(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .expect(200);
         const openedWorksheets = response.body.worksheets.filter(w => w.status === 'OPENED');
@@ -66,7 +67,7 @@ describe('worksheet.routes', () => {
 
       it('400 El item no existe en la cola', async() => {
         return request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: 'no-existe'})
           .expect(400);
@@ -74,7 +75,7 @@ describe('worksheet.routes', () => {
 
       it('409 El item no esta disponible para ser tomado', async() => {
         return request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({queueItemId: queueItems[0].id})
           .expect(409);
@@ -82,7 +83,7 @@ describe('worksheet.routes', () => {
 
       it('204 Libera un item abierto', async() => {
         return request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             queueItemId: queueItems[0].id,
@@ -93,10 +94,11 @@ describe('worksheet.routes', () => {
 
       it('200 Despues de liberarse puede tomarse de nuevo el item', async() => {
         const response = await request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
-            queueItemId: queueItems[0].id
+            queueItemId: queueItems[0].id,
+            action: 'TAKE'
           })
           .expect(200);
         response.body.should.be.a('object');
@@ -106,17 +108,18 @@ describe('worksheet.routes', () => {
 
       it('409 No puede tomar mas de un item', async() => {
         return request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
-            queueItemId: queueItems[1].id
+            queueItemId: queueItems[1].id,
+            action: 'TAKE'
           })
           .expect(409);
       });
 
       it('200 Toma el siguiente item', async() => {
         const response = await request(app)
-          .post(`/worksheets/queues/${_queue.id}`)
+          .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
           .send({
             action: 'NEXT'

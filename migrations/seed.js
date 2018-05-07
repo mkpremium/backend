@@ -70,11 +70,7 @@ async function init() {
         relatedBuildingIds: owner.map(({buildingId}) => buildingId)
       });
     }));
-  const queueItems = await Promise
-    .map(worksheets, async(worksheet) => worksheetQueueRepo.addWorksheet(queue, worksheet));
-
-  const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
-  await worksheetQueueRepo.save(updatedQueue);
+  await Promise.map(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue, worksheet.id));
 
   const Contacts = t.list(t.TypedContactInfo);
 

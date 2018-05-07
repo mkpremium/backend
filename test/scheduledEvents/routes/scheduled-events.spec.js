@@ -1,4 +1,3 @@
-import t from 'tcomb';
 import request from 'supertest';
 import Promise from 'bluebird';
 import intersectionBy from 'lodash/intersectionBy';
@@ -26,11 +25,10 @@ describe('scheduledevents.routes', () => {
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
 
     queue = await worksheetQueueRepo.save({name: 'madrid'});
-    items = await Promise
-      .mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue, worksheet));
+    await Promise.mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheetAndSave(queue.id, worksheet.id));
 
-    const queueWithItems = t.update(queue, {worksheets: {$set: items}});
-    await worksheetQueueRepo.save(queueWithItems);
+    queue = await worksheetQueueRepo.findByIdOrThrow(queue.id);
+    items = queue.worksheets;
 
     await operatorCreate('', queue.id);
     await operatorCreateBusiness();
