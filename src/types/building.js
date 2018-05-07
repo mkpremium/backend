@@ -347,6 +347,9 @@ t.Building = t.struct(
   {
     name: 'Building',
     defaultProps: {
+      get id() {
+        return uuid();
+      },
       floorArea: 0,
       landArea: 0,
       roofArea: 0,
