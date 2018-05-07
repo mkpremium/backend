@@ -93,12 +93,13 @@ export class WorksheetRepository extends Worksheet {
   async calculateNewStatus(worksheet) {
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
+        const isValidLength = worksheet.relatedOwners.length > 0;
         const someValidOwner = _some(worksheet.relatedOwners, isPrimaryVerified);
         const everyInvalidOwner = _every(worksheet.relatedOwners, isInvalidVerified);
         if (someValidOwner) {
           return WorkSheetStatus.WITH_OWNER;
         }
-        if (everyInvalidOwner) {
+        if (everyInvalidOwner && isValidLength) {
           return WorkSheetStatus.INVALID;
         }
         return WorkSheetStatus.DEFAULT;
