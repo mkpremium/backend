@@ -56,7 +56,7 @@ t.OperatorProfile = t.struct(
   {
     firstName: t.String,
     lastName: t.String,
-    city: t.list(t.String),
+    city: t.String,
     neighborhood: t.maybe(t.String),
     state: t.maybe(t.OperatorFirebaseStates),
     queueId: t.maybe(t.String),
@@ -65,7 +65,6 @@ t.OperatorProfile = t.struct(
   {
     name: 'OperatorProfile',
     defaultProps: {
-      city: [],
       state: OperatorFirebaseStates.ENABLED
     }
   }

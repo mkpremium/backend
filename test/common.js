@@ -72,7 +72,7 @@ export async function operatorCreate(index = '', queueId) {
       queueId,
       firstName: 'operator',
       lastName: 'operator',
-      city: ['barcelona'],
+      city: 'barcelona',
       email: 'operator@example.com'
     }
   });
@@ -90,7 +90,7 @@ export async function operatorCreateAdmin(queueId) {
       queueId,
       firstName: 'admin',
       lastName: 'operator',
-      city: ['barcelona']
+      city: 'barcelona'
     }
   });
 }
@@ -106,7 +106,7 @@ export async function operatorCreateStreet() {
     profile: {
       firstName: 'street',
       lastName: 'operator',
-      city: ['barcelona'],
+      city: 'barcelona',
       neighborhood: 'VALLCARCA I ELS PENITENTS'
     }
   });
@@ -123,7 +123,7 @@ export async function operatorCreateBusiness() {
     profile: {
       firstName: 'business',
       lastName: 'operator',
-      city: ['barcelona']
+      city: 'barcelona'
     }
   });
 }
@@ -140,7 +140,7 @@ export async function operatorCreateManager(queueId) {
       queueId,
       firstName: 'manager',
       lastName: 'operator',
-      city: ['barcelona']
+      city: 'barcelona'
     }
   });
 }
@@ -156,7 +156,7 @@ export async function operatorCreateStreetManager() {
     profile: {
       firstName: 'street_manager',
       lastName: 'operator',
-      city: ['barcelona']
+      city: 'barcelona'
     }
   });
 }

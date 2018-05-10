@@ -103,7 +103,7 @@ async function init() {
     profile: {
       firstName: 'Bitdistrict',
       lastName: 'dev',
-      city: ['barcelona'],
+      city: 'barcelona',
       queueId: queue.id
     }
   });

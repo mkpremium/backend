@@ -66,7 +66,7 @@ function toFirebaseStreetUser(operator) {
     Nombre: firstName,
     Apellido: lastName,
     Barrio: neighborhood,
-    Ciudad: arrayToFirebasePreference(city),
+    Ciudad: city,
     Estado: state,
     Fecha_Alta: firebaseTimestampFormat(operator.createdAt),
     Fecha_Baja: firebaseTimestampFormat(operator.disabledAt),
