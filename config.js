@@ -102,6 +102,9 @@ export const mailer = {
       pass: process.env.MAILER_PASS || 'kF5nfKm6XreTsMN8Br'
     },
     logger: true,
-    debug: false
+    debug: false,
+    tls: {
+      rejectUnauthorized: false
+    }
   })
 };
