@@ -17,7 +17,7 @@ const modelStruct = t.Operator({
   profile: {
     firstName: 'test',
     lastName: 'test',
-    city: ['test']
+    city: 'test'
   },
   agentNumber: '4483-944'
 });
