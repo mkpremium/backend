@@ -229,6 +229,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       case WorkSheetStatus.INVALID:
       case WorkSheetStatus.NO_SALE:
       case WorkSheetStatus.MEETING:
+      case WorkSheetStatus.ALREADY_SOLD:
       case WorkSheetStatus.CLOSE:
         itemNewStatus = Queue.Status.CLOSED;
         break;

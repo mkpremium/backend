@@ -95,6 +95,7 @@ export class WorksheetRepository extends Worksheet {
     const someValidOwner = isValidLength && _some(worksheet.relatedOwners, isPrimaryVerified);
     const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
     const noVende = isValidLength && _find(worksheet.relatedOwners, isPrimaryNoVende);
+    const yaVendio = isValidLength && _find(worksheet.relatedOwners, isPrimaryYaVendio);
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
         if (someValidOwner) {
@@ -107,6 +108,9 @@ export class WorksheetRepository extends Worksheet {
       case WorkSheetStatus.WITH_OWNER:
         if (noVende) {
           return WorkSheetStatus.NO_SALE;
+        }
+        if (yaVendio) {
+          return WorkSheetStatus.ALREADY_SOLD;
         }
         const meetings = await this.findMeetings(worksheet.id);
         return meetings.length > 0

@@ -13,6 +13,7 @@ export const WorkSheetStatus = {
   WITH_OWNER: 'LOOKING_MEETING',
   INVALID: 'INVALID',
   NO_SALE: 'NO_SALE',
+  ALREADY_SOLD: 'YA_VENDIO',
   MEETING: 'MEETING',
   CLOSE: 'CLOSE'
 };
@@ -32,6 +33,7 @@ export const workSheetStatusTransition = function(status) {
         WorkSheetStatus.MEETING
       ];
     // end status
+    case WorkSheetStatus.ALREADY_SOLD:
     case WorkSheetStatus.INVALID:
     case WorkSheetStatus.NO_SALE:
     case WorkSheetStatus.MEETING:
