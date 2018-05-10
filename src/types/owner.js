@@ -292,3 +292,10 @@ export function isPrimaryNoVende(data) {
     owner.status === OwnerStatus.NO_VENDE &&
     owner.type === OwnerType.PRINCIPAL;
 }
+
+export function isPrimaryYaVendio(data) {
+  const owner = t.Owner(data);
+  return owner.confirmedByOperator.value &&
+    owner.status === OwnerStatus.YA_VENDIO &&
+    owner.type === OwnerType.PRINCIPAL;
+}

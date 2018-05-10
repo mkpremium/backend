@@ -92,18 +92,16 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return fromJSON({total, results}, t.QueueListResponse);
   }
 
-  async addWorksheetAndSave(queue, worksheet) {
-    const item = await this.addWorksheet(queue, worksheet);
-    const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
-    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
+  async addWorksheetAndSave(queueId, worksheetId) {
+    const updatedQueue = await this.addWorksheet(queueId, worksheetId);
     await this.save(updatedQueue);
-
-    return item;
   }
 
-  async addWorksheet(queue, worksheet) {
+  async addWorksheet(queueId, worksheetId) {
     const itemRepo = new QueueItemRepository();
     const worksheetRepo = new WorksheetRepository();
+    const queue = await this.findByIdOrThrow(queueId);
+    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
 
     if (worksheet.queueId) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`);
@@ -112,27 +110,28 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     queueDebug('addWorksheet', worksheet.id, 'to queue', queue.id);
 
     await worksheetRepo.save(t.update(worksheet, {queueId: {$set: queue.id}}));
-    return itemRepo.save({worksheetId: worksheet.id});
+    const item = await itemRepo.save({worksheetId: worksheet.id});
+    const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
+    return t.update(queue, {worksheets: {$set: updatedWorksheets}});
   }
 
-  async removeWorksheet(queue, worksheet) {
+  async removeWorksheet(queueId, worksheetId) {
     const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
+    const queue = await this.findByIdOrThrow(queueId);
     if (worksheet.queueId !== queue.id) {
       throw newHttpError(409, `Worksheet ${worksheet.id} no se encuentra en otra cola (${worksheet.queueId})`);
     }
 
     const updatedWorksheet = t.update(worksheet, {$remove: ['queueId']});
     await worksheetRepo.save(updatedWorksheet);
+
+    const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id);
+    return t.update(queue, {worksheets: {$set: updatedWorksheetItems}});
   }
 
-  async removeWorksheetAndSave(queue, worksheetId) {
-    const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
-
-    await this.removeWorksheet(queue, worksheet);
-    const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheetId);
-    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheetItems}});
-
+  async removeWorksheetAndSave(queueId, worksheetId) {
+    const updatedQueue = await this.removeWorksheet(queueId, worksheetId);
     await this.save(updatedQueue);
   }
 
@@ -230,6 +229,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       case WorkSheetStatus.INVALID:
       case WorkSheetStatus.NO_SALE:
       case WorkSheetStatus.MEETING:
+      case WorkSheetStatus.ALREADY_SOLD:
       case WorkSheetStatus.CLOSE:
         itemNewStatus = Queue.Status.CLOSED;
         break;

@@ -20,14 +20,14 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
 
   if (isOnlyStreet(operator.roles)) {
     debugStreet('saveStreetUserToFirebase', 'street', operator.id);
-    const userRef = db.ref(`Usuarios/${operator.id}`);
+    const userRef = db.ref(`${fbInformadores.prefixURL}Usuarios/${operator.id}`);
     ops.push(userRef.child('Datos').set(toFirebaseStreetUser(operator)));
     if (newCity) {
       ops.push(userRef.child('Edificio_Default').set(null));
     }
   } else {
     debugStreet('saveStreetUserToFirebase', 'admin', operator.id);
-    const adminRef = db.ref(`AdminUsers/${operator.id}`);
+    const adminRef = db.ref(`${fbInformadores.prefixURL}AdminUsers/${operator.id}`);
     ops.push(adminRef.child('Permisos').set({
       Ciudades: arrayToFirebasePreference(operator.profile.city),
       Funciones: arrayToFirebasePreference(operator.features),
@@ -46,7 +46,7 @@ export async function saveStreetBuildingToFirebase(building, owner) {
   }
   debugStreet('saveStreetBuildingToFirebase', building.id);
   const db = fbInformadores.database();
-  return db.ref(`Edificios_Data/${building.id}`).set(toFirebaseStreetBuilding(building, owner));
+  return db.ref(`${fbInformadores.prefixURL}Edificios_Data/${building.id}`).set(toFirebaseStreetBuilding(building, owner));
 }
 
 function arrayToFirebasePreference(value) {
@@ -66,7 +66,7 @@ function toFirebaseStreetUser(operator) {
     Nombre: firstName,
     Apellido: lastName,
     Barrio: neighborhood,
-    Ciudad: arrayToFirebasePreference(city),
+    Ciudad: city,
     Estado: state,
     Fecha_Alta: firebaseTimestampFormat(operator.createdAt),
     Fecha_Baja: firebaseTimestampFormat(operator.disabledAt),

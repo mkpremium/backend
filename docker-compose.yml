@@ -1,12 +1,6 @@
 version: '3'
 
 services:
-  app:
-    image: "rkmax/mkpremium:73234a7"
-    ports:
-      - "9001:9001"
-    depends_on:
-      - db
   db:
     image: "rkmax/couchbase:bitdistrict"
     ports:

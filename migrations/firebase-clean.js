@@ -5,16 +5,16 @@ async function cleanStreet() {
   const db = fbInformadores.database();
 
   return Promise.all([
-    db.ref('AdminUsers').set(null),
-    db.ref('Usuarios').set(null),
-    db.ref('Chat_Answer').set(null),
-    db.ref('Chat_Content').set(null),
-    db.ref('Ciudad').set(null),
-    db.ref('Edificios_Data').set(null),
-    db.ref('Edificios_Mapping').set(null),
-    db.ref('Locations').set(null),
-    db.ref('Parameters').set(null),
-    db.ref('Statistics').set(null)
+    db.ref(`${fbInformadores.prefixURL}AdminUsers`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Usuarios`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Chat_Answer`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Chat_Content`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Ciudad`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Edificios_Data`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Edificios_Mapping`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Locations`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Parameters`).set(null),
+    db.ref(`${fbInformadores.prefixURL}Statistics`).set(null)
   ]);
 }
 
@@ -22,15 +22,15 @@ async function cleanBusiness() {
   const db = fbComerciales.database();
 
   return Promise.all([
-    db.ref('Buildings').set(null),
-    db.ref('Documents').set(null),
-    db.ref('Entities').set(null),
-    db.ref('Meetings').set(null),
-    db.ref('Notes').set(null),
-    db.ref('Proposes').set(null),
-    db.ref('Reminders').set(null),
-    db.ref('Users').set(null),
-    db.ref('UsersRef').set(null)
+    db.ref(`${fbComerciales.prefixURL}Buildings`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Documents`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Entities`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Meetings`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Notes`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Proposes`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Reminders`).set(null),
+    db.ref(`${fbComerciales.prefixURL}Users`).set(null),
+    db.ref(`${fbComerciales.prefixURL}UsersRef`).set(null)
   ]);
 }
 

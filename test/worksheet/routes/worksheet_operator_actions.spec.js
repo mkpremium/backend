@@ -1,4 +1,3 @@
-import t from 'tcomb';
 import Promise from 'bluebird';
 import request from 'supertest';
 import times from 'lodash/times';
@@ -14,7 +13,7 @@ describe('worksheet.routes', () => {
   let authenticatedOperator;
   let authenticatedManager;
   let owner;
-  let _queue;
+  let queue;
   before(async() => {
     const worksheetRepo = new WorksheetRepository();
     const worksheetQueueRepo = new WorksheetQueueRepository();
@@ -22,15 +21,16 @@ describe('worksheet.routes', () => {
     await deleteAll();
     await operatorCreateManager();
 
-    const queue = await worksheetQueueRepo.save({name: 'madrid'});
+    queue = await worksheetQueueRepo.save({name: 'madrid'});
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
 
-    queueItems = await Promise.map(worksheets, async(worksheet) => worksheetQueueRepo.addWorksheet(queue, worksheet));
+    await Promise
+      .mapSeries(worksheets, (worksheet) => worksheetQueueRepo.addWorksheetAndSave(queue.id, worksheet.id));
 
-    const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
-    _queue = await worksheetQueueRepo.save(updatedQueue);
+    queue = await worksheetQueueRepo.findByIdOrThrow(queue.id);
+    queueItems = queue.worksheets;
 
-    await operatorCreate('', _queue.id);
+    await operatorCreate('', queue.id);
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
   });
@@ -38,13 +38,13 @@ describe('worksheet.routes', () => {
   describe('Worksheet Operator actions', () => {
     it('Toma el item de la cola', async() => {
       await request(app)
-        .post(`/worksheets/queues/${_queue.id}`)
+        .post(`/worksheets/queues/${queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({queueItemId: queueItems[0].id})
         .expect(200);
 
       const response = await request(app)
-        .get(`/worksheets/queues/${_queue.id}`)
+        .get(`/worksheets/queues/${queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .expect(200);
       const openedWorksheets = response.body.worksheets.filter(w => w.status === 'OPENED');
@@ -142,7 +142,7 @@ describe('worksheet.routes', () => {
 
     it('Libera un item abierto', async() => {
       return request(app)
-        .post(`/worksheets/queues/${_queue.id}`)
+        .post(`/worksheets/queues/${queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
           queueItemId: queueItems[0].id,

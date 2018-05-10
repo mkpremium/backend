@@ -1,6 +1,6 @@
 import t from 'tcomb';
 import Promise from 'bluebird';
-import times from 'lodash/times';
+import _times from 'lodash/times';
 
 import app from '../src/app';
 
@@ -63,18 +63,14 @@ async function init() {
   });
   const people = await personRepo.query();
   const worksheets = await Promise
-    .all(times(ownersWithBuildings.length, () => {
+    .all(_times(ownersWithBuildings.length, () => {
       const owner = getOneOwner();
       return worksheetRepo.save({
         relatedOwnerIds: owner.map(({id}) => id),
         relatedBuildingIds: owner.map(({buildingId}) => buildingId)
       });
     }));
-  const queueItems = await Promise
-    .map(worksheets, async(worksheet) => worksheetQueueRepo.addWorksheet(queue, worksheet));
-
-  const updatedQueue = t.update(queue, {worksheets: {$set: queueItems}});
-  await worksheetQueueRepo.save(updatedQueue);
+  await Promise.mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue.id, worksheet.id));
 
   const Contacts = t.list(t.TypedContactInfo);
 
@@ -107,7 +103,7 @@ async function init() {
     profile: {
       firstName: 'Bitdistrict',
       lastName: 'dev',
-      city: ['barcelona'],
+      city: 'barcelona',
       queueId: queue.id
     }
   });

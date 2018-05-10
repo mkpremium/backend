@@ -19,7 +19,7 @@ export async function updateBuildingToFirebase(building, owner) {
 
   const db = fbComerciales.database();
 
-  const snapshot = await db.ref(`Buildings/${building.id}`).once('value');
+  const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`).once('value');
   if (snapshot.exists()) {
     return saveBuildingToFirebase(db, building, owner);
   }
@@ -29,10 +29,10 @@ export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
     return;
   }
-  const buildingRef = db.ref(`Buildings/${building.id}`);
+  const buildingRef = db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`);
 
   const saveBuildingEntity = (entity) => {
-    db.ref(`Entities/${entity.id}`).update(toFirebaseEntity(entity));
+    db.ref(`${fbComerciales.prefixURL}Entities/${entity.id}`).update(toFirebaseEntity(entity));
   };
 
   buildingRef.child('Data').set(toFirebaseBuilding(building));
@@ -48,28 +48,28 @@ export async function relateMeetingToBuilding(db, {id, building}) {
   if (!fbComerciales.enabled) {
     return;
   }
-  db.ref(`Buildings/${building.id}/Meetings/ids/${id}`).set(true);
+  db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}/Meetings/ids/${id}`).set(true);
 }
 
 export async function deleteMeetingToBuilding(db, {id, building}) {
   if (!fbComerciales.enabled) {
     return;
   }
-  db.ref(`Buildings/${building.id}/Meetings/ids/${id}`).set(null);
+  db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}/Meetings/ids/${id}`).set(null);
 }
 
 export async function saveMeetingToFirebase(db, meeting) {
   if (!fbComerciales.enabled) {
     return;
   }
-  db.ref(`Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
+  db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
 }
 
 export async function deleteMeetingToFirebase(db, meeting) {
   if (!fbComerciales.enabled) {
     return;
   }
-  return db.ref(`Meetings/${meeting.id}`).set(null);
+  return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}`).set(null);
 }
 
 export async function saveBusinessUserToFirebase(operator) {
@@ -77,7 +77,7 @@ export async function saveBusinessUserToFirebase(operator) {
     return;
   }
   const db = fbComerciales.database();
-  return db.ref(`Users/${operator.id}`).set({
+  return db.ref(`${fbComerciales.prefixURL}Users/${operator.id}`).set({
     Meetings: {},
     RemindersMeetings: {},
     RemindersProposes: {},
@@ -92,7 +92,7 @@ export async function relateMeetingToOperator(db, meeting, operatorId) {
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
-  return db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
+  return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
 }
 
 export async function deleteMeetingToOperator(db, meeting, operatorId) {
@@ -100,7 +100,7 @@ export async function deleteMeetingToOperator(db, meeting, operatorId) {
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
-  return db.ref(`Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
+  return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
 }
 
 export async function saveMetadataToFirebase(metadata) {
@@ -109,8 +109,8 @@ export async function saveMetadataToFirebase(metadata) {
   }
   const db = fbComerciales.database();
   return Promise.all([
-    db.ref(`Documents/${metadata.id}`).set(toFirebaseDocument(metadata)),
-    db.ref(`Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true)
+    db.ref(`${fbComerciales.prefixURL}Documents/${metadata.id}`).set(toFirebaseDocument(metadata)),
+    db.ref(`${fbComerciales.prefixURL}Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true)
   ]);
 }
 
@@ -124,9 +124,9 @@ export async function saveNoteToFirebase(note) {
   }
 
   const db = fbComerciales.database();
-  const noteRef = db.ref(`Notes/${note.id}`);
+  const noteRef = db.ref(`${fbComerciales.prefixURL}Notes/${note.id}`);
 
-  const buildingNotesRef = db.ref(`Buildings/${buildingId}/Notes`);
+  const buildingNotesRef = db.ref(`${fbComerciales.prefixURL}Buildings/${buildingId}/Notes`);
 
   return Promise.all([
     noteRef.set(noteWithTimestamp(note)),

@@ -18,7 +18,7 @@ import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
 import {WorkSheetStatus} from '../../types/worksheet';
-import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified} from '../../types/owner';
+import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified, isPrimaryYaVendio} from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
@@ -91,10 +91,13 @@ export class WorksheetRepository extends Worksheet {
   }
 
   async calculateNewStatus(worksheet) {
+    const isValidLength = worksheet.relatedOwners.length > 0;
+    const someValidOwner = isValidLength && _some(worksheet.relatedOwners, isPrimaryVerified);
+    const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
+    const noVende = isValidLength && _find(worksheet.relatedOwners, isPrimaryNoVende);
+    const yaVendio = isValidLength && _find(worksheet.relatedOwners, isPrimaryYaVendio);
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
-        const someValidOwner = _some(worksheet.relatedOwners, isPrimaryVerified);
-        const everyInvalidOwner = _every(worksheet.relatedOwners, isInvalidVerified);
         if (someValidOwner) {
           return WorkSheetStatus.WITH_OWNER;
         }
@@ -103,20 +106,18 @@ export class WorksheetRepository extends Worksheet {
         }
         return WorkSheetStatus.DEFAULT;
       case WorkSheetStatus.WITH_OWNER:
-        const noVende = _find(worksheet.relatedOwners, isPrimaryNoVende);
         if (noVende) {
           return WorkSheetStatus.NO_SALE;
+        }
+        if (yaVendio) {
+          return WorkSheetStatus.ALREADY_SOLD;
         }
         const meetings = await this.findMeetings(worksheet.id);
         return meetings.length > 0
           ? WorkSheetStatus.MEETING
           : WorkSheetStatus.WITH_OWNER;
-      case WorkSheetStatus.INVALID:
-        return _every(worksheet.relatedOwners, isInvalidVerified)
-          ? WorkSheetStatus.INVALID
-          : WorkSheetStatus.DEFAULT;
       default:
-        worksheetDebug(`the status ${worksheet.status} dont have planned behavior`);
+        worksheetDebug(`the status ${worksheet.status} don't have planned behavior`);
         return worksheet.status;
     }
   }
