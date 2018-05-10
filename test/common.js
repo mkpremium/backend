@@ -72,7 +72,8 @@ export async function operatorCreate(index = '', queueId) {
       queueId,
       firstName: 'operator',
       lastName: 'operator',
-      city: ['barcelona']
+      city: ['barcelona'],
+      email: 'operator@example.com'
     }
   });
 }

@@ -59,7 +59,8 @@ t.OperatorProfile = t.struct(
     city: t.list(t.String),
     neighborhood: t.maybe(t.String),
     state: t.maybe(t.OperatorFirebaseStates),
-    queueId: t.maybe(t.String)
+    queueId: t.maybe(t.String),
+    email: t.maybe(t.String)
   },
   {
     name: 'OperatorProfile',

@@ -70,7 +70,7 @@ async function init() {
         relatedBuildingIds: owner.map(({buildingId}) => buildingId)
       });
     }));
-  await Promise.map(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue, worksheet.id));
+  await Promise.mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue.id, worksheet.id));
 
   const Contacts = t.list(t.TypedContactInfo);
 

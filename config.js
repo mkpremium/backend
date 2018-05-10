@@ -1,3 +1,5 @@
+import multer from 'multer';
+import nodemailer from 'nodemailer';
 import t from 'tcomb';
 import {join} from 'path';
 import {N1qlQuery} from 'couchbase';
@@ -71,4 +73,35 @@ export const firebaseInformadores = {
   serviceAccount: process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores,
   databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || 'https://mkpremiumstreet.firebaseio.com',
   prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || ''
+};
+
+const defaultUploadDir = join(__dirname, '.uploads');
+
+export const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, process.env.UPLOAD_DIR || defaultUploadDir);
+  },
+  filename: (req, file, callback) => {
+    callback(null, `${Date.now()}-${file.fieldname}`);
+  }
+});
+
+export const mailer = {
+  info: (info) => {
+    if (process.env.MAILER_HOST === 'smtp.ethereal.email') {
+      return nodemailer.getTestMessageUrl(info);
+    }
+    return '';
+  },
+  transporter: nodemailer.createTransport({
+    host: process.env.MAILER_HOST || 'smtp.ethereal.email',
+    port: Number(process.env.MAILER_PORT || '587'),
+    secure: Boolean(process.env.MAILER_SECURE || false),
+    auth: {
+      user: process.env.MAILER_USER || 'v3hn5oczispny2x4@ethereal.email',
+      pass: process.env.MAILER_PASS || 'kF5nfKm6XreTsMN8Br'
+    },
+    logger: true,
+    debug: false
+  })
 };
