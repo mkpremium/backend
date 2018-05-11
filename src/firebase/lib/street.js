@@ -29,7 +29,7 @@ export async function saveStreetUserToFirebase(operator, newCity = true) {
     debugStreet('saveStreetUserToFirebase', 'admin', operator.id);
     const adminRef = db.ref(`${fbInformadores.prefixURL}AdminUsers/${operator.id}`);
     ops.push(adminRef.child('Permisos').set({
-      Ciudades: arrayToFirebasePreference(operator.profile.city),
+      Ciudades: stringToFirebasePreference(operator.profile.city),
       Funciones: arrayToFirebasePreference(operator.features),
       Name: operator.profile.fullName(),
       Mail: operator.email,
@@ -47,6 +47,14 @@ export async function saveStreetBuildingToFirebase(building, owner) {
   debugStreet('saveStreetBuildingToFirebase', building.id);
   const db = fbInformadores.database();
   return db.ref(`${fbInformadores.prefixURL}Edificios_Data/${building.id}`).set(toFirebaseStreetBuilding(building, owner));
+}
+
+function stringToFirebasePreference(value) {
+  if (value === OperatorFeatures.ALL) {
+    return OperatorFeatures.ALL;
+  } else {
+    return {[value]: true};
+  }
 }
 
 function arrayToFirebasePreference(value) {
