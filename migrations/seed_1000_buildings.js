@@ -8,12 +8,14 @@ import app from '../src/app';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {OwnerRepository} from '../src/owner/models';
 import {BuildingRepository} from '../src/building/models';
+import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 
 async function init() {
   await app.locals.bucketPromise;
   const worksheetRepo = new WorksheetRepository();
   const ownerRepo = new OwnerRepository();
   const buildingRepo = new BuildingRepository();
+  const queueWorksheetRepo = new WorksheetQueueRepository();
 
   const worksheets = await worksheetRepo.query();
   const ownerIds = _flatten(worksheets.map(worksheet => worksheet.relatedOwnerIds));
@@ -41,7 +43,10 @@ async function init() {
     return worksheetRepo.save(worksheetParams);
   }
 
-  await Promise.mapSeries(_times(1000), create);
+  const newWorkSheets = await Promise.mapSeries(_times(1000), create);
+
+  const [queue] = await queueWorksheetRepo.query();
+  await Promise.mapSeries(newWorkSheets, worksheet => queueWorksheetRepo.addWorksheetAndSave(queue.id, worksheet.id));
 }
 
 init()
