@@ -108,3 +108,31 @@ export const mailer = {
     }
   })
 };
+
+export const cadastreLocation = {
+  serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC',
+  waitTimeMS: 2000,
+  proxy: {
+    host: process.env.PROXY_HOST || '20.184.8.84',
+    port: process.env.PROXY_HOST || '80'
+  }
+};
+
+export const cadastreAddress = {
+  serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
+  waitTimeMS: 2000,
+  proxy: {
+    host: process.env.PROXY_HOST || '20.184.8.84',
+    port: process.env.PROXY_HOST || '80'
+  }
+
+};
+
+export const nestoriaService = {
+  serviceUrl: 'https://api.nestoria.es:443/api',
+  waitTimeMS: 2000,
+  proxy: {
+    host: process.env.PROXY_HOST || '147.75.113.107',
+    port: process.env.PROXY_HOST || '8080'
+  }
+};

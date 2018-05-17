@@ -1,6 +1,10 @@
 version: '3'
 
 services:
+  queue:
+    image: "artefactual/gearmand"
+    ports:
+      - "4730:4730"
   db:
     image: "rkmax/couchbase:bitdistrict"
     ports:

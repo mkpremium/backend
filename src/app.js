@@ -27,6 +27,7 @@ import stats from './stats';
 import street from './street';
 import autocomplete from './autocomplete';
 import email from './email';
+import banks from './banks';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -61,6 +62,7 @@ stats(app);
 street(app);
 autocomplete(app);
 email(app);
+banks(app);
 
 app.use(appErrorHandler);
 

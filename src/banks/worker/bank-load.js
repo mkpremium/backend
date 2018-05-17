@@ -1,0 +1,58 @@
+import gearman from 'gearmanode';
+import Promise from 'bluebird';
+import * as XLSX from 'xlsx';
+
+import couchbase from '../../db/couchbase';
+import {gearmanConfig} from '../../../config';
+
+import {wrap} from '../../lib/workers';
+
+import {BankFileDataRepository} from '../models';
+import {BANK_WORKER_NAMES} from './workers';
+
+class BankLoadWorker {
+  constructor() {
+    this.db = couchbase();
+    this.client = gearman.client(gearmanConfig);
+    this.worker = gearman.worker(gearmanConfig);
+
+    this._getAsyncProcessRow = this._getAsyncProcessRow.bind(this);
+    this._workerBankFile = this._workerBankFile.bind(this);
+  }
+
+  _getAsyncProcessRow(bankFileId, cadastreCol, bankPriceCol) {
+    const repo = new BankFileDataRepository();
+    return async(row) => {
+      const bankFileData = await repo.save({
+        bankFileId,
+        bankFileRowData: row,
+        cadastreReference: row[cadastreCol],
+        priceBank: Number(row[bankPriceCol])
+      });
+
+      this.client.submitJob(BANK_WORKER_NAMES.PROCESS, bankFileData.id);
+    };
+  }
+
+  async _workerBankFile(bankFile) {
+    const workbook = XLSX.readFile(bankFile.filepath);
+    const [firstSheet] = workbook.SheetNames;
+    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+    const [cadastreCol, bankPriceCol] = Object.keys(sheet[0]);
+    await Promise.each(sheet, this._getAsyncProcessRow(bankFile.id, cadastreCol, bankPriceCol));
+  }
+
+  async run() {
+    await this.db;
+    this.worker.addFunction(BANK_WORKER_NAMES.LOAD, wrap(this._workerBankFile));
+  }
+
+  static init() {
+    const worker = new BankLoadWorker();
+    worker
+      .run()
+      .catch(console.log.bind(console));
+  }
+}
+
+BankLoadWorker.init();

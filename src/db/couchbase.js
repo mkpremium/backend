@@ -9,13 +9,10 @@ import '../lib/squel/let';
 import {CouchbaseModel} from './model';
 
 const debugCouchbase = debug('app:couchbase');
-const defaultOpts = {
-  middleware: true
-};
 
 let retries = couchbase.retries;
 
-export default (app, opts = defaultOpts) => {
+export default (app) => {
   let resolve = null;
   let reject = null;
 
@@ -34,11 +31,9 @@ export default (app, opts = defaultOpts) => {
 
   checkBucket(bucket, cluster, resolve, reject);
 
-  if (!opts.middleware) {
-    return promise;
+  if (app) {
+    Object.assign(app.locals, {cluster, bucket, bucketPromise: promise});
   }
-
-  Object.assign(app.locals, {cluster, bucket, bucketPromise: promise});
 
   return promise;
 };

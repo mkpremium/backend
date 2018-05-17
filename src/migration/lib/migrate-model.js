@@ -69,7 +69,7 @@ export class MigrateModel {
 
     this.bucket = this.app.locals
       ? this.app.locals.bucket
-      : await couchbase({}, {middleware: false});
+      : await couchbase(this.app);
 
     await this.importFileToModel();
     this.postImport();

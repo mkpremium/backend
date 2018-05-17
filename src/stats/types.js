@@ -6,7 +6,8 @@ export const OperatorActions = {
   CALL_ANSWERED: 'call_answered',
   VERIFIED_OWNER: 'verified_owner',
   MEETING: 'meeting',
-  SCHEDULE_CALL: 'schedule_call'
+  SCHEDULE_CALL: 'schedule_call',
+  VIEW_WORKSHEET: 'view_worksheet'
 };
 
 t.OperatorActions = t.enums.of(Object.values(OperatorActions));
