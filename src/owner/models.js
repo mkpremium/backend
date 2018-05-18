@@ -141,9 +141,10 @@ export class OwnerRepository extends Owner {
   }
 
   async updateContact(ownerId, contactId, data) {
-    const {personId} = await this.findByIdOrThrow(ownerId);
+    const owner = await this.findByIdOrThrow(ownerId);
+    await WorksheetRepository.canUpdateOwner(owner, owner);
     const personRepo = new PersonRepository();
-    return personRepo.updateContact(personId, contactId, data);
+    return personRepo.updateContact(owner.personId, contactId, data);
   }
 
   async createOwnerAndPerson(body) {

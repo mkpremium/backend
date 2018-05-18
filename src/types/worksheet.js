@@ -30,7 +30,8 @@ export const workSheetStatusTransition = function(status) {
       return [
         status,
         WorkSheetStatus.NO_SALE,
-        WorkSheetStatus.MEETING
+        WorkSheetStatus.MEETING,
+        WorkSheetStatus.ALREADY_SOLD
       ];
     // end status
     case WorkSheetStatus.ALREADY_SOLD:
