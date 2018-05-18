@@ -26,3 +26,7 @@ export async function retrievePricesAndLocationInfo(cadastreReference) {
     priceSell
   });
 }
+
+export async function loadBankCity(filepath) {
+
+}

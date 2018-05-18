@@ -104,6 +104,7 @@ t.BanksCityData = t.struct(
       price: 0,
       priceCity: 0,
       rot: 0,
+      itp: 10,
       _documentType: 'bank-city-data'
     }
   }
