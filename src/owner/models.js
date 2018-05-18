@@ -164,7 +164,7 @@ export class OwnerRepository extends Owner {
     const owner = await this.findByIdOrThrow(ownerId);
     let updatedOwner = t.update(owner, {$merge: Object.assign({}, data, {id: ownerId})});
 
-    await WorksheetRepository.canUpdateOwner(owner);
+    await WorksheetRepository.canUpdateOwner(owner, updatedOwner);
 
     if (typeof data.verified !== 'undefined') {
       const owner = t.Owner(updatedOwner);

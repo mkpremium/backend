@@ -18,7 +18,13 @@ import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
 import {WorkSheetStatus} from '../../types/worksheet';
-import {isInvalidVerified, isPrimaryNoVende, isPrimaryVerified, isPrimaryYaVendio} from '../../types/owner';
+import {
+  isAllowedChangeState,
+  isInvalidVerified,
+  isPrimaryNoVende,
+  isPrimaryVerified,
+  isPrimaryYaVendio
+} from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
@@ -122,15 +128,16 @@ export class WorksheetRepository extends Worksheet {
     }
   }
 
-  static async canUpdateOwner(owner) {
+  static async canUpdateOwner(owner, updatedOwner) {
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findWorksheetByOwner(owner.id);
-
     if (worksheet && worksheet.status === WorkSheetStatus.WITH_OWNER && owner.isPrimaryVerified()) {
-      throw newHttpError(
-        422,
-        `No se puede actualizar el owner. Es "${owner.type}" y fue verificado (${owner.confirmedByOperator})`
-      );
+      if (!isAllowedChangeState(updatedOwner)) {
+        throw newHttpError(
+          422,
+          `No se puede actualizar el owner. Es "${owner.type}" y fue verificado (${owner.confirmedByOperator})`
+        );
+      }
     }
 
     return true;

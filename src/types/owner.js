@@ -299,3 +299,8 @@ export function isPrimaryYaVendio(data) {
     owner.status === OwnerStatus.YA_VENDIO &&
     owner.type === OwnerType.PRINCIPAL;
 }
+
+export function isAllowedChangeState(data) {
+  const owner = t.Owner(data);
+  return [OwnerStatus.YA_VENDIO, OwnerStatus.NO_VENDE, OwnerStatus.VERIFICADO].indexOf(owner.status) !== -1;
+}
