@@ -33,6 +33,7 @@ t.BankFileData = t.struct(
     priceSell: t.Number,
     priceCity: t.Number,
     rot: t.Number,
+    itp: t.Number,
     m2: t.Number,
     population: t.Number,
     location: t.maybe(t.Address),
@@ -55,6 +56,7 @@ t.BankFileData = t.struct(
       population: 0,
       rot: 0,
       m2: 0,
+      itp: 10,
       buy: true,
       processed: false,
       _documentType: 'bank-file-data'
