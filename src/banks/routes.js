@@ -17,6 +17,7 @@ const router = Router();
  *     tags: [Banks]
  *     security:
  *       - banks: []
+ *       - banks_api: []
  *     summary: Obtienes los 5 archivos cargados más recientes
  *     description:
  *      Este endpoint sirve para conocer los archivos cargados previamente
