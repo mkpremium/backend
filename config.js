@@ -123,3 +123,5 @@ export const nestoriaService = {
   serviceUrl: 'https://api.nestoria.es:443/api',
   waitTimeMS: 2000
 };
+
+export const proxyEnable = Boolean(process.env.PROXY_ENABLE || false);

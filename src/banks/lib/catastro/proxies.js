@@ -1,6 +1,7 @@
 import debug from 'debug';
 import proxyList from 'proxy-lists';
 import {defer} from '../../../lib/promise-util';
+import {proxyEnable} from '../../../../config';
 
 const debugProxy = debug('app:banks:proxies');
 
@@ -10,6 +11,10 @@ function formatter(proxy) {
 }
 
 export async function getRandomProxy() {
+  if (!proxyEnable) {
+    return false;
+  }
+
   const proxies = await getProxies();
   return proxies[Math.floor(Math.random() * proxies.length)];
 }
