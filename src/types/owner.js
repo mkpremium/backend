@@ -280,6 +280,12 @@ export function isPrimaryVerified(data) {
     owner.type === OwnerType.PRINCIPAL;
 }
 
+export function ownerVerified(data) {
+  const owner = t.Owner(data);
+  return owner.confirmedByOperator.value &&
+    owner.status === OwnerStatus.VERIFIED;
+}
+
 export function isInvalidVerified(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&

@@ -22,8 +22,8 @@ import {
   isAllowedChangeState,
   isInvalidVerified,
   ownerNoSale,
-  isPrimaryVerified,
-  ownerAlreadySold
+  ownerAlreadySold,
+  ownerVerified
 } from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
@@ -98,7 +98,7 @@ export class WorksheetRepository extends Worksheet {
 
   async calculateNewStatus(worksheet) {
     const isValidLength = worksheet.relatedOwners.length > 0;
-    const someValidOwner = isValidLength && _some(worksheet.relatedOwners, isPrimaryVerified);
+    const someValidOwner = isValidLength && _some(worksheet.relatedOwners, ownerVerified);
     const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
     const noSale = isValidLength && _find(worksheet.relatedOwners, ownerNoSale);
     const alreadySold = isValidLength && _find(worksheet.relatedOwners, ownerAlreadySold);
