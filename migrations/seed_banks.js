@@ -4,16 +4,20 @@ import {
   createFullOperator
 } from '../test/common';
 import {MigrateBankCityFile} from '../src/banks/lib/load-bank-file';
-import {BankFileRepository} from '../src/banks/models';
+import {BankFileDataRepository, BankFileRepository, BanksCityDataRepository} from '../src/banks/models';
 import {OperatorRepository} from '../src/operator/models';
 
 async function init() {
   await app.locals.bucketPromise;
+  const bankCityData = new BanksCityDataRepository();
   const bankFileRepo = new BankFileRepository();
+  const bankFileDataRepo = new BankFileDataRepository();
   const operatorRepo = new OperatorRepository();
 
   await operatorRepo.deleteQuery();
   await bankFileRepo.deleteQuery();
+  await bankFileDataRepo.deleteQuery();
+  await bankCityData.deleteQuery();
 
   await createFullOperator({
     username: `banks`,

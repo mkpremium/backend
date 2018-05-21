@@ -5,6 +5,7 @@ import xmldoc from 'xmldoc';
 import Utm from 'utm-latlng';
 
 import {cadastreLocation} from '../../../../config';
+import {getRandomProxy} from './proxies';
 
 const SRS = {
   'EPSG:32627': 'WGS 84',
@@ -58,8 +59,9 @@ export async function cadastreLocationService(cadastreReference) {
   debugCadastre('cadastreLocationService', 'init', cadastreLocation, cadastreLocation);
   await Promise.delay(cadastreLocation.waitTimeMS);
   const parser = await xmlParser();
-  debugCadastre('cadastreLocationService', 'fetching');
-  const axios = axiosCreate({proxy: cadastreLocation.proxy});
+  const proxy = await getRandomProxy();
+  debugCadastre('cadastreLocationService', 'fetching', proxy);
+  const axios = axiosCreate({proxy});
   const response = await axios.get(cadastreLocation.serviceUrl, {
     params: {
       RC: cadastreReference14,

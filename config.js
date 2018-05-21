@@ -111,28 +111,15 @@ export const mailer = {
 
 export const cadastreLocation = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC',
-  waitTimeMS: 2000,
-  proxy: {
-    host: process.env.PROXY_HOST || '175.181.40.61',
-    port: process.env.PROXY_PORT || '8080'
-  }
+  waitTimeMS: 0
 };
 
 export const cadastreAddress = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
-  waitTimeMS: 2000,
-  proxy: {
-    host: process.env.PROXY_HOST || '175.181.40.61',
-    port: process.env.PROXY_PORT || '8080'
-  }
-
+  waitTimeMS: 0
 };
 
 export const nestoriaService = {
   serviceUrl: 'https://api.nestoria.es:443/api',
-  waitTimeMS: 2000,
-  proxy: {
-    host: process.env.PROXY_HOST || '147.75.113.107',
-    port: process.env.PROXY_HOST || '8080'
-  }
+  waitTimeMS: 2000
 };

@@ -4,6 +4,7 @@ import axiosCreate from './axios';
 import {cadastreAddress} from '../../../../config';
 import Promise from 'bluebird';
 import xmldoc from 'xmldoc';
+import {getRandomProxy} from './proxies';
 
 const debugCadastre = debug('app:banks:cadastre');
 
@@ -44,8 +45,9 @@ function paramsEnvelope(rc) {
 export async function cadastreAddressService(cadastreReference) {
   debugCadastre('cadastreAddressService', 'init', cadastreAddress, cadastreReference);
   await Promise.delay(cadastreAddress.waitTimeMS);
-  debugCadastre('cadastreAddressService', 'fetching');
-  const axios = axiosCreate({proxy: cadastreAddress.proxy});
+  const proxy = await getRandomProxy();
+  const axios = axiosCreate({proxy});
+  debugCadastre('cadastreAddressService', 'fetching', proxy);
   const params = paramsEnvelope(cadastreReference);
   const response = await axios.post(
     cadastreAddress.serviceUrl,

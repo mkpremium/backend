@@ -26,6 +26,7 @@ export class BankFileRepository extends CouchbaseModel {
 
   async setProcessed(bankFile, $set) {
     const updated = t.update(bankFile, {processed: {$set}});
+    console.log('setProcessed', bankFile, {$set});
     return this.save(updated);
   }
 
@@ -44,7 +45,7 @@ export class BankFileDataRepository extends CouchbaseModel {
   async updateCounter(bankFileId) {
     const repoFile = new BankFileRepository();
     const counter = repoFile.getCounter();
-    const file = repoFile.findById(bankFileId);
+    const file = await repoFile.findById(bankFileId);
     const value = await counter.count(bankFileId, 1);
     return repoFile.setProcessed(file, value);
   }
@@ -57,7 +58,7 @@ export class BankFileDataRepository extends CouchbaseModel {
     });
 
     await this.save(updatedBankFileData);
-    await this.updateCounter(bankFileData.bankFileId);
+    await this.updateCounter(updatedBankFileData.bankFileId);
   }
 
   async findByIdOrThrow(id) {
