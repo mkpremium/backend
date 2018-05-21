@@ -14,6 +14,7 @@ import operator from './operator';
 import banks from './banks';
 
 import appErrorHandler from './lib/error-handler';
+import socket from './socket';
 
 const app = express();
 
@@ -25,7 +26,8 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(cors());
 
 Promise.all([
-  couchbase(app)
+  couchbase(app),
+  socket.initModel()
 ]).catch(err => {
   console.error(err);
 });
