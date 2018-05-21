@@ -207,7 +207,7 @@ t.Person.prototype.contactValueExists = function(value) {
  *         description: "Verifica la información por un operador humano"
  *       status:
  *         type: string
- *         enum: [NO_VERIFICADO, VERIFICADO, NO_VENDE, ERRONEO]
+ *         enum: [NO_VERIFICADO, VERIFICADO, NO_SALE, ERRONEO]
  */
 t.OwnerConfirmed = t.struct({
   value: t.Boolean,
@@ -276,31 +276,29 @@ t.Owner.prototype.isPrimaryVerified = function() {
 export function isPrimaryVerified(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.VERIFICADO &&
+    owner.status === OwnerStatus.VERIFIED &&
     owner.type === OwnerType.PRINCIPAL;
 }
 
 export function isInvalidVerified(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.ERRONEO;
+    owner.status === OwnerStatus.ERROR;
 }
 
-export function isPrimaryNoVende(data) {
+export function ownerNoSale(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.NO_VENDE &&
-    owner.type === OwnerType.PRINCIPAL;
+    owner.status === OwnerStatus.NO_SALE;
 }
 
-export function isPrimaryYaVendio(data) {
+export function ownerAlreadySold(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.YA_VENDIO &&
-    owner.type === OwnerType.PRINCIPAL;
+    owner.status === OwnerStatus.ALREADY_SOLD;
 }
 
 export function isAllowedChangeState(data) {
   const owner = t.Owner(data);
-  return [OwnerStatus.YA_VENDIO, OwnerStatus.NO_VENDE, OwnerStatus.VERIFICADO].indexOf(owner.status) !== -1;
+  return [OwnerStatus.ALREADY_SOLD, OwnerStatus.NO_SALE, OwnerStatus.VERIFIED].indexOf(owner.status) !== -1;
 }

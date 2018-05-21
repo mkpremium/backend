@@ -21,19 +21,19 @@ t.TypeContact = t.enums({
 }, 'TypeContact');
 
 export const OwnerType = {
-  NINGUNO: 'NINGUNO',
+  NONE: 'NINGUNO',
   PRINCIPAL: 'PRINCIPAL',
-  SECUNDARIO: 'SECUNDARIO',
-  VECINO: 'VECINO',
-  FAMILIAR: 'FAMILIAR'
+  SECONDARY: 'SECUNDARIO',
+  NEIGHBOUR: 'VECINO',
+  FAMILY: 'FAMILIAR'
 };
 
 export const OwnerStatus = {
-  NO_VERIFICADO: 'NO_VERIFICADO',
-  VERIFICADO: 'VERIFICADO',
-  NO_VENDE: 'NO_VENDE',
-  YA_VENDIO: 'YA_VENDIO',
-  ERRONEO: 'ERRONEO'
+  NON_VERIFIED: 'NO_VERIFICADO',
+  VERIFIED: 'VERIFICADO',
+  NO_SALE: 'NO_VENDE',
+  ALREADY_SOLD: 'YA_VENDIO',
+  ERROR: 'ERRONEO'
 };
 
 t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType');

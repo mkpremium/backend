@@ -21,9 +21,9 @@ import {WorkSheetStatus} from '../../types/worksheet';
 import {
   isAllowedChangeState,
   isInvalidVerified,
-  isPrimaryNoVende,
+  ownerNoSale,
   isPrimaryVerified,
-  isPrimaryYaVendio
+  ownerAlreadySold
 } from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
@@ -100,8 +100,8 @@ export class WorksheetRepository extends Worksheet {
     const isValidLength = worksheet.relatedOwners.length > 0;
     const someValidOwner = isValidLength && _some(worksheet.relatedOwners, isPrimaryVerified);
     const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
-    const noVende = isValidLength && _find(worksheet.relatedOwners, isPrimaryNoVende);
-    const yaVendio = isValidLength && _find(worksheet.relatedOwners, isPrimaryYaVendio);
+    const noSale = isValidLength && _find(worksheet.relatedOwners, ownerNoSale);
+    const alreadySold = isValidLength && _find(worksheet.relatedOwners, ownerAlreadySold);
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
         if (someValidOwner) {
@@ -112,10 +112,10 @@ export class WorksheetRepository extends Worksheet {
         }
         return WorkSheetStatus.DEFAULT;
       case WorkSheetStatus.WITH_OWNER:
-        if (noVende) {
+        if (noSale) {
           return WorkSheetStatus.NO_SALE;
         }
-        if (yaVendio) {
+        if (alreadySold) {
           return WorkSheetStatus.ALREADY_SOLD;
         }
         const meetings = await this.findMeetings(worksheet.id);
