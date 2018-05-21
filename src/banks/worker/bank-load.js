@@ -36,7 +36,10 @@ class BankLoadWorker {
       });
 
       const payload = JSON.stringify({id: bankFileData.id});
-      const options = {background: true};
+      const options = {
+        unique: payload.id,
+        background: true
+      };
       this.client.submitJob(BANK_WORKER_NAMES.PROCESS, payload, options);
     };
   }

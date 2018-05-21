@@ -122,7 +122,7 @@ export class CouchbaseModel {
     return this._bucket.queryAsync(searchBuilder);
   }
 
-  getCounter(options = {initial: 0}) {
+  getCounter(options = {initial: 1}) {
     return new CouchbaseCounter(this._bucket, options);
   }
 
