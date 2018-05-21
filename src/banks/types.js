@@ -63,6 +63,8 @@ t.BankFile = t.struct(
     filename: t.String,
     filepath: t.String,
     mimetype: t.String,
+    processed: t.Number,
+    total: t.Number,
 
     _documentType: t.enums.of(['bank-file'])
   },
@@ -72,6 +74,8 @@ t.BankFile = t.struct(
       get id() {
         return uuid();
       },
+      processed: 0,
+      total: 0,
       _documentType: 'bank-file'
     }
   }

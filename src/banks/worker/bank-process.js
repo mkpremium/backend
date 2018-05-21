@@ -7,10 +7,15 @@ import {wrap} from '../../lib/workers';
 
 import {BankFileDataRepository} from '../models';
 import {BANK_WORKER_NAMES} from './workers';
+import socket from '../../socket';
+import Promise from 'bluebird';
 
 class BankProcessWorker {
   constructor() {
-    this.db = couchbase();
+    this.db = Promise.all([
+      couchbase(),
+      socket.initModel()
+    ]);
     this.worker = gearman.worker(gearmanConfig);
   }
 

@@ -23,6 +23,16 @@ export class BankFileRepository extends CouchbaseModel {
     this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, payload, options);
     return bankFile;
   }
+
+  async setProcessed(bankFile, $set) {
+    const updated = t.update(bankFile, {processed: {$set}});
+    return this.save(updated);
+  }
+
+  async setTotal(bankFile, $set) {
+    const updated = t.update(bankFile, {total: {$set}});
+    return this.save(updated);
+  }
 }
 
 export class BankFileDataRepository extends CouchbaseModel {
@@ -31,13 +41,23 @@ export class BankFileDataRepository extends CouchbaseModel {
     this.Struct = t.BankFileData;
   }
 
+  async updateCounter(bankFileId) {
+    const repoFile = new BankFileRepository();
+    const counter = repoFile.getCounter();
+    const file = repoFile.findById(bankFileId);
+    const value = await counter.count(bankFileId, 1);
+    return repoFile.setProcessed(file, value);
+  }
+
   async process(bankFileData) {
     const $merge = await retrievePricesAndLocationInfo(bankFileData.cadastreReference);
     const updatedBankFileData = t.update(bankFileData, {
       $merge,
       processed: {$set: true}
     });
-    return this.save(updatedBankFileData);
+
+    await this.save(updatedBankFileData);
+    await this.updateCounter(bankFileData.bankFileId);
   }
 
   async findByIdOrThrow(id) {
