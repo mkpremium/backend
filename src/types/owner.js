@@ -286,18 +286,16 @@ export function isInvalidVerified(data) {
     owner.status === OwnerStatus.ERRONEO;
 }
 
-export function isPrimaryNoVende(data) {
+export function ownerNoSale(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.NO_VENDE &&
-    owner.type === OwnerType.PRINCIPAL;
+    owner.status === OwnerStatus.NO_VENDE;
 }
 
-export function isPrimaryYaVendio(data) {
+export function ownerAlreadySold(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.YA_VENDIO &&
-    owner.type === OwnerType.PRINCIPAL;
+    owner.status === OwnerStatus.YA_VENDIO;
 }
 
 export function isAllowedChangeState(data) {
