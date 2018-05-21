@@ -18,7 +18,9 @@ export class BankFileRepository extends CouchbaseModel {
       filepath: file.path
     };
     const bankFile = await this.save(params);
-    this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, JSON.stringify(bankFile));
+    const payload = JSON.stringify(bankFile);
+    const options = {background: true};
+    this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, payload, options);
     return bankFile;
   }
 }
