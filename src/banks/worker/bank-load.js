@@ -1,6 +1,6 @@
 import gearman from 'gearmanode';
 import Promise from 'bluebird';
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx';
 
 import couchbase from '../../db/couchbase';
 import {gearmanConfig} from '../../../config';
@@ -30,7 +30,8 @@ class BankLoadWorker {
         priceBank: Number(row[bankPriceCol])
       });
 
-      this.client.submitJob(BANK_WORKER_NAMES.PROCESS, bankFileData.id);
+      const payload = JSON.stringify({id: bankFileData.id});
+      this.client.submitJob(BANK_WORKER_NAMES.PROCESS, payload);
     };
   }
 

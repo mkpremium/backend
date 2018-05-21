@@ -1,7 +1,13 @@
 version: '3'
 
 services:
-  queue:
+  queue_ui:
+    image: "koryonik/gearman-ui"
+    ports:
+      - "8085:80"
+    depends_on:
+      - gearman
+  gearman:
     image: "artefactual/gearmand"
     ports:
       - "4730:4730"

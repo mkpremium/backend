@@ -113,8 +113,8 @@ export const cadastreLocation = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC',
   waitTimeMS: 2000,
   proxy: {
-    host: process.env.PROXY_HOST || '20.184.8.84',
-    port: process.env.PROXY_HOST || '80'
+    host: process.env.PROXY_HOST || '175.181.40.61',
+    port: process.env.PROXY_PORT || '8080'
   }
 };
 
@@ -122,8 +122,8 @@ export const cadastreAddress = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
   waitTimeMS: 2000,
   proxy: {
-    host: process.env.PROXY_HOST || '20.184.8.84',
-    port: process.env.PROXY_HOST || '80'
+    host: process.env.PROXY_HOST || '175.181.40.61',
+    port: process.env.PROXY_PORT || '8080'
   }
 
 };

@@ -9,6 +9,7 @@ import couchbase from './db/couchbase';
 import './types';
 
 // modules
+import gearman from './gearman';
 import operator from './operator';
 import banks from './banks';
 
@@ -28,6 +29,7 @@ Promise.all([
 ]).catch(err => {
   console.error(err);
 });
+gearman(app);
 operator(app);
 banks(app);
 

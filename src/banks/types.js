@@ -3,6 +3,43 @@ import '../types';
 import uuid from 'uuid/v4';
 
 /**
+* @swagger
+* definitions:
+  *   BanksAddress:
+  *     properties:
+  *       type:
+  *         type: string
+*       street:
+*         type: string
+*       number:
+*         type: number
+*       fullAddress:
+*         type: string
+*       registerNumber:
+*         type: number
+*       postalCode:
+*         $ref: "#/definitions/PostalCode"
+*       city:
+*         type: string
+*       province:
+*         type: string
+*       zone:
+*         type: string
+*/
+t.BanksAddress = t.struct(
+  {
+    type: t.String,
+    street: t.String,
+    number: t.Number,
+    fullAddress: t.maybe(t.String),
+    city: t.String
+  },
+  {
+    name: 'BanksAddress'
+  }
+);
+
+/**
  * @swagger
  * definitions:
  *   BankFile:
@@ -25,6 +62,7 @@ t.BankFile = t.struct(
     id: t.String,
     filename: t.String,
     filepath: t.String,
+    mimetype: t.String,
 
     _documentType: t.enums.of(['bank-file'])
   },
@@ -54,7 +92,11 @@ t.BankFileData = t.struct(
     itp: t.Number,
     m2: t.Number,
     population: t.Number,
-    location: t.maybe(t.Address),
+    address: t.maybe(t.BanksAddress),
+    location: t.maybe(t.struct({
+      latitude: t.Number,
+      longitude: t.Number
+    }, 'location')),
     buy: t.Boolean,
 
     processed: t.Boolean,

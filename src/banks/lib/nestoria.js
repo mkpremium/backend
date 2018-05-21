@@ -55,7 +55,7 @@ function calculatePriceZoneRaw(listing = []) {
   const listingFiltered = listing
     .filter(filterZeroPriceSize);
 
-  return calculatePriceZone(listingFiltered);
+  return calculatePriceAverage(listingFiltered);
 }
 
 function calculatePriceZone(listing = [], location) {

@@ -13,11 +13,12 @@ export class BankFileRepository extends CouchbaseModel {
 
   async processFile(file) {
     const params = {
-      filename: file.originalName,
+      mimetype: file.mimetype,
+      filename: file.originalname,
       filepath: file.path
     };
     const bankFile = await this.save(params);
-    this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, bankFile.id);
+    this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, JSON.stringify(bankFile));
     return bankFile;
   }
 }
@@ -29,7 +30,7 @@ export class BankFileDataRepository extends CouchbaseModel {
   }
 
   async process(bankFileData) {
-    const $merge = await retrievePricesAndLocationInfo(bankFileData);
+    const $merge = await retrievePricesAndLocationInfo(bankFileData.cadastreReference);
     const updatedBankFileData = t.update(bankFileData, {
       $merge,
       processed: {$set: true}
@@ -59,7 +60,7 @@ export class BanksCityDataRepository extends CouchbaseModel {
     qb
       .where('name = ?', name)
       .limit(1);
-    const [result] = repo.query(qb);
+    const [result] = await repo.query(qb);
     return result;
   }
 }

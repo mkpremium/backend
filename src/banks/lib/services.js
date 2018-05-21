@@ -20,10 +20,11 @@ export async function retrievePricesAndLocationInfo(cadastreReference) {
   const location = await cadastreLocationService(cadastreReference);
   const pricing = await nestoriaListingService(location);
   const buildingInfo = await cadastreAddressService(cadastreReference);
-  const bankCityData = cityData(buildingInfo.address.city);
+  const bankCityData = await cityData(buildingInfo.address.city);
   const priceSell = calculatePriceSell(pricing, buildingInfo);
   return Object.assign({}, pricing, buildingInfo, bankCityData, {
-    priceSell
+    priceSell,
+    location
   });
 }
 

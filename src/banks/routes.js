@@ -40,6 +40,40 @@ const router = Router();
  *           $ref: "#/definitions/Error"
  */
 router.get('/files', listBankFilesController);
+
+/**
+ * @swagger
+ * /banks/files:
+ *   post:
+ *     tags: [Banks]
+ *     summary: Carga un archivo de bancos
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - multipart/form-data
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: file
+ *        type: file
+ *        in: formData
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BankFile"
+ *       400:
+ *         description: Solicitud mal formada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
 router.post('/files', uploadBankFileController);
 router.get('/files/:id');
 

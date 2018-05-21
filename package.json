@@ -17,9 +17,13 @@
     "socket": "better-npm-run socket",
     "deploy": "scripts/deployment.sh",
     "cronjobs": "better-npm-run cronjobs",
-    "seed": "better-npm-run seed"
+    "seed": "better-npm-run seed",
+    "banks_worker_0": "better-npm-run banks_worker_0",
+    "banks_worker_1": "better-npm-run banks_worker_1"
   },
   "betterScripts": {
+    "banks_worker_0": "nodemon $NODE_DEBUG_OPTION src/banks/worker/bank-load.js --exec babel-node",
+    "banks_worker_1": "nodemon $NODE_DEBUG_OPTION src/banks/worker/bank-process.js --exec babel-node",
     "start_banks": "nodemon $NODE_DEBUG_OPTION bin/www-bank.js --exec babel-node",
     "start": "nodemon $NODE_DEBUG_OPTION bin/www.js --exec babel-node",
     "socket": "nodemon bin/socket.js --exec babel-node",

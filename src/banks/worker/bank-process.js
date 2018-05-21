@@ -14,9 +14,10 @@ class BankProcessWorker {
     this.worker = gearman.worker(gearmanConfig);
   }
 
-  static async workerBankProcess(bankFileDataId) {
+  static async workerBankProcess(args) {
+    const bankFileDataId = args.id;
     const repo = new BankFileDataRepository();
-    const bankFileData = repo.findByIdOrThrow(bankFileDataId);
+    const bankFileData = await repo.findByIdOrThrow(bankFileDataId);
     await repo.process(bankFileData);
   }
 

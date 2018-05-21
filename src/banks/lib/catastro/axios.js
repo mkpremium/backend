@@ -6,6 +6,7 @@ export default (config) => axios.create(Object.assign({
     rejectUnauthorized: false
   }),
   headers: {
+    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0',
     'Content-Type': 'text/xml'
   }
 }, config));

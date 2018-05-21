@@ -14,7 +14,7 @@ function xmlParser(rawXml) {
   const baseAddress = `${base}.dt.locs.lous.lourb.dir`;
 
   const address = {
-    number: document.valueWithPath(`${baseAddress}.pnp`),
+    number: Number(document.valueWithPath(`${baseAddress}.pnp`)),
     type: document.valueWithPath(`${baseAddress}.tv`),
     street: document.valueWithPath(`${baseAddress}.nv`)
   };
@@ -52,7 +52,7 @@ export async function cadastreAddressService(cadastreReference) {
     params, {
       headers: {
         'SOAPAction': 'http://tempuri.org/OVCServWeb/OVCCallejero/Consulta_DNPRC',
-        'Content-Type': 'text/xml; charset=utf-8',
+        'Content-Type': 'text/xml',
         'Content-Length': params.length
       }
     });
