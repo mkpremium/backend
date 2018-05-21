@@ -222,7 +222,7 @@ export class CouchbaseModel {
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
     const model = fromJSON(result, this.Struct);
 
-    if (result && sendEvent) {
+    if (result) {
       const eventType = isNewData ? 'new' : data.id;
       await this.sendEvent(eventType, dataPreSaved, sendEvent);
       await this.postSave(model);
