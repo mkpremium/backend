@@ -111,17 +111,17 @@ export const mailer = {
 
 export const cadastreLocation = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC',
-  waitTimeMS: 0
+  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000)
 };
 
 export const cadastreAddress = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
-  waitTimeMS: 0
+  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000)
 };
 
 export const nestoriaService = {
   serviceUrl: 'https://api.nestoria.es:443/api',
-  waitTimeMS: 2000
+  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000)
 };
 
 export const proxyEnable = Boolean(process.env.PROXY_ENABLE || false);
