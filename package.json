@@ -6,6 +6,8 @@
     "lint-fix": "eslint . --fix",
     "prestart": "npm run lint",
     "start": "better-npm-run start",
+    "prestart_banks": "npm run lint",
+    "start_banks": "better-npm-run start_banks",
     "prestart_migration": "npm run lint",
     "start_all": "better-npm-run start:all",
     "pretest": "npm run lint",
@@ -18,6 +20,7 @@
     "seed": "better-npm-run seed"
   },
   "betterScripts": {
+    "start_banks": "nodemon $NODE_DEBUG_OPTION bin/www-bank.js --exec babel-node",
     "start": "nodemon $NODE_DEBUG_OPTION bin/www.js --exec babel-node",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "deploy": "scripts/deployment.sh",

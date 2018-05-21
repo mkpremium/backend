@@ -2,6 +2,24 @@ import t from 'tcomb';
 import '../types';
 import uuid from 'uuid/v4';
 
+/**
+ * @swagger
+ * definitions:
+ *   BankFile:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       filename:
+ *         type: string
+ *       filepath:
+ *         type: string
+ *
+ *   BankFileBody:
+ *     properties:
+ *       file:
+ *         type: file
+ */
 t.BankFile = t.struct(
   {
     id: t.String,
@@ -109,5 +127,20 @@ t.BanksCityData = t.struct(
     }
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   Error:
+ *     properties:
+ *       message:
+ *         type: string
+ *   BankListResponse:
+ *     properties:
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/BankFile"
+ */
 
 export default t;

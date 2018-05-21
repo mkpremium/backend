@@ -2,7 +2,6 @@ import Promise from 'bluebird';
 import fromJSON from 'tcomb/lib/fromJSON';
 import * as XLSX from 'xlsx';
 import _zipObject from 'lodash/zipObject';
-import _isEmpty from 'lodash/isEmpty';
 import _isNumber from 'lodash/isNumber';
 import {BanksCityDataRepository} from '../models';
 import t from 'tcomb';
