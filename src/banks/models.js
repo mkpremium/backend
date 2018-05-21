@@ -26,7 +26,6 @@ export class BankFileRepository extends CouchbaseModel {
 
   async setProcessed(bankFile, $set) {
     const updated = t.update(bankFile, {processed: {$set}});
-    console.log('setProcessed', bankFile, {$set});
     return this.save(updated);
   }
 
