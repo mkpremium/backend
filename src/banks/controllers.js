@@ -32,8 +32,9 @@ export async function getBankFile(req, res) {
 }
 
 export async function calculateFilters(req, res) {
+  const repo = new BankFileRepository();
   const bankFileId = req.params.id;
-  const response = await BankFileRepository.calculateFilter(bankFileId, req.body);
+  const response = await repo.calculateFilter(bankFileId, req.body);
   res.json(response);
 }
 
