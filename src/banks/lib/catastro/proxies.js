@@ -21,7 +21,7 @@ export async function getRandomProxy() {
 
 export async function getProxies(min = 1) {
   const options = {
-    countries: ['es', 'us', 'ca', 'fr', 'cl'],
+    // countries: ['es', 'us', 'ca', 'fr', 'cl'],
     protocols: ['http', 'https'],
     sourcesWhiteList: ['freeproxylists'],
     sourcesBlackList: ['bitproxies', 'kingproxies'],
