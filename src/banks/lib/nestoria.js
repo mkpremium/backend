@@ -46,7 +46,7 @@ function addDistance(refLocation) {
   };
 }
 
-function calculatePriceAverage(listing = []) {
+function calculatePriceAverageM2(listing = []) {
   const total = listing.reduce((acc, {price, size}) => (price / size), 0);
   return total / Math.max(listing.length, 1);
 }
@@ -55,7 +55,7 @@ function calculatePriceZoneRaw(listing = []) {
   const listingFiltered = listing
     .filter(filterZeroPriceSize);
 
-  return calculatePriceAverage(listingFiltered);
+  return calculatePriceAverageM2(listingFiltered);
 }
 
 function calculatePriceZone(listing = [], location) {
@@ -67,7 +67,7 @@ function calculatePriceZone(listing = [], location) {
     .sort(sortPriceLowest)
     .slice(0, 10);
 
-  return calculatePriceAverage(listingSortedAndFiltered);
+  return calculatePriceAverageM2(listingSortedAndFiltered);
 }
 
 async function nestoriaSearchListing(location, radius = '0.5km') {
