@@ -1,7 +1,7 @@
 import multer from 'multer';
 import {wrap} from 'express-promise-wrap';
 import {compose} from 'compose-middleware';
-import {BankFileRepository} from './models';
+import {BankFileDataRepository, BankFileRepository} from './models';
 
 import {storage} from '../../config';
 
@@ -21,9 +21,14 @@ export async function uploadBankFile(req, res) {
 export async function getBankFile(req, res) {
   const bankFileId = req.params.id;
   const repo = new BankFileRepository();
-  const bankFile = await repo.findByIdOrThrow(bankFileId);
-  const response = BankFileRepository.single(bankFile);
-  res.json(response);
+  const dataRepo = new BankFileDataRepository();
+  const bankFileRaw = await repo.findByIdOrThrow(bankFileId);
+  const bankFileData = await dataRepo.findByFileBankId(bankFileId);
+  const bankFile = BankFileRepository.single(bankFileRaw);
+  res.json({
+    bankFile,
+    bankFileData
+  });
 }
 
 export async function calculateFilters(req, res) {

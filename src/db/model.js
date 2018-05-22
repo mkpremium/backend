@@ -219,6 +219,7 @@ export class CouchbaseModel {
   }
 
   async save(data, sendEvent) {
+    // noinspection JSCheckFunctionSignatures
     const struct = fromJSON(data, this.Struct);
     const isNewData = !data.id;
     const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
@@ -230,6 +231,7 @@ export class CouchbaseModel {
 
     await this._promiseBucket;
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+    // noinspection JSCheckFunctionSignatures
     const model = fromJSON(result, this.Struct);
 
     if (result) {

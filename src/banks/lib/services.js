@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import _some from 'lodash/some';
 import {BankFileDataRepository, BanksCityDataRepository} from '../models';
 import {cadastreLocationService} from './catastro/location';
@@ -90,9 +91,15 @@ export async function retrievePricesAndLocationInfo(cadastreReference) {
   });
 }
 
+async function updateFilters(bankFileData) {
+  const repo = new BankFileDataRepository();
+  return repo.save(bankFileData);
+}
+
 export async function calculateFilter(bankFileId, thresholds) {
   const repo = new BankFileDataRepository();
   const bankFileDataRows = await repo.findByFileBankId(bankFileId);
 
-  return bankFileDataRows.map(calculateFilters(thresholds));
+  const calculator = calculateFilters(thresholds);
+  return Promise.map(bankFileDataRows, (data) => updateFilters(calculator(data)));
 }

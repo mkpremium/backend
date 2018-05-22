@@ -97,6 +97,15 @@ t.BankFilterResult = t.struct(
  *         type: number
  *       total:
  *         type: number
+ *
+ *   BankFileDetails:
+ *     properties:
+ *       bankFile:
+ *         $ref: "#/definitions/BankFile"
+ *       bankFileData:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/BankFileData"
  */
 t.BankFile = t.struct(
   {
@@ -142,6 +151,40 @@ t.ListBankFileResponse = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   BankFileData:
+ *     properties:
+ *       id:
+ *         type: string
+ *         format: uuid/v4
+ *       bankFileId:
+ *         type: string
+ *         format: uuid/v4
+ *       cadastreReference:
+ *         type: string
+ *         description: Referencia catastral
+ *       priceBank:
+ *         type: number
+ *       priceZoneRaw:
+ *         type: number
+ *         description: "Precio por M²"
+ *       priceZone:
+ *         type: number
+ *         description: "Precio por M²"
+ *       priceSell:
+ *         type: number
+ *       priceCity:
+ *         type: number
+ *         description: "Precio por M²"
+ *       rot:
+ *         type: number
+ *       itp:
+ *         type: number
+ *       m2:
+ *         type: number
+ */
 t.BankFileData = t.struct(
   {
     id: t.String,

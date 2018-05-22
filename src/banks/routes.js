@@ -103,7 +103,7 @@ router.post('/files', uploadBankFileController);
  *       200:
  *         description: Operación exitosa
  *         schema:
- *           $ref: "#/definitions/BankFile"
+ *           $ref: "#/definitions/BankFileDetails"
  *       401:
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
@@ -146,11 +146,5 @@ router.get('/files/:id', getBankFileController);
  *
  */
 router.post('/files/:id/calculate-filters', calculateFiltersController);
-
-// router.get('/filters');
-router.post('/filtered-files');
-router.post('/filtered-files/:id');
-router.put('/filtered-files/:id');
-router.post('/filtered-files/:id/export');
 
 export default router;
