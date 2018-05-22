@@ -140,7 +140,8 @@ t.BankFileDataFilteredResponse = t.BankFileData.extend({
     population: t.Boolean,
     benefit: t.Boolean,
     priceSell: t.Boolean,
-    blacklisted: t.Boolean
+    blacklisted: t.Boolean,
+    whitelisted: t.Boolean
   }, 'filters')
 }, 'BankFileFilteredResponse');
 

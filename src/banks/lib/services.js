@@ -36,7 +36,23 @@ function filterBlacklisted(blacklisted) {
   return ({cadastreReference}) => blacklisted.indexOf(cadastreReference) !== -1;
 }
 
-function calculateFilters(thresholds) {
+function filterWhitelisted(whitelisted) {
+  if (!whitelisted) return alwaysFalse;
+  return ({cadastreReference}) => whitelisted.indexOf(cadastreReference) === -1;
+}
+
+/**
+ *
+ * @param thresholds
+ * @param [thresholds.discount]
+ * @param [thresholds.population]
+ * @param [thresholds.benefit]
+ * @param [thresholds.priceSell]
+ * @param [thresholds.blacklisted]
+ * @param [thresholds.whitelisted]
+ * @returns {function(*=): *}
+ */
+function calculateFilters(thresholds = {}) {
   return (obj) => {
     const discount = thresholds.discount || 0;
     const priceInvest = calculatePriceInvest(obj, discount);
@@ -45,9 +61,10 @@ function calculateFilters(thresholds) {
       population: filterPopulation(thresholds.population)(withPriceInvest),
       benefit: filterBenefit(thresholds.benefit)(withPriceInvest),
       priceSell: filterPriceSell(thresholds.priceSell)(withPriceInvest),
-      blacklisted: filterBlacklisted(thresholds.blacklisted)(withPriceInvest)
+      blacklisted: filterBlacklisted(thresholds.blacklisted)(withPriceInvest),
+      whitelisted: filterWhitelisted(thresholds.whitelisted)(withPriceInvest)
     };
-    const buy = !_some(Object.values(filters));
+    const buy = filters.whitelisted || !_some(Object.values(filters));
     return Object.assign({priceInvest, filters}, obj, {buy});
   };
 }
