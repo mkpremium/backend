@@ -13,8 +13,7 @@ export function wrap(workerCallback) {
       input = JSON.parse(job.payload);
     } catch (e) {
       error(e);
-      job.reportError();
-      return;
+      process.exit(255);
     }
     workerCallback(input, job)
       .then(result => {
@@ -23,7 +22,7 @@ export function wrap(workerCallback) {
       })
       .catch(err => {
         error(err);
-        job.reportError();
+        process.exit(255);
       });
   };
 }
