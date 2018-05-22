@@ -5,8 +5,6 @@ import {BankFileRepository} from './models';
 
 import {storage} from '../../config';
 
-const bankFile = multer({storage}).single('file');
-
 export async function listBankFiles(req, res) {
   const repo = new BankFileRepository();
   const response = await repo.list();
@@ -27,6 +25,8 @@ export async function getBankFile(req, res) {
   const response = BankFileRepository.single(bankFile);
   res.json(response);
 }
+
+const bankFile = multer({storage}).single('file');
 
 export const listBankFilesController = wrap(listBankFiles);
 export const uploadBankFileController = compose([bankFile, wrap(uploadBankFile)]);
