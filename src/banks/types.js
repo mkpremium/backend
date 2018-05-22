@@ -31,8 +31,31 @@ t.BanksAddress = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   BankFilterUserInput:
+ *     properties:
+ *       discount:
+ *         type: number
+ *       population:
+ *         type: number
+ *       benefit:
+ *         type: number
+ *       priceSell:
+ *         type: number
+ *       blacklisted:
+ *         type: array
+ *         items:
+ *           type: string
+ *       whitelisted:
+ *         type: array
+ *         items:
+ *           type: string
+ */
 t.BankFilterUserInput = t.struct(
   {
+    discount: t.maybe(t.Number),
     population: t.maybe(t.Number),
     benefit: t.maybe(t.Number),
     priceSell: t.maybe(t.Number),

@@ -130,6 +130,10 @@ router.get('/files/:id', getBankFileController);
  *        type: string
  *        in: path
  *        required: true
+ *      - name: body
+ *        in: body
+ *        schema:
+ *          $ref: "#/definitions/BankFilterUserInput"
  *     responses:
  *       200:
  *         description: Operación exitosa
