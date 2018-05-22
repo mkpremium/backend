@@ -137,7 +137,8 @@ t.BankFileResponse = t.struct({
   id: t.String,
   filename: t.String,
   processed: t.Number,
-  total: t.Number
+  total: t.Number,
+  userInput: t.maybe(t.BankFilterUserInput)
 }, 'BankFileResponse');
 
 t.ListBankFileResponse = t.struct(
