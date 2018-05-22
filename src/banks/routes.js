@@ -1,5 +1,10 @@
 import {Router} from 'express';
-import {getBankFileController, listBankFilesController, uploadBankFileController} from './controllers';
+import {
+  calculateFiltersController,
+  getBankFileController,
+  listBankFilesController,
+  uploadBankFileController
+} from './controllers';
 
 const router = Router();
 
@@ -107,8 +112,38 @@ router.post('/files', uploadBankFileController);
  */
 router.get('/files/:id', getBankFileController);
 
-router.get('/filters');
+/**
+ * @swagger
+ * /banks/files/{id}/calculate-filters:
+ *   post:
+ *     tags: [Banks]
+ *     summary: Calcula las opciones de compra basados en los filtros pasados
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - "application/json"
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: id
+ *        type: string
+ *        in: path
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BankFile"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.post('/files/:id/calculate-filters', calculateFiltersController);
 
+// router.get('/filters');
 router.post('/filtered-files');
 router.post('/filtered-files/:id');
 router.put('/filtered-files/:id');

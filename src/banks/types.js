@@ -15,15 +15,7 @@ import uuid from 'uuid/v4';
  *         type: number
  *       fullAddress:
  *         type: string
- *       registerNumber:
- *         type: number
- *       postalCode:
- *         $ref: "#/definitions/PostalCode"
  *       city:
- *         type: string
- *       province:
- *         type: string
- *       zone:
  *         type: string
  */
 t.BanksAddress = t.struct(
@@ -139,6 +131,26 @@ t.BankFileData = t.struct(
       buy: true,
       processed: false,
       _documentType: 'bank-file-data'
+    }
+  }
+);
+
+t.BankFileDataFilteredResponse = t.BankFileData.extend({
+  filters: t.struct({
+    population: t.Boolean,
+    benefit: t.Boolean,
+    priceSell: t.Boolean,
+    blacklisted: t.Boolean
+  }, 'filters')
+}, 'BankFileFilteredResponse');
+
+t.ListBankFileDataFilteredResponse = t.struct(
+  {
+    results: t.list(t.BankFileDataFilteredResponse)
+  }, {
+    name: 'ListBankFileDataFilteredResponse',
+    defaultProps: {
+      results: []
     }
   }
 );

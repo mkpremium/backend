@@ -2,7 +2,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
 import t from './types';
 import {newHttpError} from '../lib/http-error';
-import {retrievePricesAndLocationInfo} from './lib/services';
+import {calculateFilter, retrievePricesAndLocationInfo} from './lib/services';
 import {BANK_WORKER_NAMES} from './worker/workers';
 
 export class BankFileRepository extends CouchbaseModel {
@@ -10,6 +10,12 @@ export class BankFileRepository extends CouchbaseModel {
     super();
     this.gearman = gearman;
     this.Struct = t.BankFile;
+  }
+
+  async calculateFilter(bankFileId, thresholds) {
+    // return calculateFilter(bankFileId, thresholds);
+    const results = await calculateFilter(bankFileId, thresholds);
+    return fromJSON({results}, t.ListBankFileDataFilteredResponse);
   }
 
   async processFile(file) {
@@ -67,6 +73,14 @@ export class BankFileDataRepository extends CouchbaseModel {
     const file = await repoFile.findById(bankFileId);
     const value = await counter.count(bankFileId, 1);
     return repoFile.setProcessed(file, value);
+  }
+
+  async findByFileBankId(bankFileId) {
+    const qb = this
+      .getQueryBuilder()
+      .where('bankFileId = ?', bankFileId);
+
+    return this.query(qb);
   }
 
   async process(bankFileData) {

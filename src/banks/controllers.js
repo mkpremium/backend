@@ -26,8 +26,16 @@ export async function getBankFile(req, res) {
   res.json(response);
 }
 
+export async function calculateFilters(req, res) {
+  const bankFileId = req.params.id;
+  const repo = new BankFileRepository();
+  const response = await repo.calculateFilter(bankFileId, req.body);
+  res.json(response);
+}
+
 const bankFile = multer({storage}).single('file');
 
 export const listBankFilesController = wrap(listBankFiles);
 export const uploadBankFileController = compose([bankFile, wrap(uploadBankFile)]);
 export const getBankFileController = wrap(getBankFile);
+export const calculateFiltersController = wrap(calculateFilters);
