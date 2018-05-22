@@ -53,11 +53,6 @@ t.BanksAddress = t.struct(
  *         type: number
  *       total:
  *         type: number
- *
- *   BankFileBody:
- *     properties:
- *       file:
- *         type: file
  */
 t.BankFile = t.struct(
   {
