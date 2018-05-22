@@ -27,7 +27,7 @@ function xmlParser(rawXml) {
       state: document.valueWithPath(`${base}.dt.np`)
     }),
     use: document.valueWithPath(`${base}.debi.luso`),
-    floorArea: parseFloat(document.valueWithPath(`${base}.debi.sfc`))
+    m2: parseFloat(document.valueWithPath(`${base}.debi.sfc`))
   };
 }
 

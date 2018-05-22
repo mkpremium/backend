@@ -4,7 +4,7 @@ import {nestoriaListingService} from './nestoria';
 import {cadastreAddressService} from './catastro/address';
 
 function calculatePriceSell(pricing, buildingInfo) {
-  return pricing.priceZone / Math.max(1, buildingInfo.floorArea);
+  return pricing.priceZone / Math.max(1, buildingInfo.m2);
 }
 
 async function cityData(cityName) {
