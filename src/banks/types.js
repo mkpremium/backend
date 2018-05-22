@@ -31,6 +31,35 @@ t.BanksAddress = t.struct(
   }
 );
 
+t.BankFilterUserInput = t.struct(
+  {
+    population: t.maybe(t.Number),
+    benefit: t.maybe(t.Number),
+    priceSell: t.maybe(t.Number),
+    blacklisted: t.list(t.String),
+    whitelisted: t.list(t.String)
+  },
+  {
+    name: 'BankFilterUserInput',
+    defaultProps: {
+      blacklisted: [],
+      whitelisted: []
+    }
+  }
+);
+
+t.BankFilterResult = t.struct(
+  {
+    population: t.Boolean,
+    benefit: t.Boolean,
+    priceSell: t.Boolean,
+    blacklisted: t.Boolean
+  },
+  {
+    name: 'BankFilterResult'
+  }
+);
+
 /**
  * @swagger
  * definitions:
@@ -54,6 +83,8 @@ t.BankFile = t.struct(
     mimetype: t.String,
     processed: t.Number,
     total: t.Number,
+
+    userInput: t.maybe(t.BankFilterUserInput),
 
     _documentType: t.enums.of(['bank-file'])
   },
@@ -111,6 +142,7 @@ t.BankFileData = t.struct(
     buy: t.Boolean,
 
     processed: t.Boolean,
+    filters: t.maybe(t.BankFilterResult),
 
     _documentType: t.enums.of(['bank-file-data'])
   },
@@ -135,43 +167,13 @@ t.BankFileData = t.struct(
   }
 );
 
-t.BankFileDataFilteredResponse = t.BankFileData.extend({
-  filters: t.struct({
-    population: t.Boolean,
-    benefit: t.Boolean,
-    priceSell: t.Boolean,
-    blacklisted: t.Boolean,
-    whitelisted: t.Boolean
-  }, 'filters')
-}, 'BankFileFilteredResponse');
-
-t.ListBankFileDataFilteredResponse = t.struct(
+t.ListBankFileData = t.struct(
   {
-    results: t.list(t.BankFileDataFilteredResponse)
+    results: t.list(t.BankFileData)
   }, {
-    name: 'ListBankFileDataFilteredResponse',
+    name: 'ListBankFileData',
     defaultProps: {
       results: []
-    }
-  }
-);
-
-t.BankFilter = t.struct(
-  {
-    id: t.String,
-    name: t.String,
-    description: t.String,
-    logic: t.String,
-    value: t.Any,
-    _documentType: t.enums.of(['bank-filter'])
-  },
-  {
-    name: 'BankFilter',
-    defaultProps: {
-      get id() {
-        return uuid();
-      },
-      _documentType: 'bank-filter'
     }
   }
 );

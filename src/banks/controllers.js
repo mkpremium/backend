@@ -28,8 +28,7 @@ export async function getBankFile(req, res) {
 
 export async function calculateFilters(req, res) {
   const bankFileId = req.params.id;
-  const repo = new BankFileRepository();
-  const response = await repo.calculateFilter(bankFileId, req.body);
+  const response = await BankFileRepository.calculateFilter(bankFileId, req.body);
   res.json(response);
 }
 
