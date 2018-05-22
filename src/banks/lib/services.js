@@ -66,7 +66,7 @@ function calculateFilters(thresholds = {}) {
       whitelisted: filterWhitelisted(thresholds.whitelisted)(withPriceInvest)
     };
     const buy = filters.whitelisted || !_some(Object.values(filters));
-    return Object.assign({priceInvest, filters}, obj, {buy});
+    return Object.assign({}, obj, {priceInvest, filters, buy});
   };
 }
 
