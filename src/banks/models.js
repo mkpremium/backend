@@ -1,3 +1,4 @@
+import fromJSON from 'tcomb/lib/fromJSON';
 import {CouchbaseModel} from '../db/model';
 import t from './types';
 import {newHttpError} from '../lib/http-error';
@@ -32,6 +33,25 @@ export class BankFileRepository extends CouchbaseModel {
   async setTotal(bankFile, $set) {
     const updated = t.update(bankFile, {total: {$set}});
     return this.save(updated);
+  }
+
+  static single(bankFile) {
+    return fromJSON(bankFile, t.BankFileResponse);
+  }
+
+  static multiple(bankFiles) {
+    return fromJSON({results: bankFiles}, t.ListBankFileResponse);
+  }
+
+  async list() {
+    const qb = this.getQueryBuilder();
+    qb
+      .order('createdAt')
+      .limit(5);
+
+    const results = await this.query(qb);
+
+    return BankFileRepository.multiple(results);
   }
 }
 

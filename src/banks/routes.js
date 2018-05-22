@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {listBankFilesController, uploadBankFileController} from './controllers';
+import {getBankFileController, listBankFilesController, uploadBankFileController} from './controllers';
 
 const router = Router();
 
@@ -75,7 +75,37 @@ router.get('/files', listBankFilesController);
  *
  */
 router.post('/files', uploadBankFileController);
-router.get('/files/:id');
+
+/**
+ * @swagger
+ * /banks/files/{id}:
+ *   get:
+ *     tags: [Banks]
+ *     summary: Obtiene los detalles de un archivo
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - "application/json"
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: id
+ *        type: string
+ *        in: path
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BankFile"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.get('/files/:id', getBankFileController);
 
 router.get('/filters');
 

@@ -6,6 +6,7 @@ import {N1qlQuery, SearchQuery} from 'couchbase';
 import debug from 'debug';
 
 import {couchbase, emitModelEvents} from '../../config';
+import {newHttpError} from '../lib/http-error';
 
 const debugModel = debug('app:db:model');
 
@@ -61,6 +62,15 @@ export class CouchbaseCounter {
 export class CouchbaseModel {
   constructor() {
     this.Struct = CouchbaseModelStruct;
+  }
+
+  async findByIdOrThrow(id) {
+    const model = await this.findById(id);
+    if (!model) {
+      throw newHttpError(404, `${this.Struct.meta.name} ${id} no existe`);
+    }
+
+    return model;
   }
 
   // TODO: refactor to CouchbaseQuery

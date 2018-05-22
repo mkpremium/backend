@@ -3,29 +3,29 @@ import '../types';
 import uuid from 'uuid/v4';
 
 /**
-* @swagger
-* definitions:
-  *   BanksAddress:
-  *     properties:
-  *       type:
-  *         type: string
-*       street:
-*         type: string
-*       number:
-*         type: number
-*       fullAddress:
-*         type: string
-*       registerNumber:
-*         type: number
-*       postalCode:
-*         $ref: "#/definitions/PostalCode"
-*       city:
-*         type: string
-*       province:
-*         type: string
-*       zone:
-*         type: string
-*/
+ * @swagger
+ * definitions:
+ *   BanksAddress:
+ *     properties:
+ *       type:
+ *         type: string
+ *       street:
+ *         type: string
+ *       number:
+ *         type: number
+ *       fullAddress:
+ *         type: string
+ *       registerNumber:
+ *         type: number
+ *       postalCode:
+ *         $ref: "#/definitions/PostalCode"
+ *       city:
+ *         type: string
+ *       province:
+ *         type: string
+ *       zone:
+ *         type: string
+ */
 t.BanksAddress = t.struct(
   {
     type: t.String,
@@ -49,8 +49,10 @@ t.BanksAddress = t.struct(
  *         format: uuid/v4
  *       filename:
  *         type: string
- *       filepath:
- *         type: string
+ *       processed:
+ *         type: number
+ *       total:
+ *         type: number
  *
  *   BankFileBody:
  *     properties:
@@ -77,6 +79,24 @@ t.BankFile = t.struct(
       processed: 0,
       total: 0,
       _documentType: 'bank-file'
+    }
+  }
+);
+
+t.BankFileResponse = t.struct({
+  id: t.String,
+  filename: t.String,
+  processed: t.Number,
+  total: t.Number
+}, 'BankFileResponse');
+
+t.ListBankFileResponse = t.struct(
+  {
+    results: t.list(t.BankFileResponse)
+  }, {
+    name: 'ListBankFileResponse',
+    defaultProps: {
+      results: []
     }
   }
 );

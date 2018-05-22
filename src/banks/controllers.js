@@ -9,14 +9,8 @@ const bankFile = multer({storage}).single('file');
 
 export async function listBankFiles(req, res) {
   const repo = new BankFileRepository();
-  const qb = repo.getQueryBuilder();
-  qb
-    .order('createdAt DESC')
-    .limit(5);
-
-  const results = repo.query(qb);
-
-  res.json({results});
+  const response = await repo.list();
+  res.json(response);
 }
 
 export async function uploadBankFile(req, res) {
@@ -26,5 +20,14 @@ export async function uploadBankFile(req, res) {
   res.status(201).json(bankFile);
 }
 
+export async function getBankFile(req, res) {
+  const bankFileId = req.params.id;
+  const repo = new BankFileRepository();
+  const bankFile = await repo.findByIdOrThrow(bankFileId);
+  const response = BankFileRepository.single(bankFile);
+  res.json(response);
+}
+
 export const listBankFilesController = wrap(listBankFiles);
 export const uploadBankFileController = compose([bankFile, wrap(uploadBankFile)]);
+export const getBankFileController = wrap(getBankFile);
