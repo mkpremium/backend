@@ -69,17 +69,16 @@ export class WorksheetRepository extends Worksheet {
     const qb = this.getQueryBuilder('let')
       .where('queueId IS NULL');
 
-    const letBuilding = buildingRepo.getQueryBuilder('use', 't2')
-      .order('RANDOM()')
-      .limit(1);
+    const letBuilding = buildingRepo.getQueryBuilder('raw', 't2')
+      .order('RANDOM()');
 
     Object.keys(cleanSource).forEach(key => {
-      letBuilding.where(`address.${key} = ?`, cleanSource[key]);
+      letBuilding.where(`t2.address.${key} = ?`, cleanSource[key]);
     });
 
     qb
       .letQuery('_building', letBuilding)
-      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = _building[0].id END');
+      .where('t.`relatedBuildingIds`[0] IN _building');
 
     return this.query(qb);
   }
