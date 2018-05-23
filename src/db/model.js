@@ -5,6 +5,7 @@ import squel from 'squel';
 import {N1qlQuery, SearchQuery} from 'couchbase';
 import debug from 'debug';
 
+import init from './couchbase';
 import {couchbase, emitModelEvents} from '../../config';
 import {newHttpError} from '../lib/http-error';
 
@@ -61,6 +62,7 @@ export class CouchbaseCounter {
 
 export class CouchbaseModel {
   constructor() {
+    CouchbaseModel.prototype._promiseBucket = CouchbaseModel.prototype._promiseBucket || init();
     this.Struct = CouchbaseModelStruct;
   }
 
@@ -212,7 +214,7 @@ export class CouchbaseModel {
 
   async sendEvent(eventName, data, sendEvent = emitModelEvents) {
     debugModel('event', eventName, data, 'will be emitted', sendEvent);
-    if (sendEvent) {
+    if (sendEvent && this._socketPromise) {
       const socket = await this._socketPromise;
       return socket.sendEvent(eventName, data);
     }
