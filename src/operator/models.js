@@ -74,6 +74,8 @@ export class Operator extends CouchbaseModel {
     return t.AuthenticatedResponse({
       refreshToken,
       token,
+      access_token: token,
+      token_type: 'bearer',
       roles: operator.roles,
       operator: tokenPayload.operator,
       firebase

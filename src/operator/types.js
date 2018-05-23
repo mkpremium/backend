@@ -58,6 +58,8 @@ t.Credentials = t.struct({
 t.AuthenticatedResponse = t.struct({
   refreshToken: t.String,
   token: t.String,
+  access_token: t.String,
+  token_type: t.String,
   operator: t.struct({
     id: t.String,
     name: t.String,

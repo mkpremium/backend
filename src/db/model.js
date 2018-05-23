@@ -6,6 +6,7 @@ import {N1qlQuery, SearchQuery} from 'couchbase';
 import debug from 'debug';
 
 import {couchbase, emitModelEvents} from '../../config';
+import {newHttpError} from '../lib/http-error';
 
 const debugModel = debug('app:db:model');
 
@@ -45,9 +46,31 @@ export class EmbeddedModel {
   }
 }
 
+export class CouchbaseCounter {
+  constructor(bucket, options) {
+    this.options = options;
+    this.bucket = bucket;
+  }
+
+  async count(key, delta = 0) {
+    const counterKey = `counter:${key}`;
+    const {value} = await this.bucket.counterAsync(counterKey, delta, this.options);
+    return value;
+  }
+}
+
 export class CouchbaseModel {
   constructor() {
     this.Struct = CouchbaseModelStruct;
+  }
+
+  async findByIdOrThrow(id) {
+    const model = await this.findById(id);
+    if (!model) {
+      throw newHttpError(404, `${this.Struct.meta.name} ${id} no existe`);
+    }
+
+    return model;
   }
 
   // TODO: refactor to CouchbaseQuery
@@ -107,6 +130,10 @@ export class CouchbaseModel {
     await this._promiseBucket;
 
     return this._bucket.queryAsync(searchBuilder);
+  }
+
+  getCounter(options = {initial: 1}) {
+    return new CouchbaseCounter(this._bucket, options);
   }
 
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
@@ -192,6 +219,7 @@ export class CouchbaseModel {
   }
 
   async save(data, sendEvent) {
+    // noinspection JSCheckFunctionSignatures
     const struct = fromJSON(data, this.Struct);
     const isNewData = !data.id;
     const dataWithId = t.update(struct, {id: {$set: data.id || uuid()}});
@@ -203,9 +231,10 @@ export class CouchbaseModel {
 
     await this._promiseBucket;
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+    // noinspection JSCheckFunctionSignatures
     const model = fromJSON(result, this.Struct);
 
-    if (result && sendEvent) {
+    if (result) {
       const eventType = isNewData ? 'new' : data.id;
       await this.sendEvent(eventType, dataPreSaved, sendEvent);
       await this.postSave(model);

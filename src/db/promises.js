@@ -23,4 +23,5 @@ export default function promises(bucket) {
   bucket.queryAsync = turnsAsync(bucket, 'query');
   bucket.upsertAsync = turnsAsync(bucket, 'upsert');
   bucket.getAsync = turnsAsync(bucket, 'get');
+  bucket.counterAsync = turnsAsync(bucket, 'counter');
 }

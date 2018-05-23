@@ -27,6 +27,7 @@ import stats from './stats';
 import street from './street';
 import autocomplete from './autocomplete';
 import email from './email';
+import gearman from './gearman';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -45,6 +46,7 @@ Promise.all([
 ]).catch(err => {
   console.error(err);
 });
+gearman(app);
 operator(app);
 worksheet(app);
 owner(app);
