@@ -2,6 +2,7 @@ import {wrap} from 'express-promise-wrap';
 import {OperatorRefreshTokenRepository, OperatorRepository} from './models';
 import {History} from '../history/models';
 import {canManageOperator} from '../lib/role-operators';
+import {Calls} from '../calls/models';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -62,7 +63,9 @@ async function limitedListOperator(req, res) {
 }
 
 async function me(req, res) {
-  res.json(req.user.operator);
+  const model = new Calls();
+  const activeCall = await model.findActiveCallByOperatorId(req.user.id);
+  res.json(Object.assign({}, req.user.operator, {activeCall}));
 }
 
 export const loginController = wrap(login);
