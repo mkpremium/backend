@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import './types';
 import {newHttpError} from '../lib/http-error';
 import _get from 'lodash/get';
 import fromJSON from 'tcomb/lib/fromJSON';
