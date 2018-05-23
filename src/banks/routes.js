@@ -148,6 +148,36 @@ router.get('/files/:id', getBankFileController);
  */
 router.post('/files/:id/calculate-filters', calculateFiltersController);
 
+/**
+ * @swagger
+ * /banks/files/{id}/export:
+ *   post:
+ *     tags: [Banks]
+ *     summary: Exporta las filas del archivo en formato XLSX
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - "application/json"
+ *     parameters:
+ *      - name: id
+ *        type: string
+ *        in: path
+ *        required: true
+ *      - name: body
+ *        in: body
+ *        schema:
+ *          $ref: "#/definitions/BankFileExportInput"
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           type: file
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
 router.post('/files/:id/export', exportBankFileController);
 
 /**

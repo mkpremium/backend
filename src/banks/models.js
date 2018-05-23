@@ -1,3 +1,4 @@
+import XLSX from 'xlsx';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _difference from 'lodash/difference';
 import _uniq from 'lodash/uniq';
@@ -28,8 +29,23 @@ export class BankFileRepository extends CouchbaseModel {
     this.Struct = t.BankFile;
   }
 
-  async exportFile(bankFileId, preference = {buy: true}) {
+  async exportFile(bankFileId, args) {
+    const params = fromJSON(args, t.BankFileExportInput);
+    const filename = `/tmp/${bankFileId}.xlsx`;
+    const bankFile = await this.findByIdOrThrow(bankFileId);
+    const repoData = new BankFileDataRepository();
+    const data = await repoData.findByFileBankIdAndBuy(bankFileId, params.buy);
+    const rows = data.map(({bankFileRowData}) => bankFileRowData);
 
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
+    XLSX.writeFile(wb, filename);
+
+    return {
+      bankFile,
+      exported: filename
+    };
   }
 
   async doFilterAction(params, body) {
@@ -112,6 +128,15 @@ export class BankFileDataRepository extends CouchbaseModel {
     const file = await repoFile.findById(bankFileId);
     const value = await counter.count(bankFileId, 1);
     return repoFile.setProcessed(file, value);
+  }
+
+  async findByFileBankIdAndBuy(bankFileId, buy) {
+    const qb = this
+      .getQueryBuilder()
+      .where('bankFileId = ?', bankFileId)
+      .where('buy = ?', buy);
+
+    return this.query(qb);
   }
 
   async findByFileBankId(bankFileId) {

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import multer from 'multer';
 import {wrap} from 'express-promise-wrap';
 import {compose} from 'compose-middleware';
@@ -39,7 +40,12 @@ export async function calculateFilters(req, res) {
 }
 
 export async function exportBankFile(req, res) {
-  res.send();
+  const repo = new BankFileRepository();
+  const bankFileId = req.params.id;
+  const result = await repo.exportFile(bankFileId, req.body);
+  res.set('cContent-Type', result.bankFile.mimetype);
+  res.set('Content-Disposition', `attachment;filename=${result.bankFile.filename}`);
+  fs.createReadStream(result.exported).pipe(res);
 }
 
 export async function actionBankFileData(req, res) {

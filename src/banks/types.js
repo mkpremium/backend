@@ -88,6 +88,18 @@ t.BankFilterUpdateInput = t.struct({
   bankFileDataIds: t.list(t.String)
 }, 'BankFilterUpdateInput');
 
+/**
+ * @swagger
+ * definitions:
+ *   BankFileExportInput:
+ *     properties:
+ *       buy:
+ *         type: boolean
+ */
+t.BankFileExportInput = t.struct({
+  buy: t.Boolean
+}, 'BankFileExportInput');
+
 t.BankFilterResult = t.struct(
   {
     population: t.Boolean,
