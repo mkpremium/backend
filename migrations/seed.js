@@ -2,7 +2,7 @@ import t from 'tcomb';
 import Promise from 'bluebird';
 import _times from 'lodash/times';
 
-import app from '../src/app';
+import couchbase from '../src/db/couchbase';
 
 import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
@@ -17,7 +17,11 @@ import {BuildingRepository} from '../src/building/models';
 import {cleanFirebase} from './firebase-clean';
 
 async function init() {
-  await app.locals.bucketPromise;
+  const bucket = await couchbase();
+  const app = {
+    locals: {bucket}
+  };
+
   await deleteAll();
   await cleanFirebase();
   const migrateOwner = new MigrateModel('owner', resolve(__dirname, '../test/fixtures/sample_owners.csv'), app);
@@ -62,7 +66,7 @@ async function init() {
     }
   });
   const people = await personRepo.query();
-  const worksheets = await Promise
+  await Promise
     .all(_times(ownersWithBuildings.length, () => {
       const owner = getOneOwner();
       return worksheetRepo.save({
@@ -70,7 +74,6 @@ async function init() {
         relatedBuildingIds: owner.map(({buildingId}) => buildingId)
       });
     }));
-  await Promise.mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheet(queue.id, worksheet.id));
 
   const Contacts = t.list(t.TypedContactInfo);
 
