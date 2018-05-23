@@ -349,7 +349,7 @@ t.WorksheetQueue.prototype.findNextAvailable = function(currentItem = null) {
   const currentIndex = _findIndex(this.worksheets, {id: currentItemId});
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets;
   const nextItem = _find(worksheets, {status: Queue.Status.AVAILABLE});
-  if (!nextItem && currentIndex === this.worksheets.length - 1) {
+  if (!nextItem && currentIndex === this.worksheets.length - 1 && this.worksheets.length > 0) {
     return this.findNextAvailable();
   }
 
