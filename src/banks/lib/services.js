@@ -33,12 +33,12 @@ function filterPriceSell(threshold) {
 }
 
 function filterBlacklisted(blacklisted) {
-  if (!blacklisted) return alwaysFalse;
+  if (!blacklisted || blacklisted.length === 0) return alwaysFalse;
   return ({cadastreReference}) => blacklisted.indexOf(cadastreReference) !== -1;
 }
 
 function filterWhitelisted(whitelisted) {
-  if (!whitelisted) return alwaysFalse;
+  if (!whitelisted || whitelisted.length === 0) return alwaysFalse;
   return ({cadastreReference}) => whitelisted.indexOf(cadastreReference) === -1;
 }
 
@@ -100,6 +100,10 @@ export async function calculateFilter(bankFileId, thresholds) {
   const repo = new BankFileDataRepository();
   const bankFileDataRows = await repo.findByFileBankId(bankFileId);
 
+  return calculateFilterSpecific(bankFileDataRows, thresholds);
+}
+
+export async function calculateFilterSpecific(bankFileDataRows, thresholds) {
   const calculator = calculateFilters(thresholds);
   return Promise.map(bankFileDataRows, (data) => updateFilters(calculator(data)));
 }

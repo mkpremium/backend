@@ -1,15 +1,51 @@
 import fromJSON from 'tcomb/lib/fromJSON';
+import _difference from 'lodash/difference';
+import _uniq from 'lodash/uniq';
 import {CouchbaseModel} from '../db/model';
 import t from './types';
 import {newHttpError} from '../lib/http-error';
-import {calculateFilter, retrievePricesAndLocationInfo} from './lib/services';
+import {calculateFilter, calculateFilterSpecific, retrievePricesAndLocationInfo} from './lib/services';
 import {BANK_WORKER_NAMES} from './worker/workers';
+
+const invertedList = {
+  blacklisted: 'whitelisted',
+  whitelisted: 'blacklisted'
+};
+
+function updateListed(action, userInput, newValues) {
+  const action1 = action;
+  const action2 = invertedList[action];
+  return {
+    [action1]: _uniq(userInput[action1].concat(newValues)),
+    [action2]: _difference(userInput[action2], newValues)
+  };
+}
 
 export class BankFileRepository extends CouchbaseModel {
   constructor(gearman) {
     super();
     this.gearman = gearman;
     this.Struct = t.BankFile;
+  }
+
+  async exportFile(bankFileId, preference = {buy: true}) {
+
+  }
+
+  async doFilterAction(params, body) {
+    const args = t.BankFilterUpdateInput(Object.assign({}, params, body));
+    const repoData = new BankFileDataRepository();
+    const bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
+    const bankFile = await this.findByIdOrThrow(args.id);
+
+    const bankFileDataIds = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
+    const updatedUserInput = t
+      .update(bankFile.userInput, {$merge: updateListed(args.action, bankFile.userInput, bankFileDataIds)});
+    const updatedBankFile = t.update(bankFile, {userInput: {$set: updatedUserInput}});
+
+    await calculateFilterSpecific(bankFileDataRows, updatedBankFile.userInput);
+
+    return this.save(updatedBankFile);
   }
 
   async calculateFilter(bankFileId, params) {
@@ -83,6 +119,17 @@ export class BankFileDataRepository extends CouchbaseModel {
       .getQueryBuilder()
       .where('bankFileId = ?', bankFileId);
 
+    return this.query(qb);
+  }
+
+  async findByIds(bankFileDataIds) {
+    if (bankFileDataIds.length < 1) {
+      throw newHttpError(400, 'bankFileDataIds debe incluir al menos un valor');
+    }
+    const ids = `[${bankFileDataIds.map(id => `'${id}'`).join(', ')}]`;
+    const qb = this
+      .getQueryBuilder()
+      .where(`id IN ${ids}`);
     return this.query(qb);
   }
 

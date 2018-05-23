@@ -71,12 +71,30 @@ t.BankFilterUserInput = t.struct(
   }
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   BankFilterUpdateInput:
+ *     properties:
+ *       bankFileDataIds:
+ *         required: true
+ *         type: array
+ *         items:
+ *           type: string
+ */
+t.BankFilterUpdateInput = t.struct({
+  id: t.String,
+  action: t.enums.of(['blacklisted', 'whitelisted']),
+  bankFileDataIds: t.list(t.String)
+}, 'BankFilterUpdateInput');
+
 t.BankFilterResult = t.struct(
   {
     population: t.Boolean,
     benefit: t.Boolean,
     priceSell: t.Boolean,
-    blacklisted: t.Boolean
+    blacklisted: t.Boolean,
+    whitelisted: t.Boolean
   },
   {
     name: 'BankFilterResult'

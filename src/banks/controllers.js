@@ -38,9 +38,21 @@ export async function calculateFilters(req, res) {
   res.json(response);
 }
 
+export async function exportBankFile(req, res) {
+  res.send();
+}
+
+export async function actionBankFileData(req, res) {
+  const repo = new BankFileRepository();
+  const bankFile = await repo.doFilterAction(req.params, req.body);
+  res.json(bankFile);
+}
+
 const bankFile = multer({storage}).single('file');
 
 export const listBankFilesController = wrap(listBankFiles);
 export const uploadBankFileController = compose([bankFile, wrap(uploadBankFile)]);
 export const getBankFileController = wrap(getBankFile);
 export const calculateFiltersController = wrap(calculateFilters);
+export const exportBankFileController = wrap(exportBankFile);
+export const actionBankFileDataController = wrap(actionBankFileData);

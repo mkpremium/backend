@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {
-  calculateFiltersController,
+  actionBankFileDataController,
+  calculateFiltersController, exportBankFileController,
   getBankFileController,
   listBankFilesController,
   uploadBankFileController
@@ -146,5 +147,46 @@ router.get('/files/:id', getBankFileController);
  *
  */
 router.post('/files/:id/calculate-filters', calculateFiltersController);
+
+router.post('/files/:id/export', exportBankFileController);
+
+/**
+ * @swagger
+ * /banks/files/{id}/{action}:
+ *   post:
+ *     tags: [Banks]
+ *     summary: Actualizar blacklisted or whitelisted filtros
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - "application/json"
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: id
+ *        type: string
+ *        in: path
+ *        required: true
+ *      - name: action
+ *        type: string
+ *        in: path
+ *        required: true
+ *        enum: [blacklisted, whitelisted]
+ *      - name: body
+ *        in: body
+ *        schema:
+ *          $ref: "#/definitions/BankFilterUpdateInput"
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BankFile"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/files/:id/:action', actionBankFileDataController);
 
 export default router;
