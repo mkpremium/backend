@@ -5,6 +5,8 @@ import _head from 'lodash/head';
 import _some from 'lodash/some';
 import _every from 'lodash/every';
 import _find from 'lodash/find';
+import _omitBy from 'lodash/omitBy';
+import _isNil from 'lodash/isNil';
 import fromJSON from 'tcomb/lib/fromJSON';
 
 import {CouchbaseModel} from '../../db/model';
@@ -49,6 +51,10 @@ function canRegisterVerified(worksheet, newStatus, operatorId) {
   return true;
 }
 
+function cleanObject(obj) {
+  return _omitBy(obj, _isNil);
+}
+
 export class Worksheet extends CouchbaseModel {
   constructor() {
     super();
@@ -57,6 +63,27 @@ export class Worksheet extends CouchbaseModel {
 }
 
 export class WorksheetRepository extends Worksheet {
+  async findBySource(source) {
+    const cleanSource = cleanObject(source);
+    const buildingRepo = new BuildingRepository();
+    const qb = this.getQueryBuilder('let')
+      .where('queueId IS NULL');
+
+    const letBuilding = buildingRepo.getQueryBuilder('use', 't2')
+      .order('RANDOM()')
+      .limit(1);
+
+    Object.keys(cleanSource).forEach(key => {
+      letBuilding.where(`address.${key} = ?`, cleanSource[key]);
+    });
+
+    qb
+      .letQuery('_building', letBuilding)
+      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = _building[0].id END');
+
+    return this.query(qb);
+  }
+
   async findByIdOrThrow(worksheetId) {
     const worksheet = await this.findById(worksheetId);
     if (!worksheet) {
