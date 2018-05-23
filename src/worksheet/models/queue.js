@@ -9,7 +9,6 @@ import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
 import {WorksheetRepository} from './worksheet';
 import {utc} from '../../lib/date';
-import {WorkSheetStatus} from '../../types/worksheet';
 import {Queue} from '../../types/constants';
 
 const queueDebug = debug('app:model:queue');
@@ -94,7 +93,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async addWorksheetAndSave(queueId, worksheetId) {
     const updatedQueue = await this.addWorksheet(queueId, worksheetId);
-    await this.save(updatedQueue);
+    return this.save(updatedQueue);
   }
 
   async addWorksheet(queueId, worksheetId) {
@@ -132,7 +131,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async removeWorksheetAndSave(queueId, worksheetId) {
     const updatedQueue = await this.removeWorksheet(queueId, worksheetId);
-    await this.save(updatedQueue);
+    return this.save(updatedQueue);
   }
 
   async scheduleWorksheetInQueue(queue, itemId, operatorId) {
@@ -220,43 +219,40 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
     const operatorId = item.operatorId;
-    const updatedItem = item.release();
-    const worksheet = await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
+    await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
 
-    let itemNewStatus = updatedItem.status;
-
-    switch (worksheet.status) {
-      case WorkSheetStatus.INVALID:
-      case WorkSheetStatus.NO_SALE:
-      case WorkSheetStatus.MEETING:
-      case WorkSheetStatus.ALREADY_SOLD:
-      case WorkSheetStatus.CLOSE:
-        itemNewStatus = Queue.Status.CLOSED;
-        break;
-      default:
-        break;
+    if (item.status !== Queue.Status.SCHEDULED) {
+      return this.removeWorksheetAndSave(queue.id, item.worksheetId);
     }
 
-    const updatedItemStatus = t.update(updatedItem, {status: {$set: itemNewStatus}});
-    const updatedWorksheets = updateList(queue.worksheets, item, updatedItemStatus);
-    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
-
-    return this.save(updatedQueue);
+    return queue;
   }
 
   async nextWorksheetInQueue(queue, operatorId) {
     const operatorItem = queue.findItemByOperatorId(operatorId);
-    const nextAvailableItem = queue.findNextAvailable(operatorItem);
+    const updatedQueue = await this.findNextAvailable(queue);
+    const nextAvailableItem = updatedQueue.findNextAvailable(operatorItem);
 
     if (!nextAvailableItem) {
       throw newHttpError(422, 'No hay items disponibles en la lista');
     }
 
-    const updatedQueue = operatorItem
-      ? await this.releaseWorksheetInQueue(queue, operatorItem.id)
-      : queue;
+    const releasedUpdatedQueue = operatorItem
+      ? await this.releaseWorksheetInQueue(updatedQueue, operatorItem.id)
+      : updatedQueue;
 
-    return this.takeWorksheetInQueue(updatedQueue, nextAvailableItem.id, operatorId);
+    return this.takeWorksheetInQueue(releasedUpdatedQueue, nextAvailableItem.id, operatorId);
+  }
+
+  async findNextAvailable(queue) {
+    const worksheetRepo = new WorksheetRepository();
+    const [worksheet] = await worksheetRepo.findBySource(queue.source);
+
+    if (worksheet) {
+      return this.addWorksheetAndSave(queue.id, worksheet.id);
+    }
+
+    return queue;
   }
 
   async releaseTakenWorksheetInQueue(queueId, operatorId) {

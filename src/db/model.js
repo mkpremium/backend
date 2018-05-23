@@ -5,6 +5,7 @@ import squel from 'squel';
 import {N1qlQuery, SearchQuery} from 'couchbase';
 import debug from 'debug';
 
+import init from './couchbase';
 import {couchbase, emitModelEvents} from '../../config';
 import {newHttpError} from '../lib/http-error';
 
@@ -61,6 +62,7 @@ export class CouchbaseCounter {
 
 export class CouchbaseModel {
   constructor() {
+    CouchbaseModel.prototype._promiseBucket = CouchbaseModel.prototype._promiseBucket || init();
     this.Struct = CouchbaseModelStruct;
   }
 
@@ -74,21 +76,24 @@ export class CouchbaseModel {
   }
 
   // TODO: refactor to CouchbaseQuery
-  getQueryBuilder(method = 'select', prefix = 't') {
+  getQueryBuilder(method = 'select', prefix = 't', props = this.Struct.meta.props) {
     let qb;
 
     switch (method) {
       case 'let':
         qb = squel.let().field(`${prefix}.\`id\``);
-        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`${prefix}.\`${key}\``));
+        Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``));
         break;
       case 'use':
         qb = squel.useKey().field(`${prefix}.\`id\``);
-        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`${prefix}.\`${key}\``));
+        Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``));
+        break;
+      case 'raw':
+        qb = squel.select().field(`RAW ${prefix}.\`id\``);
         break;
       case 'select':
         qb = squel.select().field(`${prefix}.\`id\``);
-        Object.keys(this.Struct.meta.props).forEach(key => qb.field(`${prefix}.\`${key}\``));
+        Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``));
         break;
       case 'delete':
         qb = squel.delete();
@@ -212,7 +217,7 @@ export class CouchbaseModel {
 
   async sendEvent(eventName, data, sendEvent = emitModelEvents) {
     debugModel('event', eventName, data, 'will be emitted', sendEvent);
-    if (sendEvent) {
+    if (sendEvent && this._socketPromise) {
       const socket = await this._socketPromise;
       return socket.sendEvent(eventName, data);
     }
