@@ -24,7 +24,8 @@ t.BanksAddress = t.struct(
     street: t.String,
     number: t.Number,
     fullAddress: t.maybe(t.String),
-    city: t.String
+    city: t.String,
+    province: t.String
   },
   {
     name: 'BanksAddress'
@@ -206,6 +207,8 @@ t.ListBankFileResponse = t.struct(
  *         description: "Precio por M²"
  *       priceSell:
  *         type: number
+ *       priceInvest:
+ *         type: number
  *       priceCity:
  *         type: number
  *         description: "Precio por M²"
@@ -227,6 +230,7 @@ t.BankFileData = t.struct(
     priceZone: t.Number,
     priceSell: t.Number,
     priceCity: t.Number,
+    priceInvest: t.Number,
     rot: t.Number,
     itp: t.Number,
     m2: t.Number,
@@ -254,6 +258,7 @@ t.BankFileData = t.struct(
       priceSell: 0,
       priceCity: 0,
       population: 0,
+      priceInvest: 0,
       rot: 0,
       m2: 0,
       itp: 10,
