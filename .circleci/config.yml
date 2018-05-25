@@ -99,7 +99,11 @@ jobs:
               aws s3 cp --region eu-west-3 s3://mkpremium/config/firebaseInformadores.json firebaseInformadores.json
 
       - run:
-          name: PM2 Setup
+          name: MK Premium PM2 Setup
+          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/dev/banks-pm2.json banks-pm2.json
+
+      - run:
+          name: MK Banks PM2 Setup
           command: aws s3 cp --region eu-west-3 s3://mkpremium/config/dev/mkpremium-pm2.json mkpremium-pm2.json
 
       - run:
@@ -111,8 +115,12 @@ jobs:
           command: ssh-keyscan -H ec2-34-248-103-55.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
 
       - run:
-          name: Building & Deploying Files
+          name: Building & Deploying MK Premium Files
           command: TERM=xterm npm run deploy -- centos@ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
+
+      - run:
+          name: Building & Deploying MK Banks Files
+          command: TERM=xterm npm run deploy -- centos@ec2-34-248-103-55.eu-west-1.compute.amazonaws.com banks
 
 workflows:
   version: 2
