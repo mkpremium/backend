@@ -271,6 +271,8 @@ router.get('/business', limitedListOperatorController);
  *       - admin: []
  *       - manager: []
  *       - operator: []
+ *       - banks_api: []
+ *       - banks: []
  *     tags: [Operator]
  *     summary: Obtiene información acerca del operador actual
  *     responses:
