@@ -233,8 +233,14 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async nextWorksheetInQueue(queue, operatorId) {
     const operatorItem = queue.findItemByOperatorId(operatorId);
-    const updatedQueue = await this.findNextAvailable(queue);
-    const nextAvailableItem = updatedQueue.findNextAvailable(operatorItem);
+    let nextAvailableItem = queue.findNextAvailable(operatorItem);
+    let updatedQueue = queue;
+
+    // add worksheet only if the bag it's empty
+    if (!nextAvailableItem) {
+      const updatedQueue = await this.findNextAvailable(queue);
+      nextAvailableItem = updatedQueue.findNextAvailable(operatorItem);
+    }
 
     if (!nextAvailableItem) {
       throw newHttpError(422, 'No hay items disponibles en la lista');
