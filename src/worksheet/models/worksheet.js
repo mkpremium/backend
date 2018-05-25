@@ -63,11 +63,13 @@ export class Worksheet extends CouchbaseModel {
 }
 
 export class WorksheetRepository extends Worksheet {
-  async findBySource(source) {
+
+  async _findBySourceAndREference(source, referenceId) {
     const cleanSource = cleanObject(source);
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')
-      .where('queueId IS NULL');
+      .where('queueId IS NULL')
+      .sort('t.id');
 
     const letBuilding = buildingRepo.getQueryBuilder('raw', 't2')
       .order('RANDOM()');
@@ -80,7 +82,19 @@ export class WorksheetRepository extends Worksheet {
       .letQuery('_building', letBuilding)
       .where('t.`relatedBuildingIds`[0] IN _building');
 
+    if (referenceId) {
+      qb.where('t.referenceId > ?', referenceId);
+    }
+
     return this.query(qb);
+  }
+
+  async findBySource({source, referenceId}) {
+    const withReferenceResults = await this._findBySourceAndREference(source, referenceId);
+    if (!withReferenceResults || withReferenceResults.length === 0) {
+      return this._findBySourceAndREference(source);
+    }
+    return withReferenceResults;
   }
 
   async findByIdOrThrow(worksheetId) {

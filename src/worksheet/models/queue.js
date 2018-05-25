@@ -111,7 +111,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     await worksheetRepo.save(t.update(worksheet, {queueId: {$set: queue.id}}));
     const item = await itemRepo.save({worksheetId: worksheet.id});
     const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
-    return t.update(queue, {worksheets: {$set: updatedWorksheets}});
+    return t.update(queue, {
+      worksheets: {$set: updatedWorksheets},
+      referenceId: worksheet.id
+    });
   }
 
   async removeWorksheet(queueId, worksheetId) {
@@ -246,7 +249,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async findNextAvailable(queue) {
     const worksheetRepo = new WorksheetRepository();
-    const [worksheet] = await worksheetRepo.findBySource(queue.source);
+    const [worksheet] = await worksheetRepo.findBySource(queue);
 
     if (worksheet) {
       return this.addWorksheetAndSave(queue.id, worksheet.id);

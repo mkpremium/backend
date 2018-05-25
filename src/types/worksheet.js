@@ -260,15 +260,12 @@ const WorksheetQueueSource = t.struct({
  *     properties:
  *       name:
  *         type: string
- *       size:
- *         type: number
  *       source:
  *         $ref: "#/definitions/WorksheetQueueSource"
  */
 t.WorksheetQueueBody = t.struct(
   {
     name: t.String,
-    size: t.maybe(t.Number),
     source: WorksheetQueueSource
   }, {
     name: 'WorksheetQueueBody',
@@ -301,6 +298,7 @@ t.WorksheetQueue = t.struct(
     name: t.String,
     source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItem),
+    referenceId: t.maybe(t.String),
 
     _documentType: t.enums.of(['worksheet-queue'])
   },
