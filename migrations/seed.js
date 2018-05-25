@@ -14,7 +14,6 @@ import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
 import {BuildingRepository} from '../src/building/models';
-import {cleanFirebase} from './firebase-clean';
 
 async function init() {
   const bucket = await couchbase();
@@ -23,7 +22,6 @@ async function init() {
   };
 
   await deleteAll();
-  await cleanFirebase();
   const migrateOwner = new MigrateModel('owner', resolve(__dirname, '../test/fixtures/sample_owners.csv'), app);
   await migrateOwner.run();
 

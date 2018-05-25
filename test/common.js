@@ -40,7 +40,6 @@ export async function deleteAll() {
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
-    calls.deleteQuery(),
     callUnknownEvents.deleteQuery(),
     stats.deleteQuery(),
     neighborhood.deleteQuery(),
