@@ -202,7 +202,7 @@ t.QueueItemExtraInfo = t.QueueItem.extend({
 });
 
 t.QueueItem.prototype.canBeOpened = function(operatorId) {
-  if (operatorId) {
+  if (operatorId && this.operatorId) {
     return operatorId === this.operatorId;
   }
   return Queue.StatusAvailable.indexOf(this.status) !== -1;
