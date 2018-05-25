@@ -10,6 +10,7 @@ import {ScheduledEventsRepository} from '../src/scheduled-events/models';
 import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
+import {cleanFirebase} from '../migrations/firebase-clean';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -29,6 +30,7 @@ export async function deleteAll() {
   await OperatorRepository._promiseBucket;
 
   return Promise.all([
+    cleanFirebase(),
     operator.deleteQuery(),
     worksheet.deleteQuery(),
     queue.deleteQuery(),
