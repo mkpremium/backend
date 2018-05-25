@@ -58,7 +58,7 @@ export class SocketServer {
     }
 
     if (this.timers[socket.user.id]) {
-      this.timers[socket.user.id]();
+      clearTimeout(this.timers[socket.user.id]);
       delete this.timers[socket.user.id];
     }
 
