@@ -201,7 +201,10 @@ t.QueueItemExtraInfo = t.QueueItem.extend({
   lastCall: t.maybe(t.WorkSheetCall)
 });
 
-t.QueueItem.prototype.canBeOpened = function() {
+t.QueueItem.prototype.canBeOpened = function(operatorId) {
+  if (operatorId) {
+    return operatorId === this.operatorId;
+  }
   return Queue.StatusAvailable.indexOf(this.status) !== -1;
 };
 

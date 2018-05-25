@@ -3,6 +3,8 @@ import {OperatorRefreshTokenRepository, OperatorRepository} from './models';
 import {History} from '../history/models';
 import {canManageOperator} from '../lib/role-operators';
 import {Calls} from '../calls/models';
+import {WorksheetQueueRepository} from '../worksheet/models/queue';
+import _get from 'lodash/get';
 
 async function login(req, res) {
   const repo = new OperatorRepository();
@@ -64,8 +66,13 @@ async function limitedListOperator(req, res) {
 
 async function me(req, res) {
   const model = new Calls();
+  const repoWorksheetQueue = new WorksheetQueueRepository();
+
+  const queueId = _get(req, 'user.operator.profile.queueId', null);
+  const operatorId = _get(req, 'user.operator.id', null);
+  const queueItem = await repoWorksheetQueue.findItemByOperator(queueId, operatorId);
   const activeCall = await model.findActiveCallByOperatorId(req.user.id);
-  res.json(Object.assign({}, req.user.operator, {activeCall}));
+  res.json(Object.assign({}, req.user.operator, {activeCall, queueItem}));
 }
 
 export const loginController = wrap(login);

@@ -164,14 +164,14 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
     }
 
-    if (!item.canBeOpened()) {
+    if (!item.canBeOpened(operatorId)) {
       throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`);
     }
 
     const operatorItem = queue.findItemByOperatorId(operatorId);
 
-    if (operatorItem) {
-      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente`);
+    if (operatorItem && operatorItem.id !== item.id) {
+      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente ${operatorItem.id}`);
     }
 
     const worksheetRepo = new WorksheetRepository();
@@ -253,6 +253,14 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     }
 
     return queue;
+  }
+
+  async findItemByOperator(queueId, operatorId) {
+    if (!queueId) {
+      return null;
+    }
+    const queue = await this.findByIdOrThrow(queueId);
+    return queue.findItemByOperatorId(operatorId);
   }
 
   async releaseTakenWorksheetInQueue(queueId, operatorId) {
