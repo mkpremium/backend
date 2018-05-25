@@ -147,6 +147,8 @@ t.BankFile = t.struct(
     processed: t.Number,
     total: t.Number,
 
+    createdAt: t.Date,
+
     userInput: t.maybe(t.BankFilterUserInput),
 
     _documentType: t.enums.of(['bank-file'])
@@ -156,6 +158,9 @@ t.BankFile = t.struct(
     defaultProps: {
       get id() {
         return uuid();
+      },
+      get createdAt() {
+        return new Date();
       },
       processed: 0,
       total: 0,
