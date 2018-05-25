@@ -72,7 +72,7 @@ export class WorksheetRepository extends Worksheet {
       .sort('t.id');
 
     const letBuilding = buildingRepo.getQueryBuilder('raw', 't2')
-      .order('RANDOM()');
+      .order('t2.id');
 
     Object.keys(cleanSource).forEach(key => {
       letBuilding.where(`t2.address.${key} = ?`, cleanSource[key]);
