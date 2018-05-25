@@ -69,7 +69,7 @@ export class WorksheetRepository extends Worksheet {
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')
       .where('queueId IS NULL')
-      .sort('t.id');
+      .order('t.id');
 
     const letBuilding = buildingRepo.getQueryBuilder('raw', 't2')
       .order('t2.id');
