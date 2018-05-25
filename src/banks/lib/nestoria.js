@@ -47,7 +47,7 @@ function addDistance(refLocation) {
 }
 
 function calculatePriceAverageM2(listing = []) {
-  const total = listing.reduce((acc, {price, size}) => (price / size), 0);
+  const total = listing.reduce((acc, {price, size}) => acc + (price / size), 0);
   return total / Math.max(listing.length, 1);
 }
 

@@ -12,8 +12,8 @@ const fieldNames = [
   'population',
   'itp',
   'price',
-  'priceCity',
-  'rot'
+  'rot',
+  'priceCity'
 ];
 
 function isEmpty(value) {

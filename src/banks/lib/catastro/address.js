@@ -24,7 +24,7 @@ function xmlParser(rawXml) {
     address: Object.assign({}, address, {
       fullAddress: `${address.type} ${address.street} ${address.number}`,
       city: document.valueWithPath(`${base}.dt.nm`),
-      state: document.valueWithPath(`${base}.dt.np`)
+      province: document.valueWithPath(`${base}.dt.np`)
     }),
     use: document.valueWithPath(`${base}.debi.luso`),
     m2: parseFloat(document.valueWithPath(`${base}.debi.sfc`))

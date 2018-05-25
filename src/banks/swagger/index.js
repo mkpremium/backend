@@ -8,6 +8,7 @@ const swaggerDefinition = require('./swaggerDef');
 const options = {
   swaggerDefinition,
   apis: [
+    resolve(__dirname, '../../operator/**/*.js'),
     resolve(__dirname, '../**/*.js')
   ]
 };

@@ -107,7 +107,7 @@ export class BankFileRepository extends CouchbaseModel {
   async list() {
     const qb = this.getQueryBuilder();
     qb
-      .order('createdAt')
+      .order('createdAt', false)
       .limit(5);
 
     const results = await this.query(qb);
