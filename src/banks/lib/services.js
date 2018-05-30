@@ -14,7 +14,7 @@ function calculatePriceInvest({itp, priceSell, priceBank}, discount) {
 }
 
 function calculateBenefit({priceInvest, priceSell}) {
-  return (priceSell - priceInvest) / priceInvest * 100;
+  return (priceSell - priceInvest) / Math.max(priceInvest, 1) * 100;
 }
 
 function alwaysFalse() {
