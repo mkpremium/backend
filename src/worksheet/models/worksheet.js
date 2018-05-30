@@ -63,7 +63,6 @@ export class Worksheet extends CouchbaseModel {
 }
 
 export class WorksheetRepository extends Worksheet {
-
   async _findBySourceAndReference(source, referenceId) {
     const cleanSource = cleanObject(source);
     const buildingRepo = new BuildingRepository();
