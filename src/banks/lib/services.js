@@ -13,18 +13,27 @@ function calculatePriceInvest({itp, priceSell, priceBank}, discount) {
   return priceBank * (1 - discount / 100) * (1 + itp / 100) + priceSell * 0.05 + 1500;
 }
 
+function calculateBenefit({priceInvest, priceSell}) {
+  return (priceSell - priceInvest) / Math.max(priceInvest, 1) * 100;
+}
+
 function alwaysFalse() {
   return false;
 }
 
 function filterPopulation(threshold) {
   if (!threshold) return alwaysFalse;
-  return ({population}) => population < threshold;
+  return ({population}) => {
+    if (population === 0) {
+      return false;
+    }
+    return population < threshold;
+  };
 }
 
 function filterBenefit(threshold) {
   if (!threshold) return alwaysFalse;
-  return ({priceInvest, priceSell}) => priceSell - priceInvest < threshold;
+  return ({benefit}) => benefit < threshold;
 }
 
 function filterPriceSell(threshold) {
@@ -58,15 +67,18 @@ function calculateFilters(thresholds = {}) {
     const discount = thresholds.discount || 0;
     const priceInvest = calculatePriceInvest(obj, discount);
     const withPriceInvest = Object.assign({priceInvest}, obj);
+    const benefit = calculateBenefit(withPriceInvest);
+    const withBenefit = Object.assign(withPriceInvest, {benefit});
+
     const filters = {
-      population: filterPopulation(thresholds.population)(withPriceInvest),
-      benefit: filterBenefit(thresholds.benefit)(withPriceInvest),
-      priceSell: filterPriceSell(thresholds.priceSell)(withPriceInvest),
-      blacklisted: filterBlacklisted(thresholds.blacklisted)(withPriceInvest),
-      whitelisted: filterWhitelisted(thresholds.whitelisted)(withPriceInvest)
+      population: filterPopulation(thresholds.population)(withBenefit),
+      benefit: filterBenefit(thresholds.benefit)(withBenefit),
+      priceSell: filterPriceSell(thresholds.priceSell)(withBenefit),
+      blacklisted: filterBlacklisted(thresholds.blacklisted)(withBenefit),
+      whitelisted: filterWhitelisted(thresholds.whitelisted)(withBenefit)
     };
     const buy = filters.whitelisted || !_some(Object.values(filters));
-    return Object.assign({}, obj, {priceInvest, filters, buy});
+    return Object.assign({}, obj, {priceInvest, filters, buy, benefit});
   };
 }
 

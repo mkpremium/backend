@@ -133,6 +133,7 @@ export class BankFileDataRepository extends CouchbaseModel {
   async findByFileBankIdAndBuy(bankFileId, buy) {
     const qb = this
       .getQueryBuilder()
+      .where('processed = ?', true)
       .where('bankFileId = ?', bankFileId)
       .where('buy = ?', buy);
 
@@ -142,6 +143,7 @@ export class BankFileDataRepository extends CouchbaseModel {
   async findByFileBankId(bankFileId) {
     const qb = this
       .getQueryBuilder()
+      .where('processed = ?', true)
       .where('bankFileId = ?', bankFileId);
 
     return this.query(qb);

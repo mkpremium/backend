@@ -21,26 +21,35 @@ class BankLoadWorker {
     this.worker = gearman.worker(gearmanConfig);
 
     this._getAsyncProcessRow = this._getAsyncProcessRow.bind(this);
+    this._processRow = this._processRow.bind(this);
     this._workerBankFile = this._workerBankFile.bind(this);
     this._setTotal = this._setTotal.bind(this);
   }
 
-  _getAsyncProcessRow(bankFileId, cadastreCol, bankPriceCol) {
+  async _processRow(row, bankFileId, cadastreCol, bankPriceCol) {
     const repo = new BankFileDataRepository();
-    return async(row) => {
-      const bankFileData = await repo.save({
-        bankFileId,
-        bankFileRowData: row,
-        cadastreReference: row[cadastreCol],
-        priceBank: Number(row[bankPriceCol])
-      });
+    const bankFileData = await repo.save({
+      bankFileId,
+      bankFileRowData: row,
+      cadastreReference: row[cadastreCol],
+      priceBank: Number(row[bankPriceCol])
+    });
 
-      const payload = JSON.stringify({id: bankFileData.id});
-      const options = {
-        unique: payload.id,
-        background: true
-      };
-      this.client.submitJob(BANK_WORKER_NAMES.PROCESS, payload, options);
+    const payload = JSON.stringify({id: bankFileData.id});
+    const options = {
+      unique: payload.id,
+      background: true
+    };
+    this.client.submitJob(BANK_WORKER_NAMES.PROCESS, payload, options);
+  }
+
+  _getAsyncProcessRow(bankFileId, cadastreCol, bankPriceCol) {
+    return async(row) => {
+      try {
+        await this._processRow(row, bankFileId, cadastreCol, bankPriceCol);
+      } catch (e) {
+        console.error('ignorada la fila', e);
+      }
     };
   }
 
