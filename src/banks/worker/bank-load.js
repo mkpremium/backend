@@ -1,5 +1,6 @@
 import gearman from 'gearmanode';
 import Promise from 'bluebird';
+import _isNil from 'lodash/isNil';
 import XLSX from 'xlsx';
 
 import couchbase from '../../db/couchbase';
@@ -63,8 +64,9 @@ class BankLoadWorker {
     const [firstSheet] = workbook.SheetNames;
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
     const [cadastreCol, bankPriceCol] = Object.keys(sheet[0]);
-    await this._setTotal(bankFile, sheet.length);
-    await Promise.each(sheet, this._getAsyncProcessRow(bankFile.id, cadastreCol, bankPriceCol));
+    const filteredSheet = sheet.filter(filterBadFormattedCols(cadastreCol, bankPriceCol));
+    await this._setTotal(bankFile, filteredSheet.length);
+    await Promise.each(filteredSheet, this._getAsyncProcessRow(bankFile.id, cadastreCol, bankPriceCol));
   }
 
   async run() {
@@ -78,6 +80,10 @@ class BankLoadWorker {
       .run()
       .catch(console.log.bind(console));
   }
+}
+
+function filterBadFormattedCols(cadastreCol, bankPriceCol) {
+  return (row) => !_isNil(row[cadastreCol]) && !_isNil(row[bankPriceCol]);
 }
 
 BankLoadWorker.init();
