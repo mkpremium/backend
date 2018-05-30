@@ -64,7 +64,7 @@ export class Worksheet extends CouchbaseModel {
 
 export class WorksheetRepository extends Worksheet {
 
-  async _findBySourceAndREference(source, referenceId) {
+  async _findBySourceAndReference(source, referenceId) {
     const cleanSource = cleanObject(source);
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')
@@ -90,9 +90,9 @@ export class WorksheetRepository extends Worksheet {
   }
 
   async findBySource({source, referenceId}) {
-    const withReferenceResults = await this._findBySourceAndREference(source, referenceId);
+    const withReferenceResults = await this._findBySourceAndReference(source, referenceId);
     if (!withReferenceResults || withReferenceResults.length === 0) {
-      return this._findBySourceAndREference(source);
+      return this._findBySourceAndReference(source);
     }
     return withReferenceResults;
   }
