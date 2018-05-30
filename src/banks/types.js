@@ -149,7 +149,7 @@ t.BankFile = t.struct(
 
     createdAt: t.Date,
 
-    userInput: t.maybe(t.BankFilterUserInput),
+    userInput: t.BankFilterUserInput,
 
     _documentType: t.enums.of(['bank-file'])
   },
@@ -164,6 +164,11 @@ t.BankFile = t.struct(
       },
       processed: 0,
       total: 0,
+      userInput: {
+        discount: 0,
+        blacklisted: [],
+        whitelisted: []
+      },
       _documentType: 'bank-file'
     }
   }
