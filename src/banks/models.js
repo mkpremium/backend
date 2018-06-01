@@ -151,6 +151,7 @@ export class BankFileDataRepository extends CouchbaseModel {
     const counter = repoFile.getCounter();
     const file = await repoFile.findById(bankFileId);
     const value = await counter.count(`${bankFileId}:errors`, 1);
+    await repoFile.sendEvent(`${bankFileId}:error`);
     return repoFile.update(file, {errors: value});
   }
 
@@ -194,6 +195,7 @@ export class BankFileDataRepository extends CouchbaseModel {
         processed: {$set: true}
       });
     } catch (e) {
+      console.error('process have failed', e);
       updatedBankFileData = bankFileData;
       await this.updateErrorCounter(updatedBankFileData.bankFileId);
     }
