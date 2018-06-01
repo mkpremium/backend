@@ -3,7 +3,7 @@ import {
   actionBankFileDataController,
   calculateFiltersController, exportBankFileController,
   getBankFileController,
-  listBankFilesController,
+  listBankFilesController, removeBankFileController,
   uploadBankFileController
 } from './controllers';
 
@@ -218,5 +218,39 @@ router.post('/files/:id/export', exportBankFileController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/files/:id/:action', actionBankFileDataController);
+
+/**
+ * @swagger
+ * /banks/files/{id}/:
+ *   delete:
+ *     tags: [Banks]
+ *     summary: Elimina un bank file, en caso de estas siendo procesado se desocuparan los workers
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - "application/json"
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: id
+ *        type: string
+ *        in: path
+ *        required: true
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BankFile"
+ *       404:
+ *         description: No existe el archivo
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.delete('/files/:id', removeBankFileController);
 
 export default router;

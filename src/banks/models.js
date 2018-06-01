@@ -117,6 +117,19 @@ export class BankFileRepository extends CouchbaseModel {
 
     return BankFileRepository.multiple(results);
   }
+
+  async _deleteBankFile(bankFileId) {
+    await this.findByIdOrThrow(bankFileId);
+    const qb = this.getQueryBuilder('delete');
+    qb.where('id = ?', bankFileId);
+    await this.deleteQuery(qb);
+  }
+
+  async deleteBankFile(bankFileId) {
+    const dataRepo = new BankFileDataRepository();
+    await this._deleteBankFile(bankFileId);
+    await dataRepo.deleteByBankFileId(bankFileId);
+  }
 }
 
 export class BankFileDataRepository extends CouchbaseModel {
@@ -196,6 +209,12 @@ export class BankFileDataRepository extends CouchbaseModel {
     }
 
     return bankFileData;
+  }
+
+  deleteByBankFileId(bankFileId) {
+    const qb = this.getQueryBuilder('delete');
+    qb.where('bankFileId = ?', bankFileId);
+    return this.deleteQuery(qb);
   }
 }
 
