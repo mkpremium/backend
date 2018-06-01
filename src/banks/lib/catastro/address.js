@@ -5,6 +5,8 @@ import {cadastreAddress} from '../../../../config';
 import Promise from 'bluebird';
 import xmldoc from 'xmldoc';
 import {getRandomProxy} from './proxies';
+import {ONE_MONTH, ONE_YEAR} from '../../../lib/constants';
+import {BankFileRepository} from '../../models';
 
 const debugCadastre = debug('app:banks:cadastre');
 
@@ -42,7 +44,7 @@ function paramsEnvelope(rc) {
 </soap:Envelope>`;
 }
 
-export async function cadastreAddressService(cadastreReference) {
+async function cadastreAddressLive(cadastreReference) {
   debugCadastre('cadastreAddressService', 'init', cadastreAddress, cadastreReference);
   await Promise.delay(cadastreAddress.waitTimeMS);
   const proxy = await getRandomProxy();
@@ -60,6 +62,21 @@ export async function cadastreAddressService(cadastreReference) {
     });
   debugCadastre('cadastreAddressService', 'parsing', response.data);
   return xmlParser(response.data);
+}
+
+export async function cadastreAddressService(cadastreReference) {
+  const cacheKey = `address:${cadastreReference}`;
+  const repo = new BankFileRepository();
+  const cache = repo.getCache({expiry: ONE_MONTH});
+
+  const cachedAddress = await cache.getValue(cacheKey);
+  if (cachedAddress) {
+    return cachedAddress;
+  }
+  const liveAddress = await cadastreAddressLive(cadastreReference);
+  await cache.setValue(cacheKey, liveAddress);
+
+  return liveAddress;
 }
 
 if (require.main === module) {

@@ -6,6 +6,8 @@ import Utm from 'utm-latlng';
 
 import {cadastreLocation} from '../../../../config';
 import {getRandomProxy} from './proxies';
+import {BankFileRepository} from '../../models';
+import {ONE_MONTH} from '../../../lib/constants';
 
 const SRS = {
   'EPSG:32627': 'WGS 84',
@@ -54,7 +56,7 @@ async function xmlParser() {
   };
 }
 
-export async function cadastreLocationService(cadastreReference) {
+async function cadastreLocationLive(cadastreReference) {
   const cadastreReference14 = cadastreReference.substr(0, 14);
   debugCadastre('cadastreLocationService', 'init', cadastreLocation, cadastreLocation);
   await Promise.delay(cadastreLocation.waitTimeMS);
@@ -72,6 +74,21 @@ export async function cadastreLocationService(cadastreReference) {
   });
   debugCadastre('cadastreLocationService', 'parsing', response.data);
   return parser(response.data);
+}
+
+export async function cadastreLocationService(cadastreReference) {
+  const cacheKey = `location:${cadastreReference}`;
+  const repo = new BankFileRepository();
+  const cache = repo.getCache({expiry: ONE_MONTH});
+  const cachedLocation = await cache.getValue(cacheKey);
+  if (cachedLocation) {
+    return cachedLocation;
+  }
+
+  const liveLocation = await cadastreLocationLive(cadastreReference);
+  await cache.setValue(cacheKey, liveLocation);
+
+  return liveLocation;
 }
 
 if (require.main === module) {
