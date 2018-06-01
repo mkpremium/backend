@@ -69,11 +69,19 @@ export class CouchbaseSimpleCache {
 
   async getValue(key) {
     const cacheKey = `cache:${key}`;
-    return this.bucket.getAsync(cacheKey);
+    let result = null;
+    try {
+      result = await this.bucket.getAsync(cacheKey);
+    } catch (e) {
+      console.error(e);
+    }
+
+    return result;
   }
 
   async setValue(key, value) {
-
+    const cacheKey = `cache:${key}`;
+    return this.bucket.upsertToDb(cacheKey, value, this.options);
   }
 }
 
