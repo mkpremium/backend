@@ -145,6 +145,7 @@ t.BankFile = t.struct(
     filepath: t.String,
     mimetype: t.String,
     processed: t.Number,
+    errors: t.Number,
     total: t.Number,
 
     createdAt: t.Date,
@@ -164,6 +165,7 @@ t.BankFile = t.struct(
       },
       processed: 0,
       total: 0,
+      errors: 0,
       userInput: {
         discount: 0,
         blacklisted: [],
