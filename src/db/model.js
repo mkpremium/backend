@@ -8,6 +8,7 @@ import debug from 'debug';
 import init from './couchbase';
 import {couchbase, emitModelEvents} from '../../config';
 import {newHttpError} from '../lib/http-error';
+import {ONE_WEEK} from '../lib/constants';
 
 const debugModel = debug('app:db:model');
 
@@ -57,6 +58,22 @@ export class CouchbaseCounter {
     const counterKey = `counter:${key}`;
     const {value} = await this.bucket.counterAsync(counterKey, delta, this.options);
     return value;
+  }
+}
+
+export class CouchbaseSimpleCache {
+  constructor(bucket, options) {
+    this.bucket = bucket;
+    this.options = options;
+  }
+
+  async getValue(key) {
+    const cacheKey = `cache:${key}`;
+    return this.bucket.getAsync(cacheKey);
+  }
+
+  async setValue(key, value) {
+
   }
 }
 
@@ -139,6 +156,10 @@ export class CouchbaseModel {
 
   getCounter(options = {initial: 1}) {
     return new CouchbaseCounter(this._bucket, options);
+  }
+
+  getCache(options = {expiry: ONE_WEEK}) {
+    return new CouchbaseSimpleCache(this._bucket, options);
   }
 
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {

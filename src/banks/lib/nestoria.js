@@ -2,9 +2,12 @@ import Promise from 'bluebird';
 import _get from 'lodash/get';
 import debug from 'debug';
 import request from 'axios';
+import hash from 'object-hash';
 import {nestoriaService} from '../../../config';
 
 import geo from 'geolib';
+import {ONE_WEEK} from '../../lib/constants';
+import {BankFileRepository} from '../models';
 
 const debugNestoria = debug('app:banks:nestoria');
 
@@ -98,13 +101,30 @@ async function nestoriaSearchListingAutoRadius(location) {
   return {listing: firstListing, radius: '0.5km'};
 }
 
-export async function nestoriaListingService(location) {
+async function nestoriaListingLive(location) {
   debugNestoria('nestoriaListingService', 'init', nestoriaService, location);
   const {listing} = await nestoriaSearchListingAutoRadius(location);
   const priceZoneRaw = calculatePriceZoneRaw(listing);
   const priceZone = calculatePriceZone(listing, location);
 
   return {priceZoneRaw, priceZone};
+}
+
+export async function nestoriaListingService(location) {
+  const hashLocation = hash(location);
+  const cacheKey = `nestoria:${hashLocation}`;
+  const repo = new BankFileRepository();
+  const cache = repo.getCache({expiry: ONE_WEEK});
+
+  const cachedListing = await cache.getValue(cacheKey);
+  if (cachedListing) {
+    return cachedListing;
+  }
+
+  const liveListing = await nestoriaListingLive(location);
+  await cache.setValue(cacheKey, liveListing);
+
+  return liveListing;
 }
 
 if (require.main === module) {

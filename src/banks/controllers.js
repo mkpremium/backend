@@ -54,6 +54,13 @@ export async function actionBankFileData(req, res) {
   res.json(bankFile);
 }
 
+export async function removeBankFile(req, res) {
+  const bankFileId = req.params.id;
+  const repo = new BankFileRepository();
+  await repo.deleteBankFile(bankFileId);
+  res.status(204).send();
+}
+
 const bankFile = multer({storage}).single('file');
 
 export const listBankFilesController = wrap(listBankFiles);
@@ -62,3 +69,4 @@ export const getBankFileController = wrap(getBankFile);
 export const calculateFiltersController = wrap(calculateFilters);
 export const exportBankFileController = wrap(exportBankFile);
 export const actionBankFileDataController = wrap(actionBankFileData);
+export const removeBankFileController = wrap(removeBankFile);

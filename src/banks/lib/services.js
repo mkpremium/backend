@@ -97,9 +97,11 @@ export async function retrievePricesAndLocationInfo(cadastreReference) {
   const buildingInfo = await cadastreAddressService(cadastreReference);
   const bankCityData = await cityData(buildingInfo.address.city);
   const priceSell = calculatePriceSell(pricing, buildingInfo);
+  const buy = !!bankCityData;
   return Object.assign({}, pricing, buildingInfo, bankCityData, {
     priceSell,
-    location
+    location,
+    buy
   });
 }
 
