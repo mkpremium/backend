@@ -128,6 +128,8 @@ t.BankFilterResult = t.struct(
  *         type: number
  *       total:
  *         type: number
+ *       errors:
+ *         type: number
  *
  *   BankFileDetails:
  *     properties:
@@ -181,6 +183,7 @@ t.BankFileResponse = t.struct({
   filename: t.String,
   processed: t.Number,
   total: t.Number,
+  errors: t.Number,
   userInput: t.maybe(t.BankFilterUserInput)
 }, 'BankFileResponse');
 
