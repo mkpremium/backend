@@ -5,7 +5,7 @@ import {cadastreAddress} from '../../../../config';
 import Promise from 'bluebird';
 import xmldoc from 'xmldoc';
 import {getRandomProxy} from './proxies';
-import {ONE_MONTH, ONE_YEAR} from '../../../lib/constants';
+import {ONE_MONTH} from '../../../lib/constants';
 import {BankFileRepository} from '../../models';
 
 const debugCadastre = debug('app:banks:cadastre');
