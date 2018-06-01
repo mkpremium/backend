@@ -31,7 +31,7 @@ class BankLoadWorker {
     const bankFileData = await repo.save({
       bankFileId,
       bankFileRowData: row,
-      cadastreReference: row[cadastreCol],
+      cadastreReference: row[cadastreCol] || 'NO_VALUE_FOUND',
       priceBank: Number(row[bankPriceCol])
     });
 
