@@ -86,14 +86,17 @@ export class BankFileRepository extends CouchbaseModel {
     return bankFile;
   }
 
-  async setProcessed(bankFile, $set) {
-    const updated = t.update(bankFile, {processed: {$set}});
-    return this.save(updated);
+  async update(bankFile, $merge) {
+    const updatedBankFile = t.update(bankFile, {$merge});
+    return this.save(updatedBankFile);
   }
 
-  async setTotal(bankFile, $set) {
-    const updated = t.update(bankFile, {total: {$set}});
-    return this.save(updated);
+  async setProcessed(bankFile, processed) {
+    return this.update(bankFile, {processed});
+  }
+
+  async setTotal(bankFile, total) {
+    return this.update(bankFile, {total});
   }
 
   static single(bankFile) {
@@ -130,6 +133,14 @@ export class BankFileDataRepository extends CouchbaseModel {
     return repoFile.setProcessed(file, value);
   }
 
+  async updateErrorCounter(bankFileId) {
+    const repoFile = new BankFileRepository();
+    const counter = repoFile.getCounter();
+    const file = await repoFile.findById(bankFileId);
+    const value = await counter.count(`${bankFileId}:errors`, 1);
+    return repoFile.update(file, {errors: value});
+  }
+
   async findByFileBankIdAndBuy(bankFileId, buy) {
     const qb = this
       .getQueryBuilder()
@@ -161,11 +172,18 @@ export class BankFileDataRepository extends CouchbaseModel {
   }
 
   async process(bankFileData) {
-    const $merge = await retrievePricesAndLocationInfo(bankFileData.cadastreReference);
-    const updatedBankFileData = t.update(bankFileData, {
-      $merge,
-      processed: {$set: true}
-    });
+    let $merge = {};
+    let updatedBankFileData;
+    try {
+      $merge = await retrievePricesAndLocationInfo(bankFileData.cadastreReference);
+      updatedBankFileData = t.update(bankFileData, {
+        $merge,
+        processed: {$set: true}
+      });
+    } catch (e) {
+      updatedBankFileData = bankFileData;
+      await this.updateErrorCounter(updatedBankFileData.bankFileId);
+    }
 
     await this.save(updatedBankFileData);
     await this.updateCounter(updatedBankFileData.bankFileId);
