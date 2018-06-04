@@ -105,9 +105,9 @@ export async function retrievePricesAndLocationInfo(cadastreReference) {
   });
 }
 
-async function updateFilters(bankFileData) {
+async function updateFilters(bankFileData, $merge) {
   const repo = new BankFileDataRepository();
-  return repo.save(bankFileData);
+  return repo.update(bankFileData, $merge);
 }
 
 export async function calculateFilter(bankFileId, thresholds) {
@@ -119,5 +119,5 @@ export async function calculateFilter(bankFileId, thresholds) {
 
 export async function calculateFilterSpecific(bankFileDataRows, thresholds) {
   const calculator = calculateFilters(thresholds);
-  return Promise.map(bankFileDataRows, (data) => updateFilters(calculator(data)));
+  return Promise.map(bankFileDataRows, (data) => updateFilters(data, calculator(data)));
 }

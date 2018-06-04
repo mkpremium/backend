@@ -13,12 +13,12 @@ const invertedList = {
   whitelisted: 'blacklisted'
 };
 
-function updateListed(action, userInput, newValues) {
+function updateListed(action, userInput, cadastreReferences) {
   const action1 = action;
   const action2 = invertedList[action];
   return {
-    [action1]: _uniq(userInput[action1].concat(newValues)),
-    [action2]: _difference(userInput[action2], newValues)
+    [action1]: _uniq(userInput[action1].concat(cadastreReferences)),
+    [action2]: _difference(userInput[action2], cadastreReferences)
   };
 }
 
@@ -51,17 +51,22 @@ export class BankFileRepository extends CouchbaseModel {
   async doFilterAction(params, body) {
     const args = t.BankFilterUpdateInput(Object.assign({}, params, body));
     const repoData = new BankFileDataRepository();
-    const bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
     const bankFile = await this.findByIdOrThrow(args.id);
+    const bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
 
-    const bankFileDataIds = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
-    const updatedUserInput = t
-      .update(bankFile.userInput, {$merge: updateListed(args.action, bankFile.userInput, bankFileDataIds)});
+    const bankFileCadastreReferences = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
+    const updatedUserInput = t.update(bankFile.userInput, {
+      $merge: updateListed(args.action, bankFile.userInput, bankFileCadastreReferences)
+    });
     const updatedBankFile = t.update(bankFile, {userInput: {$set: updatedUserInput}});
 
     await calculateFilterSpecific(bankFileDataRows, updatedBankFile.userInput);
 
     return this.save(updatedBankFile);
+  }
+
+  doFilterActionXLSX(params, body) {
+
   }
 
   async calculateFilter(bankFileId, params) {
@@ -203,6 +208,11 @@ export class BankFileDataRepository extends CouchbaseModel {
 
     await this.save(updatedBankFileData);
     await this.updateCounter(updatedBankFileData.bankFileId);
+  }
+
+  async update(bankFileData, $merge) {
+    const updatedBankFileData = t.update(bankFileData, {$merge});
+    return this.save(updatedBankFileData);
   }
 
   async findByIdOrThrow(id) {

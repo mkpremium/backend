@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {
-  actionBankFileDataController,
+  actionBankFileDataController, actionBankFileDataWithXLSXController,
   calculateFiltersController, exportBankFileController,
   getBankFileController,
   listBankFilesController, removeBankFileController,
@@ -218,6 +218,7 @@ router.post('/files/:id/export', exportBankFileController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/files/:id/:action', actionBankFileDataController);
+router.post('/files/:id/:action.xls', actionBankFileDataWithXLSXController);
 
 /**
  * @swagger

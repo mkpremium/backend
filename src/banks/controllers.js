@@ -54,6 +54,12 @@ export async function actionBankFileData(req, res) {
   res.json(bankFile);
 }
 
+export async function actionBankFileDataWithXLSX(req, res) {
+  const repo = new BankFileRepository();
+  const bankFile = await repo.doFilterActionXLSX(req.params, req.body);
+  res.json(bankFile);
+}
+
 export async function removeBankFile(req, res) {
   const bankFileId = req.params.id;
   const repo = new BankFileRepository();
@@ -69,4 +75,5 @@ export const getBankFileController = wrap(getBankFile);
 export const calculateFiltersController = wrap(calculateFilters);
 export const exportBankFileController = wrap(exportBankFile);
 export const actionBankFileDataController = wrap(actionBankFileData);
+export const actionBankFileDataWithXLSXController = wrap(actionBankFileDataWithXLSX);
 export const removeBankFileController = wrap(removeBankFile);
