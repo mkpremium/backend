@@ -151,8 +151,9 @@ export class BankFileDataRepository extends CouchbaseModel {
     const counter = repoFile.getCounter();
     const file = await repoFile.findById(bankFileId);
     const value = await counter.count(`${bankFileId}:errors`, 1);
-    await repoFile.sendEvent(`${bankFileId}:error`);
-    return repoFile.update(file, {errors: value});
+    const updatedFile = await repoFile.update(file, {errors: value});
+    await repoFile.sendEvent(`${bankFileId}:error`, updatedFile);
+    return updatedFile;
   }
 
   async findByFileBankIdAndBuy(bankFileId, buy) {
