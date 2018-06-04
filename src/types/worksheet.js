@@ -84,6 +84,7 @@ t.WorkSheetCall = t.struct({
  */
 t.WorkSheet = t.struct({
   id: t.maybe(t.String),
+  worksheetIndex: t.maybe(t.Number),
   calls: t.list(t.WorkSheetCall),
 
   queueId: t.maybe(t.String),
@@ -298,7 +299,7 @@ t.WorksheetQueue = t.struct(
     name: t.String,
     source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItem),
-    referenceId: t.maybe(t.String),
+    worksheetIndex: t.maybe(t.Number),
 
     _documentType: t.enums.of(['worksheet-queue'])
   },

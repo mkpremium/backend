@@ -30,7 +30,7 @@
     "deploy": "scripts/deployment.sh",
     "cronjobs": "nodemon bin/cronjobs.js --exec babel-node",
     "start:all": "nf start",
-    "seed": "babel-node migrations/seed.js"
+    "seed": "babel-node $NODE_DEBUG_OPTION migrations/seed.js"
   },
   "dependencies": {
     "aws-sdk": "^2.229.1",
