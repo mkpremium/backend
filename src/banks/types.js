@@ -32,6 +32,17 @@ t.BanksAddress = t.struct(
   }
 );
 
+t.CadastreResponse = t.struct(
+  {
+    address: t.BanksAddress,
+    use: t.String,
+    m2: t.Number
+  },
+  {
+    name: 'CadastreResponse'
+  }
+);
+
 /**
  * @swagger
  * definitions:

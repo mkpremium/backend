@@ -49,11 +49,11 @@ function paramsEnvelope(rc) {
 }
 
 async function cadastreAddressLive(cadastreReference) {
-  debugCadastre('cadastreAddressService', 'init', cadastreAddress, cadastreReference);
+  debugCadastre('cadastreAddressLive', 'init', cadastreAddress, cadastreReference);
   await Promise.delay(cadastreAddress.waitTimeMS);
   const proxy = await getRandomProxy();
   const axios = axiosCreate({proxy});
-  debugCadastre('cadastreAddressService', 'fetching', proxy);
+  debugCadastre('cadastreAddressLive', 'fetching', proxy);
   const params = paramsEnvelope(cadastreReference);
   const response = await axios.post(
     cadastreAddress.serviceUrl,
@@ -64,9 +64,9 @@ async function cadastreAddressLive(cadastreReference) {
         'Content-Length': params.length
       }
     });
-  debugCadastre('cadastreAddressService', 'parsing', response.data);
+  debugCadastre('cadastreAddressLive', 'parsing', response.data);
   const data = xmlParser(response.data);
-  return fromJSON(data, t.BanksAddress);
+  return fromJSON(data, t.CadastreResponse);
 }
 
 export async function cadastreAddressService(cadastreReference) {
@@ -76,7 +76,8 @@ export async function cadastreAddressService(cadastreReference) {
 
   const cachedAddress = await cache.getValue(cacheKey);
   if (cachedAddress) {
-    return cachedAddress;
+    debugCadastre('cadastreAddressService', 'using cache', cacheKey);
+    return fromJSON(cachedAddress, t.CadastreResponse);
   }
   const liveAddress = await cadastreAddressLive(cadastreReference);
   await cache.setValue(cacheKey, liveAddress);
