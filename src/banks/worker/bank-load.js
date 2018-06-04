@@ -32,7 +32,7 @@ class BankLoadWorker {
       bankFileId,
       bankFileRowData: row,
       cadastreReference: row[cadastreCol] || 'NO_VALUE_FOUND',
-      priceBank: Number(row[bankPriceCol])
+      priceBank: Number(row[bankPriceCol] || 0)
     });
 
     const payload = JSON.stringify({id: bankFileData.id});
