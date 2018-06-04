@@ -113,7 +113,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
     return t.update(queue, {
       worksheets: {$set: updatedWorksheets},
-      referenceId: {$set: worksheet.id}
+      worksheetIndex: {$set: worksheet.worksheetIndex}
     });
   }
 

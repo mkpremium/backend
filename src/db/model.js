@@ -76,7 +76,7 @@ export class CouchbaseSimpleCache {
       console.error(e);
     }
 
-    return result;
+    return result && result.value;
   }
 
   async setValue(key, value) {

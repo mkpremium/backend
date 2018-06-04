@@ -63,7 +63,7 @@ export class Worksheet extends CouchbaseModel {
 }
 
 export class WorksheetRepository extends Worksheet {
-  async _findBySourceAndReference(source, referenceId) {
+  async _findBySourceAndReference(source, worksheetIndex) {
     const cleanSource = cleanObject(source);
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')
@@ -81,15 +81,15 @@ export class WorksheetRepository extends Worksheet {
       .letQuery('_building', letBuilding)
       .where('t.`relatedBuildingIds`[0] IN _building');
 
-    if (referenceId) {
-      qb.where('t.referenceId > ?', referenceId);
+    if (worksheetIndex) {
+      qb.where('t.worksheetIndex > ?', worksheetIndex);
     }
 
     return this.query(qb);
   }
 
-  async findBySource({source, referenceId}) {
-    const withReferenceResults = await this._findBySourceAndReference(source, referenceId);
+  async findBySource({source, worksheetIndex}) {
+    const withReferenceResults = await this._findBySourceAndReference(source, worksheetIndex);
     if (!withReferenceResults || withReferenceResults.length === 0) {
       return this._findBySourceAndReference(source);
     }
@@ -264,12 +264,21 @@ export class WorksheetRepository extends Worksheet {
   }
 
   async preSave(data) {
+    const worksheetIndex = data.worksheetIndex || await this._getNewIndex();
     // never store this
     return t.update(data, {
+      $merge: {
+        worksheetIndex
+      },
       ownerContacts: {$set: []},
       relatedBuildings: {$set: []},
       relatedOwners: {$set: []}
     });
+  }
+
+  async _getNewIndex() {
+    const counter = this.getCounter();
+    return counter.count(this.getType(), 1);
   }
 
   async list(query = {}) {
