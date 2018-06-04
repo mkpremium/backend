@@ -49,7 +49,8 @@ export class Operator extends CouchbaseModel {
   }
 
   async save(data, newCity) {
-    const operator = await super.save(data);
+    const params = fromJSON(data, t.OperatorRequest);
+    const operator = await super.save(params);
     await firebaseUserAccount(operator, newCity);
     return operator;
   }
@@ -140,7 +141,8 @@ export class OperatorRepository extends Operator {
     return this.save(updateOperator, newCity);
   }
 
-  async update(operator, params) {
+  async update(operator, data) {
+    const params = fromJSON(data, t.OperatorRequest);
     const updatedProfile = t.update(operator.profile, {
       $merge: params.profile
     });
