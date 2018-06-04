@@ -204,19 +204,29 @@ t.Operator = t.struct(
   }
 );
 
-t.OperatorRequest = t.struct({
-  username: t.StringNotEmpty,
-  password: t.Password,
-  email: t.maybe(t.String),
-  agentNumber: t.maybe(t.String),
-  level: t.maybe(t.Number),
-  features: t.list(t.OperatorFirebaseFeatures),
-  serviceId: t.maybe(t.String),
-  enable: t.Bool,
-  roles: t.list(t.OperatorRole),
+t.OperatorRequest = t.struct(
+  {
+    username: t.StringNotEmpty,
+    password: t.Password,
+    email: t.maybe(t.String),
+    agentNumber: t.maybe(t.String),
+    level: t.maybe(t.Number),
+    features: t.list(t.OperatorFirebaseFeatures),
+    serviceId: t.maybe(t.String),
+    enable: t.Bool,
+    roles: t.list(t.OperatorRole),
 
-  profile: t.OperatorProfile
-}, 'OperatorRequest');
+    profile: t.OperatorProfile
+  },
+  {
+    name: 'OperatorRequest',
+    defaultProps: {
+      enable: true,
+      roles: [],
+      features: [],
+      profile: {}
+    }
+  });
 
 t.OperatorRefreshToken = t.struct(
   {

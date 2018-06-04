@@ -64,7 +64,7 @@ export async function createFullOperator(object) {
 export async function operatorCreate(index = '', queueId) {
   return createFullOperator({
     username: `operator${index}`,
-    password: 'password',
+    password: 'Passw0rd',
     agentNumber: `operator${index}`,
     roles: [
       'OPERATOR'
@@ -82,7 +82,7 @@ export async function operatorCreate(index = '', queueId) {
 export async function operatorCreateAdmin(queueId) {
   return createFullOperator({
     username: 'admin',
-    password: 'password',
+    password: 'Passw0rd',
     agentNumber: 'admin',
     roles: [
       'ADMIN'
@@ -99,7 +99,7 @@ export async function operatorCreateAdmin(queueId) {
 export async function operatorCreateStreet() {
   return createFullOperator({
     username: 'street',
-    password: 'password',
+    password: 'Passw0rd',
     agentNumber: 'street',
     roles: [
       'STREET'
@@ -116,7 +116,7 @@ export async function operatorCreateStreet() {
 export async function operatorCreateBusiness() {
   return createFullOperator({
     username: 'business',
-    password: 'password',
+    password: 'Passw0rd',
     agentNumber: 'business',
     roles: [
       'BUSINESS'
@@ -132,7 +132,7 @@ export async function operatorCreateBusiness() {
 export async function operatorCreateManager(queueId) {
   return createFullOperator({
     username: 'manager',
-    password: 'password',
+    password: 'Passw0rd',
     agentNumber: 'manager',
     roles: [
       'MANAGER'
@@ -149,7 +149,7 @@ export async function operatorCreateManager(queueId) {
 export async function operatorCreateStreetManager() {
   return createFullOperator({
     username: 'street_manager',
-    password: 'password',
+    password: 'Passw0rd',
     agentNumber: 'street_manager',
     roles: [
       'STREET_MANAGER'
