@@ -1,3 +1,5 @@
+import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import debug from 'debug';
 import axiosCreate from './axios';
 
@@ -13,8 +15,10 @@ const debugCadastre = debug('app:banks:cadastre');
 function xmlParser(rawXml) {
   const document = new xmldoc.XmlDocument(rawXml);
 
+  const dirProperty = /lors/.test(rawXml) ? 'lors' : 'lous';
+
   const base = 'soap:Body.Consulta_DNP.consulta_dnp.bico.bi';
-  const baseAddress = `${base}.dt.locs.lous.lourb.dir`;
+  const baseAddress = `${base}.dt.locs.${dirProperty}.lourb.dir`;
 
   const address = {
     number: Number(document.valueWithPath(`${baseAddress}.pnp`)),
@@ -61,7 +65,8 @@ async function cadastreAddressLive(cadastreReference) {
       }
     });
   debugCadastre('cadastreAddressService', 'parsing', response.data);
-  return xmlParser(response.data);
+  const data = xmlParser(response.data);
+  return fromJSON(data, t.BanksAddress);
 }
 
 export async function cadastreAddressService(cadastreReference) {
