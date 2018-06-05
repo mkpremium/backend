@@ -28,7 +28,7 @@ async function createOperator(req, res) {
 
   canManageOperator(req.user.operator, req.body);
 
-  const operator = await repo.save(req.body);
+  const operator = await repo.createOperator(req.body);
   await History.registerCreate({
     contextModel: operator,
     user: req.user
@@ -44,7 +44,7 @@ async function updateOperator(req, res) {
 
   canManageOperator(req.user.operator, operator);
 
-  await repo.update(operator, req.body);
+  await repo.updateOperator(operator, req.body);
   res.status(204).send();
 }
 

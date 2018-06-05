@@ -48,11 +48,27 @@ export class Operator extends CouchbaseModel {
     });
   }
 
-  async save(data, newCity) {
+  async createOperator(data) {
     const params = fromJSON(data, t.OperatorRequest);
     const operator = await super.save(params);
-    await firebaseUserAccount(operator, newCity);
+    await firebaseUserAccount(operator);
     return operator;
+  }
+
+  async updateOperator(operator, data) {
+    fromJSON(data, t.OperatorUpdateRequest);
+    const updatedProfile = t.update(operator.profile, {
+      $merge: data.profile || {}
+    });
+    const updateOperator = t.update(operator, {
+      $merge: _omit(data, ['profile', 'id']),
+      profile: {$set: updatedProfile}
+    });
+
+    const updatedOperator = await this.save(updateOperator);
+    const newCity = JSON.stringify(_get(operator, 'profile.city')) !== JSON.stringify(_get(data, 'profile.city'));
+    await firebaseUserAccount(updatedOperator, newCity);
+    return updatedOperator;
   }
 
   async createAuthenticatedResponse(operator) {
@@ -135,23 +151,9 @@ export class OperatorRepository extends Operator {
   }
 
   async updateProfile(operator, params) {
-    const newCity = JSON.stringify(_get(operator, 'profile.city')) !== JSON.stringify(_get(params, 'profile.city'));
     const updatedProfile = t.update(operator.profile, {$merge: params});
     const updateOperator = t.update(operator, {profile: {$set: updatedProfile}});
-    return this.save(updateOperator, newCity);
-  }
-
-  async update(operator, data) {
-    const params = fromJSON(data, t.OperatorRequest);
-    const updatedProfile = t.update(operator.profile, {
-      $merge: params.profile
-    });
-    const updateOperator = t.update(operator, {
-      $merge: _omit(params, ['profile', 'id']),
-      profile: {$set: updatedProfile}
-    });
-
-    return this.save(updateOperator);
+    return this.updateOperator(operator, updateOperator);
   }
 
   async list(query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {

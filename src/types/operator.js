@@ -204,6 +204,37 @@ t.Operator = t.struct(
   }
 );
 
+t.OperatorProfileUpdate = t.struct({
+  firstName: t.maybe(t.String),
+  lastName: t.maybe(t.String),
+  city: t.maybe(t.String),
+  neighborhood: t.maybe(t.String),
+  state: t.maybe(t.OperatorFirebaseStates),
+  queueId: t.maybe(t.String),
+  email: t.maybe(t.String)
+});
+
+t.OperatorUpdateRequest = t.struct(
+  {
+    username: t.maybe(t.String),
+    password: t.maybe(t.Password),
+    email: t.maybe(t.String),
+    agentNumber: t.maybe(t.String),
+    level: t.maybe(t.Number),
+    features: t.maybe(t.list(t.OperatorFirebaseFeatures)),
+    serviceId: t.maybe(t.String),
+    enable: t.maybe(t.Bool),
+    roles: t.maybe(t.list(t.OperatorRole)),
+    profile: t.maybe(t.OperatorProfileUpdate)
+  },
+  {
+    name: 'OperatorRequest',
+    defaultProps: {
+      profile: {}
+    }
+  }
+);
+
 t.OperatorRequest = t.struct(
   {
     username: t.StringNotEmpty,
@@ -226,7 +257,8 @@ t.OperatorRequest = t.struct(
       features: [],
       profile: {}
     }
-  });
+  }
+);
 
 t.OperatorRefreshToken = t.struct(
   {
