@@ -48,7 +48,7 @@ function filterBlacklisted(blacklisted = []) {
 
 function filterWhitelisted(whitelisted = []) {
   if (whitelisted.length === 0) return alwaysFalse;
-  return ({cadastreReference}) => whitelisted.indexOf(cadastreReference) === -1;
+  return ({cadastreReference}) => whitelisted.indexOf(cadastreReference) !== -1;
 }
 
 /**
