@@ -51,7 +51,8 @@ function buildHeaders() {
   return '"id_chiamatafornitore;Id_Catastro;Id_Fornitore;ID;Verificato;proprietari;RagioneSociale;CodFis;ParIva"';
 }
 
-async function cross(input) {
+async function cross(input, opts) {
+  opts.retryJobOnError = false;
   const base = dirname(input.calls);
   const output = resolve(base, 'cross_table.csv');
   const query = buildQuery(input);
