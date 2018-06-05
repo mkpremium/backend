@@ -1,20 +1,13 @@
 import gearman from 'gearmanode';
+import {wrap} from '../../lib/workers';
 import {gearmanConfig} from '../../../config';
 
 import {seed} from '../../../migrations/seed_all';
 
 const worker = gearman.worker(gearmanConfig);
 
-function seedJobFunc(job) {
-  const files = JSON.parse(job.payload);
-  seed(files)
-    .then(() => {
-      job.workComplete();
-    })
-    .catch(err => {
-      console.error(err);
-      job.reportError();
-    });
+async function seedJobFunc(files) {
+  await seed(files);
 }
 
-worker.addFunction('seed', seedJobFunc);
+worker.addFunction('seed', wrap(seedJobFunc));

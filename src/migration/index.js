@@ -1,4 +1,3 @@
-import fileUpload from 'express-fileupload';
 import debug from 'debug';
 import routes from './routes';
 import {migrationEnabled} from '../../config';
@@ -10,10 +9,8 @@ export default (app) => {
   if (!migrationEnabled) {
     return;
   }
-  const files = fileUpload({
-    safeFileNames: true
-  });
+
   app.set('view engine', 'ejs');
   app.set('tmpdir', '/tmp');
-  app.use('/migration', files, routes);
+  app.use('/migration', routes);
 };

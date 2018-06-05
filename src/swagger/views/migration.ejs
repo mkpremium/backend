@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mk Premium herramienta de migration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+    <style>
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+        }
+        th {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="markdown-body">
+    <% if (submitted) { %>
+        <p>Archivos recibidos!</p>
+    <% }%>
+    <h1>Mk Premium herramienta de migration v<%= package.version %></h1>
+    <p>Esta herramienta no soporta migraciones incrementales, ni esta planeado hacerlo dado que este proceso se
+        realizara una única vez</p>
+
+    <p>Cada vez que la herramienta es usada, la información es eliminada completamente por la nueva información</p>
+
+    <p>Esta herramienta usa archivos CSV cuyo separador de columnas es <code>;</code> y la primera fila de cada archivo
+        debe contener las columnas descritas</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Archivo</th>
+            <th>Columnas</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <code>PROPIETARIOS.csv</code>
+            </td>
+            <td>
+                <code>
+                    Id_Fornitore;RagioneSociale;Telefono;Fax;Cellulare;Email;Internet;Indirizzo;Cap;Id_Localita;Id_Comune;Id_Prov;Id_Nazione;CodFis;ParIva;Id_Banca;Id_AgenziaBanca;CCB;IntestatarioCCB;Note;tmStmp;Id_Padre;Id_Catastro;Importante;Altro_Numero;PROPRIETARI;STREET;NUMBER;NUM_PB;NUM_IB;NUM_BD;NUM_ABC;NUM_1;NUM_2;NUM_3;Verificato;Id_Errore;Venduto;TelefonoErrato;NonRisponde;EntePubblico;Proprietario2;Famiglia;Fratelli;Figli;FILTER
+                </code>
+            </td>
+        </tr>
+        <tr>
+            <td><code>LLAMADAS.csv</code></td>
+            <td>
+                <code>
+                    id_chiamatafornitore;id_catastro;id_fornitore;cognome;nome;telefono;cellulare;id_operatorelivello1;data_livello1;id_operatorelivello2;data_livello2;visitare;data_visita;ora_visita;richiamare;data_richiamo;ora_richiamo;verificato;errore;tmstmp;vende;novende;id_errore;prezzo;proposta;proprietari;street;number;filter;venduto;telefonoerrato;nonrisponde;entepubblico;proprietario2;famiglia;fratelli;figli;elemento;situacion;calificacion;precio;codpla;qualificacion;urlimg;urlmap;urlpic;id_negoziazione;id_commerciale;id_contatto;nomecontatto;telefonocontatto;datacontatto;prezzomax;prezzorichiesto;differenzialeprezzi
+                </code>
+            </td>
+        </tr>
+        <tr>
+            <td><code>EDIFICIOS.csv</code></td>
+            <td>
+                <code>
+                    ID;TYPE;STREET;NUMBER;CARRER;NUMBERO;POSTCODE;BUILD;REFERENCE;LOCATION;POSTCODE2;CLASSE;SURFACEBUILDED;SURFACETERRAIN;COEFFICENT;USE;PROPERTYTYPE;YEARCONSTRUCTION;OWNER;PHONE;ELEMENTSNUMBER;ELEMENTSAVERAGE;COMMONSELEMENTS;MUNICIPALITY;PROVINCE;PROPRIETARI;DOMICILI;POBLACIO;NUMERO_PB;NUMERO_IB;NUMERO_BD;NUMERO_ABC;NUMERO_1;NUMERO_2;NUMERO_3;SURFACEROOF;FILTER
+                </code>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>Para realizar la migración todos los archivos son <strong>obligatorios</strong> además el proceso de migración
+    no puede ejecutarse mas de una vez al mismo tiempo</p>
+
+    <hr>
+    <h2>Realizar migracion</h2>
+    <form method="post" encType="multipart/form-data">
+        <table>
+            <tr>
+                <td>
+                    <label for="owners">PROPIETARIOS.csv</label>
+                </td>
+                <td>
+                    <input type="file" name="owners" id="owners" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="calls">LLAMADAS.csv</label>
+                </td>
+                <td>
+                    <input type="file" name="calls" id="calls" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="buildings">EDIFICIOS.csv</label>
+                </td>
+                <td>
+                    <input type="file" name="buildings" id="buildings" required>
+                </td>
+            </tr>
+            <!--<tr>-->
+                <!--<td>-->
+                    <!--<label for="notify-me">Quiero ser notificado cuando el proceso finalice</label>-->
+                <!--</td>-->
+                <!--<td>-->
+                    <!--<input type="email" placeholder="me@example.com" name="notify-me" id="notify-me">-->
+                <!--</td>-->
+            <!--</tr>-->
+        </table>
+        <input type="submit" value="Subir archivos e iniciar migración">
+    </form>
+</div>
+</body>
+</html>

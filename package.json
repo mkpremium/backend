@@ -19,11 +19,15 @@
     "cronjobs": "better-npm-run cronjobs",
     "seed": "better-npm-run seed",
     "banks_worker_0": "better-npm-run banks_worker_0",
-    "banks_worker_1": "better-npm-run banks_worker_1"
+    "banks_worker_1": "better-npm-run banks_worker_1",
+    "migration_worker_0": "better-npm-run migration_worker_0",
+    "migration_worker_1": "better-npm-run migration_worker_1"
   },
   "betterScripts": {
     "banks_worker_0": "nodemon $NODE_DEBUG_OPTION src/banks/worker/bank-load.js --exec babel-node",
     "banks_worker_1": "nodemon $NODE_DEBUG_OPTION src/banks/worker/bank-process.js --exec babel-node",
+    "migration_worker_0": "nodemon $NODE_DEBUG_OPTION src/migration/workers/cross-csv.js --exec babel-node",
+    "migration_worker_1": "nodemon $NODE_DEBUG_OPTION src/migration/workers/seed.js --exec babel-node",
     "start_banks": "nodemon $NODE_DEBUG_OPTION bin/www-bank.js --exec babel-node",
     "start": "nodemon $NODE_DEBUG_OPTION bin/www.js --exec babel-node",
     "socket": "nodemon bin/socket.js --exec babel-node",
@@ -48,7 +52,6 @@
     "dotenv": "^5.0.1",
     "ejs": "^2.5.9",
     "express": "^4.16.3",
-    "express-fileupload": "^0.4.0",
     "express-jwt": "^5.3.1",
     "express-jwt-permissions": "^1.1.0",
     "express-promise-wrap": "^0.2.2",
