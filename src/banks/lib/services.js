@@ -41,13 +41,13 @@ function filterPriceSell(threshold) {
   return ({priceSell}) => priceSell < threshold;
 }
 
-function filterBlacklisted(blacklisted) {
-  if (!blacklisted || blacklisted.length === 0) return alwaysFalse;
+function filterBlacklisted(blacklisted = []) {
+  if (blacklisted.length === 0) return alwaysFalse;
   return ({cadastreReference}) => blacklisted.indexOf(cadastreReference) !== -1;
 }
 
-function filterWhitelisted(whitelisted) {
-  if (!whitelisted || whitelisted.length === 0) return alwaysFalse;
+function filterWhitelisted(whitelisted = []) {
+  if (whitelisted.length === 0) return alwaysFalse;
   return ({cadastreReference}) => whitelisted.indexOf(cadastreReference) === -1;
 }
 
@@ -70,15 +70,21 @@ function calculateFilters(thresholds = {}) {
     const benefit = calculateBenefit(withPriceInvest);
     const withBenefit = Object.assign(withPriceInvest, {benefit});
 
-    const filters = {
+    const negativeFilters = {
       population: filterPopulation(thresholds.population)(withBenefit),
       benefit: filterBenefit(thresholds.benefit)(withBenefit),
       priceSell: filterPriceSell(thresholds.priceSell)(withBenefit),
-      blacklisted: filterBlacklisted(thresholds.blacklisted)(withBenefit),
+      blacklisted: filterBlacklisted(thresholds.blacklisted)(withBenefit)
+    };
+
+    const positiveFilters = {
       whitelisted: filterWhitelisted(thresholds.whitelisted)(withBenefit)
     };
-    const buy = filters.whitelisted || !_some(Object.values(filters));
-    return Object.assign({}, obj, {priceInvest, filters, buy, benefit});
+
+    const allFilters = Object.assign(positiveFilters, negativeFilters);
+
+    const buy = positiveFilters.whitelisted || !_some(Object.values(negativeFilters));
+    return Object.assign({}, obj, {priceInvest, filters: allFilters, buy, benefit});
   };
 }
 

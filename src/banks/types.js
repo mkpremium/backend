@@ -270,7 +270,7 @@ t.BankFileData = t.struct(
     buy: t.Boolean,
 
     processed: t.Boolean,
-    filters: t.maybe(t.BankFilterResult),
+    filters: t.BankFilterResult,
 
     _documentType: t.enums.of(['bank-file-data'])
   },
@@ -292,6 +292,13 @@ t.BankFileData = t.struct(
       itp: 10,
       buy: true,
       processed: false,
+      filters: {
+        population: false,
+        benefit: false,
+        priceSell: false,
+        blacklisted: false,
+        whitelisted: false
+      },
       _documentType: 'bank-file-data'
     }
   }
