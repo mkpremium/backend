@@ -7,7 +7,10 @@ function error(e) {
 }
 
 export function wrap(workerCallback) {
-  const wrapper = (job, wrapper) => {
+  const wrapper = (job) => {
+    const opts = {
+      retryJobOnError: true
+    };
     let input;
     try {
       input = JSON.parse(job.payload);
@@ -15,20 +18,19 @@ export function wrap(workerCallback) {
       error(e);
       process.exit(255);
     }
-    workerCallback(input, job)
+    workerCallback(input, job, opts)
       .then(result => {
         const data = result ? JSON.stringify(result) : null;
         job.workComplete(data);
       })
       .catch(err => {
         error(err);
-        if (wrapper.retryJobOnError) {
+        if (opts.retryJobOnError) {
           process.exit(255);
         } else {
           job.reportError();
         }
       });
   };
-  wrapper.retryJobOnError = true;
   return wrapper;
 }
