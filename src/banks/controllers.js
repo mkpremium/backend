@@ -2,9 +2,10 @@ import fs from 'fs';
 import multer from 'multer';
 import {wrap} from 'express-promise-wrap';
 import {compose} from 'compose-middleware';
-import {BankFileDataRepository, BankFileRepository} from './models';
+import {BankFileDataRepository, BankFileRepository, BanksCityDataRepository} from './models';
 
 import {storage} from '../../config';
+import {MigrateBankCityFile} from './lib/load-bank-file';
 
 export async function listBankFiles(req, res) {
   const repo = new BankFileRepository();
@@ -67,6 +68,14 @@ export async function removeBankFile(req, res) {
   res.status(204).send();
 }
 
+export async function updateBankCityData(req, res) {
+  const repo = new BanksCityDataRepository();
+  await repo.deleteQuery();
+  const migrate = new MigrateBankCityFile(req.file.path, req.app.locals.bucket);
+  await migrate.run();
+  res.status(204).send();
+}
+
 const bankFile = multer({storage}).single('file');
 
 export const listBankFilesController = wrap(listBankFiles);
@@ -77,3 +86,4 @@ export const exportBankFileController = wrap(exportBankFile);
 export const actionBankFileDataController = wrap(actionBankFileData);
 export const actionBankFileDataWithXLSXController = compose([bankFile, wrap(actionBankFileDataWithXLSX)]);
 export const removeBankFileController = wrap(removeBankFile);
+export const updateBankCityDataController = compose([bankFile, wrap(updateBankCityData)]);
