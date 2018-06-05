@@ -186,6 +186,7 @@ router.post('/files/:id/export', exportBankFileController);
  *   post:
  *     tags: [Banks]
  *     summary: Actualizar blacklisted or whitelisted filtros
+ *     description: El arreglo bankFileDataIds tiene prioridad sobre cadastreReferences no deben usarse juntos
  *     security:
  *       - banks: []
  *       - banks_api: []

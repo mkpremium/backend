@@ -63,9 +63,15 @@ export class BankFileRepository extends CouchbaseModel {
     const args = t.BankFilterUpdateInput(Object.assign({}, params, body));
     const repoData = new BankFileDataRepository();
     const bankFile = await this.findByIdOrThrow(args.id);
-    const bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
-
-    const bankFileCadastreReferences = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
+    let bankFileDataRows = [];
+    let bankFileCadastreReferences = [];
+    if (args.bankFileDataIds) {
+      bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
+      bankFileCadastreReferences = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
+    } else {
+      bankFileCadastreReferences = args.cadastreReferences;
+      bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences);
+    }
 
     return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences);
   }
