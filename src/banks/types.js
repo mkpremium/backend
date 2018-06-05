@@ -100,8 +100,8 @@ t.BankFilterUserInput = t.struct(
 t.BankFilterUpdateInput = t.struct({
   id: t.String,
   action: t.enums.of(['blacklisted', 'whitelisted']),
-  bankFileDataIds: t.list(t.String),
-  cadastreReferences: t.list(t.String)
+  bankFileDataIds: t.maybe(t.list(t.String)),
+  cadastreReferences: t.maybe(t.list(t.String))
 }, 'BankFilterUpdateInput');
 
 /**

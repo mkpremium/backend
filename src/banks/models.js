@@ -54,7 +54,7 @@ export class BankFileRepository extends CouchbaseModel {
     });
     const updatedBankFile = t.update(bankFile, {userInput: {$set: updatedUserInput}});
 
-    await calculateFilterSpecific(bankFileDataRows, updatedBankFile.userInput);
+    await calculateFilter(bankFile.id, updatedBankFile.userInput);
 
     return this.save(updatedBankFile);
   }
@@ -68,7 +68,7 @@ export class BankFileRepository extends CouchbaseModel {
     if (args.bankFileDataIds) {
       bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
       bankFileCadastreReferences = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
-    } else {
+    } else if (args.cadastreReferences) {
       bankFileCadastreReferences = args.cadastreReferences;
       bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences);
     }
