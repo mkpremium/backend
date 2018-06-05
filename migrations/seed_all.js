@@ -1,5 +1,4 @@
-import app from '../src/app';
-
+import couchbase from '../src/db/couchbase';
 import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
 import {
@@ -9,11 +8,15 @@ import {
 import {RelatedModel} from '../src/migration/lib/related-model';
 
 export async function seed(files) {
-  await app.locals.bucketPromise;
+  const app = {
+    locals: {
+      bucket: await couchbase()
+    }
+  };
   await deleteAll();
   await createFullOperator({
     username: `operator`,
-    password: 'operator',
+    password: 'Passw0rd',
     agentNumber: `10106-919`,
     serviceId: '17146',
     roles: [

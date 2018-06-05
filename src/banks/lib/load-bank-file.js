@@ -38,8 +38,8 @@ function rowToCity(values) {
 }
 
 export class MigrateBankCityFile {
-  constructor(filepath) {
-    this.db = couchbase();
+  constructor(filepath, db) {
+    this.db = db || couchbase();
     this.filepath = filepath;
     this.importRow = this.importRow.bind(this);
     this.repo = new BanksCityDataRepository();
@@ -49,7 +49,7 @@ export class MigrateBankCityFile {
     const parsedData = rowToCity(row);
     try {
       const data = fromJSON(parsedData, t.BanksCityData);
-      return this.repo.save(data);
+      return this.repo.save(data, false);
     } catch (e) {
       console.error('row', row, parsedData);
       throw e;

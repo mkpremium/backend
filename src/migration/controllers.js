@@ -1,11 +1,15 @@
-import Promise from 'bluebird';
-import {resolve} from 'path';
+import multer from 'multer';
 import {wrap} from 'express-promise-wrap';
-import _mapValues from 'lodash/mapValues';
+import {compose} from 'compose-middleware';
 
 import pkg from '../../package';
+import {storage} from '../../config';
 
-import {uploadDir} from '../../config';
+const files = multer({storage}).fields([
+  {name: 'calls', maxCount: 1},
+  {name: 'owners', maxCount: 1},
+  {name: 'buildings', maxCount: 1}
+]);
 
 export const migrationViewController = (req, res) => {
   res.render('migration', {
@@ -15,11 +19,10 @@ export const migrationViewController = (req, res) => {
 };
 
 async function uploadFiles(req, res) {
-  const files = await Promise.props(_mapValues(req.files, async(file, fileKey) => {
-    const name = resolve(uploadDir, `${fileKey}.csv`);
-    await file.mv(name);
-    return name;
-  }));
+  const files = {};
+  Object.keys(req.files).forEach(key => {
+    files[key] = req.files[key][0].path;
+  });
 
   const gearman = req.app.locals.gearman;
 
@@ -35,4 +38,4 @@ async function uploadFiles(req, res) {
   });
 }
 
-export const uploadFilesController = wrap(uploadFiles);
+export const uploadFilesController = compose([files, wrap(uploadFiles)]);

@@ -2,9 +2,10 @@ import fs from 'fs';
 import multer from 'multer';
 import {wrap} from 'express-promise-wrap';
 import {compose} from 'compose-middleware';
-import {BankFileDataRepository, BankFileRepository} from './models';
+import {BankFileDataRepository, BankFileRepository, BanksCityDataRepository} from './models';
 
 import {storage} from '../../config';
+import {MigrateBankCityFile} from './lib/load-bank-file';
 
 export async function listBankFiles(req, res) {
   const repo = new BankFileRepository();
@@ -54,10 +55,24 @@ export async function actionBankFileData(req, res) {
   res.json(bankFile);
 }
 
+export async function actionBankFileDataWithXLSX(req, res) {
+  const repo = new BankFileRepository();
+  const bankFile = await repo.doFilterActionXLSX(req.params, req.file);
+  res.json(bankFile);
+}
+
 export async function removeBankFile(req, res) {
   const bankFileId = req.params.id;
   const repo = new BankFileRepository();
   await repo.deleteBankFile(bankFileId);
+  res.status(204).send();
+}
+
+export async function updateBankCityData(req, res) {
+  const repo = new BanksCityDataRepository();
+  await repo.deleteQuery();
+  const migrate = new MigrateBankCityFile(req.file.path, req.app.locals.bucket);
+  await migrate.run();
   res.status(204).send();
 }
 
@@ -69,4 +84,6 @@ export const getBankFileController = wrap(getBankFile);
 export const calculateFiltersController = wrap(calculateFilters);
 export const exportBankFileController = wrap(exportBankFile);
 export const actionBankFileDataController = wrap(actionBankFileData);
+export const actionBankFileDataWithXLSXController = compose([bankFile, wrap(actionBankFileDataWithXLSX)]);
 export const removeBankFileController = wrap(removeBankFile);
+export const updateBankCityDataController = compose([bankFile, wrap(updateBankCityData)]);

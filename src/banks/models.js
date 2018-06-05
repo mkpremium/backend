@@ -13,12 +13,12 @@ const invertedList = {
   whitelisted: 'blacklisted'
 };
 
-function updateListed(action, userInput, newValues) {
+function updateListed(action, userInput, cadastreReferences) {
   const action1 = action;
   const action2 = invertedList[action];
   return {
-    [action1]: _uniq(userInput[action1].concat(newValues)),
-    [action2]: _difference(userInput[action2], newValues)
+    [action1]: _uniq(userInput[action1].concat(cadastreReferences)),
+    [action2]: _difference(userInput[action2], cadastreReferences)
   };
 }
 
@@ -48,20 +48,40 @@ export class BankFileRepository extends CouchbaseModel {
     };
   }
 
-  async doFilterAction(params, body) {
-    const args = t.BankFilterUpdateInput(Object.assign({}, params, body));
-    const repoData = new BankFileDataRepository();
-    const bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
-    const bankFile = await this.findByIdOrThrow(args.id);
-
-    const bankFileDataIds = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
-    const updatedUserInput = t
-      .update(bankFile.userInput, {$merge: updateListed(args.action, bankFile.userInput, bankFileDataIds)});
+  async _doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences) {
+    const updatedUserInput = t.update(bankFile.userInput, {
+      $merge: updateListed(args.action, bankFile.userInput, bankFileCadastreReferences)
+    });
     const updatedBankFile = t.update(bankFile, {userInput: {$set: updatedUserInput}});
 
     await calculateFilterSpecific(bankFileDataRows, updatedBankFile.userInput);
 
     return this.save(updatedBankFile);
+  }
+
+  async doFilterAction(params, body) {
+    const args = t.BankFilterUpdateInput(Object.assign({}, params, body));
+    const repoData = new BankFileDataRepository();
+    const bankFile = await this.findByIdOrThrow(args.id);
+    const bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
+
+    const bankFileCadastreReferences = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
+
+    return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences);
+  }
+
+  async doFilterActionXLSX(params, file) {
+    const workbook = XLSX.readFile(file.path);
+    const [firstSheet] = workbook.SheetNames;
+    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+    const [cadastreCol] = Object.keys(sheet[0]);
+    const bankFileCadastreReferences = sheet.map(row => row[cadastreCol]);
+    const args = t.BankFilterUpdateInput(Object.assign({bankFileDataIds: []}, params));
+    const repoData = new BankFileDataRepository();
+    const bankFile = await this.findByIdOrThrow(args.id);
+    const bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences);
+
+    return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences);
   }
 
   async calculateFilter(bankFileId, params) {
@@ -175,6 +195,19 @@ export class BankFileDataRepository extends CouchbaseModel {
     return this.query(qb);
   }
 
+  async findByCadastreReference(bankFileId, cadastreReferences) {
+    if (cadastreReferences.length < 1) {
+      throw newHttpError(400, 'cadastreReferences debe incluir al menos un valor');
+    }
+
+    const references = `[${cadastreReferences.map(id => `'${id}'`).join(', ')}]`;
+    const qb = this
+      .getQueryBuilder()
+      .where('bankFileId = ?', bankFileId)
+      .where(`cadastreReference IN ${references}`);
+    return this.query(qb);
+  }
+
   async findByIds(bankFileDataIds) {
     if (bankFileDataIds.length < 1) {
       throw newHttpError(400, 'bankFileDataIds debe incluir al menos un valor');
@@ -203,6 +236,11 @@ export class BankFileDataRepository extends CouchbaseModel {
 
     await this.save(updatedBankFileData);
     await this.updateCounter(updatedBankFileData.bankFileId);
+  }
+
+  async update(bankFileData, $merge) {
+    const updatedBankFileData = t.update(bankFileData, {$merge});
+    return this.save(updatedBankFileData);
   }
 
   async findByIdOrThrow(id) {

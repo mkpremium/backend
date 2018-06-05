@@ -12,7 +12,7 @@ export class RelatedModel extends MigrateModel {
     super('related', filename, app);
   }
 
-  async pushtoDatabaseRecord(record) {
+  async pushToDatabaseRecord(record) {
     const worksheetRepo = new WorksheetRepository();
     const buildingRepo = new BuildingRepository();
     const ownerRepo = new OwnerRepository();
@@ -40,8 +40,8 @@ export class RelatedModel extends MigrateModel {
       });
 
       await Promise.all([
-        worksheetRepo.save(updatedWorksheet),
-        ownerRepo.save(updatedOwner)
+        worksheetRepo.save(updatedWorksheet, false),
+        ownerRepo.save(updatedOwner, false)
       ]);
     } catch (e) {
       console.error('record', record);
@@ -50,6 +50,6 @@ export class RelatedModel extends MigrateModel {
   }
 
   async pushToDatabase(processedData) {
-    return Promise.mapSeries(processedData, this.pushtoDatabaseRecord);
+    return Promise.mapSeries(processedData, this.pushToDatabaseRecord);
   }
 }

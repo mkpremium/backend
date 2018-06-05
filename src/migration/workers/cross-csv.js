@@ -1,5 +1,6 @@
 import {dirname, resolve} from 'path';
 import {exec} from 'child_process';
+import {wrap} from '../../lib/workers';
 import gearman from 'gearmanode';
 
 import {gearmanConfig} from '../../../config';
@@ -50,27 +51,24 @@ function buildHeaders() {
   return '"id_chiamatafornitore;Id_Catastro;Id_Fornitore;ID;Verificato;proprietari;RagioneSociale;CodFis;ParIva"';
 }
 
-function cross(job) {
-  const input = JSON.parse(job.payload);
+async function cross(input) {
   const base = dirname(input.calls);
   const output = resolve(base, 'cross_table.csv');
   const query = buildQuery(input);
 
   const files = Object.assign({}, input, {cross: output});
-
-  const execCb = function(err) {
-    if (err && err.code) {
-      console.error(err);
-      job.reportError();
-    } else {
-      job.workComplete(JSON.stringify(files));
-    }
-  };
-
   const writeHeaders = `echo ${buildHeaders()} > ${output}`;
   const writeFile = `q -H -d ";" "${query}" >> ${output}`;
 
-  exec(`${writeHeaders} && ${writeFile}`, execCb);
+  return new Promise((resolve, reject) => {
+    exec(`${writeHeaders} && ${writeFile}`, err => {
+      if (err && err.code) {
+        reject(err);
+      } else {
+        resolve(files);
+      }
+    });
+  });
 }
 
-worker.addFunction('cross', cross);
+worker.addFunction('cross', wrap(cross));

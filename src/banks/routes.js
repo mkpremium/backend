@@ -1,9 +1,9 @@
 import {Router} from 'express';
 import {
-  actionBankFileDataController,
+  actionBankFileDataController, actionBankFileDataWithXLSXController,
   calculateFiltersController, exportBankFileController,
   getBankFileController,
-  listBankFilesController, removeBankFileController,
+  listBankFilesController, removeBankFileController, updateBankCityDataController,
   uploadBankFileController
 } from './controllers';
 
@@ -221,6 +221,50 @@ router.post('/files/:id/:action', actionBankFileDataController);
 
 /**
  * @swagger
+ * /banks/files/{id}/{action}/xlsx:
+ *   post:
+ *     tags: [Banks]
+ *     summary: Actualizar blacklisted or whitelisted filtros via XLSX
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - multipart/form-data
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: id
+ *        type: string
+ *        in: path
+ *        required: true
+ *      - name: action
+ *        type: string
+ *        in: path
+ *        required: true
+ *        enum: [blacklisted, whitelisted]
+ *      - name: file
+ *        type: file
+ *        in: formData
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/BankFile"
+ *       400:
+ *         description: Solicitud mal formada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.post('/files/:id/:action/xlsx', actionBankFileDataWithXLSXController);
+
+/**
+ * @swagger
  * /banks/files/{id}/:
  *   delete:
  *     tags: [Banks]
@@ -252,5 +296,38 @@ router.post('/files/:id/:action', actionBankFileDataController);
  *           $ref: "#/definitions/Error"
  */
 router.delete('/files/:id', removeBankFileController);
+
+/**
+ * @swagger
+ * /banks/cities/xlsx:
+ *   post:
+ *     tags: [Banks]
+ *     summary: Refresca el listado actual de ciudades
+ *     security:
+ *       - banks: []
+ *       - banks_api: []
+ *     consumes:
+ *      - multipart/form-data
+ *     produces:
+ *      - "application/json"
+ *     parameters:
+ *      - name: file
+ *        type: file
+ *        in: formData
+ *        required: true
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       400:
+ *         description: Solicitud mal formada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.post('/cities/xlsx', updateBankCityDataController);
 
 export default router;
