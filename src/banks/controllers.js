@@ -44,7 +44,7 @@ export async function exportBankFile(req, res) {
   const repo = new BankFileRepository();
   const bankFileId = req.params.id;
   const result = await repo.exportFile(bankFileId, req.body);
-  res.set('cContent-Type', result.bankFile.mimetype);
+  res.set('Content-Type', result.bankFile.mimetype);
   res.set('Content-Disposition', `attachment;filename=${result.bankFile.filename}`);
   fs.createReadStream(result.exported).pipe(res);
 }
