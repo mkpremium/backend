@@ -22,11 +22,9 @@ function alwaysFalse() {
 }
 
 function filterPopulation(threshold) {
-  if (!threshold) return alwaysFalse;
   return ({population}) => {
-    if (population === 0) {
-      return true;
-    }
+    if (population === 0) return true;
+    if (!threshold) return alwaysFalse;
     return population < threshold;
   };
 }
