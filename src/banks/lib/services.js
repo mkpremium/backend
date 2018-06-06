@@ -25,7 +25,7 @@ function filterPopulation(threshold) {
   if (!threshold) return alwaysFalse;
   return ({population}) => {
     if (population === 0) {
-      return false;
+      return true;
     }
     return population < threshold;
   };
