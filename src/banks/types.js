@@ -71,15 +71,11 @@ t.BankFilterUserInput = t.struct(
     population: t.maybe(t.Number),
     benefit: t.maybe(t.Number),
     priceSell: t.maybe(t.Number),
-    blacklisted: t.list(t.String),
-    whitelisted: t.list(t.String)
+    blacklisted: t.maybe(t.list(t.String)),
+    whitelisted: t.maybe(t.list(t.String))
   },
   {
-    name: 'BankFilterUserInput',
-    defaultProps: {
-      blacklisted: [],
-      whitelisted: []
-    }
+    name: 'BankFilterUserInput'
   }
 );
 

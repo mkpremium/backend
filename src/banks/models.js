@@ -91,11 +91,12 @@ export class BankFileRepository extends CouchbaseModel {
   }
 
   async calculateFilter(bankFileId, params) {
-    const thresholds = fromJSON(params, t.BankFilterUserInput);
+    fromJSON(params, t.BankFilterUserInput);
     const bankFile = await this.findByIdOrThrow(bankFileId);
-    const bankFileUserInput = t.update(bankFile, {userInput: {$set: thresholds}});
-    await this.save(bankFileUserInput);
-    const results = await calculateFilter(bankFileId, thresholds);
+    const bankFileUserInput = t.update(bankFile.userInput, {$merge: params});
+    const updateBankFile = t.update(bankFile, {userInput: {$set: bankFileUserInput}});
+    const updatedBankFile = await this.save(updateBankFile);
+    const results = await calculateFilter(bankFileId, updatedBankFile.userInput);
     return fromJSON({results}, t.ListBankFileData);
   }
 
