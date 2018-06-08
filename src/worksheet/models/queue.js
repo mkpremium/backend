@@ -233,13 +233,13 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async nextWorksheetInQueue(queue, operatorId) {
     const operatorItem = queue.findItemByOperatorId(operatorId);
-    let nextAvailableItem = queue.findNextAvailable(operatorItem);
+    let nextAvailableItem = queue.findNextAvailableInQueue(operatorItem);
     let updatedQueue = queue;
 
     // add worksheet only if the bag it's empty
     if (!nextAvailableItem) {
-      const updatedQueue = await this.findNextAvailable(queue);
-      nextAvailableItem = updatedQueue.findNextAvailable(operatorItem);
+      updatedQueue = await this.findNextAvailableInSource(queue);
+      nextAvailableItem = updatedQueue.findNextAvailableInQueue(operatorItem);
     }
 
     if (!nextAvailableItem) {
@@ -253,7 +253,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.takeWorksheetInQueue(releasedUpdatedQueue, nextAvailableItem.id, operatorId);
   }
 
-  async findNextAvailable(queue) {
+  async findNextAvailableInSource(queue) {
     const worksheetRepo = new WorksheetRepository();
     const [worksheet] = await worksheetRepo.findBySource(queue);
 
