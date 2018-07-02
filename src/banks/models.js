@@ -5,7 +5,7 @@ import _uniq from 'lodash/uniq';
 import {CouchbaseModel} from '../db/model';
 import t from './types';
 import {newHttpError} from '../lib/http-error';
-import {calculateFilter, calculateFilterSpecific, retrievePricesAndLocationInfo} from './lib/services';
+import {calculateFilter, retrievePricesAndLocationInfo} from './lib/services';
 import {BANK_WORKER_NAMES} from './worker/workers';
 
 const invertedList = {
@@ -38,7 +38,7 @@ export class BankFileRepository extends CouchbaseModel {
     const rows = data.map(({bankFileRowData}) => bankFileRowData);
 
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(rows);
+    const ws = XLSX.utils.json_to_sheet(rows, {cellText: false, cellHTML: false});
     XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
     XLSX.writeFile(wb, filename);
 
