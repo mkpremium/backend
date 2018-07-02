@@ -17,7 +17,7 @@ class BankProcessWorker {
   constructor() {
     this.db = Promise.all([
       couchbase(),
-      socket.initModel()
+      socket.initModel('bank-process')
     ]);
     this.worker = gearman.worker(gearmanConfig);
   }

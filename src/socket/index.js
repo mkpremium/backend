@@ -7,8 +7,8 @@ function startServer(server) {
   return new SocketServer(server);
 }
 
-function initModel() {
-  CouchbaseModel.prototype._socketPromise = connectServer();
+function initModel(name) {
+  CouchbaseModel.prototype._socketPromise = connectServer(name);
   return CouchbaseModel.prototype._socketPromise;
 }
 

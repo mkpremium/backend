@@ -35,8 +35,8 @@ function updateListed(action, userInput, cadastreReferences) {
 
 function setLabels(values) {
   const result = {};
-  _each(values, (key, value) => {
-    result[extraFieldLabels[key] || key] = value;
+  _each(values, (value, key) => {
+    result[extraFieldLabels[key] || key] = Number(value).toFixed(2);
   });
 
   return result;
@@ -44,7 +44,7 @@ function setLabels(values) {
 
 function exportedFields(bankFileData) {
   const bankFileRowData = bankFileData.bankFileRowData;
-  const extraFields = _pick(bankFileData, [
+  const extraFields = _pick(JSON.parse(JSON.stringify(bankFileData)), [
     'rot',
     'm2',
     'priceCity',

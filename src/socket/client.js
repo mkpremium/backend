@@ -31,7 +31,7 @@ export class SocketClient {
   }
 
   async sendEvent(type, body) {
-    if (!this.socket || !this.socket.connected) {
+    if (!this.socket) {
       throw new Error('No conectado al servidor de sockets');
     }
 
@@ -52,7 +52,7 @@ export class SocketClient {
   }
 }
 
-export async function connectServer() {
+export async function connectServer(name = 'mkpremium') {
   const id = uuid();
   const payload = {
     id,
@@ -61,7 +61,7 @@ export async function connectServer() {
     ],
     operator: {
       id,
-      name: 'mkpremium'
+      name
     }
   };
 
