@@ -105,7 +105,7 @@ async function nestoriaListingLive(location) {
   debugNestoria('nestoriaListingService', 'init', nestoriaService, location);
   const {listing} = await nestoriaSearchListingAutoRadius(location);
   const priceZoneRaw = calculatePriceZoneRaw(listing);
-  const priceZone = calculatePriceZone(listing, location);
+  const priceZone = calculatePriceZone(listing, location) * 0.75;
 
   return {priceZoneRaw, priceZone};
 }
