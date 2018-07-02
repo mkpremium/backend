@@ -2,6 +2,8 @@ import XLSX from 'xlsx';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _difference from 'lodash/difference';
 import _uniq from 'lodash/uniq';
+import _pick from 'lodash/pick';
+import _each from 'lodash/each';
 import {CouchbaseModel} from '../db/model';
 import t from './types';
 import {newHttpError} from '../lib/http-error';
@@ -13,6 +15,15 @@ const invertedList = {
   whitelisted: 'blacklisted'
 };
 
+const extraFieldLabels = {
+  rot: 'Rotación',
+  m2: 'Metros Cuadrados',
+  priceCity: 'Precio de la zona',
+  priceBank: 'Precio del banco',
+  priceInvest: 'Precio de inversión',
+  priceSell: 'Precio de venta'
+};
+
 function updateListed(action, userInput, cadastreReferences) {
   const action1 = action;
   const action2 = invertedList[action];
@@ -20,6 +31,30 @@ function updateListed(action, userInput, cadastreReferences) {
     [action1]: _uniq(userInput[action1].concat(cadastreReferences)),
     [action2]: _difference(userInput[action2], cadastreReferences)
   };
+}
+
+function setLabels(values) {
+  const result = {};
+  _each(values, (key, value) => {
+    result[extraFieldLabels[key] || key] = value;
+  });
+
+  return result;
+}
+
+function exportedFields(bankFileData) {
+  const bankFileRowData = bankFileData.bankFileRowData;
+  const extraFields = _pick(bankFileData, [
+    'rot',
+    'm2',
+    'priceCity',
+    'priceBank',
+    'priceInvest',
+    'priceSell'
+  ]);
+  const extraFieldsLabeled = setLabels(extraFields);
+
+  return Object.assign({}, bankFileRowData, extraFieldsLabeled);
 }
 
 export class BankFileRepository extends CouchbaseModel {
@@ -35,7 +70,7 @@ export class BankFileRepository extends CouchbaseModel {
     const bankFile = await this.findByIdOrThrow(bankFileId);
     const repoData = new BankFileDataRepository();
     const data = await repoData.findByFileBankIdAndBuy(bankFileId, params.buy);
-    const rows = data.map(({bankFileRowData}) => bankFileRowData);
+    const rows = data.map(exportedFields);
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows, {cellText: false, cellHTML: false});
