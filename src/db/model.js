@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import Promise from 'bluebird';
 import fromJSON from 'tcomb/lib/fromJSON';
 import uuid from 'uuid/v4';
 import squel from 'squel';
@@ -249,6 +250,8 @@ export class CouchbaseModel {
       debugModel('event', eventName, data, 'will be emitted', sendEvent);
       const socket = await this._socketPromise;
       return socket.sendEvent(eventName, data);
+    } else {
+      return Promise.resolve();
     }
   }
 

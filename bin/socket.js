@@ -17,7 +17,7 @@ const httpServer = Server(app);
 const server = httpServer.listen(socketConfig.port, listenHandler);
 
 Promise.all([
-  socket.initModel(),
+  socket.initModel('bin-socket'),
   couchbase(app)
 ])
   .catch(err => {

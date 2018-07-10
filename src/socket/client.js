@@ -80,20 +80,20 @@ export async function connectServer(name = 'mkpremium') {
     const socket = io(serverUri, options);
 
     socket.on('connect', () => {
-      debugClient('Server client connected');
+      debugClient('Server client connected', name);
       const client = new SocketClient(socket);
       resolve(client);
     });
 
     socket.on('connect_error', (error) => {
-      debugClient('connect_error', error.message);
+      debugClient('connect_error', name, error.message);
       if (retries <= 0) {
         reject(new Error(`It's possible an error trying to connect socket service check your setup`));
       }
     });
 
     socket.on('reconnect_attempt', () => {
-      debugClient('reconnect_attempt');
+      debugClient('reconnect_attempt', name);
       retries--;
     });
   });
