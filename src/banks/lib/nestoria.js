@@ -5,7 +5,6 @@ import request from 'axios';
 import hash from 'object-hash';
 import {nestoriaService} from '../../../config';
 
-import geo from 'geolib';
 import {ONE_WEEK} from '../../lib/constants';
 import {BankFileRepository} from '../models';
 
@@ -13,18 +12,6 @@ const debugNestoria = debug('app:banks:nestoria');
 
 function filterZeroPriceSize({size, price}) {
   return size > 0 && price > 0;
-}
-
-function sortDistanceNearest(a, b) {
-  if (a.distance < b.distance) {
-    return -1;
-  }
-
-  if (a.distance > b.distance) {
-    return 1;
-  }
-
-  return 0;
 }
 
 function sortPriceLowest(a, b) {
@@ -41,14 +28,6 @@ function sortPriceLowest(a, b) {
   return 0;
 }
 
-function addDistance(refLocation) {
-  return (obj) => {
-    const {longitude, latitude} = obj;
-    const distance = geo.getDistance(refLocation, {longitude, latitude});
-    return Object.assign({distance}, obj);
-  };
-}
-
 function calculatePriceAverageM2(listing = []) {
   const total = listing.reduce((acc, {price, size}) => acc + (price / size), 0);
   return total / Math.max(listing.length, 1);
@@ -61,14 +40,16 @@ function calculatePriceZoneRaw(listing = []) {
   return calculatePriceAverageM2(listingFiltered);
 }
 
-function calculatePriceZone(listing = [], location) {
-  const listingSortedAndFiltered = listing
-    .filter(filterZeroPriceSize)
-    .map(addDistance(location))
-    .sort(sortDistanceNearest)
-    .slice(0, 15)
+function calculatePriceZone(listing = []) {
+  const listingZeroFiltered = listing.filter(filterZeroPriceSize);
+
+  if (listing.length < 15) {
+    return calculatePriceAverageM2(listingZeroFiltered);
+  }
+
+  const listingSortedAndFiltered = listingZeroFiltered
     .sort(sortPriceLowest)
-    .slice(0, 10);
+    .slice(0, Math.ceil(listing.length * 0.5));
 
   return calculatePriceAverageM2(listingSortedAndFiltered);
 }
@@ -90,29 +71,33 @@ async function nestoriaSearchListing(location, radius = '0.5km') {
 }
 
 async function nestoriaSearchListingAutoRadius(location) {
-  const firstListing = await nestoriaSearchListing(location);
-  if (firstListing < 15) {
-    return {
-      listing: await nestoriaSearchListing(location, '4km'),
-      radius: '4km'
-    };
-  }
+  const distances = [
+    '0.1km',
+    '0.2km',
+    '0.5km'
+  ];
 
-  return {listing: firstListing, radius: '0.5km'};
+  for (let i = 0; i < distances.length; i++) {
+    const radius = distances[i];
+    const listing = await nestoriaSearchListing(location, radius);
+    if (listing.length >= 15) {
+      return {listing, radius};
+    }
+  }
 }
 
 async function nestoriaListingLive(location) {
   debugNestoria('nestoriaListingService', 'init', nestoriaService, location);
   const {listing} = await nestoriaSearchListingAutoRadius(location);
   const priceZoneRaw = calculatePriceZoneRaw(listing);
-  const priceZone = calculatePriceZone(listing, location) * 0.75;
+  const priceZone = calculatePriceZone(listing) * 0.7;
 
   return {priceZoneRaw, priceZone};
 }
 
 export async function nestoriaListingService(location) {
   const hashLocation = hash(location);
-  const cacheKey = `nestoria:${hashLocation}`;
+  const cacheKey = `${nestoriaService.cachePrefix}:${hashLocation}`;
   const repo = new BankFileRepository();
   const cache = repo.getCache({expiry: ONE_WEEK});
 
