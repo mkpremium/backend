@@ -175,15 +175,16 @@ export async function saveProposal(proposal) {
 }
 
 function toFirebaseProposal(proposal) {
-  const timestamp = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
+  const lastDate = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
+  const sendDate = firebaseTimestampFormat(proposal.createdAt);
   return t.FirebaseBuildingProposal({
     Accepted: proposal.accepted,
     Aspiration: {
       Value: proposal.aspiration,
-      ReceptionDate: timestamp
+      ReceptionDate: sendDate
     },
-    LastDate: timestamp,
-    SendDate: timestamp,
+    LastDate: lastDate,
+    SendDate: sendDate,
     Value: proposal.proposal
   });
 }
