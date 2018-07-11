@@ -12,7 +12,7 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
-export async function updateBuildingToFirebase(building, owner) {
+export async function updateBuildingToFirebase(building) {
   if (!fbComerciales.enabled) {
     return;
   }
@@ -21,7 +21,7 @@ export async function updateBuildingToFirebase(building, owner) {
 
   const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`).once('value');
   if (snapshot.exists()) {
-    return saveBuildingToFirebase(db, building, owner);
+    return saveBuildingToFirebase(db, building);
   }
 }
 

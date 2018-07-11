@@ -11,7 +11,6 @@ import {
   updateBuildingToFirebase
 } from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
-import {fbComerciales} from '../firebase';
 import {BuildingState} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
@@ -138,8 +137,7 @@ export class BuildingRepository extends Building {
     const updatedEntities = building.entities.filter(i => i.id !== entityId);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const db = fbComerciales.database();
-    await updateBuildingToFirebase(db, updatedBuilding);
+    await updateBuildingToFirebase(updatedBuilding);
   }
 
   async addEntity(building, params) {
@@ -147,8 +145,7 @@ export class BuildingRepository extends Building {
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const db = fbComerciales.database();
-    await updateBuildingToFirebase(db, updatedBuilding);
+    await updateBuildingToFirebase(updatedBuilding);
 
     return entity;
   }
@@ -170,8 +167,7 @@ export class BuildingRepository extends Building {
     const updatedEntities = updateList(building.entities, entity, updatedEntity);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    const db = fbComerciales.database();
-    await updateBuildingToFirebase(db, updatedBuilding);
+    await updateBuildingToFirebase(updatedBuilding);
 
     return updatedEntity;
   }
