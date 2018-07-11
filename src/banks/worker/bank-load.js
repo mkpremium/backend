@@ -58,7 +58,8 @@ class BankLoadWorker {
     return repo.setTotal(bankFile, total);
   }
 
-  async _workerBankFile(bankFile) {
+  async _workerBankFile(bankFile, _, opts) {
+    opts.retryJobOnError = false;
     const workbook = XLSX.readFile(bankFile.filepath);
     const [firstSheet] = workbook.SheetNames;
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);

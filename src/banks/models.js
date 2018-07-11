@@ -36,7 +36,14 @@ function updateListed(action, userInput, cadastreReferences) {
 function setLabels(values) {
   const result = {};
   _each(values, (value, key) => {
-    result[extraFieldLabels[key] || key] = Number(value).toFixed(2);
+    const format = (value) => {
+      if (key === 'rot') {
+        return Number(value).toFixed(2);
+      } else {
+        return Math.round(Number(value));
+      }
+    };
+    result[extraFieldLabels[key] || key] = format(value);
   });
 
   return result;
@@ -73,7 +80,7 @@ export class BankFileRepository extends CouchbaseModel {
     const rows = data.map(exportedFields);
 
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(rows, {cellText: false, cellHTML: false});
+    const ws = XLSX.utils.json_to_sheet(rows);
     XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
     XLSX.writeFile(wb, filename);
 
