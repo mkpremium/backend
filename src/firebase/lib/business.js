@@ -212,6 +212,8 @@ function toFirebaseBuilding(building) {
   const {lat, lng} = building.location;
   return t.FirebaseBuildingData({
     Street: _get(building, 'address.fullAddress'),
+    Address: _get(building, 'address'),
+    Cadastre: _get(building, 'cadastre'),
     Aspiration: 0,
     Proposal: 0,
     State: '',
