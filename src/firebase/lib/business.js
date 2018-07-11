@@ -25,6 +25,20 @@ export async function updateBuildingToFirebase(building) {
   }
 }
 
+export async function saveBuildingOwnerToFirebase(owner) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+  const db = fbComerciales.database();
+  const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}`).once('value');
+  if (!snapshot.exists()) {
+    return;
+  }
+
+  const ownerRef = db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}/Owner`);
+  return ownerRef.set(owner);
+}
+
 export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
     return;

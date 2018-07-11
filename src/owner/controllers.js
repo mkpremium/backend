@@ -2,6 +2,7 @@ import {wrap} from 'express-promise-wrap';
 import {OwnerRepository} from './models';
 import {History} from '../history/models';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
+import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
 
 async function updateOwnerContact(req, res) {
   const ownerId = req.params.id;
@@ -12,6 +13,10 @@ async function updateOwnerContact(req, res) {
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId);
   await repo.updateContact(ownerId, contactId, req.body);
   await History.registerUpdate({contextModel, user: req.user});
+
+  const updatedOwner = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
+  await saveBuildingOwnerToFirebase(updatedOwner);
+
   res.status(204).send();
 }
 
@@ -23,6 +28,9 @@ async function updateOwner(req, res) {
   await repo.update(id, req.body, req.user.id);
   await History.registerUpdate({contextModel, user: req.user});
 
+  const updatedOwner = await repo.findByIdWithIncludes(id, ['building', 'person']);
+  await saveBuildingOwnerToFirebase(updatedOwner);
+
   res.status(204).send();
 }
 
@@ -32,7 +40,8 @@ async function addOwnerContact(req, res) {
   const contextModel = await repo.addContact(ownerId, req.body);
   await History.registerCreate({contextModel, user: req.user});
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId);
-  const updatedOwner = await repo.findByIdWithIncludes(ownerId);
+  const updatedOwner = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
+  await saveBuildingOwnerToFirebase(updatedOwner);
   res.json(updatedOwner);
 }
 
