@@ -14,7 +14,7 @@ async function updateOwnerContact(req, res) {
   await repo.updateContact(ownerId, contactId, req.body);
   await History.registerUpdate({contextModel, user: req.user});
 
-  const updatedOwner = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
+  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
   await saveBuildingOwnerToFirebase(updatedOwner);
 
   res.status(204).send();
@@ -28,7 +28,7 @@ async function updateOwner(req, res) {
   await repo.update(id, req.body, req.user.id);
   await History.registerUpdate({contextModel, user: req.user});
 
-  const updatedOwner = await repo.findByIdWithIncludes(id, ['building', 'person']);
+  const [updatedOwner] = await repo.findByIdWithIncludes(id, ['building', 'person']);
   await saveBuildingOwnerToFirebase(updatedOwner);
 
   res.status(204).send();
@@ -40,7 +40,7 @@ async function addOwnerContact(req, res) {
   const contextModel = await repo.addContact(ownerId, req.body);
   await History.registerCreate({contextModel, user: req.user});
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId);
-  const updatedOwner = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
+  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
   await saveBuildingOwnerToFirebase(updatedOwner);
   res.json(updatedOwner);
 }

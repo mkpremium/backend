@@ -1,8 +1,11 @@
+import debug from 'debug';
 import Promise from 'bluebird';
 import _get from 'lodash/get';
 import t from '../types';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
+
+const debugFb = debug('app:firebase:comerciales');
 
 function arrayToObjectIds(collection) {
   const objectIds = {};
@@ -26,15 +29,18 @@ export async function updateBuildingToFirebase(building) {
 }
 
 export async function saveBuildingOwnerToFirebase(owner) {
+  debugFb('saveBuildingOwnerToFirebase', 'is enable', fbComerciales.enabled);
   if (!fbComerciales.enabled) {
     return;
   }
   const db = fbComerciales.database();
   const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}`).once('value');
   if (!snapshot.exists()) {
+    debugFb('saveBuildingOwnerToFirebase', `building ${owner.buildingId} doesn't exists yet`);
     return;
   }
 
+  debugFb('saveBuildingOwnerToFirebase', `saving ${owner.id}`);
   const ownerRef = db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}/Owner`);
   return ownerRef.set(owner);
 }
