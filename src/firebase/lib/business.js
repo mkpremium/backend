@@ -1,8 +1,11 @@
+import debug from 'debug';
 import Promise from 'bluebird';
 import _get from 'lodash/get';
 import t from '../types';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
+
+const debugFb = debug('app:firebase:comerciales');
 
 function arrayToObjectIds(collection) {
   const objectIds = {};
@@ -12,7 +15,7 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
-export async function updateBuildingToFirebase(building, owner) {
+export async function updateBuildingToFirebase(building) {
   if (!fbComerciales.enabled) {
     return;
   }
@@ -21,8 +24,25 @@ export async function updateBuildingToFirebase(building, owner) {
 
   const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`).once('value');
   if (snapshot.exists()) {
-    return saveBuildingToFirebase(db, building, owner);
+    return saveBuildingToFirebase(db, building);
   }
+}
+
+export async function saveBuildingOwnerToFirebase(owner) {
+  debugFb('saveBuildingOwnerToFirebase', 'is enable', fbComerciales.enabled);
+  if (!fbComerciales.enabled) {
+    return;
+  }
+  const db = fbComerciales.database();
+  const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}`).once('value');
+  if (!snapshot.exists()) {
+    debugFb('saveBuildingOwnerToFirebase', `building ${owner.buildingId} doesn't exists yet`);
+    return;
+  }
+
+  debugFb('saveBuildingOwnerToFirebase', `saving ${owner.id}`);
+  const ownerRef = db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}/Owner`);
+  return ownerRef.set(owner);
 }
 
 export async function saveBuildingToFirebase(db, building, owner) {
@@ -155,15 +175,16 @@ export async function saveProposal(proposal) {
 }
 
 function toFirebaseProposal(proposal) {
-  const timestamp = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
+  const lastDate = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
+  const sendDate = firebaseTimestampFormat(proposal.createdAt);
   return t.FirebaseBuildingProposal({
     Accepted: proposal.accepted,
     Aspiration: {
       Value: proposal.aspiration,
-      ReceptionDate: timestamp
+      ReceptionDate: sendDate
     },
-    LastDate: timestamp,
-    SendDate: timestamp,
+    LastDate: lastDate,
+    SendDate: sendDate,
     Value: proposal.proposal
   });
 }
@@ -192,6 +213,8 @@ function toFirebaseBuilding(building) {
   const {lat, lng} = building.location;
   return t.FirebaseBuildingData({
     Street: _get(building, 'address.fullAddress'),
+    Address: _get(building, 'address'),
+    Cadastre: _get(building, 'cadastre'),
     Aspiration: 0,
     Proposal: 0,
     State: '',

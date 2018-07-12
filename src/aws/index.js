@@ -66,6 +66,10 @@ export function cleanUrl(url) {
 }
 
 export function resolvePublicUrl(url) {
+  if (!/amazonaws.com/.test(url)) {
+    return url;
+  }
+
   const Key = url.replace(`https://${awsConfig.bucket}.s3.${awsConfig.region}.amazonaws.com/`, '');
   const s3 = new aws.S3();
   const params = {
