@@ -13,7 +13,7 @@ import uuid from 'uuid/v4';
  */
 t.PostalCode = t.struct(
   {
-    number: t.maybe(t.Number),
+    number: t.maybe(t.String),
     verified: t.Boolean
   },
   {
