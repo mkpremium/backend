@@ -15,7 +15,7 @@ export const addMinuteDateQueryToBuilder = (queryBuilder, fieldName, value) => {
 export const addMinuteBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {
   const [start, end] = value.split(',').map(d => d ? utc(d) : d);
   if (start) {
-    queryBuilder.where(`${fieldName} >= ?`, start.toDate());
+    queryBuilder.where(`${fieldName} > ?`, start.toDate());
   }
   if (end) {
     queryBuilder.where(`${fieldName} < ?`, end.add(1, 'minutes').toDate());
