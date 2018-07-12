@@ -137,7 +137,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const start = m.clone().subtract(1.5, 'hours').toISOString();
     const end = m.clone().add(1, 'hours').toISOString();
     console.log('areAllowedMeetingInRange', data.eventDate, start, end);
-    const meetingsInRange = await this.findMeetingInRange(data.eventDate, start, end, data.id);
+    const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end, data.id);
     if (meetingsInRange && meetingsInRange.length > 0) {
       throw newHttpError(
         400,
@@ -152,6 +152,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const eventDate = [start, end].join(',');
     addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate);
     qb.where('type = ?', ScheduledEventType.MEETINGS);
+    qb.where('notifyTo = ?', notifyTo);
     if (scheduleId) {
       qb.where('id != ?', scheduleId);
     }
