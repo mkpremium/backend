@@ -1,10 +1,12 @@
 import t from 'tcomb';
 
-t.FirebaseBuildingData = t.struct({
+export const FirebaseBuildingData = t.struct({
   Aspiration: t.Number,
   Proposal: t.Number,
   State: t.maybe(t.String),
   Street: t.String,
+  Address: t.Any,
+  Cadastre: t.Any,
   lat: t.Number,
   lng: t.Number
 }, 'FirebaseBuildingData');

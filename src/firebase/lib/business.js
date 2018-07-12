@@ -4,6 +4,7 @@ import _get from 'lodash/get';
 import t from '../types';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
+import {FirebaseBuildingData} from '../types/business';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -211,10 +212,10 @@ function toFirebaseMeeting(meeting) {
 
 function toFirebaseBuilding(building) {
   const {lat, lng} = building.location;
-  return t.FirebaseBuildingData({
+  return FirebaseBuildingData({
     Street: _get(building, 'address.fullAddress'),
-    Address: _get(building, 'address'),
-    Cadastre: _get(building, 'cadastre'),
+    Address: building.address,
+    Cadastre: building.cadastre,
     Aspiration: 0,
     Proposal: 0,
     State: '',
