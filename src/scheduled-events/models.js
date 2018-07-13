@@ -127,6 +127,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       return true;
     }
 
+    // non presencial meetings necesitan validación de tiempo y fecha
+    if (data.event.inPerson) {
+      return true;
+    }
+
     if (!areAllowedMeetingMins(data.eventDate)) {
       throw newHttpError(
         400,
