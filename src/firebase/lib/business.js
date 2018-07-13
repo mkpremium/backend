@@ -205,6 +205,7 @@ function toFirebaseMeeting(meeting) {
     Name: _get(meeting, 'contact.name', ''),
     PhoneNumber: _get(meeting, 'contact.phone', ''),
     buildingID: _get(meeting, 'building.id', ''),
+    inPerson: meeting.inPerson,
     dateCreation: firebaseTimestampFormat(meeting.createdAt),
     dateMeeting: firebaseTimestampFormat(meeting.eventDate)
   });

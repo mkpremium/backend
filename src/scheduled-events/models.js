@@ -79,7 +79,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       createdAt: scheduleEvent.createdAt,
       createdBy: scheduleEvent.createdBy,
       eventDate: scheduleEvent.eventDate,
-      address: _get(scheduleEvent, 'event.eventAddress')
+      address: _get(scheduleEvent, 'event.eventAddress'),
+      inPerson: _get(scheduleEvent, 'event.inPerson')
     };
     const ownerId = _get(scheduleEvent, 'event.ownerId');
     const contactId = _get(scheduleEvent, 'event.contactId');
