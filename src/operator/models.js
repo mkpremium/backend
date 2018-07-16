@@ -56,7 +56,7 @@ export class Operator extends CouchbaseModel {
   }
 
   async updateOperator(operator, data) {
-    fromJSON(data, t.OperatorUpdateRequest);
+    t.OperatorUpdateRequest(data);
     const updatedProfile = t.update(operator.profile, {
       $merge: data.profile || {}
     });
