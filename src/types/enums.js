@@ -74,6 +74,7 @@ t.EventType = t.enums({
 t.RecordAction = t.enums.of([
   'UPDATE',
   'CREATE',
+  'DELETE',
   'GET',
   'OPEN',
   'LIST',
