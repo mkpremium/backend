@@ -3,6 +3,11 @@ import _find from 'lodash/find';
 import _get from 'lodash/get';
 import {OwnerStatus, OwnerType} from './enums';
 
+t.OwnerBusiness = t.struct({
+  meetingWithOperatorId: t.String,
+  status: t.String
+});
+
 /**
  * @swagger
  * definitions:
@@ -34,7 +39,8 @@ t.OwnerBody = t.struct(
     person: t.maybe(t.Object),
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
-    note: t.maybe(t.String)
+    note: t.maybe(t.String),
+    business: t.maybe(t.OwnerBusiness)
   },
   {
     name: 'OwnerBody',
@@ -72,6 +78,7 @@ t.OwnerBody = t.struct(
 t.OwnerUpdate = t.struct({
   type: t.maybe(t.OwnerType),
   status: t.maybe(t.OwnerStatus),
+  business: t.maybe(t.OwnerBusiness),
   note: t.maybe(t.String),
   buildingId: t.maybe(t.String),
   person: t.maybe(t.Object)
@@ -214,6 +221,7 @@ t.OwnerConfirmed = t.struct({
   confirmedBy: t.maybe(t.String),
   confirmedAt: t.maybe(t.Date)
 }, 'confirmed');
+
 t.Owner = t.struct(
   {
     id: t.maybe(t.String),
@@ -221,6 +229,7 @@ t.Owner = t.struct(
     status: t.OwnerStatus,
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
+    business: t.maybe(t.OwnerBusiness),
 
     note: t.maybe(t.String),
 

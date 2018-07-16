@@ -16,7 +16,7 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
-export async function updateBuildingToFirebase(building) {
+export async function updateBuildingToFirebase(building, owner) {
   if (!fbComerciales.enabled) {
     return;
   }
@@ -25,7 +25,7 @@ export async function updateBuildingToFirebase(building) {
 
   const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`).once('value');
   if (snapshot.exists()) {
-    return saveBuildingToFirebase(db, building);
+    return saveBuildingToFirebase(db, building, owner);
   }
 }
 
@@ -56,10 +56,8 @@ export async function saveBuildingToFirebase(db, building, owner) {
     db.ref(`${fbComerciales.prefixURL}Entities/${entity.id}`).update(toFirebaseEntity(entity));
   };
 
-  buildingRef.child('Data').set(toFirebaseBuilding(building));
-  if (owner) {
-    buildingRef.child('Owner').set(owner);
-  }
+  buildingRef.child('Data').set(toFirebaseBuilding(building, owner));
+  buildingRef.child('Owner').set(owner);
 
   buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
@@ -211,7 +209,7 @@ function toFirebaseMeeting(meeting) {
   });
 }
 
-function toFirebaseBuilding(building) {
+function toFirebaseBuilding(building, owner) {
   const {lat, lng} = building.location;
   return FirebaseBuildingData({
     Street: _get(building, 'address.fullAddress'),
@@ -219,7 +217,7 @@ function toFirebaseBuilding(building) {
     Cadastre: building.cadastre,
     Aspiration: 0,
     Proposal: 0,
-    State: '',
+    State: _get(owner, 'business.status', ''),
     lat,
     lng
   });

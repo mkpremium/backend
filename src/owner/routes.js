@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {
-  addOwnerContactController, addOwnerController, updateOwnerContactController,
+  addOwnerContactController, addOwnerController, updateBusinessStatusController, updateOwnerContactController,
   updateOwnerController
 } from './controllers';
 
@@ -88,6 +88,44 @@ router.post('/', addOwnerController);
  *           $ref: "#/definitions/Error"
  */
 router.put('/:id', updateOwnerController);
+
+/**
+ * @swagger
+ * /owners/{id}/business-status:
+ *   put:
+ *     summary: Actualiza el estado de la negociación para un owner
+ *     tags: [Owner, Operator, Comercial]
+ *     security:
+ *       - operator: []
+ *       - admin: []
+ *       - business: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         type: string
+ *         format: uuid/v4
+ *         description: Id del propietario
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/OwnerUpdateBusinessStatus"
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       404:
+ *         description: Propietario no existe
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.put('/:id/business-status', updateBusinessStatusController);
 
 /**
  * @swagger

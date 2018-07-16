@@ -71,5 +71,5 @@ export const weekScheduleEventMeetingsController = wrap(weekScheduleEventMeeting
 export const findScheduledEventController = wrap(findByIdScheduledEvent);
 export const addScheduledCallEventController = wrap(addScheduledCallEvent);
 export const addScheduledMeetingEventController = wrap(addScheduledMeetingEvent);
-export const updateScheduledEnventController = wrap(updateScheduledEvent);
+export const updateScheduledEventController = wrap(updateScheduledEvent);
 export const deleteScheduledEventController = wrap(deleteScheduledEvent);

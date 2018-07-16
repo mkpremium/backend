@@ -36,8 +36,21 @@ export const OwnerStatus = {
   ERROR: 'ERRONEO'
 };
 
+export const OwnerBusinessStatus = {
+  PENDING: 'PENDIENTE',
+  PROPOSAL_REJECTED: 'PROPUESTA RECHAZADA',
+  PROPOSAL_SENT: 'PROPUESTA ENVIADA',
+  PROPOSAL_ACCEPTED: 'PRE-CIERRE',
+  PURCHASED: 'COMPRADO',
+
+  ALREADY_SOLD: 'VENDIDO',
+  NO_SALE: 'NO VENDE',
+  DISCARDED: 'DESCARTADO',
+};
+
 t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType');
 t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus');
+t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus');
 
 t.Gender = t.enums({
   NINGUNO: 'NINGUNO',

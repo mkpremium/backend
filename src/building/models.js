@@ -14,6 +14,7 @@ import {updateList} from '../lib/tcomb-utils';
 import {BuildingState} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
+import {OwnerRepository} from '../owner/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -137,7 +138,10 @@ export class BuildingRepository extends Building {
     const updatedEntities = building.entities.filter(i => i.id !== entityId);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    await updateBuildingToFirebase(updatedBuilding);
+    const repo = new OwnerRepository();
+    const [owner] = await repo.findByBuildingWithIncludes(building.id);
+
+    await updateBuildingToFirebase(updatedBuilding, owner);
   }
 
   async addEntity(building, params) {
@@ -145,7 +149,10 @@ export class BuildingRepository extends Building {
     const updatedEntities = t.update(building.entities, {$push: [entity]});
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    await updateBuildingToFirebase(updatedBuilding);
+    const repo = new OwnerRepository();
+    const [owner] = await repo.findByBuildingWithIncludes(building.id);
+
+    await updateBuildingToFirebase(updatedBuilding, owner);
 
     return entity;
   }
@@ -167,7 +174,10 @@ export class BuildingRepository extends Building {
     const updatedEntities = updateList(building.entities, entity, updatedEntity);
     const updatedBuilding = await this.updateEntities(building, updatedEntities);
 
-    await updateBuildingToFirebase(updatedBuilding);
+    const repo = new OwnerRepository();
+    const [owner] = await repo.findByBuildingWithIncludes(building.id);
+
+    await updateBuildingToFirebase(updatedBuilding, owner);
 
     return updatedEntity;
   }

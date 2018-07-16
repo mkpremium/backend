@@ -105,6 +105,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async firebaseMeeting(scheduleEvent) {
     const db = fbComerciales.database();
+
+    const repo = new OwnerRepository();
+    const ownerId = _get(scheduleEvent, 'event.ownerId');
+    await repo.initialBusinessStatus(ownerId, scheduleEvent.notifyTo);
+
     const meeting = await this.findMeeting(scheduleEvent);
     const {building, owner} = meeting;
 
@@ -168,6 +173,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
     const scheduledEvent = await this.save(params);
+
     await this.firebaseMeeting(scheduledEvent);
 
     return scheduledEvent;
