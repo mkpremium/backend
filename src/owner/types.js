@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _flatten from 'lodash/flatten';
@@ -41,6 +42,7 @@ t.OwnerCompactView = t.struct(
     id: t.String,
     type: t.OwnerType,
     status: t.OwnerStatus,
+    business: t.OwnerBusinessStatus,
     buildingId: isTest() ? t.maybe(t.String) : t.String,
     confirmedByOperator: t.OwnerConfirmed,
     person: t.struct({
@@ -58,6 +60,19 @@ t.OwnerCompactView = t.struct(
     }
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   OwnerUpdateBusinessStatus:
+ *     properties:
+ *       status:
+ *         type: string
+ *         enum: [PENDIENTE, PROPUESTA RECHAZADA, PROPUESTA ENVIADA, PRE-CIERRE, COMPRADO, VENDIDO, NO VENDE, DESCARTADO]
+ */
+t.OwnerUpdateBusinessStatus = t.struct({
+  status: t.OwnerBusinessStatus
+}, 'OwnerUpdateBusinessStatus');
 
 export function ownersContactViews(owners) {
   return _flatten(owners.map(ownerContactsView));

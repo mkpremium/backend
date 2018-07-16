@@ -79,7 +79,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       createdAt: scheduleEvent.createdAt,
       createdBy: scheduleEvent.createdBy,
       eventDate: scheduleEvent.eventDate,
-      address: _get(scheduleEvent, 'event.eventAddress')
+      address: _get(scheduleEvent, 'event.eventAddress'),
+      inPerson: _get(scheduleEvent, 'event.inPerson')
     };
     const ownerId = _get(scheduleEvent, 'event.ownerId');
     const contactId = _get(scheduleEvent, 'event.contactId');
@@ -104,6 +105,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async firebaseMeeting(scheduleEvent) {
     const db = fbComerciales.database();
+
+    const repo = new OwnerRepository();
+    const ownerId = _get(scheduleEvent, 'event.ownerId');
+    await repo.initialBusinessStatus(ownerId, scheduleEvent.notifyTo);
+
     const meeting = await this.findMeeting(scheduleEvent);
     const {building, owner} = meeting;
 
@@ -126,6 +132,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       return true;
     }
 
+    // non presencial meetings necesitan validación de tiempo y fecha
+    if (data.event.inPerson) {
+      return true;
+    }
+
     if (!areAllowedMeetingMins(data.eventDate)) {
       throw newHttpError(
         400,
@@ -135,9 +146,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
     const m = utc(data.eventDate);
     const start = m.clone().subtract(1.5, 'hours').toISOString();
-    const end = m.clone().add(1.5, 'hours').toISOString();
+    const end = m.clone().add(1, 'hours').toISOString();
     console.log('areAllowedMeetingInRange', data.eventDate, start, end);
-    const meetingsInRange = await this.findMeetingInRange(data.eventDate, start, end, data.id);
+    const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end, data.id);
     if (meetingsInRange && meetingsInRange.length > 0) {
       throw newHttpError(
         400,
@@ -152,6 +163,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const eventDate = [start, end].join(',');
     addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate);
     qb.where('type = ?', ScheduledEventType.MEETINGS);
+    qb.where('notifyTo = ?', notifyTo);
     if (scheduleId) {
       qb.where('id != ?', scheduleId);
     }
@@ -161,6 +173,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
     const scheduledEvent = await this.save(params);
+
     await this.firebaseMeeting(scheduledEvent);
 
     return scheduledEvent;

@@ -48,7 +48,7 @@ export default function migrateFromCsv(data) {
 
   const postalCode = () => ({
     verified: !!input.postcode2,
-    number: Number(input.postcode || input.postcode2)
+    number: ('' + Number(input.postcode || input.postcode2)).padStart(5, '0')
   });
   const ownerPhones = () => {
     const phones = [];

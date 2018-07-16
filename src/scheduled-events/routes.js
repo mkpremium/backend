@@ -5,8 +5,9 @@ import {
   addScheduledMeetingEventController,
   findScheduledEventController,
   listScheduledEventController,
-  updateScheduledEnventController,
-  deleteScheduledEventController, weekScheduleEventMeetingsController
+  updateScheduledEventController,
+  deleteScheduledEventController,
+  weekScheduleEventMeetingsController
 } from './controllers';
 
 const router = Router();
@@ -301,7 +302,7 @@ router.post('/call', addScheduledCallEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.put('/:id', updateScheduledEnventController);
+router.put('/:id', updateScheduledEventController);
 
 /**
  * @swagger

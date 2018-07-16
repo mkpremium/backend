@@ -4,6 +4,7 @@ import _get from 'lodash/get';
 import t from '../types';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
+import {FirebaseBuildingData} from '../types/business';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -15,7 +16,7 @@ function arrayToObjectIds(collection) {
   return objectIds;
 }
 
-export async function updateBuildingToFirebase(building) {
+export async function updateBuildingToFirebase(building, owner) {
   if (!fbComerciales.enabled) {
     return;
   }
@@ -24,7 +25,7 @@ export async function updateBuildingToFirebase(building) {
 
   const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`).once('value');
   if (snapshot.exists()) {
-    return saveBuildingToFirebase(db, building);
+    return saveBuildingToFirebase(db, building, owner);
   }
 }
 
@@ -55,10 +56,8 @@ export async function saveBuildingToFirebase(db, building, owner) {
     db.ref(`${fbComerciales.prefixURL}Entities/${entity.id}`).update(toFirebaseEntity(entity));
   };
 
-  buildingRef.child('Data').set(toFirebaseBuilding(building));
-  if (owner) {
-    buildingRef.child('Owner').set(owner);
-  }
+  buildingRef.child('Data').set(toFirebaseBuilding(building, owner));
+  buildingRef.child('Owner').set(owner);
 
   buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
@@ -204,20 +203,21 @@ function toFirebaseMeeting(meeting) {
     Name: _get(meeting, 'contact.name', ''),
     PhoneNumber: _get(meeting, 'contact.phone', ''),
     buildingID: _get(meeting, 'building.id', ''),
+    inPerson: meeting.inPerson,
     dateCreation: firebaseTimestampFormat(meeting.createdAt),
     dateMeeting: firebaseTimestampFormat(meeting.eventDate)
   });
 }
 
-function toFirebaseBuilding(building) {
+function toFirebaseBuilding(building, owner) {
   const {lat, lng} = building.location;
-  return t.FirebaseBuildingData({
+  return FirebaseBuildingData({
     Street: _get(building, 'address.fullAddress'),
-    Address: _get(building, 'address'),
-    Cadastre: _get(building, 'cadastre'),
+    Address: building.address,
+    Cadastre: building.cadastre,
     Aspiration: 0,
     Proposal: 0,
-    State: '',
+    State: _get(owner, 'business.status', ''),
     lat,
     lng
   });

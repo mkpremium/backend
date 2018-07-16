@@ -3,6 +3,7 @@ import {OwnerRepository} from './models';
 import {History} from '../history/models';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
 import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
+import t from './types';
 
 async function updateOwnerContact(req, res) {
   const ownerId = req.params.id;
@@ -52,7 +53,23 @@ async function addOwner(req, res) {
   res.status(201).json(owner);
 }
 
+async function updateBusinessStatus(req, res) {
+  t.OwnerUpdateBusinessStatus(req.body);
+  const ownerId = res.params.id;
+  const status = req.params.status;
+  const updatedBy = req.user.id;
+
+  const repo = new OwnerRepository();
+  const owner = await repo.updateBusinessStatus(ownerId, status, updatedBy);
+
+  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
+  await saveBuildingOwnerToFirebase(updatedOwner);
+
+  await History.registerCreate({owner, user: req.user});
+}
+
 export const updateOwnerContactController = wrap(updateOwnerContact);
 export const updateOwnerController = wrap(updateOwner);
 export const addOwnerContactController = wrap(addOwnerContact);
 export const addOwnerController = wrap(addOwner);
+export const updateBusinessStatusController = wrap(updateBusinessStatus);

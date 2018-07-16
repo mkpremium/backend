@@ -308,5 +308,6 @@ t.Meeting = t.struct({
   building: isMaybeTesting(t.Building),
   createdAt: t.Date,
   eventDate: t.Date,
+  inPerson: t.Boolean,
   createdBy: isMaybeTesting(t.String)
 }, 'Meeting');
