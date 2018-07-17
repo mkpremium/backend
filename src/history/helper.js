@@ -36,6 +36,7 @@ function getRecordContext(model, plural = false) {
 function getRecordDescription(model, username) {
   const recordContext = getRecordContext(model);
   return {
+    DELETE: `${username} ha eliminado ${recordContext}`,
     CREATE: `${username} ha creado ${recordContext}`,
     UPDATE: `${username} ha actualizado ${recordContext}`,
     GET: `${username} ha obtenido ${recordContext}`,
