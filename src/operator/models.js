@@ -28,7 +28,7 @@ export class Operator extends CouchbaseModel {
   }
 
   static async hashPassword(password) {
-    if (/^\$2a\$\d{2}\$/.test(password)) {
+    if (/^\$2\w\$\d{2}\$/.test(password)) {
       return password;
     }
     const salt = await bcrypt.genSalt(saltFactor);
