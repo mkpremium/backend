@@ -38,6 +38,9 @@ function setLabels(values) {
   const result = {};
   _each(values, (value, key) => {
     const format = (value) => {
+      if (key === 'errorMessage') {
+        return value;
+      }
       if (key === 'rot') {
         return Number(value).toFixed(2);
       } else {
