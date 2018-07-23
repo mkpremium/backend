@@ -5,7 +5,7 @@ import _uniq from 'lodash/uniq';
 import _pick from 'lodash/pick';
 import _each from 'lodash/each';
 import {CouchbaseModel} from '../db/model';
-import t from './types';
+import t, {BankFileData} from './types';
 import {newHttpError} from '../lib/http-error';
 import {calculateFilter, retrievePricesAndLocationInfo} from './lib/services';
 import {BANK_WORKER_NAMES} from './worker/workers';
@@ -206,7 +206,7 @@ export class BankFileRepository extends CouchbaseModel {
 export class BankFileDataRepository extends CouchbaseModel {
   constructor() {
     super();
-    this.Struct = t.BankFileData;
+    this.Struct = BankFileData;
   }
 
   async updateCounter(bankFileId) {

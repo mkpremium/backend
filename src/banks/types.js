@@ -245,7 +245,7 @@ t.ListBankFileResponse = t.struct(
  *       m2:
  *         type: number
  */
-t.BankFileData = t.struct(
+export const BankFileData = t.BankFileData = t.struct(
   {
     id: t.String,
     bankFileId: t.String,
