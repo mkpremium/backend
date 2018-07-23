@@ -34,7 +34,7 @@ function xmlParser(rawXml) {
       province: document.valueWithPath(`${base}.dt.np`)
     }),
     use: document.valueWithPath(`${base}.debi.luso`),
-    m2: document.valueWithPath(m2Path)
+    m2: parseFloat(document.valueWithPath(m2Path))
   };
 }
 
