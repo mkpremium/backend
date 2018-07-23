@@ -21,7 +21,8 @@ const extraFieldLabels = {
   priceCity: 'Precio de la zona',
   priceBank: 'Precio del banco',
   priceInvest: 'Precio de inversión',
-  priceSell: 'Precio de venta'
+  priceSell: 'Precio de venta',
+  errorMessage: 'Errores'
 };
 
 function updateListed(action, userInput, cadastreReferences) {
@@ -57,7 +58,8 @@ function exportedFields(bankFileData) {
     'priceCity',
     'priceBank',
     'priceInvest',
-    'priceSell'
+    'priceSell',
+    'errorMessage'
   ]);
   const extraFieldsLabeled = setLabels(extraFields);
 
