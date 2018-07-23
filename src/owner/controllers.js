@@ -55,7 +55,7 @@ async function addOwner(req, res) {
 
 async function updateBusinessStatus(req, res) {
   t.OwnerUpdateBusinessStatus(req.body);
-  const ownerId = res.params.id;
+  const ownerId = req.params.id;
   const status = req.params.status;
   const updatedBy = req.user.id;
 
@@ -66,6 +66,7 @@ async function updateBusinessStatus(req, res) {
   await saveBuildingOwnerToFirebase(updatedOwner);
 
   await History.registerCreate({owner, user: req.user});
+  res.status(204).send();
 }
 
 export const updateOwnerContactController = wrap(updateOwnerContact);
