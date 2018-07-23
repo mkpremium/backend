@@ -56,8 +56,17 @@ export async function saveBuildingToFirebase(db, building, owner) {
     db.ref(`${fbComerciales.prefixURL}Entities/${entity.id}`).update(toFirebaseEntity(entity));
   };
 
-  buildingRef.child('Data').set(toFirebaseBuilding(building, owner));
+  const firebaseBuilding = toFirebaseBuilding(building, owner);
+  buildingRef.child('Data').set(firebaseBuilding);
   buildingRef.child('Owner').set(owner);
+
+  const comercialId = _get(owner, 'business.meetingWithOperatorId');
+
+  if (comercialId) {
+    const comercialBuildingRef = db.ref(`Users/${comercialId}/Buildings${building.id}`);
+    comercialBuildingRef.child('Data').set(firebaseBuilding);
+    comercialBuildingRef.child('Owner').set(owner);
+  }
 
   buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
   building.entities.forEach(saveBuildingEntity);
