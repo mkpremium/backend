@@ -105,14 +105,23 @@ export async function saveBusinessUserToFirebase(operator) {
     return;
   }
   const db = fbComerciales.database();
-  return db.ref(`${fbComerciales.prefixURL}Users/${operator.id}`).set({
-    Meetings: {},
-    RemindersMeetings: {},
-    RemindersProposes: {},
-    UserData: {
-      Name: operator.profile.fullName()
-    }
-  });
+  const businessOperatorRef = db.ref(`${fbComerciales.prefixURL}Users/${operator.id}`);
+  const snapshot = await businessOperatorRef.once('value');
+  if (snapshot.exists()) {
+    return businessOperatorRef
+      .child('UserData').set({
+        Name: operator.profile.fullName()
+      });
+  }
+  return businessOperatorRef
+    .set({
+      Meetings: {},
+      RemindersMeetings: {},
+      RemindersProposes: {},
+      UserData: {
+        Name: operator.profile.fullName()
+      }
+    });
 }
 
 export async function relateMeetingToOperator(db, meeting, operatorId) {
