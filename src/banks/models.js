@@ -239,11 +239,14 @@ export class BankFileDataRepository extends CouchbaseModel {
     return this.query(qb);
   }
 
-  async findByFileBankId(bankFileId, processed = true) {
+  async findByFileBankId(bankFileId, processed) {
     const qb = this
       .getQueryBuilder()
-      .where('processed = ?', processed)
       .where('bankFileId = ?', bankFileId);
+
+    if (typeof processed !== 'undefined') {
+      qb.where('processed = ?', processed);
+    }
 
     return this.query(qb);
   }

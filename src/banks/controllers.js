@@ -25,7 +25,7 @@ export async function getBankFile(req, res) {
   const repo = new BankFileRepository();
   const dataRepo = new BankFileDataRepository();
   const bankFileRaw = await repo.findByIdOrThrow(bankFileId);
-  const bankFileData = await dataRepo.findByFileBankId(bankFileId, false);
+  const bankFileData = await dataRepo.findByFileBankId(bankFileId);
   const bankFile = BankFileRepository.single(bankFileRaw);
   res.json({
     bankFile,

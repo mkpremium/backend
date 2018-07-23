@@ -116,7 +116,7 @@ async function updateFilters(bankFileData, $merge) {
 
 export async function calculateFilter(bankFileId, thresholds) {
   const repo = new BankFileDataRepository();
-  const bankFileDataRows = await repo.findByFileBankId(bankFileId);
+  const bankFileDataRows = await repo.findByFileBankId(bankFileId, true);
 
   return calculateFilterSpecific(bankFileDataRows, thresholds);
 }
