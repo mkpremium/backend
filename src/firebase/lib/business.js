@@ -63,7 +63,7 @@ export async function saveBuildingToFirebase(db, building, owner) {
   const comercialId = _get(owner, 'business.meetingWithOperatorId');
 
   if (comercialId) {
-    const comercialBuildingRef = db.ref(`Users/${comercialId}/Buildings${building.id}`);
+    const comercialBuildingRef = db.ref(`Users/${comercialId}/Buildings/${building.id}`);
     comercialBuildingRef.child('Data').set(firebaseBuilding);
     comercialBuildingRef.child('Owner').set(owner);
   }
