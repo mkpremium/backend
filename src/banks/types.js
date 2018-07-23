@@ -268,7 +268,8 @@ t.BankFileData = t.struct(
       longitude: t.Number
     }, 'location')),
     buy: t.Boolean,
-
+    error: t.Boolean,
+    errorMessage: t.maybe(t.String),
     processed: t.Boolean,
     filters: t.BankFilterResult,
 
@@ -292,6 +293,7 @@ t.BankFileData = t.struct(
       itp: 10,
       buy: true,
       processed: false,
+      error: false,
       filters: {
         population: false,
         benefit: false,

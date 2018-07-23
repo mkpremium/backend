@@ -279,7 +279,10 @@ export class BankFileDataRepository extends CouchbaseModel {
       });
     } catch (e) {
       console.error('process have failed', e);
-      updatedBankFileData = bankFileData;
+      updatedBankFileData = t.update(bankFileData, {
+        error: {$set: true},
+        errorMessage: {$set: e.message}
+      });
       await this.updateErrorCounter(updatedBankFileData.bankFileId);
     }
 
