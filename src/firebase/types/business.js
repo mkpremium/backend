@@ -11,7 +11,7 @@ export const FirebaseBuildingData = t.struct({
   lng: t.Number
 }, 'FirebaseBuildingData');
 
-t.FirebaseMeeting = t.struct(
+export const FirebaseMeeting = t.struct(
   {
     Aspiration: t.Number,
     Email: t.maybe(t.String),
@@ -20,6 +20,8 @@ t.FirebaseMeeting = t.struct(
     PhoneNumber: t.maybe(t.String),
     Proposal: t.Number,
     Street: t.String,
+    inPerson: t.Boolean,
+    businessOperatorId: t.maybe(t.String),
     buildingID: t.String,
     dateCreation: t.Number,
     dateMeeting: t.Number

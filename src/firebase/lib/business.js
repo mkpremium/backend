@@ -4,7 +4,7 @@ import _get from 'lodash/get';
 import t from '../types';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
-import {FirebaseBuildingData} from '../types/business';
+import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -204,7 +204,7 @@ function noteWithTimestamp(note) {
 }
 
 function toFirebaseMeeting(meeting) {
-  return t.FirebaseMeeting({
+  return FirebaseMeeting({
     Owner: meeting.owner,
     Aspiration: 0,
     Street: meeting.address,
@@ -213,6 +213,7 @@ function toFirebaseMeeting(meeting) {
     PhoneNumber: _get(meeting, 'contact.phone', ''),
     buildingID: _get(meeting, 'building.id', ''),
     inPerson: meeting.inPerson,
+    businessOperatorId: meeting.notifyTo,
     dateCreation: firebaseTimestampFormat(meeting.createdAt),
     dateMeeting: firebaseTimestampFormat(meeting.eventDate)
   });

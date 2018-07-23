@@ -311,3 +311,5 @@ t.Meeting = t.struct({
   inPerson: t.Boolean,
   createdBy: isMaybeTesting(t.String)
 }, 'Meeting');
+
+export default t;
