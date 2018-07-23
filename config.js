@@ -116,7 +116,8 @@ export const cadastreLocation = {
 
 export const cadastreAddress = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
-  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000)
+  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000),
+  cachePrefix: process.env.CADASTRE_ADDRESS_CACHE_KEY || 'address_cache'
 };
 
 export const nestoriaService = {

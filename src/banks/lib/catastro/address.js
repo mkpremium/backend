@@ -18,6 +18,7 @@ function xmlParser(rawXml) {
   const dirProperty = /lors/.test(rawXml) ? 'lors' : 'lous';
 
   const base = 'soap:Body.Consulta_DNP.consulta_dnp.bico.bi';
+  const m2Path = 'soap:Body.Consulta_DNP.consulta_dnp.bico.lcons.cons.dfcons.stl';
   const baseAddress = `${base}.dt.locs.${dirProperty}.lourb.dir`;
 
   const address = {
@@ -33,7 +34,7 @@ function xmlParser(rawXml) {
       province: document.valueWithPath(`${base}.dt.np`)
     }),
     use: document.valueWithPath(`${base}.debi.luso`),
-    m2: parseFloat(document.valueWithPath(`${base}.debi.sfc`))
+    m2: document.valueWithPath(m2Path)
   };
 }
 
@@ -70,7 +71,7 @@ async function cadastreAddressLive(cadastreReference) {
 }
 
 export async function cadastreAddressService(cadastreReference) {
-  const cacheKey = `address:${cadastreReference}`;
+  const cacheKey = `${cadastreAddress.cachePrefix}:${cadastreReference}`;
   const repo = new BankFileRepository();
   const cache = repo.getCache({expiry: ONE_MONTH});
 
