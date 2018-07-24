@@ -190,21 +190,21 @@ export class OwnerRepository extends Owner {
   async updateBusinessStatus(ownerId, status, updatedBy) {
     const owner = await this.findByIdOrThrow(ownerId);
 
-    const update = async($set) => {
+    const update = $set => {
       const updatedOwner = t.update(owner, {business: {$set}});
       return this.save(updatedOwner);
     };
 
-    if (!owner.business) {
+    if (owner.business) {
+      const updatedBusiness = t.update(owner.business, {status: {$set: status}});
+      return update(updatedBusiness);
+    } else {
       // no definido antes? no cita?
       const business = {
         status,
         meetingWithOperatorId: updatedBy
       };
       return update(business);
-    } else {
-      const updatedBusiness = t.update(owner.business, {status: {$set: status}});
-      return update(updatedBusiness);
     }
   }
 

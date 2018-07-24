@@ -84,6 +84,8 @@ async function nestoriaSearchListingAutoRadius(location) {
       return {listing, radius};
     }
   }
+
+  return {listing: [], radius: '0.5km'};
 }
 
 async function nestoriaListingLive(location) {
