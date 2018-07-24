@@ -133,7 +133,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     }
 
     // non presencial meetings necesitan validación de tiempo y fecha
-    if (data.event.inPerson) {
+    if (!data.event.inPerson) {
       return true;
     }
 
