@@ -22,7 +22,7 @@ t.BanksAddress = t.struct(
   {
     type: t.String,
     street: t.String,
-    number: t.Number,
+    number: t.maybe(t.Number),
     fullAddress: t.maybe(t.String),
     city: t.String,
     province: t.String
@@ -35,7 +35,7 @@ t.BanksAddress = t.struct(
 t.CadastreResponse = t.struct(
   {
     address: t.BanksAddress,
-    use: t.String,
+    use: t.maybe(t.String),
     m2: t.Number
   },
   {

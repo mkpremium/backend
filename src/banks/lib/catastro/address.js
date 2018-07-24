@@ -21,8 +21,10 @@ function xmlParser(rawXml) {
   const m2Path = 'soap:Body.Consulta_DNP.consulta_dnp.bico.lcons.cons.dfcons.stl';
   const baseAddress = `${base}.dt.locs.${dirProperty}.lourb.dir`;
 
+  const addressNumber = document.valueWithPath(`${baseAddress}.pnp`);
+
   const address = {
-    number: Number(document.valueWithPath(`${baseAddress}.pnp`)),
+    number: addressNumber ? Number(addressNumber) : null,
     type: document.valueWithPath(`${baseAddress}.tv`),
     street: document.valueWithPath(`${baseAddress}.nv`)
   };
@@ -87,7 +89,7 @@ export async function cadastreAddressService(cadastreReference) {
 }
 
 if (require.main === module) {
-  const sampleCadastreReference = '9914502TF7091S0021GT';
+  const sampleCadastreReference = '35004A002007240000OD';
   cadastreAddressService(sampleCadastreReference)
     .then(result => {
       console.log(JSON.stringify(result, null, 2));
