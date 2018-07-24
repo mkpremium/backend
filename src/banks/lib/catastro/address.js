@@ -73,6 +73,7 @@ async function cadastreAddressLive(cadastreReference) {
 }
 
 export async function cadastreAddressService(cadastreReference) {
+  const cadastreReference14 = cadastreReference.substr(0, 14);
   const cacheKey = `${cadastreAddress.cachePrefix}:${cadastreReference}`;
   const repo = new BankFileRepository();
   const cache = repo.getCache({expiry: ONE_MONTH});
@@ -82,7 +83,7 @@ export async function cadastreAddressService(cadastreReference) {
     debugCadastre('cadastreAddressService', 'using cache', cacheKey);
     return fromJSON(cachedAddress, t.CadastreResponse);
   }
-  const liveAddress = await cadastreAddressLive(cadastreReference);
+  const liveAddress = await cadastreAddressLive(cadastreReference14);
   await cache.setValue(cacheKey, liveAddress);
 
   return liveAddress;
