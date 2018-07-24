@@ -67,7 +67,7 @@ async function nestoriaSearchListing(location, radius = '0.5km') {
     }
   });
 
-  return _get(response.data, 'response.listings', []);
+  return _get(response, 'data.response.listings', []);
 }
 
 async function nestoriaSearchListingAutoRadius(location) {
