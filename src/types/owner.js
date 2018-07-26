@@ -6,7 +6,7 @@ import {OwnerStatus, OwnerType} from './enums';
 t.OwnerBusiness = t.struct({
   meetingWithOperatorId: t.String,
   status: t.String
-});
+}, 'OwnerBusiness');
 
 /**
  * @swagger

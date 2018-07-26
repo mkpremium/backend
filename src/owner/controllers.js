@@ -56,7 +56,7 @@ async function addOwner(req, res) {
 async function updateBusinessStatus(req, res) {
   t.OwnerUpdateBusinessStatus(req.body);
   const ownerId = req.params.id;
-  const status = req.params.status;
+  const status = req.body.status;
   const updatedBy = req.user.id;
 
   const repo = new OwnerRepository();
