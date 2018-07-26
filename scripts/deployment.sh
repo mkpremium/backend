@@ -52,7 +52,7 @@ deploy() {
   local deploy_dir=/home/centos/apps/${app_name}
 
   echo -en "Checking node version         \t:"
-  remove_node_modules=`validate_nvm ${dist_host} ${deploy_dir} || echo 'rm -rf node_modules; npm install -g pm2'`
+  remove_node_modules=`validate_nvm ${dist_host} ${deploy_dir} || echo 'rm -rf node_modules; npm install -g pm2@2.10.4'`
   remove_node_modules_msg=`validate_nvm ${dist_host} ${deploy_dir} && echo OK || echo Reinstalling`
   echo -e "${bold}${remove_node_modules_msg}${normal}"
 
