@@ -172,11 +172,28 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
+    await this.validateUniqueWorksheet(params);
     const scheduledEvent = await this.save(params);
 
     await this.firebaseMeeting(scheduledEvent);
 
     return scheduledEvent;
+  }
+
+  async validateUniqueWorksheet(params) {
+    const worksheetId = _get(params, 'event.worksheetId');
+
+    if (!worksheetId) {
+      return;
+    }
+
+    const qb = this.getQueryBuilder()
+      .where('event.worksheetId = ?', worksheetId);
+    const result = await this.query(qb);
+
+    if (result && result.length > 0) {
+      throw newHttpError(400, 'No se pueden crear multiples citas para una misma worksheet');
+    }
   }
 
   async addScheduleCallEvent(data = {}, createdBy) {
