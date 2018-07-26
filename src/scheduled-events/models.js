@@ -204,14 +204,14 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async update(id, data = {}) {
     debugModel('update', id, data);
     const scheduledEvent = await this.findByIdOrThrow(id);
-    const changes = fromJSON(data, t.UpdateScheduledEvent);
+    fromJSON(data, t.UpdateScheduledEvent);
     const updatedEvent = t.update(scheduledEvent.event, {
-      $merge: changes.event
+      $merge: data.event
     });
     const updatedScheduledEventData = t.update(scheduledEvent, {
       $merge: {
-        notifyAt: changes.notifyAt,
-        eventDate: changes.eventDate,
+        notifyAt: data.notifyAt,
+        eventDate: data.eventDate,
         event: updatedEvent
       }
     });
