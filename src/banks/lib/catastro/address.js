@@ -25,7 +25,7 @@ function xmlParser(rawXml) {
 
   const address = {
     number: addressNumber ? Number(addressNumber) : null,
-    type: document.valueWithPath(`${baseAddress}.tv`),
+    type: document.valueWithPath(`${baseAddress}.tv`) || '',
     street: document.valueWithPath(`${baseAddress}.nv`)
   };
 
@@ -90,7 +90,7 @@ export async function cadastreAddressService(cadastreReference) {
 }
 
 if (require.main === module) {
-  const sampleCadastreReference = '35004A002007240000OD';
+  const sampleCadastreReference = '9006701YH1590E0043IO';
   cadastreAddressService(sampleCadastreReference)
     .then(result => {
       console.log(JSON.stringify(result, null, 2));

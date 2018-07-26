@@ -20,7 +20,7 @@ import uuid from 'uuid/v4';
  */
 t.BanksAddress = t.struct(
   {
-    type: t.String,
+    type: t.maybe(t.String),
     street: t.String,
     number: t.maybe(t.Number),
     fullAddress: t.maybe(t.String),
