@@ -227,7 +227,7 @@ t.BuildingEntity = t.struct(
   {
     id: t.String,
     status: t.BuildingEntityStatus,
-    name: t.String,
+    name: t.maybe(t.String),
     type: t.String,
     surface: t.Number,
     rent: t.Number,

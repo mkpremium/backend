@@ -40,7 +40,7 @@ export const PersonInputDTO = t.struct({
 export default function migrateFromCsv(data) {
   const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
 
-  const isEmpty = (val) => typeof val === 'undefined' || val === null || val === '';
+  const isEmpty = val => typeof val === 'undefined' || val == null || val === '';
 
   const birthDate = () => {
     if (isEmpty(input.ano_naci) || isEmpty(input.mes_naci) || isEmpty(input.dia_naci)) {
@@ -73,7 +73,7 @@ export default function migrateFromCsv(data) {
     }
 
     if (!isEmpty(input.telefono_ib)) {
-      contacts.push(input.telefono_pb);
+      contacts.push(input.telefono_ib);
     }
 
     if (!isEmpty(input.telefono_abc)) {

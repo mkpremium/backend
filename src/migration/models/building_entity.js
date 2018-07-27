@@ -28,6 +28,7 @@ export default function migrateFromCsv(data) {
   const input = BuildingEntityDTO(cleanDataAndRemoveNullValues(data));
 
   return t.BuildingEntity({
+    name: input.entita,
     surface: Number(input.m2 || 0),
     rent: input.mensile ? Number(input.mensile) : void 0,
     expiration: input.data_limite ? new Date(input.data_limite) : void 0,
