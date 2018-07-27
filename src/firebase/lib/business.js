@@ -35,6 +35,11 @@ export async function saveBuildingOwnerToFirebase(owner) {
     return;
   }
   const db = fbComerciales.database();
+
+  if (owner.building) {
+    return saveBuildingToFirebase(db, owner.building, owner);
+  }
+
   const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}`).once('value');
   if (!snapshot.exists()) {
     debugFb('saveBuildingOwnerToFirebase', `building ${owner.buildingId} doesn't exists yet`);
