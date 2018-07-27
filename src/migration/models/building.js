@@ -87,7 +87,8 @@ export default function migrateFromCsv(data) {
 
   const number = value => {
     if (value) {
-      return Number(value.replace(',', '.'));
+      const number = Number(value.replace(',', '.'));
+      return isNaN(number) ? 0 : number;
     }
 
     return 0;

@@ -39,6 +39,10 @@ export class RelatedModel extends MigrateModel {
         }
       });
 
+      if (updatedWorksheet.relatedBuildingIds.length === 0) {
+        console.log('RELATED', record);
+      }
+
       await Promise.all([
         worksheetRepo.save(updatedWorksheet, false),
         ownerRepo.save(updatedOwner, false)

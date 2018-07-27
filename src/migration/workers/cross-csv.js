@@ -9,12 +9,12 @@ const worker = gearman.worker(gearmanConfig);
 
 function buildQuery({calls, owners, buildings}) {
   return `SELECT
-    llamadas.id_chiamatafornitore,
+    llamadas.id_chiamatafornitore as id_chiamatafornitore,
     llamadas.Id_Catastro,
     propietarios.Id_Fornitore,
     edificios.ID,
     propietarios.Verificato,
-    llamadas.proprietari,
+    llamadas.proprietari as proprietari,
     propietarios.RagioneSociale,
     propietarios.CodFis,
     propietarios.ParIva,
@@ -47,10 +47,6 @@ function buildQuery({calls, owners, buildings}) {
   COLLATE NOCASE`;
 }
 
-function buildHeaders() {
-  return '"id_chiamatafornitore;Id_Catastro;Id_Fornitore;ID;Verificato;proprietari;RagioneSociale;CodFis;ParIva"';
-}
-
 async function cross(input, job, opts) {
   opts.retryJobOnError = false;
   const base = dirname(input.calls);
@@ -58,11 +54,10 @@ async function cross(input, job, opts) {
   const query = buildQuery(input);
 
   const files = Object.assign({}, input, {cross: output});
-  const writeHeaders = `echo ${buildHeaders()} > ${output}`;
-  const writeFile = `q -H -d ";" "${query}" >> ${output}`;
+  const writeFile = `q -O -H -d ";" "${query}" >> ${output}`;
 
   return new Promise((resolve, reject) => {
-    exec(`${writeHeaders} && ${writeFile}`, err => {
+    exec(`${writeFile}`, err => {
       if (err && err.code) {
         reject(err);
       } else {

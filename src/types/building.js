@@ -63,7 +63,7 @@ t.Elements = t.struct({
  */
 t.BuildingOwner = t.struct(
   {
-    name: t.String,
+    name: t.maybe(t.String),
     address: t.SimpleAddress,
     phones: t.list(t.SimplePhoneNumber)
   },
@@ -228,9 +228,9 @@ t.BuildingEntity = t.struct(
     id: t.String,
     status: t.BuildingEntityStatus,
     name: t.maybe(t.String),
-    type: t.String,
+    type: t.maybe(t.String),
     surface: t.Number,
-    rent: t.Number,
+    rent: t.maybe(t.Number),
     expiration: t.maybe(t.Date),
 
     _migrateBuildingId: t.maybe(t.String),

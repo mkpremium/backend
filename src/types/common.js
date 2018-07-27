@@ -35,7 +35,7 @@ t.PostalCode = t.struct(
  *         type: string
  */
 t.SimpleAddress = t.struct({
-  fullAddress: t.String,
+  fullAddress: t.maybe(t.String),
   city: t.maybe(t.String),
   postalCode: t.maybe(t.String)
 }, 'SimpleAddress');

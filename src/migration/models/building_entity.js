@@ -27,10 +27,19 @@ const BuildingEntityDTO = t.struct({
 export default function migrateFromCsv(data) {
   const input = BuildingEntityDTO(cleanDataAndRemoveNullValues(data));
 
+  const number = value => {
+    if (value) {
+      return Number(value.replace(',', '.'));
+    }
+
+    return 0;
+  };
+
   return t.BuildingEntity({
     name: input.entita,
-    surface: Number(input.m2 || 0),
-    rent: input.mensile ? Number(input.mensile) : void 0,
+    type: input.tipoentita,
+    surface: number(input.m2),
+    rent: number(input.mensile),
     expiration: input.data_limite ? new Date(input.data_limite) : void 0,
 
     _migrateBuildingId: input.id_catastro,
