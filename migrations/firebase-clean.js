@@ -1,8 +1,12 @@
 import Promise from 'bluebird';
 import {fbInformadores, fbComerciales} from '../src/firebase';
+import {firebaseComerciales, firebaseInformadores} from '../config';
 
 async function cleanStreet() {
   const db = fbInformadores.database();
+  if (!firebaseInformadores.enabled) {
+    return;
+  }
 
   return Promise.all([
     db.ref(`${fbInformadores.prefixURL}AdminUsers`).set(null),
@@ -20,6 +24,10 @@ async function cleanStreet() {
 
 async function cleanBusiness() {
   const db = fbComerciales.database();
+
+  if (!firebaseComerciales.enabled) {
+    return;
+  }
 
   return Promise.all([
     db.ref(`${fbComerciales.prefixURL}Buildings`).set(null),
