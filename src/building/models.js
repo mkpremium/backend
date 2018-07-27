@@ -2,6 +2,7 @@ import t from 'tcomb';
 import debug from 'debug';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
+import squel from 'squel';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
@@ -77,6 +78,15 @@ export class BuildingRepository extends Building {
     }
 
     return building;
+  }
+
+  async findBuildingByMetadataMigration(lookupData) {
+    const expr = squel.expr()
+      .or('t._migrateId = ?', lookupData)
+      .or('t.cadastre.reference = ?', lookupData);
+    const qb = this.getQueryBuilder().where(expr);
+    const [result] = await this.query(qb);
+    return result;
   }
 
   async addMetadataToBuilding(building, params) {
