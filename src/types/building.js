@@ -233,8 +233,8 @@ t.BuildingEntity = t.struct(
     rent: t.Number,
     expiration: t.maybe(t.Date),
 
-    _migrateBuildingId: t.String,
-    _migrateIdStatus: t.String
+    _migrateBuildingId: t.maybe(t.String),
+    _migrateIdStatus: t.maybe(t.String)
   },
   {
     name: 'BuildingEntity',
