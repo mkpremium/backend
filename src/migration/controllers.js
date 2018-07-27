@@ -8,7 +8,8 @@ import {storage} from '../../config';
 const files = multer({storage}).fields([
   {name: 'calls', maxCount: 1},
   {name: 'owners', maxCount: 1},
-  {name: 'buildings', maxCount: 1}
+  {name: 'buildings', maxCount: 1},
+  {name: 'people', maxCount: 1}
 ]);
 
 export const migrationViewController = (req, res) => {

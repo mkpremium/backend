@@ -34,8 +34,10 @@ export async function seed(files) {
   const migrateBuildings = new MigrateModel('building', files.buildings, app);
   const migrateOwners = new MigrateModel('owner', files.owners, app);
   const migrateWorksheets = new MigrateModel('worksheet', files.calls, app);
+  const migratePeople = new MigrateModel('person', files.people, app);
   const relations = new RelatedModel(files.cross, app);
 
+  await migratePeople.run();
   await migrateBuildings.run();
   await migrateOwners.run();
   await migrateWorksheets.run();
@@ -43,6 +45,7 @@ export async function seed(files) {
 }
 
 const defaultFiles = {
+  people: resolve(__dirname, '../csv/PERSONAS.csv'),
   buildings: resolve(__dirname, '../csv/EDIFICIOS.csv'),
   owners: resolve(__dirname, '../csv/PROPIETARIOS.csv'),
   calls: resolve(__dirname, '../csv/LLAMADAS.csv'),

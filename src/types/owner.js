@@ -150,7 +150,7 @@ t.Person = t.struct(
     contacts: t.list(t.TypedContactInfo),
     addresses: t.list(t.SimpleAddress),
     birthDate: t.maybe(t.Date),
-    gender: t.Gender,
+    gender: t.maybe(t.Gender),
 
     personType: t.PersonType,
 
