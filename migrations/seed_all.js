@@ -6,6 +6,7 @@ import {
   operatorCreateManager
 } from '../test/common';
 import {RelatedModel} from '../src/migration/lib/related-model';
+import {MigrateEntities} from '../src/migration/lib/migrate-entities';
 
 export async function seed(files) {
   const app = {
@@ -36,12 +37,14 @@ export async function seed(files) {
   const migrateWorksheets = new MigrateModel('worksheet', files.calls, app);
   const migratePeople = new MigrateModel('person', files.people, app);
   const relations = new RelatedModel(files.cross, app);
+  const buildingEntities = new MigrateEntities(files.entities, app);
 
   await migratePeople.run();
   await migrateBuildings.run();
   await migrateOwners.run();
   await migrateWorksheets.run();
   await relations.run();
+  await buildingEntities.run();
 }
 
 const defaultFiles = {
@@ -49,7 +52,8 @@ const defaultFiles = {
   buildings: resolve(__dirname, '../csv/EDIFICIOS.csv'),
   owners: resolve(__dirname, '../csv/PROPIETARIOS.csv'),
   calls: resolve(__dirname, '../csv/LLAMADAS.csv'),
-  cross: resolve(__dirname, '../csv/cross_table.csv')
+  cross: resolve(__dirname, '../csv/cross_table.csv'),
+  entities: resolve(__dirname, '../csv/SITARR.csv')
 };
 
 if (require.main === module) {

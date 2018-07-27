@@ -14,7 +14,7 @@ const seedDebug = debug('app:seed:metadata');
 
 export async function seed(directory) {
   seedDebug('seeding from', directory);
-  await await couchbase();
+  await couchbase();
   const files = await readAllFiles(directory);
   Promise.mapSeries(files, addMetadata);
 }

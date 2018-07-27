@@ -29,6 +29,10 @@ export function removeNullValues(object) {
   return newObject;
 }
 
+export function cleanDataAndRemoveNullValues(object) {
+  return removeNullValues(cleanObjectKeys(object));
+}
+
 /**
  * Values from CSV comes with many emptiness values NULL, null, --- this function
  * turn those values into a real null
