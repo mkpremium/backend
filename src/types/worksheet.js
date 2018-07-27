@@ -5,6 +5,7 @@ import {Queue} from './constants';
 import debug from 'debug';
 
 import '../owner/types';
+import {newHttpError} from '../lib/http-error';
 
 const debugWorksheet = debug('app:types:worksheet');
 
@@ -230,6 +231,13 @@ t.QueueItem.prototype.schedule = function(operatorId) {
   });
 };
 
+t.QueueItem.prototype.releaseSchedule = function(operatorId) {
+  if (this.status === Queue.Status.SCHEDULED && this.operatorId === operatorId) {
+    return this.release();
+  }
+  throw newHttpError(400, 'No puede liberar este item');
+};
+
 /**
  * @swagger
  * definitions:
@@ -344,6 +352,10 @@ t.WorksheetQueue.prototype.findItemByWorksheetId = function(worksheetId) {
 
 t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
   return _find(this.worksheets, {operatorId});
+};
+
+t.WorksheetQueue.prototype.findScheduledItemsByOperatorId = function(operatorId) {
+  return _find(this.worksheets, {operatorId, status: Queue.Status.SCHEDULED});
 };
 
 t.WorksheetQueue.prototype.findNextAvailableInQueue = function(currentItem = null) {

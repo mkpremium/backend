@@ -45,7 +45,7 @@ export const OwnerBusinessStatus = {
 
   ALREADY_SOLD: 'VENDIDO',
   NO_SALE: 'NO VENDE',
-  DISCARDED: 'DESCARTADO',
+  DISCARDED: 'DESCARTADO'
 };
 
 t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType');

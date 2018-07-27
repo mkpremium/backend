@@ -6,7 +6,11 @@ import {
   actionsOnWorksheetQueueController,
   queueTakenFindByOperatorController,
   addOwnerToWorksheetController,
-  getQueueController, createQueueController, updateQueueController, deleteQueueController
+  getQueueController,
+  createQueueController,
+  updateQueueController,
+  deleteQueueController,
+  getScheduledWorksheetsController, removeScheduledWorksheetController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -342,6 +346,75 @@ router.put('/queues/:id', permissions.manager, updateQueueController);
  *
  */
 router.delete('/queues/:id', permissions.manager, deleteQueueController);
+
+/**
+ * @swagger
+ * /worksheets/queues/{id}/scheduled:
+ *   get:
+ *     tags: [Queue, Operator]
+ *     security:
+ *       - manager: []
+ *       - operator: []
+ *       - admin: []
+ *     summary: Devuelve los items programados (worksheets)
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string *
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref: "#/definitions/QueueItem"
+ */
+router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController);
+
+/**
+ * @swagger
+ * definitions:
+ *   RemoveScheduledWorksheet:
+ *     properties:
+ *       itemId:
+ *         type: string
+ * /worksheets/queues/{id}/scheduled:
+ *   delete:
+ *     tags: [Queue, Operator]
+ *     summary: Elimina la programación de una worksheet
+ *     security:
+ *       - operator: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id de la cola de trabajo
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/RemoveScheduledWorksheet"
+ *     responses:
+ *       204:
+ *         description: Operación exitosa
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *
+ */
+router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController);
 
 /**
  * @swagger

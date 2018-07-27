@@ -145,6 +145,27 @@ async function addOwnerToWorksheet(req, res) {
   res.status(201).json(owner);
 }
 
+async function getScheduledWorksheets(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const queueId = req.params.id;
+  const operatorId = req.user.id;
+  const queue = await repo.findByIdOrThrow(queueId);
+  const items = queue.findScheduledItemsByOperatorId(operatorId);
+  res.json(items);
+}
+
+async function removeScheduledWorksheet(req, res) {
+  const repo = new WorksheetQueueRepository();
+  const queueId = req.params.id;
+  const operatorId = req.user.id;
+  const itemId = req.body.itemId;
+
+  const queue = await repo.findByIdOrThrow(queueId);
+  await repo.removeScheduledWorksheet(queue, itemId, operatorId);
+
+  res.status(204).send();
+}
+
 export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet);
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
@@ -155,3 +176,5 @@ export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator)
 export const createQueueController = wrap(createQueue);
 export const updateQueueController = wrap(updateQueue);
 export const deleteQueueController = wrap(deleteQueue);
+export const getScheduledWorksheetsController = wrap(getScheduledWorksheets);
+export const removeScheduledWorksheetController = wrap(removeScheduledWorksheet);

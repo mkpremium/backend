@@ -231,6 +231,26 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return queue;
   }
 
+  async removeScheduledWorksheet(queue, itemId, operatorId) {
+    const item = queue.findItemById(itemId);
+
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
+    }
+
+    const updatedItem = item.releaseSchedule(operatorId);
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
+    const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
+
+    queueDebug('removeScheduleWorksheet', item.worksheetId, 'scheduled from queue ', queue.id);
+
+    await this.save(updatedQueue);
+  }
+
+  async getScheduledWorksheets(queue, operatorId) {
+    return queue.findScheduledItemsByOperatorId(operatorId);
+  }
+
   async nextWorksheetInQueue(queue, operatorId) {
     const operatorItem = queue.findItemByOperatorId(operatorId);
     let nextAvailableItem = queue.findNextAvailableInQueue(operatorItem);
