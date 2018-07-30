@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import _find from 'lodash/find';
 import _findIndex from 'lodash/findIndex';
+import _filter from 'lodash/filter';
 import {Queue} from './constants';
 import debug from 'debug';
 
@@ -358,7 +359,7 @@ t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
 };
 
 t.WorksheetQueue.prototype.findScheduledItemsByOperatorId = function(operatorId) {
-  return _find(this.worksheets, {operatorId, status: Queue.Status.SCHEDULED});
+  return _filter(this.worksheets, {operatorId, status: Queue.Status.SCHEDULED});
 };
 
 t.WorksheetQueue.prototype.findNextAvailableInQueue = function(currentItem = null) {
