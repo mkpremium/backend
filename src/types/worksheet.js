@@ -6,6 +6,7 @@ import debug from 'debug';
 
 import '../owner/types';
 import {newHttpError} from '../lib/http-error';
+import {ScheduledEvent} from '../scheduled-events/types';
 
 const debugWorksheet = debug('app:types:worksheet');
 
@@ -110,7 +111,7 @@ t.WorkSheet = t.struct({
 
   _migrateId: t.maybe(t.String),
 
-  lastAddedMeeting: t.maybe(t.ScheduledEvent),
+  lastAddedMeeting: t.maybe(ScheduledEvent),
 
   _documentType: t.enums.of(['worksheet'])
 }, {

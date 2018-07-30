@@ -140,7 +140,7 @@ t.ScheduledTask = t.struct(
   }
 );
 
-t.ScheduledEvent = t.struct(
+export const ScheduledEvent = t.ScheduledEvent = t.struct(
   {
     id: t.maybe(t.String),
     type: t.ScheduledEventType,
