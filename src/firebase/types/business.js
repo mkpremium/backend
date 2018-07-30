@@ -75,6 +75,6 @@ t.FirebaseBuildingEntity = t.struct({
   Situation: t.String,
   Surface: t.Number,
   Type: t.String
-});
+}, 'FirebaseBuildingEntity');
 
 export default t;

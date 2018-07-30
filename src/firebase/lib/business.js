@@ -2,6 +2,7 @@ import debug from 'debug';
 import Promise from 'bluebird';
 import _get from 'lodash/get';
 import t from '../types';
+import fromJSON from 'tcomb/lib/fromJSON';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
@@ -257,12 +258,12 @@ function toFirebaseDocument(metadata) {
 }
 
 function toFirebaseEntity(entity) {
-  return t.FirebaseBuildingEntity({
+  return fromJSON({
     Entity: entity.name,
     Expiration: firebaseTimestampFormat(entity.expiration),
     Rent: entity.rent,
     Situation: entity.status,
     Surface: entity.surface,
     Type: entity.type
-  });
+  }, t.FirebaseBuildingEntity);
 }
