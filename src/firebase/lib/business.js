@@ -1,6 +1,7 @@
 import debug from 'debug';
 import Promise from 'bluebird';
 import _get from 'lodash/get';
+import mime from 'mime-types';
 import t from '../types';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {fbComerciales} from '../index';
@@ -253,6 +254,7 @@ function toFirebaseDocument(metadata) {
     DocumentName: metadata.name,
     Url: metadata.url,
     Thumbnail: metadata.previewUrl,
+    mime: mime.lookup(metadata.previewUrl),
     date: firebaseTimestampFormat(metadata.createdAt)
   });
 }

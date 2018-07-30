@@ -40,6 +40,7 @@ t.FirebaseDocument = t.struct(
   {
     DocumentName: t.maybe(t.String),
     Url: t.String,
+    mime: t.maybe(t.String),
     Thumbnail: t.maybe(t.String),
     date: t.Number
   },
