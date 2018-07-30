@@ -24,6 +24,7 @@ import {
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
 import {ScheduledEventType} from './types';
+import {WorksheetRepository} from '../worksheet/models/worksheet';
 
 const debugModel = debug('app:model:scheduled-events');
 
@@ -174,6 +175,13 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
     await this.validateUniqueWorksheet(params);
     const scheduledEvent = await this.save(params);
+
+    if (_get(scheduledEvent, 'event.worksheetId')) {
+      const worksheetRepo = new WorksheetRepository();
+      const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'));
+      const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
+      await worksheetRepo.save(updatedWorksheet, false);
+    }
 
     await this.firebaseMeeting(scheduledEvent);
 

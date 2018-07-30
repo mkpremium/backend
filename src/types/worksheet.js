@@ -110,6 +110,8 @@ t.WorkSheet = t.struct({
 
   _migrateId: t.maybe(t.String),
 
+  lastAddedMeeting: t.maybe(t.ScheduledEvent),
+
   _documentType: t.enums.of(['worksheet'])
 }, {
   name: 'WorkSheet',
