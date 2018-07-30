@@ -137,10 +137,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.save(updatedQueue);
   }
 
-  async scheduleWorksheetInQueue(queue, itemId, operatorId) {
-    const item = queue.findItemById(itemId);
+  async scheduleWorksheetInQueue(queue, worksheetId, operatorId) {
+    const item = queue.findItemByWorksheetId(worksheetId);
     if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
+      throw newHttpError(400, `La Worksheet ${worksheetId} no fue encontrada en la cola`);
     }
 
     const worksheetRepo = new WorksheetRepository();

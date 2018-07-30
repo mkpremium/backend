@@ -35,7 +35,7 @@ async function addScheduledCallEvent(req, res) {
   const scheduledEvent = await repo.addScheduleCallEvent(req.body, req.user.id);
 
   const queue = await queueRepo.findByIdOrThrow(req.user.operator.profile.queueId);
-  await queueRepo.scheduleWorksheetInQueue(queue, scheduledEvent.event.itemId, scheduledEvent.notifyTo);
+  await queueRepo.scheduleWorksheetInQueue(queue, scheduledEvent.event.worksheetId, scheduledEvent.notifyTo);
 
   await OperatorStats.registerAction(req.user.id, OperatorActions.SCHEDULE_CALL);
   res.status(201).json(scheduledEvent);
