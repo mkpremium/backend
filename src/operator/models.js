@@ -36,9 +36,7 @@ export class Operator extends CouchbaseModel {
   }
 
   async preSave(data) {
-    // TODO: optimize on near future to one single query
     await this.unique(data, 'username');
-    await this.unique(data, 'agentNumber');
 
     const password = await Operator.hashPassword(data.password);
     return t.update(data, {
