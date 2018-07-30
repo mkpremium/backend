@@ -14,7 +14,10 @@ export const meetingDayFormat = date => m(date).format('DD-MM-YYYY');
 export const meetingWeekFormat = date => m(date).format('YYYY:WW');
 
 export function firebaseTimestampFormat(date) {
-  return date ? date.valueOf() : 0;
+  if (date) {
+    return (new Date(date)).valueOf();
+  }
+  return 0;
 }
 
 export function firebaseStringToNumber(number) {
