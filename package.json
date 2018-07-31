@@ -19,6 +19,7 @@
     "cronjobs": "better-npm-run cronjobs",
     "seed": "better-npm-run seed",
     "seed_all": "better-npm-run seed_all",
+    "seed_relations": "better-npm-run seed_relations",
     "banks_worker_0": "better-npm-run banks_worker_0",
     "banks_worker_1": "better-npm-run banks_worker_1",
     "migration_worker_0": "better-npm-run migration_worker_0",
@@ -36,7 +37,8 @@
     "cronjobs": "nodemon bin/cronjobs.js --exec babel-node",
     "start:all": "nf start",
     "seed": "babel-node $NODE_DEBUG_OPTION migrations/seed.js",
-    "seed_all": "babel-node $NODE_DEBUG_OPTION migrations/seed_all.js"
+    "seed_all": "babel-node $NODE_DEBUG_OPTION migrations/seed_all.js",
+    "seed_relations": "babel-node $NODE_DEBUG_OPTION migrations/seed_relations.js"
   },
   "dependencies": {
     "aws-sdk": "^2.229.1",

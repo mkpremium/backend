@@ -238,6 +238,15 @@ export class WorksheetRepository extends Worksheet {
     }
   }
 
+  async findWorksheetByBuilding(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId);
+
+    const results = await this.query(qb);
+
+    return _head(results);
+  }
+
   async findWorksheetByOwner(ownerId) {
     const qb = this.getQueryBuilder()
       .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId);

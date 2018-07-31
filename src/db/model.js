@@ -206,6 +206,13 @@ export class CouchbaseModel {
     }
   }
 
+  async findEmptyWorksheets() {
+    const qb = this.getQueryBuilder()
+      .where('ARRAY_COUNT(t.relatedBuildingIds) = 0');
+
+    return this.query(qb);
+  }
+
   async findByMigratedId(migratedId) {
     const qb = this.getQueryBuilder();
     const expr = squel.expr()
