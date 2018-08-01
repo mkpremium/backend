@@ -254,7 +254,7 @@ function toFirebaseDocument(metadata) {
     DocumentName: metadata.name,
     Url: metadata.url,
     Thumbnail: metadata.previewUrl,
-    mime: mime.lookup(metadata.previewUrl),
+    mime: mime.lookup(metadata.url),
     date: firebaseTimestampFormat(metadata.createdAt)
   });
 }
