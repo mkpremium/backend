@@ -62,7 +62,8 @@ export class WorksheetRepository extends Worksheet {
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')
       .where('queueId IS NULL')
-      .order('t.worksheetIndex');
+      .order('t.worksheetIndex')
+      .limit(1);
 
     const letBuilding = buildingRepo.getQueryBuilder('raw', 't2')
       .order('t2.id');
