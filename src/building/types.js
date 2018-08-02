@@ -44,6 +44,7 @@ t.BuildingMetadata = t.struct(
     buildingId: t.String,
     name: t.maybe(t.String),
     url: t.String,
+    mimeType: t.maybe(t.String),
     previewUrl: t.maybe(t.String),
     createdAt: t.Date,
     createdBy: t.String,

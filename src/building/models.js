@@ -1,5 +1,6 @@
 import t from 'tcomb';
 import debug from 'debug';
+import mime from 'mime-types';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _get from 'lodash/get';
 import squel from 'squel';
@@ -90,6 +91,7 @@ export class BuildingRepository extends Building {
   }
 
   async addMetadataToBuilding(building, params) {
+    const mimeType = mime.lookup(params.url);
     const localPreview = await makePreview(params.url);
     const previewUrl = await uploadPreview('preview', localPreview);
 
@@ -97,6 +99,7 @@ export class BuildingRepository extends Building {
     const body = Object.assign({}, params, {
       buildingId: building.id,
       previewUrl,
+      mimeType,
       url: cleanUrl(params.url)
     });
     const metadata = await metaRepo.save(body);
