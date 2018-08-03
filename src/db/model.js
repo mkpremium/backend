@@ -214,12 +214,7 @@ export class CouchbaseModel {
   }
 
   async findByMigratedId(migratedId) {
-    const qb = this.getQueryBuilder();
-    const expr = squel.expr()
-      .or('ANY v IN t.`_migrateId` SATISFIES v = ? END', migratedId)
-      .or('t.`_migrateId` = ?', migratedId);
-
-    qb.where(expr);
+    const qb = this.getQueryBuilder().where('t.`_migrateId` = ?', migratedId);
     const results = await this.query(qb);
 
     if (!results || results.length === 0) {

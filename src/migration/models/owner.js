@@ -111,7 +111,8 @@ export default function migrateFromCsv(data) {
     secondSurname: input.num_2,
     documentNumber: input.pariva,
     personType: personType(),
-    contacts: contacts()
+    contacts: contacts(),
+    _migrateOwnerId: input.id_fornitore
   });
 
   const owner = t.Owner({
@@ -121,7 +122,7 @@ export default function migrateFromCsv(data) {
     personId: person.id,
     person: person,
     _relatedTo: input.proprietari,
-    _migrateId: [input.id_fornitore]
+    _migrateId: input.id_fornitore
   });
 
   return {owner, person};

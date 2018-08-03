@@ -18,9 +18,17 @@ export class RelatedModel extends MigrateModel {
     const ownerRepo = new OwnerRepository();
 
     try {
-      const [worksheet] = await worksheetRepo.findByMigratedId(record.worksheetId);
-      const [building] = await buildingRepo.findByMigratedId(record.buildingId);
-      const [owner] = await ownerRepo.findByMigratedId(record.ownerId);
+      const {worksheets, buildings, owners} = await Promise.props({
+        worksheets: worksheetRepo.findByMigratedId(record.worksheetId),
+        buildings: buildingRepo.findByMigratedId(record.buildingId),
+        owners: ownerRepo.findByMigratedId(record.ownerId)
+      });
+
+      const [worksheet] = worksheets;
+      const [building] = buildings;
+      const [owner] = owners;
+
+      console.log('related-mode', 'before', record.worksheetId, worksheet.id, worksheet.relatedBuildingIds, 'Owners', worksheet.relatedOwnerIds);
 
       const updatedWorksheet = t.update(worksheet, {
         relatedBuildingIds: {
@@ -39,9 +47,7 @@ export class RelatedModel extends MigrateModel {
         }
       });
 
-      if (updatedWorksheet.relatedBuildingIds.length === 0) {
-        console.log('RELATED', record);
-      }
+      console.log('related-mode', 'after', record.worksheetId, worksheet.id, updatedWorksheet.relatedBuildingIds, 'Owners', updatedWorksheet.relatedOwnerIds);
 
       await Promise.all([
         worksheetRepo.save(updatedWorksheet, false),

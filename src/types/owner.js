@@ -154,7 +154,10 @@ t.Person = t.struct(
 
     personType: t.PersonType,
 
-    _documentType: t.String
+    _documentType: t.String,
+
+    _migrateId: t.maybe(t.String),
+    _migrateOwnerId: t.maybe(t.String)
   },
   {
     name: 'Person',
@@ -235,7 +238,7 @@ t.Owner = t.struct(
 
     confirmedByOperator: t.OwnerConfirmed,
 
-    _migrateId: t.list(t.String),
+    _migrateId: t.maybe(t.String),
     _relatedTo: t.maybe(t.String),
     _documentType: t.String
   },

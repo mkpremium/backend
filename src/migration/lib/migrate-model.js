@@ -2,7 +2,6 @@ import models from '../models';
 import debug from 'debug';
 import Promise from 'bluebird';
 
-import {combineDuplicatesDocumentNumber} from '../models/owner';
 import couchbase from '../../db/couchbase';
 import {csvToJson} from './index';
 
@@ -25,7 +24,7 @@ export class MigrateModel {
   postImport() {
     switch (this.name) {
       case 'owner':
-        this.processedData = combineDuplicatesDocumentNumber(this.migratedData);
+        this.processedData = this.migratedData;
         break;
       default:
         this.processedData = this.migratedData;
@@ -59,7 +58,7 @@ export class MigrateModel {
   async pushToDatabase(processedData) {
     debugMigrate('importing to db', processedData.length, 'records');
     const push = migratedRecord => this.bucket.upsertToDb(migratedRecord.id, migratedRecord);
-    return Promise.mapSeries(processedData, push);
+    return Promise.map(processedData, push, {concurrency: 2});
   }
 
   async run() {

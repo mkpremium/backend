@@ -90,9 +90,10 @@ export default function migrateFromCsv(data) {
     firstSurname: _get(input, 'apellido_1', ''),
     secondSurname: _get(input, 'apellido_2', ''),
     birthDate: birthDate(),
-    address: [address()],
+    addresses: [address()],
     contacts: contacts(),
     gender: gender(),
-    personType: 'NATURAL'
+    personType: 'NATURAL',
+    _migrateId: input.id
   });
 }
