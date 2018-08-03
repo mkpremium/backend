@@ -20,6 +20,7 @@
     "seed": "better-npm-run seed",
     "seed_all": "better-npm-run seed_all",
     "seed_relations": "better-npm-run seed_relations",
+    "seed_family": "better-npm-run seed_family",
     "banks_worker_0": "better-npm-run banks_worker_0",
     "banks_worker_1": "better-npm-run banks_worker_1",
     "migration_worker_0": "better-npm-run migration_worker_0",
@@ -38,7 +39,8 @@
     "start:all": "nf start",
     "seed": "babel-node $NODE_DEBUG_OPTION migrations/seed.js",
     "seed_all": "babel-node $NODE_DEBUG_OPTION migrations/seed_all.js",
-    "seed_relations": "babel-node $NODE_DEBUG_OPTION migrations/seed_relations.js"
+    "seed_relations": "babel-node $NODE_DEBUG_OPTION migrations/seed_relations.js",
+    "seed_family": "babel-node $NODE_DEBUG_OPTION migrations/seed_family.js"
   },
   "dependencies": {
     "aws-sdk": "^2.229.1",
