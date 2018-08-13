@@ -33,7 +33,8 @@ export const OwnerStatus = {
   VERIFIED: 'VERIFICADO',
   NO_SALE: 'NO_VENDE',
   ALREADY_SOLD: 'YA_VENDIO',
-  ERROR: 'ERRONEO'
+  ERROR: 'ERRONEO',
+  PUBLIC: 'ENTE_PUBLICO'
 };
 
 export const OwnerBusinessStatus = {
