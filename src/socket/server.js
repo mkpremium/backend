@@ -5,6 +5,7 @@ import socketIO from 'socket.io';
 import _get from 'lodash/get';
 import {WorksheetQueueRepository} from '../worksheet/models/queue';
 import {Calls} from '../calls/models';
+import {OperatorRepository} from '../operator/models';
 
 const socketDebug = debug('app:socket');
 const SYSTEM_ID = 'system'; // bite me :lel:
@@ -55,6 +56,11 @@ export class SocketServer {
         this.io.emit(data.payload.type, data);
         ack(true);
       });
+    } else {
+      OperatorRepository.setOnline(socket.user.id, true)
+        .catch(err => {
+          console.error('when online', err);
+        });
     }
 
     if (this.timers[socket.user.id]) {
@@ -82,6 +88,12 @@ export class SocketServer {
         socketDebug('scheduling release taken worksheets for', socket.user.id);
         scheduleRelease();
       }
+
+      OperatorRepository
+        .setOnline(socket.user.id, this.io.sockets[socket.user.id].connected)
+        .catch(err => {
+          console.error('when online', err);
+        });
     });
   }
 }

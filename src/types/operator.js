@@ -182,6 +182,7 @@ t.Operator = t.struct(
     serviceId: t.maybe(t.String),
     enable: t.Bool,
     roles: t.list(t.OperatorRole),
+    online: t.Bool,
 
     profile: t.OperatorProfile,
 
@@ -193,6 +194,7 @@ t.Operator = t.struct(
     name: 'Operator',
     defaultProps: {
       enable: true,
+      online: false,
       roles: [],
       features: [],
       profile: {},

@@ -108,6 +108,15 @@ export class OperatorRepository extends Operator {
     return owner;
   }
 
+  static async setOnline(operatorId, online) {
+    const repo = new OperatorRepository();
+    const operator = await repo.findById(operatorId);
+    if (operator) {
+      const updatedOperator = t.update(operator, {online: {$set: online}});
+      await repo.save(updatedOperator, false);
+    }
+  }
+
   async findByCredential(data) {
     const {username, password} = new t.Credentials(data);
     const qb = this.getQueryBuilder()
@@ -191,7 +200,7 @@ export class OperatorRepository extends Operator {
         meetingsMade: findOrZero(stats, OperatorActions.MEETING),
         scheduledCalls: findOrZero(stats, OperatorActions.SCHEDULE_CALL)
       };
-      return t.OperatorResults({operator, counters});
+      return t.OperatorResults({operator, onLine: operator.online, counters});
     });
   }
 }
