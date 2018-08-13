@@ -216,8 +216,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
     }
 
-    if (item.canBeOpened()) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) ya se encuentra abierto`);
+    if (!item.canBeReleased()) {
+      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberador`);
     }
 
     queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);

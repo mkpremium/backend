@@ -214,6 +214,14 @@ t.QueueItem.prototype.canBeOpened = function(operatorId) {
   return Queue.StatusAvailable.indexOf(this.status) !== -1;
 };
 
+t.QueueItem.prototype.canBeReleased = function(operatorId) {
+  if (operatorId && this.operatorId) {
+    return operatorId === this.operatorId;
+  }
+
+  return false;
+};
+
 t.QueueItem.prototype.take = function(operatorId = null) {
   return t.update(this, {
     status: {$set: Queue.Status.OPENED},
