@@ -270,6 +270,7 @@ t.BuildingEntity = t.struct(
 t.BuildingMetadataPreview = t.struct({
   id: t.String,
   name: t.maybe(t.String),
+  mimeType: t.maybe(t.String),
   previewUrl: t.maybe(t.String)
 });
 
