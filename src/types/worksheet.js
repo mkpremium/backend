@@ -184,7 +184,8 @@ t.QueueItem = t.struct(
     worksheetId: t.String,
     operatorId: t.maybe(t.String),
     status: t.WorkSheetQueueStatus,
-    addedAt: t.Date
+    addedAt: t.Date,
+    event: t.maybe(t.Any)
   },
   {
     name: 'QueueItem',
@@ -232,14 +233,16 @@ t.QueueItem.prototype.take = function(operatorId = null) {
 t.QueueItem.prototype.release = function() {
   return t.update(this, {
     status: {$set: Queue.Status.AVAILABLE},
-    operatorId: {$set: null}
+    operatorId: {$set: null},
+    event: {$set: null}
   });
 };
 
-t.QueueItem.prototype.schedule = function(operatorId) {
+t.QueueItem.prototype.schedule = function(operatorId, scheduledEvent) {
   return t.update(this, {
     status: {$set: Queue.Status.SCHEDULED},
-    operatorId: {$set: operatorId}
+    operatorId: {$set: operatorId},
+    event: {$set: scheduledEvent}
   });
 };
 

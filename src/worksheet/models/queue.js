@@ -137,7 +137,9 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.save(updatedQueue);
   }
 
-  async scheduleWorksheetInQueue(queue, worksheetId, operatorId) {
+  async scheduleWorksheetInQueue(queue, scheduledEvent) {
+    const worksheetId = scheduledEvent.event.worksheetId;
+    const operatorId = scheduledEvent.notifyTo;
     const item = queue.findItemByWorksheetId(worksheetId);
     if (!item) {
       throw newHttpError(400, `La Worksheet ${worksheetId} no fue encontrada en la cola`);
@@ -150,7 +152,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`);
     }
 
-    const updatedItem = item.schedule(operatorId);
+    const updatedItem = item.schedule(operatorId, scheduledEvent);
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
