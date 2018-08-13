@@ -27,7 +27,7 @@ ${bold}NAME${normal}
   $name - Build and deploy the files to the <ssh-host>:${deploy_dir}
 
 ${bold}SYNOPSIS${normal}
-  sh $name <ssh-host> <app-name>
+  sh $name <ssh-host> <app-name> [user (default: centos)]
 
 ${bold}DESCRIPTION${normal}
   Build and deploy the files to the ssh-host that pass as first argument
@@ -78,7 +78,7 @@ pm2 reload --update-env ${app_name}-pm2.json
 EOF
 }
 
-if [ $# -ne 2 ]; then
+if [ $# -lt 2 ]; then
     summary
     exit 1
 fi
