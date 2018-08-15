@@ -255,6 +255,10 @@ t.Owner = t.struct(
     }
   }
 );
+t.OwnerWithInclude = t.Owner.extend({
+  building: t.maybe(t.Building),
+  person: t.maybe(t.Person)
+});
 
 t.Owner.prototype.fullName = function() {
   if (this.person) {

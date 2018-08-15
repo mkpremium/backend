@@ -91,7 +91,7 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  */
 const Event = t.struct(
   {
-    owner: t.maybe(t.Owner),
+    owner: t.maybe(t.OwnerWithInclude),
     ownerId: t.maybe(t.String),
     queueId: t.maybe(t.String),
     itemId: t.maybe(t.String),
