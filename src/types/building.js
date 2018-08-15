@@ -362,7 +362,6 @@ t.Building = t.struct(
       proposals: [],
       metadata: [],
       entities: [],
-      _migrateId: [],
       Id_Estado: null,
       _documentType: 'building'
     }

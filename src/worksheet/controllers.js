@@ -126,7 +126,7 @@ async function queueTakenFindByOperator(req, res) {
   const queue = await repo.findByIdOrThrow(queueId);
   canOperatorHandleQueue(req.user.operator, queueId);
 
-  const queueItem = queue.findItemByOperatorId(operatorId);
+  const queueItem = queue.findOpenedItemByOperatorId(operatorId);
   await History.registerGet({
     contextModel: queue,
     user: req.user

@@ -173,7 +173,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`);
     }
 
-    const operatorItem = queue.findItemByOperatorId(operatorId);
+    const operatorItem = queue.findOpenedItemByOperatorId(operatorId);
 
     if (operatorItem && operatorItem.id !== item.id) {
       throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente ${operatorItem.id}`);
@@ -212,18 +212,17 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.deleteQuery(qb);
   }
 
-  async releaseWorksheetInQueue(queue, itemId) {
+  async releaseWorksheetInQueue(queue, itemId, operatorId) {
     const item = queue.findItemById(itemId);
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
     }
 
-    if (!item.canBeReleased()) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberador`);
+    if (!item.canBeReleased(operatorId)) {
+      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`);
     }
 
     queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
-    const operatorId = item.operatorId;
     await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
 
     if (item.status !== Queue.Status.SCHEDULED) {
@@ -254,7 +253,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async nextWorksheetInQueue(queue, operatorId) {
-    const operatorItem = queue.findItemByOperatorId(operatorId);
+    const operatorItem = queue.findOpenedItemByOperatorId(operatorId);
     let nextAvailableItem = queue.findNextAvailableInQueue(operatorItem);
     let updatedQueue = queue;
 
@@ -269,7 +268,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     }
 
     const releasedUpdatedQueue = operatorItem
-      ? await this.releaseWorksheetInQueue(updatedQueue, operatorItem.id)
+      ? await this.releaseWorksheetInQueue(updatedQueue, operatorItem.id, operatorId)
       : updatedQueue;
 
     return this.takeWorksheetInQueue(releasedUpdatedQueue, nextAvailableItem.id, operatorId);
@@ -291,15 +290,15 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       return null;
     }
     const queue = await this.findByIdOrThrow(queueId);
-    return queue.findItemByOperatorId(operatorId);
+    return queue.findOpenedItemByOperatorId(operatorId);
   }
 
   async releaseTakenWorksheetInQueue(queueId, operatorId) {
     const queue = await this.findByIdOrThrow(queueId);
-    const operatorItem = queue.findItemByOperatorId(operatorId);
+    const operatorItem = queue.findOpenedItemByOperatorId(operatorId);
 
     if (operatorItem) {
-      await this.releaseWorksheetInQueue(queue, operatorItem.id);
+      await this.releaseWorksheetInQueue(queue, operatorItem.id, operatorId);
     }
   }
 }

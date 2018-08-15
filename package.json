@@ -32,7 +32,7 @@
     "migration_worker_0": "nodemon $NODE_DEBUG_OPTION src/migration/workers/cross-csv.js --exec babel-node",
     "migration_worker_1": "nodemon $NODE_DEBUG_OPTION src/migration/workers/seed.js --exec babel-node",
     "start_banks": "nodemon $NODE_DEBUG_OPTION bin/www-bank.js --exec babel-node",
-    "start": "nodemon $NODE_DEBUG_OPTION bin/www.js --exec babel-node",
+    "start": "nodemon bin/www.js --exec babel-node $NODE_DEBUG_OPTION ",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "deploy": "scripts/deployment.sh",
     "cronjobs": "nodemon bin/cronjobs.js --exec babel-node",

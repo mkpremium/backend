@@ -369,6 +369,10 @@ t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
   return _find(this.worksheets, {operatorId});
 };
 
+t.WorksheetQueue.prototype.findOpenedItemByOperatorId = function(operatorId) {
+  return _find(this.worksheets, {operatorId, status: Queue.Status.OPENED});
+};
+
 t.WorksheetQueue.prototype.findScheduledItemsByOperatorId = function(operatorId) {
   return _filter(this.worksheets, {operatorId, status: Queue.Status.SCHEDULED});
 };
