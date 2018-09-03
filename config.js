@@ -38,7 +38,8 @@ export const migrationEnabled = Boolean(process.env.MIGRATION_MODULE || false);
 export const uploadDir = process.env.REPORT_DIR || '/tmp';
 export const gearmanConfig = {
   host: process.env.GERMAN_HOST || 'localhost',
-  port: parseInt(process.env.GEARMAN_PORT || 4730)
+  port: parseInt(process.env.GEARMAN_PORT || 4730),
+  recoverTime: 5000 // gearman defaults to 30000
 };
 
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0);

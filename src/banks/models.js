@@ -9,6 +9,7 @@ import t, {BankFileData} from './types';
 import {newHttpError} from '../lib/http-error';
 import {calculateFilter, retrievePricesAndLocationInfo} from './lib/services';
 import {BANK_WORKER_NAMES} from './worker/workers';
+import {defer} from '../lib/promise-util';
 
 const invertedList = {
   blacklisted: 'whitelisted',
@@ -156,8 +157,12 @@ export class BankFileRepository extends CouchbaseModel {
     const bankFile = await this.save(params);
     const payload = JSON.stringify(bankFile);
     const options = {background: true};
-    this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, payload, options);
-    return bankFile;
+
+    const {promise, resolve, reject} = defer();
+    const job = this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, payload, options);
+    job.on('submited', () => resolve(bankFile));
+    job.on('error', err => reject(err));
+    return promise;
   }
 
   async update(bankFile, $merge) {
