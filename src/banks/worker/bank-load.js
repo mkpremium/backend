@@ -11,6 +11,15 @@ import {BankFileDataRepository, BankFileRepository} from '../models';
 import {BANK_WORKER_NAMES} from './workers';
 import socket from '../../socket';
 
+function toNumber(value, defaultValue) {
+  const number = Number(value || defaultValue);
+  if (isNaN(number)) {
+    return defaultValue;
+  } else {
+    return number;
+  }
+}
+
 class BankLoadWorker {
   constructor() {
     this.db = Promise.all([
@@ -32,7 +41,7 @@ class BankLoadWorker {
       bankFileId,
       bankFileRowData: row,
       cadastreReference: row[cadastreCol] || 'NO_VALUE_FOUND',
-      priceBank: Number(row[bankPriceCol] || 0)
+      priceBank: toNumber(row[bankPriceCol], 0)
     });
 
     const payload = JSON.stringify({id: bankFileData.id});
