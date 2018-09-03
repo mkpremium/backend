@@ -238,7 +238,7 @@ t.Owner = t.struct(
 
     confirmedByOperator: t.OwnerConfirmed,
 
-    _migrateId: t.maybe(t.union(t.String, t.list(t.String))),
+    _migrateId: t.maybe(t.Any),
     _relatedTo: t.maybe(t.String),
     _documentType: t.String
   },
