@@ -194,7 +194,7 @@ export class OperatorStatsRepository extends OperatorStats {
     const filter = GetStatsFilter(params);
     const [dateRange, results] = GetStatsFilterFixed.is(filter)
       ? await this.getPerformanceByFixed(filter.range, filter.operatorId)
-      : await this.getPerformanceByDateRange(filter.dateRange, filter.operatorId);
+      : await this.getPerformanceByDateRange(filter.dateBetween, filter.operatorId);
     const groupedResults = _groupBy(filterPerformanceEvents(results), 'operatorId');
     return _.mapValues(groupedResults, operatorCalculation(dateRange));
   }
