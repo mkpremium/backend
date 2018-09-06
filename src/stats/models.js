@@ -134,11 +134,11 @@ export class OperatorStatsRepository extends OperatorStats {
 
   async getStats(params) {
     const filter = GetStatsFilter(params);
-    if (GetStatsFilterFixed.is(filter)) {
-      return this.getStatsFixed(filter.range, filter.operatorId);
-    } else {
-      return this.getStatsByDateRange(filter.dateBetween, filter.operatorId);
-    }
+    const results = GetStatsFilterFixed.is(filter)
+      ? await this.getStatsFixed(filter.range, filter.operatorId)
+      : await this.getStatsByDateRange(filter.dateBetween, filter.operatorId);
+
+    return _groupBy(results, 'operatorId');
   }
 
   async getStatsFixed(value, operatorId) {
@@ -163,7 +163,8 @@ export class OperatorStatsRepository extends OperatorStats {
           .field('createdAt')
           .group('operatorId')
           .group('action')
-          .group('createdAt');
+          .group('createdAt')
+          .order('operatorId').order('createdAt');
         break;
       case 'total':
       default:
@@ -171,11 +172,10 @@ export class OperatorStatsRepository extends OperatorStats {
           .field('operatorId')
           .field('action')
           .group('operatorId')
-          .group('action');
+          .group('action')
+          .order('operatorId');
         break;
     }
-
-    qb.order('operatorId').order('createdAt');
 
     return this.query(qb);
   }

@@ -35,6 +35,16 @@ const ListStats = t.struct(
   }
 );
 
+function calculateCounters(counters) {
+  const mappedCounters = {};
+  Object.values(OperatorActions).map(statKey => {
+    const state = _find(counters, {action: statKey}) || {count: 0};
+    mappedCounters[statKey] = state.count;
+  });
+
+  return mappedCounters;
+}
+
 export class Operator extends CouchbaseModel {
   constructor() {
     super();
@@ -207,15 +217,8 @@ export class OperatorRepository extends Operator {
     const results = await statsRepo.getStats(params);
 
     return operators.results.map(operator => {
-      const stats = _filter(results, {operatorId: operator.id});
-      const counters = {
-        callsMade: findOrZero(stats, OperatorActions.CALL),
-        callsAnswered: findOrZero(stats, OperatorActions.CALL_ANSWERED),
-        verifiedOwners: findOrZero(stats, OperatorActions.VERIFIED_OWNER),
-        meetingsMade: findOrZero(stats, OperatorActions.MEETING),
-        scheduledCalls: findOrZero(stats, OperatorActions.SCHEDULE_CALL)
-      };
-      return t.OperatorResults({operator, onLine: operator.online, counters});
+      const counters = calculateCounters(results[operator.id] || []);
+      return {operator, onLine: operator.online, counters};
     });
   }
 
