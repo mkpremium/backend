@@ -21,6 +21,20 @@ function findOrZero(counters, action) {
   return result ? result.count : 0;
 }
 
+const ListStats = t.struct(
+  {
+    role: t.enums.of([OperatorRoles.OPERATOR, OperatorRoles.BUSINESS]),
+    view: t.enums.of(['day', 'total'])
+  },
+  {
+    name: 'ListStats',
+    defaultProps: {
+      role: OperatorRoles.OPERATOR,
+      view: 'total'
+    }
+  }
+);
+
 export class Operator extends CouchbaseModel {
   constructor() {
     super();
@@ -186,7 +200,8 @@ export class OperatorRepository extends Operator {
   }
 
   async listWithStats(params) {
-    const operators = await this.list({role: OperatorRoles.OPERATOR});
+    const args = ListStats(params);
+    const operators = await this.list({role: args.role});
     const statsRepo = new OperatorStatsRepository();
 
     const results = await statsRepo.getStats(params);
@@ -202,6 +217,18 @@ export class OperatorRepository extends Operator {
       };
       return t.OperatorResults({operator, onLine: operator.online, counters});
     });
+  }
+
+  async listWithPerformance(params) {
+    const operators = await this.list({role: OperatorRoles.OPERATOR});
+    const statsRepo = new OperatorStatsRepository();
+
+    const results = await statsRepo.getPerformance(params);
+
+    return operators.results.map(operator => ({
+      operator,
+      performance: results[operator.id]
+    }));
   }
 }
 

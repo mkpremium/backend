@@ -1,4 +1,10 @@
 import {utc} from '../date';
+import m from 'moment-timezone';
+import {extendMoment} from 'moment-range';
+
+const mr = extendMoment(m);
+
+export const splitDateRange = value => value.split(',').map(d => d ? utc(d) : d);
 
 export const addDateQueryToBuilder = (queryBuilder, fieldName, value) => {
   const m = utc(value);
@@ -13,7 +19,7 @@ export const addMinuteDateQueryToBuilder = (queryBuilder, fieldName, value) => {
 };
 
 export const addMinuteBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {
-  const [start, end] = value.split(',').map(d => d ? utc(d) : d);
+  const [start, end] = splitDateRange(value);
   if (start) {
     queryBuilder.where(`${fieldName} > ?`, start.toDate());
   }
@@ -23,7 +29,7 @@ export const addMinuteBetweenQueryToBuilder = (queryBuilder, fieldName, value) =
 };
 
 export const addBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {
-  const [start, end] = value.split(',').map(d => d ? utc(d) : d);
+  const [start, end] = splitDateRange(value);
   if (start) {
     queryBuilder.where(`${fieldName} >= ?`, start.startOf('day').toDate());
   }
@@ -31,3 +37,7 @@ export const addBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {
     queryBuilder.where(`${fieldName} < ?`, end.endOf('day').toDate());
   }
 };
+
+export const rangeStartEnd = (start, end) => mr.range(start, end);
+export const dailyRange = dateRange => rangeStartEnd(...dateRange.split(',')).by('day');
+export const dateRangeArray = (dateRange) => Array.from(dailyRange(dateRange));

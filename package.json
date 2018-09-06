@@ -70,6 +70,7 @@
     "klaw": "^2.1.1",
     "lodash": "^4.17.10",
     "mime-types": "^2.1.19",
+    "moment-range": "^4.0.1",
     "moment-timezone": "^0.5.16",
     "morgan": "^1.7.0",
     "morgan-body": "^2.4.0",

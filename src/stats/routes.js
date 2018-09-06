@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {overAllController} from './controller';
+import {overAllController, performanceController} from './controller';
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
@@ -29,6 +29,16 @@ const router = Router();
  *         in: query
  *         type: string
  *         enum: [today, yesterday, month, lastMonth, year, lastYear]
+ *         description: rangos de fecha pre establecidos, cuando esta presente se omite el parametro dateBetween
+ *       - name: role
+ *         in: query
+ *         type: string
+ *         enum: [OPERATOR, BUSINESS]
+ *       - name: dateBetween
+ *         in: query
+ *         type: string
+ *         format: YYYY-MM-DD,YYYY-MM-DD
+ *         description: rangos de fecha personalizado (YYYY-MM-DD,YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Estadísticas por operador
@@ -46,5 +56,50 @@ const router = Router();
  *           $ref: "#/definitions/Error"
  */
 router.get('/', overAllController);
+/**
+ * @swagger
+ * /stats/performance:
+ *   get:
+ *     tags: [Stats, Manager]
+ *     summary: "Obtiene el performance por operador"
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: range
+ *         in: query
+ *         type: string
+ *         enum: [today, yesterday, month, lastMonth, year, lastYear]
+ *         description: rangos de fecha pre establecidos, cuando esta presente se omite el parametro dateBetween
+ *       - name: operatorId
+ *         in: query
+ *         type: string
+ *         description: filtra un solo operador
+ *       - name: dateBetween
+ *         in: query
+ *         type: string
+ *         format: YYYY-MM-DD,YYYY-MM-DD
+ *         description: rangos de fecha personalizado (YYYY-MM-DD,YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Estadísticas por operador
+ *         schema:
+ *           type: "array"
+ *           items:
+ *             $ref: "#/definitions/OperatorResults"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/performance', performanceController);
 
 export default router;

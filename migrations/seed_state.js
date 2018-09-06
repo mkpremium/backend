@@ -31,7 +31,8 @@ async function init() {
         firstName: 'Operador',
         lastName: 'Prueba',
         city: 'barcelona'
-      }
+      },
+      createdAt: madrid().subtract(2, 'years')
     });
     operators.push(operator);
   }

@@ -183,7 +183,9 @@ export class CouchbaseModel {
 
   async queryRaw(query) {
     debugModel('queryRaw', query);
-    return this._bucket.queryAsync(query);
+    const result = await this._bucket.queryAsync(query);
+    debugModel('result');
+    return result;
   }
 
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
