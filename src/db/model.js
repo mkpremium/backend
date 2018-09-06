@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import fromJSON from 'tcomb/lib/fromJSON';
 import uuid from 'uuid/v4';
 import squel from 'squel';
-import {N1qlQuery, SearchQuery} from 'couchbase';
+import {N1qlQuery, SearchQuery, ViewQuery} from 'couchbase';
 import debug from 'debug';
 
 import init from './couchbase';
@@ -107,6 +107,10 @@ export class CouchbaseModel {
     return model;
   }
 
+  getView(viewName) {
+    return ViewQuery.from('operator', viewName);
+  }
+
   // TODO: refactor to CouchbaseQuery
   getQueryBuilder(method = 'select', prefix = 't', props = this.Struct.meta.props) {
     let qb;
@@ -177,13 +181,20 @@ export class CouchbaseModel {
     return new CouchbaseSimpleCache(this._bucket, options);
   }
 
+  async queryRaw(query) {
+    debugModel('queryRaw', query);
+    return this._bucket.queryAsync(query);
+  }
+
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
     await this._promiseBucket;
     const queryParam = queryBuilder.toParam();
     debugModel('query', `c(${consistency})`, queryParam);
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
-    return this._bucket.queryAsync(n1ql, queryParam.values);
+    const result = await this._bucket.queryAsync(n1ql, queryParam.values);
+    debugModel('result');
+    return result;
   }
 
   async unique(data, field) {

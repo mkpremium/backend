@@ -24,6 +24,11 @@ const router = Router();
  *       - "application/json"
  *     produces:
  *       - "application/json"
+ *     parameters:
+ *       - name: range
+ *         in: query
+ *         type: string
+ *         enum: [today, yesterday, month, lastMonth, year, lastYear]
  *     responses:
  *       200:
  *         description: Estadísticas por operador
@@ -40,6 +45,6 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.manager, overAllController);
+router.get('/', overAllController);
 
 export default router;

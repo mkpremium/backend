@@ -25,6 +25,8 @@ import {
 import {OwnerRepository} from '../owner/models';
 import {ScheduledEventType} from './types';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
+import {OperatorActions} from '../stats/types';
+import {OperatorStats} from '../stats/models';
 
 const debugModel = debug('app:model:scheduled-events');
 
@@ -181,6 +183,10 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'));
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
+      if (worksheet.lastAddedMeeting != null) {
+        await OperatorStats.registerAction(createdBy, OperatorActions.MEETING);
+        await OperatorStats.registerAction(data.notifyTo, OperatorActions.MEETING);
+      }
     }
 
     await this.firebaseMeeting(scheduledEvent);

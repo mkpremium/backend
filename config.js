@@ -8,6 +8,7 @@ export const port = parseInt(process.env.APP_PORT || '9001');
 export const emitHistoryEvents = Boolean(process.env.EMIT_HISTORY_EVENTS || false);
 export const emitModelEvents = Boolean(process.env.EMIT_MODEL_EVENTS || false);
 export const socket = {
+  enabled: JSON.parse(process.env.SOCKET_ENABLED || 'true'),
   port: parseInt(process.env.SOCKET_PORT || '9002'),
   server: process.env.SOCKET_SERVER || 'http://localhost',
   reconnectionAttempts: process.env.SOCKET_CONNECTION_RETRIES || 10

@@ -47,8 +47,6 @@ async function addScheduledMeetingEvent(req, res) {
   canScheduleMeeting(req.user.operator, req.body.notifyTo);
 
   const scheduledEvent = await repo.addScheduledMeetingEvent(req.body, req.user.id);
-
-  await OperatorStats.registerAction(req.user.id, OperatorActions.MEETING);
   res.status(201).json(scheduledEvent);
 }
 

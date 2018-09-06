@@ -103,7 +103,9 @@ async function actionsOnWorksheetQueue(req, res) {
       });
       return res.json(worksheet);
     case QueueRequestAction.RELEASE:
-      const releasedWorksheet = await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id);
+      const releasedWorksheet = params.queueItemId
+        ? await repo.releaseWorksheetInQueue(queue, params.queueItemId, req.user.id)
+        : await repo.releaseWorksheetByIdInQueue(queue, params.worksheetId, req.user.id);
       await History.registerRelease({
         contextModel: releasedWorksheet,
         user: req.user

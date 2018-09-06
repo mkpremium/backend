@@ -171,8 +171,8 @@ export class OperatorRepository extends Operator {
     const qbCount = this.getQueryBuilder('count');
 
     if (params.role) {
-      qb.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
-      qbCount.where('ANY v IN t.`roles` SATISFIES v = ? END', params.role);
+      qb.where('ANY v IN TOKENS(t.`roles`) SATISFIES v = ? END', params.role);
+      qbCount.where('ANY v IN TOKENS(t.`roles`) SATISFIES v = ? END', params.role);
     }
 
     if (typeof params.enable !== 'undefined') {
@@ -185,11 +185,11 @@ export class OperatorRepository extends Operator {
     return fromJSON({total, results}, responseStruct);
   }
 
-  async listWithStats() {
+  async listWithStats(params) {
     const operators = await this.list({role: OperatorRoles.OPERATOR});
     const statsRepo = new OperatorStatsRepository();
 
-    const results = await statsRepo.getOverAll();
+    const results = await statsRepo.getStats(params);
 
     return operators.results.map(operator => {
       const stats = _filter(results, {operatorId: operator.id});

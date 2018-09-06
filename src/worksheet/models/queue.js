@@ -10,6 +10,8 @@ import {updateList} from '../../lib/tcomb-utils';
 import {WorksheetRepository} from './worksheet';
 import {utc} from '../../lib/date';
 import {Queue} from '../../types/constants';
+import {OperatorActions} from '../../stats/types';
+import {OperatorStats} from '../../stats/models';
 
 const queueDebug = debug('app:model:queue');
 
@@ -197,6 +199,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     await this.save(updatedQueue);
 
+    await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET);
+
     return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
   }
 
@@ -212,8 +216,23 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.deleteQuery(qb);
   }
 
+  async releaseWorksheetByIdInQueue(queue, worksheetId, operatorId) {
+    const item = queue.findItemByWorksheetId(worksheetId);
+
+    if (!item) {
+      throw newHttpError(400, `La worksheet ${worksheetId} no fue encontrada en la cola`);
+    }
+
+    if (!item.canBeReleased(operatorId)) {
+      throw newHttpError(409, `El ${item.id} (${item.status}) no puede ser liberado`);
+    }
+
+    return this.releaseItemInQueue(queue, item, operatorId);
+  }
+
   async releaseWorksheetInQueue(queue, itemId, operatorId) {
     const item = queue.findItemById(itemId);
+
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
     }
@@ -222,6 +241,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`);
     }
 
+    return this.releaseItemInQueue(queue, item, operatorId);
+  }
+
+  async releaseItemInQueue(queue, item, operatorId) {
     queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
     await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
 

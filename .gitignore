@@ -48,3 +48,7 @@ firebase*.json
 
 # Email attachments
 .uploads
+
+
+# Local tools
+bitdistrict-m*.sh

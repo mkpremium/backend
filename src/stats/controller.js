@@ -4,7 +4,7 @@ import {OperatorRepository} from '../operator/models';
 
 async function overAll(req, res) {
   const operatorRepo = new OperatorRepository();
-  const results = await operatorRepo.listWithStats();
+  const results = await operatorRepo.listWithStats(req.query);
   res.json(results);
 }
 

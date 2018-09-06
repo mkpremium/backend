@@ -7,24 +7,19 @@ import '../types';
 import '../lib/squel/let';
 
 import {CouchbaseModel} from './model';
+import {defer} from '../lib/promise-util';
 
 const debugCouchbase = debug('app:couchbase');
 
 let retries = couchbase.retries;
 
 export default (app) => {
-  let resolve = null;
-  let reject = null;
-
   debugCouchbase(`initializing couchbase connection with "${couchbase.uri}"`);
   const cluster = new Couchbase.Cluster(couchbase.uri);
   cluster.authenticate(couchbase.user, couchbase.pass);
 
   // http://bluebirdjs.com/docs/api/deferred-migration.html
-  const promise = new Promise(function() {
-    resolve = arguments[0];
-    reject = arguments[1];
-  });
+  const {promise, resolve, reject} = defer();
 
   const bucket = cluster.openBucket(couchbase.bucket);
   CouchbaseModel.prototype._promiseBucket = promise;

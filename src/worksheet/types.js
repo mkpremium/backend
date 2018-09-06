@@ -41,11 +41,19 @@ const QueueRequestItemParams = QueueRequestParams.extend(
   }
 );
 
-t.QueueRequestParams = t.union([QueueRequestParams, QueueRequestItemParams]);
+const QueueRequestWorksheetParams = QueueRequestParams.extend(
+  {
+    worksheetId: t.String
+  }
+);
+
+t.QueueRequestParams = t.union([QueueRequestParams, QueueRequestItemParams, QueueRequestWorksheetParams]);
 t.QueueRequestParams.dispatch = function(x) {
   switch (x.action) {
     case QueueRequestAction.NEXT:
       return QueueRequestParams;
+    case QueueRequestAction.RELEASE:
+      return QueueRequestWorksheetParams;
     default:
       return QueueRequestItemParams;
   }
