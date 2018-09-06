@@ -128,4 +128,8 @@ export const nestoriaService = {
   cachePrefix: process.env.NESTORIA_CACHE_KEY || 'nestoria_cache'
 };
 
+export const operatorPerformance = {
+  numberOfDayOffset: Number(process.env.PERFORMANCE_OFFSET_DAYS || 15)
+};
+
 export const proxyEnable = Boolean(process.env.PROXY_ENABLE || false);

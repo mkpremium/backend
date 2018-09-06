@@ -12,6 +12,7 @@ import {
   splitDateRange
 } from '../lib/query/helpers';
 import {queryDateFormat, utc} from '../lib/date';
+import {operatorPerformance} from '../../config';
 
 const statDebug = debug('app:model:stats');
 
@@ -110,7 +111,7 @@ function getDateBetweenByFixed(value, offset = 0) {
 
 function getDateRangeOffset(dateRange) {
   const [start, end] = splitDateRange(dateRange);
-  const startOffset = start.subtract(15, 'days');
+  const startOffset = start.subtract(operatorPerformance.numberOfDayOffset, 'days');
   return [
     queryDateFormat(startOffset),
     queryDateFormat(end)
@@ -213,7 +214,7 @@ function operatorCalculation(dateRange) {
     const ratios = {};
     dateRangeArray(dateRange).forEach(day => {
       const dayDate = queryDateFormat(day);
-      const start = queryDateFormat(day.clone().subtract(15, 'days'));
+      const start = queryDateFormat(day.clone().subtract(operatorPerformance.numberOfDayOffset, 'days'));
       const end = queryDateFormat(day);
       const range = rangeStartEnd(start, end);
       const values = [];
