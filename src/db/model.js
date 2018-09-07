@@ -182,10 +182,15 @@ export class CouchbaseModel {
   }
 
   async queryRaw(query) {
+    await this._promiseBucket;
     debugModel('queryRaw', query);
     const result = await this._bucket.queryAsync(query);
     debugModel('result');
     return result;
+  }
+
+  getBucketName() {
+    return couchbase.bucket;
   }
 
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {

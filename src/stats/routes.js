@@ -1,5 +1,10 @@
 import {Router} from 'express';
-import {overAllController, performanceController} from './controller';
+import {
+  overAllController,
+  ownerBusinessStatsController,
+  ownerStatsController,
+  performanceController
+} from './controller';
 import {permissions} from '../middleware/jwt';
 
 const router = Router();
@@ -55,7 +60,8 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', overAllController);
+router.get('/', permissions.manager, overAllController);
+
 /**
  * @swagger
  * /stats/performance:
@@ -100,6 +106,76 @@ router.get('/', overAllController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/performance', performanceController);
+router.get('/performance', permissions.manager, performanceController);
+
+/**
+ * @swagger
+ * /stats/owner:
+ *   get:
+ *     tags: [Stats, Manager]
+ *     summary: "Obtiene estadisticas de los owner actuales"
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: city
+ *         in: query
+ *         type: string
+ *         description: Nombre de la ciudad
+ *     responses:
+ *       200:
+ *         schema:
+ *           type: "array"
+ *           items:
+ *             $ref: "#/definitions/OperatorResults"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/owner', permissions.manager, ownerStatsController);
+
+/**
+ * @swagger
+ * /stats/owner-business:
+ *   get:
+ *     tags: [Stats, Manager]
+ *     summary: "Obtiene estadisticas de los owner actuales comerciales"
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: operatorId
+ *         in: query
+ *         type: string
+ *         description: Operador comercial ID
+ *     responses:
+ *       200:
+ *         schema:
+ *           type: "array"
+ *           items:
+ *             $ref: "#/definitions/OperatorResults"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/owner-business', permissions.manager, ownerBusinessStatsController);
 
 export default router;

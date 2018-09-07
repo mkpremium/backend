@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASE_CSV="/home/rkmax/Development/BIX/mkpremium-backend/development_csv"
 
 llamadas_propietarios() {
-  local llamadas="//home/rkmax/Development/BIX/mkpremium-backend/csv/LLAMADAS.csv"
-  local propietarios="/home/rkmax/Development/BIX/mkpremium-backend/csv/PROPIETARIOS.csv"
-  local edificios="/home/rkmax/Development/BIX/mkpremium-backend/csv/EDIFICIOS.csv"
+  local llamadas="${BASE_CSV}/LLAMADAS.csv"
+  local propietarios="${BASE_CSV}/PROPIETARIOS.csv"
+  local edificios="${BASE_CSV}/EDIFICIOS.csv"
   q -O -H -d ";" "$(cat <<SQL
   SELECT
     llamadas.id_chiamatafornitore as id_chiamatafornitore,
@@ -46,5 +47,5 @@ SQL
 )"
 }
 
-file=${DIR}/../csv/cross_table.csv
+file=${BASE_CSV}/cross_table.csv
 llamadas_propietarios > ${file}

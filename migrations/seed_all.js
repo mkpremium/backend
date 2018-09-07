@@ -15,31 +15,31 @@ export async function seed(files) {
     }
   };
   await deleteAll();
-  await createFullOperator({
-    username: `operator`,
-    password: 'Passw0rd',
-    agentNumber: `10106-919`,
-    serviceId: '17146',
-    roles: [
-      'OPERATOR'
-    ],
-    profile: {
-      firstName: 'Operador',
-      lastName: 'Prueba',
-      city: 'barcelona'
-    }
-  });
-  await operatorCreateAdmin();
-  await operatorCreateManager();
+  // await createFullOperator({
+  //   username: `operator`,
+  //   password: 'Passw0rd',
+  //   agentNumber: `10106-919`,
+  //   serviceId: '17146',
+  //   roles: [
+  //     'OPERATOR'
+  //   ],
+  //   profile: {
+  //     firstName: 'Operador',
+  //     lastName: 'Prueba',
+  //     city: 'barcelona'
+  //   }
+  // });
+  // await operatorCreateAdmin();
+  // await operatorCreateManager();
 
   const migrateBuildings = new MigrateModel('building', files.buildings, app);
   const migrateOwners = new MigrateModel('owner', files.owners, app);
   const migrateWorksheets = new MigrateModel('worksheet', files.calls, app);
-  const migratePeople = new MigrateModel('person', files.people, app);
+  // const migratePeople = new MigrateModel('person', files.people, app);
   const relations = new RelatedModel(files.cross, app);
   const buildingEntities = new MigrateEntities(files.entities, app);
 
-  await migratePeople.run();
+  // await migratePeople.run();
   await migrateBuildings.run();
   await migrateOwners.run();
   await migrateWorksheets.run();
@@ -47,13 +47,18 @@ export async function seed(files) {
   await buildingEntities.run();
 }
 
+function resolvePath(filename) {
+  const csvFolder = 'development_csv';
+  return resolve(__dirname, '..', csvFolder, filename);
+}
+
 const defaultFiles = {
-  people: resolve(__dirname, '../csv/PERSONAS.csv'),
-  buildings: resolve(__dirname, '../csv/EDIFICIOS.csv'),
-  owners: resolve(__dirname, '../csv/PROPIETARIOS.csv'),
-  calls: resolve(__dirname, '../csv/LLAMADAS.csv'),
-  cross: resolve(__dirname, '../csv/cross_table.csv'),
-  entities: resolve(__dirname, '../csv/SITARR.csv')
+  people: resolvePath('PERSONAS.csv'),
+  buildings: resolvePath('EDIFICIOS.csv'),
+  owners: resolvePath('PROPIETARIOS.csv'),
+  calls: resolvePath('LLAMADAS.csv'),
+  cross: resolvePath('cross_table.csv'),
+  entities: resolvePath('SITARR.csv')
 };
 
 if (require.main === module) {

@@ -30,8 +30,8 @@ export async function deleteAll() {
   await OperatorRepository._promiseBucket;
 
   return Promise.all([
-    cleanFirebase(),
-    operator.deleteQuery(),
+    // cleanFirebase(),
+    // operator.deleteQuery(),
     worksheet.deleteQuery(),
     queue.deleteQuery(),
     people.deleteQuery(),
@@ -41,7 +41,7 @@ export async function deleteAll() {
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
     callUnknownEvents.deleteQuery(),
-    stats.deleteQuery(),
+    // stats.deleteQuery(),
     neighborhood.deleteQuery(),
     city.deleteQuery()
   ]);

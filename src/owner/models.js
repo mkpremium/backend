@@ -1,13 +1,16 @@
+import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import _head from 'lodash/head';
 import _isArray from 'lodash/isArray';
+import _find from 'lodash/find';
 import _isEmpty from 'lodash/isEmpty';
+import _isNil from 'lodash/isNil';
 import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {updateList} from '../lib/tcomb-utils';
 import {BuildingRepository} from '../building/models';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
-import {OwnerBusinessStatus} from '../types/enums';
+import {OwnerBusinessStatus, OwnerStatus} from '../types/enums';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -106,6 +109,14 @@ function mapOwnerIncludes(owner) {
     building: _head(owner.building || [])
   });
 }
+
+const OwnerStatsParams = t.struct({
+  city: t.maybe(t.String)
+});
+
+const OwnerBusinessStatsParams = t.struct({
+  operatorId: t.maybe(t.String)
+});
 
 export class OwnerRepository extends Owner {
   async findByIdOrThrow(ownerId) {
@@ -227,5 +238,53 @@ export class OwnerRepository extends Owner {
     }
 
     return ownerContactValue;
+  }
+
+  async ownerStats(args = {}) {
+    const params = OwnerStatsParams(args);
+    const bucket = this.getBucketName();
+    const query = _isNil(params.city)
+      ? `SELECT t.status, COUNT(*) as count FROM ${bucket} \`t\`
+WHERE t.\`_documentType\` = 'owner'
+GROUP BY t.status`
+      : `SELECT t.status, building[0].address.city, COUNT(*) as count FROM ${bucket} \`t\`
+LET building = (SELECT RAW p FROM mkpremium \`p\` USE KEYS t.buildingId  WHERE id = t.buildingId LIMIT 1)
+WHERE t.\`_documentType\` = 'owner' AND t.buildingId IS NOT MISSING
+AND LOWER(building[0].address.city) = LOWER('${params.city}')
+GROUP BY t.status, building[0].address.city`;
+    const result = await this.queryRaw(N1qlQuery.fromString(query));
+
+    const totals = {};
+
+    Object.values(OwnerStatus).forEach(status => {
+      const total = _find(result, {status}) || {count: 0};
+      totals[status] = total.count;
+    });
+
+    return totals;
+  }
+
+  async ownerBusinessStats(args = {}) {
+    const params = OwnerBusinessStatsParams(args);
+    const bucket = this.getBucketName();
+    const query = _isNil(params.operatorId)
+      ? `SELECT t.business.status, COUNT(*) as count
+FROM ${bucket} \`t\`
+WHERE t.\`_documentType\` = 'owner' AND t.business IS NOT MISSING AND t.business IS NOT NULL
+GROUP BY t.business.status`
+      : `SELECT t.business.status, COUNT(*) as count
+FROM ${bucket} \`t\`
+WHERE t.\`_documentType\` = 'owner' AND t.business IS NOT MISSING AND t.business IS NOT NULL
+AND t.business.meetingWithOperatorId = '${params.operator}'
+GROUP BY t.business.status`;
+    const result = await this.queryRaw(N1qlQuery.fromString(query));
+    const totals = {};
+
+    Object.values(OwnerBusinessStatus).forEach(status => {
+      const total = _find(result, {status}) || {count: 0};
+      totals[status] = total.count;
+    });
+
+    return totals;
   }
 }

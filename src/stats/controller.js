@@ -1,6 +1,7 @@
 import {wrap} from 'express-promise-wrap';
 
 import {OperatorRepository} from '../operator/models';
+import {OwnerRepository} from '../owner/models';
 
 async function overAll(req, res) {
   const operatorRepo = new OperatorRepository();
@@ -14,5 +15,19 @@ async function performance(req, res) {
   res.json(results);
 }
 
+async function ownerStats(req, res) {
+  const repo = new OwnerRepository();
+  const results = await repo.ownerStats(req.query);
+  res.json(results);
+}
+
+async function ownerBusinessStats(req, res) {
+  const repo = new OwnerRepository();
+  const results = await repo.ownerBusinessStats(req.query);
+  res.json(results);
+}
+
 export const overAllController = wrap(overAll);
 export const performanceController = wrap(performance);
+export const ownerStatsController = wrap(ownerStats);
+export const ownerBusinessStatsController = wrap(ownerBusinessStats);
