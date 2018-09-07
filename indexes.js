@@ -5,10 +5,10 @@ import couchbase from './src/db/couchbase';
 
 const indexes = [
   {name: 'id', query: 'CREATE INDEX `id` ON `mkpremium`(`id`)'},
-  {name: 'id_documentType', query: 'CREATE INDEX `building_id` ON `mkpremium`(`id`,`_documentType`)'},
+  {name: 'building_id', query: 'CREATE INDEX `building_id` ON `mkpremium`(`id`,`_documentType`)'},
   {
     name: 'worksheetIndex',
-    query: 'CREATE INDEX `worksheetIndex` ON `mkpremium`(`worksheetIndex``_documentType`) WHERE (`_documentType` = "worksheet")'
+    query: 'CREATE INDEX `worksheetIndex` ON `mkpremium`(`worksheetIndex`,`_documentType`) WHERE (`_documentType` = "worksheet")'
   },
   {name: '_migratedId', query: 'CREATE INDEX `_migratedId` ON `mkpremium`(`_migratedId`) '},
   {
@@ -28,6 +28,10 @@ const indexes = [
   {
     name: 'operator_stats_',
     query: 'CREATE INDEX `operator_stats_` ON `mkpremium`(`operatorId`, `createdAt`, `_documentType`) WHERE (`_documentType` = "operator-stats")'
+  },
+  {
+    name: 'operator_stats_city',
+    query: 'CREATE INDEX `operator_stats_city` ON `mkpremium`(`createdAt`, `_documentType`, `city`) WHERE (`_documentType` = "operator-stats" AND `city` IS NOT NULL)'
   },
   {
     name: 'operator_roles',

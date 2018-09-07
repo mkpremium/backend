@@ -248,7 +248,7 @@ export class OwnerRepository extends Owner {
 WHERE t.\`_documentType\` = 'owner'
 GROUP BY t.status`
       : `SELECT t.status, building[0].address.city, COUNT(*) as count FROM ${bucket} \`t\`
-LET building = (SELECT RAW p FROM mkpremium \`p\` USE KEYS t.buildingId  WHERE id = t.buildingId LIMIT 1)
+LET building = (SELECT RAW p FROM ${bucket} \`p\` USE KEYS t.buildingId  WHERE id = t.buildingId LIMIT 1)
 WHERE t.\`_documentType\` = 'owner' AND t.buildingId IS NOT MISSING
 AND LOWER(building[0].address.city) = LOWER('${params.city}')
 GROUP BY t.status, building[0].address.city`;

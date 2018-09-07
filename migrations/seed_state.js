@@ -57,8 +57,10 @@ async function seedStats(operatorId, createdAt) {
 
   const views = chance.integer(viewPerOperator);
   const meetings = chance.integer({min: 0, max: views});
+  const cities = ['BARCELONA', 'MADRID', 'BARRANQUILLA'];
   for (let j = 0; j < views; j++) {
-    await repo.save({operatorId, action: OperatorActions.VIEW_WORKSHEET, createdAt}, false);
+    const city = chance.pickone(cities);
+    await repo.save({operatorId, action: OperatorActions.VIEW_WORKSHEET, createdAt, city}, false);
   }
 
   for (let k = 0; k < meetings; k++) {

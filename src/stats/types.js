@@ -23,6 +23,8 @@ t.OperatorStats = t.struct(
     operatorId: t.String,
     action: t.OperatorActions,
     createdAt: t.Date,
+    // Filters
+    city: t.maybe(t.String),
 
     _documentType: t.enums.of(['operator-stats'])
   },

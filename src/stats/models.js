@@ -23,17 +23,18 @@ export class OperatorStats extends CouchbaseModel {
     this.Struct = t.OperatorStats;
   }
 
-  static async registerAction(operatorId, action) {
+  static async registerAction(operatorId, action, filters = {}) {
     statDebug('registerAction', action, operatorId);
     const operatorStats = new OperatorStats();
-    return operatorStats.save({operatorId, action});
+    return operatorStats.save(Object.assign({operatorId, action}, filters));
   }
 }
 
 const GetStatsFilterBase = t.struct(
   {
     operatorId: t.maybe(t.String),
-    view: t.String
+    view: t.String,
+    city: t.maybe(t.String)
   },
   {
     name: 'GetStatsFilter',
@@ -140,10 +141,8 @@ export class OperatorStatsRepository extends OperatorStats {
   async getStats(params) {
     const filter = GetStatsFilter(params);
     const results = GetStatsFilterFixed.is(filter)
-      ? await this.getStatsFixed(filter.range, filter.operatorId, filter.view)
-      : await this.getStatsByDateRange(filter.dateBetween, filter.operatorId, filter.view);
-
-    console.log('getStats', filter.view);
+      ? await this.getStatsFixed(filter)
+      : await this.getStatsByDateRange(filter.dateBetween, filter);
 
     switch (filter.view) {
       case 'day':
@@ -154,20 +153,24 @@ export class OperatorStatsRepository extends OperatorStats {
     }
   }
 
-  async getStatsFixed(value, operatorId, view) {
-    const dateBetween = getDateBetweenByFixed(value);
-    return this.getStatsByDateRange(dateBetween, operatorId, view);
+  async getStatsFixed(filter) {
+    const dateBetween = getDateBetweenByFixed(filter.range);
+    return this.getStatsByDateRange(dateBetween, filter);
   }
 
-  async getStatsByDateRange(dateRange, operatorId, view = 'total') {
+  async getStatsByDateRange(dateRange, filter) {
     const qb = this.getQueryBuilder('count');
     addBetweenQueryToBuilder(qb, 'createdAt', dateRange);
 
-    if (!_isNil(operatorId)) {
-      qb.where('operatorId = ?', operatorId);
+    if (!_isNil(filter.operatorId)) {
+      qb.where('operatorId = ?', filter.operatorId);
     }
 
-    switch (view) {
+    if (!_isNil(filter.city)) {
+      qb.where('city = ?', filter.city);
+    }
+
+    switch (filter.view) {
       case 'day':
         qb
           .field('operatorId')
@@ -193,21 +196,79 @@ export class OperatorStatsRepository extends OperatorStats {
     return this.query(qb);
   }
 
-  async getPerformanceByDateRange(dateRange, operatorId) {
-    const results = await this.getStatsByDateRange(getDateRangeOffset(dateRange), operatorId, 'day');
+  async getCityStats(params) {
+    const filter = GetStatsFilter(params);
+    const results = GetStatsFilterFixed.is(filter)
+      ? await this.getCityStatsFixed(filter)
+      : await this.getCityStatsByDateRange(filter.dateBetween, filter);
+
+    switch (filter.view) {
+      case 'day':
+        return _.mapValues(_groupBy(results, 'city'), operatorStats);
+      case 'total':
+      default:
+        return _.chain(results).groupBy('city').mapValues(calculateCounters).value();
+    }
+  }
+
+  async getCityStatsFixed(filter) {
+    const dateBetween = getDateBetweenByFixed(filter.range);
+    return this.getCityStatsByDateRange(dateBetween, filter);
+  }
+
+  async getCityStatsByDateRange(dateRange, filter) {
+    const qb = this.getQueryBuilder('count');
+    addBetweenQueryToBuilder(qb, 'createdAt', dateRange);
+
+    if (!_isNil(filter.operatorId)) {
+      qb.where('operatorId = ?', filter.operatorId);
+    }
+
+    if (!_isNil(filter.city)) {
+      qb.where('city = ?', filter.city);
+    }
+
+    switch (filter.view) {
+      case 'day':
+        qb
+          .field('city')
+          .field('action')
+          .field('DATE_FORMAT_STR(createdAt, "1111-11-11") as createdAtStr')
+          .field('createdAt')
+          .group('city')
+          .group('action')
+          .group('createdAt')
+          .order('city').order('createdAt');
+        break;
+      case 'total':
+      default:
+        qb
+          .field('city')
+          .field('action')
+          .group('city')
+          .group('action')
+          .order('city');
+        break;
+    }
+
+    return this.query(qb);
+  }
+
+  async getPerformanceByDateRange(dateRange, filter) {
+    const results = await this.getStatsByDateRange(getDateRangeOffset(dateRange), filter);
     return [dateRange, results];
   }
 
-  async getPerformanceByFixed(value, operatorId) {
-    const dateRange = getDateBetweenByFixed(value);
-    return this.getPerformanceByDateRange(dateRange, operatorId, 'day');
+  async getPerformanceByFixed(filter) {
+    const dateRange = getDateBetweenByFixed(filter.range);
+    return this.getPerformanceByDateRange(dateRange, filter);
   }
 
   async getPerformance(params) {
     const filter = GetStatsFilter(params);
     const [dateRange, results] = GetStatsFilterFixed.is(filter)
-      ? await this.getPerformanceByFixed(filter.range, filter.operatorId)
-      : await this.getPerformanceByDateRange(filter.dateBetween, filter.operatorId);
+      ? await this.getPerformanceByFixed(filter)
+      : await this.getPerformanceByDateRange(filter.dateBetween, filter);
     const groupedResults = _groupBy(filterPerformanceEvents(results), 'operatorId');
     return _.mapValues(groupedResults, operatorCalculation(dateRange));
   }
@@ -275,15 +336,4 @@ function dailyCalculation(dayActions) {
     .sumBy('count')
     .value();
   return meetings / Math.max(1, views);
-}
-
-export class OperatorPerformance extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = t.OperatorPerformace;
-  }
-
-  calculateForOperator(operatorId) {
-
-  }
 }

@@ -4,6 +4,7 @@ import debug from 'debug';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _map from 'lodash/map';
 import _set from 'lodash/set';
+import _get from 'lodash/get';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
@@ -182,7 +183,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     }
 
     const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findById(item.worksheetId);
+    const worksheet = await worksheetRepo.findByIdWIthIncludes(item.worksheetId);
 
     if (!worksheet) {
       throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`);
@@ -199,7 +200,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     await this.save(updatedQueue);
 
-    await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET);
+    if (!operatorItem) {
+      const city = _get(worksheet, 'relatedBuildings.0.address.city');
+      await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, {city});
+    }
 
     return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);
   }
