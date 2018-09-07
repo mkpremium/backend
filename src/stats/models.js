@@ -13,6 +13,7 @@ import {
 } from '../lib/query/helpers';
 import {queryDateFormat, utc} from '../lib/date';
 import {operatorPerformance} from '../../config';
+import _find from 'lodash/find';
 
 const statDebug = debug('app:model:stats');
 
@@ -31,10 +32,14 @@ export class OperatorStats extends CouchbaseModel {
 
 const GetStatsFilterBase = t.struct(
   {
-    operatorId: t.maybe(t.String)
+    operatorId: t.maybe(t.String),
+    view: t.String
   },
   {
-    name: 'GetStatsFilter'
+    name: 'GetStatsFilter',
+    defaultProps: {
+      view: 'total'
+    }
   }
 );
 
@@ -135,15 +140,23 @@ export class OperatorStatsRepository extends OperatorStats {
   async getStats(params) {
     const filter = GetStatsFilter(params);
     const results = GetStatsFilterFixed.is(filter)
-      ? await this.getStatsFixed(filter.range, filter.operatorId)
-      : await this.getStatsByDateRange(filter.dateBetween, filter.operatorId);
+      ? await this.getStatsFixed(filter.range, filter.operatorId, filter.view)
+      : await this.getStatsByDateRange(filter.dateBetween, filter.operatorId, filter.view);
 
-    return _groupBy(results, 'operatorId');
+    console.log('getStats', filter.view);
+
+    switch (filter.view) {
+      case 'day':
+        return _.mapValues(_groupBy(results, 'operatorId'), operatorStats);
+      case 'total':
+      default:
+        return _.chain(results).groupBy('operatorId').mapValues(calculateCounters).value();
+    }
   }
 
-  async getStatsFixed(value, operatorId) {
+  async getStatsFixed(value, operatorId, view) {
     const dateBetween = getDateBetweenByFixed(value);
-    return this.getStatsByDateRange(dateBetween, operatorId);
+    return this.getStatsByDateRange(dateBetween, operatorId, view);
   }
 
   async getStatsByDateRange(dateRange, operatorId, view = 'total') {
@@ -233,6 +246,23 @@ function operatorCalculation(dateRange) {
     });
     return ratios;
   };
+}
+
+function calculateCounters(counters) {
+  const mappedCounters = {};
+  Object.values(OperatorActions).map(statKey => {
+    const state = _find(counters, {action: statKey}) || {count: 0};
+    mappedCounters[statKey] = state.count;
+  });
+
+  return mappedCounters;
+}
+
+function operatorStats(operatorStats) {
+  return _.chain(operatorStats)
+    .groupBy('createdAtStr')
+    .mapValues(calculateCounters)
+    .value();
 }
 
 function dailyCalculation(dayActions) {

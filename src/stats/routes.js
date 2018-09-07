@@ -39,6 +39,10 @@ const router = Router();
  *         in: query
  *         type: string
  *         enum: [OPERATOR, BUSINESS]
+ *       - name: view
+ *         in: query
+ *         type: string
+ *         enum: [total, day]
  *       - name: dateBetween
  *         in: query
  *         type: string
@@ -60,7 +64,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.manager, overAllController);
+router.get('/', overAllController);
 
 /**
  * @swagger

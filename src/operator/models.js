@@ -16,11 +16,6 @@ import {OperatorActions} from '../stats/types';
 import {firebaseSetup, firebaseUserAccount} from '../firebase';
 import {bearerTokenExtractor} from '../middleware/jwt';
 
-function findOrZero(counters, action) {
-  const result = _find(counters, {action});
-  return result ? result.count : 0;
-}
-
 const ListStats = t.struct(
   {
     role: t.enums.of([OperatorRoles.OPERATOR, OperatorRoles.BUSINESS]),
@@ -35,11 +30,10 @@ const ListStats = t.struct(
   }
 );
 
-function calculateCounters(counters) {
+function defaultCounters() {
   const mappedCounters = {};
   Object.values(OperatorActions).map(statKey => {
-    const state = _find(counters, {action: statKey}) || {count: 0};
-    mappedCounters[statKey] = state.count;
+    mappedCounters[statKey] = 0;
   });
 
   return mappedCounters;
@@ -215,11 +209,21 @@ export class OperatorRepository extends Operator {
     const statsRepo = new OperatorStatsRepository();
 
     const results = await statsRepo.getStats(params);
+    const defaultValues = defaultCounters();
 
-    return operators.results.map(operator => {
-      const counters = calculateCounters(results[operator.id] || []);
-      return {operator, onLine: operator.online, counters};
-    });
+    switch (args.view) {
+      case 'day':
+        return operators.results.map(operator => {
+          const counters = results[operator.id] || {};
+          return {operator, onLine: operator.online, counters};
+        });
+      case 'total':
+      default:
+        return operators.results.map(operator => {
+          const counters = results[operator.id] || defaultValues;
+          return {operator, onLine: operator.online, counters};
+        });
+    }
   }
 
   async listWithPerformance(params) {
