@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import {WorksheetQueueCount} from '../types/worksheet';
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
@@ -127,7 +128,7 @@ t.WorkSheetLitResponse = t.struct(
 t.QueueListResponse = t.struct(
   {
     total: t.Number,
-    results: t.list(t.WorksheetQueue)
+    results: t.list(WorksheetQueueCount)
   },
   {
     name: 'QueueListResponse',

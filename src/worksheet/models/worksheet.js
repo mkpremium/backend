@@ -1,6 +1,8 @@
 import Promise from 'bluebird';
+import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import debug from 'debug';
+import _get from 'lodash/get';
 import _head from 'lodash/head';
 import _some from 'lodash/some';
 import _every from 'lodash/every';
@@ -58,6 +60,27 @@ export class Worksheet extends CouchbaseModel {
 }
 
 export class WorksheetRepository extends Worksheet {
+
+  async countWorksheetsInSource(source) {
+    const bucket = this.getBucketName();
+    const sourceFilter = [];
+    Object.keys(source).forEach(key => {
+      const value = source[key];
+      if (!_isNil(value)) {
+        sourceFilter.push(`t2.address.${key} = ${value}`);
+      }
+    });
+    const filter = sourceFilter.length > 0
+      ? 'AND ' + sourceFilter.join(' AND ')
+      : '';
+
+    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
+    LET _building = (SELECT RAW t2.id FROM ${bucket} t2 WHERE (t2._documentType = 'building' ${filter}))
+    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (t.relatedBuildingIds[0] IN _building)`;
+    const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
+    return _get(results, '0.count', 0);
+  }
+
   async _findBySourceAndReference(source, worksheetIndex) {
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')

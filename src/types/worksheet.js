@@ -336,6 +336,12 @@ t.WorksheetQueue = t.struct(
   }
 );
 
+export const WorksheetQueueCount = t.WorksheetQueue.extend(
+  {
+    possibleNumberOfWorksheets: t.Number
+  }
+);
+
 t.WorksheetQueueExtraInfo = t.struct(
   {
     id: t.maybe(t.String),

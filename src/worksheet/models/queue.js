@@ -85,13 +85,18 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async list(query = {}) {
+    const wsRepo = new WorksheetRepository();
     const params = t.ListQuery(query);
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset);
     const total = await this.countQuery();
     const results = await this.query(qb);
-    return fromJSON({total, results}, t.QueueListResponse);
+    const resultsWithCount = await Promise.map(results, async(queue) => {
+      const count = await wsRepo.countWorksheetsInSource(queue.source);
+      return Object.assign(JSON.parse(JSON.stringify(queue)), {possibleNumberOfWorksheets: count});
+    });
+    return fromJSON({total, results: resultsWithCount}, t.QueueListResponse);
   }
 
   async addWorksheetAndSave(queueId, worksheetId) {
