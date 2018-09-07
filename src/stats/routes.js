@@ -64,7 +64,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', overAllController);
+router.get('/', permissions.manager, overAllController);
 
 /**
  * @swagger
