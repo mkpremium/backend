@@ -30,7 +30,7 @@ export async function deleteAll() {
   await OperatorRepository._promiseBucket;
 
   return Promise.all([
-    // cleanFirebase(),
+    cleanFirebase(),
     operator.deleteQuery(),
     worksheet.deleteQuery(),
     queue.deleteQuery(),
