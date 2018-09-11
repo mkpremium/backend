@@ -41,15 +41,15 @@ const indexes = [
 
 async function init() {
   const bucket = await couchbase();
-  await Promise.map(indexes, async({name, queryStr}) => {
-    const query = queryStr.replace('__BUCKET_NAME__', bucket._name);
+  await Promise.map(indexes, async({name, query}) => {
+    const queryStr = query.replace('__BUCKET_NAME__', bucket._name);
     try {
       await bucket.queryAsync(N1qlQuery.fromString(`DROP INDEX \`${bucket._name}\`.\`${name}\``));
     } catch (e) {
       console.log('index creating failed', e.message);
     }
 
-    await bucket.queryAsync(N1qlQuery.fromString(`${query} USING GSI WITH {"defer_build":true}`));
+    await bucket.queryAsync(N1qlQuery.fromString(`${queryStr} USING GSI WITH {"defer_build":true}`));
   });
 
   // build indexes

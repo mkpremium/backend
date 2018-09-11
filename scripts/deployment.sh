@@ -53,7 +53,7 @@ deploy() {
   local deploy_dir=/home/${user}/apps/${app_name}
 
   echo -e "Replacing config files for       \t: ${bold}${dist_host}${normal}"
-  cp conf/${dist_host}/* build/
+  cp -r conf/${dist_host}/. build/
 
   echo "Deploying..."
   echo -e "Root project                  \t: ${bold}$(pwd)${normal}"
