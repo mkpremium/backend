@@ -72,8 +72,9 @@ async function deleteAll() {
 
 async function cleanQueue() {
   const repo = new WorksheetQueueRepository();
-  const cleanQueues = N1qlQuery.fromString(`UPDATE mkpremium t SET worksheets = [], worksheetIndex = undefined WHERE t._documentType = 'worksheet-queue'`);
-  const resetCounter = N1qlQuery.fromString('DELETE FROM mkpremium t WHERE META().id = \'counter:worksheet\'');
+  const bucket = repo.getBucketName();
+  const cleanQueues = N1qlQuery.fromString(`UPDATE ${bucket} t SET worksheets = [], worksheetIndex = undefined WHERE t._documentType = 'worksheet-queue'`);
+  const resetCounter = N1qlQuery.fromString(`DELETE FROM ${bucket} t WHERE META().id = 'counter:worksheet'`);
   await repo.queryRaw(cleanQueues);
   await repo.queryRaw(resetCounter);
 }
