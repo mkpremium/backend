@@ -2,7 +2,9 @@
   "devDependencies": null,
   "main": "bin/www.js",
   "scripts": {
-    "start": "node --require dotenv/config ."
+    "start": "node --require dotenv/config .",
+    "migrate": "node --require dotenv/config migrations/seed_all.js",
+    "build_index": "node --require dotenv/config indexes.js"
   },
   "betterScripts": null
 }
