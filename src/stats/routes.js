@@ -3,7 +3,7 @@ import {
   overAllController, overCitiesController,
   ownerBusinessStatsController,
   ownerStatsController,
-  performanceController
+  performanceController, worksheetStatsController
 } from './controller';
 import {permissions} from '../middleware/jwt';
 
@@ -195,6 +195,41 @@ router.get('/performance', permissions.manager, performanceController);
  *           $ref: "#/definitions/Error"
  */
 router.get('/owner', permissions.manager, ownerStatsController);
+
+/**
+ * @swagger
+ * /stats/worksheets:
+ *   get:
+ *     tags: [Stats, Manager]
+ *     summary: "Obtiene estadisticas de las worksheets actuales"
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: city
+ *         in: query
+ *         type: string
+ *         description: Nombre de la ciudad
+ *     responses:
+ *       200:
+ *         schema:
+ *           type: "array"
+ *           items:
+ *             $ref: "#/definitions/OperatorResults"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/worksheets', permissions.manager, worksheetStatsController);
 
 /**
  * @swagger

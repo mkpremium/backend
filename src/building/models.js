@@ -18,6 +18,8 @@ import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
 import {OwnerRepository} from '../owner/models';
 import {BuildingMetadata} from './types';
+import {OperatorActions} from '../stats/types';
+import {OperatorStats} from '../stats/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -126,6 +128,10 @@ export class BuildingRepository extends Building {
     });
 
     await this.save(updatedBuilding);
+
+    if (building.proposals.length === 0) {
+      await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT);
+    }
 
     return proposal;
   }

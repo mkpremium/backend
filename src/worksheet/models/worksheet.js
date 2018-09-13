@@ -32,7 +32,7 @@ import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
-import {BuildingState} from '../../types/enums';
+import {BuildingState, OwnerStatus} from '../../types/enums';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -59,6 +59,10 @@ export class Worksheet extends CouchbaseModel {
   }
 }
 
+const WorksheetStatsParams = t.struct({
+  city: t.maybe(t.String)
+});
+
 export class WorksheetRepository extends Worksheet {
 
   async countWorksheetsInSource(source) {
@@ -79,6 +83,30 @@ export class WorksheetRepository extends Worksheet {
     WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (t.relatedBuildingIds[0] IN _building)`;
     const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
     return _get(results, '0.count', 0);
+  }
+
+  async worksheetStats(args = {}) {
+    const params = WorksheetStatsParams(args);
+    const bucket = this.getBucketName();
+    const query = _isNil(params.city)
+      ? `SELECT t.status, COUNT(*) as count FROM ${bucket} t
+WHERE t._documentType = 'worksheet'
+GROUP BY t.status`
+      : `SELECT t.status, COUNT(*) as count FROM ${bucket} t
+LET building = (SELECT RAW p FROM ${bucket} p USE KEYS t.relatedBuildingIds[0] WHERE p.id = t.relatedBuildingIds[0] LIMIT 1)
+WHERE t._documentType = 'worksheet'
+AND LOWER(building[0].address.city) = LOWER('${params.city}')
+GROUP BY t.status`;
+
+    const result = await this.queryRaw(N1qlQuery.fromString(query));
+    const totals = {};
+
+    Object.values(WorkSheetStatus).forEach(status => {
+      const total = _find(result, {status}) || {count: 0};
+      totals[status] = total.count;
+    });
+
+    return totals;
   }
 
   async _findBySourceAndReference(source, worksheetIndex) {

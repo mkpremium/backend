@@ -3,6 +3,7 @@ import {wrap} from 'express-promise-wrap';
 import {OperatorRepository} from '../operator/models';
 import {OwnerRepository} from '../owner/models';
 import {OperatorStatsRepository} from './models';
+import {WorksheetRepository} from '../worksheet/models/worksheet';
 
 async function overAll(req, res) {
   const operatorRepo = new OperatorRepository();
@@ -28,6 +29,12 @@ async function ownerStats(req, res) {
   res.json(results);
 }
 
+async function worksheetStats(req, res) {
+  const repo = new WorksheetRepository();
+  const results = await repo.worksheetStats(req.query);
+  res.json(results);
+}
+
 async function ownerBusinessStats(req, res) {
   const repo = new OwnerRepository();
   const results = await repo.ownerBusinessStats(req.query);
@@ -37,5 +44,6 @@ async function ownerBusinessStats(req, res) {
 export const overAllController = wrap(overAll);
 export const performanceController = wrap(performance);
 export const ownerStatsController = wrap(ownerStats);
+export const worksheetStatsController = wrap(worksheetStats);
 export const ownerBusinessStatsController = wrap(ownerBusinessStats);
 export const overCitiesController = wrap(overCities);
