@@ -21,14 +21,15 @@ export const WorkSheetStatus = {
   CLOSE: 'CLOSE'
 };
 
+export const NotFinalWorksheetStats = [
+  WorkSheetStatus.DEFAULT,
+  WorkSheetStatus.WITH_OWNER
+];
+
 export const workSheetStatusTransition = function(status) {
   switch (status) {
     case WorkSheetStatus.DEFAULT:
-      return [
-        status,
-        WorkSheetStatus.WITH_OWNER,
-        WorkSheetStatus.INVALID
-      ];
+      return Object.values(WorkSheetStatus);
     case WorkSheetStatus.WITH_OWNER:
       return [
         status,

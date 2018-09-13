@@ -20,7 +20,7 @@ import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
-import {WorkSheetStatus} from '../../types/worksheet';
+import {NotFinalWorksheetStats, WorkSheetStatus} from '../../types/worksheet';
 import {
   isAllowedChangeState,
   isInvalidVerified,
@@ -32,7 +32,9 @@ import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
-import {BuildingState, OwnerStatus} from '../../types/enums';
+import {BuildingState} from '../../types/enums';
+
+const statuses = `[${NotFinalWorksheetStats.map(id => `'${id}'`).join(', ')}]`;
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -80,7 +82,7 @@ export class WorksheetRepository extends Worksheet {
 
     const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
     LET _building = (SELECT RAW t2.id FROM ${bucket} t2 WHERE (t2._documentType = 'building' ${filter}))
-    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (t.relatedBuildingIds[0] IN _building)`;
+    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status IS ${statuses}) AND (t.relatedBuildingIds[0] IN _building)`;
     const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
     return _get(results, '0.count', 0);
   }
@@ -110,9 +112,11 @@ GROUP BY t.status`;
   }
 
   async _findBySourceAndReference(source, worksheetIndex) {
+
     const buildingRepo = new BuildingRepository();
     const qb = this.getQueryBuilder('let')
       .where('queueId IS NULL')
+      .where(`status IN ${statuses}`)
       .order('t.worksheetIndex')
       .limit(1);
 
@@ -180,25 +184,43 @@ GROUP BY t.status`;
   async findMeetings(worksheetId) {
     const meetingRepo = new ScheduledEvents();
     const qb = meetingRepo.getQueryBuilder();
-    qb.where('context.worksheetId = ?', worksheetId);
+    qb.where('event.worksheetId = ?', worksheetId);
     return meetingRepo.query(qb);
   }
 
   async calculateNewStatus(worksheet) {
+    worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
     const isValidLength = worksheet.relatedOwners.length > 0;
     const someValidOwner = isValidLength && _some(worksheet.relatedOwners, ownerVerified);
     const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
-    const noSale = isValidLength && _find(worksheet.relatedOwners, ownerNoSale);
-    const alreadySold = isValidLength && _find(worksheet.relatedOwners, ownerAlreadySold);
+    const noSale = isValidLength && _some(worksheet.relatedOwners, ownerNoSale);
+    const alreadySold = isValidLength && _some(worksheet.relatedOwners, ownerAlreadySold);
+    const meetings = await this.findMeetings(worksheet.id);
+    const hasMeeting = meetings.length > 0;
+
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
+        if (hasMeeting) {
+          return WorkSheetStatus.MEETING;
+        }
+
+        if (noSale) {
+          return WorkSheetStatus.NO_SALE;
+        }
+
+        if (alreadySold) {
+          return WorkSheetStatus.ALREADY_SOLD;
+        }
+
         if (someValidOwner) {
           return WorkSheetStatus.WITH_OWNER;
         }
+
         if (everyInvalidOwner) {
           return WorkSheetStatus.INVALID;
         }
-        return WorkSheetStatus.DEFAULT;
+
+        return worksheet.status;
       case WorkSheetStatus.WITH_OWNER:
         if (noSale) {
           return WorkSheetStatus.NO_SALE;
@@ -206,10 +228,11 @@ GROUP BY t.status`;
         if (alreadySold) {
           return WorkSheetStatus.ALREADY_SOLD;
         }
-        const meetings = await this.findMeetings(worksheet.id);
-        return meetings.length > 0
-          ? WorkSheetStatus.MEETING
-          : WorkSheetStatus.WITH_OWNER;
+
+        if (hasMeeting) {
+          return WorkSheetStatus.MEETING;
+        }
+        return worksheet.status;
       default:
         worksheetDebug(`the status ${worksheet.status} don't have planned behavior`);
         return worksheet.status;
