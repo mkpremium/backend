@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BASE_CSV="/home/rkmax/Development/BIX/mkpremium-backend/development_csv"
+BASE_CSV="${DIR}/csv"
 
 llamadas_propietarios() {
   local llamadas="${BASE_CSV}/LLAMADAS.csv"

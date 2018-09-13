@@ -1,6 +1,7 @@
 import debug from 'debug';
 import Promise from 'bluebird';
 import _get from 'lodash/get';
+import _isNil from 'lodash/isNil';
 
 import t from '../types';
 import fromJSON from 'tcomb/lib/fromJSON';
@@ -237,8 +238,12 @@ function toFirebaseMeeting(meeting) {
 
 function toFirebaseBuilding(building, owner) {
   const {lat, lng} = building.location;
+  let Street = _get(building, 'address.fullAddress');
+  if (_isNil(Street)) {
+    Street = _get(building, 'cadastre.address', '');
+  }
   return FirebaseBuildingData({
-    Street: _get(building, 'address.fullAddress'),
+    Street,
     Address: building.address,
     Cadastre: building.cadastre,
     Aspiration: 0,
@@ -261,11 +266,11 @@ function toFirebaseDocument(metadata) {
 
 function toFirebaseEntity(entity) {
   return fromJSON({
-    Entity: entity.name,
+    Entity: entity.name || '',
     Expiration: firebaseTimestampFormat(entity.expiration),
     Rent: entity.rent,
     Situation: entity.status,
-    Surface: entity.surface,
+    Surface: entity.surface || 0,
     Type: entity.type
   }, t.FirebaseBuildingEntity);
 }

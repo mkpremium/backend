@@ -17,6 +17,7 @@ import {BuildingState} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
 import {OwnerRepository} from '../owner/models';
+import {BuildingMetadata} from './types';
 
 const debugBuilding = debug('app:model:building');
 
@@ -30,7 +31,7 @@ export class Building extends CouchbaseModel {
 export class Metadata extends CouchbaseModel {
   constructor() {
     super();
-    this.Struct = t.BuildingMetadata;
+    this.Struct = BuildingMetadata;
   }
 
   async findByIdOrThrow(metadataId) {
@@ -91,7 +92,7 @@ export class BuildingRepository extends Building {
   }
 
   async addMetadataToBuilding(building, params) {
-    const mimeType = mime.lookup(params.url);
+    const mimeType = mime.lookup(cleanUrl(params.url));
     const localPreview = await makePreview(params.url);
     const previewUrl = await uploadPreview('preview', localPreview);
 

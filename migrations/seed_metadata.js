@@ -2,13 +2,10 @@ import Promise from 'bluebird';
 import klaw from 'klaw';
 import path from 'path';
 import mime from 'mime-types';
-import fs from 'fs';
-import axios from 'axios';
-import FormData from 'form-data';
 import debug from 'debug';
-import {getPrivateUploadUrl} from '../src/aws';
 import {BuildingRepository} from '../src/building/models';
 import couchbase from '../src/db/couchbase';
+import {uploadFile} from '../src/aws';
 
 const seedDebug = debug('app:seed:metadata');
 
@@ -16,7 +13,7 @@ export async function seed(directory) {
   seedDebug('seeding from', directory);
   await couchbase();
   const files = await readAllFiles(directory);
-  Promise.mapSeries(files, addMetadata);
+  await Promise.mapSeries(files, addMetadata);
 }
 
 async function addMetadata(filepath) {
@@ -25,8 +22,12 @@ async function addMetadata(filepath) {
   const building = await repo.findBuildingByMetadataMigration(lookupData);
   if (building) {
     if (!filenameExistOnBuilding(building, filepath)) {
-      const url = await uploadFile(filepath);
-      await repo.addMetadataToBuilding(building, {url});
+      const url = await uploadFileS3(filepath);
+      await repo.addMetadataToBuilding(building, {
+        url,
+        name: path.basename(filepath),
+        createdBy: 'migration'
+      });
       seedDebug('addMetadata', 'added', filepath);
     } else {
       seedDebug('addMetadata', 'skip was added before', filepath);
@@ -45,21 +46,14 @@ function filenameExistOnBuilding(building, filepath) {
     building.metadata.find(findBy);
 }
 
-async function uploadFile(filepath) {
+async function uploadFileS3(filepath) {
   seedDebug('uploadFile', 'upload file to S3', filepath);
   const config = {
     fileName: path.basename(filepath),
     fileType: mime.lookup(filepath)
   };
-  const url = getPrivateUploadUrl('metadata-dummy', config);
-  await postFile(url, filepath);
-  return url;
-}
 
-async function postFile(url, filePath) {
-  const form = new FormData();
-  form.append('file', fs.createReadStream(filePath));
-  return axios.post(url, form);
+  return uploadFile('metadata-migration', config, filepath);
 }
 
 async function readAllFiles(directory, allowedFiles = /.jpeg|.jpg|.png|.pdf/i) {
@@ -79,11 +73,11 @@ async function readAllFiles(directory, allowedFiles = /.jpeg|.jpg|.png|.pdf/i) {
   });
 }
 
-if (require.main === module) {
-  seed('/home/rkmax/data-dummy')
-    .then(() => process.exit(0))
-    .catch(err => {
-      console.error(err);
-      process.exit(0);
-    });
-}
+const dir = path.resolve(process.argv[2]) || '/home/rkmax/data-dummy';
+
+seed(dir)
+  .then(() => process.exit(0))
+  .catch(err => {
+    console.error(err);
+    process.exit(0);
+  });

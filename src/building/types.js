@@ -38,7 +38,7 @@ import uuid from 'uuid/v4';
  *         type: string
  *         description: URL usada para subir el archivo a amazon S3
  */
-t.BuildingMetadata = t.struct(
+export const BuildingMetadata = t.BuildingMetadata = t.struct(
   {
     id: t.String,
     buildingId: t.String,

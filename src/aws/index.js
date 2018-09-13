@@ -12,7 +12,7 @@ import mime from 'mime-types';
 import {awsConfig} from '../../config';
 
 const awsDebug = debug('app:aws');
-const accountConfig = _pick(awsConfig, ['region', 'accessKeyId', 'secretAccessKey']);
+const accountConfig = _pick(awsConfig, ['region', 'accessKeyId', 'secretAccessKey', 'signatureVersion']);
 
 aws.config.update(accountConfig);
 
@@ -25,6 +25,7 @@ export function getPrivateUploadUrl(prefix, config) {
   const params = {
     Bucket: awsConfig.bucket,
     Key,
+    Expires: 900,
     ACL: 'private',
     ContentType: fileType
   };
@@ -32,6 +33,35 @@ export function getPrivateUploadUrl(prefix, config) {
   return s3.getSignedUrl('putObject', params);
 }
 
+export async function uploadFile(prefix, params, filepath) {
+  if (!filepath) {
+    return null;
+  }
+
+  const {fileName, fileType} = t.SignedUrlRequest(params);
+  const s3 = new aws.S3();
+  const data = await fs.readFile(filepath);
+  const Key = keyName(prefix, fileName);
+
+  const s3params = {
+    Bucket: awsConfig.bucket,
+    Key,
+    Expires: 900,
+    ACL: 'private',
+    ContentType: fileType,
+    Body: data
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.upload(s3params, (err, response) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(response.Location);
+      }
+    });
+  });
+}
 function keyName(prefix, fileName) {
   return `${prefix}/${uuid()}${path.extname(fileName)}`;
 }
