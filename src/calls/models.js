@@ -55,11 +55,13 @@ export class Calls extends CouchbaseModel {
     const updatedEvents = t.update(call.events, {$push: [newEvent]});
     const updatedCall = t.update(call, {events: {$merge: updatedEvents}});
 
-    if (newEvent.status === CallStatus.confirmed && call.userId) {
+    const event = await this.save(updatedCall, sendEvent);
+
+    if (newEvent.status === 'confirmed' && call.userId) {
       await OperatorStats.registerAction(call.userId, OperatorActions.CALL_ANSWERED);
     }
 
-    return this.save(updatedCall, sendEvent);
+    return event;
   }
 
   async updateStatus(callId, status) {

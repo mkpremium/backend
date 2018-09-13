@@ -9,6 +9,8 @@ import {
   shouldOmitEvent,
   buildCallEvent
 } from './helper';
+import {OperatorActions} from '../stats/types';
+import {OperatorStats} from '../stats/models';
 
 async function call(req, res) {
   const ownerId = req.params.ownerId;
@@ -17,6 +19,7 @@ async function call(req, res) {
   const from = req.user.operator;
   const phoneValue = await owner.getContactPhoneNumber(ownerId, contactId);
   const call = await requestCall(from, phoneValue);
+  await OperatorStats.registerAction(req.user.operator.id, OperatorActions.CALL);
   res.status(200).send(call);
 }
 

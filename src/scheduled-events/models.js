@@ -183,7 +183,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'));
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
-      if (worksheet.lastAddedMeeting != null) {
+      if (worksheet.lastAddedMeeting === null) {
         await OperatorStats.registerAction(createdBy, OperatorActions.MEETING);
         await OperatorStats.registerAction(data.notifyTo, OperatorActions.MEETING);
       }
