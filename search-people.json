@@ -81,7 +81,7 @@
     }
   },
   "sourceType": "couchbase",
-  "sourceName": "mkpremium_staging",
+  "sourceName": "mkpremium",
   "sourceParams": {},
   "planParams": {
     "maxPartitionsPerPIndex": 171,

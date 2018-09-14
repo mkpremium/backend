@@ -312,8 +312,12 @@ function operatorCalculation(dateRange) {
 function calculateCounters(counters) {
   const mappedCounters = {};
   Object.values(OperatorActions).map(statKey => {
-    const state = _find(counters, {action: statKey}) || {count: 0};
-    mappedCounters[statKey] = state.count;
+    let total = 0;
+    _.filter(counters, {action: statKey}).forEach(({count}) => {
+      total += count;
+    });
+
+    mappedCounters[statKey] = total;
   });
 
   return mappedCounters;
