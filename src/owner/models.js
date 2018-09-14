@@ -11,6 +11,7 @@ import {updateList} from '../lib/tcomb-utils';
 import {BuildingRepository} from '../building/models';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
 import {OwnerBusinessStatus, OwnerStatus} from '../types/enums';
+import _ from 'lodash';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -257,8 +258,11 @@ GROUP BY t.status, building[0].address.city`;
     const totals = {};
 
     Object.values(OwnerStatus).forEach(status => {
-      const total = _find(result, {status}) || {count: 0};
-      totals[status] = total.count;
+      let total = 0;
+      _.filter(result, {status}).forEach(({count}) => {
+        total += count;
+      });
+      totals[status] = total;
     });
 
     return totals;
@@ -275,14 +279,17 @@ GROUP BY t.business.status`
       : `SELECT t.business.status, COUNT(*) as count
 FROM ${bucket} \`t\`
 WHERE t.\`_documentType\` = 'owner' AND t.business IS NOT MISSING AND t.business IS NOT NULL
-AND t.business.meetingWithOperatorId = '${params.operator}'
+AND t.business.meetingWithOperatorId = '${params.operatorId}'
 GROUP BY t.business.status`;
     const result = await this.queryRaw(N1qlQuery.fromString(query));
     const totals = {};
 
     Object.values(OwnerBusinessStatus).forEach(status => {
-      const total = _find(result, {status}) || {count: 0};
-      totals[status] = total.count;
+      let total = 0;
+      _.filter(result, {status}).forEach(({count}) => {
+        total += count;
+      });
+      totals[status] = total;
     });
 
     return totals;

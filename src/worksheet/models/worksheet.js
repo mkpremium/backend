@@ -66,14 +66,13 @@ const WorksheetStatsParams = t.struct({
 });
 
 export class WorksheetRepository extends Worksheet {
-
   async countWorksheetsInSource(source) {
     const bucket = this.getBucketName();
     const sourceFilter = [];
     Object.keys(source).forEach(key => {
       const value = source[key];
       if (!_isNil(value)) {
-        sourceFilter.push(`t2.address.${key} = ${value}`);
+        sourceFilter.push(`t2.address.${key} = '${value}'`);
       }
     });
     const filter = sourceFilter.length > 0

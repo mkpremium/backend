@@ -196,13 +196,15 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async validateUniqueWorksheet(params) {
     const worksheetId = _get(params, 'event.worksheetId');
+    const type = _get(params, 'type');
 
     if (!worksheetId) {
       return;
     }
 
     const qb = this.getQueryBuilder()
-      .where('event.worksheetId = ?', worksheetId);
+      .where('event.worksheetId = ?', worksheetId)
+      .where('type = ?', type);
     const result = await this.query(qb);
 
     if (result && result.length > 0) {
