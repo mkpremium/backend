@@ -82,7 +82,7 @@ export class WorksheetRepository extends Worksheet {
 
     const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
     LET _building = (SELECT RAW t2.id FROM ${bucket} t2 WHERE (t2._documentType = 'building' ${filter}))
-    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status IS ${statuses}) AND (t.relatedBuildingIds[0] IN _building)`;
+    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status IN ${statuses}) AND (t.relatedBuildingIds[0] IN _building)`;
     const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
     return _get(results, '0.count', 0);
   }
