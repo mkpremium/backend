@@ -301,6 +301,12 @@ export function ownerVerified(data) {
     owner.status === OwnerStatus.VERIFIED;
 }
 
+export function publicEntity(data) {
+  const owner = t.Owner(data);
+  return owner.confirmedByOperator.value &&
+    owner.status === OwnerStatus.PUBLIC;
+}
+
 export function isInvalidVerified(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&

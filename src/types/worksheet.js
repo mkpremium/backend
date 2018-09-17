@@ -18,7 +18,7 @@ export const WorkSheetStatus = {
   NO_SALE: 'NO_SALE',
   ALREADY_SOLD: 'YA_VENDIO',
   MEETING: 'MEETING',
-  CLOSE: 'CLOSE'
+  PUBLIC: 'ENTE_PUBLICO'
 };
 
 export const NotFinalWorksheetStats = [

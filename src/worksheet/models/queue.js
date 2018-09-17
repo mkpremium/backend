@@ -129,7 +129,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
     const queue = await this.findByIdOrThrow(queueId);
-    if (worksheet.queueId !== queue.id) {
+    if (worksheet.queueId && worksheet.queueId !== queue.id) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`);
     }
 

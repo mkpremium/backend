@@ -94,11 +94,11 @@ function getDateBetweenByFixed(value, offset = 0) {
     case 'year':
       return [
         queryDateFormat(today.clone().subtract(offset, 'days').startOf('year')),
-        queryDateFormat(today.clone().endOf('year'))].join(',');
+        queryDateFormat(today.clone().endOf('day'))].join(',');
     case 'month':
       return [
         queryDateFormat(today.clone().subtract(offset, 'days').startOf('month')),
-        queryDateFormat(today.clone().endOf('month'))].join(',');
+        queryDateFormat(today.clone().endOf('day'))].join(',');
     case 'lastMonth':
       return [
         queryDateFormat(lastMonth.clone().subtract(offset, 'days').startOf('month')),

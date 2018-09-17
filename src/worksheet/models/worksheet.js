@@ -26,7 +26,7 @@ import {
   isInvalidVerified,
   ownerNoSale,
   ownerAlreadySold,
-  ownerVerified
+  ownerVerified, publicEntity
 } from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
@@ -191,6 +191,7 @@ GROUP BY t.status`;
     worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
     const isValidLength = worksheet.relatedOwners.length > 0;
     const someValidOwner = isValidLength && _some(worksheet.relatedOwners, ownerVerified);
+    const isPublicEntity = isValidLength && _some(worksheet.relatedOwners, publicEntity)
     const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
     const noSale = isValidLength && _some(worksheet.relatedOwners, ownerNoSale);
     const alreadySold = isValidLength && _some(worksheet.relatedOwners, ownerAlreadySold);
@@ -199,6 +200,10 @@ GROUP BY t.status`;
 
     switch (worksheet.status) {
       case WorkSheetStatus.DEFAULT:
+        if (isPublicEntity) {
+          return WorkSheetStatus.PUBLIC;
+        }
+
         if (hasMeeting) {
           return WorkSheetStatus.MEETING;
         }
