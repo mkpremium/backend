@@ -13,7 +13,13 @@ export async function seed(directory) {
   seedDebug('seeding from', directory);
   await couchbase();
   const files = await readAllFiles(directory);
-  await Promise.mapSeries(files, addMetadata);
+  await Promise.mapSeries(files, async(file) => {
+    try {
+      await addMetadata(file);
+    } catch (e) {
+      seedDebug('ignore file', file, e);
+    }
+  });
 }
 
 async function addMetadata(filepath) {
