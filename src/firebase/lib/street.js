@@ -7,6 +7,7 @@ import {firebaseStringToNumber, firebaseTimestampFormat} from '../../lib/date';
 import {fbInformadores} from '../';
 import {OperatorFeatures} from '../../types/operator';
 import {isOnlyStreet, isStreetAdmin} from '../../lib/role-operators';
+import _isNil from 'lodash/isNil';
 
 const debugStreet = debug('app:firebase:street');
 
@@ -86,10 +87,17 @@ function toFirebaseStreetUser(operator) {
 
 function toFirebaseStreetBuilding(building) {
   debugStreet('toFirebaseStreetBuilding', building, building.owner);
+  // eslint-disable-next-line camelcase
+  let Calle_Completa = _get(building, 'address.fullAddress');
+  if (_isNil(Calle_Completa)) {
+    // eslint-disable-next-line camelcase
+    Calle_Completa = _get(building, 'cadastre.address', '');
+  }
+
   return t.FirebaseStreetBuildingData({
     Id_Estado: building.Id_Estado,
     Id_Edificio: building.id,
-    Calle_Completa: building.address.fullAddress,
+    Calle_Completa,
     Tipo_Calle: building.address.type,
     Ciudad: building.address.city,
     Nombre_Calle: building.address.street,
