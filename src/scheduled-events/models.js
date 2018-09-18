@@ -180,12 +180,13 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new WorksheetRepository();
-      const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'));
+      const worksheet = await worksheetRepo.findByIdWIthIncludes(_get(scheduledEvent, 'event.worksheetId'));
+      const city = _get(worksheet, 'relatedBuildings.0.address.city');
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
       if (worksheet.lastAddedMeeting === null) {
-        await OperatorStats.registerAction(createdBy, OperatorActions.MEETING);
-        await OperatorStats.registerAction(data.notifyTo, OperatorActions.MEETING);
+        await OperatorStats.registerAction(createdBy, OperatorActions.MEETING, {city});
+        await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, {city});
       }
     }
 
