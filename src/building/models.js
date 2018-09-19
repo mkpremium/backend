@@ -129,8 +129,10 @@ export class BuildingRepository extends Building {
 
     await this.save(updatedBuilding);
 
+    const city = _get(building, 'address.city');
+
     if (building.proposals.length === 0) {
-      await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT);
+      await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, {city});
     }
 
     return proposal;

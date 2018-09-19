@@ -327,5 +327,10 @@ export function ownerAlreadySold(data) {
 
 export function isAllowedChangeState(data) {
   const owner = t.Owner(data);
-  return [OwnerStatus.ALREADY_SOLD, OwnerStatus.NO_SALE, OwnerStatus.VERIFIED].indexOf(owner.status) !== -1;
+  return [
+    OwnerStatus.ALREADY_SOLD,
+    OwnerStatus.NO_SALE,
+    OwnerStatus.VERIFIED,
+    OwnerStatus.PUBLIC
+  ].indexOf(owner.status) !== -1;
 }
