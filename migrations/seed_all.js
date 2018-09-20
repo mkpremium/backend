@@ -15,6 +15,7 @@ import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
+import {MigratePersonModel} from '../src/migration/lib/migrate-person';
 
 export async function seed(files) {
   const app = {
@@ -29,7 +30,7 @@ export async function seed(files) {
   const migrateBuildings = new MigrateModel('building', files.buildings, app);
   const migrateOwners = new MigrateModel('owner', files.owners, app);
   const migrateWorksheets = new MigrateModel('worksheet', files.calls, app);
-  const migratePeople = new MigrateModel('person', files.people, app);
+  const migratePeople = new MigratePersonModel(files.people, app);
   const relations = new RelatedModel(files.cross, app);
   const buildingEntities = new MigrateEntities(files.entities, app);
 

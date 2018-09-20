@@ -37,7 +37,7 @@ export const PersonInputDTO = t.struct({
   sexo: t.maybe(t.String)
 }, 'BuildingInputDTO');
 
-export default function migrateFromCsv(data) {
+export default function migrateFromCsv(data, codes) {
   const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
 
   const isEmpty = val => typeof val === 'undefined' || val == null || val === '';
@@ -48,10 +48,16 @@ export default function migrateFromCsv(data) {
     }
     return new Date(`${input.ano_naci}-${input.mes_naci}-${input.dia_naci}`);
   };
-  const address = () => ({
-    fullAddress: input.nuc,
-    postalCode: input.cod_post ? input.cod_post.padStart(5, '0') : null
-  });
+  const address = () => {
+    const postalCode = input.cod_post ? input.cod_post.padStart(5, '0') : null;
+    const info = postalCode ? codes.findByPostalCode(postalCode) : null;
+    const city = info ? info.nombre_entidad_singular : null;
+    return ({
+      fullAddress: input.domicili || input.nuc,
+      postalCode,
+      city
+    });
+  };
 
   const gender = () => {
     const value = input.sexo || '';

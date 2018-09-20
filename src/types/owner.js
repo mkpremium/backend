@@ -288,6 +288,14 @@ t.Owner.prototype.isPrimaryVerified = function() {
   return isPrimaryVerified(this);
 };
 
+export function familyOwner(data) {
+  const owner = t.Owner(data);
+  return [
+    OwnerType.PRINCIPAL,
+    OwnerType.SECONDARY
+  ].indexOf(owner.type) !== -1;
+}
+
 export function isPrimaryVerified(data) {
   const owner = t.Owner(data);
   return owner.confirmedByOperator.value &&

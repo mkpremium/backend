@@ -191,7 +191,7 @@ GROUP BY t.status`;
     worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
     const isValidLength = worksheet.relatedOwners.length > 0;
     const someValidOwner = isValidLength && _some(worksheet.relatedOwners, ownerVerified);
-    const isPublicEntity = isValidLength && _some(worksheet.relatedOwners, publicEntity)
+    const isPublicEntity = isValidLength && _some(worksheet.relatedOwners, publicEntity);
     const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
     const noSale = isValidLength && _some(worksheet.relatedOwners, ownerNoSale);
     const alreadySold = isValidLength && _some(worksheet.relatedOwners, ownerAlreadySold);

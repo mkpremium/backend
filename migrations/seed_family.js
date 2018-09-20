@@ -1,6 +1,16 @@
+import t from 'tcomb';
+import uuid from 'uuid/v4';
+import _ from 'lodash';
 import couchbase from '../src/db/couchbase';
 import {resolve} from 'path';
-import {RelatedOwnerFamilyModel} from '../src/migration/lib/related-owner-family-model';
+import {MigratePersonModel} from '../src/migration/lib/migrate-person';
+import {readCodigosPostalesMunicipios} from '../csv/codigos_postales_municipios';
+import {OwnerRepository, PersonRepository} from '../src/owner/models';
+
+import Promise from 'bluebird';
+import {WorksheetRepository} from '../src/worksheet/models/worksheet';
+import {familyOwner} from '../src/types/owner';
+import {OwnerType} from '../src/types/enums';
 
 export async function seed(files) {
   const app = {
@@ -8,9 +18,89 @@ export async function seed(files) {
       bucket: await couchbase()
     }
   };
+  const codes = await readCodigosPostalesMunicipios();
+  const migratePeople = new MigratePersonModel(files.people, codes, app);
+  await migratePeople.run();
 
-  const relations = new RelatedOwnerFamilyModel(files.cross, app);
-  await relations.run();
+  const repo = new WorksheetRepository();
+  const worksheets = await repo.query();
+  const worksheetIds = _.map(worksheets, _.property('id'));
+  await Promise.map(worksheetIds, processWorksheet, {concurrency: 2});
+}
+
+async function processWorksheet(worksheetId) {
+  const repo = new WorksheetRepository();
+  const worksheet = await repo.findByIdWIthIncludes(worksheetId);
+  console.log('\n\nworksheet', worksheetId);
+  console.log('people in worksheet', _.map(worksheet.relatedOwners, _.property('person.id')));
+  const filteredOwners = worksheet.relatedOwners.filter(familyOwner);
+  return Promise.map(filteredOwners, owner => processOwner(owner, worksheet));
+}
+
+async function processOwner(owner, worksheet) {
+  const owners = worksheet.relatedOwners;
+  const currentPersons = _.map(owners, _.property('person.id'));
+  const filterOnWorksheet = person => currentPersons.indexOf(person.id) !== -1;
+
+  const family = await findFamilyName(owner.person);
+  const filteredFamily = _.reject(family, filterOnWorksheet);
+  const neighborhoods = await findNeighborhoods(_.get(owner, 'person.addresses.0.fullAddress'));
+  const filteredNeighborhoods = _.reject(neighborhoods, filterOnWorksheet);
+
+  const familyOwners = await createOwners(owner, filteredFamily, OwnerType.FAMILY);
+  const neighborhoodOwners = await createOwners(owner, filteredNeighborhoods, OwnerType.NEIGHBOUR);
+
+  const newOwners = familyOwners.concat(neighborhoodOwners);
+
+  const repo = new WorksheetRepository();
+  await Promise.map(newOwners, owner => repo.addOwner(worksheet, owner));
+
+  // const justIds = collection => _.map(collection, _.property('id'));
+  // console.log('owner', owner.id, 'person', owner.person.id);
+  // console.log('family found', justIds(family));
+  // console.log('filtered family', justIds(filteredFamily));
+  // console.log('neighborhood found', justIds(neighborhoods));
+  // console.log('filtered neighborhood', justIds(filteredNeighborhoods));
+  // console.log('added owners', justIds(newOwners));
+}
+
+async function findFamilyName({id, firstSurname, secondSurname}) {
+  if (_.isNil(firstSurname) || _.isNil(secondSurname)) {
+    return [];
+  }
+
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder()
+    .where('id != ?', id)
+    .where('LOWER(t.firstSurname) = LOWER(?)', firstSurname)
+    .where('LOWER(t.secondSurname) = LOWER(?)', secondSurname);
+  return repo.query(qb);
+}
+
+async function findNeighborhoods(fullAddress) {
+  if (_.isNil(fullAddress)) {
+    return [];
+  }
+
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder()
+    .where('t.addresses[0].fullAddress = ?', fullAddress);
+  return repo.query(qb);
+}
+
+async function createOwners(owner, people, type) {
+  const repo = new OwnerRepository();
+  return Promise.map(people, person => {
+    const newOwner = t.update(owner, {
+      $merge: {
+        id: uuid(),
+        type,
+        personId: person.id,
+        _migrateId: null
+      }
+    });
+    return repo.save(newOwner, false);
+  });
 }
 
 const defaultFiles = {
