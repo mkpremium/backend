@@ -91,11 +91,11 @@ export class WorksheetRepository extends Worksheet {
     const bucket = this.getBucketName();
     const query = _isNil(params.city)
       ? `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-WHERE t._documentType = 'worksheet AND t.status IS NOT MISSING'
+WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
 GROUP BY t.status`
       : `SELECT t.status, COUNT(*) as count FROM ${bucket} t
 LET building = (SELECT RAW p FROM ${bucket} p USE KEYS t.relatedBuildingIds[0] WHERE p.id = t.relatedBuildingIds[0] LIMIT 1)
-WHERE t._documentType = 'worksheet AND t.status IS NOT MISSING'
+WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
 AND LOWER(building[0].address.city) = LOWER('${params.city}')
 GROUP BY t.status`;
 

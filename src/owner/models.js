@@ -2,7 +2,6 @@ import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import _head from 'lodash/head';
 import _isArray from 'lodash/isArray';
-import _find from 'lodash/find';
 import _isEmpty from 'lodash/isEmpty';
 import _isNil from 'lodash/isNil';
 import {CouchbaseModel} from '../db/model';
@@ -21,7 +20,10 @@ export class Owner extends CouchbaseModel {
 }
 
 export class Person extends CouchbaseModel {
-
+  constructor() {
+    super();
+    this.Struct = t.Person;
+  }
 }
 
 export class PersonRepository extends Person {
@@ -274,11 +276,11 @@ GROUP BY t.status, building[0].address.city`;
     const query = _isNil(params.operatorId)
       ? `SELECT t.business.status, COUNT(*) as count
 FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business IS NOT MISSING AND t.business IS NOT NULL
+WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
 GROUP BY t.business.status`
       : `SELECT t.business.status, COUNT(*) as count
 FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business IS NOT MISSING AND t.business IS NOT NULL
+WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
 AND t.business.meetingWithOperatorId = '${params.operatorId}'
 GROUP BY t.business.status`;
     const result = await this.queryRaw(N1qlQuery.fromString(query));

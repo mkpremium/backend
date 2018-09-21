@@ -1,7 +1,8 @@
-import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
 import couchbase from '../src/db/couchbase';
+import {Owner, familyOwner} from '../src/types/owner';
 import {resolve} from 'path';
 import {MigratePersonModel} from '../src/migration/lib/migrate-person';
 import {readCodigosPostalesMunicipios} from '../csv/codigos_postales_municipios';
@@ -9,7 +10,6 @@ import {OwnerRepository, PersonRepository} from '../src/owner/models';
 
 import Promise from 'bluebird';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
-import {familyOwner} from '../src/types/owner';
 import {OwnerType} from '../src/types/enums';
 
 export async function seed(files) {
@@ -29,12 +29,16 @@ export async function seed(files) {
 }
 
 async function processWorksheet(worksheetId) {
-  const repo = new WorksheetRepository();
-  const worksheet = await repo.findByIdWIthIncludes(worksheetId);
-  console.log('\n\nworksheet', worksheetId);
-  console.log('people in worksheet', _.map(worksheet.relatedOwners, _.property('person.id')));
-  const filteredOwners = worksheet.relatedOwners.filter(familyOwner);
-  return Promise.map(filteredOwners, owner => processOwner(owner, worksheet));
+  try {
+    const repo = new WorksheetRepository();
+    const worksheet = await repo.findByIdWIthIncludes(worksheetId);
+    console.log('\n\nworksheet', worksheetId);
+    console.log('people in worksheet', _.map(worksheet.relatedOwners, _.property('person.id')));
+    const filteredOwners = worksheet.relatedOwners.filter(familyOwner);
+    return Promise.map(filteredOwners, owner => processOwner(owner, worksheet));
+  } catch (e) {
+    console.log('error processing ', worksheetId, e);
+  }
 }
 
 async function processOwner(owner, worksheet) {
@@ -91,14 +95,18 @@ async function findNeighborhoods(fullAddress) {
 async function createOwners(owner, people, type) {
   const repo = new OwnerRepository();
   return Promise.map(people, person => {
-    const newOwner = t.update(owner, {
-      $merge: {
-        id: uuid(),
-        type,
-        personId: person.id,
-        _migrateId: null
+    const rawOwner = Object.assign(owner, {
+      id: uuid(),
+      type,
+      person: null,
+      personId: person.id,
+      _migrateId: null,
+      confirmedByOperator: {
+        value: false
       }
     });
+
+    const newOwner = fromJSON(rawOwner, Owner);
     return repo.save(newOwner, false);
   });
 }

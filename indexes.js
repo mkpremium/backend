@@ -4,52 +4,65 @@ import {N1qlQuery} from 'couchbase';
 import couchbase from './src/db/couchbase';
 
 const indexes = [
-  {name: 'id', query: 'CREATE INDEX `id` ON `__BUCKET_NAME__`(`id`)'},
-  {name: 'building_id', query: 'CREATE INDEX `building_id` ON `__BUCKET_NAME__`(`id`,`_documentType`)'},
+  {
+    name: 'id',
+    query: '(`id`)'
+  },
+  {
+    name: 'building_id',
+    query: '(`id`,`_documentType`)'
+  },
   {
     name: 'worksheetIndex',
-    query: 'CREATE INDEX `worksheetIndex` ON `__BUCKET_NAME__`(`worksheetIndex`,`_documentType`) WHERE (`_documentType` = "worksheet")'
+    query: '(`worksheetIndex`,`_documentType`) WHERE `_documentType` = "worksheet"'
   },
-  {name: '_migratedId', query: 'CREATE INDEX `_migratedId` ON `__BUCKET_NAME__`(`_migratedId`) '},
+  {
+    name: '_migratedId',
+    query: '(`_migratedId`) '},
   {
     name: '_documentType_migratedId',
-    query: 'CREATE INDEX `_documentType_migratedId` ON `__BUCKET_NAME__`(`_documentType`,`_migratedId`) '
-  },
-  {name: '_documentType_id', query: 'CREATE INDEX `_documentType_id` ON `__BUCKET_NAME__`(`_documentType`,`id`)'},
-  {name: '_documentType', query: 'CREATE INDEX `_documentType` ON `__BUCKET_NAME__`(`_documentType`)'},
-  {
-    name: 'operator_stats_createdAt',
-    query: 'CREATE INDEX `operator_stats_createdAt` ON `__BUCKET_NAME__`(`createdAt`, `_documentType`) WHERE (`_documentType` = "operator-stats")'
+    query: '(`_documentType`,`_migratedId`)'
   },
   {
-    name: 'operator_stats_operator',
-    query: 'CREATE INDEX `operator_stats_operator` ON `__BUCKET_NAME__`(`operatorId`, `_documentType`) WHERE (`_documentType` = "operator-stats")'
+    name: '_documentType_id',
+    query: '(`_documentType`,`id`)'
   },
   {
-    name: 'operator_stats_',
-    query: 'CREATE INDEX `operator_stats_` ON `__BUCKET_NAME__`(`operatorId`, `createdAt`, `_documentType`) WHERE (`_documentType` = "operator-stats")'
-  },
-  {
-    name: 'operator_stats_city',
-    query: 'CREATE INDEX `operator_stats_city` ON `__BUCKET_NAME__`(`createdAt`, `_documentType`, `city`) WHERE (`_documentType` = "operator-stats" AND `city` IS NOT NULL)'
+    name: '_documentType',
+    query: '(`_documentType`)'
   },
   {
     name: 'operator_roles',
-    query: 'CREATE INDEX `operator_roles` ON `__BUCKET_NAME__`(ALL TOKENS(`roles`)) WHERE (`_documentType` = "operator")'
+    query: '(ALL TOKENS(`roles`)) WHERE `_documentType` = "operator"'
+  },
+  {
+    name: 'worksheet_status',
+    query: '(`status`,`_documentType`) WHERE `_documentType` = "worksheet"'
+  },
+  {
+    name: 'owner_business_status',
+    query: '(`business`.`status`) WHERE `_documentType` = "owner" and `business`.`status` IS NOT MISSING'
+  },
+  {
+    name: 'operator_stats_count',
+    query: '(city, action, createdAt) WHERE _documentType = \'operator-stats\' AND city IS NOT MISSING'
+  },
+  {
+    name: 'operator_stats_operator_count',
+    query: '(operatorId ASC, action, createdAt ASC) WHERE _documentType = \'operator-stats\''
   }
 ];
 
 async function init() {
   const bucket = await couchbase();
   await Promise.map(indexes, async({name, query}) => {
-    const queryStr = query.replace('__BUCKET_NAME__', bucket._name);
     try {
       await bucket.queryAsync(N1qlQuery.fromString(`DROP INDEX \`${bucket._name}\`.\`${name}\``));
     } catch (e) {
       console.log('index creating failed', e.message);
     }
 
-    await bucket.queryAsync(N1qlQuery.fromString(`${queryStr} USING GSI WITH {"defer_build":true}`));
+    await bucket.queryAsync(N1qlQuery.fromString(`CREATE INDEX ${name} ON ${bucket._name} ${query} USING GSI WITH {"defer_build":true}`));
   });
 
   // build indexes

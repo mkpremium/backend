@@ -180,6 +180,9 @@ export class OperatorStatsRepository extends OperatorStats {
           .group('operatorId')
           .group('action')
           .group('createdAt')
+          .where('action IS NOT MISSING')
+          .where('operatorId IS NOT MISSING')
+          .where('createdAt IS NOT MISSING')
           .order('operatorId').order('createdAt');
         break;
       case 'total':
@@ -189,6 +192,8 @@ export class OperatorStatsRepository extends OperatorStats {
           .field('action')
           .group('operatorId')
           .group('action')
+          .where('action IS NOT MISSING')
+          .where('operatorId IS NOT MISSING')
           .order('operatorId');
         break;
     }
@@ -238,6 +243,9 @@ export class OperatorStatsRepository extends OperatorStats {
           .group('city')
           .group('action')
           .group('createdAt')
+          .where('city IS NOT MISSING')
+          .where('action IS NOT MISSING')
+          .where('createdAt IS NOT MISSING')
           .order('city').order('createdAt');
         break;
       case 'total':
@@ -247,7 +255,9 @@ export class OperatorStatsRepository extends OperatorStats {
           .field('action')
           .group('city')
           .group('action')
-          .order('city');
+          .order('city')
+          .where('city IS NOT MISSING')
+          .where('action IS NOT MISSING');
         break;
     }
 

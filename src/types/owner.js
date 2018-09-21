@@ -1,3 +1,4 @@
+import fromJSON from 'tcomb/lib/fromJSON';
 import t from 'tcomb';
 import _find from 'lodash/find';
 import _get from 'lodash/get';
@@ -225,7 +226,7 @@ t.OwnerConfirmed = t.struct({
   confirmedAt: t.maybe(t.Date)
 }, 'confirmed');
 
-t.Owner = t.struct(
+export const Owner = t.Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
@@ -289,7 +290,7 @@ t.Owner.prototype.isPrimaryVerified = function() {
 };
 
 export function familyOwner(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return [
     OwnerType.PRINCIPAL,
     OwnerType.SECONDARY
@@ -297,44 +298,44 @@ export function familyOwner(data) {
 }
 
 export function isPrimaryVerified(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFIED &&
     owner.type === OwnerType.PRINCIPAL;
 }
 
 export function ownerVerified(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFIED;
 }
 
 export function publicEntity(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.PUBLIC;
 }
 
 export function isInvalidVerified(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ERROR;
 }
 
 export function ownerNoSale(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.NO_SALE;
 }
 
 export function ownerAlreadySold(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ALREADY_SOLD;
 }
 
 export function isAllowedChangeState(data) {
-  const owner = t.Owner(data);
+  const owner = fromJSON(data, t.Owner);
   return [
     OwnerStatus.ALREADY_SOLD,
     OwnerStatus.NO_SALE,
