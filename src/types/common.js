@@ -182,7 +182,7 @@ t.TypedContactInfoUpdate = t.struct(
  *       zone:
  *         type: string
  */
-t.Address = t.struct(
+export const Address = t.Address = t.struct(
   {
     type: t.String,
     street: t.String,

@@ -12,12 +12,16 @@ import Promise from 'bluebird';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {OwnerType} from '../src/types/enums';
 
-export async function seed(files) {
+async function seedFamily(files) {
   const app = {
     locals: {
       bucket: await couchbase()
     }
   };
+  return processFamilyMembers(files, app);
+}
+
+export async function processFamilyMembers(files, app) {
   const codes = await readCodigosPostalesMunicipios();
   const migratePeople = new MigratePersonModel(files.people, codes, app);
   await migratePeople.run();
@@ -122,7 +126,7 @@ const defaultFiles = {
 
 if (require.main === module) {
   console.log('starting seed');
-  seed(defaultFiles)
+  seedFamily(defaultFiles)
     .then(() => process.exit(0))
     .catch(err => {
       console.error(err);

@@ -16,6 +16,8 @@ import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {MigratePersonModel} from '../src/migration/lib/migrate-person';
+import {denormalizeWorksheets} from './seed_denormalize';
+import {processFamilyMembers} from './seed_family';
 
 export async function seed(files) {
   const app = {
@@ -40,6 +42,8 @@ export async function seed(files) {
   await migrateWorksheets.run();
   await relations.run();
   await buildingEntities.run();
+  await processFamilyMembers(files, app);
+  await denormalizeWorksheets();
 }
 
 async function deleteAll() {

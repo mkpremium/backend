@@ -4,7 +4,8 @@
     "migrate": "node --require dotenv/config migrations/seed_all.js",
     "build_index": "node --require dotenv/config indexes.js",
     "metadata": "node --require dotenv/config migrations/seed_metadata.js",
-    "family": "node --require dotenv/config migrations/seed_family.js"
+    "family": "node --require dotenv/config migrations/seed_family.js",
+    "denormalize": "node --require dotenv/config migrations/seed_denormalize.js"
   },
   "betterScripts": null
 }

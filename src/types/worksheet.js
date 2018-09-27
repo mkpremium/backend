@@ -6,6 +6,7 @@ import {Queue} from './constants';
 import debug from 'debug';
 
 import '../owner/types';
+import {Address} from './common';
 import {newHttpError} from '../lib/http-error';
 import {ScheduledEvent} from '../scheduled-events/types';
 
@@ -115,7 +116,9 @@ t.WorkSheet = t.struct({
 
   lastAddedMeeting: t.maybe(ScheduledEvent),
 
-  _documentType: t.enums.of(['worksheet'])
+  _documentType: t.enums.of(['worksheet']),
+
+  buildingAddress: t.maybe(Address)
 }, {
   name: 'WorkSheet',
   defaultProps: {
