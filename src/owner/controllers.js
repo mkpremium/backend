@@ -60,10 +60,7 @@ async function updateBusinessStatus(req, res) {
   const updatedBy = req.user.id;
 
   const repo = new OwnerRepository();
-  const owner = await repo.updateBusinessStatus(ownerId, status, updatedBy);
-
-  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person']);
-  await saveBuildingOwnerToFirebase(updatedOwner);
+  const owner = await repo.updateBusinessStatusFirebase(ownerId, status, updatedBy);
 
   await History.registerCreate({owner, user: req.user});
   res.status(204).send();

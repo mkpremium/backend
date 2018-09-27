@@ -11,6 +11,7 @@ import {BuildingRepository} from '../building/models';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
 import {OwnerBusinessStatus, OwnerStatus} from '../types/enums';
 import _ from 'lodash';
+import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -199,6 +200,13 @@ export class OwnerRepository extends Owner {
       const updatedOwner = t.update(owner, {business: {$set: business}});
       return this.save(updatedOwner, false);
     }
+  }
+
+  async updateBusinessStatusFirebase(ownerId, status, updatedBy) {
+    const owner = await this.updateBusinessStatus(ownerId, status, updatedBy);
+    const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person']);
+    await saveBuildingOwnerToFirebase(updatedOwner);
+    return owner;
   }
 
   async updateBusinessStatus(ownerId, status, updatedBy) {

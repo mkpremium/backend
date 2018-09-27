@@ -13,7 +13,7 @@ import {
   updateBuildingToFirebase
 } from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
-import {BuildingState} from '../types/enums';
+import {BuildingState, OwnerBusinessStatus} from '../types/enums';
 import {toGeoJSON} from '../street/views';
 import {NeighborhoodRepository} from '../street/models';
 import {OwnerRepository} from '../owner/models';
@@ -128,6 +128,11 @@ export class BuildingRepository extends Building {
     });
 
     await this.save(updatedBuilding);
+
+    if (proposal.ownerId) {
+      const ownerRepo = new OwnerRepository();
+      await ownerRepo.updateBusinessStatusFirebase(proposal.ownerId, OwnerBusinessStatus.PROPOSAL_SENT, operatorId);
+    }
 
     const city = _get(building, 'address.city');
 
