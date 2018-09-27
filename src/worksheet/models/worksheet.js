@@ -72,16 +72,16 @@ export class WorksheetRepository extends Worksheet {
     Object.keys(source).forEach(key => {
       const value = source[key];
       if (!_isNil(value)) {
-        sourceFilter.push(`t2.address.${key} = '${value}'`);
+        sourceFilter.push(`t.buildingAddress.${key} IS NOT MISSING`);
+        sourceFilter.push(`t.buildingAddress.${key} = '${value}'`);
       }
     });
     const filter = sourceFilter.length > 0
       ? 'AND ' + sourceFilter.join(' AND ')
       : '';
 
-    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
-    LET _building = (SELECT RAW t2.id FROM ${bucket} t2 WHERE (t2._documentType = 'building' ${filter}))
-    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status IN ${statuses}) AND (t.relatedBuildingIds[0] IN _building)`;
+    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t    
+    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`;
     const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
     return _get(results, '0.count', 0);
   }
@@ -111,33 +111,36 @@ GROUP BY t.status`;
   }
 
   async _findBySourceAndReference(source, worksheetIndex) {
-
-    const buildingRepo = new BuildingRepository();
-    const qb = this.getQueryBuilder('let')
+    const qb = this.getQueryBuilder()
       .where('queueId IS NULL')
-      .where(`status IN ${statuses}`)
+      .where(`status = 'OPEN' OR status = 'LOOKING_MEETING'`)
       .order('t.worksheetIndex')
       .limit(1);
-
-    const letBuilding = buildingRepo.getQueryBuilder('raw', 't2')
-      .order('t2.id');
 
     Object.keys(source).forEach(key => {
       const value = source[key];
       if (!_isNil(value)) {
-        letBuilding.where(`t2.address.${key} = ?`, value);
+        qb.where(`t.buildingAddress.${key} IS NOT MISSING`);
+        qb.where(`t.buildingAddress.${key} = ?`, value);
       }
     });
 
-    qb
-      .letQuery('_building', letBuilding)
-      .where('t.`relatedBuildingIds`[0] IN _building');
-
     if (worksheetIndex) {
+      qb.where('t.worksheetIndex IS NOT MISSING');
       qb.where('t.worksheetIndex > ?', worksheetIndex);
     }
 
-    return this.query(qb);
+    try {
+      const promise = Promise.resolve(this.query(qb));
+      const result = await promise.timeout(3000);
+      return result;
+    } catch (e) {
+      if (e instanceof Promise.TimeoutError) {
+        return Promise.resolve(this.query(qb)).timeout(3000);
+      } else {
+        throw e;
+      }
+    }
   }
 
   async findBySource({source, worksheetIndex}) {
