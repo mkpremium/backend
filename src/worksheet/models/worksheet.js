@@ -130,7 +130,17 @@ GROUP BY t.status`;
       qb.where('t.worksheetIndex > ?', worksheetIndex);
     }
 
-    return this.query(qb);
+    try {
+      const promise = Promise.resolve(this.query(qb));
+      const result = await promise.timeout(3000);
+      return result;
+    } catch (e) {
+      if (e instanceof Promise.TimeoutError) {
+        return Promise.resolve(this.query(qb)).timeout(3000);
+      } else {
+        throw e;
+      }
+    }
   }
 
   async findBySource({source, worksheetIndex}) {
@@ -261,7 +271,7 @@ GROUP BY t.status`;
     }
 
     const savedWorksheet = await this.save(updatedWorksheet);
-    await this.shouldMarkBuildingAndRequestMoreInfo(savedWorksheet);
+    // await this.shouldMarkBuildingAndRequestMoreInfo(savedWorksheet);
 
     return savedWorksheet;
   }
