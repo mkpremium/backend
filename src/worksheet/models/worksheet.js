@@ -130,17 +130,7 @@ GROUP BY t.status`;
       qb.where('t.worksheetIndex > ?', worksheetIndex);
     }
 
-    try {
-      const promise = Promise.resolve(this.query(qb));
-      const result = await promise.timeout(3000);
-      return result;
-    } catch (e) {
-      if (e instanceof Promise.TimeoutError) {
-        return Promise.resolve(this.query(qb)).timeout(3000);
-      } else {
-        throw e;
-      }
-    }
+    return this.query(qb);
   }
 
   async findBySource({source, worksheetIndex}) {

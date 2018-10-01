@@ -284,16 +284,6 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return queue.findScheduledItemsByOperatorId(operatorId);
   }
 
-  async nextWorksheetInQueueRetry(queue, operatorId) {
-    try {
-      const result = await this.nextWorksheetInQueue(queue, operatorId);
-      return result;
-    } catch (e) {
-      queueDebug('nextWorksheetInQueueRetry', 'ignoring error and trying again');
-      return this.nextWorksheetInQueue(queue, operatorId);
-    }
-  }
-
   async nextWorksheetInQueue(queue, operatorId) {
     const operatorItem = queue.findOpenedItemByOperatorId(operatorId);
     let nextAvailableItem = queue.findNextAvailableInQueue(operatorItem);
