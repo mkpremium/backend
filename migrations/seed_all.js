@@ -18,6 +18,7 @@ import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {MigratePersonModel} from '../src/migration/lib/migrate-person';
 import {denormalizeWorksheets} from './seed_denormalize';
 import {processFamilyMembers} from './seed_family';
+import {invalidate} from './seed_invalidate';
 
 export async function seed(files) {
   const app = {
@@ -44,6 +45,7 @@ export async function seed(files) {
   await buildingEntities.run();
   await processFamilyMembers(files, app);
   await denormalizeWorksheets();
+  await invalidate();
 }
 
 async function deleteAll() {

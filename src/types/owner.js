@@ -316,10 +316,20 @@ export function publicEntity(data) {
     owner.status === OwnerStatus.PUBLIC;
 }
 
+export function publicEntityNotVerify(data) {
+  const owner = fromJSON(data, t.Owner);
+  return owner.status === OwnerStatus.PUBLIC;
+}
+
 export function isInvalidVerified(data) {
   const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ERROR;
+}
+
+export function isInvalid(data) {
+  const owner = fromJSON(data, t.Owner);
+  return owner.status === OwnerStatus.ERROR;
 }
 
 export function ownerNoSale(data) {

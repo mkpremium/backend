@@ -61,7 +61,13 @@ async function processOwner(owner, worksheet) {
   const newOwners = familyOwners.concat(neighborhoodOwners);
 
   const repo = new WorksheetRepository();
-  await Promise.map(newOwners, owner => repo.addOwner(worksheet, owner));
+  await Promise.map(newOwners, async(owner)=> {
+    try {
+      await repo.addOwner(worksheet, owner);
+    } catch (e) {
+      console.error(`[processOwner] error adding ${owner.id} to ${worksheet.id}`, e);
+    }
+  });
 
   // const justIds = collection => _.map(collection, _.property('id'));
   // console.log('owner', owner.id, 'person', owner.person.id);
