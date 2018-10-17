@@ -107,6 +107,11 @@ export class CouchbaseModel {
     return model;
   }
 
+  async unlock(id, cas) {
+    await this._promiseBucket;
+    return this._bucket.unlockAsync(id, cas);
+  }
+
   getView(viewName) {
     return ViewQuery.from('operator', viewName);
   }
@@ -231,11 +236,11 @@ export class CouchbaseModel {
     return this.query(qb);
   }
 
-  async findByMigratedId(migratedId) {
+  async findByMigratedId(migratedId, required = true) {
     const qb = this.getQueryBuilder().where('t.`_migrateId` = ?', migratedId);
     const results = await this.query(qb);
 
-    if (!results || results.length === 0) {
+    if (required && (!results || results.length === 0)) {
       throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by _migrateId: ${migratedId}`);
     }
 

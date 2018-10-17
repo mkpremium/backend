@@ -41,7 +41,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(404, `La cola ${queueId} no existe`);
     }
 
-    return queue;
+    return fromJSON(queue, t.WorksheetQueue);
   }
 
   async getExtraInfo(queue) {
@@ -104,10 +104,9 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.save(updatedQueue);
   }
 
-  async addWorksheet(queueId, worksheetId) {
+  async addWorksheetToQueue(queue, worksheetId) {
     const itemRepo = new QueueItemRepository();
     const worksheetRepo = new WorksheetRepository();
-    const queue = await this.findByIdOrThrow(queueId);
     const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
 
     if (worksheet.queueId) {
@@ -119,16 +118,22 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     await worksheetRepo.save(t.update(worksheet, {queueId: {$set: queue.id}}));
     const item = await itemRepo.save({worksheetId: worksheet.id});
     const updatedWorksheets = t.update(queue.worksheets, {$push: [item]});
-    return t.update(queue, {
+    const updatedQueue = t.update(queue, {
       worksheets: {$set: updatedWorksheets},
       worksheetIndex: {$set: worksheet.worksheetIndex}
     });
+
+    return fromJSON(updatedQueue, t.WorksheetQueue);
   }
 
-  async removeWorksheet(queueId, worksheetId) {
+  async addWorksheet(queueId, worksheetId) {
+    const queue = await this.findByIdOrThrow(queueId);
+    return this.addWorksheetToQueue(queue, worksheetId);
+  }
+
+  async removeWorksheetInQueue(queue, worksheetId) {
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
-    const queue = await this.findByIdOrThrow(queueId);
     if (worksheet.queueId && worksheet.queueId !== queue.id) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`);
     }
@@ -138,6 +143,11 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id);
     return t.update(queue, {worksheets: {$set: updatedWorksheetItems}});
+  }
+
+  async removeWorksheet(queueId, worksheetId) {
+    const queue = await this.findByIdOrThrow(queueId);
+    return this.removeWorksheetInQueue(queue, worksheetId);
   }
 
   async removeWorksheetAndSave(queueId, worksheetId) {
@@ -171,7 +181,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return updatedItem;
   }
 
-  async takeWorksheetInQueue(queue, itemId, operatorId) {
+  async takeWorksheetInQueue(data, itemId, operatorId) {
+    const queue = fromJSON(data, t.WorksheetQueue);
     const item = queue.findItemById(itemId);
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
@@ -236,7 +247,21 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `El ${item.id} (${item.status}) no puede ser liberado`);
     }
 
-    return this.releaseItemInQueue(queue, item, operatorId);
+    return this.releaseItemInQueueAndSave(queue, item, operatorId);
+  }
+
+  async releaseWorksheetInQueueAndSave(queue, itemId, operatorId) {
+    const item = queue.findItemById(itemId);
+
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`);
+    }
+
+    if (!item.canBeReleased(operatorId)) {
+      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`);
+    }
+
+    return this.releaseItemInQueueAndSave(queue, item, operatorId);
   }
 
   async releaseWorksheetInQueue(queue, itemId, operatorId) {
@@ -253,12 +278,23 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return this.releaseItemInQueue(queue, item, operatorId);
   }
 
-  async releaseItemInQueue(queue, item, operatorId) {
+  async releaseItemInQueueAndSave(queue, item, operatorId) {
     queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
     await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
 
     if (item.status !== Queue.Status.SCHEDULED) {
       return this.removeWorksheetAndSave(queue.id, item.worksheetId);
+    }
+
+    return queue;
+  }
+
+  async releaseItemInQueue(queue, item, operatorId) {
+    queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id);
+    await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId);
+
+    if (item.status !== Queue.Status.SCHEDULED) {
+      return this.removeWorksheetInQueue(queue, item.worksheetId);
     }
 
     return queue;
@@ -311,7 +347,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const [worksheet] = await worksheetRepo.findBySource(queue);
 
     if (worksheet) {
-      return this.addWorksheetAndSave(queue.id, worksheet.id);
+      return this.addWorksheetToQueue(queue, worksheet.id);
     }
 
     return queue;
@@ -330,7 +366,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const operatorItem = queue.findOpenedItemByOperatorId(operatorId);
 
     if (operatorItem) {
-      await this.releaseWorksheetInQueue(queue, operatorItem.id, operatorId);
+      await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId);
     }
   }
 }

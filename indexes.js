@@ -18,7 +18,12 @@ const indexes = [
   },
   {
     name: '_migratedId',
-    query: '(`_migratedId`) '},
+    query: '(`_migratedId`) '
+  },
+  {
+    name: 'building_cadastre_migrate_id',
+    query: '(_migrateId, _documentType, cadastre.reference) WHERE _documentType = \'building\''
+  },
   {
     name: '_documentType_migratedId',
     query: '(`_documentType`,`_migratedId`)'
@@ -50,12 +55,24 @@ const indexes = [
   {
     name: 'operator_stats_operator_count',
     query: '(operatorId ASC, action, createdAt ASC) WHERE _documentType = \'operator-stats\''
+  },
+  {
+    name: 'owner_migrate_id',
+    query: '(`_migrateId`, `_documentType`)'
+  },
+  {
+    name: 'owner_relationships',
+    query: '(_documentType, buildingId, personId) WHERE _documentType = \'owner\''
+  },
+  {
+    name: 'person_name',
+    query: '(_documentType, id, LOWER(firstSurname), LOWER(secondSurname)) WHERE _documentType = \'person\''
   }
 ];
 
 async function init() {
   const bucket = await couchbase();
-  await Promise.map(indexes, async({name, query}) => {
+  await Promise.mapSeries(indexes, async({name, query}) => {
     try {
       await bucket.queryAsync(N1qlQuery.fromString(`DROP INDEX \`${bucket._name}\`.\`${name}\``));
     } catch (e) {

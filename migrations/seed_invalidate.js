@@ -1,9 +1,11 @@
-import _ from 'lodash';
+import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
+import Promise from 'bluebird';
 import couchbase from '../src/db/couchbase';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import _every from 'lodash/every';
 import {isInvalid, publicEntityNotVerify} from '../src/types/owner';
-import {WorkSheetStatus} from '../src/types/worksheet';
+import {Worksheet, WorkSheetStatus} from '../src/types/worksheet';
 import _some from 'lodash/some';
 
 async function init() {
@@ -21,14 +23,15 @@ export async function invalidate() {
     } catch (e) {
       console.log('calculate new status ', worksheet.id, e);
     }
-  });
+  }, {concurrency: 2});
 }
 
 async function calculateInvalidWorksheet(worksheet) {
   const worksheetRepo = new WorksheetRepository();
-  const workseetComplete = worksheetRepo.findByIdWIthIncludes(worksheet.id);
-  const newStatus = calculateNewStatus(workseetComplete);
-  const updatedWorksheet = worksheet.setStatus(newStatus);
+  const worksheetComplete = await worksheetRepo.findByIdWIthIncludes(worksheet.id);
+  const newStatus = calculateNewStatus(worksheetComplete);
+  const w = fromJSON(worksheet, Worksheet);
+  const updatedWorksheet = w.setStatus(newStatus);
   await worksheetRepo.save(updatedWorksheet);
 }
 

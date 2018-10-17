@@ -1,4 +1,4 @@
-FROM couchbase:5.0.1
+FROM couchbase:5.5.2
 MAINTAINER Julian Reyes <jreyes@bixlabs.com>
 
 ENV \

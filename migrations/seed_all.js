@@ -19,6 +19,7 @@ import {MigratePersonModel} from '../src/migration/lib/migrate-person';
 import {denormalizeWorksheets} from './seed_denormalize';
 import {processFamilyMembers} from './seed_family';
 import {invalidate} from './seed_invalidate';
+import {readCodigosPostalesMunicipios} from '../csv/codigos_postales_municipios';
 
 export async function seed(files) {
   const app = {
@@ -30,10 +31,12 @@ export async function seed(files) {
   await deleteAll();
   await cleanQueue();
 
+  const codes = await readCodigosPostalesMunicipios();
+
   const migrateBuildings = new MigrateModel('building', files.buildings, app);
   const migrateOwners = new MigrateModel('owner', files.owners, app);
   const migrateWorksheets = new MigrateModel('worksheet', files.calls, app);
-  const migratePeople = new MigratePersonModel(files.people, app);
+  const migratePeople = new MigratePersonModel(files.people, codes, app);
   const relations = new RelatedModel(files.cross, app);
   const buildingEntities = new MigrateEntities(files.entities, app);
 

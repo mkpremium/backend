@@ -87,7 +87,7 @@ t.WorkSheetCall = t.struct({
  *           $ref: "#/definitions/OwnerCompactView"
  *
  */
-t.WorkSheet = t.struct({
+export const Worksheet = t.WorkSheet = t.struct({
   id: t.maybe(t.String),
   worksheetIndex: t.maybe(t.Number),
   calls: t.list(t.WorkSheetCall),

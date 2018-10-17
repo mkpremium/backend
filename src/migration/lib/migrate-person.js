@@ -27,7 +27,7 @@ export class MigratePersonModel extends MigrateModel {
     debugMigrate('importing to db', processedData.length, 'records');
     const repo = new PersonRepository();
     const push = async(migratedRecord) => {
-      const [person] = await repo.findByMigratedId(migratedRecord._migrateId);
+      const [person] = await repo.findByMigratedId(migratedRecord._migrateId, false);
       if (person) {
         debugMigrate(`person ${migratedRecord._migrateId} was found, updating ${person.id}`);
         const updatedPerson = t.update(person, {$merge: _.omit(migratedRecord, ['id'])});

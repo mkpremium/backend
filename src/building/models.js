@@ -88,7 +88,9 @@ export class BuildingRepository extends Building {
     const expr = squel.expr()
       .or('t._migrateId = ?', lookupData)
       .or('t.cadastre.reference = ?', lookupData);
-    const qb = this.getQueryBuilder().where(expr);
+    const qb = this.getQueryBuilder()
+      .where('t._migrateId IS NOT MISSING')
+      .where(expr);
     const [result] = await this.query(qb);
     return result;
   }

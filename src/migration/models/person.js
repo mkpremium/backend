@@ -37,7 +37,7 @@ export const PersonInputDTO = t.struct({
   sexo: t.maybe(t.String)
 }, 'BuildingInputDTO');
 
-export default function migrateFromCsv(data, codes) {
+export default function migrateFromCsv(data = {}, codes) {
   const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
 
   const isEmpty = val => typeof val === 'undefined' || val == null || val === '';
