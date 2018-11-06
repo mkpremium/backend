@@ -1,12 +1,12 @@
 import app from '../src/app';
 
-import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
+import {MigrateModelV2} from '../src/migration/lib/migrate-model-v2';
 
 async function init() {
   await app.locals.bucketPromise;
 
-  const migrateBuildings = new MigrateModel('building', resolve(__dirname, '../test/fixtures/sample_buildings_20.csv'), app);
+  const migrateBuildings = new MigrateModelV2('building', resolve(__dirname, '../test/fixtures/sample_buildings_20.csv'), app);
   await migrateBuildings.run();
 }
 

@@ -37,57 +37,60 @@ export const PersonInputDTO = t.struct({
   sexo: t.maybe(t.String)
 }, 'BuildingInputDTO');
 
+function isEmpty(val) {
+  return typeof val === 'undefined' || val == null || val === '';
+}
+
+function birthDate(input) {
+  if (isEmpty(input.ano_naci) || isEmpty(input.mes_naci) || isEmpty(input.dia_naci)) {
+    return null;
+  }
+  return new Date(`${input.ano_naci}-${input.mes_naci}-${input.dia_naci}`);
+}
+
+function address(input, codes) {
+  const postalCode = input.cod_post ? input.cod_post.padStart(5, '0') : null;
+  const info = postalCode ? codes.findByPostalCode(postalCode) : null;
+  const city = info ? info.nombre_entidad_singular : null;
+  return ({
+    fullAddress: input.domicili || input.nuc,
+    postalCode,
+    city
+  });
+}
+
+function gender(input) {
+  const value = input.sexo || '';
+  switch (value.toUpperCase()) {
+    case 'H':
+      return 'MASCULINO';
+    case 'M':
+      return 'FEMENINO';
+    default:
+      return 'NINGUNO';
+  }
+}
+
+function contacts(input) {
+  const contacts = [];
+
+  if (!isEmpty(input.telefono_pb)) {
+    contacts.push(input.telefono_pb);
+  }
+
+  if (!isEmpty(input.telefono_ib)) {
+    contacts.push(input.telefono_ib);
+  }
+
+  if (!isEmpty(input.telefono_abc)) {
+    contacts.push(input.telefono_abc);
+  }
+
+  return _uniq(contacts).map(value => ({value}));
+}
+
 export default function migrateFromCsv(data = {}, codes) {
   const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
-
-  const isEmpty = val => typeof val === 'undefined' || val == null || val === '';
-
-  const birthDate = () => {
-    if (isEmpty(input.ano_naci) || isEmpty(input.mes_naci) || isEmpty(input.dia_naci)) {
-      return null;
-    }
-    return new Date(`${input.ano_naci}-${input.mes_naci}-${input.dia_naci}`);
-  };
-  const address = () => {
-    const postalCode = input.cod_post ? input.cod_post.padStart(5, '0') : null;
-    const info = postalCode ? codes.findByPostalCode(postalCode) : null;
-    const city = info ? info.nombre_entidad_singular : null;
-    return ({
-      fullAddress: input.domicili || input.nuc,
-      postalCode,
-      city
-    });
-  };
-
-  const gender = () => {
-    const value = input.sexo || '';
-    switch (value.toUpperCase()) {
-      case 'H':
-        return 'MASCULINO';
-      case 'M':
-        return 'FEMENINO';
-      default:
-        return 'NINGUNO';
-    }
-  };
-
-  const contacts = () => {
-    const contacts = [];
-
-    if (!isEmpty(input.telefono_pb)) {
-      contacts.push(input.telefono_pb);
-    }
-
-    if (!isEmpty(input.telefono_ib)) {
-      contacts.push(input.telefono_ib);
-    }
-
-    if (!isEmpty(input.telefono_abc)) {
-      contacts.push(input.telefono_abc);
-    }
-
-    return _uniq(contacts).map(value => ({value}));
-  };
 
   return t.Person({
     id: uuid(),
@@ -95,10 +98,10 @@ export default function migrateFromCsv(data = {}, codes) {
     firstName: _get(input, 'nombre', ''),
     firstSurname: _get(input, 'apellido_1', ''),
     secondSurname: _get(input, 'apellido_2', ''),
-    birthDate: birthDate(),
-    addresses: [address()],
-    contacts: contacts(),
-    gender: gender(),
+    birthDate: birthDate(input),
+    addresses: [address(input, codes)],
+    contacts: contacts(input),
+    gender: gender(input),
     personType: 'NATURAL',
     _migrateId: input.id
   });

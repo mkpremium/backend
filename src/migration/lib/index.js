@@ -1,12 +1,17 @@
-import csv from 'csvtojson';
+import csv from 'csvtojson/v1';
 import fs from 'fs-extra';
 import Promise from 'bluebird';
+import debug from 'debug';
+
+const debugCsv = debug('app:lib:csvToJson');
 
 const noOp = () => {
 };
 
 const defaultOptions = {
-  delimiter: ';'
+  delimiter: ';',
+  fork: true,
+  workerNum: 8
 };
 
 /**
@@ -23,14 +28,17 @@ export async function csvToJson(filepath, processFunc = noOp, options = defaultO
     let rowCount = 0;
     csv(options)
       .fromFile(filepath)
-      .on('json', (row) => {
+      .on('json', function(row) {
         rowCount++;
+        if (rowCount % 10000 === 0) {
+          debugCsv('batch row couting', rowCount, 'on', filepath);
+        }
         queue.push(processFunc(row, rowCount));
       })
-      .on('done', err => {
+      .on('done', function(err) {
         Promise.all(queue.filter(n => n))
-          .then(() => {})
-          .finally(() => {
+          .then(function() {})
+          .finally(function() {
             err ? reject(err) : resolve();
           });
       });

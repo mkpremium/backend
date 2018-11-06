@@ -67,6 +67,14 @@ const indexes = [
   {
     name: 'person_name',
     query: '(_documentType, id, LOWER(firstSurname), LOWER(secondSurname)) WHERE _documentType = \'person\''
+  },
+  {
+    name: 'person_address',
+    query: '(DISTINCT ARRAY v.fullAddress FOR v in addresses END) WHERE (_documentType = \'person\')'
+  },
+  {
+    name: 'owner_related',
+    query: '(_documentType, _relatedTo) WHERE _documentType= \'owner\''
   }
 ];
 

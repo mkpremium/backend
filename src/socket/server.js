@@ -54,7 +54,9 @@ export class SocketServer {
       socket.on('event', (data, ack) => {
         socketDebug('broadcasting', data.payload.type);
         this.io.emit(data.payload.type, data);
-        ack(true);
+        if (ack) {
+          ack(true);
+        }
       });
     } else {
       OperatorRepository.setOnline(socket.user.id, true)

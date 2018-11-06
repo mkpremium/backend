@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BASE_CSV="${DIR}/csv"
+BASE_CSV=${1}
 
 llamadas_propietarios() {
   local llamadas="${BASE_CSV}/LLAMADAS.csv"
@@ -40,12 +39,12 @@ llamadas_propietarios() {
     llamadas.datacontatto
   FROM ${llamadas} llamadas
     JOIN ${propietarios} propietarios
-      ON (propietarios.Id_Catastro = llamadas.Id_Catastro)
+      ON (propietarios.PROPRIETARI = llamadas.proprietari)
     JOIN ${edificios} edificios
       ON (llamadas.proprietari = edificios.PROPRIETARI)
 SQL
 )"
 }
 
-file=${BASE_CSV}/cross_table.csv
+file=${BASE_CSV}/CROSS_TABLE.csv
 llamadas_propietarios > ${file}

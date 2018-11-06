@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import io from 'socket.io-client';
 import t from 'tcomb';
 import debug from 'debug';
@@ -10,6 +11,8 @@ import {defer} from '../lib/promise-util';
 
 const SYSTEM_ID = 'system';
 const debugClient = debug('app:socket:server-client');
+
+let buffer = [];
 
 export class SocketClient {
   constructor(socket) {
@@ -40,19 +43,25 @@ export class SocketClient {
 
     debugClient('emitting', event.payload.type);
 
-    this.socket.emit('event', event, ack => {
-      if (!ack) {
-        reject(Error('Evento no pudo ser enviando'));
-      } else {
-        resolve(ack);
-      }
-    });
+    if (this.socket.connected) {
+      this.socket.emit('event', event, ack => {
+        if (!ack) {
+          reject(Error('Evento no pudo ser enviando'));
+        } else {
+          resolve(ack);
+        }
+      });
+    } else {
+      console.error(new Error('Evento no pudo ser enviando, socket no conectado se guarda en buffer'));
+      buffer.push({resolve, reject, event});
+      resolve(false);
+    }
 
     return promise;
   }
 }
 
-export async function connectServer(name = 'mkpremium') {
+export async function connectServer(name = 'mkpremium', onReconnect) {
   const id = uuid();
   const payload = {
     id,
@@ -83,6 +92,14 @@ export async function connectServer(name = 'mkpremium') {
       debugClient('Server client connected', name);
       const client = new SocketClient(socket);
       resolve(client);
+      if (onReconnect) {
+        onReconnect(Promise.resolve(client));
+      }
+      for (let i = 0; i < buffer.length; i++) {
+        socket.emit('event', buffer[i].event);
+      }
+
+      buffer = [];
     });
 
     socket.on('connect_error', (error) => {

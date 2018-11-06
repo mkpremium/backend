@@ -1,11 +1,10 @@
+import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
 import couchbase from '../src/db/couchbase';
 import {Owner, familyOwner} from '../src/types/owner';
 import {resolve} from 'path';
-import {MigratePersonModel} from '../src/migration/lib/migrate-person';
-import {readCodigosPostalesMunicipios} from '../csv/codigos_postales_municipios';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
 
 import Promise from 'bluebird';
@@ -22,10 +21,6 @@ async function seedFamily(files) {
 }
 
 export async function processFamilyMembers(files, app) {
-  const codes = await readCodigosPostalesMunicipios();
-  const migratePeople = new MigratePersonModel(files.people, codes, app);
-  await migratePeople.run();
-
   const repo = new WorksheetRepository();
   const worksheets = await repo.query();
   const worksheetIds = _.map(worksheets, _.property('id'));
@@ -52,30 +47,55 @@ async function processOwner(owner, worksheet) {
 
   const family = await findFamilyName(owner.person);
   const filteredFamily = _.reject(family, filterOnWorksheet);
-  const neighborhoods = await findNeighborhoods(_.get(owner, 'person.addresses.0.fullAddress'));
+
+  const personNeighborhoods = await findNeighborhoods(_.get(owner, 'person.addresses.0.fullAddress'));
+  const buildingNeighborhoods = await findNeighborhoods(_.get(worksheet, 'relatedBuildings.0.address.fullAddress'));
+  const neighborhoods = personNeighborhoods.concat(buildingNeighborhoods);
+
   const filteredNeighborhoods = _.reject(neighborhoods, filterOnWorksheet);
 
   const familyOwners = await createOwners(owner, filteredFamily, OwnerType.FAMILY);
   const neighborhoodOwners = await createOwners(owner, filteredNeighborhoods, OwnerType.NEIGHBOUR);
 
-  const newOwners = familyOwners.concat(neighborhoodOwners);
+  const relatedOwners = await findRelatedOwners(owner);
+
+  const newOwners = relatedOwners
+    .concat(familyOwners)
+    .concat(neighborhoodOwners);
 
   const repo = new WorksheetRepository();
-  await Promise.map(newOwners, async(owner)=> {
+  await Promise.map(newOwners, async(owner) => {
     try {
       await repo.addOwner(worksheet, owner);
     } catch (e) {
       console.error(`[processOwner] error adding ${owner.id} to ${worksheet.id}`, e);
     }
   });
+}
 
-  // const justIds = collection => _.map(collection, _.property('id'));
-  // console.log('owner', owner.id, 'person', owner.person.id);
-  // console.log('family found', justIds(family));
-  // console.log('filtered family', justIds(filteredFamily));
-  // console.log('neighborhood found', justIds(neighborhoods));
-  // console.log('filtered neighborhood', justIds(filteredNeighborhoods));
-  // console.log('added owners', justIds(newOwners));
+async function findRelatedOwners(owner) {
+  const name = _.get(owner, 'person.name');
+  if (_.isNil(name)) {
+    return [];
+  }
+
+  const repo = new OwnerRepository();
+  const qb = repo.getQueryBuilder()
+    .where('t._relatedTo = ?', owner.person.name)
+    .where('t.buildingId IS MISSING');
+  const ownersData = await repo.query(qb);
+  const owners = ownersData.map(d => repo.toStruct(d));
+  if (owners.length === 0) {
+    return owners;
+  }
+  return Promise.map(owners, ownerToUpdate => updateOwnerFrom(ownerToUpdate, owner));
+}
+
+async function updateOwnerFrom(ownerToUpdate, fromOwner) {
+  const repo = new OwnerRepository();
+  const update = t.update(ownerToUpdate, {buildingId: {$set: fromOwner.buildingId}});
+  await repo.save(update, false);
+  return ownerToUpdate;
 }
 
 async function findFamilyName({id, firstSurname, secondSurname}) {
@@ -98,13 +118,32 @@ async function findNeighborhoods(fullAddress) {
 
   const repo = new PersonRepository();
   const qb = repo.getQueryBuilder()
-    .where('t.addresses[0].fullAddress = ?', fullAddress);
+    .where('ANY v IN addresses SATISFIES v.fullAddress = ? END', fullAddress);
   return repo.query(qb);
+}
+
+async function findOwnerBy(personId, buildingId) {
+  const repo = new OwnerRepository();
+  const qb = repo.getQueryBuilder()
+    .where('t.buildingId = ?', buildingId)
+    .where('t.personId = ?', personId);
+  const [personData] = await repo.query(qb);
+
+  if (personData) {
+    return repo.toStruct(personData);
+  }
+
+  return null;
 }
 
 async function createOwners(owner, people, type) {
   const repo = new OwnerRepository();
-  return Promise.map(people, person => {
+  return Promise.map(people, async(person) => {
+    const personOwner = await findOwnerBy(person.id, owner.buildingId);
+    if (personOwner) {
+      return personOwner;
+    }
+
     const rawOwner = Object.assign(owner, {
       id: uuid(),
       type,
@@ -131,7 +170,6 @@ const defaultFiles = {
 };
 
 if (require.main === module) {
-  console.log('starting seed');
   seedFamily(defaultFiles)
     .then(() => process.exit(0))
     .catch(err => {

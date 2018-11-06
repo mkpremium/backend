@@ -52,3 +52,7 @@ firebase*.json
 
 # Local tools
 bitdistrict-m*.sh
+
+
+# Migration data
+data/

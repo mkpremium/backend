@@ -191,11 +191,16 @@ export const Address = t.Address = t.struct(
     registerNumber: t.Number,
     postalCode: t.PostalCode,
     city: t.String,
-    province: t.String,
-    zone: t.String,
-    neighborhood: t.String
+    province: t.maybe(t.String),
+    zone: t.maybe(t.String),
+    neighborhood: t.maybe(t.String)
   },
   {
-    name: 'Address'
+    name: 'Address',
+    defaultProps: {
+      zone: '',
+      neighborhood: '',
+      province: ''
+    }
   }
 );

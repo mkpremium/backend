@@ -1,12 +1,14 @@
 {
   "devDependencies": null,
   "scripts": {
-    "migrate": "node --require source-map-support/register --require dotenv/config migrations/seed_all.js",
-    "build_index": "node --require source-map-support/register --require dotenv/config indexes.js",
-    "metadata": "node --require source-map-support/register --require dotenv/config migrations/seed_metadata.js",
-    "family": "node --require source-map-support/register --require dotenv/config migrations/seed_family.js",
-    "invalidate": "node --require source-map-support/register --require dotenv/config migrations/seed_invalidate.js",
-    "denormalize": "node --require source-map-support/register --require dotenv/config migrations/seed_denormalize.js"
+    "migrate": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_all.js",
+    "build_index": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config indexes.js",
+    "metadata": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_metadata.js",
+    "family": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_family.js",
+    "people": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_people.js",
+    "invalidate": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_invalidate.js",
+    "denormalize": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_denormalize.js",
+    "cross": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_relations.js"
   },
   "betterScripts": null
 }

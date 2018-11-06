@@ -1,63 +1,46 @@
-import _find from 'lodash/find';
 import Promise from 'bluebird';
 import t from 'tcomb';
 
-import {MigrateModel} from './migrate-model';
 import {WorksheetRepository} from '../../worksheet/models/worksheet';
 import {BuildingRepository} from '../../building/models';
 import {OwnerRepository} from '../../owner/models';
 import _uniq from 'lodash/uniq';
+import {MigrateModelV2} from './migrate-model-v2';
 
-export class RelatedOwnerBuildingModel extends MigrateModel {
+export class RelatedOwnerBuildingModel extends MigrateModelV2 {
   constructor(filename, app = {}) {
     super('related', filename, app);
   }
 
-  async pushToDatabaseRecord(records, emptyWorksheet) {
-    const record = _find(records, {worksheetId: emptyWorksheet._migrateId});
-    if (!record) {
-      return;
-    }
-
-    let omited = false;
-
+  async pushToDatabase(record) {
     const buildingRepo = new BuildingRepository();
     const worksheetRepo = new WorksheetRepository();
     const ownerRepo = new OwnerRepository();
 
-    const [building] = await buildingRepo.findByMigratedId(record.buildingId);
-    if (building) {
-      const worksheetByBuilding = await worksheetRepo.findWorksheetByBuilding(building.id);
+    try {
+      const [building] = await buildingRepo.findByMigratedId(record.buildingId);
+      const [owner] = await ownerRepo.findByMigratedId(record.ownerId);
+      const [worksheet] = await worksheetRepo.findByMigratedId(record.worksheetId);
 
-      if (worksheetByBuilding) {
-        console.log('OMITED', 'building found in another worksheet', record);
-        omited = true;
+      if (!building) {
+        console.log('OMITED', 'building doesnt exists', record);
+        return;
       }
-    } else {
-      console.log('OMITED', 'building doesnt exists', record);
-      omited = true;
-    }
 
-    const [owner] = await ownerRepo.findByMigratedId(record.ownerId);
-    if (owner) {
-      const worksheetByOwner = await worksheetRepo.findWorksheetByOwner(owner.id);
-
-      if (worksheetByOwner) {
-        console.log('OMITED', 'owner found in another worksheet', record);
-        omited = true;
+      if (!owner) {
+        console.log('OMITED', 'owner doesnt exists', record);
       }
-    } else {
-      console.log('OMITED', 'owner doesnt exists', record);
-      omited = true;
-    }
 
-    if (!omited) {
-      const updatedWorksheet = t.update(emptyWorksheet, {
+      if (!worksheet) {
+        console.log('OMITED', 'worksheet doesnt exists', record);
+      }
+
+      const updatedWorksheet = t.update(worksheet, {
         relatedBuildingIds: {
-          $set: _uniq(emptyWorksheet.relatedBuildingIds.concat([building.id]))
+          $set: _uniq(worksheet.relatedBuildingIds.concat([building.id]))
         },
         relatedOwnerIds: {
-          $set: _uniq(emptyWorksheet.relatedOwnerIds.concat([owner.id]))
+          $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
         }
       });
       const updatedOwner = t.update(owner, {
@@ -72,14 +55,9 @@ export class RelatedOwnerBuildingModel extends MigrateModel {
         worksheetRepo.save(updatedWorksheet, false),
         ownerRepo.save(updatedOwner, false)
       ]);
+    } catch (e) {
+      console.error('ERROR ON RECORD', record);
+      throw e;
     }
-  }
-
-  async pushToDatabase(processedData) {
-    const worksheetRepo = new WorksheetRepository();
-    const emptyWorksheets = await worksheetRepo.findEmptyWorksheets();
-
-    return Promise
-      .mapSeries(emptyWorksheets, (emptyWorksheet) => this.pushToDatabaseRecord(processedData, emptyWorksheet));
   }
 }

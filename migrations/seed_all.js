@@ -1,6 +1,5 @@
 import {N1qlQuery} from 'couchbase';
 import couchbase from '../src/db/couchbase';
-import {MigrateModel} from '../src/migration/lib/migrate-model';
 import {resolve} from 'path';
 import {RelatedModel} from '../src/migration/lib/related-model';
 import {MigrateEntities} from '../src/migration/lib/migrate-entities';
@@ -13,13 +12,11 @@ import {Calls, CallsRawEvents} from '../src/calls/models';
 import {ScheduledEventsRepository} from '../src/scheduled-events/models';
 import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
-import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
-import {MigratePersonModel} from '../src/migration/lib/migrate-person';
 import {denormalizeWorksheets} from './seed_denormalize';
 import {processFamilyMembers} from './seed_family';
 import {invalidate} from './seed_invalidate';
-import {readCodigosPostalesMunicipios} from '../csv/codigos_postales_municipios';
+import {MigrateModelV2} from '../src/migration/lib/migrate-model-v2';
 
 export async function seed(files) {
   const app = {
@@ -31,29 +28,25 @@ export async function seed(files) {
   await deleteAll();
   await cleanQueue();
 
-  const codes = await readCodigosPostalesMunicipios();
-
-  const migrateBuildings = new MigrateModel('building', files.buildings, app);
-  const migrateOwners = new MigrateModel('owner', files.owners, app);
-  const migrateWorksheets = new MigrateModel('worksheet', files.calls, app);
-  const migratePeople = new MigratePersonModel(files.people, codes, app);
+  const migrateBuildings = new MigrateModelV2('building', files.buildings, app);
+  const migrateOwners = new MigrateModelV2('owner', files.owners, app);
+  const migrateWorksheets = new MigrateModelV2('worksheet', files.calls, app);
   const relations = new RelatedModel(files.cross, app);
   const buildingEntities = new MigrateEntities(files.entities, app);
 
-  await migratePeople.run();
   await migrateBuildings.run();
   await migrateOwners.run();
   await migrateWorksheets.run();
   await relations.run();
-  await buildingEntities.run();
-  await processFamilyMembers(files, app);
-  await denormalizeWorksheets();
-  await invalidate();
+  // await buildingEntities.run();
+  // await processFamilyMembers(files, app);
+  // await denormalizeWorksheets();
+  // await invalidate();
 }
 
 async function deleteAll() {
+  const person = new PersonRepository();
   const worksheet = new WorksheetRepository();
-  const people = new PersonRepository();
   const owner = new OwnerRepository();
   const history = new HistoryRepository();
   const calls = new Calls();
@@ -61,22 +54,18 @@ async function deleteAll() {
   const scheduledEvent = new ScheduledEventsRepository();
   const building = new BuildingRepository();
   const stats = new OperatorStats();
-  const neighborhood = new NeighborhoodRepository();
-  const city = new CityRepository();
 
   return Promise.all([
     cleanFirebase(),
+    person.deleteQuery(),
     worksheet.deleteQuery(),
-    people.deleteQuery(),
     owner.deleteQuery(),
     building.deleteQuery(),
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
     callUnknownEvents.deleteQuery(),
-    stats.deleteQuery(),
-    neighborhood.deleteQuery(),
-    city.deleteQuery()
+    stats.deleteQuery()
   ]);
 }
 
@@ -89,9 +78,12 @@ async function cleanQueue() {
   await repo.queryRaw(resetCounter);
 }
 
+const DIR = typeof process.argv[2] !== 'undefined'
+  ? resolve(process.argv[2])
+  : resolve(__dirname, '..', 'data');
+
 function resolvePath(filename) {
-  const csvFolder = 'csv';
-  return resolve(__dirname, '..', csvFolder, filename);
+  return resolve(DIR, filename);
 }
 
 const defaultFiles = {
@@ -99,7 +91,7 @@ const defaultFiles = {
   buildings: resolvePath('EDIFICIOS.csv'),
   owners: resolvePath('PROPIETARIOS.csv'),
   calls: resolvePath('LLAMADAS.csv'),
-  cross: resolvePath('cross_table.csv'),
+  cross: resolvePath('CROSS_TABLE.csv'),
   entities: resolvePath('SITARR.csv')
 };
 

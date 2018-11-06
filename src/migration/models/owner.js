@@ -103,9 +103,11 @@ export default function migrateFromCsv(data) {
     }
   };
 
+  const name = input.ragionesociale || `NO Name ${input.id_fornitore}`;
+
   const person = t.Person({
     id: uuid(),
-    name: input.ragionesociale,
+    name,
     firstName: input.num_3,
     firstSurname: input.num_1,
     secondSurname: input.num_2,

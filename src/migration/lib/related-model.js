@@ -2,17 +2,17 @@ import t from 'tcomb';
 import Promise from 'bluebird';
 import _uniq from 'lodash/uniq';
 
-import {MigrateModel} from './migrate-model';
 import {WorksheetRepository} from '../../worksheet/models/worksheet';
 import {BuildingRepository} from '../../building/models';
 import {OwnerRepository} from '../../owner/models';
+import {MigrateModelV2} from './migrate-model-v2';
 
-export class RelatedModel extends MigrateModel {
+export class RelatedModel extends MigrateModelV2 {
   constructor(filename, app = {}) {
     super('related', filename, app);
   }
 
-  async pushToDatabaseRecord(record) {
+  async pushToDatabase(record) {
     const worksheetRepo = new WorksheetRepository();
     const buildingRepo = new BuildingRepository();
     const ownerRepo = new OwnerRepository();
@@ -57,9 +57,5 @@ export class RelatedModel extends MigrateModel {
       console.error('record', record);
       throw e;
     }
-  }
-
-  async pushToDatabase(processedData) {
-    return Promise.mapSeries(processedData, this.pushToDatabaseRecord);
   }
 }

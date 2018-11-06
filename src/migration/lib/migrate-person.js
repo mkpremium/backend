@@ -37,6 +37,6 @@ export class MigratePersonModel extends MigrateModel {
         return this.bucket.upsertToDb(migratedRecord.id, migratedRecord);
       }
     };
-    return Promise.map(processedData, push, {concurrency: 10});
+    return Promise.map(processedData, push, {concurrency: 4});
   }
 }
