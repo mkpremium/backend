@@ -91,10 +91,13 @@ function contacts(input) {
 
 export default function migrateFromCsv(data = {}, codes) {
   const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
+  const name = `${_get(input, 'nombre', '')} ${_get(input, 'apellido_1', '')} ${_get(input, 'apellido_2', '')}`
+    .trim()
+    .replace(/\s+/g, ' ');
 
   return t.Person({
     id: uuid(),
-    name: `${_get(input, 'nombre', '')} ${_get(input, 'apellido_1', '')} ${_get(input, 'apellido_2', '')}`.trim(),
+    name,
     firstName: _get(input, 'nombre', ''),
     firstSurname: _get(input, 'apellido_1', ''),
     secondSurname: _get(input, 'apellido_2', ''),

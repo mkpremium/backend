@@ -1,4 +1,3 @@
-import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import Promise from 'bluebird';
 import couchbase from '../src/db/couchbase';

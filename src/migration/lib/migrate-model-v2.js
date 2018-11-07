@@ -49,6 +49,7 @@ export class MigrateModelV2 {
           break;
         default:
           await this.pushToDatabase(models[this.name](data));
+          break;
       }
     } catch (e) {
       console.error(e.message, 'at', row, data);

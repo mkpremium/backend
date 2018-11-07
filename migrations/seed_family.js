@@ -10,6 +10,7 @@ import {OwnerRepository, PersonRepository} from '../src/owner/models';
 import Promise from 'bluebird';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {OwnerType} from '../src/types/enums';
+import {defaultFiles} from './defaults';
 
 async function seedFamily(files) {
   const app = {
@@ -159,15 +160,6 @@ async function createOwners(owner, people, type) {
     return repo.save(newOwner, false);
   });
 }
-
-const defaultFiles = {
-  people: resolve(__dirname, '../csv/PERSONAS.csv'),
-  buildings: resolve(__dirname, '../csv/EDIFICIOS.csv'),
-  owners: resolve(__dirname, '../csv/PROPIETARIOS.csv'),
-  calls: resolve(__dirname, '../csv/LLAMADAS.csv'),
-  cross: resolve(__dirname, '../csv/cross_table.csv'),
-  entities: resolve(__dirname, '../csv/SITARR.csv')
-};
 
 if (require.main === module) {
   seedFamily(defaultFiles)

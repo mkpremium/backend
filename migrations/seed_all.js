@@ -1,6 +1,5 @@
 import {N1qlQuery} from 'couchbase';
 import couchbase from '../src/db/couchbase';
-import {resolve} from 'path';
 import {RelatedModel} from '../src/migration/lib/related-model';
 import {MigrateEntities} from '../src/migration/lib/migrate-entities';
 import Promise from 'bluebird';
@@ -17,6 +16,7 @@ import {denormalizeWorksheets} from './seed_denormalize';
 import {processFamilyMembers} from './seed_family';
 import {invalidate} from './seed_invalidate';
 import {MigrateModelV2} from '../src/migration/lib/migrate-model-v2';
+import {defaultFiles} from './defaults';
 
 export async function seed(files) {
   const app = {
@@ -34,10 +34,10 @@ export async function seed(files) {
   const relations = new RelatedModel(files.cross, app);
   const buildingEntities = new MigrateEntities(files.entities, app);
 
-  await migrateBuildings.run();
   await migrateOwners.run();
-  await migrateWorksheets.run();
-  await relations.run();
+  // await migrateBuildings.run();
+  // await migrateWorksheets.run();
+  // await relations.run();
   // await buildingEntities.run();
   // await processFamilyMembers(files, app);
   // await denormalizeWorksheets();
@@ -77,23 +77,6 @@ async function cleanQueue() {
   await repo.queryRaw(cleanQueues);
   await repo.queryRaw(resetCounter);
 }
-
-const DIR = typeof process.argv[2] !== 'undefined'
-  ? resolve(process.argv[2])
-  : resolve(__dirname, '..', 'data');
-
-function resolvePath(filename) {
-  return resolve(DIR, filename);
-}
-
-const defaultFiles = {
-  people: resolvePath('PERSONAS.csv'),
-  buildings: resolvePath('EDIFICIOS.csv'),
-  owners: resolvePath('PROPIETARIOS.csv'),
-  calls: resolvePath('LLAMADAS.csv'),
-  cross: resolvePath('CROSS_TABLE.csv'),
-  entities: resolvePath('SITARR.csv')
-};
 
 if (require.main === module) {
   console.log('starting seed');

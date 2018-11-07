@@ -1,11 +1,10 @@
 import csv from 'csvtojson';
 import couchbase from '../src/db/couchbase';
 import {readCodigosPostalesMunicipios} from '../csv/codigos_postales_municipios';
-import {resolve} from 'path';
 import migrateFromCsv from '../src/migration/models/person';
-import {PersonRepository} from '../src/owner/models';
 
 import {defer} from '../src/lib/promise-util';
+import {defaultFiles} from './defaults';
 
 async function init(files) {
   const app = {
@@ -14,44 +13,23 @@ async function init(files) {
     }
   };
 
-  const people = new PersonRepository();
-  await people.deleteQuery();
-
   await processPeople(files, app);
 }
 
 async function processPeople({people}, app) {
+  console.log(people);
   const codes = await readCodigosPostalesMunicipios();
   return csvToJSON(people, async function(row) {
     let person = migrateFromCsv(row, codes);
-    await app.locals.bucket.upsertToDb(person.id, person);
-    person = null;
-  });
-}
-
-// eslint-disable-next-line no-unused-vars
-async function initDump(files) {
-
-  await processPeople(files);
-}
-
-// eslint-disable-next-line no-unused-vars
-async function processPeopleDump({people}) {
-  let count = 0;
-  const {promise} = defer();
-  csvToJSON(people, async function() {
-    count++;
-    if (count % 100000 === 0) {
-      heapdump.writeSnapshot();
+    if (person._migrateId === '123521') {
+      console.log(person);
+      process.exit(0);
     }
+
+    // await app.locals.bucket.upsertToDb(person.id, person);
+    // person = null;
   });
-
-  return promise;
 }
-
-const defaultFiles = {
-  people: resolve(__dirname, '../csv/PERSONAS.csv')
-};
 
 if (require.main === module) {
   init(defaultFiles)
@@ -72,7 +50,13 @@ const noOp = () => {
 };
 
 async function csvToJSON(filepath, processFunc = noOp, options = defaultOptions) {
-  return csv(options)
+  const {promise, resolve, reject} = defer();
+  csv(options)
     .fromFile(filepath)
-    .subscribe(processFunc);
+    .subscribe(processFunc)
+    .on('done', function(err) {
+      err ? reject(err) : resolve();
+    });
+
+  return promise;
 }
