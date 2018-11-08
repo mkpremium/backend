@@ -143,6 +143,9 @@ export class CouchbaseModel {
       case 'delete':
         qb = squel.delete();
         break;
+      case 'update':
+        qb = squel.update();
+        break;
       case 'count':
         qb = squel.select().field('COUNT(*) as count');
         break;
@@ -150,8 +153,16 @@ export class CouchbaseModel {
         throw new Error(`method ${method} not allowed (select, delete)`);
     }
 
+    switch (method) {
+      case 'update':
+        qb.table(couchbase.bucket, prefix);
+        break;
+      default:
+        qb.from(couchbase.bucket, prefix);
+        break;
+    }
+
     qb
-      .from(couchbase.bucket, prefix)
       .where(`${prefix}.\`_documentType\` = ?`, this.getType());
 
     return qb;

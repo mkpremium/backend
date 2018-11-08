@@ -1,17 +1,29 @@
 #!/usr/bin/env bash
 
 BASE_CSV=${1}
+llamadas="${BASE_CSV}/LLAMADAS.csv"
+propietarios="${BASE_CSV}/PROPIETARIOS.csv"
+edificios="${BASE_CSV}/EDIFICIOS.csv"
 
-llamadas_propietarios() {
-  local llamadas="${BASE_CSV}/LLAMADAS.csv"
-  local propietarios="${BASE_CSV}/PROPIETARIOS.csv"
-  local edificios="${BASE_CSV}/EDIFICIOS.csv"
+step_1_file=${BASE_CSV}/STEP_1.csv
+outfile=${BASE_CSV}/CROSS_TABLE.csv
+
+step_1_add_address() {
+  q -O -H -d ";" "$(cat <<SQL
+  SELECT llamadas.*, edificios.CARRER
+  FROM ${llamadas} llamadas
+    JOIN ${edificios} edificios
+      ON (llamadas.id_catastro = edificios.ID)
+SQL
+)"
+}
+
+step_2_cross_owner() {
   q -O -H -d ";" "$(cat <<SQL
   SELECT
     llamadas.id_chiamatafornitore as id_chiamatafornitore,
     llamadas.Id_Catastro,
     propietarios.Id_Fornitore,
-    edificios.ID,
     propietarios.Verificato,
     llamadas.proprietari as proprietari,
     propietarios.RagioneSociale,
@@ -37,14 +49,20 @@ llamadas_propietarios() {
     llamadas.id_operatorelivello2,
     llamadas.data_livello2,
     llamadas.datacontatto
-  FROM ${llamadas} llamadas
-    JOIN ${propietarios} propietarios
-      ON (propietarios.PROPRIETARI = llamadas.proprietari)
-    JOIN ${edificios} edificios
-      ON (llamadas.proprietari = edificios.PROPRIETARI)
+  FROM ${step_1_file} llamadas
+    LEFT JOIN ${propietarios} propietarios
+      ON (
+        llamadas.proprietari = propietarios.PROPRIETARI
+        AND (
+          llamadas.Id_Catastro = propietarios.Id_Catastro
+          OR propietarios.Indirizzo = llamadas.CARRER
+        )
+      )
+  ORDER BY llamadas.Id_Catastro, llamadas.proprietari
 SQL
 )"
 }
 
-file=${BASE_CSV}/CROSS_TABLE.csv
-llamadas_propietarios > ${file}
+
+step_1_add_address > ${step_1_file}
+step_2_cross_owner > ${outfile}

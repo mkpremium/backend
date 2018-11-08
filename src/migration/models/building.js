@@ -105,6 +105,7 @@ export default function migrateFromCsv(data) {
   return t.Building({
     id: uuid(),
     _migrateId: input.id,
+    _relatedTo: input.proprietari,
     address: {
       type: input.type,
       street: input.street,

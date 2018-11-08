@@ -30,18 +30,16 @@ export async function seed(files) {
 
   const migrateBuildings = new MigrateModelV2('building', files.buildings, app);
   const migrateOwners = new MigrateModelV2('owner', files.owners, app);
-  const migrateWorksheets = new MigrateModelV2('worksheet', files.calls, app);
   const relations = new RelatedModel(files.cross, app);
-  const buildingEntities = new MigrateEntities(files.entities, app);
+  // const buildingEntities = new MigrateEntities(files.entities, app);
 
   await migrateOwners.run();
-  // await migrateBuildings.run();
-  // await migrateWorksheets.run();
-  // await relations.run();
+  await migrateBuildings.run();
   // await buildingEntities.run();
   // await processFamilyMembers(files, app);
   // await denormalizeWorksheets();
   // await invalidate();
+  await relations.run();
 }
 
 async function deleteAll() {

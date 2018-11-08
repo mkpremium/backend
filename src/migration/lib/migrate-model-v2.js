@@ -1,6 +1,6 @@
 import models from '../models';
 import debug from 'debug';
-import os from 'os';
+// import os from 'os';
 
 import couchbase from '../../db/couchbase';
 import csv from 'csvtojson';
@@ -10,8 +10,8 @@ const debugMigrate = debug('app:migration:migrate');
 
 const defaultOptions = {
   delimiter: ';',
-  fork: true,
-  workerNum: Math.max(os.cpus().length - 1, 1) // ensure at least one worker
+  // fork: true,
+  // workerNum: Math.max(os.cpus().length - 1, 1) // ensure at least one worker
 };
 
 const noOp = () => {

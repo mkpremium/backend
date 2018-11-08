@@ -56,3 +56,4 @@ bitdistrict-m*.sh
 
 # Migration data
 data/
+*.txt

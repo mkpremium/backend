@@ -1,5 +1,4 @@
 import uuid from 'uuid/v4';
-import uuidv5 from 'uuid/v5';
 import t from 'tcomb';
 import {cleanObjectKeys, removeNullValues} from './models-helper';
 import {isEmpty, merge, omit, difference} from 'lodash';
@@ -108,11 +107,9 @@ export default function migrateFromCsv(data) {
   };
 
   const name = input.ragionesociale || `NO Name ${input.id_fornitore}`;
-  const personId = isEmpty(input.proprietari) ? uuid() : uuidv5(input.proprietari, PERSON_NAMESPACE);
-  const ownerId = isEmpty(input.proprietari) ? uuid() : uuidv5(input.proprietari, OWNER_NAMESPACE);
 
   const person = t.Person({
-    id: personId,
+    id: uuid(),
     name,
     firstName: input.num_3,
     firstSurname: input.num_1,
@@ -120,11 +117,12 @@ export default function migrateFromCsv(data) {
     documentNumber: input.pariva,
     personType: personType(),
     contacts: contacts(),
-    _migrateOwnerId: input.id_fornitore
+    _migrateOwnerId: input.id_fornitore,
+    _relatedTo: input.proprietari
   });
 
   const owner = t.Owner({
-    id: ownerId,
+    id: uuid(),
     type: ownerType(),
     note: input.note,
     personId: person.id,
@@ -132,11 +130,6 @@ export default function migrateFromCsv(data) {
     _relatedTo: input.proprietari,
     _migrateId: input.id_fornitore
   });
-
-  if (['61116', '352834', '354258'].indexOf(owner._migrateId) !== -1) {
-    console.log('OWNER', owner);
-    console.log('PERSON', person);
-  }
 
   return {owner, person};
 }

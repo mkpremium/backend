@@ -14,12 +14,13 @@ const CrossInputDTO = t.struct({
 }, 'CrossInputDTO');
 
 const CrossDTO = t.struct({
-  ownerId: t.String,
+  ownerId: t.maybe(t.String),
+  ownerType: t.maybe(t.String),
+  ownerName: t.maybe(t.String),
   worksheetId: t.String,
   buildingId: t.String,
   verified: t.Boolean,
-  ownerName: t.String,
-  contactName: t.String,
+  contactName: t.maybe(t.String),
   contactDocument: t.maybe(t.String)
 }, 'CrossDTO');
 
@@ -39,9 +40,10 @@ export default function migrateFromCsv(data) {
 
   return CrossDTO({
     worksheetId: input.id_chiamatafornitore,
-    buildingId: input.id,
+    buildingId: input.id_catastro,
     ownerId: input.id_fornitore,
     verified: verified(),
+    ownerType: input.codfis,
     ownerName: input.proprietari,
     contactName: input.ragionesociale,
     contactDocument: input.pariva

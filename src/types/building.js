@@ -346,6 +346,7 @@ t.Building = t.struct(
     Id_Estado: t.maybe(t.String), // Use to sync firebase informadores
 
     _migrateId: t.String,
+    _relatedTo: t.maybe(t.String),
     _documentType: t.String
   },
   {

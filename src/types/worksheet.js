@@ -113,6 +113,7 @@ export const Worksheet = t.WorkSheet = t.struct({
   viewedBy: t.maybe(t.String),
 
   _migrateId: t.maybe(t.String),
+  _relatedTo: t.maybe(t.String),
 
   lastAddedMeeting: t.maybe(ScheduledEvent),
 
