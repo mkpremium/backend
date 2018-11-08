@@ -73,6 +73,14 @@ const indexes = [
     query: '(DISTINCT ARRAY v.fullAddress FOR v in addresses END) WHERE (_documentType = \'person\')'
   },
   {
+    name: 'owner_owner_name',
+    query: '(_documentType, name) WHERE _documentType = \'owner\''
+  },
+  {
+    name: 'person_owner_name',
+    query: '(_documentType, name) WHERE _documentType = \'person\''
+  },
+  {
     name: 'owner_related',
     query: '(_documentType, _relatedTo) WHERE _documentType= \'owner\''
   }

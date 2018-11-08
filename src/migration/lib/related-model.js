@@ -1,12 +1,13 @@
+import uuid from 'uuid/v4';
 import t from 'tcomb';
 import Promise from 'bluebird';
 import _ from 'lodash';
 
 import {WorksheetRepository} from '../../worksheet/models/worksheet';
 import {BuildingRepository} from '../../building/models';
-import {OwnerRepository} from '../../owner/models';
+import {OwnerRepository, PersonRepository} from '../../owner/models';
 import {MigrateModelV2} from './migrate-model-v2';
-import uuid from 'uuid/v4';
+import {OwnerType} from '../../types/enums';
 
 async function createRelatedWorksheet(record, ownerRecords) {
   const idsToFind = ownerIds(ownerRecords);
@@ -18,7 +19,7 @@ async function createRelatedWorksheet(record, ownerRecords) {
   if (idsToFind.length !== owners.length) {
     throw new Error(`Cannot find all owners with IDS [${idsToFind.join(', ')}]`);
   }
-
+  await createPrincipalIfNeed(building, owners);
   await updateOwnersBuildings(idsToFind, building.id);
   await createWorksheet(building, owners);
 }
@@ -48,6 +49,37 @@ async function findOwners(ownerIds) {
 
 function arrayToQuery(values) {
   return `[${values.map(value => `'${value}'`).join(', ')}]`;
+}
+
+async function createPrincipalIfNeed(building, owners) {
+  const principalOwner = _.find(owners, {name: building.owner.name, type: OwnerType.PRINCIPAL});
+
+  if (principalOwner) return;
+
+  const person = await findOrCreatePerson(building.owner);
+  const owner = await createOwner(person, building);
+  owners.push(owner);
+}
+
+async function createOwner(person, building) {
+  const repo = new OwnerRepository();
+  return repo.save({
+    id: uuid(),
+    person,
+    buildingId: building.id,
+    personId: person.id,
+    _relatedTo: building.owner.name,
+    name: building.owner.name,
+    type: OwnerType.PRINCIPAL
+  }, false);
+}
+
+async function findOrCreatePerson(owner) {
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder().where('name = ?', owner.name);
+  const [person] = await repo.query(qb);
+
+  return person || repo.save({name: owner.name, id: uuid()}, false);
 }
 
 async function updateOwnersBuildings(ownerIds, buildingId) {
@@ -129,53 +161,6 @@ export class RelatedModel extends MigrateModelV2 {
       this.addOwner(record);
     } else {
       return this.createWorksheet(record);
-    }
-  }
-
-  async pushToDatabase_(record) {
-    const worksheetRepo = new WorksheetRepository();
-    const buildingRepo = new BuildingRepository();
-    const ownerRepo = new OwnerRepository();
-
-    try {
-      const {worksheets, buildings, owners} = await Promise.props({
-        worksheets: worksheetRepo.findByMigratedId(record.worksheetId),
-        buildings: buildingRepo.findByMigratedId(record.buildingId),
-        owners: ownerRepo.findByMigratedId(record.ownerId)
-      });
-
-      const [worksheet] = worksheets;
-      const [building] = buildings;
-      const [owner] = owners;
-
-      console.log('related-mode', 'before', record.worksheetId, worksheet.id, worksheet.relatedBuildingIds, 'Owners', worksheet.relatedOwnerIds);
-
-      const updatedWorksheet = t.update(worksheet, {
-        relatedBuildingIds: {
-          $set: _.uniq(worksheet.relatedBuildingIds.concat([building.id]))
-        },
-        relatedOwnerIds: {
-          $set: _.uniq(worksheet.relatedOwnerIds.concat([owner.id]))
-        }
-      });
-      const updatedOwner = t.update(owner, {
-        buildingId: {
-          $set: building.id
-        },
-        verified: {
-          $set: record.verified
-        }
-      });
-
-      console.log('related-mode', 'after', record.worksheetId, worksheet.id, updatedWorksheet.relatedBuildingIds, 'Owners', updatedWorksheet.relatedOwnerIds);
-
-      await Promise.all([
-        worksheetRepo.save(updatedWorksheet, false),
-        ownerRepo.save(updatedOwner, false)
-      ]);
-    } catch (e) {
-      console.error('record', record);
-      throw e;
     }
   }
 }

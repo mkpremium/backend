@@ -167,7 +167,8 @@ t.Person = t.struct(
       contacts: [],
       addresses: [],
       gender: 'NINGUNO',
-      _documentType: 'person'
+      _documentType: 'person',
+      personType: 'NATURAL'
     }
   }
 );
@@ -235,6 +236,7 @@ export const Owner = t.Owner = t.struct(
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
     business: t.maybe(t.OwnerBusiness),
+    name: t.String,
 
     note: t.maybe(t.String),
 

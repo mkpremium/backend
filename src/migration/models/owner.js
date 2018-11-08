@@ -127,6 +127,7 @@ export default function migrateFromCsv(data) {
     note: input.note,
     personId: person.id,
     person: person,
+    name,
     _relatedTo: input.proprietari,
     _migrateId: input.id_fornitore
   });
