@@ -33,8 +33,10 @@ export async function seed(files) {
   const relations = new RelatedModel(files.cross, app);
   // const buildingEntities = new MigrateEntities(files.entities, app);
 
-  await migrateOwners.run();
-  await migrateBuildings.run();
+  await Promise.all([
+    migrateOwners.run(),
+    migrateBuildings.run()
+  ]);
   // await buildingEntities.run();
   // await processFamilyMembers(files, app);
   // await denormalizeWorksheets();

@@ -4,7 +4,6 @@ import uuid from 'uuid/v4';
 import _ from 'lodash';
 import couchbase from '../src/db/couchbase';
 import {Owner, familyOwner} from '../src/types/owner';
-import {resolve} from 'path';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
 
 import Promise from 'bluebird';
