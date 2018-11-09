@@ -21,6 +21,7 @@ async function createRelatedWorksheet(record, ownerRecords) {
   }
   await createPrincipalIfNeed(building, owners);
   await updateOwnersBuildings(idsToFind, building.id);
+  await createRelatedOwners(building, owners);
   await createWorksheet(building, owners);
 }
 
@@ -56,12 +57,32 @@ async function createPrincipalIfNeed(building, owners) {
 
   if (principalOwner) return;
 
-  const person = await findOrCreatePerson(building.owner);
-  const owner = await createOwner(person, building);
+  const owner = await findOrCreateOwner(building);
   owners.push(owner);
 }
 
-async function createOwner(person, building) {
+async function findOrCreateOwner(building) {
+  console.log('adding principal to', building.buildingId, building.owner.name);
+
+  const owner = await findOwner(building);
+  if (owner) {
+    return owner;
+  }
+
+  const person = await findOrCreatePerson(building.owner);
+  return createOwner(person, building, OwnerType.PRINCIPAL);
+}
+
+async function findOwner(building) {
+  const repo = new OwnerRepository();
+  const qb = repo.getQueryBuilder()
+    .where('name = ?', building.owner.name);
+  const [owner] = await repo.query(qb);
+
+  return owner;
+}
+
+async function createOwner(person, building, type) {
   const repo = new OwnerRepository();
   return repo.save({
     id: uuid(),
@@ -69,8 +90,8 @@ async function createOwner(person, building) {
     buildingId: building.id,
     personId: person.id,
     _relatedTo: building.owner.name,
-    name: building.owner.name,
-    type: OwnerType.PRINCIPAL
+    name: person.name,
+    type
   }, false);
 }
 
@@ -80,6 +101,25 @@ async function findOrCreatePerson(owner) {
   const [person] = await repo.query(qb);
 
   return person || repo.save({name: owner.name, id: uuid()}, false);
+}
+
+async function findMigratePerson(owner) {
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder()
+    .where('_migrateId IS NOT MISSING')
+    .where('name = ?', owner.name);
+  const people = await repo.query(qb);
+
+  // return just person that have all the info to work with
+  function goodOne(person) {
+    return person.birthYear !== 0 &&
+      !_.isEmpty(person.firstSurname) &&
+      !_.isEmpty(person.secondSurname);
+  }
+
+  console.log('findMigratePerson ', owner.name, 'found', people.length);
+
+  return _.find(people, goodOne);
 }
 
 async function updateOwnersBuildings(ownerIds, buildingId) {
@@ -106,6 +146,116 @@ async function createWorksheet(building, owners) {
   });
 
   return repo.save(worksheet, false);
+}
+
+async function createRelatedOwners(building, owners) {
+  const {family, related, neighbors} = await findByRelatedPeople(building);
+
+  async function createRelated(relatedPeople, type) {
+    if (relatedPeople.length === 0) {
+      return [];
+    }
+    return Promise.map(relatedPeople, (person) => createOwner(person, building, type));
+  }
+
+  const familyOwners = await createRelated(family, OwnerType.FAMILY);
+  const relatedOwners = await createRelated(related, OwnerType.RELATED);
+  const neighborsOwners = await createRelated(neighbors, OwnerType.NEIGHBOUR);
+
+  const newOwners = familyOwners.concat(relatedOwners).concat(neighborsOwners);
+
+  if (newOwners.length > 0) {
+    const ids = _.map(newOwners, 'id');
+    console.log('adding extra owners', building._migrateId, building.owner.name, ids);
+  }
+
+  newOwners.forEach(related => {
+    owners.push(related);
+  });
+}
+
+async function findByRelatedPeople(building) {
+  const person = await findMigratePerson(building.owner);
+  if (!person) {
+    return {
+      family: [],
+      related: [],
+      neighbors: []
+    };
+  }
+  // hermanos
+  const related = await findPeopleByFamilyName(person);
+  // familia misma casa
+  const family = await findPeopleInSameHouse(person);
+  // neighborhood same building
+  const neighbors = await findPeopleSameBuilding(building);
+
+  return {
+    family,
+    related,
+    neighbors
+  };
+}
+
+async function findPeopleByFamilyName(person) {
+  if (person.birthYear === 0 || _.isEmpty(person.firstSurname) || _.isEmpty(person.secondSurname)) {
+    return [];
+  }
+
+  const ageStart = person.birthYear - 10;
+  const ageEnd = person.birthYear + 10;
+
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder()
+    .where('t.birthYear >= ?', ageStart)
+    .where('t.birthYear <= ?', ageEnd)
+    .where('t.firstSurname = ?', person.firstSurname)
+    .where('t.secondSurname = ?', person.secondSurname);
+
+  return repo.query(qb);
+}
+
+async function findPeopleInSameHouse(person) {
+  const [address] = person.addresses;
+  if (!address) return [];
+
+  const floor = _.get(address, 'floor', '') || '';
+  const number = _.get(address, 'number', '') || '';
+  const addressLocation = floor + number;
+
+  if (_.isEmpty(address.fullAddress) || _.isEmpty(address.postalCode) || _.isEmpty(addressLocation)) {
+    return [];
+  }
+
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder()
+    .where('t._address.fullAddress = ?', address.fullAddress)
+    .where('t._address.postalCode = ?', address.postalCode);
+
+  if (!_.isEmpty(floor)) {
+    qb.where('t._address.floor = ?', floor);
+  }
+  if (!_.isEmpty(number)) {
+    qb.where('t._address.number = ?', number);
+  }
+
+  return repo.query(qb);
+}
+
+async function findPeopleSameBuilding(building) {
+  const fullAddress = _.get(building, 'address.fullAddress', '') || '';
+  const postalCode = _.get(building, 'address.postalCode', '') || '';
+
+  if (_.isEmpty(fullAddress) || _.isEmpty(postalCode)) {
+    return [];
+  }
+
+  const repo = new PersonRepository();
+  const qb = repo.getQueryBuilder()
+    .where('t._address.fullAddress = ?', fullAddress)
+    .where('t._address.postalCode = ?', postalCode);
+
+  return repo.query(qb);
 }
 
 export class RelatedModel extends MigrateModelV2 {

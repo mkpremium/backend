@@ -25,7 +25,8 @@ export const OwnerType = {
   PRINCIPAL: 'PRINCIPAL',
   SECONDARY: 'SECUNDARIO',
   NEIGHBOUR: 'VECINO',
-  FAMILY: 'FAMILIAR'
+  FAMILY: 'FAMILIAR',
+  RELATED: 'HERMANOS'
 };
 
 export const OwnerStatus = {

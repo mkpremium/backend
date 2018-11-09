@@ -53,7 +53,9 @@ function address(input, codes) {
   const info = postalCode ? codes.findByPostalCode(postalCode) : null;
   const city = info ? info.nombre_entidad_singular : null;
   return ({
-    fullAddress: input.domicili || input.nuc,
+    fullAddress: input.domicili,
+    floor: input.piso,
+    number: input.puerta,
     postalCode,
     city
   });
@@ -91,9 +93,11 @@ function contacts(input) {
 
 export default function migrateFromCsv(data = {}, codes) {
   const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
-  const name = `${_get(input, 'nombre', '')} ${_get(input, 'apellido_1', '')} ${_get(input, 'apellido_2', '')}`
+  const name = `${_get(input, 'apellido_1', '')} ${_get(input, 'apellido_2', '')} ${_get(input, 'nombre', '')}`
     .trim()
     .replace(/\s+/g, ' ');
+
+  const addr = address(input, codes);
 
   return t.Person({
     id: uuid(),
@@ -102,10 +106,13 @@ export default function migrateFromCsv(data = {}, codes) {
     firstSurname: _get(input, 'apellido_1', ''),
     secondSurname: _get(input, 'apellido_2', ''),
     birthDate: birthDate(input),
-    addresses: [address(input, codes)],
+    birthYear: !isEmpty(input.ano_naci) ? Number(input.ano_naci) : 0,
+    addresses: [addr],
+    _address: addr,
     contacts: contacts(input),
     gender: gender(input),
     personType: 'NATURAL',
-    _migrateId: input.id
+    _migrateId: input.id,
+    _relatedTo: input.proprietari
   });
 }

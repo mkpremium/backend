@@ -66,3 +66,5 @@ SQL
 
 step_1_add_address > ${step_1_file}
 step_2_cross_owner > ${outfile}
+# clean up
+rm ${step_1_file}

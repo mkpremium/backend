@@ -33,10 +33,10 @@ export async function seed(files) {
   const relations = new RelatedModel(files.cross, app);
   // const buildingEntities = new MigrateEntities(files.entities, app);
 
-  await Promise.all([
-    migrateOwners.run(),
-    migrateBuildings.run()
-  ]);
+  // await Promise.all([
+  //   migrateOwners.run(),
+  //   migrateBuildings.run()
+  // ]);
   // await buildingEntities.run();
   // await processFamilyMembers(files, app);
   // await denormalizeWorksheets();
@@ -57,10 +57,10 @@ async function deleteAll() {
 
   return Promise.all([
     cleanFirebase(),
-    person.deleteQuery(),
+    // person.deleteQuery(),
     worksheet.deleteQuery(),
-    owner.deleteQuery(),
-    building.deleteQuery(),
+    // owner.deleteQuery(),
+    // building.deleteQuery(),
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
