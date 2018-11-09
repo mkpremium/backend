@@ -17,6 +17,7 @@ import {processFamilyMembers} from './seed_family';
 import {invalidate} from './seed_invalidate';
 import {MigrateModelV2} from '../src/migration/lib/migrate-model-v2';
 import {defaultFiles} from './defaults';
+import {MigrateOwner} from '../src/migration/lib/migrate-owner';
 
 export async function seed(files) {
   const app = {
@@ -29,19 +30,19 @@ export async function seed(files) {
   await cleanQueue();
 
   const migrateBuildings = new MigrateModelV2('building', files.buildings, app);
-  const migrateOwners = new MigrateModelV2('owner', files.owners, app);
+  const migrateOwners = new MigrateOwner(files.owners, app);
   const relations = new RelatedModel(files.cross, app);
-  // const buildingEntities = new MigrateEntities(files.entities, app);
+  const buildingEntities = new MigrateEntities(files.entities, app);
 
-  // await Promise.all([
-  //   migrateOwners.run(),
-  //   migrateBuildings.run()
-  // ]);
-  // await buildingEntities.run();
-  // await processFamilyMembers(files, app);
-  // await denormalizeWorksheets();
-  // await invalidate();
+  await Promise.all([
+    migrateOwners.run(),
+    migrateBuildings.run()
+  ]);
+
   await relations.run();
+  await buildingEntities.run();
+  // await invalidate();
+  // await relations.run();
 }
 
 async function deleteAll() {
@@ -57,10 +58,10 @@ async function deleteAll() {
 
   return Promise.all([
     cleanFirebase(),
-    // person.deleteQuery(),
+    person.deleteQuery(),
     worksheet.deleteQuery(),
-    // owner.deleteQuery(),
-    // building.deleteQuery(),
+    owner.deleteQuery(),
+    building.deleteQuery(),
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),

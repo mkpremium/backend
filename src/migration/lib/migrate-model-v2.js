@@ -39,6 +39,10 @@ export class MigrateModelV2 {
     this.processFunc = this.processFunc.bind(this);
   }
 
+  parseData(data) {
+    return models[this.name](data);
+  }
+
   async processFunc(data, row) {
     try {
       switch (this.name) {
@@ -75,6 +79,6 @@ export class MigrateModelV2 {
       ? this.app.locals.bucket
       : await couchbase(this.app);
 
-    await this.importFileToModel();
+    return this.importFileToModel();
   }
 }
