@@ -175,7 +175,7 @@ GROUP BY t.status`;
       const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds);
       worksheet = t.update(worksheet, {
         relatedOwners: {$set: relatedOwners},
-        ownerContacts: {$set: ownersContactViews(relatedOwners)}
+        ownerContacts: {$set: ownersContactViews(relatedOwners, worksheet)}
       });
     }
 

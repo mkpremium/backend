@@ -66,11 +66,19 @@ async function findOrCreateOwner(building) {
 
   const owner = await findOwner(building);
   if (owner) {
-    return owner;
+    return addBuildingIdToOwner(owner, building);
   }
 
   const person = await findOrCreatePerson(building.owner);
   return createOwner(person, building, OwnerType.PRINCIPAL);
+}
+
+async function addBuildingIdToOwner(owner, building) {
+  const repo = new OwnerRepository();
+  const updatedOwner = t.update(owner, {buildingId: {$set: building.id}});
+
+  await repo.save(updatedOwner, false);
+  return owner;
 }
 
 async function findOwner(building) {
@@ -209,8 +217,9 @@ async function findPeopleByFamilyName(person) {
   const qb = repo.getQueryBuilder()
     .where('t.birthYear >= ?', ageStart)
     .where('t.birthYear <= ?', ageEnd)
-    .where('t.firstSurname = ?', person.firstSurname)
-    .where('t.secondSurname = ?', person.secondSurname);
+    .where('LOWER(t.firstSurname) = LOWER(?)', person.firstSurname)
+    .where('LOWER(t.secondSurname) = LOWER(?)', person.secondSurname)
+    .limit(10);
 
   return repo.query(qb);
 }
@@ -229,15 +238,18 @@ async function findPeopleInSameHouse(person) {
 
   const repo = new PersonRepository();
   const qb = repo.getQueryBuilder()
+    .where('t._address IS NOT MISSING')
     .where('t._address.fullAddress = ?', address.fullAddress)
-    .where('t._address.postalCode = ?', address.postalCode);
+    .where('t._address.postalCode = ?', address.postalCode.number);
 
   if (!_.isEmpty(floor)) {
     qb.where('t._address.floor = ?', floor);
   }
   if (!_.isEmpty(number)) {
-    qb.where('t._address.number = ?', number);
+    qb.where('t._address.`number` = ?', number);
   }
+
+  qb.limit(10);
 
   return repo.query(qb);
 }
@@ -253,7 +265,8 @@ async function findPeopleSameBuilding(building) {
   const repo = new PersonRepository();
   const qb = repo.getQueryBuilder()
     .where('t._address.fullAddress = ?', fullAddress)
-    .where('t._address.postalCode = ?', postalCode);
+    .where('t._address.postalCode = ?', postalCode)
+    .limit(10);
 
   return repo.query(qb);
 }

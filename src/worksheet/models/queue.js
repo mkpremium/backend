@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import t from 'tcomb';
 import debug from 'debug';
 import fromJSON from 'tcomb/lib/fromJSON';
+import _ from 'lodash';
 import _map from 'lodash/map';
 import _set from 'lodash/set';
 import _get from 'lodash/get';
@@ -134,7 +135,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   async removeWorksheetInQueue(queue, worksheetId) {
     const worksheetRepo = new WorksheetRepository();
     const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId);
-    if (worksheet.queueId && worksheet.queueId !== queue.id) {
+    const haveEmptyQueueId = _.isNil(worksheet.queueId) || _.isEmpty(worksheet.queueId);
+    if (!haveEmptyQueueId && worksheet.queueId !== queue.id) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`);
     }
 

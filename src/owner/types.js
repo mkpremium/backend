@@ -74,11 +74,15 @@ t.OwnerUpdateBusinessStatus = t.struct({
   status: t.OwnerBusinessStatus
 }, 'OwnerUpdateBusinessStatus');
 
-export function ownersContactViews(owners) {
-  return _flatten(owners.map(ownerContactsView));
+export function ownersContactViews(owners, worksheet) {
+  function mapOwner(owner) {
+    return ownerContactsView(owner, worksheet.relatedBuildings[0]);
+  }
+
+  return _flatten(owners.map(mapOwner));
 }
 
-export function ownerContactsView(owner) {
+export function ownerContactsView(owner, building) {
   return owner.person.contacts
     .map((contact) => fromJSON(Object.assign({}, owner, {
       person: owner.person,

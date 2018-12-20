@@ -47,7 +47,7 @@
     "seed_family": "babel-node $NODE_DEBUG_OPTION migrations/seed_family.js",
     "seed_people": "babel-node $NODE_DEBUG_OPTION migrations/seed_people.js",
     "seed_denormalize": "babel-node $NODE_DEBUG_OPTION migrations/seed_denormalize.js",
-    "seed_metadata": "babel-node $NODE_DEBUG_OPTION migrations/seed_metadata.js"
+    "seed_metadata": "babel-node $NODE_DEBUG_OPTION migrations/seed_meta.js"
   },
   "dependencies": {
     "aws-sdk": "^2.313.0",

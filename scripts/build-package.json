@@ -3,7 +3,7 @@
   "scripts": {
     "migrate": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_all.js",
     "build_index": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config indexes.js",
-    "metadata": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_metadata.js",
+    "metadata": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_meta.js",
     "family": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_family.js",
     "people": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_people.js",
     "invalidate": "node --max-old-space-size=8192 --require source-map-support/register --require dotenv/config migrations/seed_invalidate.js",
