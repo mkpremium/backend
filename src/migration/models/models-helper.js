@@ -39,7 +39,7 @@ export function cleanDataAndRemoveNullValues(object) {
  * @param value
  * @return {*}
  */
-function removeNullValue(value) {
+export function removeNullValue(value) {
   if (!value) {
     return null;
   }
