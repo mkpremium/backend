@@ -38,6 +38,7 @@ function mainAction() {
       process.exit(1);
     });
 }
+
 // endregion
 
 async function main(inputFile) {
@@ -75,6 +76,7 @@ async function head(filename, number = 1) {
     });
   });
 }
+
 // endregion
 
 class BuildingNotes extends MigrateModelV3 {
@@ -101,17 +103,30 @@ async function findBuilding(data) {
   return repo.findByMigratedId(migratedId);
 }
 
+async function noteWasMigrated(data) {
+  const repo = new NoteRepository();
+  const qb = repo.getQueryBuilder()
+    .where('context._migrateId = ?', data['ID'])
+    .limit(1);
+  const result = await repo.query(qb);
+  return result && result.length > 0;
+}
+
 async function createNote(building, data) {
   const repo = new NoteRepository();
+  const itWasMigrated = await noteWasMigrated(data);
   const note = {
     note: noteBody(data),
     createdAt: noteDate(data),
     context: {
-      buildingId: building.id
+      buildingId: building.id,
+      _migrateId: data['ID']
     }
   };
 
-  return repo.createNote(note, 'migration');
+  if (!itWasMigrated) {
+    return repo.createNote(note, 'migration');
+  }
 }
 
 function noteBody(data) {
