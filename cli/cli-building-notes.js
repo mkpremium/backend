@@ -91,42 +91,55 @@ class BuildingNotes extends MigrateModelV3 {
 
 async function createBuildingNote(data) {
   const building = await findBuilding(data);
-  return createNote(building, data);
+  return migrateNote(building, data);
 }
 
 async function findBuilding(data) {
   const repo = new BuildingRepository();
-  const migratedId = removeNullValue(data['ID_CATASTRO']);
-  if (migratedId === null) {
+  const buildingMigrateId = removeNullValue(data['ID_CATASTRO']);
+  if (buildingMigrateId === null) {
     throw new Error(`invalid ID_CATASTRO '${data['ID_CATASTRO']}'`);
   }
-  return repo.findByMigratedId(migratedId);
+  return repo.findByMigratedId(buildingMigrateId);
 }
 
-async function noteWasMigrated(data) {
+async function migrateNote(building, data) {
+  const migrateId = removeNullValue(data['ID']);
+
+  if (migrateId === null) {
+    throw new Error('cannot migrate notes with invalid note ID');
+  }
+
+  const itWasMigrated = await noteWasMigrated(migrateId);
+
+  if (itWasMigrated) {
+    return;
+  }
+
+  return createNote(data, building.id, migrateId);
+}
+
+async function noteWasMigrated(migrateId) {
   const repo = new NoteRepository();
   const qb = repo.getQueryBuilder()
-    .where('context._migrateId = ?', data['ID'])
+    .where('context._migrateId = ?', migrateId)
     .limit(1);
   const result = await repo.query(qb);
   return result && result.length > 0;
 }
 
-async function createNote(building, data) {
+async function createNote(data, buildingId, migrateId) {
   const repo = new NoteRepository();
-  const itWasMigrated = await noteWasMigrated(data);
+
   const note = {
     note: noteBody(data),
     createdAt: noteDate(data),
     context: {
-      buildingId: building.id,
-      _migrateId: data['ID']
+      buildingId: buildingId,
+      _migrateId: migrateId
     }
   };
-
-  if (!itWasMigrated) {
-    return repo.createNote(note, 'migration');
-  }
+  return repo.createNote(note, 'migration');
 }
 
 function noteBody(data) {
