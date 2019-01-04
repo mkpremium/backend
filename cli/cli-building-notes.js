@@ -1,12 +1,12 @@
 #!/usr/bin/env babel-node
 import program from 'commander';
 import fs from 'fs-extra';
-import {exec} from 'child_process';
 import {MigrateModelV3} from '../src/migration/lib/migrate-model-v3';
 import {BuildingRepository} from '../src/building/models';
 import {NoteRepository} from '../src/notes/models';
 import {madrid} from '../src/lib/date';
 import {removeNullValue} from '../src/migration/models/models-helper';
+import {validateHeaders} from './lib';
 
 // ~/Descargas/HISTORIAL_CON_PRIMER_IDCATASTRO.csv
 // ID;ID_CATASTRO;FECHA;ID_OPERDADOR;NOTAS
@@ -54,27 +54,7 @@ async function validateFile(inputFile) {
     throw new Error(`'${inputFile} doesn't exist or cannot be readed`);
   }
 
-  return validateHeaders(inputFile);
-}
-
-async function validateHeaders(inputFile) {
-  const expectedHeaders = 'ID;ID_CATASTRO;FECHA;ID_OPERDADOR;NOTAS';
-  const headers = await head(inputFile);
-  if (headers !== expectedHeaders) {
-    throw new Error(`${inputFile} should have the following first line '${expectedHeaders}', but found '${headers}'`);
-  }
-}
-
-async function head(filename, number = 1) {
-  return new Promise((resolve, reject) => {
-    exec(`head -n${number} ${filename}`, (err, stdout) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout.replace(/\n/, ''));
-      }
-    });
-  });
+  return validateHeaders(inputFile, 'ID;ID_CATASTRO;FECHA;ID_OPERDADOR;NOTAS');
 }
 
 // endregion
