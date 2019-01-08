@@ -75,7 +75,7 @@ export const firebaseInformadores = {
   enabled: !isTest(),
   serviceAccount: process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores,
   databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || 'https://mkpremiumstreet.firebaseio.com',
-  prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || ''
+  prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || '_'
 };
 
 const defaultUploadDir = join(__dirname, '.uploads');
@@ -104,7 +104,7 @@ export const mailer = {
       user: process.env.MAILER_USER || 'v3hn5oczispny2x4@ethereal.email',
       pass: process.env.MAILER_PASS || 'kF5nfKm6XreTsMN8Br'
     },
-    logger: true,
+    logger: false,
     debug: false,
     tls: {
       rejectUnauthorized: false

@@ -5,16 +5,13 @@ import {MigrateEntities} from '../src/migration/lib/migrate-entities';
 import Promise from 'bluebird';
 import {cleanFirebase} from './firebase-clean';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
-import {OwnerRepository, PersonRepository} from '../src/owner/models';
+import {OwnerRepository} from '../src/owner/models';
 import {HistoryRepository} from '../src/history/models';
 import {Calls, CallsRawEvents} from '../src/calls/models';
 import {ScheduledEventsRepository} from '../src/scheduled-events/models';
 import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
-import {denormalizeWorksheets} from './seed_denormalize';
-import {processFamilyMembers} from './seed_family';
-import {invalidate} from './seed_invalidate';
 import {MigrateModelV2} from '../src/migration/lib/migrate-model-v2';
 import {defaultFiles} from './defaults';
 import {MigrateOwner} from '../src/migration/lib/migrate-owner';
@@ -39,7 +36,6 @@ export async function seed(files) {
 
   await relations.run();
   await buildingEntities.run();
-  // await invalidate();
 }
 
 async function deleteAll() {

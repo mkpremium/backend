@@ -1,0 +1,5 @@
+export const Files = {
+  BUILDINGS: 'EDIFICIOS.csv',
+  OWNERS: 'PROPIETARIOS.csv',
+  WORKSHEET_RELATIONS: 'CROSS_TABLE.csv'
+};

@@ -18,7 +18,7 @@ program
 
 function mainAction() {
   if (program.args.length === 0) {
-    console.error('input-file is required');
+    console.error('input-dir is required');
     program.help();
   }
 
