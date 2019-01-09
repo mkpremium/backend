@@ -11,6 +11,9 @@ export async function migrateBuildingNotes(inputFile, bucket) {
 
 export class BuildingNotes extends MigrateModelV3 {
   async parseToData(data, row) {
+    if (data['FECHA'] !== '2018-11-21 09:49:38.530') {
+      return;
+    }
     await createBuildingNote(data);
   }
 }
@@ -60,12 +63,13 @@ async function createNote(data, buildingId, migrateId) {
   const note = {
     note: noteBody(data),
     createdAt: noteDate(data),
+    createdBy: 'migration',
     context: {
       buildingId: buildingId,
       _migrateId: migrateId
     }
   };
-  return repo.createNote(note, 'migration');
+  return repo.createNoteMigration(note);
 }
 
 function noteBody(data) {

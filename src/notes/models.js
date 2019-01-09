@@ -21,6 +21,13 @@ export class NoteRepository extends Note {
     return note;
   }
 
+  async createNoteMigration(params = {}) {
+    const noteBody = fromJSON(params, TNote);
+    const note = await this.save(noteBody);
+    await saveNoteToFirebase(note);
+    return note;
+  }
+
   async listNotes(query = {}) {
     const params = fromJSON(query, t.NoteListQuery);
     const qb = this.getQueryBuilder()
