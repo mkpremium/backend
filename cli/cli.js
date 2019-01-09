@@ -7,4 +7,5 @@ program
   .command('building-notes [input-file]', 'Agrega notas los edificios')
   .command('building-states [input-dir]', 'Actualiza el estado de los edificios')
   .command('owners-verify [input-file]', 'Verifica los owners')
+  .command('db-indexes', 'Recrea los indices de la base de datos')
   .parse(process.argv);

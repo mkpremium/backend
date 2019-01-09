@@ -232,11 +232,12 @@ export class CouchbaseModel {
   async query(queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
     await this._promiseBucket;
     const queryParam = queryBuilder.toParam();
+
     debugModel('query', `c(${consistency})`, queryParam);
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
     const result = await this._bucket.queryAsync(n1ql, queryParam.values);
-    debugModel('result');
+    debugModel('query-result', `c(${consistency})`, queryParam);
     return result;
   }
 

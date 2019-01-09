@@ -43,7 +43,8 @@ export async function deleteAll() {
     scheduledEvent.deleteQuery(),
     callUnknownEvents.deleteQuery(),
     stats.deleteQuery(),
-    cleanQueue()
+    cleanQueue(),
+    cleanNotes(true)
   ]);
 }
 
