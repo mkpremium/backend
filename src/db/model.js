@@ -278,6 +278,11 @@ export class CouchbaseModel {
     return results;
   }
 
+  async findOneByMigrateId(migrateId, require = true) {
+    const [result] = await this.findByMigratedId(migrateId, require);
+    return result;
+  }
+
   async findById(id) {
     try {
       debugModel('findById', this._getMeta().defaultProps._documentType, id);

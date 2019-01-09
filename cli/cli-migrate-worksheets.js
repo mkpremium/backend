@@ -9,14 +9,14 @@ import {migrateWorksheets} from './lib/migrate-worksheets';
 import {Files} from './constants';
 import couchbase from '../src/db/couchbase';
 
-// region main entry
 program
   .arguments('[input-dir]')
   .version('0.0.1')
-  .option('-c, --clean', 'Elimina los datos ')
+  .option('-c, --clean', 'Elimina los datos previos')
   .action(mainAction)
   .parse(process.argv);
 
+// region main entry
 function mainAction() {
   if (program.args.length === 0) {
     console.error('input-dir is required');

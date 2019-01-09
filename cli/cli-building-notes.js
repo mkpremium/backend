@@ -1,12 +1,14 @@
 #!/usr/bin/env babel-node
 import program from 'commander';
 import fs from 'fs-extra';
+import couchbase from '../src/db/couchbase';
 import {MigrateModelV3} from '../src/migration/lib/migrate-model-v3';
 import {BuildingRepository} from '../src/building/models';
 import {NoteRepository} from '../src/notes/models';
 import {madrid} from '../src/lib/date';
 import {removeNullValue} from '../src/migration/models/models-helper';
 import {validateHeaders} from './lib';
+import {cleanNotes} from './lib/migrate-utils';
 
 // ~/Descargas/HISTORIAL_CON_PRIMER_IDCATASTRO.csv
 // ID;ID_CATASTRO;FECHA;ID_OPERDADOR;NOTAS
@@ -23,6 +25,7 @@ import {validateHeaders} from './lib';
 program
   .arguments('[input-file]')
   .version('0.0.1')
+  .option('-c, --clean', 'Elimina los datos previos')
   .action(mainAction)
   .parse(process.argv);
 
@@ -33,6 +36,9 @@ function mainAction() {
   }
 
   main.apply(null, arguments)
+    .then(() => {
+      process.exit(0);
+    })
     .catch(err => {
       console.error(err);
       process.exit(1);
@@ -43,6 +49,8 @@ function mainAction() {
 
 async function main(inputFile) {
   await validateFile(inputFile);
+  await couchbase();
+  await cleanNotes(program.clean);
   const migrate = new BuildingNotes(inputFile);
   await migrate.run();
 }
@@ -61,11 +69,7 @@ async function validateFile(inputFile) {
 
 class BuildingNotes extends MigrateModelV3 {
   async parseToData(data, row) {
-    try {
-      await createBuildingNote(data);
-    } catch (e) {
-      console.error(`at row ${row}, ${e.message}`);
-    }
+    await createBuildingNote(data);
   }
 }
 
@@ -80,7 +84,7 @@ async function findBuilding(data) {
   if (buildingMigrateId === null) {
     throw new Error(`invalid ID_CATASTRO '${data['ID_CATASTRO']}'`);
   }
-  return repo.findByMigratedId(buildingMigrateId);
+  return repo.findOneByMigrateId(buildingMigrateId);
 }
 
 async function migrateNote(building, data) {
@@ -123,7 +127,7 @@ async function createNote(data, buildingId, migrateId) {
 }
 
 function noteBody(data) {
-  return `${data['NOTAS']} - ${data['ID_OPERADOR']}`;
+  return `${data['NOTAS']} - ${data['ID_OPERDADOR']}`;
 }
 
 function noteDate(data) {

@@ -59,7 +59,7 @@ t.NoteListQuery = t.ListQuery.extend(
  *         format: YYYY-MM-DDTHH:mm:ss.sssZ
  *         description: Fecha de creación de la nota
  */
-t.Note = t.struct(
+export const TNote = t.Note = t.struct(
   {
     id: t.String,
     note: t.String,

@@ -4,11 +4,12 @@ import fromJSON from 'tcomb/lib/fromJSON';
 
 import {addBetweenQueryToBuilder, addDateQueryToBuilder} from '../lib/query/helpers';
 import {saveNoteToFirebase} from '../firebase/lib/business';
+import {TNote} from './types';
 
 export class Note extends CouchbaseModel {
   constructor() {
     super();
-    this.Struct = t.Note;
+    this.Struct = TNote;
   }
 }
 

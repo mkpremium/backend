@@ -9,11 +9,18 @@ import Promise from 'bluebird';
 import {cleanFirebase} from '../../migrations/firebase-clean';
 import {WorksheetQueueRepository} from '../../src/worksheet/models/queue';
 import {N1qlQuery} from 'couchbase';
+import {NoteRepository} from '../../src/notes/models';
 
 export async function clean(clean = false) {
   if (!clean) return;
 
   await deleteAll();
+}
+
+export async function cleanNotes(clean = false) {
+  if (!clean) return;
+  const notes = new NoteRepository();
+  await notes.deleteQuery();
 }
 
 export async function deleteAll() {
