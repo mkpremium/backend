@@ -101,7 +101,7 @@ export class CouchbaseModel {
   async findByIdOrThrow(id) {
     const model = await this.findById(id);
     if (!model) {
-      throw newHttpError(404, `${this.Struct.meta.name} ${id} no existe`);
+      throw newHttpError(404, `${this._getMeta().name} ${id} no existe`);
     }
 
     return model;
@@ -121,7 +121,7 @@ export class CouchbaseModel {
   }
 
   // TODO: refactor to CouchbaseQuery
-  getQueryBuilder(method = 'select', prefix = 't', props = this.Struct.meta.props) {
+  getQueryBuilder(method = 'select', prefix = 't', props = this._getMeta().props) {
     let qb;
 
     switch (method) {
@@ -168,8 +168,24 @@ export class CouchbaseModel {
     return qb;
   }
 
+  _getMeta() {
+    if (typeof this.Struct === 'undefined') {
+      throw new Error([
+        'Something really bad happened, Struct should be defined in some way.',
+        'you miss call "await couchbase()" import from src/db/couchbase.',
+        'or model types are missing move the import from src/db/couchbase top before another repositories or model.',
+        'last thing go to the type model and export it as a real const and import then to your repository',
+        'blame rkmax for this :P'
+      ].join(' '));
+    }
+    if (typeof this.Struct.meta === 'undefined') {
+      throw new Error('it looks like you forget define the Struct for this model or was not imported correctly');
+    }
+    return this.Struct.meta;
+  }
+
   getType() {
-    return this.Struct.meta.defaultProps._documentType;
+    return this._getMeta().defaultProps._documentType;
   }
 
   async countQuery(queryBuilder = this.getQueryBuilder('count')) {
@@ -256,7 +272,7 @@ export class CouchbaseModel {
     const results = await this.query(qb);
 
     if (required && (!results || results.length === 0)) {
-      throw new Error(`No records ${this.Struct.meta.defaultProps._documentType} found by _migrateId: ${migratedId}`);
+      throw new Error(`No records ${this._getMeta().defaultProps._documentType} found by _migrateId: ${migratedId}`);
     }
 
     return results;
@@ -264,7 +280,7 @@ export class CouchbaseModel {
 
   async findById(id) {
     try {
-      debugModel('findById', this.Struct.meta.defaultProps._documentType, id);
+      debugModel('findById', this._getMeta().defaultProps._documentType, id);
       await this._promiseBucket;
       const result = await this._bucket.getAsync(id);
       if (result && result.value) {
