@@ -5,6 +5,10 @@ Simple Node.js API.
 
 ## Requirements
 
+- docker
+- docker compose
+- nvm
+
 - node and npm
 - Couchbase
 
