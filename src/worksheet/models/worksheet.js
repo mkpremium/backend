@@ -326,7 +326,7 @@ GROUP BY t.status`;
 
     const results = await this.query(qb);
 
-    return _head(results);
+    return fromJSON(_head(results), t.WorkSheet);
   }
 
   async findWorksheetByOwner(ownerId) {

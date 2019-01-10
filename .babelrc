@@ -1,4 +1,5 @@
 {
   "presets": ["env"],
-  "plugins": ["transform-runtime", "shebang"]
+  "plugins": ["transform-runtime", "shebang"],
+  "sourceMaps": "both"
 }

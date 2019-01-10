@@ -10,22 +10,20 @@ export async function noSale(inputFile) {
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.NO_SALE)(data);
+    return updateWorksheetStatus(WorkSheetStatus.NO_SALE, data);
   }
 }
 
-function updateWorksheetStatus(newStatus) {
-  async function _updateWorksheetStatus(data) {
-    try {
-      const buildingMigrateId = getBuildingMigrateIdNotNull(data);
-      const worksheet = await findWorksheetByMigrateId(buildingMigrateId);
-      return worksheet.setStatus(newStatus);
-    } catch (e) {
-      console.error(e.message, data);
-    }
-  }
+async function updateWorksheetStatus(newStatus, data) {
+  const buildingMigrateId = getBuildingMigrateIdNotNull(data);
+  const worksheet = await findWorksheetByMigrateId(buildingMigrateId);
+  const updatedWorksheet = worksheet.setStatus(newStatus);
+  await saveDataChange(updatedWorksheet);
+}
 
-  return _updateWorksheetStatus;
+async function saveDataChange(worksheet) {
+  const repo = new WorksheetRepository();
+  return repo.save(worksheet, false);
 }
 
 function getBuildingMigrateIdNotNull(data) {
@@ -41,7 +39,7 @@ export async function withMeeting(inputFile) {
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.MEETING)(data);
+    return updateWorksheetStatus(WorkSheetStatus.MEETING, data);
   }
 }
 
@@ -50,12 +48,12 @@ export async function alreadySold(inputFile) {
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.ALREADY_SOLD)(data);
+    return updateWorksheetStatus(WorkSheetStatus.ALREADY_SOLD, data);
   }
 }
 
 async function findWorksheetByMigrateId(buildingMigrateId) {
-  const building = await findBuilding(buildingMigrateId);
+  const [building] = await findBuilding(buildingMigrateId);
   return findWorksheet(building.id);
 }
 

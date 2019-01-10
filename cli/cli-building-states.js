@@ -2,6 +2,7 @@
 import program from 'commander';
 import {checkInputs} from './lib';
 import {alreadySold, noSale, withMeeting} from './lib/migrate-building-states';
+import couchbase from '../src/db/couchbase';
 
 // ~/Descargas/ESTADOS EDIFICIOS_ ID CATASTRO (12-2008)
 
@@ -19,6 +20,9 @@ function mainAction() {
   }
 
   main.apply(null, arguments)
+    .then(() => {
+      process.exit(0);
+    })
     .catch(err => {
       console.error(err);
       process.exit(1);
@@ -36,6 +40,7 @@ async function main(inputDir) {
 
   const files = await checkInputs(inputDir, inputFiles);
 
+  await couchbase();
   await noSale(files['NoVende.csv']);
   await withMeeting(files['Visitas.csv']);
   await alreadySold(files['YaVendido.csv']);
