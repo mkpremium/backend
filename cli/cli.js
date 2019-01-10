@@ -8,4 +8,5 @@ program
   .command('building-states [input-dir]', 'Actualiza el estado de los edificios')
   .command('owners-verify [input-file]', 'Verifica los owners')
   .command('db-indexes', 'Recrea los indices de la base de datos')
+  .command('operator', 'Gestiona operadores (cuentas de usuario)')
   .parse(process.argv);
