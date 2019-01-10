@@ -68,5 +68,5 @@ export function actionWrapper(fn) {
         console.error(err);
         process.exit(1);
       });
-  }
+  };
 }

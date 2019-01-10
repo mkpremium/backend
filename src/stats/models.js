@@ -13,7 +13,6 @@ import {
 } from '../lib/query/helpers';
 import {queryDateFormat, utc} from '../lib/date';
 import {operatorPerformance} from '../../config';
-import _find from 'lodash/find';
 
 const statDebug = debug('app:model:stats');
 

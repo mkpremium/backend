@@ -3,9 +3,6 @@ import t from 'tcomb';
 import {cleanObjectKeys, removeNullValues} from './models-helper';
 import {isEmpty, merge, omit, difference} from 'lodash';
 
-const OWNER_NAMESPACE = '1b671a64-40d5-491e-99b0-da01ff1f3341';
-const PERSON_NAMESPACE = '0388e047-ffa8-4ea8-a4b4-1627e2844822';
-
 export const OwnerInputDTO = t.struct({
   id_fornitore: t.Str,
   ragionesociale: t.maybe(t.Str),

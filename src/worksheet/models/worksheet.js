@@ -20,7 +20,7 @@ import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
-import {NotFinalWorksheetStats, WorkSheetStatus} from '../../types/worksheet';
+import {WorkSheetStatus} from '../../types/worksheet';
 import {
   isAllowedChangeState,
   isInvalidVerified,
@@ -33,8 +33,6 @@ import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
 import {BuildingState} from '../../types/enums';
-
-const statuses = `[${NotFinalWorksheetStats.map(id => `'${id}'`).join(', ')}]`;
 
 const worksheetDebug = debug('app:model:worksheet');
 

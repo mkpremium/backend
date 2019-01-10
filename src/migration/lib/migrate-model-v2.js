@@ -9,7 +9,7 @@ import {defer} from '../../lib/promise-util';
 const debugMigrate = debug('app:migration:migrate');
 
 const defaultOptions = {
-  delimiter: ';',
+  delimiter: ';'
   // fork: true,
   // workerNum: Math.max(os.cpus().length - 1, 1) // ensure at least one worker
 };

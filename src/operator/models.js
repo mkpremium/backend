@@ -1,7 +1,5 @@
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
-import _find from 'lodash/find';
-import _filter from 'lodash/filter';
 import _omit from 'lodash/omit';
 import _get from 'lodash/get';
 import bcrypt from 'bcrypt';

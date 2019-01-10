@@ -30,7 +30,6 @@ import email from './email';
 import gearman from './gearman';
 
 import appErrorHandler from './lib/error-handler';
-import banks from './banks';
 
 const app = express();
 
