@@ -25,6 +25,13 @@ export async function checkInputs(inputDir, inputs) {
   return lodash.zipObject(inputs, fullPaths);
 }
 
+export async function checkInputFile(inputFile) {
+  const exist = await fs.pathExists(inputFile);
+  if (!exist) {
+    throw new Error(`there's no file ${inputFile}`);
+  }
+}
+
 /**
  * Read f¡st line of a file and check for an expected line
  * @throws
