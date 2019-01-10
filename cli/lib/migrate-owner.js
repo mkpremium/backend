@@ -48,8 +48,12 @@ class MigrateVerifyOwner extends MigrateModelV3 {
   async parseToData(data, row) {
     const {owner, input} = parse(data);
     const migrateId = owner._migrateId;
-    const migrateOwner = await MigrateVerifyOwner.findByMigrateId(migrateId);
-    await MigrateVerifyOwner.verifyOwner(migrateOwner, input);
+    if (input.verificato === '1') {
+      const migrateOwner = await MigrateVerifyOwner.findByMigrateId(migrateId);
+      await MigrateVerifyOwner.verifyOwner(migrateOwner);
+    } else {
+      // no-op
+    }
   }
 
   static async findByMigrateId(migrateId) {
@@ -57,11 +61,7 @@ class MigrateVerifyOwner extends MigrateModelV3 {
     return repo.findOneByMigrateId(migrateId);
   }
 
-  static async verifyOwner(owner, input) {
-    if (input.verificato !== '1') {
-      return;
-    }
-
+  static async verifyOwner(owner) {
     const updatedOwner = owner.verifyOwner('migrate', true, {
       status: OwnerStatus.VERIFIED
     });
