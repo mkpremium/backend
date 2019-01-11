@@ -40,8 +40,8 @@ jobs:
               curl -O https://bootstrap.pypa.io/get-pip.py &&
               sudo python get-pip.py &&
               sudo pip install awscli --upgrade &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/firebaseComerciales.json firebaseComerciales.json &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/firebaseInformadores.json firebaseInformadores.json
+              aws s3 cp --region eu-west-3 s3://mkpremium/config/circleci/firebaseComerciales.json firebaseComerciales.json &&
+              aws s3 cp --region eu-west-3 s3://mkpremium/config/circleci/firebaseInformadores.json firebaseInformadores.json
 
       # run tests!
       - run:
@@ -95,16 +95,16 @@ jobs:
               curl -O https://bootstrap.pypa.io/get-pip.py &&
               sudo python get-pip.py &&
               sudo pip install awscli --upgrade &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/firebaseComerciales.json firebaseComerciales.json &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/firebaseInformadores.json firebaseInformadores.json
+              aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/firebaseComerciales.json firebaseComerciales.json &&
+              aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/firebaseInformadores.json firebaseInformadores.json
 
       - run:
           name: MK Premium PM2 Setup
-          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/dev/banks-pm2.json banks-pm2.json
+          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/banks-pm2.json banks-pm2.json
 
       - run:
           name: MK Banks PM2 Setup
-          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/dev/mkpremium-pm2.json mkpremium-pm2.json
+          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/mkpremium-pm2.json mkpremium-pm2.json
 
       - run:
           name: install deps

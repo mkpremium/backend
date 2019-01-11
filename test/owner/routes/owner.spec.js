@@ -16,8 +16,8 @@ describe('owner.routes', () => {
     await operatorCreateManager();
     const ownerRepo = new OwnerRepository();
     const personRepo = new PersonRepository();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
-    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
 
     ownerWithPersonToSave = {
       type: 'PRINCIPAL',
