@@ -6,7 +6,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/node:carbon
+      - image: circleci/node:8.11.1
       - image: rkmax/couchbase:bitdistrict
 
     working_directory: ~/repo
@@ -61,7 +61,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/node:9.2
+      - image: circleci/node:8.11.1
     environment:
       - NODE_ENV: "production"
 
