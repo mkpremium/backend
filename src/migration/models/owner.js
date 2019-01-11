@@ -129,7 +129,7 @@ export default function migrateFromCsv(data) {
     _migrateId: input.id_fornitore
   });
 
-  return {owner, person};
+  return {owner, person, input};
 }
 
 export function combineDuplicatesDocumentNumber(data) {

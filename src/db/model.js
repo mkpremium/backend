@@ -281,7 +281,7 @@ export class CouchbaseModel {
 
   async findOneByMigrateId(migrateId, require = true) {
     const [result] = await this.findByMigratedId(migrateId, require);
-    return result;
+    return fromJSON(result, this.Struct);
   }
 
   async findById(id) {

@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   queue_ui:
@@ -27,6 +27,11 @@ services:
       - "18092:18092"
     networks:
       - mkpremium
+    volumes:
+      - /run/media/rkmax/Development/docker-volumen/mkpremium_db:/opt/couchbase/var
+    mem_limit: 10g
+    memswap_limit: 10g
+    cpuset: 6-11
 networks:
   mkpremium:
     external: false

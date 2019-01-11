@@ -278,15 +278,15 @@ t.Owner.prototype.findFirstGoodContact = function() {
   }
 };
 
-t.Owner.prototype.verifyOwner = function(confirmedBy, value = true) {
+t.Owner.prototype.verifyOwner = function(confirmedBy, value = true, extra = {}) {
   return t.update(this, {
-    $merge: {
+    $merge: Object.assign({}, extra, {
       confirmedByOperator: {
         value,
         confirmedBy,
         confirmedAt: new Date()
       }
-    }
+    })
   });
 };
 
