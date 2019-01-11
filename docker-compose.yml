@@ -31,8 +31,7 @@ services:
       - /run/media/rkmax/Development/docker-volumen/mkpremium_db:/opt/couchbase/var
     mem_limit: 10g
     memswap_limit: 10g
-    cpuset: 7-12
-    cpu_quota: 70
+    cpuset: 6-11
 networks:
   mkpremium:
     external: false
