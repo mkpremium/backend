@@ -2,11 +2,12 @@ import multer from 'multer';
 import nodemailer from 'nodemailer';
 import t from 'tcomb';
 import {join} from 'path';
+import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
 
 export const port = parseInt(process.env.APP_PORT || '9001');
-export const emitHistoryEvents = Boolean(process.env.EMIT_HISTORY_EVENTS || false);
-export const emitModelEvents = Boolean(process.env.EMIT_MODEL_EVENTS || false);
+export const emitHistoryEvents = JSON.parse(process.env.EMIT_HISTORY_EVENTS || false);
+export const emitModelEvents = JSON.parse(process.env.EMIT_MODEL_EVENTS || false);
 export const socket = {
   enabled: JSON.parse(process.env.SOCKET_ENABLED || 'true'),
   port: parseInt(process.env.SOCKET_PORT || '9002'),
@@ -35,7 +36,7 @@ export const numintec = {
 
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10);
 
-export const migrationEnabled = Boolean(process.env.MIGRATION_MODULE || false);
+export const migrationEnabled = JSON.parse(process.env.MIGRATION_MODULE || false);
 export const uploadDir = process.env.REPORT_DIR || '/tmp';
 export const gearmanConfig = {
   host: process.env.GERMAN_HOST || 'localhost',
@@ -55,7 +56,7 @@ export const awsConfig = {
 };
 
 export const tests = {
-  skipCalls: Boolean(process.env.TEST_SKIP_CALLS || false)
+  skipCalls: JSON.parse(process.env.TEST_SKIP_CALLS || false)
 };
 
 export const isTest = () => process.env.NODE_ENV === 'test';
@@ -64,15 +65,22 @@ export const isMaybeTesting = v => isTest() ? t.maybe(v) : v;
 const defaultFirebaseServiceAccount = join(__dirname, 'firebaseComerciales.json');
 const defaultFirebaseServiceAccountInformadores = join(__dirname, 'firebaseInformadores.json');
 
+function isEnabled(value) {
+  if (_.isEmpty(value)) {
+    return !isTest();
+  }
+  return JSON.parse(value);
+}
+
 export const firebaseComerciales = {
-  enabled: !isTest(),
+  enabled: isEnabled(process.env.FIREBASE_COMERCIALES || 'true'),
   serviceAccount: process.env.FIREBASE_COMERCIALES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
   databaseURL: process.env.FIREBASE_COMERCIALES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_COMERCIALES_PREFIX_URL || '_'
 };
 
 export const firebaseInformadores = {
-  enabled: !isTest(),
+  enabled: isEnabled(process.env.FIREBASE_INFORMADORES || 'true'),
   serviceAccount: process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores,
   databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || '_'
@@ -99,7 +107,7 @@ export const mailer = {
   transporter: nodemailer.createTransport({
     host: process.env.MAILER_HOST || 'smtp.ethereal.email',
     port: Number(process.env.MAILER_PORT || '587'),
-    secure: Boolean(process.env.MAILER_SECURE || false),
+    secure: JSON.parse(process.env.MAILER_SECURE || false),
     auth: {
       user: process.env.MAILER_USER || 'v3hn5oczispny2x4@ethereal.email',
       pass: process.env.MAILER_PASS || 'kF5nfKm6XreTsMN8Br'
@@ -133,4 +141,4 @@ export const operatorPerformance = {
   numberOfDayOffset: Number(process.env.PERFORMANCE_OFFSET_DAYS || 15)
 };
 
-export const proxyEnable = Boolean(process.env.PROXY_ENABLE || false);
+export const proxyEnable = JSON.parse(process.env.PROXY_ENABLE || false);
