@@ -161,17 +161,21 @@ export async function saveMetadataToFirebase(metadata) {
 
 export async function saveNoteToFirebase(note) {
   if (!fbComerciales.enabled) {
+    debugFb('saveNoteToFirebase', 'note omitted to save into firebase, because fbComerciales.enabled =', fbComerciales.enabled);
     return;
   }
   const buildingId = note.context.buildingId;
+
   if (!buildingId) {
+    debugFb('saveNoteToFirebase', 'note omitted to save into firebase, because no buildingInd in context');
     return;
   }
 
   const db = fbComerciales.database();
   const noteRef = db.ref(`${fbComerciales.prefixURL}Notes/${note.id}`);
-
   const buildingNotesRef = db.ref(`${fbComerciales.prefixURL}Buildings/${buildingId}/Notes`);
+
+  debugFb('saveNoteToFirebase', 'saving note to', `${fbComerciales.prefixURL}Notes/${note.id}`);
 
   return Promise.all([
     noteRef.set(noteWithTimestamp(note)),
