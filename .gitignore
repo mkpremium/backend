@@ -57,3 +57,7 @@ bitdistrict-m*.sh
 # Migration data
 data/
 *.txt
+
+
+# Docker local
+/docker-compose.yml
