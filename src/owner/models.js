@@ -162,17 +162,19 @@ export class OwnerRepository extends Owner {
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
-
+  
   async createOwnerAndPerson(body) {
     const ownerBody = t.OwnerBody(body);
-
-    if (!_isEmpty(ownerBody.person)) {
-      const personRepo = new PersonRepository();
-      const person = await personRepo.save(ownerBody.person);
-      body.personId = person.id;
-      delete body.person;
-    }
-
+    const personRepo = new PersonRepository();
+    
+    const person = _isEmpty(ownerBody.person)
+      ? await personRepo.findByIdOrThrow(ownerBody.personId)
+      : await personRepo.save(ownerBody.person);
+    
+    body.personId = person.id;
+    body.name = person.fullName();
+    delete body.person;
+    
     return this.save(body);
   }
 
