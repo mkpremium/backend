@@ -4,7 +4,6 @@ import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
 
 describe('owner.routes', () => {
-  const ownerRepo = new OwnerRepository();
   const personRepo = new PersonRepository();
   let authenticatedOperator;
   let authenticatedManager;
@@ -32,7 +31,6 @@ describe('owner.routes', () => {
   });
 
   describe('POST /owners @request', () => {
-    
     it('201 Registrar owner con person - Operación exitosa', async() => {
       await request(app)
         .post('/owners')
@@ -53,9 +51,9 @@ describe('owner.routes', () => {
     });
   });
 
-  describe.skip('PUT /owners/:id @request', () => {
-    
+  describe.skip('PUT /owners/:id @request', async() => {
     it('204 Operación exitosa', async() => {
+      const ownerRepo = new OwnerRepository();
       ownerToUpdate = await ownerRepo.save(ownerWithPersonToSave);
       await request(app)
         .put(`/owners/${ownerToUpdate.id}`)
@@ -65,8 +63,7 @@ describe('owner.routes', () => {
           note: 'This is a sample note'
         })
         .expect(204);
-
-      const ownerRepo = new OwnerRepository();
+      
       const updated = await ownerRepo.findById(ownerToUpdate.id);
       updated.status.should.be.equal('NO_VERIFICADO');
       updated.note.should.be.equal('This is a sample note');

@@ -7,7 +7,7 @@ import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 
 const personRepo = new PersonRepository();
 
-//TODO: fix this test
+// TODO: fix this test
 describe.skip('owner-contact.routes', () => {
   let owner;
   let person;
