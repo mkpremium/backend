@@ -429,7 +429,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   
     await Promise.all(queues.map(async(queue) => {
       const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
-      if (worksheetsToBeLiberated) {
+      if (worksheetsToBeLiberated.length) {
         allWorksheetsToBeLiberated = allWorksheetsToBeLiberated.concat(worksheetsToBeLiberated);
       }
     }));
