@@ -6,6 +6,7 @@ import _ from 'lodash';
 import _map from 'lodash/map';
 import _set from 'lodash/set';
 import _get from 'lodash/get';
+import _difference from 'lodash/difference';
 import {CouchbaseModel, EmbeddedModel} from '../../db/model';
 import {newHttpError} from '../../lib/http-error';
 import {updateList} from '../../lib/tcomb-utils';
@@ -369,6 +370,73 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     if (operatorItem) {
       await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId);
+    }
+  }
+  
+  /**
+   * Makes a difference between the worksheet queue array of worksheets
+   * and the worksheets that have said queue id set.
+   * @param queue - model.
+   * @returns array of worksheets ids.
+   */
+  static async getWorkSheetsToBeLiberatedByQueue(queue) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheetsIdsInQueueArray = _map(queue.worksheets, 'worksheetId');
+    const worksheetsWithQueueId = await worksheetRepo.findWorksheetsByQueueId(queue.id);
+    const worksheetsIdsWithQueueId = _map(worksheetsWithQueueId, 'id');
+    
+    return _difference(worksheetsIdsWithQueueId, worksheetsIdsInQueueArray);
+  }
+  
+  /**
+   * Liberates worksheets that have a queue id but are not in such queue.
+   * Use in command.
+   * @param queueId - the queue id
+   * @returns {Promise<void>}
+   */
+  async freeNotInQueueWorksheets(queueId) {
+    if (!queueId) {
+      return null;
+    }
+  
+    const worksheetRepo = new WorksheetRepository();
+    const queue = await this.findByIdOrThrow(queueId);
+    const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
+    
+    if (worksheetsToBeLiberated.length) {
+      await worksheetRepo.updateQueueId(worksheetsToBeLiberated);
+    }
+  }
+  
+  
+  /**
+   * Gets all worksheets queues.
+   * @returns {Promise<Array<Worksheet>>}
+   */
+  async findAll() {
+    const qb = this.getQueryBuilder();
+  
+    return this.query(qb);
+  }
+  
+  /**
+   *
+   * @returns {Promise<void>}
+   */
+  async cleanAllWorksheetsNotInQueue() {
+    const worksheetRepo = new WorksheetRepository();
+    let allWorksheetsToBeLiberated = [];
+    const queues = await this.findAll();
+  
+    await Promise.all(queues.map(async (queue) => {
+      const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
+      if (worksheetsToBeLiberated) {
+        allWorksheetsToBeLiberated = allWorksheetsToBeLiberated.concat(worksheetsToBeLiberated)
+      }
+    }));
+  
+    if (allWorksheetsToBeLiberated.length) {
+      await worksheetRepo.updateQueueId(allWorksheetsToBeLiberated);
     }
   }
 }

@@ -78,7 +78,7 @@ export class WorksheetRepository extends Worksheet {
       ? 'AND ' + sourceFilter.join(' AND ')
       : '';
 
-    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t    
+    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
     WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`;
     const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
     return _get(results, '0.count', 0);
@@ -391,5 +391,30 @@ GROUP BY t.status`;
     const results = await this.query(qb);
 
     return fromJSON({total, results}, t.WorkSheetLitResponse);
+  }
+  
+  /**
+   * Find all worksheets with a particular queue id.
+   * @param queueId
+   * @returns {Promise<Array<Worksheet>>}
+   */
+  async findWorksheetsByQueueId(queueId) {
+    const qb = this
+      .getQueryBuilder()
+      .where('queueId = ?', queueId);
+    
+    return this.query(qb);
+  }
+  
+  /**
+   * Sets to null the queue id of an array of worksheets ids.
+   * @returns {Promise<void>}
+   */
+  async updateQueueId(worksheetIds) {
+    const bucket = this.getBucketName();
+    const cleanQueueIds = N1qlQuery
+      .fromString(`UPDATE ${bucket} t SET queueId = null WHERE META().id IN ${JSON.stringify(worksheetIds)}`);
+    
+    return this.queryRaw(cleanQueueIds);
   }
 }
