@@ -408,7 +408,6 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     }
   }
   
-  
   /**
    * Gets all worksheets queues.
    * @returns {Promise<Array<Worksheet>>}
@@ -428,10 +427,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     let allWorksheetsToBeLiberated = [];
     const queues = await this.findAll();
   
-    await Promise.all(queues.map(async (queue) => {
+    await Promise.all(queues.map(async(queue) => {
       const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
       if (worksheetsToBeLiberated) {
-        allWorksheetsToBeLiberated = allWorksheetsToBeLiberated.concat(worksheetsToBeLiberated)
+        allWorksheetsToBeLiberated = allWorksheetsToBeLiberated.concat(worksheetsToBeLiberated);
       }
     }));
   
