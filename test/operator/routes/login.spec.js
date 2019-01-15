@@ -114,7 +114,7 @@ describe('operator.routes', () => {
       response.body.should.have.a.property('message');
     });
 
-    it('200 Login con firebase (informador)', async() => {
+    it.skip('200 Login con firebase (informador)', async() => {
       const {body} = await request(app)
         .post('/operators/login')
         .send({
@@ -128,7 +128,7 @@ describe('operator.routes', () => {
       /street/i.test(body.firebase.databaseURL).should.be.equal(true);
     });
 
-    it('200 Login con firebase (comercial)', async() => {
+    it.skip('200 Login con firebase (comercial)', async() => {
       const {body} = await request(app)
         .post('/operators/login')
         .send({

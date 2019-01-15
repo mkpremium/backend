@@ -11,10 +11,11 @@ export async function migrateBuildingNotes(inputFile, bucket) {
 
 export class BuildingNotes extends MigrateModelV3 {
   async parseToData(data, row) {
-    if (data['FECHA'] !== '2018-11-21 09:49:38.530') {
-      return;
+    try {
+      await createBuildingNote(data);
+    } catch (e) {
+      console.error('row', row, 'ignored because', e.message);
     }
-    await createBuildingNote(data);
   }
 }
 

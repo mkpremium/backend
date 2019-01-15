@@ -14,7 +14,7 @@ describe('operator.routes', () => {
 
     await operatorCreate();
     await operatorCreateAdmin();
-    authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
+    authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'Passw0rd'});
   });
 
   describe('GET /operators @request', () => {

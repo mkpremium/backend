@@ -15,7 +15,7 @@ describe.skip('owner-contact.routes', () => {
   before(async() => {
     await deleteAll();
     await operatorCreate();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
     const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
     const results = await migrate.run();
     person = results.find(o => o.contacts && o.contacts.length > 0);

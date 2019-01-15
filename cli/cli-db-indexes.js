@@ -2,6 +2,7 @@
 
 import program from 'commander';
 import Promise from 'bluebird';
+import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
 import {DbIndexes} from './constants';
 import couchbase from '../src/db/couchbase';
@@ -9,6 +10,8 @@ import couchbase from '../src/db/couchbase';
 program
   .version('0.0.1')
   .option('-n,--name [search]', 'Especifique una cadena de búsqueda (ej: migration_)', '')
+  .option('-d,--drop', 'Los indices son solo eliminados', false)
+  .option('-N,--dry-run', 'No realiza ninguna acción', false)
   .action(mainEntry)
   .parse(process.argv);
 
@@ -28,12 +31,12 @@ function mainEntry() {
 
 async function main() {
   const bucket = await couchbase();
-  const indexes = indexesToRecreate(program.name);
+  const indexes = indexesToOperate(program.name);
   const indexNames = await Promise.mapSeries(indexes, async(index) => recreateIndex(bucket, index));
   await buildIndexes(bucket, indexNames);
 }
 
-function indexesToRecreate(searchName) {
+function indexesToOperate(searchName) {
   if (searchName) {
     const regexFilter = new RegExp(searchName, 'i');
     return DbIndexes.filter(({name}) => regexFilter.test(name));
@@ -44,26 +47,59 @@ function indexesToRecreate(searchName) {
 
 async function recreateIndex(bucket, index) {
   await dropIndex(bucket, index.name);
-  await createIndex(bucket, index);
+  if (program.drop) {
+    return;
+  }
 
-  return index.name;
+  return createIndex(bucket, index);
 }
 
 async function dropIndex(bucket, indexName) {
+  const _lg = result => log(`drop index ${bucket._name}.${indexName}`, result);
+  if (program.dryRun) {
+    _lg('OK');
+    return;
+  }
   try {
     const query = N1qlQuery.fromString(`DROP INDEX \`${bucket._name}\`.\`${indexName}\``);
     await bucket.queryAsync(query);
+    _lg('OK');
   } catch (e) {
+    _lg('FAILURE', e.message);
     // no-op
   }
 }
 
 async function createIndex(bucket, {query, name}) {
-  const q = N1qlQuery.fromString(`CREATE INDEX ${name} ON ${bucket._name} ${query} USING GSI WITH {"defer_build":true}`);
-  await bucket.queryAsync(q);
+  const _lg = (result) => log(`create index ${bucket._name}.${name}`, result);
+
+  if (program.dryRun) {
+    _lg('OK');
+    return;
+  }
+
+  try {
+    const q = N1qlQuery.fromString(`CREATE INDEX ${name} ON ${bucket._name} ${query} USING GSI WITH {"defer_build":true}`);
+    await bucket.queryAsync(q);
+    _lg('OK');
+    return name;
+  } catch (e) {
+    _lg('FAILURE', e.message);
+    // no-op
+  }
 }
 
 async function buildIndexes(bucket, indexes) {
-  const names = indexes.map(name => `\`${name}\``).join(', ');
+  const cleanIndexes = _.compact(indexes).map(name => `\`${name}\``);
+  if (cleanIndexes.length === 0) {
+    return;
+  }
+  log(`building indexes`, cleanIndexes);
+  const names = cleanIndexes.join(', ');
   await bucket.queryAsync(N1qlQuery.fromString(`BUILD INDEX ON \`${bucket._name}\`(${names}) USING GSI`));
+}
+
+function log() {
+  const dryRun = program.dryRun ? '(doing nothing)' : '(exec)';
+  console.log(dryRun, ...arguments);
 }

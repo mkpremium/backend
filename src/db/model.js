@@ -5,6 +5,7 @@ import uuid from 'uuid/v4';
 import squel from 'squel';
 import {N1qlQuery, SearchQuery, ViewQuery} from 'couchbase';
 import debug from 'debug';
+import _ from 'lodash';
 
 import init from './couchbase';
 import {couchbase, emitModelEvents} from '../../config';
@@ -285,6 +286,9 @@ export class CouchbaseModel {
   }
 
   async findById(id) {
+    if (_.isEmpty(id)) {
+      throw new Error('id should be defined');
+    }
     try {
       debugModel('findById', this._getMeta().defaultProps._documentType, id);
       await this._promiseBucket;

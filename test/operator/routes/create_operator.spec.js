@@ -13,8 +13,8 @@ describe('operator.routes', () => {
     await operatorCreateAdmin();
     await operatorCreate();
     await operatorCreate('test');
-    authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'password'});
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedAdmin = await operatorLogin(app, {username: 'admin', password: 'Passw0rd'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
   });
 
   describe('POST /operator @request', () => {

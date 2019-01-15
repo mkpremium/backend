@@ -42,7 +42,7 @@ if (!tests.skipCalls) {
 
       await operatorRepo.save({
         username: 'callerOperator',
-        password: 'password',
+        password: 'Passw0rd',
         agentNumber: '10106-919',
         serviceId: '17146',
         roles: [
@@ -53,7 +53,7 @@ if (!tests.skipCalls) {
           lastName: 'operator'
         }
       });
-      authenticatedOperator = await operatorLogin(app, {username: 'callerOperator', password: 'password'});
+      authenticatedOperator = await operatorLogin(app, {username: 'callerOperator', password: 'Passw0rd'});
       const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_calls_owner.csv'), app);
       const results = await migrate.run();
       person = results.find(o => o.contacts && o.contacts.length > 0);
@@ -178,7 +178,7 @@ if (!tests.skipCalls) {
 
       await operatorRepo.save({
         username: 'callerOperator',
-        password: 'password',
+        password: 'Passw0rd',
         agentNumber: '10106-919',
         serviceId: '17146',
         roles: [
@@ -189,7 +189,7 @@ if (!tests.skipCalls) {
           lastName: 'operator'
         }
       });
-      authenticatedOperator = await operatorLogin(app, {username: 'callerOperator', password: 'password'});
+      authenticatedOperator = await operatorLogin(app, {username: 'callerOperator', password: 'Passw0rd'});
       await callsModel.save({
         userId: authenticatedOperator.operator.id,
         from: '919',

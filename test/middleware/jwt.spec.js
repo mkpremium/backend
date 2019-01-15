@@ -7,7 +7,7 @@ describe('JWT middleware', () => {
   before(async() => {
     await deleteAll();
     await operatorCreate();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
   });
 
   it('Devuelve la información del usuario', async() => {

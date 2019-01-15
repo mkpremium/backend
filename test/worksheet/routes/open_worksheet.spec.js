@@ -27,7 +27,7 @@ describe('worksheet.routes', () => {
     queueItems = queue.worksheets;
 
     await operatorCreate('', queue.id);
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
   });
 
   describe('queue.routes', () => {

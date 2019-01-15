@@ -31,8 +31,8 @@ describe('worksheet.routes', () => {
 
     await operatorCreate();
     await operatorCreateManager();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
-    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
   });
 
   describe('GET /worksheets @request', () => {
