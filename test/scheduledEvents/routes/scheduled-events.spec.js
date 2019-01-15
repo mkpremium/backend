@@ -32,8 +32,8 @@ describe('scheduledevents.routes', () => {
 
     await operatorCreate('', queue.id);
     await operatorCreateBusiness();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
-    authenticatedBusiness = await operatorLogin(app, {username: 'business', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+    authenticatedBusiness = await operatorLogin(app, {username: 'business', password: 'Passw0rd'});
 
     scheduledMeetingsEventObject = {
       type: 'MEETINGS',
@@ -206,7 +206,7 @@ describe('scheduledevents.routes', () => {
   });
 
   describe('POST /scheduled-events @request', () => {
-    it('Create call 201Operación exitosa', async() => {
+    it('Create call operación exitosa', async() => {
       await request(app)
         .post('/scheduled-events/call')
         .set('Authorization', authenticatedOperator.authorization)

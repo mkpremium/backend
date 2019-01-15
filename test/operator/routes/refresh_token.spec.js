@@ -8,7 +8,7 @@ describe('operator.routes', () => {
   before(async() => {
     await deleteAll();
     await operatorCreate();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
   });
 
   describe('POST /operators/refresh-token @request', () => {

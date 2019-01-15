@@ -19,7 +19,7 @@ describe('street.routes', () => {
     await operatorCreateStreetManager();
     admin = await operatorCreateAdmin();
     street = await operatorCreateStreet();
-    authenticatedManager = await operatorLogin(app, {username: 'street_manager', password: 'password'});
+    authenticatedManager = await operatorLogin(app, {username: 'street_manager', password: 'Passw0rd'});
   });
 
   describe('POST /api/changeUserState', () => {

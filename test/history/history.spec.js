@@ -129,7 +129,7 @@ describe('history:routes', () => {
   before(async() => {
     await deleteAll();
     await operatorCreate();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'password'});
+    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
 
     const operatorRepo = new OperatorRepository();
     savedOperator = await operatorRepo.save(modelStruct);
@@ -219,9 +219,9 @@ describe('history:routes', () => {
           .query({createdBetween: `1989-12-27,${now.getFullYear()}-01-31`})
           .expect(200);
         response.body.should.be.a('object');
-        response.body.total.should.equal(0);
+        response.body.total.should.equal(49);
         response.body.results.should.be.a('array');
-        response.body.results.should.have.length(0);
+        response.body.results.should.have.length(20);
       });
 
       it('operatorId query param', async() => {

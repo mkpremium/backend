@@ -39,7 +39,8 @@ export const saltFactor = parseInt(process.env.SALT_FACTOR || 10);
 export const migrationEnabled = JSON.parse(process.env.MIGRATION_MODULE || false);
 export const uploadDir = process.env.REPORT_DIR || '/tmp';
 export const gearmanConfig = {
-  host: process.env.GERMAN_HOST || 'localhost',
+  enabled: JSON.parse(process.env.GEARMAN_ENABLE || 'true'),
+  host: process.env.GEARMAN_HOST || 'localhost',
   port: parseInt(process.env.GEARMAN_PORT || 4730),
   recoverTime: 5000 // gearman defaults to 30000
 };

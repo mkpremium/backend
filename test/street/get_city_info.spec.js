@@ -16,7 +16,7 @@ describe('street.routes', () => {
   before(async() => {
     await deleteAll();
     await operatorCreateStreetManager();
-    authenticatedManager = await operatorLogin(app, {username: 'street_manager', password: 'password'});
+    authenticatedManager = await operatorLogin(app, {username: 'street_manager', password: 'Passw0rd'});
 
     const migrateNeighborhoods = new MigrateModel('neighborhood', resolve(__dirname, '../../csv/Barrios.csv'), app, {delimiter: ','});
     await migrateNeighborhoods.run();

@@ -47,7 +47,7 @@ export async function deleteAll() {
   ]);
 }
 
-export async function operatorLogin(app, credentials = {username: 'admin', password: 'password'}) {
+export async function operatorLogin(app, credentials = {username: 'admin', password: 'Passw0rd'}) {
   const response = await request(app)
     .post('/operators/login')
     .send(credentials)
