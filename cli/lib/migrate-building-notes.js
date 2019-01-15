@@ -11,7 +11,11 @@ export async function migrateBuildingNotes(inputFile, bucket) {
 
 export class BuildingNotes extends MigrateModelV3 {
   async parseToData(data, row) {
-    await createBuildingNote(data);
+    try {
+      await createBuildingNote(data);
+    } catch (e) {
+      console.error('row', row, 'ignored because', e.message);
+    }
   }
 }
 
