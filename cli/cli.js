@@ -1,6 +1,8 @@
 #!/usr/bin/env babel-node
 import program from 'commander';
 
+require('dotenv').config();
+
 program
   .version('0.0.1')
   .command('migrate-worksheets [input-dir]', 'Migra hojas de trabajo anteriores')

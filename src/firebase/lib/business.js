@@ -54,30 +54,62 @@ export async function saveBuildingOwnerToFirebase(owner) {
   return ownerRef.set(owner);
 }
 
+export async function saveBuildingToFirebase_(building, owner) {
+  try {
+    if (!fbComerciales.enabled) {
+      return;
+    }
+
+    const db = fbComerciales.database();
+    await saveBuildingToFirebase(db, building, owner);
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
+
 export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
+    debugFb('saveBuildingToFirebase', 'building omitted to save into firebase, because fbComerciales.enabled =', fbComerciales.enabled);
     return;
   }
+
+  if (!building) {
+    debugFb('saveBuildingToFirebase', 'building omitted to save into firebase, because building null');
+    return;
+  }
+
+  const promises = [];
   const buildingRef = db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`);
 
-  const saveBuildingEntity = (entity) => {
-    db.ref(`${fbComerciales.prefixURL}Entities/${entity.id}`).update(toFirebaseEntity(entity));
-  };
+  const saveBuildingEntity = (entity) => db
+    .ref(`${fbComerciales.prefixURL}Entities/${entity.id}`)
+    .update(toFirebaseEntity(entity));
 
   const firebaseBuilding = toFirebaseBuilding(building, owner);
-  buildingRef.child('Data').set(firebaseBuilding);
-  buildingRef.child('Owner').set(owner);
+  promises.push(buildingRef.child('Data').set(firebaseBuilding));
+
+  if (owner) {
+    promises.push(buildingRef.child('Owner').set(owner));
+  }
 
   const comercialId = _get(owner, 'business.meetingWithOperatorId');
 
   if (comercialId) {
     const comercialBuildingRef = db.ref(`Users/${comercialId}/Buildings/${building.id}`);
-    comercialBuildingRef.child('Data').set(firebaseBuilding);
-    comercialBuildingRef.child('Owner').set(owner);
+    promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding));
+    promises.push(comercialBuildingRef.child('Owner').set(owner));
   }
 
-  buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities));
-  building.entities.forEach(saveBuildingEntity);
+  debugFb('saveBuildingToFirebase', 'saving building to', `${fbComerciales.prefixURL}Buildings/${building.id}`);
+
+  promises.push(buildingRef.child('Entities/ids').set(arrayToObjectIds(building.entities)));
+  const entityPromises = building.entities.map(saveBuildingEntity);
+  const allPromises = promises.concat(entityPromises);
+
+  if (allPromises.length > 0) {
+    return Promise.all(allPromises);
+  }
 }
 
 export async function relateMeetingToBuilding(db, {id, building}) {

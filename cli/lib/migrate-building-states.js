@@ -4,21 +4,35 @@ import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {WorkSheetStatus} from '../../src/types/worksheet';
 import {removeNullValue} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
+import {saveBuildingToFirebase_} from '../../src/firebase/lib/business';
+import _find from 'lodash/find';
+import {ownerVerified} from '../../src/types/owner';
+import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 
 export async function noSale(inputFile) {
   await validateHeaders(inputFile, 'Id_Catastro;NoVende');
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.NO_SALE, data);
+    await updateWorksheetStatus(WorkSheetStatus.NO_SALE, data);
   }
 }
 
 async function updateWorksheetStatus(newStatus, data) {
   const buildingMigrateId = getBuildingMigrateIdNotNull(data);
   const worksheet = await findWorksheetByMigrateId(buildingMigrateId);
-  const updatedWorksheet = worksheet.setStatus(newStatus);
+  const w = fromJSON(worksheet, t.WorkSheet);
+  const updatedWorksheet = w.setStatus(newStatus);
   await saveDataChange(updatedWorksheet);
+
+  async function sendToFirebase(worksheet) {
+    const owner = _find(worksheet.relatedOwners, ownerVerified);
+    const [building] = worksheet.relatedBuildings;
+    await saveBuildingToFirebase_(building, owner);
+  }
+
+  return sendToFirebase(worksheet);
 }
 
 async function saveDataChange(worksheet) {
@@ -69,7 +83,5 @@ async function findWorksheet(buildingId) {
     throw new Error(`Could not find worksheet for building ${buildingId}`);
   }
 
-  return worksheet;
-
-  // return repo.findByIdWIthIncludes(worksheet.id);
+  return repo.findByIdWIthIncludes(worksheet.id);
 }
