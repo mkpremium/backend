@@ -123,7 +123,13 @@ export async function deleteMeetingToBuilding(db, {id, building}) {
   if (!fbComerciales.enabled) {
     return;
   }
-  db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}/Meetings/ids/${id}`).set(null);
+
+  if (!building) {
+    debugFb('deleteMeetingToBuilding', 'omitted meeting from building null');
+    return;
+  }
+
+  return db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}/Meetings/ids/${id}`).set(null);
 }
 
 export async function saveMeetingToFirebase(db, meeting) {

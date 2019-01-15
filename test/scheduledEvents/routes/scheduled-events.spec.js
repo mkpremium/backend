@@ -8,15 +8,16 @@ import {deleteAll, operatorCreate, operatorCreateBusiness, operatorLogin} from '
 import {WorksheetQueueRepository} from '../../../src/worksheet/models/queue';
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import {utc} from '../../../src/lib/date';
+import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
 
 describe('scheduledevents.routes', () => {
   let authenticatedOperator;
-  let authenticatedBusiness;
   let scheduledMeetingsEventObject;
   let scheduledCallsEventObject;
   let scheduledEventToBeUpdated;
   let items;
   let queue;
+  let owner;
   before(async() => {
     await deleteAll();
     const worksheetQueueRepo = new WorksheetQueueRepository();
@@ -30,10 +31,15 @@ describe('scheduledevents.routes', () => {
     queue = await worksheetQueueRepo.findByIdOrThrow(queue.id);
     items = queue.worksheets;
 
+    const personRepo = new PersonRepository();
+    const person = await personRepo.save({name: 'TEST'});
+
+    const ownerRepo = new OwnerRepository();
+    owner = await ownerRepo.save({name: 'TEST', personId: person.id}, false);
+
     await operatorCreate('', queue.id);
     await operatorCreateBusiness();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
-    authenticatedBusiness = await operatorLogin(app, {username: 'business', password: 'Passw0rd'});
 
     scheduledMeetingsEventObject = {
       type: 'MEETINGS',
@@ -216,33 +222,11 @@ describe('scheduledevents.routes', () => {
           eventDate: new Date('2018-05-30T16:30:00Z'),
           event: {
             itemId: items[0].id,
-            queueId: queue.id
+            queueId: queue.id,
+            worksheetId: items[0].worksheetId
           }
         })
         .expect(201);
-    });
-
-    it('Create meeting 201 Operación exitosa', async() => {
-      const response = await request(app)
-        .post('/scheduled-events/meeting')
-        .set('Authorization', authenticatedBusiness.authorization)
-        .send({
-          notifyTo: authenticatedBusiness.operator.id,
-          notifyAt: new Date('2018-07-01T16:30:00Z'),
-          eventDate: new Date('2018-07-01T16:30:00Z'),
-          event: {
-            ownerId: 'not-exist-in-db',
-            contactId: 'not-exist-in-db',
-            worksheetId: 'not-exist-in-db',
-            buildingId: 'not-exist-in-db',
-            eventLocation: {
-              lat: 0,
-              long: 0
-            },
-            eventAddress: 'no exists'
-          }
-        });
-      response.status.should.equal(201);
     });
   });
 
@@ -252,9 +236,12 @@ describe('scheduledevents.routes', () => {
         .put(`/scheduled-events/${scheduledEventToBeUpdated.id}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
+          notifyTo: authenticatedOperator.operator.id,
           notifyAt: new Date('2018-02-28T16:24:39Z'),
           eventDate: new Date('2018-02-28T16:30:39Z'),
-          event: {}
+          event: {
+            ownerId: owner.id
+          }
         })
         .expect(204);
     });
