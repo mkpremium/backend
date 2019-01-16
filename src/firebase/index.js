@@ -4,21 +4,24 @@ import {saveStreetUserToFirebase} from './lib/street';
 import {isBusiness, isStreet} from '../lib/role-operators';
 import {saveBusinessUserToFirebase} from './lib/business';
 
-export const fbComerciales = admin.initializeApp({
-  credential: admin.credential.cert(firebaseComerciales.serviceAccount),
-  databaseURL: firebaseComerciales.databaseURL
-}, 'comerciales');
+export const fbComerciales = initializeFirebase(firebaseComerciales, 'comerciales');
+export const fbInformadores = initializeFirebase(firebaseInformadores, 'informadores');
 
-fbComerciales.enabled = firebaseComerciales.enabled;
-fbComerciales.prefixURL = firebaseComerciales.prefixURL;
+function initializeFirebase({enabled, serviceAccount, databaseURL, prefixURL}, name) {
+  if (enabled) {
+    const app = admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL
+    }, name);
 
-export const fbInformadores = admin.initializeApp({
-  credential: admin.credential.cert(firebaseInformadores.serviceAccount),
-  databaseURL: firebaseInformadores.databaseURL
-}, 'informadores');
-
-fbInformadores.enabled = firebaseInformadores.enabled;
-fbInformadores.prefixURL = firebaseInformadores.prefixURL;
+    return Object.assign(app, {
+      enabled,
+      prefixURL
+    });
+  } else {
+    return {enabled, prefixURL};
+  }
+}
 
 function choseFirebaseSetup(roles) {
   if (isBusiness(roles)) {

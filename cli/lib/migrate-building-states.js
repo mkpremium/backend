@@ -5,8 +5,8 @@ import {WorkSheetStatus} from '../../src/types/worksheet';
 import {removeNullValue} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import {saveBuildingToFirebase_} from '../../src/firebase/lib/business';
-import _find from 'lodash/find';
-import {ownerVerified} from '../../src/types/owner';
+import _ from 'lodash';
+import {isPrimary} from '../../src/types/owner';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 
@@ -27,12 +27,24 @@ async function updateWorksheetStatus(newStatus, data) {
   await saveDataChange(updatedWorksheet);
 
   async function sendToFirebase(worksheet) {
-    const owner = _find(worksheet.relatedOwners, ownerVerified);
-    const [building] = worksheet.relatedBuildings;
+    const {owner, building} = getOwnerBuilding(worksheet);
     await saveBuildingToFirebase_(building, owner);
   }
 
   return sendToFirebase(worksheet);
+}
+
+export function getOwnerBuilding(worksheet) {
+  const [building] = worksheet.relatedBuildings;
+  const primaryOwner = _.chain(worksheet.relatedOwners).filter(isPrimary).head().value();
+  const alternativeOwner = _.chain(worksheet.relatedOwners).head().value();
+  const owner = JSON.parse(JSON.stringify(primaryOwner || alternativeOwner));
+  owner.building = building;
+  owner.business = {
+    meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a',
+    status: worksheet.status
+  };
+  return {owner, building};
 }
 
 async function saveDataChange(worksheet) {
@@ -40,7 +52,7 @@ async function saveDataChange(worksheet) {
   return repo.save(worksheet, false);
 }
 
-function getBuildingMigrateIdNotNull(data) {
+export function getBuildingMigrateIdNotNull(data) {
   const buildingMigrateId = removeNullValue(data['Id_Catastro']);
   if (buildingMigrateId === null) {
     throw new Error(`invalid ID_CATASTRO '${data['Id_Catastro']}'`);
@@ -66,7 +78,7 @@ export async function alreadySold(inputFile) {
   }
 }
 
-async function findWorksheetByMigrateId(buildingMigrateId) {
+export async function findWorksheetByMigrateId(buildingMigrateId) {
   const [building] = await findBuilding(buildingMigrateId);
   return findWorksheet(building.id);
 }

@@ -1,3 +1,5 @@
+import {OwnerBusinessStatus} from '../src/types/enums';
+
 export const Files = {
   BUILDINGS: 'EDIFICIOS.csv',
   OWNERS: 'PROPIETARIOS.csv',
@@ -98,3 +100,28 @@ export const DbIndexes = [
     query: '(_documentType, context.buildingId, context._migrateId) WHERE _documentType = "note"'
   }
 ];
+
+// Id;Estado
+// 10;INICIO
+// 15;
+// 16;"PROP. ENVIADA"
+// 17;"PROP. RECHAZADA"
+// 18;"YA VENDIDO"
+// 19;DESCARTADO
+// 21;"NO VENDE"
+// 28;"PRE CIERRE"
+// 29;COMPRADO
+const _MapBusinessStates = {
+  10: OwnerBusinessStatus.PENDING,
+  16: OwnerBusinessStatus.PROPOSAL_SENT,
+  17: OwnerBusinessStatus.PROPOSAL_REJECTED,
+  18: OwnerBusinessStatus.ALREADY_SOLD,
+  19: OwnerBusinessStatus.DISCARDED,
+  21: OwnerBusinessStatus.NO_SALE,
+  28: OwnerBusinessStatus.PROPOSAL_ACCEPTED,
+  29: OwnerBusinessStatus.PURCHASED
+};
+
+export function mapBusinessStates(value) {
+  return _MapBusinessStates[value] || OwnerBusinessStatus.PENDING;
+}

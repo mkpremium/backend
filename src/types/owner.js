@@ -302,6 +302,11 @@ export function familyOwner(data) {
   ].indexOf(owner.type) !== -1;
 }
 
+export function isPrimary(data) {
+  const owner = fromJSON(data, t.Owner);
+  return owner.type === OwnerType.PRINCIPAL;
+}
+
 export function isPrimaryVerified(data) {
   const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&

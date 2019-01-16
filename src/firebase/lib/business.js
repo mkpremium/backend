@@ -98,7 +98,9 @@ export async function saveBuildingToFirebase(db, building, owner) {
   if (comercialId) {
     const comercialBuildingRef = db.ref(`Users/${comercialId}/Buildings/${building.id}`);
     promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding));
-    promises.push(comercialBuildingRef.child('Owner').set(owner));
+    if (owner) {
+      promises.push(comercialBuildingRef.child('Owner').set(owner));
+    }
   }
 
   debugFb('saveBuildingToFirebase', 'saving building to', `${fbComerciales.prefixURL}Buildings/${building.id}`);
