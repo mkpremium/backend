@@ -2,7 +2,7 @@
 import program from 'commander';
 import {checkInputs} from './lib';
 import couchbase from '../src/db/couchbase';
-import {migrateBusinessStates} from './lib/migrate-business-states,js';
+import {migrateBusinessStates} from './lib/migrate-business-states';
 
 program
   .arguments('[input-dir]')
@@ -16,7 +16,7 @@ function mainAction() {
     program.help();
   }
 
-  main(...arguments)
+  main.apply(null, arguments)
     .then(() => {
       process.exit(0);
     })
