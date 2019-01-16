@@ -75,7 +75,7 @@ t.FirebaseBuildingEntity = t.struct({
   Rent: t.Number,
   Situation: t.String,
   Surface: t.Number,
-  Type: t.String
+  Type: t.maybe(t.String)
 }, 'FirebaseBuildingEntity');
 
 export default t;

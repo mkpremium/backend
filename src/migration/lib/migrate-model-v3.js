@@ -17,9 +17,8 @@ export async function csvToJSON(filepath, processFunc = noOp, options = defaultO
   csv(options)
     .fromFile(filepath)
     .subscribe(processFunc)
-    .on('done', function(err) {
-      err ? reject(err) : resolve();
-    });
+    .on('error', err => reject(err))
+    .on('done', () => resolve());
 
   return promise;
 }
