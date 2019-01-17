@@ -161,3 +161,5 @@ export async function operatorCreateStreetManager() {
     }
   });
 }
+
+export const defaultPassword = 'Passw0rd';

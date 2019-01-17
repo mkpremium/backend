@@ -424,18 +424,13 @@ export class WorksheetQueueRepository extends WorksheetQueue {
    */
   async cleanAllWorksheetsNotInQueue() {
     const worksheetRepo = new WorksheetRepository();
-    let allWorksheetsToBeLiberated = [];
     const queues = await this.findAll();
   
     await Promise.all(queues.map(async(queue) => {
       const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
       if (worksheetsToBeLiberated.length) {
-        allWorksheetsToBeLiberated = allWorksheetsToBeLiberated.concat(worksheetsToBeLiberated);
+        await worksheetRepo.updateQueueId(worksheetsToBeLiberated);
       }
     }));
-  
-    if (allWorksheetsToBeLiberated.length) {
-      await worksheetRepo.updateQueueId(allWorksheetsToBeLiberated);
-    }
   }
 }

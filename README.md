@@ -63,6 +63,42 @@ Utiliza [docker][2] y [docker-compose][3] para instalar los servicios necesarios
     Para mas información acerca de los comandos disponibles lease la documentación de
     [docker-compose][3]
     
+    > **Nota**: es posible que en su sistema deba usar `sudo` al usar los comandos docker y docker-compose
+
+6. Correr las migraciones
+
+  Solicite el archivo CSV si no lo tiene. Luego:
+
+ `$ cli/cli-migrate-worksheets.js path/to/CSV/folder`
+ 
+7. Correr el proyecto
+ 
+  Ejecute: `$ npm start`
+  
+8. Docs
+ 
+  Después de iniciada podría ver los docs [aquí][10]
+
+ 9- Panel de couchbase
+ 
+ El panel de couchbase de accede via [el siguiente link][11] el usuario es `Administrator` 
+ y el password es `password`.
+
+### Notas
+
+#### Comandos
+
+Para ver los comandos disponibles ejecute:  
+
+`$ cli/cli.js`
+
+##### Crear operador
+
+Para crear un operador ejecute, por ejemplo:   
+
+`$ cli/cli-operator-add.js -u 'robin' -P 'password'`
+    
+    
 ## Dependencias opcionales
 
 El proyecto usa herramientas externas para algunos casos concretos, como generación de vistas previas
@@ -85,3 +121,5 @@ ejecutar dichas partes en su ambiente o realizar deployments de manera manual
 [7]: http://harelba.github.io/q/
 [8]: https://waterlan.home.xs4all.nl/dos2unix/es/man1/dos2unix.htm
 [9]: https://rsync.samba.org/
+[10]: http://localhost:9001/docs/
+[11]: http://127.0.0.1:8091/ui/index.html
