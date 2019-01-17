@@ -62,6 +62,17 @@ Utiliza [docker][2] y [docker-compose][3] para instalar los servicios necesarios
         
     Para mas información acerca de los comandos disponibles lease la documentación de
     [docker-compose][3]
+    
+## Dependencias opcionales
+
+El proyecto usa herramientas externas para algunos casos concretos, como generación de vistas previas
+preprocesado de archivos y migración, estas son opcionales salvo que piense probar o usar
+ejecutar dichas partes en su ambiente o realizar deployments de manera manual
+
+- [imagemagick][6], durante la generación de los previews de los meta datos de los edificios
+- [q (text as data)][7], previo a la migración de datos, para preprocesar y relacionar la data
+- [dos2unix][8], previo a la migración de datos, para transformar los archivos con formatos foráneos
+- [rsync][9], durante el proceso de despliegue
 
 
 
@@ -70,3 +81,7 @@ Utiliza [docker][2] y [docker-compose][3] para instalar los servicios necesarios
 [3]: https://docs.docker.com/compose/install/
 [4]: https://github.com/nodejs/node-gyp
 [5]: docker-compose.template.yml
+[6]: https://www.imagemagick.org/
+[7]: http://harelba.github.io/q/
+[8]: https://waterlan.home.xs4all.nl/dos2unix/es/man1/dos2unix.htm
+[9]: https://rsync.samba.org/
