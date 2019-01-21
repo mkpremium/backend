@@ -61,3 +61,7 @@ data/
 
 # Docker local
 /docker-compose.yml
+
+# idea
+/.idea
+/MKBackEnd.iml

@@ -11,4 +11,5 @@ program
   .command('owners-verify [input-file]', 'Verifica los owners')
   .command('db-indexes', 'Recrea los indices de la base de datos')
   .command('operator', 'Gestiona operadores (cuentas de usuario)')
+  .command('queue', 'Gestiona colas de trabajo')
   .parse(process.argv);
