@@ -104,16 +104,17 @@ workflows:
   # testing is done on any branch that is not master
   testing:
     jobs:
-      - test:
-          filters:
-            branches:
-              ignore:
-                - master
+      - test
+#      - test:
+#          filters:
+#            branches:
+#              ignore:
+#                - master
   # Deployment should happen just on master branch
-  deploying:
-    jobs:
-      - deploy:
-          filters:
-            branches:
-              only:
-                - master
+#  deploying:
+#    jobs:
+#      - deploy:
+#          filters:
+#            branches:
+#              only:
+#                - master
