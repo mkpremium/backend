@@ -105,7 +105,8 @@ El proyecto usa herramientas externas para algunos casos concretos, como generac
 preprocesado de archivos y migración, estas son opcionales salvo que piense probar o usar
 ejecutar dichas partes en su ambiente o realizar deployments de manera manual
 
-- [imagemagick][6], durante la generación de los previews de los meta datos de los edificios
+- [imagemagick][6], durante la generación de los previews de los meta datos de los edificios, adicionalmente
+  es posible que necesite realizar [configuraciones adicionales al policy][12] de ImageMagick
 - [q (text as data)][7], previo a la migración de datos, para preprocesar y relacionar la data
 - [dos2unix][8], previo a la migración de datos, para transformar los archivos con formatos foráneos
 - [rsync][9], durante el proceso de despliegue
@@ -123,3 +124,4 @@ ejecutar dichas partes en su ambiente o realizar deployments de manera manual
 [9]: https://rsync.samba.org/
 [10]: http://localhost:9001/docs/
 [11]: http://127.0.0.1:8091/ui/index.html
+[12]: https://stackoverflow.com/a/52661288/816721
