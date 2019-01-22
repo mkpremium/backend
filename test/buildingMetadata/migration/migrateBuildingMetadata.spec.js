@@ -2,7 +2,7 @@ import {deleteAll} from '../../common';
 import BuildingHelper from '../../helpers/building';
 import _ from 'lodash';
 import t from 'tcomb';
-import {BuildingRepository} from "../../../src/building/models";
+import {BuildingRepository} from '../../../src/building/models';
 import {resolve} from 'path';
 import {seed} from '../../../cli/lib/migrate-building-metadata';
 
@@ -14,7 +14,7 @@ describe('Migrate building metadata', () => {
   describe('Migrate building metadata command', () => {
     it('able to associate files with building and upload those to s3', async() => {
       const buildingRepository = new BuildingRepository();
-      const buildings  = await BuildingHelper.runBuildingSeedAndGetThemAll();
+      const buildings = await BuildingHelper.runBuildingSeedAndGetThemAll();
       building = _.first(buildings);
   
       // there are two files related to the building with migration id 4,

@@ -66,15 +66,15 @@ async function readAllFiles(directory, allowedFiles = /.jpeg|.jpg|.png|.pdf/i) {
   return new Promise((resolve, reject) => {
     const files = [];
     klaw(directory)
-    .on('data', item => {
-      if (allowedFiles.test(item.path)) {
-        files.push(item.path);
-      }
-    })
-    .on('error', err => reject(err))
-    .on('end', () => {
-      seedDebug('readAllFiles', `found ${files.length} files on ${directory}`);
-      resolve(files);
-    });
+      .on('data', item => {
+        if (allowedFiles.test(item.path)) {
+          files.push(item.path);
+        }
+      })
+      .on('error', err => reject(err))
+      .on('end', () => {
+        seedDebug('readAllFiles', `found ${files.length} files on ${directory}`);
+        resolve(files);
+      });
   });
 }

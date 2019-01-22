@@ -28,8 +28,6 @@ async function cleanBusiness() {
   }
   const db = fbComerciales.database();
 
-  const db = fbComerciales.database();
-
   return Promise.all([
     db.ref(`${fbComerciales.prefixURL}Buildings`).set(null),
     db.ref(`${fbComerciales.prefixURL}Documents`).set(null),
