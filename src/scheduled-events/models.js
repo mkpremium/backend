@@ -123,6 +123,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async deleteFirebaseMeeting(scheduleEvent) {
+    if (!fbComerciales.enabled) {
+      return;
+    }
     const db = fbComerciales.database();
     const meeting = await this.findMeeting(scheduleEvent);
     await deleteMeetingToFirebase(db, meeting);
