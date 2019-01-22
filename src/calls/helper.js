@@ -26,11 +26,11 @@ export const isUnknownEvent = async(body) => {
   return false;
 };
 
-export const shouldOmitEvent = (body) => {
-  const fromUser = _get(body, 'data.fromuser', null);
-  const [fromUserServiceData] = _get(body, 'data.ServiceData', '').split('#');
+const omitRegex = /1###1$/;
 
-  return fromUser === fromUserServiceData;
+export const shouldOmitEvent = (body) => {
+  const serviceData = _get(body, 'data.ServiceData', '');
+  return !omitRegex.test(serviceData);
 };
 
 export const getCallStatus = (body) => {
