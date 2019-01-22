@@ -18,12 +18,14 @@ describe('scheduledevents.routes', () => {
   let items;
   let queue;
   let owner;
+  let worksheet;
   before(async() => {
     await deleteAll();
     const worksheetQueueRepo = new WorksheetQueueRepository();
     const worksheetRepo = new WorksheetRepository();
     const scheduledEventRepo = new ScheduledEventsRepository();
     const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
+    [worksheet] = worksheets;
 
     queue = await worksheetQueueRepo.save({name: 'madrid'});
     await Promise.mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheetAndSave(queue.id, worksheet.id));
@@ -49,7 +51,7 @@ describe('scheduledevents.routes', () => {
       event: {
         ownerId: 'not-exist-in-db',
         contactId: 'not-exist-in-db',
-        worksheetId: 'not-exist-in-db',
+        worksheetId: worksheet.id,
         buildingId: 'not-exist-in-db',
         eventLocation: {
           lat: 0,
@@ -66,7 +68,7 @@ describe('scheduledevents.routes', () => {
       eventDate: new Date('2018-02-29T16:24:00Z'),
       event: {
         contactId: 'not-exist-in-db',
-        worksheetId: 'not-exist-in-db',
+        worksheetId: worksheet.id,
         buildingId: 'not-exist-in-db'
       }
     };
