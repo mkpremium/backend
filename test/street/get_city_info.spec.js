@@ -10,7 +10,7 @@ import {nonEquality, oldAppResponse} from '../common-asserts';
 import {resolve} from 'path';
 import {MigrateModel} from '../../src/migration/lib/migrate-model';
 
-describe('street.routes', () => {
+describe.skip('street.routes', () => {
   let authenticatedManager;
 
   before(async() => {

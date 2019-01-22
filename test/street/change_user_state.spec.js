@@ -9,7 +9,7 @@ import {
   operatorLogin
 } from '../common';
 
-describe('street.routes', () => {
+describe.skip('street.routes', () => {
   let authenticatedManager;
   let street;
   let admin;
