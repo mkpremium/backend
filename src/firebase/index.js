@@ -19,7 +19,7 @@ function initializeFirebase({enabled, serviceAccount, databaseURL, prefixURL}, n
       prefixURL
     });
   } else {
-    return {enabled, prefixURL};
+    return {enabled, prefixURL, database() {}};
   }
 }
 
