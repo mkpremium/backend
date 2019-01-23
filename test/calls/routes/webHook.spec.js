@@ -37,7 +37,7 @@ const numintecEvents = [
       'accountcode': '10106-920-17146-675594824-CEO',
       'CI': 'NONE',
       'direction': 'inbound',
-      'state': 'early',
+      'state': 'confirmed',
       'proxy': '128.140.201.226',
       'fromuser': '675594824',
       'ServiceData': '675594824#17146#9154705234692096434###1###1',
@@ -114,9 +114,11 @@ describe('Numintec Web Hook', () => {
     await Promise.mapSeries(numintecEvents, numintecRequest);
     const call = await findCall(id);
     call.events.length.should.equal(3);
+    CallStatus[call.events[0].status].should.equal(CallStatus.early);
+    CallStatus[call.events[1].status].should.equal(CallStatus.confirmed);
+    CallStatus[call.events[2].status].should.equal(CallStatus.terminated);
     call.status.should.equal(CallStatus.terminated);
   });
-  it('web hook should be able to detect numintec bad behavior and finish call');
 });
 
 async function numintecRequest(body) {
