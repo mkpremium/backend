@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import t from 'tcomb';
 
 const recordContexts = t.RecordContext.meta.map;
@@ -49,7 +50,7 @@ function getRecordDescription(model, username) {
 
 export function getHistoryStruct({type, contextModel, user}) {
   const model = getModelName(contextModel);
-  const username = user.operator.username;
+  const username = _.get(user, 'operator.username', user.id);
   const recordType = contextModel ? type : 'ERROR';
   const id = getModelId(contextModel);
 

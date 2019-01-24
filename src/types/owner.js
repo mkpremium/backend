@@ -238,7 +238,7 @@ export const Owner = t.Owner = t.struct(
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
     business: t.maybe(t.OwnerBusiness),
-    name: t.String,
+    name: t.maybe(t.String),
 
     note: t.maybe(t.String),
 

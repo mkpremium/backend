@@ -73,6 +73,10 @@ async function doHangUp(activeCall) {
 async function hangup(operatorId) {
   const model = new Calls();
   const activeCall = await model.findActiveCallByOperatorId(operatorId);
+  if (!activeCall) {
+    return true;
+  }
+
   const result = await doHangUp(activeCall);
   if (result.status) {
     return result;

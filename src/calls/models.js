@@ -32,9 +32,10 @@ export class Calls extends CouchbaseModel {
   }
 
   async findActiveCallByOperatorId(operatorId) {
+    const activeStatus = [CallStatus.confirmed, CallStatus.early].map(id => `'${id}'`).join(', ');
     const qb = await this.getQueryBuilder()
       .where('userId = ?', operatorId)
-      .where('status != ?', CallStatus.terminated)
+      .where(`status IN [${activeStatus}]`)
       .limit(1);
 
     const [call] = await this.query(qb);

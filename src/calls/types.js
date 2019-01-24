@@ -51,7 +51,7 @@ t.Calls = t.struct(
   {
     name: 'Calls',
     defaultProps: {
-      status: 'INICIADA',
+      status: 'DESCONOCIDO',
       _documentType: 'calls',
       origin: 'SYSTEM',
       get date() {
