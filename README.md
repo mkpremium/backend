@@ -103,13 +103,57 @@ Para crear un operador ejecute, por ejemplo:
 
 El proyecto usa herramientas externas para algunos casos concretos, como generación de vistas previas
 preprocesado de archivos y migración, estas son opcionales salvo que piense probar o usar
-ejecutar dichas partes en su ambiente o realizar deployments de manera manual
+ejecutar dichas partes en su ambiente o realizar deployments de manera manual.
 
 - [imagemagick][6], durante la generación de los previews de los meta datos de los edificios, adicionalmente
   es posible que necesite realizar [configuraciones adicionales al policy][12] de ImageMagick
 - [q (text as data)][7], previo a la migración de datos, para preprocesar y relacionar la data
 - [dos2unix][8], previo a la migración de datos, para transformar los archivos con formatos foráneos
-- [rsync][9], durante el proceso de despliegue
+- [rsync][9], durante el proceso de despliegue.
+
+### Migraciones de metadata de edificios
+
+A continuación un ejemplo del comando:
+
+`cli/cli.js building-metadata  /home/robin/Documents/picked_data/`
+
+Para que esto funcione si es necesario tener imagemagick instalada, 
+se recomienda seguir [los pasos](https://askubuntu.com/questions/745660/imagemagick-png-delegate-install-problems/746195#746195)
+que se pondrán abajo para una máquina con ubuntu:
+
+```
+$ sudo apt-get install build-essential checkinstall \
+             libx11-dev libxext-dev zlib1g-dev libpng12-dev \
+             libjpeg-dev libfreetype6-dev libxml2-dev
+```
+Luego ir menú, sofware & updates y habilitar source code. 
+
+Luego: 
+```
+$ sudo apt-get build-dep imagemagick
+```
+
+Después:
+
+```
+$ wget http://www.imagemagick.org/download/ImageMagick-7.0.8-24.tar.bz2 && \
+  tar xvf ImageMagick-7.0.8-24.tar.bz2 && cd ImageMagick-7.0.8-24 && ./configure && make && \
+  sudo checkinstall -D --install=yes --fstrans=no --pakdir "$HOME/imagemagick_build" \
+       --pkgname imagemagick --backup=no --deldoc=yes --deldesc=yes --delspec=yes --default \
+       --pkgversion "7.0.5-10" && \
+  make distclean && sudo ldconfig
+```
+Después probamos que salga lo siguiente:
+```
+$ identify -version
+Version: ImageMagick 7.0.5-10 Q16 x86_64 2017-06-05 http://www.imagemagick.org
+Copyright: Copyright (C) 1999-2017 ImageMagick Studio LLC
+License: http://www.imagemagick.org/script/license.php
+Features: Cipher DPC OpenMP 
+Delegates (built-in): bzlib djvu fftw fontconfig freetype jbig jng jpeg lcms lqr lzma openexr pangocairo png tiff wmf x xml zlib
+```
+Después puede ser que tenga un problemas relacionado con permisos, verificar y entrar al siguiente link para solicuonar:
+[Aquí](https://stackoverflow.com/questions/42928765/convertnot-authorized-aaaa-error-constitute-c-readimage-453)
 
 
 

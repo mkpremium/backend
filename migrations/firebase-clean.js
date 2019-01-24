@@ -26,7 +26,6 @@ async function cleanBusiness() {
   if (!firebaseComerciales.enabled) {
     return;
   }
-
   const db = fbComerciales.database();
 
   return Promise.all([

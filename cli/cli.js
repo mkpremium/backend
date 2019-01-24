@@ -12,4 +12,5 @@ program
   .command('db-indexes', 'Recrea los indices de la base de datos')
   .command('operator', 'Gestiona operadores (cuentas de usuario)')
   .command('queue', 'Gestiona colas de trabajo')
+  .command('building-metadata [input-file]', 'Sube a la nube los archivos relacionados con edificios y los asocia a estos')
   .parse(process.argv);
