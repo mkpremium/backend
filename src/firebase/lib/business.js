@@ -96,7 +96,7 @@ export async function saveBuildingToFirebase(db, building, owner) {
   const comercialId = _get(owner, 'business.meetingWithOperatorId');
 
   if (comercialId) {
-    const comercialBuildingRef = db.ref(`Users/${comercialId}/Buildings/${building.id}`);
+    const comercialBuildingRef = db.ref(`${fbComerciales.prefixURL}Users/${comercialId}/Buildings/${building.id}`);
     promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding));
     if (owner) {
       promises.push(comercialBuildingRef.child('Owner').set(owner));
@@ -233,8 +233,8 @@ export async function saveProposal(proposal) {
   const firebaseProposal = toFirebaseProposal(proposal);
 
   const db = fbComerciales.database();
-  const proposalRef = db.ref(`Proposes/${proposal.id}`);
-  const buildingProposalsRef = db.ref(`Buildings/${buildingId}/Proposes`);
+  const proposalRef = db.ref(`${fbComerciales.prefixURL}Proposes/${proposal.id}`);
+  const buildingProposalsRef = db.ref(`${fbComerciales.prefixURL}Buildings/${buildingId}/Proposes`);
 
   return Promise.all([
     proposalRef.set(firebaseProposal),
