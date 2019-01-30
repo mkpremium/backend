@@ -1,4 +1,5 @@
 import {OwnerBusinessStatus} from '../src/types/enums';
+import {WorkSheetStatus} from "../src/types/worksheet";
 
 export const Files = {
   BUILDINGS: 'EDIFICIOS.csv',
@@ -122,6 +123,18 @@ const _MapBusinessStates = {
   29: OwnerBusinessStatus.PURCHASED
 };
 
+const worksheetToFirebaseBusiness = {
+  [WorkSheetStatus.MEETING]: OwnerBusinessStatus.PENDING,
+  [WorkSheetStatus.INVALID]: OwnerBusinessStatus.DISCARDED,
+  [WorkSheetStatus.PUBLIC]: OwnerBusinessStatus.DISCARDED,
+  [WorkSheetStatus.NO_SALE]: OwnerBusinessStatus.NO_SALE,
+  [WorkSheetStatus.ALREADY_SOLD]: OwnerBusinessStatus.ALREADY_SOLD
+};
+
 export function mapBusinessStates(value) {
   return _MapBusinessStates[value] || OwnerBusinessStatus.PENDING;
+}
+
+export function onlyForBusiness(value) {
+  return worksheetToFirebaseBusiness[value];
 }
