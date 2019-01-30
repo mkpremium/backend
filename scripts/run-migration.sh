@@ -2,7 +2,9 @@
 
 set -e
 
-_current=$(owd)
+_current=$(pwd)
+
+source ~/.nvm/nvm.sh
 
 cd /home/ubuntu/apps/mkpremium
 nvm use
