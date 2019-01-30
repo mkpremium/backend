@@ -12,7 +12,7 @@ babel ./ \
   --out-dir ./build \
   -s -q \
   --copy-files \
-  --ignore node_modules,development,docker,iml,lock,data
+  --ignore node_modules,development,docker,iml,lock
 
 # Node setup
 cp ./.nvmrc ./build/
