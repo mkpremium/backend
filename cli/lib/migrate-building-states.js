@@ -9,6 +9,7 @@ import _ from 'lodash';
 import {isPrimary} from '../../src/types/owner';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
+import {onlyForBusiness} from "../constants";
 
 export async function noSale(inputFile) {
   await validateHeaders(inputFile, 'Id_Catastro;NoVende');
@@ -31,7 +32,7 @@ async function updateWorksheetStatus(newStatus, data) {
     await saveBuildingToFirebase_(building, owner);
   }
 
-  return sendToFirebase(worksheet);
+  return sendToFirebase(updatedWorksheet);
 }
 
 export function getOwnerBuilding(worksheet) {
@@ -39,11 +40,14 @@ export function getOwnerBuilding(worksheet) {
   const primaryOwner = _.chain(worksheet.relatedOwners).filter(isPrimary).head().value();
   const alternativeOwner = _.chain(worksheet.relatedOwners).head().value();
   const owner = JSON.parse(JSON.stringify(primaryOwner || alternativeOwner));
+  const businessStatus = onlyForBusiness(worksheet.status);
   owner.building = building;
-  owner.business = {
-    meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a',
-    status: worksheet.status
-  };
+  if (businessStatus) {
+    owner.business = {
+      meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a',
+      status: businessStatus
+    };
+  }
   return {owner, building};
 }
 

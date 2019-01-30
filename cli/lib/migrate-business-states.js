@@ -23,7 +23,7 @@ async function doOnEachRow(data) {
     };
 
     const repo = new OwnerRepository();
-    await repo.updateBusinessStatus(owner.id, status, business.meetingWithOperatorId);
+    await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
     console.log('migrate business status', buildingMigrateId, building.id);
   } catch (e) {
     console.error(e.message);
