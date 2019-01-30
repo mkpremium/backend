@@ -3,7 +3,7 @@ import {OwnerRepository} from '../../src/owner/models';
 import {HistoryRepository} from '../../src/history/models';
 import {Calls, CallsRawEvents} from '../../src/calls/models';
 import {ScheduledEventsRepository} from '../../src/scheduled-events/models';
-import {BuildingRepository} from '../../src/building/models';
+import {BuildingRepository, MetadataRepository} from '../../src/building/models';
 import {OperatorStats} from '../../src/stats/models';
 import Promise from 'bluebird';
 import {cleanFirebase} from '../../migrations/firebase-clean';
@@ -32,9 +32,11 @@ export async function deleteAll() {
   const scheduledEvent = new ScheduledEventsRepository();
   const building = new BuildingRepository();
   const stats = new OperatorStats();
+  const meta = new MetadataRepository();
 
   return Promise.all([
     cleanFirebase(),
+    meta.deleteQuery(),
     worksheet.deleteQuery(),
     owner.deleteQuery(),
     building.deleteQuery(),
