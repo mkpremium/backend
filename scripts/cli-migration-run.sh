@@ -4,13 +4,13 @@ set -e
 
 _current=$(pwd)
 
+# setup
 source ~/.nvm/nvm.sh
-
 cd /home/ubuntu/apps/mkpremium
 nvm use
 
 NODE_CMD="node -r dotenv/config"
-DATA_DIR=~/picked_data
+DATA_DIR=${1:-"~/picked_data"}
 
 ${NODE_CMD} cli/cli-migrate-worksheets.js --clean ${DATA_DIR}/CSV/
 ${NODE_CMD} cli/cli-owners-verify.js ${DATA_DIR}/CSV/PROPIETARIOS.csv
