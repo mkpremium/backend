@@ -11,6 +11,6 @@ nvm use
 
 NODE_CMD="node -r dotenv/config"
 
-${NODE_CMD} cli/queue-clean-all.js
+${NODE_CMD} cli/cli-queue-clean-all.js
 
 cd ${_current}

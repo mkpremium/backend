@@ -156,6 +156,23 @@ Después puede ser que tenga un problemas relacionado con permisos, verificar y 
 [Aquí](https://stackoverflow.com/questions/42928765/convertnot-authorized-aaaa-error-constitute-c-readimage-453)
 
 
+## Tareas programadas (CRON jobs)
+
+El proyecto necesita en ambientes remotos ejecutar tareas programas, estas deben ejecutarse
+con el usuario donde esta corriendo, nunca se debe usar el usuario root, para ello
+debe usar crontab
+
+     $ crontab -e
+     
+Sera abierto con el editor que elija
+
+### Limpieza de worksheets en el limbo
+
+Se recomienda ejecutar periódicamente según la necesidad y cantidad de worksheet.
+El ejemplo ejecta el script cada minuto
+
+     */1 * * * * <project-root>/scripts/cli-queue-clean-all.sh >> <path-to-log>/cli-queue-clean-all.log 2>&1
+
 
 [1]: https://github.com/creationix/nvm
 [2]: https://docs.docker.com/install/
