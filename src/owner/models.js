@@ -328,16 +328,10 @@ GROUP BY t.business.status`;
   
         ownerIncludes(qbOwners, ['person']);
         const result = await this.query(qbOwners);
-  
-        // return result.map(mapOwnerIncludes);
-  
-        results = result.map(mapOwnerIncludes);// await this.query(qbOwners);
-        
-        console.log('results', results);
+        results = result.map(mapOwnerIncludes);
       }
     }
   
-    console.log('results', results);
     return fromJSON({results}, t.OwnerLitResponse);
   }
 }
