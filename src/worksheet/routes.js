@@ -82,6 +82,10 @@ const router = Router();
  *         items:
  *           type: string
  *           format: dd-mm-YYYY
+ *       - name: ownerName
+ *         in: query
+ *         type: string
+ *         description: Nombre de owner relacionado
  *     responses:
  *       200:
  *         description: Lista de hojas de trabajo

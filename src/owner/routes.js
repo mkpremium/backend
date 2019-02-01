@@ -1,8 +1,13 @@
 import {Router} from 'express';
 import {
-  addOwnerContactController, addOwnerController, updateBusinessStatusController, updateOwnerContactController,
+  addOwnerContactController,
+  addOwnerController,
+  listOwnerController,
+  updateBusinessStatusController,
+  updateOwnerContactController,
   updateOwnerController
 } from './controllers';
+import {permissions} from '../middleware/jwt';
 
 const router = Router();
 
@@ -207,5 +212,43 @@ router.put('/:id/contacts/:contactId', updateOwnerContactController);
  *           $ref: "#/definitions/Error"
  */
 router.post('/:id/contacts', addOwnerContactController);
+
+/**
+ * @swagger
+ * /owners:
+ *   get:
+ *     tags: [Owner, Manager]
+ *     summary: Obtiene el listado de owners
+ *     security:
+ *       - manager: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         type: number
+ *         description: Cantidad máxima a de registros a recibir
+ *         default: 20
+ *       - name: contactNumber
+ *         in: query
+ *         type: string
+ *         description: Numero de contacto - requerido.
+ *     responses:
+ *       200:
+ *         description: Lista de owners
+ *         schema:
+ *           $ref: "#/definitions/OwnerLitResponse"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/', permissions.manager, listOwnerController);
 
 export default router;

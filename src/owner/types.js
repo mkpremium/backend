@@ -74,6 +74,41 @@ t.OwnerUpdateBusinessStatus = t.struct({
   status: t.OwnerBusinessStatus
 }, 'OwnerUpdateBusinessStatus');
 
+/**
+ * @swagger
+ * definitions:
+ *   OwnerLitResponse:
+ *     required:
+ *       - results
+ *     properties:
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/OwnerWithInclude"
+ */
+t.OwnerLitResponse = t.struct(
+  {
+    results: t.list(t.OwnerWithInclude)
+  },
+  {
+    name: 'OwnerLitResponse',
+    defaultProps: {
+      results: []
+    }
+  }
+);
+
+export const OwnerListQuery = t.OwnerListQuery = t.ListQuery.extend(
+  {
+    contactNumber: t.maybe(t.String)
+  },
+  {
+    name: 'OwnerListQuery',
+    defaultProps: {
+    }
+  }
+);
+
 export function ownersContactViews(owners, worksheet) {
   function mapOwner(owner) {
     return ownerContactsView(owner, worksheet.relatedBuildings[0]);

@@ -60,11 +60,12 @@ t.QueueRequestParams.dispatch = function(x) {
   }
 };
 
-t.WorksheetListQuery = t.ListQuery.extend(
+export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
   {
     status: t.maybe(t.WorkSheetStatus),
     viewedAt: t.maybe(t.String),
-    viewedBetween: t.maybe(t.StringSplitList)
+    viewedBetween: t.maybe(t.StringSplitList),
+    ownerName: t.maybe(t.String)
   },
   {
     name: 'WorksheetListQuery',
