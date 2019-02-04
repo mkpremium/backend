@@ -9,7 +9,7 @@ import _ from 'lodash';
 import {isPrimary} from '../../src/types/owner';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
-import {onlyForBusiness} from "../constants";
+import {onlyForBusiness} from '../constants';
 
 export async function noSale(inputFile) {
   await validateHeaders(inputFile, 'Id_Catastro;NoVende');

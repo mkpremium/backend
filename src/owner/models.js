@@ -12,6 +12,8 @@ import {WorksheetRepository} from '../worksheet/models/worksheet';
 import {OwnerBusinessStatus, OwnerStatus} from '../types/enums';
 import _ from 'lodash';
 import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
+import fromJSON from 'tcomb/lib/fromJSON';
+import {OwnerListQuery} from './types';
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -305,5 +307,31 @@ GROUP BY t.business.status`;
     });
 
     return totals;
+  }
+  
+  async list(query = {}) {
+    const params = new OwnerListQuery(query);
+    let results = [];
+    
+    if (params.contactNumber) {
+      const personRepository = new PersonRepository();
+      const qbPerson = personRepository.getQueryBuilder('select')
+        .limit(params.limit)
+        .where('ANY v IN contacts SATISFIES `v`.`value` = ? END', params.contactNumber);
+      const personResults = await personRepository.query(qbPerson);
+      const personIds = _.uniq(_.map(personResults, 'id'));
+      
+      if (personIds && personIds.length) {
+        const qbOwners = this.getQueryBuilder('let')
+          .limit(params.limit)
+          .where(`personId IN ${JSON.stringify(personIds)}`);
+  
+        ownerIncludes(qbOwners, ['person']);
+        const result = await this.query(qbOwners);
+        results = result.map(mapOwnerIncludes);
+      }
+    }
+  
+    return fromJSON({results}, t.OwnerLitResponse);
   }
 }

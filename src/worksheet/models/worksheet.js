@@ -33,6 +33,7 @@ import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
 import {BuildingState} from '../../types/enums';
+import {WorksheetListQuery} from '../types';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -368,7 +369,7 @@ GROUP BY t.status`;
   }
 
   async list(query = {}) {
-    const params = new t.WorksheetListQuery(query);
+    const params = new WorksheetListQuery(query);
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset);
@@ -386,7 +387,12 @@ GROUP BY t.status`;
       addBetweenQueryToBuilder(qb, 'viewedAt', params.viewedBetween);
       addBetweenQueryToBuilder(qbCount, 'viewedAt', params.viewedBetween);
     }
-
+    
+    if (params.ownerName) {
+      qb.where('_relatedTo = ?', params.ownerName);
+      qbCount.where('_relatedTo = ?', params.ownerName);
+    }
+    
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);
 

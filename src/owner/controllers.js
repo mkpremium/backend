@@ -66,8 +66,15 @@ async function updateBusinessStatus(req, res) {
   res.status(204).send();
 }
 
+async function ownerList(req, res) {
+  const repo = new OwnerRepository();
+  const owners = await repo.list(req.query);
+  res.json(owners);
+}
+
 export const updateOwnerContactController = wrap(updateOwnerContact);
 export const updateOwnerController = wrap(updateOwner);
 export const addOwnerContactController = wrap(addOwnerContact);
 export const addOwnerController = wrap(addOwner);
 export const updateBusinessStatusController = wrap(updateBusinessStatus);
+export const listOwnerController = wrap(ownerList);

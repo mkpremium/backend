@@ -4,8 +4,8 @@ import program from 'commander';
 import Promise from 'bluebird';
 import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
-import {DbIndexes} from './constants';
 import couchbase from '../src/db/couchbase';
+import {DbIndexes} from './constants';
 
 program
   .version('0.0.1')

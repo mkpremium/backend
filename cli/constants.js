@@ -1,5 +1,5 @@
 import {OwnerBusinessStatus} from '../src/types/enums';
-import {WorkSheetStatus} from "../src/types/worksheet";
+import {WorkSheetStatus} from '../src/types/worksheet';
 
 export const Files = {
   BUILDINGS: 'EDIFICIOS.csv',
@@ -99,6 +99,10 @@ export const DbIndexes = [
   {
     name: 'note_migration_building',
     query: '(_documentType, context.buildingId, context._migrateId) WHERE _documentType = "note"'
+  },
+  {
+    name: 'worksheet_migration_related',
+    query: '(_documentType, _relatedTo) WHERE _documentType = "worksheet"'
   }
 ];
 
