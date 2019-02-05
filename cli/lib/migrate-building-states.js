@@ -4,12 +4,13 @@ import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {WorkSheetStatus} from '../../src/types/worksheet';
 import {removeNullValue} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import {saveBuildingToFirebase_} from '../../src/firebase/lib/business';
 import _ from 'lodash';
 import {isPrimary} from '../../src/types/owner';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {onlyForBusiness} from '../constants';
+import {OwnerBusinessStatus} from '../../src/types/enums';
+import {OwnerRepository} from '../../src/owner/models';
 
 export async function noSale(inputFile) {
   await validateHeaders(inputFile, 'Id_Catastro;NoVende');
@@ -28,23 +29,37 @@ async function updateWorksheetStatus(newStatus, data) {
   await saveDataChange(updatedWorksheet);
 
   async function sendToFirebase(worksheet) {
-    const {owner, building} = getOwnerBuilding(worksheet);
-    await saveBuildingToFirebase_(building, owner);
+    const {owner} = getOwnerBuilding(worksheet);
+
+    switch (newStatus) {
+      case WorkSheetStatus.MEETING:
+        const status = OwnerBusinessStatus.PENDING;
+        const business = {
+          status,
+          meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a'
+        };
+        const repo = new OwnerRepository();
+        await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
+        break;
+      default:
+        // no-op: estas worksheets no llevan a comerciales
+        break;
+    }
   }
 
   return sendToFirebase(updatedWorksheet);
 }
 
-export function getOwnerBuilding(worksheet) {
+export function getOwnerBuilding(worksheet, businessId) {
   const [building] = worksheet.relatedBuildings;
   const primaryOwner = _.chain(worksheet.relatedOwners).filter(isPrimary).head().value();
   const alternativeOwner = _.chain(worksheet.relatedOwners).head().value();
   const owner = JSON.parse(JSON.stringify(primaryOwner || alternativeOwner));
   const businessStatus = onlyForBusiness(worksheet.status);
   owner.building = building;
-  if (businessStatus) {
+  if (businessStatus && businessId) {
     owner.business = {
-      meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a',
+      meetingWithOperatorId: businessId,
       status: businessStatus
     };
   }
