@@ -3,6 +3,9 @@ import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import BuildingHelper from './building';
 import Promise from 'bluebird';
 import t from 'tcomb';
+import app from "../../src/app";
+import request from "supertest";
+import _ from "lodash";
 
 /**
  * Creates worksheets using the model
@@ -43,9 +46,20 @@ async function findByIdModel(worksheetId) {
   return worksheetRepository.findByIdOrThrow(worksheetId);
 }
 
+async function searchWorksheetEndpoint(authenticatedManager, payload) {
+  return request(app)
+    .get(`/worksheets/search`)
+    .set('Authorization', authenticatedManager.authorization)
+    .query(payload)
+    .expect(200)
+    .then(response => {
+      return response.body;
+    });
+}
+
 module.exports = {
-  createWorksheetsViaModel,
   createWorksheetsWithBuildingsAssociated,
   updateQueueIdWorksheetModel,
-  findByIdModel
+  findByIdModel,
+  searchWorksheetEndpoint
 };

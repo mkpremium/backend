@@ -33,7 +33,8 @@ import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
 import {BuildingState} from '../../types/enums';
-import {WorksheetListQuery} from '../types';
+import {WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse} from '../types';
+import _map from 'lodash/map';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -422,5 +423,34 @@ GROUP BY t.status`;
       .fromString(`UPDATE ${bucket} t SET queueId = null WHERE META().id IN ${JSON.stringify(worksheetIds)}`);
     
     return this.queryRaw(cleanQueueIds);
+  }
+  
+  /**
+   * Searches worksheets using full text search tool from current database.
+   * @param {Object} query
+   * @property query.keyword - the word to be searched
+   * @property query.limit - the limit of the results, default : 20
+   * @returns {Promise<WorksheetSearchResponse>}
+   */
+  async searchWorksheets(query) {
+    let results = [];
+    const params = t.WorksheetSearchQuery(query); // AQUI NO PUEDO DEFINIR LIMIT MIRAR QUE ESTA COMENTADO
+    const qs = this.getSearchBuilder(params.query);
+    //console.log('LIMITE', params.limit);
+    qs.limit(params.limit || 20);
+    
+    const searchResult = await this.search(qs).catch(e=> console.log(e));
+    const worksheetIds = _uniq(_map(searchResult, 'id'));
+    console.log('worksheetIds', worksheetIds);
+    
+    if (worksheetIds.length) {
+      const queryBuilder = this
+        .getQueryBuilder('select')
+        .where(`id IN ${JSON.stringify(worksheetIds)}`);
+  
+      results = await this.query(queryBuilder);
+    }
+    
+    return fromJSON({results}, WorksheetSearchResponse);
   }
 }
