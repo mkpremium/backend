@@ -48,7 +48,7 @@ const router = Router();
  * @swagger
  * /worksheets:
  *   get:
- *     tags: [Worksheet, Manager]
+ *     tags: [Worksheet, Manager, Operator]
  *     summary: Obtiene el listado de fichas de trabajo
  *     security:
  *       - manager: []
@@ -100,7 +100,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.manager, worksheetListController);
+router.get('/', permissions.operator, worksheetListController);
 
 /**
  * @swagger

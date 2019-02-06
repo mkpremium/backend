@@ -217,10 +217,12 @@ router.post('/:id/contacts', addOwnerContactController);
  * @swagger
  * /owners:
  *   get:
- *     tags: [Owner, Manager]
+ *     tags: [Owner, Manager, Operator, Business]
  *     summary: Obtiene el listado de owners
  *     security:
  *       - manager: []
+ *       - operator: []
+ *       - business: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -249,6 +251,6 @@ router.post('/:id/contacts', addOwnerContactController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.manager, listOwnerController);
+router.get('/', listOwnerController);
 
 export default router;
