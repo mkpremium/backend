@@ -128,11 +128,7 @@ const _MapBusinessStates = {
 };
 
 const worksheetToFirebaseBusiness = {
-  [WorkSheetStatus.MEETING]: OwnerBusinessStatus.PENDING,
-  [WorkSheetStatus.INVALID]: OwnerBusinessStatus.DISCARDED,
-  [WorkSheetStatus.PUBLIC]: OwnerBusinessStatus.DISCARDED,
-  [WorkSheetStatus.NO_SALE]: OwnerBusinessStatus.NO_SALE,
-  [WorkSheetStatus.ALREADY_SOLD]: OwnerBusinessStatus.ALREADY_SOLD
+  [WorkSheetStatus.MEETING]: OwnerBusinessStatus.PENDING
 };
 
 export function mapBusinessStates(value) {
