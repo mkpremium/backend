@@ -1,11 +1,10 @@
+import t from 'tcomb';
 import times from 'lodash/times';
+import Promise from 'bluebird';
+import request from 'supertest';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import BuildingHelper from './building';
-import Promise from 'bluebird';
-import t from 'tcomb';
-import app from "../../src/app";
-import request from "supertest";
-import _ from "lodash";
+import app from '../../src/app';
 
 /**
  * Creates worksheets using the model
@@ -16,7 +15,7 @@ import _ from "lodash";
 async function createWorksheetsViaModel(payload) {
   const payloadData = payload || {times: 5};
   const worksheetRepository = new WorksheetRepository();
-  
+
   return Promise.all(times(payloadData.times, () => worksheetRepository.save({})));
 }
 
@@ -25,7 +24,7 @@ async function createWorksheetsWithBuildingsAssociated() {
   const buildings = await BuildingHelper.runBuildingSeedAndGetThemAll();
   const buildingArraySize = buildings.length;
   const worksheets = await createWorksheetsViaModel({times: buildingArraySize});
-  
+
   return Promise.map(worksheets, async(ws) => {
     const building = buildings.pop();
     const updatedWorksheet = t.update(ws, {buildingAddress: {$set: building.address}});
@@ -42,7 +41,7 @@ async function updateQueueIdWorksheetModel(worksheetId, queueId) {
 
 async function findByIdModel(worksheetId) {
   const worksheetRepository = new WorksheetRepository();
-  
+
   return worksheetRepository.findByIdOrThrow(worksheetId);
 }
 

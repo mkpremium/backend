@@ -388,18 +388,18 @@ GROUP BY t.status`;
       addBetweenQueryToBuilder(qb, 'viewedAt', params.viewedBetween);
       addBetweenQueryToBuilder(qbCount, 'viewedAt', params.viewedBetween);
     }
-    
+
     if (params.ownerName) {
       qb.where('_relatedTo = ?', params.ownerName);
       qbCount.where('_relatedTo = ?', params.ownerName);
     }
-    
+
     const total = await this.countQuery(qbCount);
     const results = await this.query(qb);
 
     return fromJSON({total, results}, t.WorkSheetLitResponse);
   }
-  
+
   /**
    * Find all worksheets with a particular queue id.
    * @param queueId
@@ -409,10 +409,10 @@ GROUP BY t.status`;
     const qb = this
       .getQueryBuilder()
       .where('queueId = ?', queueId);
-    
+
     return this.query(qb);
   }
-  
+
   /**
    * Sets to null the queue id of an array of worksheets ids.
    * @returns {Promise<void>}
@@ -421,10 +421,10 @@ GROUP BY t.status`;
     const bucket = this.getBucketName();
     const cleanQueueIds = N1qlQuery
       .fromString(`UPDATE ${bucket} t SET queueId = null WHERE META().id IN ${JSON.stringify(worksheetIds)}`);
-    
+
     return this.queryRaw(cleanQueueIds);
   }
-  
+
   /**
    * Searches worksheets using full text search tool from current database.
    * @param {Object} query
@@ -434,23 +434,21 @@ GROUP BY t.status`;
    */
   async searchWorksheets(query) {
     let results = [];
-    const params = t.WorksheetSearchQuery(query); // AQUI NO PUEDO DEFINIR LIMIT MIRAR QUE ESTA COMENTADO
+    const params = new WorksheetSearchQuery(query);
     const qs = this.getSearchBuilder(params.query);
-    //console.log('LIMITE', params.limit);
-    qs.limit(params.limit || 20);
-    
-    const searchResult = await this.search(qs).catch(e=> console.log(e));
-    const worksheetIds = _uniq(_map(searchResult, 'id'));
-    console.log('worksheetIds', worksheetIds);
-    
+    qs.limit(Number(params.limit));
+
+    const searchResult = await this.search(qs);
+    const worksheetIds = _map(searchResult, 'id');
+
     if (worksheetIds.length) {
       const queryBuilder = this
         .getQueryBuilder('select')
         .where(`id IN ${JSON.stringify(worksheetIds)}`);
-  
+
       results = await this.query(queryBuilder);
     }
-    
+
     return fromJSON({results}, WorksheetSearchResponse);
   }
 }

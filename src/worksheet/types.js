@@ -140,15 +140,18 @@ t.QueueListResponse = t.struct(
   }
 );
 
-t.WorksheetSearchQuery = t.struct({
-  query: t.String,
-  //limit: t.Positive,
-}, {
-  name: 'WorksheetSearchQuery',
-  /*defaultProps: {
-    limit: 15
-  }*/
-});
+export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
+  {
+    query: t.String,
+    limit: t.Positive
+  },
+  {
+    name: 'WorksheetSearchQuery',
+    defaultProps: {
+      limit: 15
+    }
+  }
+);
 
 /**
  * @swagger

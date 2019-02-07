@@ -1,30 +1,23 @@
 import app from '../../../src/app';
-import {
-  deleteAll,
-  operatorCreateManager,
-  operatorLogin,
-  defaultPassword
-} from '../../common';
+import {defaultPassword, deleteAll, operatorCreateManager, operatorLogin} from '../../common';
 import WorksheetHelper from '../../helpers/worksheet';
 
-describe('search worksheets', () => {
+describe('Route search worksheets', () => {
   let authenticatedManager;
   let manager;
-  let worksheets;
   beforeEach(async() => {
     await deleteAll();
     manager = await operatorCreateManager();
     authenticatedManager = await operatorLogin(app, {username: manager.username, password: defaultPassword});
-    
-    worksheets = await WorksheetHelper.createWorksheetsWithBuildingsAssociated();
 
+    await WorksheetHelper.createWorksheetsWithBuildingsAssociated();
   });
   describe('search worksheets by address', () => {
     it('able to search worksheets by building address', async() => {
       // We know there are buildings in Barcelona
-      const response = await WorksheetHelper.searchWorksheetEndpoint(authenticatedManager, {keyword: 'b*'});
-      console.log('response', JSON.stringify(response));
+      const response = await WorksheetHelper.searchWorksheetEndpoint(authenticatedManager, {query: 'b*'});
       response.results.should.be.a('array');
+      response.results.length.should.not.equal(0);
     });
   });
 });

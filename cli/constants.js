@@ -143,135 +143,133 @@ export const DBIndexesFullTextSearch = [
   {
     name: 'worksheet',
     definition: {
-      "type": "fulltext-index",
-      "name": "worksheet",
-      "uuid": "",
-      "sourceType": "couchbase",
-      "sourceName": process.env.COUCHBASE_BUCKET,
-      "sourceUUID": "",
-      "planParams": {
-        "maxPartitionsPerPIndex": 171
+      'type': 'fulltext-index',
+      'name': 'worksheet',
+      'sourceType': 'couchbase',
+      'sourceName': process.env.COUCHBASE_BUCKET,
+      'planParams': {
+        'maxPartitionsPerPIndex': 171
       },
-      "params": {
-        "doc_config": {
-          "docid_prefix_delim": "",
-          "docid_regexp": "",
-          "mode": "type_field",
-          "type_field": "_documentType"
+      'params': {
+        'doc_config': {
+          'docid_prefix_delim': '',
+          'docid_regexp': '',
+          'mode': 'type_field',
+          'type_field': '_documentType'
         },
-        "mapping": {
-          "analysis": {},
-          "default_analyzer": "standard",
-          "default_datetime_parser": "dateTimeOptional",
-          "default_field": "_all",
-          "default_mapping": {
-            "default_analyzer": "",
-            "dynamic": true,
-            "enabled": false
+        'mapping': {
+          'analysis': {},
+          'default_analyzer': 'standard',
+          'default_datetime_parser': 'dateTimeOptional',
+          'default_field': '_all',
+          'default_mapping': {
+            'default_analyzer': '',
+            'dynamic': true,
+            'enabled': false
           },
-          "default_type": "_default",
-          "docvalues_dynamic": true,
-          "index_dynamic": true,
-          "store_dynamic": false,
-          "type_field": "_type",
-          "types": {
-            "worksheet": {
-              "default_analyzer": "ar",
-              "dynamic": true,
-              "enabled": true,
-              "properties": {
-                "buildingAddress": {
-                  "default_analyzer": "",
-                  "dynamic": true,
-                  "enabled": true,
-                  "properties": {
-                    "city": {
-                      "default_analyzer": "",
-                      "dynamic": false,
-                      "enabled": true,
-                      "fields": [
+          'default_type': '_default',
+          'docvalues_dynamic': true,
+          'index_dynamic': true,
+          'store_dynamic': false,
+          'type_field': '_type',
+          'types': {
+            'worksheet': {
+              'default_analyzer': 'ar',
+              'dynamic': true,
+              'enabled': true,
+              'properties': {
+                'buildingAddress': {
+                  'default_analyzer': '',
+                  'dynamic': true,
+                  'enabled': true,
+                  'properties': {
+                    'city': {
+                      'default_analyzer': '',
+                      'dynamic': false,
+                      'enabled': true,
+                      'fields': [
                         {
-                          "include_in_all": true,
-                          "include_term_vectors": true,
-                          "index": true,
-                          "name": "city",
-                          "store": true,
-                          "type": "text"
+                          'include_in_all': true,
+                          'include_term_vectors': true,
+                          'index': true,
+                          'name': 'city',
+                          'store': true,
+                          'type': 'text'
                         }
                       ]
                     },
-                    "fullAddress": {
-                      "default_analyzer": "",
-                      "dynamic": false,
-                      "enabled": true,
-                      "fields": [
+                    'fullAddress': {
+                      'default_analyzer': '',
+                      'dynamic': false,
+                      'enabled': true,
+                      'fields': [
                         {
-                          "include_in_all": true,
-                          "include_term_vectors": true,
-                          "index": true,
-                          "name": "fullAddress",
-                          "store": true,
-                          "type": "text"
+                          'include_in_all': true,
+                          'include_term_vectors': true,
+                          'index': true,
+                          'name': 'fullAddress',
+                          'store': true,
+                          'type': 'text'
                         }
                       ]
                     },
-                    "neighborhood": {
-                      "default_analyzer": "",
-                      "dynamic": false,
-                      "enabled": true,
-                      "fields": [
+                    'neighborhood': {
+                      'default_analyzer': '',
+                      'dynamic': false,
+                      'enabled': true,
+                      'fields': [
                         {
-                          "include_in_all": true,
-                          "include_term_vectors": true,
-                          "index": true,
-                          "name": "neighborhood",
-                          "store": true,
-                          "type": "text"
+                          'include_in_all': true,
+                          'include_term_vectors': true,
+                          'index': true,
+                          'name': 'neighborhood',
+                          'store': true,
+                          'type': 'text'
                         }
                       ]
                     },
-                    "province": {
-                      "default_analyzer": "",
-                      "dynamic": false,
-                      "enabled": true,
-                      "fields": [
+                    'province': {
+                      'default_analyzer': '',
+                      'dynamic': false,
+                      'enabled': true,
+                      'fields': [
                         {
-                          "include_in_all": true,
-                          "include_term_vectors": true,
-                          "index": true,
-                          "name": "province",
-                          "store": true,
-                          "type": "text"
+                          'include_in_all': true,
+                          'include_term_vectors': true,
+                          'index': true,
+                          'name': 'province',
+                          'store': true,
+                          'type': 'text'
                         }
                       ]
                     },
-                    "street": {
-                      "default_analyzer": "",
-                      "dynamic": false,
-                      "enabled": true,
-                      "fields": [
+                    'street': {
+                      'default_analyzer': '',
+                      'dynamic': false,
+                      'enabled': true,
+                      'fields': [
                         {
-                          "include_in_all": true,
-                          "include_term_vectors": true,
-                          "index": true,
-                          "name": "street",
-                          "store": true,
-                          "type": "text"
+                          'include_in_all': true,
+                          'include_term_vectors': true,
+                          'index': true,
+                          'name': 'street',
+                          'store': true,
+                          'type': 'text'
                         }
                       ]
                     },
-                    "zone": {
-                      "default_analyzer": "",
-                      "dynamic": false,
-                      "enabled": true,
-                      "fields": [
+                    'zone': {
+                      'default_analyzer': '',
+                      'dynamic': false,
+                      'enabled': true,
+                      'fields': [
                         {
-                          "include_in_all": true,
-                          "include_term_vectors": true,
-                          "index": true,
-                          "name": "zone",
-                          "store": true,
-                          "type": "text"
+                          'include_in_all': true,
+                          'include_term_vectors': true,
+                          'index': true,
+                          'name': 'zone',
+                          'store': true,
+                          'type': 'text'
                         }
                       ]
                     }
@@ -281,12 +279,12 @@ export const DBIndexesFullTextSearch = [
             }
           }
         },
-        "store": {
-          "indexType": "upside_down",
-          "kvStoreName": "mossStore"
+        'store': {
+          'indexType': 'upside_down',
+          'kvStoreName': 'mossStore'
         }
       },
-      "sourceParams": {}
+      'sourceParams': {}
     }
   }
 ];

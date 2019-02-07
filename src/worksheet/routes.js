@@ -459,7 +459,7 @@ router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWork
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/search', permissions.operator, searchWorksheetController);
+router.get('/search', searchWorksheetController);
 
 /**
  * @swagger
