@@ -168,6 +168,18 @@ async function removeScheduledWorksheet(req, res) {
   res.status(204).send();
 }
 
+/**
+ * Searches worksheets by keyword.
+ * @param request
+ * @param response
+ * @returns {Promise<void>}
+ */
+async function searchWorksheets(request, response) {
+  const repo = new WorksheetRepository();
+  const worksheets = await repo.searchWorksheets(request.query);
+  response.json(worksheets);
+}
+
 export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet);
 export const worksheetListController = wrap(worksheetList);
 export const worksheetFindByIdController = wrap(findById);
@@ -180,3 +192,4 @@ export const updateQueueController = wrap(updateQueue);
 export const deleteQueueController = wrap(deleteQueue);
 export const getScheduledWorksheetsController = wrap(getScheduledWorksheets);
 export const removeScheduledWorksheetController = wrap(removeScheduledWorksheet);
+export const searchWorksheetController = wrap(searchWorksheets);

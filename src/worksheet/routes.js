@@ -10,7 +10,7 @@ import {
   createQueueController,
   updateQueueController,
   deleteQueueController,
-  getScheduledWorksheetsController, removeScheduledWorksheetController
+  getScheduledWorksheetsController, removeScheduledWorksheetController, searchWorksheetController
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
@@ -53,6 +53,7 @@ const router = Router();
  *     security:
  *       - manager: []
  *       - admin: []
+ *       - operator: []
  *     consumes:
  *       - "application/json"
  *     produces:
@@ -419,6 +420,46 @@ router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheets
  *
  */
 router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController);
+
+/**
+ * @swagger
+ * /worksheets/search:
+ *   get:
+ *     tags: [Worksheet, Manager]
+ *     summary: Busca fichas de trabajo por dirección
+ *     security:
+ *       - manager: []
+ *       - admin: []
+ *       - operator: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         type: number
+ *         description: Cantidad máxima a de registros a recibir
+ *         default: 20
+ *       - name: query
+ *         in: query
+ *         type: string
+ *         description: Dirección o palabra clave de dirección
+ *     responses:
+ *       200:
+ *         description: Lista de hojas de trabajo por dirección
+ *         schema:
+ *           $ref: "#/definitions/WorksheetSearchResponse"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.get('/search', searchWorksheetController);
 
 /**
  * @swagger

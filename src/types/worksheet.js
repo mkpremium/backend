@@ -4,7 +4,6 @@ import _findIndex from 'lodash/findIndex';
 import _filter from 'lodash/filter';
 import {Queue} from './constants';
 import debug from 'debug';
-
 import '../owner/types';
 import {Address} from './common';
 import {newHttpError} from '../lib/http-error';

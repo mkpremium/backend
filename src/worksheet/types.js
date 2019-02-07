@@ -139,3 +139,40 @@ t.QueueListResponse = t.struct(
     }
   }
 );
+
+export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
+  {
+    query: t.String,
+    limit: t.Positive
+  },
+  {
+    name: 'WorksheetSearchQuery',
+    defaultProps: {
+      limit: 20
+    }
+  }
+);
+
+/**
+ * @swagger
+ * definitions:
+ *   WorksheetSearchResponse:
+ *     required:
+ *       - results
+ *     properties:
+ *       results:
+ *         type: array
+ *         items:
+ *           $ref: "#/definitions/Worksheet"
+ */
+export const WorksheetSearchResponse = t.struct(
+  {
+    results: t.list(t.WorkSheet)
+  },
+  {
+    name: 'WorksheetSearchResponse',
+    defaultProps: {
+      results: []
+    }
+  }
+);
