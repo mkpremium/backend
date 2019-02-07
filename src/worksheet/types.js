@@ -148,7 +148,7 @@ export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
   {
     name: 'WorksheetSearchQuery',
     defaultProps: {
-      limit: 15
+      limit: 20
     }
   }
 );

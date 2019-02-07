@@ -1,5 +1,6 @@
 import {OwnerBusinessStatus} from '../src/types/enums';
 import {WorkSheetStatus} from '../src/types/worksheet';
+import {couchbase} from '../config';
 
 export const Files = {
   BUILDINGS: 'EDIFICIOS.csv',
@@ -146,7 +147,7 @@ export const DBIndexesFullTextSearch = [
       'type': 'fulltext-index',
       'name': 'worksheet',
       'sourceType': 'couchbase',
-      'sourceName': process.env.COUCHBASE_BUCKET,
+      'sourceName': couchbase.bucket,
       'planParams': {
         'maxPartitionsPerPIndex': 171
       },
