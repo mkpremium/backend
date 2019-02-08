@@ -22,32 +22,34 @@ export async function noSale(inputFile) {
 }
 
 async function updateWorksheetStatus(newStatus, data) {
+  const owner = await findOwnerByMigrate(data);
   const buildingMigrateId = getBuildingMigrateIdNotNull(data);
   const worksheet = await findWorksheetByMigrateId(buildingMigrateId);
   const w = fromJSON(worksheet, t.WorkSheet);
   const updatedWorksheet = w.setStatus(newStatus);
   await saveDataChange(updatedWorksheet);
 
-  async function sendToFirebase(worksheet) {
-    const {owner} = getOwnerBuilding(worksheet);
-
-    switch (newStatus) {
-      case WorkSheetStatus.MEETING:
-        const status = OwnerBusinessStatus.PENDING;
-        const business = {
-          status,
-          meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a'
-        };
-        const repo = new OwnerRepository();
-        await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
-        break;
-      default:
-        // no-op: estas worksheets no llevan a comerciales
-        break;
-    }
+  switch (newStatus) {
+    case WorkSheetStatus.MEETING:
+      const status = OwnerBusinessStatus.PENDING;
+      const business = {
+        status,
+        meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a'
+      };
+      const repo = new OwnerRepository();
+      await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
+      break;
+    default:
+      // no-op: estas worksheets no llevan a comerciales
+      break;
   }
+}
 
-  return sendToFirebase(updatedWorksheet);
+async function findOwnerByMigrate(data) {
+  const repo = new OwnerRepository();
+  const migratedId = data['Id_Propietario'];
+
+  return repo.findByMigratedId(migratedId);
 }
 
 export function getOwnerBuilding(worksheet, businessId) {
