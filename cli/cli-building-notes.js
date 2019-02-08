@@ -54,7 +54,7 @@ async function main(inputFile) {
 async function validateFile(inputFile) {
   const pathExists = await fs.pathExists(inputFile);
   if (!pathExists) {
-    throw new Error(`'${inputFile} doesn't exist or cannot be readed`);
+    throw new Error(`'${inputFile} doesn't exist or cannot be read`);
   }
 
   return validateHeaders(inputFile, 'ID;ID_CATASTRO;FECHA;ID_OPERDADOR;NOTAS');
