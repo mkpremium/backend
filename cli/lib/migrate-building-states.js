@@ -21,35 +21,47 @@ export async function noSale(inputFile) {
   }
 }
 
-async function updateWorksheetStatus(newStatus, data) {
-  const owner = await findOwnerByMigrate(data);
+async function updateWorksheetStatus(newStatus, data, mapBusiness) {
   const buildingMigrateId = getBuildingMigrateIdNotNull(data);
   const worksheet = await findWorksheetByMigrateId(buildingMigrateId);
   const w = fromJSON(worksheet, t.WorkSheet);
   const updatedWorksheet = w.setStatus(newStatus);
   await saveDataChange(updatedWorksheet);
 
-  switch (newStatus) {
-    case WorkSheetStatus.MEETING:
-      const status = OwnerBusinessStatus.PENDING;
-      const business = {
-        status,
-        meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a'
-      };
-      const repo = new OwnerRepository();
-      await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
-      break;
-    default:
-      // no-op: estas worksheets no llevan a comerciales
-      break;
+  return updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness);
+}
+
+async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness) {
+  if (WorkSheetStatus.MEETING !== newStatus) {
+    return;
   }
+
+  const meetingWithOperatorId = mapBusiness[data['Id_Comercial']];
+
+  if (!meetingWithOperatorId) {
+    throw new Error(`Id_Comercial '${data['Id_Comercial']}' is not present on the map-business.json`);
+  }
+
+  const owner = await findOwnerByMigrate(data);
+  const status = OwnerBusinessStatus.PENDING;
+  const business = {
+    status,
+    meetingWithOperatorId
+  };
+  const repo = new OwnerRepository();
+  await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
 }
 
 async function findOwnerByMigrate(data) {
   const repo = new OwnerRepository();
   const migratedId = data['Id_Propietario'];
 
-  return repo.findByMigratedId(migratedId);
+  const owners = await repo.findByMigratedId(migratedId);
+  if (owners.length === 0) {
+    throw new Error(`Cannot find owner by ${migratedId}`);
+  }
+
+  return owners[0];
 }
 
 export function getOwnerBuilding(worksheet, businessId) {
@@ -81,12 +93,12 @@ export function getBuildingMigrateIdNotNull(data) {
   return buildingMigrateId;
 }
 
-export async function withMeeting(inputFile) {
-  await validateHeaders(inputFile, 'Id_Catastro;Visitare');
+export async function withMeeting(inputFile, mapBusiness) {
+  await validateHeaders(inputFile, '"Id_Catastro";"Visita";"Id_Comercial";"Fecha";"Id_Propietario"');
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.MEETING, data);
+    return updateWorksheetStatus(WorkSheetStatus.MEETING, data, mapBusiness);
   }
 }
 
