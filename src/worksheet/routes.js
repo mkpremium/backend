@@ -101,7 +101,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.operator, worksheetListController);
+router.get('/', worksheetListController);
 
 /**
  * @swagger

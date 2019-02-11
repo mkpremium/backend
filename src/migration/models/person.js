@@ -34,7 +34,9 @@ export const PersonInputDTO = t.struct({
   domicili_ib: t.maybe(t.String),
   domicili_db: t.maybe(t.String),
   domicili_abc: t.maybe(t.String),
-  sexo: t.maybe(t.String)
+  sexo: t.maybe(t.String),
+  tel_he: t.maybe(t.String),
+  movil_he: t.maybe(t.String)
 }, 'BuildingInputDTO');
 
 function isEmpty(val) {
@@ -86,6 +88,14 @@ function contacts(input) {
 
   if (!isEmpty(input.telefono_abc)) {
     contacts.push(input.telefono_abc);
+  }
+  
+  if (!isEmpty(input.tel_he)) {
+    contacts.push(input.tel_he);
+  }
+  
+  if (!isEmpty(input.movil_he)) {
+    contacts.push(input.movil_he);
   }
 
   return _uniq(contacts).map(value => ({value}));

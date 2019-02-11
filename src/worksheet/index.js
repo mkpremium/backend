@@ -6,5 +6,5 @@ import jwt from '../middleware/jwt';
 export default (app) => {
   const secured = jwt();
 
-  app.use('/worksheets', routes);
+  app.use('/worksheets', secured, routes);
 };

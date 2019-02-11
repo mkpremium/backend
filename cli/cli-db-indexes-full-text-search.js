@@ -29,7 +29,7 @@ function mainEntry() {
 // endregion
 
 const instance = axios.create({
-  baseURL: 'http://127.0.0.1:8094/api/index/',
+  baseURL: couchbase.uriAPIRest,
   timeout: 1000,
   headers: {
     'Content-Type': 'application/json',

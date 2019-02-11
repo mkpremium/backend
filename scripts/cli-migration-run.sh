@@ -14,11 +14,11 @@ cd ${SCRIPT_DIR}/../
 source ~/.nvm/nvm.sh
 nvm use
 
-#${NODE_CMD} cli/cli-migrate-worksheets.js --clean ${DATA_DIR}/CSV/
-#${NODE_CMD} cli/cli-owners-verify.js ${DATA_DIR}/CSV/PROPIETARIOS.csv
+${NODE_CMD} cli/cli-migrate-worksheets.js --clean ${DATA_DIR}/CSV/
+${NODE_CMD} cli/cli-owners-verify.js ${DATA_DIR}/CSV/PROPIETARIOS.csv
 ${NODE_CMD} cli/cli-building-states.js ${DATA_DIR}/CSV/BUILDING_STATES/
-#${NODE_CMD} cli/cli-business-states.js ${DATA_DIR}/CSV/BUSINESS_STATES/
-#${NODE_CMD} cli/cli-building-notes.js ${DATA_DIR}/CSV/BUILDING_NOTES.csv
-#${NODE_CMD} cli/cli-building-metadata.js ${DATA_DIR}/
+${NODE_CMD} cli/cli-business-states.js ${DATA_DIR}/CSV/BUSINESS_STATES/
+${NODE_CMD} cli/cli-building-notes.js ${DATA_DIR}/CSV/BUILDING_NOTES.csv
+${NODE_CMD} cli/cli-building-metadata.js ${DATA_DIR}/
 
 cd ${CURRENT_DIR}

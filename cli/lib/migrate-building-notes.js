@@ -12,6 +12,10 @@ export async function migrateBuildingNotes(inputFile, bucket) {
 export class BuildingNotes extends MigrateModelV3 {
   async parseToData(data, row) {
     try {
+      if (isAutomaticCall(data)) {
+        console.warn('row', row, 'ignored because', 'llamada automatica');
+        return;
+      }
       await createBuildingNote(data);
     } catch (e) {
       console.error('row', row, 'ignored because', e.message);
@@ -79,4 +83,10 @@ function noteBody(data) {
 
 function noteDate(data) {
   return madrid(new Date(data['FECHA'])).toDate();
+}
+
+const regexAutomaticCall = /llamada automatica/i;
+
+function isAutomaticCall(data) {
+  return regexAutomaticCall.test(data['NOTAS']);
 }
