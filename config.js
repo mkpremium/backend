@@ -21,7 +21,8 @@ export const couchbase = {
   pass: process.env.COUCHBASE_PASS || 'password',
   timeout: parseInt(process.env.COUCHBASE_TIMEOUT || 2500),
   retries: parseInt(process.env.COUCHBASE_TIMEOUT_RETRIES || 3),
-  consistency: parseInt(process.env.COUCHBASE_CONSISTENCY || N1qlQuery.Consistency.STATEMENT_PLUS)
+  consistency: parseInt(process.env.COUCHBASE_CONSISTENCY || N1qlQuery.Consistency.STATEMENT_PLUS),
+  uriAPIRest:process.env.COUCHBASE_API_REST || 'http://127.0.0.1:8094/api/index/',
 };
 export const jwt = {
   secret: process.env.JWT_SECRET || 'Bitdistrict1sGreat',
