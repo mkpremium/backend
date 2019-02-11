@@ -1,7 +1,4 @@
-Id_Catastro;Visitare
-151;1
-152;1
-153;1
-154;1
-155;1
-156;1
+"Id_Catastro";"Visita";"Id_Comercial";"Fecha";"Id_Propietario"
+"151";"True";"M.MESA";"1900-01-03 13:00:00";"110533"
+"152";"True";"M.MESA";"1900-01-22 17:00:00";"110534"
+"153";"True";"M.MESA";"1900-10-24 16:30:00";"110535"

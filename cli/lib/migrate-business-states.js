@@ -17,13 +17,8 @@ async function doOnEachRow(data) {
 
     const status = mapBusinessStates(data['EstadoSeguimiento']);
 
-    const business = {
-      status,
-      meetingWithOperatorId: 'b4bc93a1-3b48-4f50-9af9-5b135285918a'
-    };
-
     const repo = new OwnerRepository();
-    await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
+    await repo.updateBusinessStatusFirebase(owner.id, status, owner.business.meetingWithOperatorId);
     console.log('migrate business status', buildingMigrateId, building.id);
   } catch (e) {
     console.error(e.message);

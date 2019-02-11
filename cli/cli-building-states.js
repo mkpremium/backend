@@ -1,4 +1,5 @@
 #!/usr/bin/env babel-node
+import fs from 'fs-extra';
 import program from 'commander';
 import {checkInputs} from './lib';
 import {alreadySold, noSale, withMeeting} from './lib/migrate-building-states';
@@ -35,13 +36,15 @@ async function main(inputDir) {
   const inputFiles = [
     'NoVende.csv',
     'Visitas.csv',
-    'YaVendido.csv'
+    'YaVendido.csv',
+    'map-business.json'
   ];
 
   const files = await checkInputs(inputDir, inputFiles);
 
   await couchbase();
+  const mapBusiness = await fs.readJson(files['map-business.json']);
   await noSale(files['NoVende.csv']);
-  await withMeeting(files['Visitas.csv']);
+  await withMeeting(files['Visitas.csv'], mapBusiness);
   await alreadySold(files['YaVendido.csv']);
 }
