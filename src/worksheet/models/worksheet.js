@@ -16,7 +16,7 @@ import {
   addBetweenQueryToBuilder
 } from '../../lib/query/helpers';
 import {newHttpError} from '../../lib/http-error';
-import {OwnerRepository} from '../../owner/models';
+import {OwnerRepository, PersonRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
@@ -442,13 +442,8 @@ GROUP BY t.status`;
     const worksheetIds = _map(searchResult, 'id');
 
     if (worksheetIds.length) {
-      const queryBuilder = this
-        .getQueryBuilder('select')
-        .where(`id IN ${JSON.stringify(worksheetIds)}`);
-
-      results = await this.query(queryBuilder);
+      results = await Promise.map(worksheetIds, (worksheetId) => this.findByIdWIthIncludes(worksheetId));
     }
-
     return fromJSON({results}, WorksheetSearchResponse);
   }
 }
