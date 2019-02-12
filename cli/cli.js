@@ -16,4 +16,5 @@ program
   .command('queue', 'Gestiona colas de trabajo')
   .command('building-metadata [input-file]', 'Sube a la nube los archivos relacionados con edificios y los asocia a estos')
   .command('db-indexes-full-text-search', 'Recrea los indices de la base de datos para el full text search')
+  .command('migrate-persons [input-file]', 'Migración de personas.')
   .parse(process.argv);
