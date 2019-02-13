@@ -7,7 +7,6 @@ import {
   updateOwnerContactController,
   updateOwnerController
 } from './controllers';
-import {permissions} from '../middleware/jwt';
 
 const router = Router();
 

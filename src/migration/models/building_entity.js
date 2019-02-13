@@ -24,6 +24,15 @@ const BuildingEntityDTO = t.struct({
   m2t: t.maybe(t.String)
 });
 
+export const buildingEntitiesDefaultStatus = 'SIN DATOS';
+export const buildingEntitiesStatus = {
+  '2': 'VACIO',
+  '4': 'INDEFINIDO',
+  '5': 'A TERMINO',
+  '6': 'OKUPAS',
+  '': buildingEntitiesDefaultStatus
+};
+
 export default function migrateFromCsv(data) {
   const input = BuildingEntityDTO(cleanDataAndRemoveNullValues(data));
 
@@ -41,6 +50,7 @@ export default function migrateFromCsv(data) {
     surface: number(input.m2),
     rent: number(input.mensile),
     expiration: input.data_limite ? new Date(input.data_limite) : void 0,
+    status: buildingEntitiesStatus[input.id_situazione],
 
     _migrateBuildingId: input.id_catastro,
     _migrateIdStatus: input.id_situazione
