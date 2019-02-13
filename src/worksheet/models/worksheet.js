@@ -368,6 +368,23 @@ GROUP BY t.status`;
     const counter = this.getCounter();
     return counter.count(this.getType(), 1);
   }
+  
+  /**
+   * Attaches related building objects to a worksheet
+   * @param worksheet
+   * @returns {Promise<*>}
+   */
+  async worksheetWithRelatedBuildings(worksheet) {
+    if (worksheet.relatedBuildingIds.length > 0) {
+      const buildingRepo = new BuildingRepository();
+      const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`;
+      const rbQb = await buildingRepo.getQueryBuilder().where(`id IN ${idsText}`);
+      const relatedBuildings = await buildingRepo.query(rbQb);
+      worksheet = t.update(worksheet, {relatedBuildings: {$set: relatedBuildings}});
+    }
+    
+    return worksheet;
+  }
 
   async list(query = {}) {
     const params = new WorksheetListQuery(query);
@@ -395,7 +412,9 @@ GROUP BY t.status`;
     }
 
     const total = await this.countQuery(qbCount);
-    const results = await this.query(qb);
+    let results = await this.query(qb);
+  
+    results = await Promise.map(results, (worksheet) => this.worksheetWithRelatedBuildings(worksheet));
 
     return fromJSON({total, results}, t.WorkSheetLitResponse);
   }
