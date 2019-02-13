@@ -29,8 +29,7 @@ export const buildingEntitiesStatus = {
   '2': 'VACIO',
   '4': 'INDEFINIDO',
   '5': 'A TERMINO',
-  '6': 'OKUPAS',
-  '': buildingEntitiesDefaultStatus
+  '6': 'OKUPAS'
 };
 
 export default function migrateFromCsv(data) {

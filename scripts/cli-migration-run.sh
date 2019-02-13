@@ -20,5 +20,6 @@ ${NODE_CMD} cli/cli-building-states.js ${DATA_DIR}/CSV/BUILDING_STATES/
 ${NODE_CMD} cli/cli-business-states.js ${DATA_DIR}/CSV/BUSINESS_STATES/
 ${NODE_CMD} cli/cli-building-notes.js ${DATA_DIR}/CSV/BUILDING_NOTES.csv
 ${NODE_CMD} cli/cli-building-metadata.js ${DATA_DIR}/
+${NODE_CMD} cli/cli-building-entities.js ${DATA_DIR}/CSV/ESTADOS_Y_DETALLES_EDIFICIOS.csv
 
 cd ${CURRENT_DIR}

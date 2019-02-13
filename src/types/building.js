@@ -168,7 +168,7 @@ t.BuildingProposal = t.struct(
   }
 );
 
-t.BuildingEntityStatus = t.enums.of(Object.values(buildingEntitiesStatus));
+t.BuildingEntityStatus = t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus));
 
 /**
  * @swagger
