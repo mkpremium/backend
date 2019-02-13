@@ -1,5 +1,6 @@
 import t from 'tcomb';
 import uuid from 'uuid/v4';
+import {buildingEntitiesDefaultStatus, buildingEntitiesStatus} from '../migration/models/building_entity';
 
 /**
  * @swagger
@@ -167,16 +168,7 @@ t.BuildingProposal = t.struct(
   }
 );
 
-const BuildingEntityStatus = {
-  EMPTY: 'vacio',
-  UNDEFINED: 'indefinido',
-  SALE: 'venta',
-  RENT: 'arriendo',
-  NO_SALE: 'no vende',
-  OKUPAS: 'okupas'
-};
-
-t.BuildingEntityStatus = t.enums.of(Object.values(BuildingEntityStatus));
+t.BuildingEntityStatus = t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus));
 
 /**
  * @swagger
@@ -185,7 +177,7 @@ t.BuildingEntityStatus = t.enums.of(Object.values(BuildingEntityStatus));
  *     properties:
  *       status:
  *         type: string
- *         enum: [vacio, indefinido, venta arriendo, no vende, okupas]
+ *         enum: [VACIO, INDEFINIDO, A TERMINO, OKUPAS, SIN DATOS]
  *         description: "Estado de la situación arrendataria"
  *       name:
  *         type: string
@@ -239,7 +231,7 @@ t.BuildingEntity = t.struct(
   {
     name: 'BuildingEntity',
     defaultProps: {
-      status: BuildingEntityStatus.UNDEFINED,
+      status: buildingEntitiesDefaultStatus,
       surface: 0,
       rent: 0,
       get id() {
