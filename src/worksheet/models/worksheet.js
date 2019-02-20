@@ -73,7 +73,7 @@ export class WorksheetRepository extends Worksheet {
       const value = source[key];
       if (!_isNil(value)) {
         sourceFilter.push(`t.buildingAddress.${key} IS NOT MISSING`);
-        sourceFilter.push(`t.buildingAddress.${key} = '${value}'`);
+        sourceFilter.push(`t.buildingAddress.${key} = ${JSON.stringify(value)}`);
       }
     });
     const filter = sourceFilter.length > 0
