@@ -110,7 +110,7 @@ export default function migrateFromCsv(data) {
       type: input.type,
       street: input.street,
       number: number(input.number),
-      fullAddress: input.carrer,
+      fullAddress: input.location,
       registerNumber: number(input.numbero),
       postalCode: postalCode(),
       city: input.municipality,
