@@ -1,13 +1,13 @@
 #!/usr/bin/env babel-node
 import program from 'commander';
 
+import couchbase from '../src/db/couchbase';
 import {checkInputs} from './lib';
 import {clean} from './lib/migrate-utils';
 import {migrateBuilding} from './lib/migrate-building';
 import {migrateOwners} from './lib/migrate-owner';
 import {migrateWorksheets} from './lib/migrate-worksheets';
 import {Files} from './constants';
-import couchbase from '../src/db/couchbase';
 
 program
   .arguments('[input-dir]')

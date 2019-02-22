@@ -20,7 +20,7 @@ export async function clean(clean = false) {
 export async function cleanNotes(clean = false) {
   if (!clean) return;
   const notes = new NoteRepository();
-  await notes.deleteQuery();
+  return notes.deleteQuery();
 }
 
 export async function deleteAll() {
@@ -51,7 +51,7 @@ export async function deleteAll() {
     buildingProposal.deleteQuery(),
     cleanQueue(),
     cleanNotes(true)
-  ]);
+  ], (a) => a);
 }
 
 export async function cleanQueue() {
