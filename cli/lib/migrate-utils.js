@@ -1,9 +1,9 @@
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import {OwnerRepository} from '../../src/owner/models';
+import {OwnerRepository, PersonRepository} from '../../src/owner/models';
 import {HistoryRepository} from '../../src/history/models';
 import {Calls, CallsRawEvents} from '../../src/calls/models';
 import {ScheduledEventsRepository} from '../../src/scheduled-events/models';
-import {BuildingRepository, MetadataRepository} from '../../src/building/models';
+import {BuildingProposalRepository, BuildingRepository, MetadataRepository} from '../../src/building/models';
 import {OperatorStats} from '../../src/stats/models';
 import Promise from 'bluebird';
 import {cleanFirebase} from '../../migrations/firebase-clean';
@@ -33,18 +33,22 @@ export async function deleteAll() {
   const building = new BuildingRepository();
   const stats = new OperatorStats();
   const meta = new MetadataRepository();
+  const personRepository = new PersonRepository();
+  const buildingProposal = new BuildingProposalRepository();
 
-  return Promise.all([
+  return Promise.mapSeries([
     cleanFirebase(),
     meta.deleteQuery(),
     worksheet.deleteQuery(),
     owner.deleteQuery(),
+    personRepository.deleteQuery(),
     building.deleteQuery(),
     history.deleteQuery(),
     calls.deleteQuery(),
     scheduledEvent.deleteQuery(),
     callUnknownEvents.deleteQuery(),
     stats.deleteQuery(),
+    buildingProposal.deleteQuery(),
     cleanQueue(),
     cleanNotes(true)
   ]);
