@@ -43,6 +43,6 @@ async function validateFile(inputFile) {
     throw new Error(`'${inputFile} doesn't exist or cannot be read`);
   }
 
-  return validateHeaders(inputFile, 'ID;PROVINCIA;MUNICIPIO;APELLIDO_1;APELLIDO_2;NOMBRE;TIPO_VIA;NOMBRE_VIA;NUM_VIA;BLOQUE;PORTAL;ESCALERA;PISO;PUERTA;DIA_NACI;MES_NACI;ANO_NACI;COD_POST;NUC;PROPRIETARI;DOMICILI;TELEFONO_PB;TELEFONO_IB;TELEFONO_DB;TELEFONO_ABC;DOMICILI_PB;DOMICILI_IB;DOMICILI_DB;DOMICILI_ABC;SEXO;EDAD;TEL_HE;MOVIL_HE;TIPO_PERSONA;ID_CATASTRO');
+  return validateHeaders(inputFile, `"ido";"provincia";"municipio";"apellido_1";"apellido_2";"nombre";"tipo_via";"nombre_via";"num_via";"bloque";"portal";"escalera";"piso";"puerta";"dia_naci";"mes_naci";"ano_naci";"cod_post";"nuc";"proprietari";"domicili";"telefono_pb";"telefono_ib";"telefono_db";"telefono_abc";"domicili_pb";"domicili_ib";"domicili_db";"domicili_abc";"sexo";"edad";"tel_he";"movil_he";"tipo_persona";"id_catastro"`);
 }
 // endregion
