@@ -49,7 +49,14 @@ export const OwnerInputDTO = t.struct({
   famiglia: t.maybe(t.Str),
   fratelli: t.maybe(t.Str),
   figli: t.maybe(t.Str),
-  filter: t.maybe(t.Str)
+  filter: t.maybe(t.Str),
+  indirizzo_he: t.maybe(t.Str),
+  cap_he: t.maybe(t.Str),
+  id_localita_he: t.maybe(t.Str),
+  id_prov_he: t.maybe(t.Str),
+  telefono_he: t.maybe(t.Str),
+  cellulare_he: t.maybe(t.Str),
+  altro_numero_he: t.maybe(t.Str)
 });
 
 export default function migrateFromCsv(data) {
@@ -68,6 +75,27 @@ export default function migrateFromCsv(data) {
       contacts.push({
         type: 'TELEFONO',
         value: input.telefono
+      });
+    }
+    
+    if (input.telefono_he) {
+      contacts.push({
+        type: 'TELEFONO',
+        value: input.telefono_he
+      });
+    }
+  
+    if (input.cellulare_he) {
+      contacts.push({
+        type: 'TELEFONO',
+        value: input.cellulare_he
+      });
+    }
+  
+    if (input.altro_numero_he) {
+      contacts.push({
+        type: 'TELEFONO',
+        value: input.altro_numero_he
       });
     }
 
