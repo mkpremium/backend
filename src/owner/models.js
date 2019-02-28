@@ -334,4 +334,10 @@ GROUP BY t.business.status`;
   
     return fromJSON({results}, t.OwnerLitResponse);
   }
+  
+  async findByPersonId(personId) {
+    const qb = this.getQueryBuilder().where('t.`personId` = ?', personId);
+    const results = await this.query(qb);
+    return results && results.length && _.first(results);
+  }
 }

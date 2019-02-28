@@ -11,7 +11,6 @@ export async function migrateBuildingEntities(inputFile) {
 }
 
 export class MigrateEntities extends MigrateModelV3 {
-
   async parseToData(data, row) {
     return entity(data);
   }

@@ -238,7 +238,7 @@ export class CouchbaseModel {
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
     const result = await this._bucket.queryAsync(n1ql, queryParam.values);
-    debugModel('query-result', `c(${consistency})`, queryParam);
+    // debugModel('query-result', `c(${consistency})`, queryParam);
     return result;
   }
 
@@ -350,5 +350,19 @@ export class CouchbaseModel {
     }
 
     return model;
+  }
+  
+  async findByCatastroId(catastroId, required = true) {
+    const expr = squel.expr().and('t.cadastre.reference = ?', catastroId);
+    const qb = this.getQueryBuilder()
+      .where('t._migrateId IS NOT MISSING')
+      .where(expr);
+    const results = await this.query(qb);
+    
+    if (required && (!results || results.length === 0)) {
+      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by cadastre.reference: ${catastroId}`);
+    }
+  
+    return results;
   }
 }

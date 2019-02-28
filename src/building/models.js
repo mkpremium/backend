@@ -20,6 +20,7 @@ import {OwnerRepository} from '../owner/models';
 import {BuildingMetadata} from './types';
 import {OperatorActions} from '../stats/types';
 import {OperatorStats} from '../stats/models';
+import _ from 'lodash';
 
 const debugBuilding = debug('app:model:building');
 
@@ -258,6 +259,12 @@ export class BuildingRepository extends Building {
     qs.fields('*');
 
     return this.search(qs);
+  }
+  
+  async findById(id) {
+    const qb = this.getQueryBuilder().where('t.`id` = ?', id);
+    const results = await this.query(qb);
+    return results && results.length && _.first(results);
   }
 }
 
