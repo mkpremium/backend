@@ -20,7 +20,7 @@ import {OwnerRepository} from '../owner/models';
 import {BuildingMetadata} from './types';
 import {OperatorActions} from '../stats/types';
 import {OperatorStats} from '../stats/models';
-import _ from "lodash";
+import _ from 'lodash';
 
 const debugBuilding = debug('app:model:building');
 

@@ -238,7 +238,7 @@ export class CouchbaseModel {
     const n1ql = N1qlQuery.fromString(queryParam.text);
     n1ql.consistency(consistency);
     const result = await this._bucket.queryAsync(n1ql, queryParam.values);
-    //debugModel('query-result', `c(${consistency})`, queryParam);
+    // debugModel('query-result', `c(${consistency})`, queryParam);
     return result;
   }
 

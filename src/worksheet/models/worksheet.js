@@ -16,7 +16,7 @@ import {
   addBetweenQueryToBuilder
 } from '../../lib/query/helpers';
 import {newHttpError} from '../../lib/http-error';
-import {OwnerRepository, PersonRepository} from '../../owner/models';
+import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
@@ -375,15 +375,16 @@ GROUP BY t.status`;
    * @returns {Promise<*>}
    */
   async worksheetWithRelatedBuildings(worksheet) {
+    let updatedWorksheet = worksheet;
     if (worksheet.relatedBuildingIds.length > 0) {
       const buildingRepo = new BuildingRepository();
       const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`;
       const rbQb = await buildingRepo.getQueryBuilder().where(`id IN ${idsText}`);
       const relatedBuildings = await buildingRepo.query(rbQb);
-      worksheet = t.update(worksheet, {relatedBuildings: {$set: relatedBuildings}});
+      updatedWorksheet = t.update(worksheet, {relatedBuildings: {$set: relatedBuildings}});
     }
     
-    return worksheet;
+    return updatedWorksheet;
   }
 
   async list(query = {}) {

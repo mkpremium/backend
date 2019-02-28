@@ -5,9 +5,9 @@ import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
-import {WorksheetRepository} from "../../src/worksheet/models/worksheet";
-import {BuildingRepository} from "../../src/building/models";
-import {readCodigosPostalesMunicipios} from "../../csv/codigos_postales_municipios";
+import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
+import {BuildingRepository} from '../../src/building/models';
+import {readCodigosPostalesMunicipios} from '../../csv/codigos_postales_municipios';
 
 const debugMigrate = debug('app:migration:person');
 export const phonesPropertyNames = ['telefono_pb', 'telefono_ib', 'telefono_db', 'telefono_abc', 'tel_he', 'movil_he'];
@@ -47,7 +47,7 @@ export const PersonInput = t.struct({
   tel_he: t.maybe(t.Str),
   movil_he: t.maybe(t.Str),
   tipo_persona: t.maybe(t.Str),
-  id_catastro: t.maybe(t.Str),
+  id_catastro: t.maybe(t.Str)
 });
 
 /**
@@ -64,7 +64,7 @@ export async function migratePersons(inputFile) {
     const inputPerson = PersonInput(removeNullValues(cleanObjectKeys(personRecord)));
     try {
       await processPerson(inputPerson, codes);
-    } catch(error) {
+    } catch (error) {
       console.error(error, ' in record with ido:', inputPerson.ido, ' and id catastro:', inputPerson.id_catastro);
     }
   }
@@ -117,7 +117,9 @@ async function processRelationWithWorksheet(person, inputPerson) {
 }
 
 /**
- *
+ * Process relation of owner, if the catastro of the migration record is different of the catastro of the
+ * building related to the owner, it creates a new owner (relationship with the migration building
+ * (indicated by the catastro id) nad it adds the owner to the worksheet.
  * @param owner
  * @param person
  * @param inputPerson
@@ -129,9 +131,8 @@ async function processRelationOfOwnerWithBuilding(owner, person, inputPerson) {
   const catastroId = inputPerson.id_catastro;
   
   if (building.cadastre.reference !== catastroId) {
-  
     debugMigrate(`Owner existed, but the related building does not have the same catastro id found in csv person record.`);
-   // search building by catastro
+    // search building by catastro
     building = await buildingRepository.findBuildingByMetadataMigration(catastroId);
     
     if (building) {
@@ -148,7 +149,7 @@ async function processRelationOfOwnerWithBuilding(owner, person, inputPerson) {
 }
 
 /**
- *
+ * Updates person contacts.
  * @param person
  * @param inputPerson
  * @returns {Promise<void>}
@@ -222,7 +223,7 @@ export async function createPerson(inputPerson, codes) {
 }
 
 /**
- * Creates owner and relations
+ * Creates owner and relations.
  * @param person
  * @param inputPerson
  * @returns {Promise<void>}
@@ -250,7 +251,7 @@ export async function findWorksheetCatastroId(inputPerson) {
 }
 
 /**
- * Finds worksheet by id catastro
+ * Finds worksheet by id catastro.
  * @param catastroId
  * @returns {Promise<*>}
  */
@@ -261,7 +262,7 @@ export async function findWorksheetByCatastro(catastroId) {
 }
 
 /**
- * Finds building by id catastro
+ * Finds building by id catastro.
  * @param catastroId
  * @returns {Promise<*>}
  */
@@ -271,7 +272,7 @@ async function findBuilding(catastroId) {
 }
 
 /**
- *
+ * Finds worksheet by building id.
  * @param buildingId
  * @returns {Promise<*>}
  */
@@ -295,6 +296,25 @@ async function findPerson(personMigrateId) {
   const [person] = await personRepository.findByMigratedId(personMigrateId, false);
   return person;
 }
+
+/**
+ * Generates the contacts phones
+ * @param inputPerson
+ * @returns {Array}
+ */
+const generateContactsNoDuplicates = (inputPerson) => {
+  const contacts = [];
+  let phones = getUniquePhones(inputPerson);
+  
+  phones.map((phone) => {
+    contacts.push({
+      type: 'TELEFONO',
+      value: phone
+    });
+  });
+  
+  return contacts;
+};
 
 /**
  * Creates the person and owner structs base on the csv record of a person
@@ -324,7 +344,7 @@ export function migrateFromCsv(inputPerson, worksheet, codes) {
     gender: gender(inputPerson),
     personType: 'NATURAL',
     _relatedTo: inputPerson.proprietari,
-    _migrateId: inputPerson.ido,
+    _migrateId: inputPerson.ido
   });
   const owner = generateOwner(inputPerson, person, worksheet);
   
@@ -368,25 +388,6 @@ function getUniquePhones(inputPerson) {
   
   return _.uniq(phones);
 }
-
-/**
- *
- * @param inputPerson
- * @returns {Array}
- */
-const generateContactsNoDuplicates = (inputPerson) => {
-  const contacts = [];
-  let phones = getUniquePhones(inputPerson);
-  
-  phones.map((phone) => {
-    contacts.push({
-      type: 'TELEFONO',
-      value: phone
-    });
-  });
-  
-  return contacts;
-};
 
 /**
  * Generates address object
