@@ -1,9 +1,15 @@
+import debug from 'debug';
 import {MigrateModelV3} from '../../src/migration/lib/migrate-model-v3';
 import {OwnerRepository, PersonRepository} from '../../src/owner/models';
 import parse from '../../src/migration/models/owner';
 import merge from 'deepmerge';
 import t from 'tcomb';
 import {OwnerStatus} from '../../src/types/enums';
+import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
+import {WorkSheetStatus} from '../../src/types/worksheet';
+import fromJSON from 'tcomb/lib/fromJSON';
+
+const debugMigrate = debug('app:migration:owners-verify');
 
 export async function migrateOwners(inputFile, bucket) {
   const migrateOwners = new MigrateOwner(inputFile, bucket);
@@ -49,8 +55,19 @@ class MigrateVerifyOwner extends MigrateModelV3 {
     const {owner, input} = parse(data);
     const migrateId = owner._migrateId;
     if (input.verificato === '1') {
+      debugMigrate('\nStart process for row with Id_Fornitore:', data['Id_Fornitore']);
       const migrateOwner = await MigrateVerifyOwner.findByMigrateId(migrateId);
       await MigrateVerifyOwner.verifyOwner(migrateOwner);
+      debugMigrate('After owner verification, owner id: ', migrateOwner.id);
+      const worksheetRepository = new WorksheetRepository();
+      const worksheet = await worksheetRepository.findWorksheetByOwner(migrateOwner.id);
+      if (worksheet) {
+        debugMigrate('Updating worksheet status, worksheet id: ', worksheet.id);
+        const w = fromJSON(worksheet, t.WorkSheet);
+        const updatedWorksheet = w.setStatus(WorkSheetStatus.WITH_OWNER);
+        await worksheetRepository.save(updatedWorksheet, false);
+        debugMigrate('Finished process with owner id:', migrateOwner.id);
+      }
     } else {
       // no-op
     }

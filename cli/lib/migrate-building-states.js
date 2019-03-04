@@ -1,3 +1,4 @@
+import debug from 'debug';
 import {BuildingRepository} from '../../src/building/models';
 import {validateHeaders} from '../lib';
 import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
@@ -12,13 +13,23 @@ import {onlyForBusiness} from '../constants';
 import {OwnerBusinessStatus} from '../../src/types/enums';
 import {OwnerRepository} from '../../src/owner/models';
 
+const debugMigrate = debug('app:migration:building-states');
+
 export async function noSale(inputFile) {
+  debugMigrate('[noSale] Process started for file NoVende.csv ...');
   await validateHeaders(inputFile, 'Id_Catastro;NoVende');
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    await updateWorksheetStatus(WorkSheetStatus.NO_SALE, data);
+    try {
+      debugMigrate('\n[noSale] Process started for record: \n', data);
+      await updateWorksheetStatus(WorkSheetStatus.NO_SALE, data);
+    } catch (error) {
+      debugMigrate('[noSale.Error]', error, ' in record: \n', data);
+    }
   }
+  
+  debugMigrate('[noSale] Process ended for file NoVende.csv');
 }
 
 async function updateWorksheetStatus(newStatus, data, mapBusiness) {
@@ -94,21 +105,36 @@ export function getBuildingMigrateIdNotNull(data) {
 }
 
 export async function withMeeting(inputFile, mapBusiness) {
+  debugMigrate('[withMeeting] Process started for file Visitas.csv...');
   await validateHeaders(inputFile, '"Id_Catastro";"Visita";"Id_Comercial";"Fecha";"Id_Propietario"');
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.MEETING, data, mapBusiness);
+    try {
+      debugMigrate('\n[withMeeting] Process started for record \n', data);
+      await updateWorksheetStatus(WorkSheetStatus.MEETING, data, mapBusiness);
+    } catch (error) {
+      debugMigrate('[withMeeting Error]', error, ' in record: \n', data);
+    }
   }
+  
+  debugMigrate('[withMeeting] Process ended for file Visitas.csv');
 }
 
 export async function alreadySold(inputFile) {
+  debugMigrate('[alreadySold] Process started for file YaVendido.csv...');
   await validateHeaders(inputFile, 'Id_Catastro;Venduto');
   await csvToJSON(inputFile, doOnEachRow);
 
   async function doOnEachRow(data) {
-    return updateWorksheetStatus(WorkSheetStatus.ALREADY_SOLD, data);
+    try {
+      debugMigrate('\n[alreadySold] Process started for record \n', data);
+      await updateWorksheetStatus(WorkSheetStatus.ALREADY_SOLD, data);
+    } catch (error) {
+      debugMigrate('[alreadySold Error]', error, ' in record: \n', data);
+    }
   }
+  debugMigrate('[alreadySold] Process ended for file YaVendido.csv');
 }
 
 export async function findWorksheetByMigrateId(buildingMigrateId) {
