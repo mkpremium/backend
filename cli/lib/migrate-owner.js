@@ -5,10 +5,9 @@ import parse from '../../src/migration/models/owner';
 import merge from 'deepmerge';
 import t from 'tcomb';
 import {OwnerStatus} from '../../src/types/enums';
-import {WorksheetRepository} from "../../src/worksheet/models/worksheet";
-import Promise from "bluebird";
-import {WorkSheetStatus} from "../../src/types/worksheet";
-import fromJSON from "tcomb/lib/fromJSON";
+import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
+import {WorkSheetStatus} from '../../src/types/worksheet';
+import fromJSON from 'tcomb/lib/fromJSON';
 
 const debugMigrate = debug('app:migration:owners-verify');
 
