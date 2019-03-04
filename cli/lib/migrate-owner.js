@@ -51,6 +51,14 @@ class MigrateOwner extends MigrateModelV3 {
 }
 
 class MigrateVerifyOwner extends MigrateModelV3 {
+  async processFunc(data, row) {
+    try {
+      await Promise.resolve(this.parseToData(data, row));
+    } catch (e) {
+      console.error('Migrate verify-owners error:', e.message, 'at', row, data);
+    }
+  }
+  
   async parseToData(data, row) {
     const {owner, input} = parse(data);
     const migrateId = owner._migrateId;
@@ -61,7 +69,7 @@ class MigrateVerifyOwner extends MigrateModelV3 {
       debugMigrate('After owner verification, owner id: ', migrateOwner.id);
       const worksheetRepository = new WorksheetRepository();
       const worksheet = await worksheetRepository.findWorksheetByOwner(migrateOwner.id);
-      if (worksheet) {
+      if (worksheet && worksheet.status === WorkSheetStatus.DEFAULT) {
         debugMigrate('Updating worksheet status, worksheet id: ', worksheet.id);
         const w = fromJSON(worksheet, t.WorkSheet);
         const updatedWorksheet = w.setStatus(WorkSheetStatus.WITH_OWNER);
