@@ -5,7 +5,7 @@ import {validateHeaders} from '../lib';
 import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 
 export async function migrateBusinessStates(inputFile) {
-  await validateHeaders(inputFile, 'Id_Catastro;EstadoSeguimiento');
+  await validateHeaders(inputFile, 'Id_Catastro;EstadoSeguimiento;Id_Propietario');
   await csvToJSON(inputFile, doOnEachRow);
 }
 
