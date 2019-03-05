@@ -63,7 +63,7 @@ async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness) {
   await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
 }
 
-async function findOwnerByMigrate(data) {
+export async function findOwnerByMigrate(data) {
   const repo = new OwnerRepository();
   const migratedId = data['Id_Propietario'];
 

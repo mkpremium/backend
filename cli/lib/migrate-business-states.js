@@ -1,4 +1,4 @@
-import {findWorksheetByMigrateId, getBuildingMigrateIdNotNull, getOwnerBuilding} from './migrate-building-states';
+import {findOwnerByMigrate, getBuildingMigrateIdNotNull} from './migrate-building-states';
 import {mapBusinessStates} from '../constants';
 import {OwnerRepository} from '../../src/owner/models';
 import {validateHeaders} from '../lib';
@@ -12,14 +12,13 @@ export async function migrateBusinessStates(inputFile) {
 async function doOnEachRow(data) {
   try {
     const buildingMigrateId = getBuildingMigrateIdNotNull(data);
-    const worksheet = await findWorksheetByMigrateId(buildingMigrateId);
-    const {owner, building} = getOwnerBuilding(worksheet);
+    const owner = await findOwnerByMigrate(data);
 
     const status = mapBusinessStates(data['EstadoSeguimiento']);
 
     const repo = new OwnerRepository();
     await repo.updateBusinessStatusFirebase(owner.id, status, owner.business.meetingWithOperatorId);
-    console.log('migrate business status', buildingMigrateId, building.id);
+    console.log('migrate business status', buildingMigrateId, owner.buildingId);
   } catch (e) {
     console.error(e.message);
   }
