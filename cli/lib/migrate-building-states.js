@@ -39,10 +39,10 @@ async function updateWorksheetStatus(newStatus, data, mapBusiness) {
   const updatedWorksheet = w.setStatus(newStatus);
   await saveDataChange(updatedWorksheet);
 
-  return updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness);
+  return updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness, updatedWorksheet);
 }
 
-async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness) {
+async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness, worksheet) {
   if (WorkSheetStatus.MEETING !== newStatus) {
     return;
   }
@@ -60,6 +60,20 @@ async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness) {
     meetingWithOperatorId
   };
   const repo = new OwnerRepository();
+  
+  if (!owner.buildingId) {
+    debugMigrate('Owner with id:',owner.id, 'has building id null, proceed to set the building of worksheet...');
+    
+    // update owner building with worksheet building
+    const updatedOwner = t.update(owner, {buildingId: {$set: worksheet.relatedBuildingIds[0]}});
+    await repo.save(updatedOwner, false);
+    owner.buildingId = worksheet.relatedBuildingIds[0];
+  
+    // add owner to worksheet
+    const worksheetRepository = new WorksheetRepository();
+    await worksheetRepository.addOwner(worksheet, owner);
+  }
+  
   await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
 }
 
