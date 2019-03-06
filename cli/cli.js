@@ -17,4 +17,5 @@ program
   .command('building-metadata [input-file]', 'Sube a la nube los archivos relacionados con edificios y los asocia a estos')
   .command('db-indexes-full-text-search', 'Recrea los indices de la base de datos para el full text search')
   .command('migrate-persons [input-file]', 'Migración de personas.')
+  .command('owners', 'Procesos que tienen que ver con owners')
   .parse(process.argv);
