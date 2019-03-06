@@ -491,10 +491,13 @@ GROUP BY t.status`;
    * Finds all worksheets with the owners.
    * @returns {Promise<*>}
    */
-  async findAllWorksheetsWithOwners() {
-    const qb = this.getQueryBuilder();
+  async findAllWorksheetsWithOwners(limit, offset) {
+    const qb = this.getQueryBuilder()
+      .limit(limit || 10)
+      .offset(offset || 0)
+      .order('worksheetIndex');
     const results = await this.query(qb);
-
+    
     return Promise.map(results, (worksheet) => WorksheetRepository.worksheetWithRelatedOwners(worksheet));
   }
 }
