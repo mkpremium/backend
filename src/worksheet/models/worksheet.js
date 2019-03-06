@@ -466,4 +466,35 @@ GROUP BY t.status`;
     }
     return fromJSON({results}, WorksheetSearchResponse);
   }
+  
+  /**
+   * Attaches related owners objects to a worksheet
+   * @param worksheet
+   * @returns {Promise<*>}
+   */
+  static async worksheetWithRelatedOwners(worksheet) {
+    let updatedWorksheet = worksheet;
+  
+    if (worksheet.relatedOwnerIds.length > 0) {
+      const ownerRepository = new OwnerRepository();
+      const relatedOwners = await ownerRepository.findByIdWithIncludes(worksheet.relatedOwnerIds);
+      updatedWorksheet = t.update(worksheet, {
+        relatedOwners: {$set: relatedOwners},
+        ownerContacts: {$set: ownersContactViews(relatedOwners, worksheet)}
+      });
+    }
+    
+    return updatedWorksheet;
+  }
+  
+  /**
+   * Finds all worksheets with the owners.
+   * @returns {Promise<*>}
+   */
+  async findAllWorksheetsWithOwners() {
+    const qb = this.getQueryBuilder();
+    const results = await this.query(qb);
+
+    return Promise.map(results, (worksheet) => WorksheetRepository.worksheetWithRelatedOwners(worksheet));
+  }
 }
