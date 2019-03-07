@@ -78,7 +78,14 @@ async function createNote(data, buildingId, migrateId) {
 }
 
 function noteBody(data) {
-  return `${data['NOTAS']} - ${data['ID_OPERDADOR']}`;
+  let note = `${data['NOTAS']} - ${data['ID_OPERDADOR']}`;
+  const street = data['CALLE'];
+  
+  if (street) {
+   note +=  ' - ' +  street;
+  }
+  
+  return note;
 }
 
 function noteDate(data) {
