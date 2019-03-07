@@ -2,7 +2,6 @@
 import program from 'commander';
 import fs from 'fs-extra';
 import couchbase from '../src/db/couchbase';
-import {validateHeaders} from './lib';
 import {cleanNotes} from './lib/migrate-utils';
 import {migrateBuildingNotes} from './lib/migrate-building-notes';
 
@@ -56,7 +55,5 @@ async function validateFile(inputFile) {
   if (!pathExists) {
     throw new Error(`'${inputFile} doesn't exist or cannot be read`);
   }
-
-  return validateHeaders(inputFile, 'ID;ID_CATASTRO;FECHA;ID_OPERDADOR;NOTAS');
 }
 // endregion
