@@ -134,6 +134,15 @@ export class OwnerRepository extends Owner {
     return owner;
   }
 
+  async findByMigratedId(migratedId) {
+    const owners = await super.findByMigratedId(migratedId);
+    if (owners.length === 0) {
+      throw new Error(`Cannot find owner by ${migratedId}`);
+    }
+
+    return fromJSON(owners[0], this.Struct);
+  }
+
   async findByBuildingWithIncludes(buildingId, includes = ['person', 'building']) {
     const qb = this.getQueryBuilder('let').where('buildingId = ?', buildingId);
     ownerIncludes(qb, includes);
@@ -164,19 +173,19 @@ export class OwnerRepository extends Owner {
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
-  
+
   async createOwnerAndPerson(body) {
     const ownerBody = t.OwnerBody(body);
     const personRepo = new PersonRepository();
-    
+
     const person = _isEmpty(ownerBody.person)
       ? await personRepo.findByIdOrThrow(ownerBody.personId)
       : await personRepo.save(ownerBody.person);
-    
+
     body.personId = person.id;
     body.name = person.fullName();
     delete body.person;
-    
+
     return this.save(body);
   }
 
@@ -308,11 +317,11 @@ GROUP BY t.business.status`;
 
     return totals;
   }
-  
+
   async list(query = {}) {
     const params = new OwnerListQuery(query);
     let results = [];
-    
+
     if (params.contactNumber) {
       const personRepository = new PersonRepository();
       const qbPerson = personRepository.getQueryBuilder('select')
@@ -320,21 +329,21 @@ GROUP BY t.business.status`;
         .where('ANY v IN contacts SATISFIES `v`.`value` = ? END', params.contactNumber);
       const personResults = await personRepository.query(qbPerson);
       const personIds = _.uniq(_.map(personResults, 'id'));
-      
+
       if (personIds && personIds.length) {
         const qbOwners = this.getQueryBuilder('let')
           .limit(params.limit)
           .where(`personId IN ${JSON.stringify(personIds)}`);
-  
+
         ownerIncludes(qbOwners, ['person']);
         const result = await this.query(qbOwners);
         results = result.map(mapOwnerIncludes);
       }
     }
-  
+
     return fromJSON({results}, t.OwnerLitResponse);
   }
-  
+
   async findByPersonId(personId) {
     const qb = this.getQueryBuilder().where('t.`personId` = ?', personId);
     const results = await this.query(qb);

@@ -28,7 +28,7 @@ export async function noSale(inputFile) {
       debugMigrate('[noSale.Error]', error, ' in record: \n', data);
     }
   }
-  
+
   debugMigrate('[noSale] Process ended for file NoVende.csv');
 }
 
@@ -39,10 +39,10 @@ async function updateWorksheetStatus(newStatus, data, mapBusiness) {
   const updatedWorksheet = w.setStatus(newStatus);
   await saveDataChange(updatedWorksheet);
 
-  return updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness);
+  return updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness, updatedWorksheet);
 }
 
-async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness) {
+async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness, worksheet) {
   if (WorkSheetStatus.MEETING !== newStatus) {
     return;
   }
@@ -60,6 +60,19 @@ async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness) {
     meetingWithOperatorId
   };
   const repo = new OwnerRepository();
+
+  if (!owner.buildingId) {
+    debugMigrate('Owner with id:',owner.id, 'has building id null, proceed to set the building of worksheet...');
+
+    // update owner building with worksheet building
+    const updatedOwner = t.update(owner, {buildingId: {$set: worksheet.relatedBuildingIds[0]}});
+    await repo.save(updatedOwner, false);
+
+    // add owner to worksheet
+    const worksheetRepository = new WorksheetRepository();
+    await worksheetRepository.addOwner(worksheet, owner);
+  }
+
   await repo.updateBusinessStatusFirebase(owner.id, status, business.meetingWithOperatorId);
 }
 
@@ -67,12 +80,7 @@ export async function findOwnerByMigrate(data) {
   const repo = new OwnerRepository();
   const migratedId = data['Id_Propietario'];
 
-  const owners = await repo.findByMigratedId(migratedId);
-  if (owners.length === 0) {
-    throw new Error(`Cannot find owner by ${migratedId}`);
-  }
-
-  return owners[0];
+  return repo.findByMigratedId(migratedId);
 }
 
 export function getOwnerBuilding(worksheet, businessId) {
@@ -117,7 +125,7 @@ export async function withMeeting(inputFile, mapBusiness) {
       debugMigrate('[withMeeting Error]', error, ' in record: \n', data);
     }
   }
-  
+
   debugMigrate('[withMeeting] Process ended for file Visitas.csv');
 }
 
