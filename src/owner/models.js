@@ -29,6 +29,12 @@ export class Person extends CouchbaseModel {
   }
 }
 
+export const ContactStatus = {
+  UNDEFINED: 'UNDEFINED',
+  GOOD: 'GOOD',
+  BAD: 'BAD'
+};
+
 export class PersonRepository extends Person {
   constructor() {
     super();

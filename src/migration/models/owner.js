@@ -78,6 +78,13 @@ export default function migrateFromCsv(data) {
       });
     }
     
+    if (input.cellulare) {
+      contacts.push({
+        type: 'TELEFONO',
+        value: input.cellulare.replace(/[^0-9]/, '')
+      });
+    }
+    
     if (input.telefono_he) {
       contacts.push({
         type: 'TELEFONO',
