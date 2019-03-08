@@ -11,7 +11,7 @@ export async function synchronizeMetadataWithFirebase() {
   
   const buildingRepository = new BuildingRepository();
   const metadataRepository = new MetadataRepository();
-  const buildingIds = await buildingRepository.getCityBuildingIds('BARCELONA');
+  const buildingIds = await buildingRepository.getCityBuildingIds('MADRID');
   
   // this is for the couchbase limitation
   const buildingIdsClunks =  _.chunk(buildingIds, 1000);
