@@ -21,6 +21,7 @@ import {BuildingMetadata} from './types';
 import {OperatorActions} from '../stats/types';
 import {OperatorStats} from '../stats/models';
 import _ from 'lodash';
+import {N1qlQuery} from 'couchbase';
 
 const debugBuilding = debug('app:model:building');
 
@@ -265,6 +266,32 @@ export class BuildingRepository extends Building {
     const qb = this.getQueryBuilder().where('t.`id` = ?', id);
     const results = await this.query(qb);
     return results && results.length && _.first(results);
+  }
+  
+  /**
+   *
+   * @param city
+   * @returns {Promise<*>}
+   */
+  async getCityBuildingIds(city) {
+    const bucket = this.getBucketName();
+    const query = `SELECT RAW id  FROM ${bucket} t
+                   WHERE t._documentType = 'building' AND t.address.city = '${city}'
+                   ORDER BY id`;
+  
+    return this.queryRaw(N1qlQuery.fromString(query));
+  }
+  
+  /**
+   *
+   * @param buildingIds
+   * @returns {Promise<*>}
+   */
+  async findBuildingsByIds(buildingIds) {
+    const ids = `[${buildingIds.map(id => `'${id}'`).join(', ')}]`;
+    const qb = this.getQueryBuilder()
+      .where(`id IN ${ids}`);
+    return this.query(qb);
   }
 }
 
