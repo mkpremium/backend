@@ -18,4 +18,5 @@ program
   .command('db-indexes-full-text-search', 'Recrea los indices de la base de datos para el full text search')
   .command('migrate-persons [input-file]', 'Migración de personas.')
   .command('owners', 'Procesos que tienen que ver con owners')
+  .command('metadata', 'Procesos que tienen que ver la metadata de los edificios')
   .parse(process.argv);
