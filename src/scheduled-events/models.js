@@ -120,7 +120,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await saveMeetingToFirebase(db, meeting);
     await relateMeetingToBuilding(db, meeting);
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);
-    await denormalizeBuildingMeeting(db, meeting.notifyTo, building.id, meeting);
+    await denormalizeBuildingMeeting(meeting.notifyTo, building.id, meeting);
   }
 
   async deleteFirebaseMeeting(scheduleEvent) {
@@ -197,6 +197,12 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await this.firebaseMeeting(scheduledEvent);
 
     return scheduledEvent;
+  }
+
+  async findAllMeetings() {
+    const qb = this.getQueryBuilder()
+      .where('type = ?', ScheduledEventType.MEETINGS);
+    return this.query(qb);
   }
 
   async validateUniqueWorksheet(params) {
