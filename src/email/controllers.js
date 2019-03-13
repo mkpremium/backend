@@ -15,7 +15,7 @@ async function sendMessage(message) {
   debugEmail('sendMessage', 'success', info, mailer.info(info));
 }
 
-function createMessage(from, to, subject, body, attachment) {
+function createMessage(from, to, subject, body, attachment, cc, cco) {
   if (!from) {
     throw newHttpError(409, 'No tiene email configurado comuníquese con su administrador');
   }
@@ -32,9 +32,12 @@ function createMessage(from, to, subject, body, attachment) {
 
   const message = {
     to,
+    cc,
+    bcc: cco,
     from,
     subject,
     text: body,
+    html: body,
     attachments
   };
 
@@ -43,9 +46,9 @@ function createMessage(from, to, subject, body, attachment) {
 }
 
 async function createEmail(req, res) {
-  const {to, subject, body} = t.EmailBody(req.body);
+  const {to, subject, body, cc, cco} = t.EmailBody(req.body);
   const from = req.user.operator.profile.email;
-  const message = createMessage(from, to, subject, body, req.file);
+  const message = createMessage(from, to, subject, body, req.file, cc, cco);
   await sendMessage(message);
   res.status(201).send();
 }
