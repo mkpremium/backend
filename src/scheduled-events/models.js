@@ -16,7 +16,7 @@ import {fbComerciales} from '../firebase';
 import {
   deleteMeetingToBuilding,
   deleteMeetingToFirebase,
-  deleteMeetingToOperator,
+  deleteMeetingToOperator, denormalizeBuildingMeeting,
   relateMeetingToBuilding,
   relateMeetingToOperator,
   saveBuildingToFirebase,
@@ -120,6 +120,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await saveMeetingToFirebase(db, meeting);
     await relateMeetingToBuilding(db, meeting);
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);
+    await denormalizeBuildingMeeting(db, meeting.notifyTo, building.id, meeting);
   }
 
   async deleteFirebaseMeeting(scheduleEvent) {

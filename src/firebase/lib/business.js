@@ -180,6 +180,14 @@ export async function relateMeetingToOperator(db, meeting, operatorId) {
   return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
 }
 
+export async function denormalizeBuildingMeeting(db, operatorId, buildingId, meeting) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}/LastMeeting`).set(toFirebaseMeeting(meeting));
+}
+
 export async function deleteMeetingToOperator(db, meeting, operatorId) {
   if (!fbComerciales.enabled) {
     return;
