@@ -186,8 +186,28 @@ export async function denormalizeBuildingMeeting(operatorId, buildingId, meeting
   }
 
   const db = fbComerciales.database();
+  const ref = db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}`);
+  return ref.child('LastMeeting').set(toFirebaseMeeting(meeting));
+}
 
-  return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}/LastMeeting`).set(toFirebaseMeeting(meeting));
+export async function denormalizeBuildingData(operatorId, meeting) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+  
+  const db = fbComerciales.database();
+  const promises = [];
+  const {building, owner} = meeting;
+  const ref = db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${building.id}`);
+  
+  const firebaseBuilding = toFirebaseBuilding(building, owner);
+  promises.push(ref.child('Data').set(firebaseBuilding));
+  
+  if (owner) {
+    promises.push(ref.child('Owner').set(owner));
+  }
+  
+  return Promise.all(promises);
 }
 
 export async function deleteMeetingToOperator(db, meeting, operatorId) {
