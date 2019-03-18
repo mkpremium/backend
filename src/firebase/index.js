@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import {firebaseComerciales, firebaseInformadores} from '../../config';
 import {saveStreetUserToFirebase} from './lib/street';
-import {isBusiness, isStreet} from '../lib/role-operators';
+import {isAdmin, isBusiness, isStreet} from '../lib/role-operators';
 import {saveBusinessUserToFirebase} from './lib/business';
 
 export const fbComerciales = initializeFirebase(firebaseComerciales, 'comerciales');
@@ -24,7 +24,7 @@ function initializeFirebase({enabled, serviceAccount, databaseURL, prefixURL}, n
 }
 
 function choseFirebaseSetup(roles) {
-  if (isBusiness(roles)) {
+  if (isBusiness(roles) || isAdmin(roles)) {
     return {
       fb: fbComerciales,
       databaseURL: firebaseComerciales.databaseURL
