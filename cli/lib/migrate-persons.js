@@ -268,7 +268,7 @@ export async function findWorksheetByCatastro(catastroId) {
  */
 async function findBuilding(catastroId) {
   const buildingRepository = new BuildingRepository();
-  return buildingRepository.findByCatastroId(catastroId);
+  return buildingRepository.findByMigratedId(catastroId);
 }
 
 /**
