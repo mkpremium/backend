@@ -5,59 +5,31 @@ import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
-import axios from 'axios';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import {BuildingRepository} from '../../src/building/models';
 import Promise from "bluebird";
+import {OperatorStats} from "../../src/stats/models";
+import {OperatorActions} from "../../src/stats/types";
+import {WorkSheetStatus} from "../../src/types/worksheet";
+import fromJSON from "tcomb/lib/fromJSON";
 
-const debugMigrate = debug('app:migration:portugal');
-
-const requester = axios.create({
-  baseURL: 'https://maps.googleapis.com/maps/api/geocode',
-  params: {
-    key: 'AIzaSyCUI2ZE7LZzG0V3ioe9gu8mJZKtFmQYPrY'
-  }
-});
+const debugMigrate = debug('app:migration:portugal:contacts');
 
 export const Input = t.struct({
-  id_finca: t.maybe(t.Str),
-  calle: t.maybe(t.Str),
   no: t.maybe(t.Str),
-  barrio: t.maybe(t.Str),
-  ciudad: t.maybe(t.Str),
-  matriz1: t.maybe(t.Str),
-  matriz2: t.maybe(t.Str),
-  matriz3: t.maybe(t.Str),
-  propietario1: t.maybe(t.Str),
-  dni1: t.maybe(t.Str),
-  direccion1: t.maybe(t.Str),
-  propietario2: t.maybe(t.Str),
-  dni2: t.maybe(t.Str),
-  direccion2: t.maybe(t.Str),
-  propietario3: t.maybe(t.Str),
-  dni3: t.maybe(t.Str),
-  direccion3: t.maybe(t.Str),
-  propietario4: t.maybe(t.Str),
-  dni4: t.maybe(t.Str),
-  direccion4: t.maybe(t.Str),
-  propietario5: t.maybe(t.Str),
-  dni5: t.maybe(t.Str),
-  direccion5: t.maybe(t.Str),
-  propietario6: t.maybe(t.Str),
-  dni6: t.maybe(t.Str),
-  direccion6: t.maybe(t.Str),
-  propietario7: t.maybe(t.Str),
-  dni7: t.maybe(t.Str),
-  direccion7: t.maybe(t.Str),
-  propietario8: t.maybe(t.Str),
-  dni8: t.maybe(t.Str),
-  direccion8: t.maybe(t.Str),
-  propietario9: t.maybe(t.Str),
-  dni9: t.maybe(t.Str),
-  direccion9: t.maybe(t.Str),
-  propietario10: t.maybe(t.Str),
-  dni10: t.maybe(t.Str),
-  direccion10: t.maybe(t.Str)
+  tel1: t.maybe(t.Str),
+  tel2: t.maybe(t.Str),
+  tel3: t.maybe(t.Str),
+  tel4: t.maybe(t.Str),
+  tel5: t.maybe(t.Str),
+  tel6: t.maybe(t.Str),
+  tel7: t.maybe(t.Str),
+  tel8: t.maybe(t.Str),
+  tel9: t.maybe(t.Str),
+  tel10: t.maybe(t.Str),
+  tel11: t.maybe(t.Str),
+  tel12: t.maybe(t.Str),
+  tel13: t.maybe(t.Str),
 });
 
 /**
@@ -67,24 +39,24 @@ export const Input = t.struct({
  */
 export async function migrate(inputFile) {
   debugMigrate('Process started...');
-  const buildingWithErrors = [];
+  const contactsWithErrors = [];
   await csvToJSON(inputFile, doOnEachRow);
   
   
-  async function doOnEachRow(personRecord) {
-    const input = Input(removeNullValues(cleanObjectKeys(personRecord)));
+  async function doOnEachRow(record) {
+    const input = Input(removeNullValues(cleanObjectKeys(record)));
     try {
-      await processBuilding(input);
+      await processContacts(input);
     } catch (error) {
-      console.error(error, ' in record with id_finca:', input.id_finca);
-      buildingWithErrors.push({
-        edificio: input.id_finca,
+      console.error(error, ' in record with no:', input.no);
+      contactsWithErrors.push({
+        person: input.no,
         error: error && error.toString()
       })
     }
   }
   
-  debugMigrate('Building with errors:', JSON.stringify(buildingWithErrors, null, 2));
+  debugMigrate('Contacts with errors:', JSON.stringify(contactsWithErrors, null, 2));
   debugMigrate('Process ended.');
 }
 
@@ -93,64 +65,70 @@ export async function migrate(inputFile) {
  * @param input - csv row data
  * @returns {Promise<void>}
  */
-async function processBuilding(input) {
-  debugMigrate('\n[NEW ROW] Process Building record with id_finca:', input.id_finca);
-  const catastro = getFieldNotNull(input, 'id_finca');
+async function processContacts(input) {
+  debugMigrate('\n[NEW ROW] Process person record with no/dni:', input.no);
+  const dni = getFieldNotNull(input, 'no');
   
-  if (catastro) {
-    const building = await findBuilding(catastro);
-    if (building) {
-      debugMigrate(`Building found...skip row with catastro:`, catastro);
-      throw new Error(`Building already existed.`);
+  if (dni) {
+    const person = await findPerson(dni);
+    if (person) {
+      debugMigrate(`Person found...`);
+      await updatePersonAndWorksheet(input, person);
+      debugMigrate('\nProcess ended for person record with dni no:', input.no);
     } else {
-      debugMigrate(`Building not found, proceed to create building, worksheet, person and owner...`);
-      await createAll(input);
-      debugMigrate('\nProcess ended for building record with catastro / id_finca:', input.id_finca);
+      debugMigrate(`Person not found, skip row no/dni:`, input.no);
+      throw new Error(`Person not found .`);
     }
   }
 }
 
 /**
- * Getting geo data from google api
- * @param input
+ * Finds person by dni.
+ * @param dni
  * @returns {Promise<*>}
  */
-async function getGeoData(input){
-  const address = `${input.calle} ${input.no}`;
-  const url = 'json?address=' + address.replace(/ /g, '+');
-  debugMigrate('getting geo data...', 'requester GET', url);
-  try {
-    let postalCode = '';
-    let latitude = null;
-    let longitude = null;
-    const result = await requester.get(url);
+async function findPerson(dni) {
+  const personRepository = new PersonRepository();
+  return personRepository.findByDocumentNumber(dni, false);
+}
+
+
+async function updatePersonAndWorksheet(input, person) {
+  const personRepository = new PersonRepository();
+  const ownerRepository = new OwnerRepository();
+  const worksheetRepository = new WorksheetRepository();
+  const contacts = [];
   
-    debugMigrate('geo data', 'requester OK', JSON.stringify(result.data, null, 2));
-  
-    if (result.data) {
-      const data = _.first(result.data.results);
-      const location = data && data.geometry && data.geometry.location;
-      latitude = location && location.lat;
-      longitude = location && location.lng;
-      const searchAddressComponents = data && data['address_components'];
+  for (let i = 1; i <= 13; i++) {
+    const phone = input['tel' + i];
     
-      if (searchAddressComponents) {
-        searchAddressComponents.map(function (searchAddressComponent) {
-          if (searchAddressComponent.types[0] === 'postal_code') {
-            postalCode = searchAddressComponent.short_name;
-          }
-        });
-      }
+    if (phone) {
+      contacts.push({
+        type: 'TELEFONO',
+        value: input['tel' + i]
+      });
     }
+  }
+  
+  if (contacts.length) {
+    const updatedPerson = t.update(person, {contacts: {$merge: contacts}});
+    await personRepository.save(updatedPerson);
+    const owner = await ownerRepository.findByPersonId(person.id);
     
-    return {
-      latitude: latitude,
-      longitude: longitude,
-      postalCode
-    };
-  } catch (exception) {
-    debugMigrate('geo data', 'requester error',exception);
-    return null;
+    if (owner) {
+      let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
+      if (worksheet) {
+        worksheet = fromJSON(worksheet, t.WorkSheet);
+        const updatedWorksheet = worksheet.setStatus(WorkSheetStatus.DEFAULT);
+        await worksheetRepository.save(updatedWorksheet);
+      } else {
+        throw new Error(`Worksheet not found.`);
+      }
+    } else {
+      throw new Error(`Owner not found.`);
+    }
+  } else {
+    throw new Error(`No contacts found in csv.`);
   }
 }
 
@@ -313,16 +291,7 @@ async function generateObjects(input) {
   return {owners, building, worksheet};
 }
 
-/**
- * Finds building by catastro.
- * @param catastro
- * @returns {Promise<*>}
- */
-async function findBuilding(catastro) {
-  const buildingRepository = new BuildingRepository();
-  const building = await buildingRepository.findByCatastro(catastro, false);
-  return building && building[0];
-}
+
 
 /**
  * Validates a field in the input cvs row.
