@@ -186,11 +186,11 @@ t.TypedContactInfoUpdate = t.struct(
  */
 export const Address = t.Address = t.struct(
   {
-    type: t.String,
+    type: t.maybe(t.String),
     street: t.String,
     number: t.Number,
     fullAddress: t.maybe(t.String),
-    registerNumber: t.Number,
+    registerNumber: t.maybe(t.Number),
     postalCode: t.PostalCode,
     city: t.String,
     province: t.maybe(t.String),

@@ -28,8 +28,8 @@ t.Cadastre = t.struct({
  *         type: number
  */
 t.Location = t.struct({
-  lat: t.Number,
-  lng: t.Number
+  lat: t.maybe(t.Number),
+  lng: t.maybe(t.Number)
 }, 'Location');
 
 /**
@@ -325,10 +325,10 @@ t.Building = t.struct(
     propertyType: t.maybe(t.String), // FIXME: define this as a t.enums
     buildingDate: t.Number,
     location: t.Location,
-    elements: t.Elements,
+    elements: t.maybe(t.Elements),
     entities: t.list(t.BuildingEntity),
     ownerId: t.maybe(t.String),
-    owner: t.BuildingOwner, // TODO: move to owners collection
+    owner: t.maybe(t.BuildingOwner), // TODO: move to owners collection
     state: t.BuildingState,
     proposals: t.list(t.String),
     recentProposal: t.maybe(t.BuildingProposal),

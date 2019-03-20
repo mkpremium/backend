@@ -64,7 +64,8 @@ t.Gender = t.enums({
 
 t.PersonType = t.enums({
   NATURAL: 'NATURAL',
-  JURIDICA: 'JURIDICA'
+  JURIDICA: 'JURIDICA',
+  NONE: 'NINGUNO'
 });
 
 t.EventType = t.enums({
