@@ -14,6 +14,7 @@ import _ from 'lodash';
 import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
+import squel from "squel/dist/squel";
 
 export class Owner extends CouchbaseModel {
   constructor() {
@@ -88,6 +89,25 @@ export class PersonRepository extends Person {
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
 
     return this.save(updatedPerson);
+  }
+  
+  /**
+   * Find person by dni / document number
+   * @param documentNumber
+   * @param required
+   * @returns {Promise<void>}
+   */
+  async findByDocumentNumber(documentNumber, required = true) {
+    const expr = squel.expr().and('t.documentNumber = ?', documentNumber);
+    const qb = this.getQueryBuilder()
+      .where(expr);
+    const results = await this.query(qb);
+  
+    if (required && (!results || results.length === 0)) {
+      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
+    }
+  
+    return _head(results);
   }
 }
 

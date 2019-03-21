@@ -352,15 +352,20 @@ export class CouchbaseModel {
     return model;
   }
   
-  async findByCatastroId(catastroId, required = true) {
-    const expr = squel.expr().and('t.cadastre.reference = ?', catastroId);
+  /**
+   * Find building by cadastre reference / catastro
+   * @param catastro
+   * @param required
+   * @returns {Promise<*>}
+   */
+  async findByCatastro(catastro, required = true) {
+    const expr = squel.expr().and('t.cadastre.reference = ?', catastro);
     const qb = this.getQueryBuilder()
-      .where('t._migrateId IS NOT MISSING')
       .where(expr);
     const results = await this.query(qb);
     
     if (required && (!results || results.length === 0)) {
-      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by cadastre.reference: ${catastroId}`);
+      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by cadastre.reference: ${catastro}`);
     }
   
     return results;
