@@ -318,7 +318,7 @@ async function generateObjects(input) {
  * @param catastro
  * @returns {Promise<*>}
  */
-async function findBuilding(catastro) {
+export async function findBuilding(catastro) {
   const buildingRepository = new BuildingRepository();
   const building = await buildingRepository.findByCatastro(catastro, false);
   return building && building[0];
