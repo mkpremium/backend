@@ -109,6 +109,25 @@ export class PersonRepository extends Person {
   
     return _head(results);
   }
+  
+  /**
+   * Find person migrateOwnerId
+   * @param migrateOwnerId
+   * @param required
+   * @returns {Promise<void>}
+   */
+  async findByMigrateOwnerId(migrateOwnerId, required = true) {
+    const expr = squel.expr().and('t._migrateOwnerId = ?', migrateOwnerId);
+    const qb = this.getQueryBuilder()
+      .where(expr);
+    const results = await this.query(qb);
+    
+    if (required && (!results || results.length === 0)) {
+      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by _migrateOwnerId: ${migrateOwnerId}`);
+    }
+    
+    return _head(results);
+  }
 }
 
 function ownerIncludes(qb, includes) {
