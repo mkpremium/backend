@@ -500,4 +500,17 @@ GROUP BY t.status`;
     
     return Promise.map(results, (worksheet) => WorksheetRepository.worksheetWithRelatedOwners(worksheet));
   }
+  
+  /**
+   * Find all worksheets with a particular status.
+   * @param status
+   * @returns {Promise<Array<Worksheet>>}
+   */
+  async findWorksheetsByStatus(status) {
+    const qb = this
+    .getQueryBuilder()
+    .where('status = ?', status);
+    
+    return this.query(qb);
+  }
 }

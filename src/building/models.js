@@ -293,6 +293,19 @@ export class BuildingRepository extends Building {
       .where(`id IN ${ids}`);
     return this.query(qb);
   }
+  
+  /**
+   *
+   * @param buildingId
+   * @returns {Promise<*>}
+   */
+  async getBuildingNotesIds(buildingId) {
+    const bucket = this.getBucketName();
+    const documentType = 'note';
+    const query = `SELECT RAW id FROM ${bucket} t WHERE t._documentType = ${JSON.stringify(documentType)} AND t.context.buildingId = ${JSON.stringify(buildingId)}`;
+    
+    return this.queryRaw(N1qlQuery.fromString(query));
+  }
 }
 
 function calculeStateTotals(results, neighborhoods) {
