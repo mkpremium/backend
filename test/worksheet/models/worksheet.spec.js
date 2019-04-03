@@ -1,8 +1,52 @@
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
+import app from '../../../src/app';
+import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
+import WorksheetHelper from '../../helpers/worksheet';
+import OwnerHelper from '../../helpers/owner';
+import {prettyPrint} from '../../helpers/util';
+import _ from 'lodash';
+import {OwnerStatus} from "../../../src/types/enums";
+import {WorkSheetStatus} from "../../../src/types/worksheet";
 
 describe('WorksheetRepository', () => {
-  it('findBySource', async() => {
-    const repo = new WorksheetRepository();
-    await repo.findBySource({});
+  
+  describe('Worksheet find by source', () => {
+    it('findBySource', async () => {
+      const repo = new WorksheetRepository();
+      await repo.findBySource({source: {city: 'BARCELONA'}});
+    });
+  });
+  
+  describe('Test worksheet status changes', () => {
+    let authenticatedOperator, authenticatedManager, worksheetsWithOwner;
+    before(async() => {
+      await deleteAll();
+      await operatorCreate();
+      await operatorCreateManager();
+      authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+      authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+  
+      worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);
+    });
+    it('Test update worksheet status', async() => {
+      const worksheetAndOwner = _.first(worksheetsWithOwner);
+      const worksheet = worksheetAndOwner.worksheet;
+      const owner = worksheetAndOwner.owner;
+      const ownerPayload = {
+        status: OwnerStatus.PUBLIC,
+        verified: true
+      };
+      
+      // change owner status
+      await OwnerHelper.updateOwnerViaEndpoint(owner.id, ownerPayload, authenticatedOperator);
+      const updated = await OwnerHelper.findOwner(owner.id);
+      updated.status.should.be.equal(OwnerStatus.PUBLIC);
+      
+      // calculate worksheet status
+      const worksheetUpdated = await WorksheetHelper.updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetUpdated.status.should.be.equal(WorkSheetStatus.PUBLIC);
+      
+      prettyPrint('worksheet updated', worksheetUpdated);
+    });
   });
 });

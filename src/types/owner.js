@@ -75,6 +75,8 @@ t.OwnerBody = t.struct(
  *         type: string
  *         format: uuid/v4
  *         description: Id de la persona relacionada
+ *       confirmed:
+ *         type: boolean
  */
 t.OwnerUpdate = t.struct({
   type: t.maybe(t.OwnerType),
@@ -82,7 +84,8 @@ t.OwnerUpdate = t.struct({
   business: t.maybe(t.OwnerBusiness),
   note: t.maybe(t.String),
   buildingId: t.maybe(t.String),
-  person: t.maybe(t.Object)
+  person: t.maybe(t.Object),
+  confirmed: t.maybe(t.Boolean)
 }, 'OwnerUpdate');
 
 /**
