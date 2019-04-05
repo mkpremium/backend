@@ -20,4 +20,5 @@ program
   .command('owners', 'Procesos que tienen que ver con owners')
   .command('metadata', 'Procesos que tienen que ver la metadata de los edificios')
   .command('building', 'Procesos que tienen que ver con el edificio')
+  .command('migrate-persons-v2 [input-file]', 'Migración de personas diferente formato de archivo.')
   .parse(process.argv);
