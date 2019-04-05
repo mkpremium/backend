@@ -4,9 +4,11 @@ import {OwnerRepository, PersonRepository} from '../../src/owner/models';
 import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import Promise from "bluebird";
-import {WorkSheetStatus} from "../../src/types/worksheet";
-import fromJSON from "tcomb/lib/fromJSON";
+import Promise from 'bluebird';
+import {WorkSheetStatus} from '../../src/types/worksheet';
+import fromJSON from 'tcomb/lib/fromJSON';
+import _ from 'lodash';
+import {N1qlQuery} from "couchbase";
 
 const debugMigrate = debug('app:migration:portugal:contacts');
 
@@ -98,6 +100,7 @@ async function updatePersonAndWorksheet(input, person) {
   const ownerRepository = new OwnerRepository();
   const worksheetRepository = new WorksheetRepository();
   const contacts = [];
+  let phonesArray = [];
   
   for (let i = 1; i <= 13; i++) {
     const phone = input['tel' + i];
@@ -105,27 +108,60 @@ async function updatePersonAndWorksheet(input, person) {
     if (phone) {
       contacts.push({
         type: 'TELEFONO',
-        value: input['tel' + i]
+        value: phone
       });
+      phonesArray.push(phone);
     }
   }
   
   if (contacts.length) {
-    const updatedPerson = t.update(person, {contacts: {$merge: contacts}});
-    await personRepository.save(updatedPerson);
-    const owner = await ownerRepository.findByPersonId(person.id);
-    
-    if (owner) {
-      let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
-      if (worksheet) {
-        worksheet = fromJSON(worksheet, t.WorkSheet);
-        const updatedWorksheet = worksheet.setStatus(WorkSheetStatus.DEFAULT);
-        await worksheetRepository.save(updatedWorksheet);
+    const currentContactsObjectsArray = person.contacts || [];
+    const currentPhones = currentContactsObjectsArray.map((contact) => {
+      return contact.value;
+    });
+    debugMigrate(`currentPhones...${currentPhones}`);
+    const updatedContacts = currentContactsObjectsArray;
+    const migrationPhones = _.uniq(phonesArray);
+    debugMigrate(`migrationPhones...${migrationPhones}`);
+    const newPhones = _.difference(migrationPhones, currentPhones);
+  
+    if (newPhones.length) {
+      debugMigrate(`new phones...${newPhones}`);
+  
+      newPhones.map((phone) => {
+        updatedContacts.push({
+          type: 'TELEFONO',
+          value: phone
+        });
+      });
+  
+      debugMigrate(`updatedContacts...${JSON.stringify(updatedContacts, null, 2)}`);
+      const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
+      await personRepository.save(updatedPerson);
+      const owner = await ownerRepository.findByPersonId(person.id);
+  
+      if (owner) {
+        let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
+        if (worksheet) {
+          worksheet = fromJSON(worksheet, t.WorkSheet);
+  
+          debugMigrate('worksheet id', worksheet.id, 'with status', worksheet.status);
+          if (worksheet.status === WorkSheetStatus.INVALID) {
+            const bucket = worksheetRepository.getBucketName();
+            const updateAddress = N1qlQuery
+              .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(WorkSheetStatus.DEFAULT)} WHERE id = ${JSON.stringify(worksheet.id)}`);
+  
+            await worksheetRepository.queryRaw(updateAddress);
+            debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status);
+          }
+        } else {
+          throw new Error(`Worksheet not found.`);
+        }
       } else {
-        throw new Error(`Worksheet not found.`);
+        throw new Error(`Owner not found.`);
       }
     } else {
-      throw new Error(`Owner not found.`);
+      debugMigrate(`No new phones to be added, proceed.`);
     }
   } else {
     throw new Error(`No contacts found in csv.`);
