@@ -18,7 +18,7 @@ describe('WorksheetRepository', () => {
     });
   });
 
-  describe('Test worksheet status changes', () => {
+  describe('Test worksheet status changes from DEFAULT to PUBLIC', () => {
     let authenticatedOperator, authenticatedManager, worksheetsWithOwner, queue;
     before(async() => {
       await deleteAll();
@@ -49,6 +49,58 @@ describe('WorksheetRepository', () => {
       const worksheetUpdated = await WorksheetHelper
         .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
       worksheetUpdated.status.should.be.equal(WorkSheetStatus.PUBLIC);
+    });
+
+    it('no available items on the queue', async() => {
+      await doActionInQueueEndpoint(authenticatedOperator, queue.id, null, 422);
+    });
+  });
+
+  describe('Test worksheet status changes from DEFAULT, WITH_OWNER to PUBLIC', () => {
+    let authenticatedOperator, authenticatedManager, worksheetsWithOwner, queue;
+    before(async() => {
+      await deleteAll();
+      queue = await createQueue();
+      await operatorCreate('', queue.id);
+      await operatorCreateManager();
+      authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+      authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+
+      worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);
+    });
+
+    it('Test update worksheet status', async() => {
+      const worksheetAndOwner = _.first(worksheetsWithOwner);
+      const worksheet = worksheetAndOwner.worksheet;
+      const owner = worksheetAndOwner.owner;
+
+      // 1. Verify owner
+      const verifyOwnerPayload = {
+        status: OwnerStatus.VERIFIED,
+        verified: true
+      };
+      await OwnerHelper.updateOwnerViaEndpoint(owner.id, verifyOwnerPayload, authenticatedOperator);
+      const updated = await OwnerHelper.findOwner(owner.id);
+      updated.status.should.be.equal(OwnerStatus.VERIFIED);
+
+      // calculate worksheet status
+      const worksheetUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetUpdated.status.should.be.equal(WorkSheetStatus.WITH_OWNER);
+
+      // 2. Mark as Public
+      const publicOwnerPayload = {
+        status: OwnerStatus.PUBLIC,
+        verified: true
+      };
+      await OwnerHelper.updateOwnerViaEndpoint(owner.id, publicOwnerPayload, authenticatedOperator);
+      const publicOwner = await OwnerHelper.findOwner(owner.id);
+      publicOwner.status.should.be.equal(OwnerStatus.PUBLIC);
+
+      // calculate worksheet status
+      const worksheetPublicUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetPublicUpdated.status.should.be.equal(WorkSheetStatus.PUBLIC);
     });
 
     it('no available items on the queue', async() => {
