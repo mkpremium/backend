@@ -513,4 +513,20 @@ GROUP BY t.status`;
     
     return this.query(qb);
   }
+  
+  /**
+   * Adds an owner to a worksheet
+   * @param worksheet
+   * @param owner
+   * @returns {Promise<*>}
+   */
+  async addOnlyOwner(worksheet, owner) {
+    const updatedWorksheet = t.update(worksheet, {
+      relatedOwnerIds: {
+        $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
+      }
+    });
+    
+    return this.save(updatedWorksheet);
+  }
 }
