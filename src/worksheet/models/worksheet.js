@@ -229,6 +229,9 @@ GROUP BY t.status`;
 
         return worksheet.status;
       case WorkSheetStatus.WITH_OWNER:
+        if (isPublicEntity) {
+          return WorkSheetStatus.PUBLIC;
+        }
         if (noSale) {
           return WorkSheetStatus.NO_SALE;
         }
@@ -368,7 +371,7 @@ GROUP BY t.status`;
     const counter = this.getCounter();
     return counter.count(this.getType(), 1);
   }
-  
+
   /**
    * Attaches related building objects to a worksheet
    * @param worksheet
@@ -383,7 +386,7 @@ GROUP BY t.status`;
       const relatedBuildings = await buildingRepo.query(rbQb);
       updatedWorksheet = t.update(worksheet, {relatedBuildings: {$set: relatedBuildings}});
     }
-    
+
     return updatedWorksheet;
   }
 
@@ -414,7 +417,7 @@ GROUP BY t.status`;
 
     const total = await this.countQuery(qbCount);
     let results = await this.query(qb);
-  
+
     results = await Promise.map(results, (worksheet) => this.worksheetWithRelatedBuildings(worksheet));
 
     return fromJSON({total, results}, t.WorkSheetLitResponse);
@@ -466,7 +469,7 @@ GROUP BY t.status`;
     }
     return fromJSON({results}, WorksheetSearchResponse);
   }
-  
+
   /**
    * Attaches related owners objects to a worksheet
    * @param worksheet
@@ -474,7 +477,7 @@ GROUP BY t.status`;
    */
   static async worksheetWithRelatedOwners(worksheet) {
     let updatedWorksheet = worksheet;
-  
+
     if (worksheet.relatedOwnerIds.length > 0) {
       const ownerRepository = new OwnerRepository();
       const relatedOwners = await ownerRepository.findByIdWithIncludes(worksheet.relatedOwnerIds);
@@ -483,10 +486,10 @@ GROUP BY t.status`;
         ownerContacts: {$set: ownersContactViews(relatedOwners, worksheet)}
       });
     }
-    
+
     return updatedWorksheet;
   }
-  
+
   /**
    * Finds all worksheets with the owners.
    * @returns {Promise<*>}
@@ -497,10 +500,10 @@ GROUP BY t.status`;
       .offset(offset || 0)
       .order('worksheetIndex');
     const results = await this.query(qb);
-    
+
     return Promise.map(results, (worksheet) => WorksheetRepository.worksheetWithRelatedOwners(worksheet));
   }
-  
+
   /**
    * Find all worksheets with a particular status.
    * @param status
@@ -510,7 +513,7 @@ GROUP BY t.status`;
     const qb = this
     .getQueryBuilder()
     .where('status = ?', status);
-    
+
     return this.query(qb);
   }
   

@@ -10,7 +10,7 @@ async function createQueueEndpoint(authenticatedManager, payload) {
       city: 'BARCELONA'
     }
   }, payload);
-  
+
   return request(app)
     .post(`/worksheets/queues`)
     .set('Authorization', authenticatedManager.authorization)
@@ -21,44 +21,36 @@ async function createQueueEndpoint(authenticatedManager, payload) {
     });
 }
 
-async function doActionInQueueEndpoint(authenticatedManagerOrOperator, queueId, payload) {
+export async function doActionInQueueEndpoint(authenticatedManagerOrOperator, queueId, payload, expectedCode = 200) {
   const defaultPayload = {
     action: 'NEXT'
   };
-  
+
   return request(app)
     .post(`/worksheets/queues/${queueId}`)
     .set('Authorization', authenticatedManagerOrOperator.authorization)
     .send(payload || defaultPayload)
-    .expect(200)
+    .expect(expectedCode)
     .then(response => {
       return response.body;
     })
     .catch(error => console.log('Error endpoint: ', error));
 }
 
-async function findByIdModel(queueId) {
+export async function findByIdModel(queueId) {
   const worksheetQueueRepository = new WorksheetQueueRepository();
-  
+
   return worksheetQueueRepository.findByIdOrThrow(queueId);
 }
 
-async function cleanWorksheetsNotInQueueViaModel(queueId) {
+export async function cleanWorksheetsNotInQueueViaModel(queueId) {
   const worksheetQueueRepository = new WorksheetQueueRepository();
-  
+
   return worksheetQueueRepository.freeNotInQueueWorksheets(queueId);
 }
 
-async function cleanAllWorksheetsNotInQueueViaModel() {
+export async function cleanAllWorksheetsNotInQueueViaModel() {
   const worksheetQueueRepository = new WorksheetQueueRepository();
-  
+
   return worksheetQueueRepository.cleanAllWorksheetsNotInQueue();
 }
-
-module.exports = {
-  createQueueEndpoint,
-  doActionInQueueEndpoint,
-  findByIdModel,
-  cleanWorksheetsNotInQueueViaModel,
-  cleanAllWorksheetsNotInQueueViaModel
-};

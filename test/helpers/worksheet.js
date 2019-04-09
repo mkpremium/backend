@@ -5,6 +5,8 @@ import request from 'supertest';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import BuildingHelper from './building';
 import app from '../../src/app';
+import {createOwnerViaEndpoint} from './owner';
+import _ from 'lodash';
 
 /**
  * Creates worksheets using the model
@@ -23,11 +25,13 @@ async function createWorksheetsWithBuildingsAssociated() {
   const worksheetRepository = new WorksheetRepository();
   const buildings = await BuildingHelper.runBuildingSeedAndGetThemAll();
   const buildingArraySize = buildings.length;
-  const worksheets = await createWorksheetsViaModel({times: buildingArraySize});
+  const worksheets = await createWorksheetsViaModel({times: 1});
 
   return Promise.map(worksheets, async(ws) => {
     const building = buildings.pop();
-    const updatedWorksheet = t.update(ws, {buildingAddress: {$set: building.address}});
+    let updatedWorksheet = t.update(ws, {buildingAddress: {$set: building.address}});
+    await worksheetRepository.save(updatedWorksheet, false);
+    updatedWorksheet = t.update(ws, {relatedBuildingIds: {$set: [building.id]}});
     return worksheetRepository.save(updatedWorksheet, false);
   });
 }
@@ -56,9 +60,42 @@ async function searchWorksheetEndpoint(authenticatedManager, payload) {
     });
 }
 
+/**
+ * Creates worksheets, each with building and an owner associated.
+ * @param authenticatedManager
+ * @returns {Promise<void>} - array of objects, object has two properties: worksheet and owner
+ */
+async function createWorksheetsAndOwnerWithBuilding(authenticatedManager) {
+  const worksheetRepository = new WorksheetRepository();
+  const worksheets = await createWorksheetsWithBuildingsAssociated();
+  
+  return Promise.map(worksheets, async(worksheet) => {
+    const buildingId = _.first(worksheet.relatedBuildingIds);
+    const owner = await createOwnerViaEndpoint(authenticatedManager, buildingId);
+    const updatedWorksheet = await worksheetRepository.addOwner(worksheet, owner);
+    return {
+      worksheet: updatedWorksheet,
+      owner: owner
+    }
+  });
+}
+
+/**
+ * Updates worksheet status via model
+ * @param worksheetId
+ * @param operatorId
+ * @returns {Promise<*>}
+ */
+function updateStatusViaModel(worksheetId, operatorId) {
+  const worksheetRepository = new WorksheetRepository();
+  return worksheetRepository.updateStatus(worksheetId, operatorId);
+}
+
 module.exports = {
   createWorksheetsWithBuildingsAssociated,
   updateQueueIdWorksheetModel,
   findByIdModel,
-  searchWorksheetEndpoint
+  searchWorksheetEndpoint,
+  createWorksheetsAndOwnerWithBuilding,
+  updateStatusViaModel
 };
