@@ -2,6 +2,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import t from 'tcomb';
 import _find from 'lodash/find';
 import _get from 'lodash/get';
+import _every from 'lodash/every';
 import {OwnerStatus, OwnerType} from './enums';
 
 t.OwnerBusiness = t.struct({
@@ -273,6 +274,29 @@ t.Owner.prototype.fullName = function() {
   if (this.person) {
     return this.person.fullName();
   }
+};
+
+/**
+ * @return {t.Owner}
+ */
+t.OwnerWithInclude.prototype.calculateOwnerValidStatus = function() {
+  if (!this.person) {
+    throw new Error(`owner ${this.id} cannot calculateOwnerStatus`);
+  }
+
+  const contacts = _get(this, 'person.contacts', []);
+  const hasNoContacts = contacts.length === 0;
+
+  const isBadContact = contact =>
+    this.confirmedByOperator.value && contact.status === 'BAD';
+
+  const ownerIsInvalid = hasNoContacts || _every(contacts, isBadContact);
+
+  if (ownerIsInvalid) {
+    return t.update(this, {status: {$set: OwnerStatus.ERROR}});
+  }
+
+  return this;
 };
 
 t.Owner.prototype.findFirstGoodContact = function() {

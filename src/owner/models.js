@@ -155,10 +155,11 @@ function ownerIncludes(qb, includes) {
 }
 
 function mapOwnerIncludes(owner) {
-  return Object.assign({}, owner, {
+  const data = Object.assign({}, owner, {
     person: _head(owner.person || []),
     building: _head(owner.building || [])
   });
+  return fromJSON(data, t.OwnerWithInclude);
 }
 
 const OwnerStatsParams = t.struct({
@@ -177,6 +178,22 @@ export class OwnerRepository extends Owner {
     }
 
     return owner;
+  }
+
+  /**
+   *
+   * @param {*} data
+   * @return {Promise<t.Owner>}
+   */
+  static async validateOwner(data) {
+    const owner = fromJSON(data, t.OwnerWithInclude);
+    const ownerRepo = new OwnerRepository();
+    const updatedOwner = owner.calculateOwnerValidStatus(false);
+    if (updatedOwner.status !== owner.status) {
+      return ownerRepo.save(updatedOwner, false);
+    }
+
+    return Promise.resolve(owner);
   }
 
   async findByMigratedId(migratedId) {

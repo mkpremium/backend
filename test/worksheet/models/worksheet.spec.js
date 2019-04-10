@@ -1,7 +1,7 @@
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import app from '../../../src/app';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
-import WorksheetHelper from '../../helpers/worksheet';
+import WorksheetHelper, {CreateWorksheetType} from '../../helpers/worksheet';
 import OwnerHelper from '../../helpers/owner';
 import {prettyPrint} from '../../helpers/util';
 import _ from 'lodash';
@@ -105,6 +105,59 @@ describe('WorksheetRepository', () => {
 
     it('no available items on the queue', async() => {
       await doActionInQueueEndpoint(authenticatedOperator, queue.id, null, 422);
+    });
+  });
+
+  describe('Update status for invalid Worksheets', () => {
+    let authenticatedOperator, authenticatedManager, worksheetsNoContacts, worksheetsBadContacts, queue;
+    before(async() => {
+      await deleteAll();
+      queue = await createQueue();
+      await operatorCreate('', queue.id);
+      await operatorCreateManager();
+      authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+      authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+
+      worksheetsNoContacts = await WorksheetHelper
+        .createWorksheetsAndOwnerWithBuilding(authenticatedManager, CreateWorksheetType.INVALID_NO_CONTACTS);
+      worksheetsBadContacts = await WorksheetHelper
+        .createWorksheetsAndOwnerWithBuilding(authenticatedManager, CreateWorksheetType.INVALID_BAD_CONTACTS);
+    });
+
+    it('Test update status with worksheet without contacts', async() => {
+      const worksheetAndOwner = _.first(worksheetsNoContacts);
+      const worksheet = worksheetAndOwner.worksheet;
+
+      // calculate worksheet status
+      const worksheetUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetUpdated.status.should.be.equal(WorkSheetStatus.INVALID);
+    });
+
+    it('Test update status with worksheet with bad contacts, no operator confirm', async() => {
+      const worksheetAndOwner = _.first(worksheetsBadContacts);
+      const worksheet = worksheetAndOwner.worksheet;
+
+      // calculate worksheet status
+      const worksheetUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetUpdated.status.should.be.equal(WorkSheetStatus.DEFAULT);
+    });
+
+    it('Test update status with worksheet with bad contacts, operator confirmed', async() => {
+      const worksheetAndOwner = _.first(worksheetsBadContacts);
+      const {worksheet, owner} = worksheetAndOwner;
+
+      // Confirm
+      const payload = {
+        verified: true
+      };
+      await OwnerHelper.updateOwnerViaEndpoint(owner.id, payload, authenticatedOperator);
+
+      // calculate worksheet status
+      const worksheetUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetUpdated.status.should.be.equal(WorkSheetStatus.INVALID);
     });
   });
 });

@@ -5,7 +5,11 @@ import request from 'supertest';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import BuildingHelper from './building';
 import app from '../../src/app';
-import {createOwnerViaEndpoint} from './owner';
+import {
+  createOwnerViaEndpointBadContacts,
+  createOwnerViaEndpointNoContacts,
+  createOwnerViaEndpointValid
+} from './owner';
 import _ from 'lodash';
 
 /**
@@ -24,7 +28,6 @@ async function createWorksheetsViaModel(payload) {
 async function createWorksheetsWithBuildingsAssociated() {
   const worksheetRepository = new WorksheetRepository();
   const buildings = await BuildingHelper.runBuildingSeedAndGetThemAll();
-  const buildingArraySize = buildings.length;
   const worksheets = await createWorksheetsViaModel({times: 1});
 
   return Promise.map(worksheets, async(ws) => {
@@ -60,24 +63,43 @@ async function searchWorksheetEndpoint(authenticatedManager, payload) {
     });
 }
 
+export const CreateWorksheetType = {
+  VALID: 0,
+  INVALID_NO_CONTACTS: 1,
+  INVALID_BAD_CONTACTS: 2
+};
+
 /**
  * Creates worksheets, each with building and an owner associated.
  * @param authenticatedManager
+ * @param type
  * @returns {Promise<void>} - array of objects, object has two properties: worksheet and owner
  */
-async function createWorksheetsAndOwnerWithBuilding(authenticatedManager) {
+async function createWorksheetsAndOwnerWithBuilding(authenticatedManager, type = CreateWorksheetType.VALID) {
   const worksheetRepository = new WorksheetRepository();
   const worksheets = await createWorksheetsWithBuildingsAssociated();
-  
+
   return Promise.map(worksheets, async(worksheet) => {
     const buildingId = _.first(worksheet.relatedBuildingIds);
-    const owner = await createOwnerViaEndpoint(authenticatedManager, buildingId);
+    const owner = await createOwnerByType(authenticatedManager, buildingId, type);
     const updatedWorksheet = await worksheetRepository.addOwner(worksheet, owner);
     return {
       worksheet: updatedWorksheet,
       owner: owner
-    }
+    };
   });
+}
+
+async function createOwnerByType(authenticatedManager, buildingId, type) {
+  switch (type) {
+    case CreateWorksheetType.INVALID_NO_CONTACTS:
+      return createOwnerViaEndpointNoContacts(authenticatedManager, buildingId);
+    case CreateWorksheetType.INVALID_BAD_CONTACTS:
+      return createOwnerViaEndpointBadContacts(authenticatedManager, buildingId);
+    case CreateWorksheetType.VALID:
+    default:
+      return createOwnerViaEndpointValid(authenticatedManager, buildingId);
+  }
 }
 
 /**
@@ -91,7 +113,7 @@ function updateStatusViaModel(worksheetId, operatorId) {
   return worksheetRepository.updateStatus(worksheetId, operatorId);
 }
 
-module.exports = {
+export default {
   createWorksheetsWithBuildingsAssociated,
   updateQueueIdWorksheetModel,
   findByIdModel,

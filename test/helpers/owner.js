@@ -1,6 +1,6 @@
 import {OwnerRepository} from '../../src/owner/models';
 import request from 'supertest';
-import app from "../../src/app";
+import app from '../../src/app';
 const chance = require('chance').Chance();
 
 /**
@@ -9,7 +9,29 @@ const chance = require('chance').Chance();
  * @param buildingId
  * @returns {Promise<*>}
  */
-async function createOwnerViaEndpoint(authenticatedManager, buildingId) {
+export async function createOwnerViaEndpointValid(authenticatedManager, buildingId) {
+  return createOwnerViaEndpoint_(authenticatedManager, buildingId, [
+    {
+      value: '12345678',
+      status: 'UNDEFINED'
+    }
+  ]);
+}
+
+export async function createOwnerViaEndpointNoContacts(authenticatedManager, buildingId) {
+  return createOwnerViaEndpoint_(authenticatedManager, buildingId, []);
+}
+
+export async function createOwnerViaEndpointBadContacts(authenticatedManager, buildingId) {
+  return createOwnerViaEndpoint_(authenticatedManager, buildingId, [
+    {
+      value: '12345678',
+      status: 'BAD'
+    }
+  ]);
+}
+
+export async function createOwnerViaEndpoint_(authenticatedManager, buildingId, contacts) {
   const ownerWithPersonToSave = {
     type: 'PRINCIPAL',
     status: 'VERIFICADO',
@@ -17,14 +39,15 @@ async function createOwnerViaEndpoint(authenticatedManager, buildingId) {
     note: '',
     person: {
       name: chance.name(),
-      personType: 'NATURAL'
+      personType: 'NATURAL',
+      contacts
     }
   };
-  
+
   if (buildingId) {
     ownerWithPersonToSave.buildingId = buildingId;
   }
-  
+
   return request(app)
     .post('/owners')
     .set('Authorization', authenticatedManager.authorization)
@@ -42,7 +65,7 @@ async function createOwnerViaEndpoint(authenticatedManager, buildingId) {
  * @param authenticatedOperator
  * @returns {Promise<Test|*|void>}
  */
-async function updateOwnerViaEndpoint(ownerId, payload, authenticatedOperator) {
+export async function updateOwnerViaEndpoint(ownerId, payload, authenticatedOperator) {
   return request(app)
     .put(`/owners/${ownerId}`)
     .set('Authorization', authenticatedOperator.authorization)
@@ -54,13 +77,15 @@ async function updateOwnerViaEndpoint(ownerId, payload, authenticatedOperator) {
  *
  * @param ownerId
  */
-function findOwner(ownerId) {
+export function findOwner(ownerId) {
   const ownerRepo = new OwnerRepository();
   return ownerRepo.findById(ownerId);
 }
 
 module.exports = {
-  createOwnerViaEndpoint,
+  createOwnerViaEndpointNoContacts,
+  createOwnerViaEndpointBadContacts,
+  createOwnerViaEndpointValid,
   updateOwnerViaEndpoint,
   findOwner
 };
