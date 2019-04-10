@@ -98,7 +98,7 @@ export const Worksheet = t.WorkSheet = t.struct({
   relatedBuildingIds: t.list(t.String),
   relatedBuildings: t.list(t.Building),
   relatedOwnerIds: t.list(t.String),
-  relatedOwners: t.list(t.Owner),
+  relatedOwners: t.list(t.OwnerWithInclude),
 
   // never store this
   ownerContacts: t.list(t.OwnerCompactView),

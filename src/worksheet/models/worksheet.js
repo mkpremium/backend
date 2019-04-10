@@ -23,10 +23,9 @@ import {ownersContactViews} from '../../owner/types';
 import {WorkSheetStatus} from '../../types/worksheet';
 import {
   isAllowedChangeState,
-  isInvalidVerified,
   ownerNoSale,
   ownerAlreadySold,
-  ownerVerified, publicEntity
+  ownerVerified, publicEntity, isInvalid
 } from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
@@ -193,11 +192,15 @@ GROUP BY t.status`;
   async calculateNewStatus(worksheet) {
     worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
     const isValidLength = worksheet.relatedOwners.length > 0;
-    const someValidOwner = isValidLength && _some(worksheet.relatedOwners, ownerVerified);
-    const isPublicEntity = isValidLength && _some(worksheet.relatedOwners, publicEntity);
-    const everyInvalidOwner = isValidLength && _every(worksheet.relatedOwners, isInvalidVerified);
-    const noSale = isValidLength && _some(worksheet.relatedOwners, ownerNoSale);
-    const alreadySold = isValidLength && _some(worksheet.relatedOwners, ownerAlreadySold);
+    const owners = isValidLength
+      ? await Promise.map(worksheet.relatedOwners, OwnerRepository.validateOwner)
+      : [];
+
+    const someValidOwner = isValidLength && _some(owners, ownerVerified);
+    const isPublicEntity = isValidLength && _some(owners, publicEntity);
+    const everyInvalidOwner = isValidLength && _every(owners, isInvalid);
+    const noSale = isValidLength && _some(owners, ownerNoSale);
+    const alreadySold = isValidLength && _some(owners, ownerAlreadySold);
     const meetings = await this.findMeetings(worksheet.id);
     const hasMeeting = meetings.length > 0;
 
@@ -516,7 +519,7 @@ GROUP BY t.status`;
 
     return this.query(qb);
   }
-  
+
   /**
    * Adds an owner to a worksheet
    * @param worksheet
@@ -529,7 +532,7 @@ GROUP BY t.status`;
         $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
       }
     });
-    
+
     return this.save(updatedWorksheet);
   }
 }
