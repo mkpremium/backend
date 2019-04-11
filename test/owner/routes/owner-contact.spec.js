@@ -3,33 +3,45 @@ import {resolve} from 'path';
 import app from '../../../src/app';
 import {PersonRepository} from '../../../src/owner/models';
 import {MigrateModel} from '../../../src/migration/lib/migrate-model';
-import {deleteAll, operatorCreate, operatorLogin} from '../../common';
+import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
+import WorksheetHelper from '../../helpers/worksheet';
+import _ from 'lodash';
+import OwnerHelper from '../../helpers/owner';
 
 const personRepo = new PersonRepository();
 
 // TODO: fix this test
-describe.skip('owner-contact.routes', () => {
+describe('owner-contact.routes', () => {
   let owner;
   let person;
   let authenticatedOperator;
+  let authenticatedManager;
   before(async() => {
     await deleteAll();
     await operatorCreate();
+    await operatorCreateManager();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
-    const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
+    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+    /*const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
     const results = await migrate.run();
     person = results.find(o => o.contacts && o.contacts.length > 0);
-    owner = results.find(o => o.personId === person.id);
+    owner = results.find(o => o.personId === person.id);*/
   });
 
-  describe('PUT /owners/:id/contacts/:contactId @request', () => {
-    it('204 Operación exitosa', async() => {
+  describe('Update owner contact', () => {
+    it('Able to update owner contact', async() => {
+      const worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);
+      const worksheetAndOwner = _.first(worksheetsWithOwner);
+      const owner = worksheetAndOwner.owner;
+      const person = await OwnerHelper.findOwnerPerson(owner.personId);
       const contactId = person.contacts[0].id;
+      
       await request(app)
         .put(`/owners/${owner.id}/contacts/${contactId}`)
         .set('Authorization', authenticatedOperator.authorization)
         .send({
-          value: '1234567890',
+          type: 'TELEFONO',
+          value: '914290152',
           status: 'GOOD',
           note: 'test note'
         })
@@ -37,10 +49,10 @@ describe.skip('owner-contact.routes', () => {
 
       const updatedPerson = await personRepo.findById(person.id);
 
-      JSON.stringify(updatedPerson.contacts[0].value).should.be.equal(JSON.stringify('1234567890'));
+      JSON.stringify(updatedPerson.contacts[0].value).should.be.equal(JSON.stringify('914290152'));
     });
 
-    it('404 Propietario no existe', async() => {
+    it.skip('404 Propietario no existe', async() => {
       return request(app)
         .put('/owners/blah-blah/contacts')
         .set('Authorization', authenticatedOperator.authorization)
@@ -48,7 +60,7 @@ describe.skip('owner-contact.routes', () => {
     });
   });
 
-  describe('POST /owners/:id/contacts @request', () => {
+  describe.skip('POST /owners/:id/contacts @request', () => {
     it('204 Operación exitosa', async() => {
       await request(app)
         .post(`/owners/${owner.id}/contacts`)

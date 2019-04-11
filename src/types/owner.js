@@ -261,7 +261,8 @@ export const Owner = t.Owner = t.struct(
       type: 'NINGUNO',
       status: 'NO_VERIFICADO',
       _documentType: 'owner',
-      _relatedTo: ''
+      _relatedTo: '',
+      _migrateId: null
     }
   }
 );

@@ -1,4 +1,4 @@
-import {OwnerRepository} from '../../src/owner/models';
+import {OwnerRepository, PersonRepository} from '../../src/owner/models';
 import request from 'supertest';
 import app from '../../src/app';
 const chance = require('chance').Chance();
@@ -82,10 +82,20 @@ export function findOwner(ownerId) {
   return ownerRepo.findById(ownerId);
 }
 
+/**
+ * Find person by owner.personId
+ * @param personId
+ */
+export function findOwnerPerson(personId) {
+  const personRepository = new PersonRepository();
+  return personRepository.findById(personId);
+}
+
 module.exports = {
   createOwnerViaEndpointNoContacts,
   createOwnerViaEndpointBadContacts,
   createOwnerViaEndpointValid,
   updateOwnerViaEndpoint,
-  findOwner
+  findOwner,
+  findOwnerPerson
 };
