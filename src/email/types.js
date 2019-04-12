@@ -5,7 +5,14 @@ t.EmailBody = t.struct({
   cc: t.maybe(t.String),
   cco: t.maybe(t.String),
   body: t.String,
+  html: t.maybe(t.String),
+  text: t.maybe(t.String),
   subject: t.String
-}, 'EmailBody');
+}, {
+  name: 'EmailBody',
+  defaultProps: {
+    body: ''
+  }
+});
 
 export default t;
