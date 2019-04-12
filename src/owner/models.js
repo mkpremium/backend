@@ -90,7 +90,7 @@ export class PersonRepository extends Person {
 
     return this.save(updatedPerson);
   }
-  
+
   /**
    * Find person by dni / document number
    * @param documentNumber
@@ -102,14 +102,14 @@ export class PersonRepository extends Person {
     const qb = this.getQueryBuilder()
       .where(expr);
     const results = await this.query(qb);
-  
+
     if (required && (!results || results.length === 0)) {
       throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
     }
-  
+
     return _head(results);
   }
-  
+
   /**
    * Find person migrateOwnerId
    * @param migrateOwnerId
@@ -121,11 +121,11 @@ export class PersonRepository extends Person {
     const qb = this.getQueryBuilder()
       .where(expr);
     const results = await this.query(qb);
-    
+
     if (required && (!results || results.length === 0)) {
       throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by _migrateOwnerId: ${migrateOwnerId}`);
     }
-    
+
     return _head(results);
   }
 }
@@ -155,11 +155,10 @@ function ownerIncludes(qb, includes) {
 }
 
 function mapOwnerIncludes(owner) {
-  const data = Object.assign({}, owner, {
+  return Object.assign({}, owner, {
     person: _head(owner.person || []),
     building: _head(owner.building || [])
   });
-  return fromJSON(data, t.OwnerWithInclude);
 }
 
 const OwnerStatsParams = t.struct({
@@ -188,7 +187,7 @@ export class OwnerRepository extends Owner {
   static async validateOwner(data) {
     const owner = fromJSON(data, t.OwnerWithInclude);
     const ownerRepo = new OwnerRepository();
-    const updatedOwner = owner.calculateOwnerValidStatus(false);
+    const updatedOwner = owner.calculateOwnerValidStatus();
     if (updatedOwner.status !== owner.status) {
       return ownerRepo.save(updatedOwner, false);
     }
