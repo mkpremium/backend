@@ -1,6 +1,7 @@
 import debug from 'debug';
 import multer from 'multer';
 import uuid from 'uuid/v4';
+import _ from 'lodash';
 import {wrap} from 'express-promise-wrap';
 import {compose} from 'compose-middleware';
 import {mailer, storage} from '../../config';
@@ -15,7 +16,10 @@ async function sendMessage(message) {
   debugEmail('sendMessage', 'success', info, mailer.info(info));
 }
 
-function createMessage(from, to, subject, body, attachment, cc, cco) {
+function createMessage(from, data, attachment) {
+
+  const {to, subject, text, html, cc, cco} = t.EmailBody(data);
+
   if (!from) {
     throw newHttpError(409, 'No tiene email configurado comuníquese con su administrador');
   }
@@ -23,10 +27,9 @@ function createMessage(from, to, subject, body, attachment, cc, cco) {
   const attachments = [];
   if (attachment) {
     attachments.push({
-      filename: `${attachment.filename}-${attachment.originalname}`,
+      filename: attachment.originalname,
       path: attachment.path,
-      contentType: attachment.mimetype,
-      cid: uuid()
+      contentType: attachment.mimetype
     });
   }
 
@@ -36,8 +39,8 @@ function createMessage(from, to, subject, body, attachment, cc, cco) {
     bcc: cco,
     from,
     subject,
-    text: body,
-    html: body,
+    html,
+    text,
     attachments
   };
 
@@ -46,9 +49,8 @@ function createMessage(from, to, subject, body, attachment, cc, cco) {
 }
 
 async function createEmail(req, res) {
-  const {to, subject, body, cc, cco} = t.EmailBody(req.body);
   const from = req.user.operator.profile.email;
-  const message = createMessage(from, to, subject, body, req.file, cc, cco);
+  const message = createMessage(from, req.body || {}, req.file);
   await sendMessage(message);
   res.status(201).send();
 }
