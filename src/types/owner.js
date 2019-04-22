@@ -150,7 +150,7 @@ t.Person = t.struct(
     firstName: t.maybe(t.String),
     firstSurname: t.maybe(t.String),
     secondSurname: t.maybe(t.String),
-    documentNumber: t.maybe(t.String), // Note: unique
+    documentNumber: t.maybe(t.String), // Note: make unique one day
 
     contacts: t.list(t.TypedContactInfo),
     addresses: t.list(t.SimpleAddress),
@@ -165,7 +165,9 @@ t.Person = t.struct(
 
     _migrateId: t.maybe(t.String),
     _migrateOwnerId: t.maybe(t.String),
-    _relatedTo: t.maybe(t.String)
+    _relatedTo: t.maybe(t.String),
+    _secondMigration: t.maybe(t.Boolean),
+    _verifiedOwnerMigrateId: t.maybe(t.String)
   },
   {
     name: 'Person',
@@ -174,7 +176,13 @@ t.Person = t.struct(
       addresses: [],
       gender: 'NINGUNO',
       _documentType: 'person',
-      personType: 'NATURAL'
+      personType: 'NATURAL',
+      _secondMigration: false,
+      birthDate: null,
+      birthYear: null,
+      _migrateId: null,
+      _address: null,
+      _verifiedOwnerMigrateId: null
     }
   }
 );
@@ -250,7 +258,9 @@ export const Owner = t.Owner = t.struct(
 
     _migrateId: t.maybe(t.Any),
     _relatedTo: t.maybe(t.String),
-    _documentType: t.String
+    _documentType: t.String,
+    _secondMigration: t.maybe(t.Boolean),
+    _verifiedMigrateId: t.maybe(t.String)
   },
   {
     name: 'Owner',
@@ -262,7 +272,10 @@ export const Owner = t.Owner = t.struct(
       status: 'NO_VERIFICADO',
       _documentType: 'owner',
       _relatedTo: '',
-      _migrateId: null
+      _migrateId: null,
+      business: null,
+      _secondMigration: false,
+      _verifiedMigrateId: null
     }
   }
 );
