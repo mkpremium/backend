@@ -127,7 +127,8 @@ t.TypedContactInfo = t.struct(
         return uuid();
       },
       type: 'TELEFONO',
-      status: 'UNDEFINED'
+      status: 'UNDEFINED',
+      note: null
     }
   }
 );
