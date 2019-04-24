@@ -8,6 +8,8 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
+import {OwnerRepository} from '../../owner/models';
+import {OwnerStatus} from '../../types/enums';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -17,6 +19,14 @@ function arrayToObjectIds(collection) {
     objectIds[item.id] = true;
   });
   return objectIds;
+}
+
+function arrayToObject(collection) {
+  const objects = {};
+  collection.forEach(item => {
+    objects[item.id] = item;
+  });
+  return objects;
 }
 
 export async function updateBuildingToFirebase(building, owner) {
@@ -68,6 +78,15 @@ export async function saveBuildingToFirebase_(building, owner) {
   }
 }
 
+/**
+ * Finds owners related to the buildingId given which status is VERIFICADO
+ * @returns {Promise<void>}
+ */
+async function findVerifiedOwners(buildingId) {
+  const ownerRepository = new OwnerRepository();
+  return ownerRepository.findAllByBuildingId(buildingId, OwnerStatus.VERIFIED);
+}
+
 export async function saveBuildingToFirebase(db, building, owner) {
   if (!fbComerciales.enabled) {
     debugFb('saveBuildingToFirebase', 'building omitted to save into firebase, because fbComerciales.enabled =', fbComerciales.enabled);
@@ -100,6 +119,12 @@ export async function saveBuildingToFirebase(db, building, owner) {
     promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding));
     if (owner) {
       promises.push(comercialBuildingRef.child('Owner').set(owner));
+    }
+    
+    const owners = await findVerifiedOwners(building.id);
+    if (owners && owners.length) {
+      debugFb('saveBuildingToFirebase', 'saving verifiedOwners');
+      promises.push(comercialBuildingRef.child('VerifiedOwners').set(arrayToObject(owners)));
     }
   }
 

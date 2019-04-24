@@ -1,6 +1,8 @@
 import request from 'supertest';
+import {resolve} from 'path';
 import app from '../../../src/app';
 import {PersonRepository} from '../../../src/owner/models';
+import {MigrateModel} from '../../../src/migration/lib/migrate-model';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
 import WorksheetHelper from '../../helpers/worksheet';
 import _ from 'lodash';
@@ -20,10 +22,6 @@ describe('owner-contact.routes', () => {
     await operatorCreateManager();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
-    /* const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
-    const results = await migrate.run();
-    person = results.find(o => o.contacts && o.contacts.length > 0);
-    owner = results.find(o => o.personId === person.id); */
   });
 
   describe('Update owner contact', () => {
@@ -33,7 +31,7 @@ describe('owner-contact.routes', () => {
       const owner = worksheetAndOwner.owner;
       const person = await OwnerHelper.findOwnerPerson(owner.personId);
       const contactId = person.contacts[0].id;
-
+      
       await request(app)
         .put(`/owners/${owner.id}/contacts/${contactId}`)
         .set('Authorization', authenticatedOperator.authorization)
