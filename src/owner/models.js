@@ -234,10 +234,19 @@ export class OwnerRepository extends Owner {
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
+  
+  
 
   async createOwnerAndPerson(body) {
     const ownerBody = t.OwnerBody(body);
     const personRepo = new PersonRepository();
+    const buildingRepository = new BuildingRepository();
+    const buildingId = ownerBody.buildingId;
+    let building;
+    
+    if (buildingId) {
+      building = await buildingRepository.findByIdOrThrow(buildingId);
+    }
 
     const person = _isEmpty(ownerBody.person)
       ? await personRepo.findByIdOrThrow(ownerBody.personId)
@@ -247,7 +256,15 @@ export class OwnerRepository extends Owner {
     body.name = person.fullName();
     delete body.person;
 
-    return this.save(body);
+    const owner = await this.save(body);
+    
+    if (building) {
+      const worksheetRepository = new WorksheetRepository();
+      const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId);
+      await worksheetRepository.addOnlyOwner(worksheet, owner);
+    }
+    
+    return owner;
   }
 
   async update(ownerId, data = {}, operatorId) {
