@@ -4,11 +4,10 @@ import {OwnerRepository, PersonRepository} from '../../src/owner/models';
 import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import Promise from 'bluebird';
 import {WorkSheetStatus} from '../../src/types/worksheet';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _ from 'lodash';
-import {N1qlQuery} from "couchbase";
+import {N1qlQuery} from 'couchbase';
 
 const debugMigrate = debug('app:migration:portugal:contacts');
 

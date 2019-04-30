@@ -2,9 +2,7 @@
 import program from 'commander';
 import fs from 'fs-extra';
 import couchbase from '../src/db/couchbase';
-import {validateHeaders} from './lib';
-import {migratePersons} from './lib/migrate-persons';
-import {migrate} from "./lib/migrate-portugal";
+import {migrate} from './lib/migrate-portugal';
 
 // region main entry
 program
@@ -44,4 +42,5 @@ async function validateFile(inputFile) {
     throw new Error(`'${inputFile} doesn't exist or cannot be read`);
   }
 }
+
 // endregion

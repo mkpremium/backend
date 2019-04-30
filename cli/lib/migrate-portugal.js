@@ -72,10 +72,10 @@ export async function migrate(inputFile) {
   const buildingWithErrors = [];
   await csvToJSON(inputFile, doOnEachRow);
 
-  async function doOnEachRow(personRecord) {
+  async function doOnEachRow(personRecord, row) {
     const input = Input(removeNullValues(cleanObjectKeys(personRecord)));
     try {
-      await processBuilding(input);
+      await processBuilding(input, row);
     } catch (error) {
       console.error(error, ' in record with id_finca:', input.id_finca);
       buildingWithErrors.push({
@@ -92,21 +92,24 @@ export async function migrate(inputFile) {
 /**
  *
  * @param input - csv row data
+ * @param row
  * @returns {Promise<void>}
  */
-async function processBuilding(input) {
-  debugMigrate('\n[NEW ROW] Process Building record with id_finca:', input.id_finca);
+async function processBuilding(input, row) {
+  console.time('processBuilding');
+  debugMigrate(`\n[NEW ROW ${row}] Process Building record with id_finca:`, input.id_finca);
   const catastro = getFieldNotNull(input, 'id_finca');
 
   if (catastro) {
     const building = await findBuilding(catastro);
     if (building) {
       debugMigrate(`Building found...skip row with catastro:`, catastro);
-      throw new Error(`Building already existed.`);
+      await checkAndAddOwners(building, input);
     } else {
       debugMigrate(`Building not found, proceed to create building, worksheet, person and owner...`);
       await createAll(input);
       debugMigrate('\nProcess ended for building record with catastro / id_finca:', input.id_finca);
+      console.timeEnd('processBuilding');
     }
   }
 }
@@ -126,8 +129,6 @@ async function getGeoData(input) {
     let latitude = 0;
     let longitude = 0;
     const result = await requester.get(url, {params: {address}});
-
-    debugMigrate('geo data', 'requester OK', JSON.stringify(result.data, null, 2));
 
     if (result.data) {
       const data = _.first(result.data.results);
@@ -163,6 +164,7 @@ function axiosException(err) {
 
   return [];
 }
+
 /**
  * Creates building, worksheet, owner and person.
  * @param input
@@ -172,9 +174,6 @@ async function createAll(input) {
   const ownerRepository = new OwnerRepository();
   const personRepository = new PersonRepository();
   const {owners, building, worksheet} = await generateObjects(input);
-  console.log('owners', owners);
-  console.log('building', building);
-  console.log('worksheet', worksheet);
 
   debugMigrate('Creating building with id:', building.id);
   const buildingRepository = new BuildingRepository();
@@ -190,6 +189,48 @@ async function createAll(input) {
 
     await ownerRepository.save(ownerAndPerson.owner);
     debugMigrate('Created owner with id: ', ownerAndPerson.owner.id);
+  });
+}
+
+async function checkAndAddOwners(building, input) {
+  const worksheetRepo = new WorksheetRepository();
+  const ownerRepository = new OwnerRepository();
+  const personRepository = new PersonRepository();
+  const {owners} = await generateObjects(input, building);
+
+  const worksheet = await worksheetRepo.findWorksheetByBuilding(building.id);
+  const worksheetWithOwners = await worksheetRepo.findByIdWIthIncludes(worksheet.id);
+
+  debugMigrate(`Checking owners [${owners.length}] for existent : ${building.id}`);
+
+  function newAddOwner(owner) {
+    function inRelatedOwners(relatedOwner) {
+      return !_.isEmpty(relatedOwner.person.documentNumber) &&
+        !_.isEmpty(owner.person.documentNumber) &&
+        relatedOwner.person.documentNumber === owner.person.documentNumber;
+    }
+
+    if (worksheetWithOwners.relatedOwners.length === 0) {
+      return true;
+    }
+
+    return !worksheetWithOwners.relatedOwners.find(inRelatedOwners);
+  }
+
+  if (owners.length === 0) {
+    return;
+  }
+
+  await Promise.map(owners, async(ownerAndPerson) => {
+    if (newAddOwner(ownerAndPerson.owner)) {
+      await ownerRepository.save(ownerAndPerson.owner);
+      debugMigrate('Created owner with id:', ownerAndPerson.owner.id);
+
+      await personRepository.save(ownerAndPerson.person);
+      debugMigrate('Created person with id:', ownerAndPerson.person.id);
+    } else {
+      debugMigrate('Skipping owner/person documentNumber:', ownerAndPerson.person.documentNumber);
+    }
   });
 }
 
@@ -210,9 +251,10 @@ const number = value => {
 /**
  *
  * @param input
+ * @param previousBuilding
  * @returns {Promise<{owners: Array, building: *, worksheet: *}>}
  */
-async function generateObjects(input) {
+async function generateObjects(input, previousBuilding) {
   const buildingId = uuid();
   const owners = [];
 
@@ -235,7 +277,7 @@ async function generateObjects(input) {
         _migrateId: input.id_finca
       });
 
-      const owner = t.Owner({
+      const owner = t.OwnerWithInclude({
         id: uuid(),
         type: owners.length ? 'SECUNDARIO' : 'PRINCIPAL',
         note: address.fullAddress,
@@ -254,7 +296,19 @@ async function generateObjects(input) {
     }
   }
 
-  const geodata = await getGeoData(input);
+  async function cachedGeoData() {
+    if (previousBuilding) {
+      return {
+        postalCode: previousBuilding.address.postalCode.number,
+        latitude: previousBuilding.location.lat,
+        longitude: previousBuilding.location.lat
+      };
+    }
+
+    return getGeoData(input);
+  }
+
+  const geoData = await cachedGeoData();
   let relatedTo = '';
   let ownerForBuilding = null;
   let ownerId = null;
@@ -281,7 +335,7 @@ async function generateObjects(input) {
       number: number(input.no),
       fullAddress,
       postalCode: {
-        number: (geodata && geodata.postalCode) || null
+        number: (geoData && geoData.postalCode) || null
       },
       city: input.ciudad,
       province: input.provincia || input.ciudad,
@@ -295,8 +349,8 @@ async function generateObjects(input) {
       address: fullAddress
     },
     location: {
-      lat: (geodata && geodata.latitude) || 0,
-      lng: (geodata && geodata.longitude) || 0
+      lat: (geoData && geoData.latitude) || 0,
+      lng: (geoData && geoData.longitude) || 0
     },
     ownerId: ownerId,
     owner: ownerForBuilding,
