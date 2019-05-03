@@ -14,6 +14,8 @@ npx babel ./ \
   --copy-files \
   --ignore node_modules,development,docker,iml,lock
 
+rm -rf ./build/{.git,.circleci,.idea}
+
 # Node setup
 cp ./.nvmrc ./build/
 

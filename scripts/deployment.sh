@@ -74,7 +74,7 @@ tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > /dev/null
 cd ${deploy_dir}
 nvm install
 npm ci
-pm2 reload --update-env ${app_name}-pm2.json
+type pm2 2> /dev/null && pm2 reload --update-env ${app_name}-pm2.json
 EOF
 }
 

@@ -1,5 +1,5 @@
 {
-  "presets": ["@babel/preset-env"],
-  "plugins": ["@babel/transform-runtime"],
+  "presets": ["env"],
+  "plugins": ["transform-runtime", "shebang"],
   "sourceMaps": "both"
 }
