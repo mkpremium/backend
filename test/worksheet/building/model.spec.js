@@ -1,10 +1,12 @@
+import assert from 'assert';
 import {createBuildingWithWorksheet} from '../../../src/worksheet/building/model';
 import {WorkSheetStatus} from '../../../src/types/worksheet';
 import {deleteAll} from '../../common';
 import {WorksheetBuildingHelper} from '../../helpers/worksheet-building';
 import {OperatorHelper} from '../../helpers/operator';
+import {catchError} from '../../helpers/util';
 
-describe('Worksheet/building/model', () => {
+describe('worksheet/building/model', () => {
   const payload = {
     location: {
       lat: 0,
@@ -36,13 +38,13 @@ describe('Worksheet/building/model', () => {
     }
   });
 
-  describe('createBuildingWithWorksheet', () => {
-    function asserts(worksheet) {
-      worksheet.should.be.an('object');
-      worksheet.id.should.not.equal(null);
-      worksheet.status.should.equal(WorkSheetStatus.INVALID);
-    }
+  function asserts(worksheet) {
+    worksheet.should.be.an('object');
+    worksheet.id.should.not.equal(null);
+    worksheet.status.should.equal(WorkSheetStatus.INVALID);
+  }
 
+  describe('createBuildingWithWorksheet', () => {
     beforeEach(async() => deleteAll());
 
     it('create building with worksheet by placeId', async() => {
@@ -50,16 +52,40 @@ describe('Worksheet/building/model', () => {
       asserts(worksheet);
     });
 
+    it('create building with worksheet by cadastre reference', async() => {
+      const worksheet = await createBuildingWithWorksheet(payloadWithCadastre);
+      asserts(worksheet);
+    });
+
+    it('doesnt allow create building with duplicate placeId', async() => {
+      await createBuildingWithWorksheet(payloadWithPlaceId);
+
+      const {error} = await catchError(createBuildingWithWorksheet(payloadWithPlaceId));
+
+      if (!error) {
+        assert.fail('Should not allow save duplicate');
+      }
+    });
+
+    it('doesnt allow create building with duplicate cadastre reference', async() => {
+      await createBuildingWithWorksheet(payloadWithCadastre);
+
+      const {error} = await catchError(() => createBuildingWithWorksheet(payloadWithCadastre));
+
+      if (!error) {
+        assert.fail('Should not allow save duplicate');
+      }
+    });
+  });
+
+  describe('POST /worksheets/buildings', () => {
+    beforeEach(async() => deleteAll());
+
     it('create building with worksheet by placeId (API)', async() => {
       const authenticatedOperator = await OperatorHelper.createAndLogin();
       const worksheet = await WorksheetBuildingHelper
         .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithPlaceId);
 
-      asserts(worksheet);
-    });
-
-    it('create building with worksheet by cadastre reference', async() => {
-      const worksheet = await createBuildingWithWorksheet(payloadWithCadastre);
       asserts(worksheet);
     });
 
