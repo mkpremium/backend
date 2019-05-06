@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import uuid from 'uuid/v4';
 import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import debug from 'debug';
@@ -20,7 +21,7 @@ import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
 import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
-import {WorkSheetStatus} from '../../types/worksheet';
+import {Worksheet, WorkSheetStatus} from '../../types/worksheet';
 import {
   isAllowedChangeState,
   ownerNoSale,
@@ -34,6 +35,7 @@ import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
 import {BuildingState} from '../../types/enums';
 import {WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse} from '../types';
 import _map from 'lodash/map';
+import {emitModelEvents} from '../../../config';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -53,93 +55,14 @@ function canRegisterVerified(worksheet, newStatus, operatorId) {
   return true;
 }
 
-export class Worksheet extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = t.WorkSheet;
-  }
-}
-
 const WorksheetStatsParams = t.struct({
   city: t.maybe(t.String)
 });
 
-export class WorksheetRepository extends Worksheet {
-  async countWorksheetsInSource(source) {
-    const bucket = this.getBucketName();
-    const sourceFilter = [];
-    Object.keys(source).forEach(key => {
-      const value = source[key];
-      if (!_isNil(value)) {
-        sourceFilter.push(`t.buildingAddress.${key} IS NOT MISSING`);
-        sourceFilter.push(`t.buildingAddress.${key} = ${JSON.stringify(value)}`);
-      }
-    });
-    const filter = sourceFilter.length > 0
-      ? 'AND ' + sourceFilter.join(' AND ')
-      : '';
-
-    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
-    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`;
-    const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
-    return _get(results, '0.count', 0);
-  }
-
-  async worksheetStats(args = {}) {
-    const params = WorksheetStatsParams(args);
-    const bucket = this.getBucketName();
-    const query = _isNil(params.city)
-      ? `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-GROUP BY t.status`
-      : `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-LET building = (SELECT RAW p FROM ${bucket} p USE KEYS t.relatedBuildingIds[0] WHERE p.id = t.relatedBuildingIds[0] LIMIT 1)
-WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-AND LOWER(building[0].address.city) = LOWER('${params.city}')
-GROUP BY t.status`;
-
-    const result = await this.queryRaw(N1qlQuery.fromString(query));
-    const totals = {};
-
-    Object.values(WorkSheetStatus).forEach(status => {
-      const total = _find(result, {status}) || {count: 0};
-      totals[status] = total.count;
-    });
-
-    return totals;
-  }
-
-  async _findBySourceAndReference(source, worksheetIndex) {
-    const qb = this.getQueryBuilder()
-      .where('queueId IS NULL')
-      .where(`status = 'OPEN' OR status = 'LOOKING_MEETING'`)
-      .order('t.worksheetIndex')
-      .limit(1);
-
-    Object.keys(source).forEach(key => {
-      const value = source[key];
-      if (!_isNil(value)) {
-        qb.where(`t.buildingAddress.${key} IS NOT MISSING`);
-        qb.where(`t.buildingAddress.${key} = ?`, value);
-      }
-    });
-
-    if (worksheetIndex) {
-      qb.where('t.worksheetIndex IS NOT MISSING');
-      qb.where('t.worksheetIndex > ?', worksheetIndex);
-    }
-
-    try {
-      const promise = Promise.resolve(this.query(qb));
-      const result = await promise.timeout(3000);
-      return result;
-    } catch (e) {
-      if (e instanceof Promise.TimeoutError) {
-        return Promise.resolve(this.query(qb)).timeout(3000);
-      } else {
-        throw e;
-      }
-    }
+export class WorksheetRepository extends CouchbaseModel {
+  constructor() {
+    super();
+    this.Struct = t.WorkSheet;
   }
 
   async findBySource({source, worksheetIndex}) {
@@ -187,6 +110,24 @@ GROUP BY t.status`;
     const qb = meetingRepo.getQueryBuilder();
     qb.where('event.worksheetId = ?', worksheetId);
     return meetingRepo.query(qb);
+  }
+
+  async findWorksheetByBuilding(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId);
+
+    const results = await this.query(qb);
+
+    return fromJSON(_head(results), t.WorkSheet);
+  }
+
+  async findWorksheetByOwner(ownerId) {
+    const qb = this.getQueryBuilder()
+      .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId);
+
+    const results = await this.query(qb);
+
+    return _head(results);
   }
 
   async calculateNewStatus(worksheet) {
@@ -252,21 +193,6 @@ GROUP BY t.status`;
     }
   }
 
-  static async canUpdateOwner(owner, updatedOwner) {
-    const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findWorksheetByOwner(owner.id);
-    if (worksheet && worksheet.status === WorkSheetStatus.WITH_OWNER && owner.isPrimaryVerified()) {
-      if (!isAllowedChangeState(updatedOwner)) {
-        throw newHttpError(
-          422,
-          `No se puede actualizar el owner. Es "${owner.type}" y fue verificado (${owner.confirmedByOperator})`
-        );
-      }
-    }
-
-    return true;
-  }
-
   async updateStatus(worksheetId, operatorId) {
     const worksheetData = await this.findByIdWIthIncludes(worksheetId);
     const worksheet = fromJSON(worksheetData, t.WorkSheet);
@@ -282,6 +208,7 @@ GROUP BY t.status`;
     return savedWorksheet;
   }
 
+  // noinspection JSUnusedGlobalSymbols
   async shouldMarkBuildingAndRequestMoreInfo(worksheet) {
     const shouldContinue = worksheet.status === WorkSheetStatus.INVALID;
     worksheetDebug('shouldMarkBuildingAndRequestMoreInfo', worksheet.id, shouldContinue);
@@ -308,6 +235,78 @@ GROUP BY t.status`;
     }
   }
 
+  async addOwner(worksheet, owner) {
+    const updatedWorksheet = t.update(worksheet, {
+      relatedBuildingIds: {
+        $set: _uniq(worksheet.relatedBuildingIds.concat([owner.buildingId]))
+      },
+      relatedOwnerIds: {
+        $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
+      }
+    });
+
+    return this.save(updatedWorksheet);
+  }
+
+  async worksheetStats(args = {}) {
+    const params = WorksheetStatsParams(args);
+    const bucket = this.getBucketName();
+    const query = _isNil(params.city)
+      ? `SELECT t.status, COUNT(*) as count FROM ${bucket} t
+WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
+GROUP BY t.status`
+      : `SELECT t.status, COUNT(*) as count FROM ${bucket} t
+LET building = (SELECT RAW p FROM ${bucket} p USE KEYS t.relatedBuildingIds[0] WHERE p.id = t.relatedBuildingIds[0] LIMIT 1)
+WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
+AND LOWER(building[0].address.city) = LOWER('${params.city}')
+GROUP BY t.status`;
+
+    const result = await this.queryRaw(N1qlQuery.fromString(query));
+    const totals = {};
+
+    Object.values(WorkSheetStatus).forEach(status => {
+      const total = _find(result, {status}) || {count: 0};
+      totals[status] = total.count;
+    });
+
+    return totals;
+  }
+
+  async countWorksheetsInSource(source) {
+    const bucket = this.getBucketName();
+    const sourceFilter = [];
+    Object.keys(source).forEach(key => {
+      const value = source[key];
+      if (!_isNil(value)) {
+        sourceFilter.push(`t.buildingAddress.${key} IS NOT MISSING`);
+        sourceFilter.push(`t.buildingAddress.${key} = ${JSON.stringify(value)}`);
+      }
+    });
+    const filter = sourceFilter.length > 0
+      ? 'AND ' + sourceFilter.join(' AND ')
+      : '';
+
+    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
+    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`;
+    const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
+    return _get(results, '0.count', 0);
+  }
+
+  static async canUpdateOwner(owner, updatedOwner) {
+    const worksheetRepo = new WorksheetRepository();
+    const worksheet = await worksheetRepo.findWorksheetByOwner(owner.id);
+    if (worksheet && worksheet.status === WorkSheetStatus.WITH_OWNER && owner.isPrimaryVerified()) {
+      if (!isAllowedChangeState(updatedOwner)) {
+        throw newHttpError(
+          422,
+          `No se puede actualizar el owner. Es "${owner.type}" y fue verificado (${owner.confirmedByOperator})`
+        );
+      }
+    }
+
+    return true;
+  }
+
   static async notifyWorkSheetChange(worksheetId) {
     const worksheetRepo = new WorksheetRepository();
     await worksheetRepo.sendWorksheetEvent(worksheetId);
@@ -326,35 +325,19 @@ GROUP BY t.status`;
     }
   }
 
-  async findWorksheetByBuilding(buildingId) {
-    const qb = this.getQueryBuilder()
-      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId);
-
-    const results = await this.query(qb);
-
-    return fromJSON(_head(results), t.WorkSheet);
-  }
-
-  async findWorksheetByOwner(ownerId) {
-    const qb = this.getQueryBuilder()
-      .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId);
-
-    const results = await this.query(qb);
-
-    return _head(results);
-  }
-
-  async addOwner(worksheet, owner) {
-    const updatedWorksheet = t.update(worksheet, {
-      relatedBuildingIds: {
-        $set: _uniq(worksheet.relatedBuildingIds.concat([owner.buildingId]))
-      },
-      relatedOwnerIds: {
-        $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
-      }
+  static async createNewForBuilding(building) {
+    const worksheet = Worksheet({
+      id: uuid(),
+      _relatedTo: _get(building, 'owner.name'),
+      relatedBuildingIds: [building.id],
+      relatedOwnerIds: [],
+      buildingAddress: building.address,
+      status: WorkSheetStatus.INVALID,
+      queueId: null
     });
+    const repo = new WorksheetRepository();
 
-    return this.save(updatedWorksheet);
+    return repo.save(worksheet, emitModelEvents);
   }
 
   async preSave(data) {
@@ -368,6 +351,39 @@ GROUP BY t.status`;
       relatedBuildings: {$set: []},
       relatedOwners: {$set: []}
     });
+  }
+
+  async _findBySourceAndReference(source, worksheetIndex) {
+    const qb = this.getQueryBuilder()
+      .where('queueId IS NULL')
+      .where(`status = 'OPEN' OR status = 'LOOKING_MEETING'`)
+      .order('t.worksheetIndex')
+      .limit(1);
+
+    Object.keys(source).forEach(key => {
+      const value = source[key];
+      if (!_isNil(value)) {
+        qb.where(`t.buildingAddress.${key} IS NOT MISSING`);
+        qb.where(`t.buildingAddress.${key} = ?`, value);
+      }
+    });
+
+    if (worksheetIndex) {
+      qb.where('t.worksheetIndex IS NOT MISSING');
+      qb.where('t.worksheetIndex > ?', worksheetIndex);
+    }
+
+    try {
+      const promise = Promise.resolve(this.query(qb));
+      const result = await promise.timeout(3000);
+      return result;
+    } catch (e) {
+      if (e instanceof Promise.TimeoutError) {
+        return Promise.resolve(this.query(qb)).timeout(3000);
+      } else {
+        throw e;
+      }
+    }
   }
 
   async _getNewIndex() {

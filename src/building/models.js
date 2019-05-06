@@ -2,6 +2,7 @@ import t from 'tcomb';
 import debug from 'debug';
 import mime from 'mime-types';
 import fromJSON from 'tcomb/lib/fromJSON';
+import {toJSON} from '../lib/tcomb';
 import _get from 'lodash/get';
 import squel from 'squel';
 import {CouchbaseModel} from '../db/model';
@@ -22,15 +23,10 @@ import {OperatorActions} from '../stats/types';
 import {OperatorStats} from '../stats/models';
 import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
+import {Building} from '../types/building';
+import {emitModelEvents} from '../../config';
 
 const debugBuilding = debug('app:model:building');
-
-export class Building extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = t.Building;
-  }
-}
 
 export class Metadata extends CouchbaseModel {
   constructor() {
@@ -76,7 +72,12 @@ export class MetadataRepository extends Metadata {
 
 }
 
-export class BuildingRepository extends Building {
+export class BuildingRepository extends CouchbaseModel {
+  constructor() {
+    super();
+    this.Struct = t.Building;
+  }
+
   async findByIdOrThrow(buildingId) {
     const building = await this.findById(buildingId);
     if (!building) {
@@ -95,6 +96,24 @@ export class BuildingRepository extends Building {
       .where(expr);
     const [result] = await this.query(qb);
     return result;
+  }
+
+  static async findByPlaceId(placeId) {
+    const repo = new BuildingRepository();
+    const qb = repo.getQueryBuilder()
+      .where('placeId', placeId);
+    const [building] = await repo.query(qb);
+    return building;
+  }
+
+  static async createNewBuilding(data) {
+    const json = toJSON(data);
+    const updatedJson = Object.assign(json, {
+      _migrateId: data.placeId || data.cadastre.reference
+    });
+    const building = Building(updatedJson);
+    const repo = new BuildingRepository();
+    return repo.save(building, emitModelEvents);
   }
 
   async addMetadataToBuilding(building, params) {
@@ -261,13 +280,13 @@ export class BuildingRepository extends Building {
 
     return this.search(qs);
   }
-  
+
   async findById(id) {
     const qb = this.getQueryBuilder().where('t.`id` = ?', id);
     const results = await this.query(qb);
     return results && results.length && _.first(results);
   }
-  
+
   /**
    *
    * @param city
@@ -278,10 +297,10 @@ export class BuildingRepository extends Building {
     const query = `SELECT RAW id  FROM ${bucket} t
                    WHERE t._documentType = 'building' AND t.address.city = '${city}'
                    ORDER BY id`;
-  
+
     return this.queryRaw(N1qlQuery.fromString(query));
   }
-  
+
   /**
    *
    * @param buildingIds
@@ -293,7 +312,7 @@ export class BuildingRepository extends Building {
       .where(`id IN ${ids}`);
     return this.query(qb);
   }
-  
+
   /**
    *
    * @param buildingId
@@ -303,7 +322,7 @@ export class BuildingRepository extends Building {
     const bucket = this.getBucketName();
     const documentType = 'note';
     const query = `SELECT RAW id FROM ${bucket} t WHERE t._documentType = ${JSON.stringify(documentType)} AND t.context.buildingId = ${JSON.stringify(buildingId)}`;
-    
+
     return this.queryRaw(N1qlQuery.fromString(query));
   }
 }
