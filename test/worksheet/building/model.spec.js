@@ -70,7 +70,7 @@ describe('worksheet/building/model', () => {
     it('doesnt allow create building with duplicate cadastre reference', async() => {
       await createBuildingWithWorksheet(payloadWithCadastre);
 
-      const {error} = await catchError(() => createBuildingWithWorksheet(payloadWithCadastre));
+      const {error} = await catchError(createBuildingWithWorksheet(payloadWithCadastre));
 
       if (!error) {
         assert.fail('Should not allow save duplicate');

@@ -11,6 +11,7 @@ import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 import {cleanFirebase} from '../migrations/firebase-clean';
+import {cleanQueue} from '../cli/lib/migrate-utils';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -43,7 +44,8 @@ export async function deleteAll() {
     callUnknownEvents.deleteQuery(),
     stats.deleteQuery(),
     neighborhood.deleteQuery(),
-    city.deleteQuery()
+    city.deleteQuery(),
+    cleanQueue()
   ]);
 }
 
