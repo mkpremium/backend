@@ -4,7 +4,8 @@ import {newHttpError} from '../../lib/http-error';
 import {WorksheetRepository} from '../models/worksheet';
 
 const errorsMessage = {
-  errorBuildingByPlaceId: [400, 'Ya Existe un edificio con el mismo placeId']
+  errorBuildingByPlaceId: [400, 'Ya Existe un edificio con el mismo placeId'],
+  errorBuildingByCadastre: [400, 'Ya Existe un edificio con el mismo cadastre.reference']
 };
 
 /**
@@ -44,5 +45,11 @@ async function createBuildingByPlaceId(input) {
  * @return {Promise<void>}
  */
 async function createBuildingByCadastre(input) {
+  const building = await BuildingRepository.findByCadastre(input.cadastre);
+  if (building) {
+    throw newHttpError(...errorsMessage.errorBuildingByCadastre);
+  }
 
+  const newBuilding = await BuildingRepository.createNewBuilding(input);
+  return WorksheetRepository.createNewForBuilding(newBuilding);
 }

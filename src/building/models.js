@@ -106,6 +106,15 @@ export class BuildingRepository extends CouchbaseModel {
     return building;
   }
 
+  static async findByCadastre(cadastre) {
+    const repo = new BuildingRepository();
+    const qb = repo.getQueryBuilder()
+      .where('cadastre IS NOT MISSING')
+      .where('cadastre.reference', cadastre.reference);
+    const [building] = await repo.query(qb);
+    return building;
+  }
+
   static async createNewBuilding(data) {
     const json = toJSON(data);
     const updatedJson = Object.assign(json, {
