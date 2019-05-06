@@ -11,7 +11,15 @@ const options = {
     resolve(__dirname, '../**/*.js')
   ]
 };
-const specs = swaggerJSDoc(options);
+
+let specs;
+
+try {
+  specs = swaggerJSDoc(options);
+} catch (e) {
+  console.error(e.mark);
+  throw e;
+}
 
 function apiJSON(req, res) {
   res.setHeader('Content-Type', 'application/json');
