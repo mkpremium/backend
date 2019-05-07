@@ -29,11 +29,26 @@ describe('worksheet/building/model', () => {
   };
 
   const payloadWithPlaceId = Object.assign({}, payload, {
-    placeId: 'aaaabbbcccc00045'
+    placeId: 'aaaabbbcccc00045',
+    cadastre: {
+      reference: null,
+      address: null
+    }
+  });
+
+  const payloadWithPlaceId2 = Object.assign({}, payload, {
+    placeId: 'aaaabbbcccc00046'
   });
   const payloadWithCadastre = Object.assign({}, payload, {
     cadastre: {
       reference: 'aaaabbbbbbcccc',
+      address: 'TV 44 # 100 - 82'
+    }
+  });
+
+  const payloadWithCadastre2 = Object.assign({}, payload, {
+    cadastre: {
+      reference: 'aaaabbbbbbdddd',
       address: 'TV 44 # 100 - 82'
     }
   });
@@ -57,6 +72,11 @@ describe('worksheet/building/model', () => {
       asserts(worksheet);
     });
 
+    it('create more than one building with worksheet by placeId', async() => {
+      await createBuildingWithWorksheet(payloadWithPlaceId);
+      await createBuildingWithWorksheet(payloadWithPlaceId2);
+    });
+
     it('doesnt allow create building with duplicate placeId', async() => {
       await createBuildingWithWorksheet(payloadWithPlaceId);
 
@@ -75,6 +95,11 @@ describe('worksheet/building/model', () => {
       if (!error) {
         assert.fail('Should not allow save duplicate');
       }
+    });
+
+    it('create more than one building with worksheet by cadastre reference', async() => {
+      await createBuildingWithWorksheet(payloadWithCadastre);
+      await createBuildingWithWorksheet(payloadWithCadastre2);
     });
   });
 

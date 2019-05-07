@@ -101,7 +101,9 @@ export class BuildingRepository extends CouchbaseModel {
   static async findByPlaceId(placeId) {
     const repo = new BuildingRepository();
     const qb = repo.getQueryBuilder()
-      .where('placeId', placeId);
+      .where('placeId IS NOT MISSING')
+      .where('placeId = ?', placeId)
+      .limit(1);
     const [building] = await repo.query(qb);
     return building;
   }
@@ -110,7 +112,8 @@ export class BuildingRepository extends CouchbaseModel {
     const repo = new BuildingRepository();
     const qb = repo.getQueryBuilder()
       .where('cadastre IS NOT MISSING')
-      .where('cadastre.reference', cadastre.reference);
+      .where('cadastre.reference = ?', cadastre.reference)
+      .limit(1);
     const [building] = await repo.query(qb);
     return building;
   }
