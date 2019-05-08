@@ -12,6 +12,7 @@ import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 import {cleanFirebase} from '../migrations/firebase-clean';
 import {cleanQueue} from '../cli/lib/migrate-utils';
+import {CadastreRepository} from '../src/cadastre/models';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -27,6 +28,7 @@ export async function deleteAll() {
   const stats = new OperatorStats();
   const neighborhood = new NeighborhoodRepository();
   const city = new CityRepository();
+  const cadastre = new CadastreRepository();
 
   await OperatorRepository._promiseBucket;
 
@@ -45,6 +47,7 @@ export async function deleteAll() {
     stats.deleteQuery(),
     neighborhood.deleteQuery(),
     city.deleteQuery(),
+    cadastre.deleteQuery(),
     cleanQueue()
   ]);
 }
