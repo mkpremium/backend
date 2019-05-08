@@ -27,7 +27,9 @@ export class CadastreRepository extends CouchbaseModel {
     }
 
     const provinces = await this.api.fetchProvinces();
-    await this.saveToExpire(cacheKey, provinces);
+    if (provinces.length > 0) {
+      await this.saveToExpire(cacheKey, provinces);
+    }
 
     return provinces;
   }
@@ -40,7 +42,9 @@ export class CadastreRepository extends CouchbaseModel {
     }
 
     const cities = await this.api.fetchCities(province);
-    await this.saveToExpire(cities);
+    if (cities.length > 0) {
+      await this.saveToExpire(cities);
+    }
 
     return cities;
   }
@@ -53,7 +57,9 @@ export class CadastreRepository extends CouchbaseModel {
     }
 
     const streets = await this.api.fetchStreets(province, city);
-    await this.saveToExpire(cacheKey, streets);
+    if (streets.length > 0) {
+      await this.saveToExpire(cacheKey, streets);
+    }
 
     return streets;
   }
