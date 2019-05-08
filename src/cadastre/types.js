@@ -16,21 +16,57 @@ export const CadastreCache = tcomb.struct(
 );
 
 export const CadastreStreetType = tcomb.enums.of(Object.keys(streetTypes));
+
+/**
+ * @swagger
+ * definitions:
+ *   CadastreStreet:
+ *     properties:
+ *       type:
+ *         type: string
+ *         description: Tipo de via
+ *       name:
+ *         type: string
+ *         description: Nombre de la via
+ */
 export const CadastreStreet = tcomb.struct(
   {
     type: CadastreStreetType,
-    name: tcomb.String,
-    number: tcomb.String
+    name: tcomb.String
   },
   {
     name: 'CadastreStreet'
   }
 );
+
+/**
+ * @swagger
+ * definitions:
+ *   CadastreAddressInput:
+ *     properties:
+ *       province:
+ *         type: string
+ *       city:
+ *         type: string
+ *       street:
+ *         $ref: "#/definitions/CadastreStreet"
+ *         description: "Puede un elemento obtenido del endpoint de cadastre/streets"
+ *       number:
+ *         type: string
+ *   CadastreAddress:
+ *     properties:
+ *       location:
+ *         $ref: "#/definitions/Location"
+ *       address:
+ *         $ref: "#/definitions/Address"
+ *
+ */
 export const CadastreAddressInput = tcomb.struct(
   {
     province: tcomb.String,
     city: tcomb.String,
-    street: CadastreStreet
+    street: CadastreStreet,
+    number: tcomb.String
   },
   {
     name: 'NormalizedAddress'
