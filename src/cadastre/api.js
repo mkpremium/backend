@@ -5,6 +5,7 @@ import axiosCadastreClient from '../banks/lib/catastro/axios';
 import {parseCoords} from './coord-parser';
 import {keys, streetTypes, templates, urls} from './constants';
 import {cadastrewaitTimeMS} from '../../config';
+import {newHttpError} from '../lib/http-error';
 
 export class CadastreApi {
   constructor(fakeData = {}) {
@@ -70,6 +71,10 @@ export class CadastreApi {
     const xml = await this.fetchXml(keys.BY_CADASTRE, params);
     const result = camaro(xml, templates[keys.BY_CADASTRE]);
 
+    if (result.error) {
+      throw newHttpError(500, 'Catastro api: ' + result.error);
+    }
+
     return parseCoords(result);
   }
 
@@ -77,7 +82,12 @@ export class CadastreApi {
    * @private
    */
   static parseXmlItems(xml, templateKey) {
-    const {items} = camaro(xml, templates[templateKey]);
+    const {items, error} = camaro(xml, templates[templateKey]);
+
+    if (error) {
+      throw newHttpError(500, 'Catastro api: ' + error);
+    }
+
     return items;
   }
 

@@ -114,29 +114,34 @@ export const templates = {
     items: ['//prov', {
       id: 'cpine',
       name: 'np'
-    }]
+    }],
+    error: '//err/des'
   },
   [keys.CITIES]: {
     items: ['//muni', {
       id: 'loine/cm',
       name: 'nm'
-    }]
+    }],
+    error: '//err/des'
   },
   [keys.STREET]: {
     items: ['//calle', {
       id: 'dir/cv',
       type: 'dir/tv',
       name: 'dir/nv'
-    }]
+    }],
+    error: '//err/des'
   },
   [keys.BY_ADDRESS]: {
     first: '//pc/pc1',
     second: '//pc/pc2',
-    third: '//pc/car'
+    third: '//pc/car',
+    error: '//err/des'
   },
   [keys.BY_CADASTRE]: {
     srs: '//geo/srs',
     xcen: '//geo/xcen',
-    ycen: '//geo/ycen'
+    ycen: '//geo/ycen',
+    error: '//err/des'
   }
 };
