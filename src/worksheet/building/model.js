@@ -18,10 +18,10 @@ export async function createBuildingWithWorksheet(data = {}) {
   const input = CreateBuildingInput(data);
 
   if (BuildingByPlaceId.is(input)) {
-    return createBuildingByPlaceId(input);
+    return createBuildingByPlaceId(data);
   }
 
-  return createBuildingByCadastre(input);
+  return createBuildingByCadastre(data);
 }
 
 /**
