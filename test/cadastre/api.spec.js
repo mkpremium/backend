@@ -52,19 +52,116 @@ describe('cadastre/api', () => {
     });
   });
 
-  describe('fetchCadastreByAddress', () => {
+  describe('fetchBuildingByAddress', () => {
     it('able to fetch cadastre by using normalized building address', async() => {
-      const reference = await api.fetchCadastreByAddress({
-        province: 'BARCELONA',
-        city: 'L\'HOSPITALET DE LLOBREGAT',
+      const resultBuilding = await api.fetchBuildingByAddress({
+        province: 'MADRID',
+        city: 'MADRID',
         street: {
-          type: 'AV',
-          name: 'CARRILET DEL'
+          type: 'PZ',
+          name: 'TIRSO DE MOLINA'
         },
-        number: '50'
+        number: '8'
       });
 
-      reference.should.equal('7398504DF2779G');
+      const building = {
+        'address': {
+          'city': 'MADRID',
+          'fullAddress': 'PZ TIRSO DE MOLINA 8 MADRID',
+          'number': '8',
+          'postalCode': {
+            'number': '28012'
+          },
+          'province': 'MADRID',
+          'street': 'TIRSO DE MOLINA',
+          'type': 'PZ'
+        },
+        'buildingDate': '1900',
+        'cadastre': {
+          'address': 'PZ TIRSO DE MOLINA 8 28012 MADRID (MADRID)',
+          'rc': {
+            'car': '0001',
+            'cc1': 'W',
+            'cc2': 'K',
+            'pc1': '0339101',
+            'pc2': 'VK4703G'
+          },
+          'reference': '0339101VK4703G0001WK'
+        },
+        'coefficient': '100,000000',
+        'elements': {
+          'average': 291.1,
+          'commons': 341,
+          'number': 10
+        },
+        'entities': [
+          {
+            'door': 'DR',
+            'plant': '00',
+            'surface': '282',
+            'type': 'COMERCIO'
+          },
+          {
+            'door': 'IZ',
+            'plant': '00',
+            'surface': '274',
+            'type': 'COMERCIO'
+          },
+          {
+            'door': 'DR',
+            'plant': '01',
+            'surface': '353',
+            'type': 'VIVIENDA'
+          },
+          {
+            'door': 'IZ',
+            'plant': '01',
+            'surface': '245',
+            'type': 'VIVIENDA'
+          },
+          {
+            'door': 'DR',
+            'plant': '02',
+            'surface': '436',
+            'type': 'VIVIENDA'
+          },
+          {
+            'door': 'IZ',
+            'plant': '02',
+            'surface': '162',
+            'type': 'VIVIENDA'
+          },
+          {
+            'door': 'DR',
+            'plant': '03',
+            'surface': '159',
+            'type': 'VIVIENDA'
+          },
+          {
+            'door': '01',
+            'plant': '-1',
+            'surface': '659',
+            'type': 'ALMACEN'
+          },
+          {
+            'door': 'ES',
+            'plant': 'CC',
+            'surface': '156',
+            'type': 'VIVIENDA'
+          },
+          {
+            'door': 'UN',
+            'plant': 'OM',
+            'surface': '185',
+            'type': 'ALMACEN'
+          }
+        ],
+        'landArea': '2911',
+        'propertyType': 'UR',
+        'use': 'Residencial'
+      };
+
+      resultBuilding.should.eql(building);
     });
   });
 

@@ -225,6 +225,9 @@ t.BuildingEntity = t.struct(
     rent: t.maybe(t.Number),
     expiration: t.maybe(t.Date),
 
+    plant: t.maybe(t.String),
+    door: t.maybe(t.String),
+
     _migrateBuildingId: t.maybe(t.String),
     _migrateIdStatus: t.maybe(t.String)
   },

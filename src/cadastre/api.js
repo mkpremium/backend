@@ -6,6 +6,7 @@ import {parseCoords} from './coord-parser';
 import {keys, streetTypes, templates, urls} from './constants';
 import {cadastrewaitTimeMS} from '../../config';
 import {newHttpError} from '../lib/http-error';
+import {calculateElements} from '../building/models';
 
 export class CadastreApi {
   constructor(fakeData = {}) {
@@ -42,22 +43,44 @@ export class CadastreApi {
     return items.map(street => Object.assign({}, street, {typeName: streetTypes[street.type]} || []));
   }
 
-  async fetchCadastreByAddress(address) {
+  async fetchBuildingByAddress(address) {
     const params = {
       Provincia: address.province,
       Municipio: address.city,
-      TipoVia: address.street.type,
-      NomVia: address.street.name,
-      Numero: address.number
+      Sigla: address.street.type,
+      Calle: address.street.name,
+      Numero: address.number,
+      Bloque: '',
+      Escalera: '',
+      Planta: '',
+      Puerta: ''
     };
     const xml = await this.fetchXml(keys.BY_ADDRESS, params);
-    const result = camaro(xml, templates[keys.BY_ADDRESS]);
+    const {building, error} = camaro(xml, templates[keys.BY_ADDRESS]);
 
-    return [
-      _.get(result, 'first', ''),
-      _.get(result, 'second', ''),
-      _.get(result, 'third', '')
+    if (error) {
+      throw newHttpError(500, 'Catastro api: ' + error);
+    }
+
+    building.address.fullAddress = [
+      _.get(building, 'address.type', ''),
+      _.get(building, 'address.street', ''),
+      _.get(building, 'address.number', ''),
+      _.get(building, 'address.city', '')
+    ].join(' ').trim();
+    building.cadastre.reference = [
+      _.get(building, 'cadastre.rc.pc1', ''),
+      _.get(building, 'cadastre.rc.pc2', ''),
+      _.get(building, 'cadastre.rc.car', ''),
+      _.get(building, 'cadastre.rc.cc1', ''),
+      _.get(building, 'cadastre.rc.cc2', '')
     ].join('');
+
+    const commons = building.entities.find(({type}) => type === 'ELEMENTOS COMUNES');
+    building.entities = building.entities.filter(({type}) => type !== 'ELEMENTOS COMUNES');
+    building.elements = calculateElements({commons: Number(commons.surface)}, building.entities);
+
+    return building;
   }
 
   async fetchLocationByCadastre(cadastreReference) {

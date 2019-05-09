@@ -106,7 +106,7 @@ export const urls = {
   [keys.PROVINCES]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaProvincia',
   [keys.CITIES]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaMunicipio',
   [keys.STREET]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaVia',
-  [keys.BY_ADDRESS]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaNumero',
+  [keys.BY_ADDRESS]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/Consulta_DNPLOC',
   [keys.BY_CADASTRE]: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC'
 };
 export const templates = {
@@ -133,9 +133,39 @@ export const templates = {
     error: '//err/des'
   },
   [keys.BY_ADDRESS]: {
-    first: '//pc/pc1',
-    second: '//pc/pc2',
-    third: '//pc/car',
+    building: {
+      cadastre: {
+        rc: {
+          pc1: '//rc/pc1',
+          pc2: '//rc/pc2',
+          car: '//rc/car',
+          cc1: '//rc/cc1',
+          cc2: '//rc/cc2'
+        },
+        address: '//ldt'
+      },
+      address: {
+        number: '//dir/pnp',
+        type: '//dir/tv',
+        street: '//dir/nv',
+        city: '//np',
+        province: '//nm',
+        postalCode: {
+          number: '//dp'
+        }
+      },
+      use: '//debi/luso',
+      propertyType: '//idbi/cn',
+      entities: ['//cons', {
+        surface: 'dfcons/stl',
+        type: 'lcd',
+        plant: 'dt/lourb/loint/pt',
+        door: 'dt/lourb/loint/pu'
+      }],
+      coefficient: '//cpt',
+      landArea: '//sfc',
+      buildingDate: '//ant'
+    },
     error: '//err/des'
   },
   [keys.BY_CADASTRE]: {

@@ -77,26 +77,12 @@ export class CadastreRepository extends CouchbaseModel {
       return cached.value;
     }
 
-    const cadastreReference = await this.api.fetchCadastreByAddress(address);
-    const location = await this.api.fetchLocationByCadastre(cadastreReference);
+    const building = await this.api.fetchBuildingByAddress(address);
+    building.location = await this.api.fetchLocationByCadastre(building.cadastre.reference);
 
-    const fullAddress = `${address.street.type} ${address.street.name} ${address.number}, ${address.city}`;
+    await this.saveToExpire(cacheKey, building);
 
-    const completeInfo = {
-      location,
-      address: {
-        fullAddress,
-        type: address.street.type,
-        street: address.street.name,
-        number: address.number,
-        city: address.city,
-        province: address.province
-      }
-    };
-
-    await this.saveToExpire(cacheKey, completeInfo);
-
-    return completeInfo;
+    return building;
   }
 
   /**

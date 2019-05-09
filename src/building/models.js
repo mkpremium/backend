@@ -363,9 +363,9 @@ function filterStateByNeighborhood(neighborhood, state) {
     rb.state === state;
 }
 
-function calculateElements({commons}, entities) {
+export function calculateElements({commons}, entities) {
   const number = entities.length;
-  const sumSurface = entities.reduce((acc, {surface}) => acc + surface, 0);
+  const sumSurface = entities.reduce((acc, {surface}) => acc + Number(surface), 0);
   const average = sumSurface / (number > 0 ? number : 1);
 
   debugBuilding('calculateElements', {number, average, commons});
