@@ -9,17 +9,17 @@ async function getProvinces(req, res) {
 }
 
 async function getCities(req, res) {
-  CitiesInput(req.body || {});
+  CitiesInput(req.query || {});
   const repo = new CadastreRepository();
-  const {province} = req.body;
+  const {province} = req.query;
   const cities = await repo.getCitiesByProvince(province);
   res.json(cities);
 }
 
 async function getStreets(req, res) {
-  StreetsInput(req.body || {});
+  StreetsInput(req.query || {});
   const repo = new CadastreRepository();
-  const {province, city} = req.body;
+  const {province, city} = req.query;
   const streets = await repo.getStreetNamesByCity(province, city);
   res.json(streets);
 }
