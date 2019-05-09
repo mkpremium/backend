@@ -76,6 +76,8 @@ export class CadastreApi {
       _.get(building, 'cadastre.rc.cc2', '')
     ].join('');
 
+    delete building.cadastre.rc;
+
     const commons = building.entities.find(({type}) => type === 'ELEMENTOS COMUNES');
     building.entities = building.entities.filter(({type}) => type !== 'ELEMENTOS COMUNES');
     building.elements = calculateElements({commons: Number(commons.surface)}, building.entities);

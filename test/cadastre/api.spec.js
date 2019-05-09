@@ -54,15 +54,17 @@ describe('cadastre/api', () => {
 
   describe('fetchBuildingByAddress', () => {
     it('able to fetch cadastre by using normalized building address', async() => {
-      const resultBuilding = await api.fetchBuildingByAddress({
-        province: 'MADRID',
-        city: 'MADRID',
-        street: {
-          type: 'PZ',
-          name: 'TIRSO DE MOLINA'
-        },
-        number: '8'
-      });
+      const resultBuilding = await api.fetchBuildingByAddress(
+        {
+          province: 'MADRID',
+          city: 'MADRID',
+          street: {
+            type: 'PZ',
+            name: 'TIRSO DE MOLINA'
+          },
+          number: '8'
+        }
+      );
 
       const building = {
         'address': {
@@ -79,13 +81,6 @@ describe('cadastre/api', () => {
         'buildingDate': '1900',
         'cadastre': {
           'address': 'PZ TIRSO DE MOLINA 8 28012 MADRID (MADRID)',
-          'rc': {
-            'car': '0001',
-            'cc1': 'W',
-            'cc2': 'K',
-            'pc1': '0339101',
-            'pc2': 'VK4703G'
-          },
           'reference': '0339101VK4703G0001WK'
         },
         'coefficient': '100,000000',
