@@ -43,7 +43,7 @@ export class CadastreRepository extends CouchbaseModel {
 
     const cities = await this.api.fetchCities(province);
     if (cities.length > 0) {
-      await this.saveToExpire(cities);
+      await this.saveToExpire(cacheKey, cities);
     }
 
     return cities;
