@@ -1,12 +1,15 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import camaro from 'camaro';
+import debug from 'debug';
 import axiosCadastreClient from '../banks/lib/catastro/axios';
 import {parseCoords} from './coord-parser';
 import {keys, streetTypes, templates, urls} from './constants';
 import {cadastrewaitTimeMS} from '../../config';
 import {newHttpError} from '../lib/http-error';
 import {calculateElements} from '../building/models';
+
+const debugApi = debug('app:cadastre:api');
 
 export class CadastreApi {
   constructor(fakeData = {}) {
@@ -70,15 +73,12 @@ export class CadastreApi {
     ].join(' ').trim();
     building.cadastre.reference = [
       _.get(building, 'cadastre.rc.pc1', ''),
-      _.get(building, 'cadastre.rc.pc2', ''),
-      _.get(building, 'cadastre.rc.car', ''),
-      _.get(building, 'cadastre.rc.cc1', ''),
-      _.get(building, 'cadastre.rc.cc2', '')
+      _.get(building, 'cadastre.rc.pc2', '')
     ].join('');
 
     delete building.cadastre.rc;
 
-    const commons = building.entities.find(({type}) => type === 'ELEMENTOS COMUNES') | {surface: 0};
+    const commons = building.entities.find(({type}) => type === 'ELEMENTOS COMUNES') || {surface: 0};
     building.entities = building.entities.filter(({type}) => type !== 'ELEMENTOS COMUNES');
     building.elements = calculateElements({commons: Number(commons.surface)}, building.entities);
 
@@ -136,6 +136,7 @@ export class CadastreApi {
     } else {
       try {
         await Promise.delay(cadastrewaitTimeMS);
+        debugApi('fetching', urls[key], {params});
         const response = await this.client.get(urls[key], {params});
         xml = response.data;
       } catch (e) {
