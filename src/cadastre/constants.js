@@ -148,8 +148,8 @@ export const templates = {
         number: '//dir/pnp',
         type: '//dir/tv',
         street: '//dir/nv',
-        city: '//np',
-        province: '//nm',
+        city: '//nm',
+        province: '//np',
         postalCode: {
           number: '//dp'
         }
@@ -163,7 +163,7 @@ export const templates = {
         door: 'dt/lourb/loint/pu'
       }],
       coefficient: '//cpt',
-      landArea: '//sfc',
+      floorArea: '//sfc',
       buildingDate: '//ant'
     },
     error: '//err/des'
