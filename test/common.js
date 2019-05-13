@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import request from 'supertest';
-import {OperatorRepository} from '../src/operator/models';
+import {OperatorRefreshTokenRepository, OperatorRepository} from '../src/operator/models';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
@@ -29,6 +29,7 @@ export async function deleteAll() {
   const neighborhood = new NeighborhoodRepository();
   const city = new CityRepository();
   const cadastre = new CadastreRepository();
+  const refresh = new OperatorRefreshTokenRepository();
 
   await OperatorRepository._promiseBucket;
 
@@ -48,6 +49,7 @@ export async function deleteAll() {
     neighborhood.deleteQuery(),
     city.deleteQuery(),
     cadastre.deleteQuery(),
+    refresh.deleteQuery(),
     cleanQueue()
   ]);
 }

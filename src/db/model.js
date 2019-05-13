@@ -218,6 +218,12 @@ export class CouchbaseModel {
     return new CouchbaseSimpleCache(this._bucket, options);
   }
 
+  async raw(query, consistency = couchbase.consistency) {
+    const n1ql = N1qlQuery.fromString(query);
+    n1ql.consistency(consistency);
+    return this.queryRaw(n1ql);
+  }
+
   async queryRaw(query) {
     await this._promiseBucket;
     debugModel('queryRaw', query);

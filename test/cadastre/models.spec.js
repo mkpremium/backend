@@ -1,5 +1,4 @@
 import {CadastreRepository} from '../../src/cadastre/models';
-import {deleteAll} from '../common';
 
 describe('cadastre/model', () => {
   describe('getProvinces', () => {
