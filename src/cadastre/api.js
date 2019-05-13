@@ -73,7 +73,10 @@ export class CadastreApi {
     ].join(' ').trim();
     building.cadastre.reference = [
       _.get(building, 'cadastre.rc.pc1', ''),
-      _.get(building, 'cadastre.rc.pc2', '')
+      _.get(building, 'cadastre.rc.pc2', ''),
+      _.get(building, 'cadastre.rc.car', ''),
+      _.get(building, 'cadastre.rc.cc1', ''),
+      _.get(building, 'cadastre.rc.cc2', '')
     ].join('');
 
     delete building.cadastre.rc;
@@ -90,7 +93,7 @@ export class CadastreApi {
       Provincia: '',
       Municipio: '',
       SRS: '',
-      RC: cadastreReference
+      RC: cadastreReference.substr(0, 14) // cadastre fails if more than 14 is send over
     };
 
     const xml = await this.fetchXml(keys.BY_CADASTRE, params);
