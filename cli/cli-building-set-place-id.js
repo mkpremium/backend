@@ -29,12 +29,16 @@ async function main() {
 }
 
 export async function setBuildingsPlaceIdByCity(city) {
-  debugCli(`Buscando edificios que necesitan placeId para '${city}'`);
+  debugCli(`buscando edificios que necesitan placeId para '${city}'`);
   const buildings = await queryBuildingByCity(city);
-  debugCli(`Se encontraron ${buildings.length} edificios, para la ciudad '${city}'`);
+  debugCli(`se encontraron ${buildings.length} edificios, para la ciudad '${city}'`);
+
+  const options = {
+    concurrency: 3
+  };
 
   if (buildings.length > 0) {
-    await Promise.map(buildings, mapLocationToPlaceId);
+    await Promise.map(buildings, mapLocationToPlaceId, options);
   }
 }
 
@@ -55,7 +59,7 @@ async function mapLocationToPlaceId({id, location}) {
   if (placeId) {
     return setBuildingPlaceId(id, placeId);
   } else {
-    debugCli(`No se encontró placeId para ${id}, ${JSON.stringify(location)}`);
+    debugCli(`no se encontró placeId para ${id}, ${JSON.stringify(location)}`);
   }
 }
 
@@ -73,6 +77,7 @@ async function queryPlaceIdByLocation(location) {
 }
 
 async function setBuildingPlaceId(id, placeId) {
+  debugCli(`actualizando placeId = ${placeId} para edificio ${id}`);
   const repo = new BuildingRepository();
   const bucket = repo.getBucketName();
   const query = `UPDATE ${bucket} SET placeId = '${placeId}'
