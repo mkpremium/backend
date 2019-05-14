@@ -121,6 +121,11 @@ export class WorksheetRepository extends CouchbaseModel {
     return fromJSON(_head(results), t.WorkSheet);
   }
 
+  static async findByBuilding(buildingId) {
+    const repo = new WorksheetRepository();
+    return repo.findWorksheetByBuilding(buildingId);
+  }
+
   async findWorksheetByOwner(ownerId) {
     const qb = this.getQueryBuilder()
       .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId);

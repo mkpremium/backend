@@ -23,10 +23,11 @@ const BaseBuilding = t.struct({
 });
 
 export const BuildingByCadastre = BaseBuilding
-  .extend({cadastre: BuildingCadastre}, 'BuildingByCadastre');
+  .extend({
+    cadastre: t.maybe(BuildingCadastre)
+  }, 'BuildingByCadastre');
 
-export const BuildingByPlaceId = BaseBuilding
-  .extend({placeId: t.String}, 'BuildingByPlaceId');
+export const BuildingByAddress = BaseBuilding.extend({}, 'BuildingByAddress');
 
 /**
  * @swagger
@@ -37,18 +38,14 @@ export const BuildingByPlaceId = BaseBuilding
  *         $ref: "#/definitions/BuildingLocation"
  *       address:
  *         $ref: "#/definitions/Address"
- *       placeId:
- *         type: string
- *         description: Google Place ID obligatorio si cadastre no esta presente
  *       cadastre:
  *         $ref: "#/definitions/Cadastre"
- *         description: Obligatorio si placeId no esta presente
  */
-export const CreateBuildingInput = t.union([BuildingCadastre, BuildingByPlaceId]);
+export const CreateBuildingInput = t.union([BuildingCadastre, BuildingByAddress]);
 CreateBuildingInput.dispatch = function(input) {
-  if (input.placeId) {
-    return BuildingByPlaceId;
+  if (input.cadastre) {
+    return BuildingByCadastre;
   }
 
-  return BuildingByCadastre;
+  return BuildingByAddress;
 };

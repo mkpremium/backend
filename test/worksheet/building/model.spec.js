@@ -4,7 +4,6 @@ import {WorkSheetStatus} from '../../../src/types/worksheet';
 import {deleteAll} from '../../common';
 import {WorksheetBuildingHelper} from '../../helpers/worksheet-building';
 import {OperatorHelper} from '../../helpers/operator';
-import {catchError} from '../../helpers/util';
 
 describe('worksheet/building/model', () => {
   const payload = {
@@ -28,16 +27,22 @@ describe('worksheet/building/model', () => {
     }
   };
 
-  const payloadWithPlaceId = Object.assign({}, payload, {
-    placeId: 'aaaabbbcccc00045',
-    cadastre: {
-      reference: null,
-      address: null
+  const payloadWithAddress = Object.assign({}, payload);
+  const payloadWithAddress2 = Object.assign({}, payload, {
+    address: {
+      type: 'Transversal',
+      street: '44',
+      number: 10082,
+      fullAddress: 'Transversal 44 # 100 - 83',
+      postalCode: {
+        number: 80001,
+        verified: true
+      },
+      city: 'Barranquilla',
+      province: 'Atlantico',
+      zone: 'Norte',
+      neighborhood: 'Miramar'
     }
-  });
-
-  const payloadWithPlaceId2 = Object.assign({}, payload, {
-    placeId: 'aaaabbbcccc00046'
   });
   const payloadWithCadastre = Object.assign({}, payload, {
     cadastre: {
@@ -48,7 +53,7 @@ describe('worksheet/building/model', () => {
 
   const payloadWithCadastre2 = Object.assign({}, payload, {
     cadastre: {
-      reference: 'aaaabbbbbbdddd',
+      reference: 'aaaabbbbbbcccc1',
       address: 'TV 44 # 100 - 82'
     }
   });
@@ -62,27 +67,27 @@ describe('worksheet/building/model', () => {
   describe('createBuildingWithWorksheet', () => {
     beforeEach(async() => deleteAll());
 
-    it('create building with worksheet by placeId', async() => {
-      const worksheet = await createBuildingWithWorksheet(payloadWithPlaceId);
+    it('create building with worksheet with only address', async() => {
+      const {worksheet} = await createBuildingWithWorksheet(payloadWithAddress);
       asserts(worksheet);
     });
 
     it('create building with worksheet by cadastre reference', async() => {
-      const worksheet = await createBuildingWithWorksheet(payloadWithCadastre);
+      const {worksheet} = await createBuildingWithWorksheet(payloadWithCadastre);
       asserts(worksheet);
     });
 
-    it('create more than one building with worksheet by placeId', async() => {
-      await createBuildingWithWorksheet(payloadWithPlaceId);
-      await createBuildingWithWorksheet(payloadWithPlaceId2);
+    it('create more than one building with worksheet with only address', async() => {
+      await createBuildingWithWorksheet(payloadWithAddress);
+      await createBuildingWithWorksheet(payloadWithAddress2);
     });
 
-    it('doesnt allow create building with duplicate placeId', async() => {
-      await createBuildingWithWorksheet(payloadWithPlaceId);
+    it('doesnt allow create building with duplicate fullAddress', async() => {
+      await createBuildingWithWorksheet(payloadWithAddress);
 
-      const {error} = await catchError(createBuildingWithWorksheet(payloadWithPlaceId));
+      const {created} = await createBuildingWithWorksheet(payloadWithAddress);
 
-      if (!error) {
+      if (created) {
         assert.fail('Should not allow save duplicate');
       }
     });
@@ -90,9 +95,9 @@ describe('worksheet/building/model', () => {
     it('doesnt allow create building with duplicate cadastre reference', async() => {
       await createBuildingWithWorksheet(payloadWithCadastre);
 
-      const {error} = await catchError(createBuildingWithWorksheet(payloadWithCadastre));
+      const {created} = await createBuildingWithWorksheet(payloadWithCadastre);
 
-      if (!error) {
+      if (created) {
         assert.fail('Should not allow save duplicate');
       }
     });
@@ -109,7 +114,7 @@ describe('worksheet/building/model', () => {
     it('create building with worksheet by placeId (API)', async() => {
       const authenticatedOperator = await OperatorHelper.createAndLogin();
       const worksheet = await WorksheetBuildingHelper
-        .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithPlaceId);
+        .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithAddress);
 
       asserts(worksheet);
     });
@@ -119,6 +124,16 @@ describe('worksheet/building/model', () => {
       const worksheet = await WorksheetBuildingHelper
         .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithCadastre);
       asserts(worksheet);
+    });
+
+    it('should return worksheet if building cannot be created', async() => {
+      const authenticatedOperator = await OperatorHelper.createAndLogin();
+      const worksheet = await WorksheetBuildingHelper
+        .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithCadastre);
+      asserts(worksheet);
+      const response2 = await WorksheetBuildingHelper
+        .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithCadastre, 400);
+      asserts(response2.worksheet);
     });
   });
 });

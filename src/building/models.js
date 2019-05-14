@@ -118,10 +118,23 @@ export class BuildingRepository extends CouchbaseModel {
     return building;
   }
 
+  static async findByAddress(fullAddress) {
+    if (_.isEmpty(fullAddress)) {
+      throw newHttpError(400, 'fullAddress no puede estar vacia');
+    }
+    const repo = new BuildingRepository();
+    const qb = repo.getQueryBuilder()
+      .where('cadastre IS NOT MISSING')
+      .where('address.fullAddress = ?', fullAddress)
+      .limit(1);
+    const [building] = await repo.query(qb);
+    return building;
+  }
+
   static async createNewBuilding(data) {
     const json = toJSON(data);
     const updatedJson = Object.assign(json, {
-      _migrateId: data.placeId || data.cadastre.reference
+      _migrateId: _.get(data, 'cadastre.reference', _.get(data, 'address.fullAddress'))
     });
     const building = Building(updatedJson);
     const repo = new BuildingRepository();

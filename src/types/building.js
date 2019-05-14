@@ -342,7 +342,6 @@ export const Building = t.Building = t.struct(
 
     _migrateId: t.String,
     _relatedTo: t.maybe(t.String),
-    placeId: t.maybe(t.String),
     _documentType: t.String
   },
   {
