@@ -122,6 +122,8 @@ export const mailer = {
   })
 };
 
+export const cadastrewaitTimeMS = Number(process.env.SERVICES_WAIT_TIME || 2000);
+
 export const cadastreLocation = {
   serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC',
   waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000)

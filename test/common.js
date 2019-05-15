@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import request from 'supertest';
-import {OperatorRepository} from '../src/operator/models';
+import {OperatorRefreshTokenRepository, OperatorRepository} from '../src/operator/models';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
 import {OwnerRepository, PersonRepository} from '../src/owner/models';
@@ -11,6 +11,8 @@ import {BuildingRepository} from '../src/building/models';
 import {OperatorStats} from '../src/stats/models';
 import {CityRepository, NeighborhoodRepository} from '../src/street/models';
 import {cleanFirebase} from '../migrations/firebase-clean';
+import {cleanQueue} from '../cli/lib/migrate-utils';
+import {CadastreRepository} from '../src/cadastre/models';
 
 export async function deleteAll() {
   const operator = new OperatorRepository();
@@ -26,6 +28,8 @@ export async function deleteAll() {
   const stats = new OperatorStats();
   const neighborhood = new NeighborhoodRepository();
   const city = new CityRepository();
+  const cadastre = new CadastreRepository();
+  const refresh = new OperatorRefreshTokenRepository();
 
   await OperatorRepository._promiseBucket;
 
@@ -43,7 +47,10 @@ export async function deleteAll() {
     callUnknownEvents.deleteQuery(),
     stats.deleteQuery(),
     neighborhood.deleteQuery(),
-    city.deleteQuery()
+    city.deleteQuery(),
+    cadastre.deleteQuery(),
+    refresh.deleteQuery(),
+    cleanQueue()
   ]);
 }
 

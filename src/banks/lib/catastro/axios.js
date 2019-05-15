@@ -1,7 +1,7 @@
 import axios from 'axios';
 import https from 'https';
 
-export default (config) => axios.create(Object.assign({
+export const axiosCadastreClient = (config) => axios.create(Object.assign({
   httpsAgent: new https.Agent({
     rejectUnauthorized: false
   }),
@@ -10,3 +10,5 @@ export default (config) => axios.create(Object.assign({
     'Content-Type': 'text/xml'
   }
 }, config));
+
+export default axiosCadastreClient;

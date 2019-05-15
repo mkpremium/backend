@@ -8,11 +8,13 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 rm -rf build/*
 
 # Build assets
-babel ./ \
+npx babel ./ \
   --out-dir ./build \
   -s -q \
   --copy-files \
   --ignore node_modules,development,docker,iml,lock
+
+rm -rf ./build/{.git,.circleci,.idea}
 
 # Node setup
 cp ./.nvmrc ./build/

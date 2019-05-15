@@ -218,6 +218,12 @@ export class CouchbaseModel {
     return new CouchbaseSimpleCache(this._bucket, options);
   }
 
+  async raw(query, consistency = couchbase.consistency) {
+    const n1ql = N1qlQuery.fromString(query);
+    n1ql.consistency(consistency);
+    return this.queryRaw(n1ql);
+  }
+
   async queryRaw(query) {
     await this._promiseBucket;
     debugModel('queryRaw', query);
@@ -327,7 +333,7 @@ export class CouchbaseModel {
     }
   }
 
-  async save(data, sendEvent) {
+  async save(data, sendEvent, opts = {}) {
     // noinspection JSCheckFunctionSignatures
     const struct = fromJSON(data, this.Struct);
     const isNewData = !data.id;
@@ -339,7 +345,7 @@ export class CouchbaseModel {
     }
 
     await this._promiseBucket;
-    const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved);
+    const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts);
     // noinspection JSCheckFunctionSignatures
     const model = fromJSON(result, this.Struct);
 
@@ -351,7 +357,7 @@ export class CouchbaseModel {
 
     return model;
   }
-  
+
   /**
    * Find building by cadastre reference / catastro
    * @param catastro
@@ -363,11 +369,11 @@ export class CouchbaseModel {
     const qb = this.getQueryBuilder()
       .where(expr);
     const results = await this.query(qb);
-    
+
     if (required && (!results || results.length === 0)) {
       throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by cadastre.reference: ${catastro}`);
     }
-  
+
     return results;
   }
 }

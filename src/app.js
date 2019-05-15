@@ -28,6 +28,7 @@ import street from './street';
 import autocomplete from './autocomplete';
 import email from './email';
 import gearman from './gearman';
+import cadastre from './cadastre';
 
 import appErrorHandler from './lib/error-handler';
 
@@ -63,6 +64,7 @@ stats(app);
 street(app);
 autocomplete(app);
 email(app);
+cadastre(app);
 
 app.use(appErrorHandler);
 

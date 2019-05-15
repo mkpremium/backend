@@ -12,7 +12,7 @@ import {buildingEntitiesDefaultStatus, buildingEntitiesStatus} from '../migratio
  *       address:
  *         type: string
  */
-t.Cadastre = t.struct({
+export const BuildingCadastre = t.Cadastre = t.struct({
   reference: t.String,
   address: t.String
 }, 'Cadastre');
@@ -27,7 +27,7 @@ t.Cadastre = t.struct({
  *       lng:
  *         type: number
  */
-t.Location = t.struct({
+export const BuildingLocation = t.Location = t.struct({
   lat: t.maybe(t.Number),
   lng: t.maybe(t.Number)
 }, 'Location');
@@ -225,6 +225,9 @@ t.BuildingEntity = t.struct(
     rent: t.maybe(t.Number),
     expiration: t.maybe(t.Date),
 
+    plant: t.maybe(t.String),
+    door: t.maybe(t.String),
+
     _migrateBuildingId: t.maybe(t.String),
     _migrateIdStatus: t.maybe(t.String)
   },
@@ -311,7 +314,7 @@ t.BuildingMetadataPreview = t.struct({
  *         items:
  *           $ref: "#/definitions/BuildingMetadataPreview"
  */
-t.Building = t.struct(
+export const Building = t.Building = t.struct(
   {
     id: t.String,
     address: t.Address,
@@ -356,6 +359,8 @@ t.Building = t.struct(
       metadata: [],
       entities: [],
       Id_Estado: null,
+      buildingType: 'VERTICAL',
+      state: 'BUENO',
       _documentType: 'building'
     }
   }
