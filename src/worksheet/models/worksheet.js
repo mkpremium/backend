@@ -535,8 +535,8 @@ GROUP BY t.status`;
    */
   async findWorksheetsByStatus(status) {
     const qb = this
-    .getQueryBuilder()
-    .where('status = ?', status);
+      .getQueryBuilder()
+      .where('status = ?', status);
 
     return this.query(qb);
   }

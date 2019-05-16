@@ -1,62 +1,63 @@
 import uuid from 'uuid/v4';
-import t from 'tcomb';
+import * as t from 'tcomb';
 import {cleanObjectKeys, removeNullValues} from './models-helper';
-import {isEmpty, merge, omit, difference} from 'lodash';
+import {difference, isEmpty, merge, omit} from 'lodash';
 
+/* eslint camelcase: 0 */
 export const OwnerInputDTO = t.struct({
-  id_fornitore: t.Str,
-  ragionesociale: t.maybe(t.Str),
-  telefono: t.maybe(t.Str),
-  fax: t.maybe(t.Str),
-  cellulare: t.maybe(t.Str),
-  email: t.maybe(t.Str),
-  internet: t.maybe(t.Str),
-  indirizzo: t.maybe(t.Str),
-  cap: t.maybe(t.Str),
-  id_localita: t.maybe(t.Str),
-  id_comune: t.maybe(t.Str),
-  id_prov: t.maybe(t.Str),
-  id_nazione: t.maybe(t.Str),
-  codfis: t.maybe(t.Str),
-  pariva: t.maybe(t.Str),
-  id_banca: t.maybe(t.Str),
-  id_agenziabanca: t.maybe(t.Str),
-  ccb: t.maybe(t.Str),
-  intestatarioccb: t.maybe(t.Str),
-  note: t.maybe(t.Str),
-  tmstmp: t.maybe(t.Str),
-  id_padre: t.maybe(t.Str),
-  id_catastro: t.maybe(t.Str),
-  importante: t.maybe(t.Str),
-  altro_numero: t.maybe(t.Str),
-  proprietari: t.maybe(t.Str),
-  street: t.maybe(t.Str),
-  number: t.maybe(t.Str),
-  num_pb: t.maybe(t.Str),
-  num_ib: t.maybe(t.Str),
-  num_bd: t.maybe(t.Str),
-  num_abc: t.maybe(t.Str),
-  num_1: t.maybe(t.Str),
-  num_2: t.maybe(t.Str),
-  num_3: t.maybe(t.Str),
-  verificato: t.maybe(t.Str),
-  id_errore: t.maybe(t.Str),
-  venduto: t.maybe(t.Str),
-  telefonoerrato: t.maybe(t.Str),
-  nonrisponde: t.maybe(t.Str),
-  entepubblico: t.maybe(t.Str),
-  proprietario2: t.maybe(t.Str),
-  famiglia: t.maybe(t.Str),
-  fratelli: t.maybe(t.Str),
-  figli: t.maybe(t.Str),
-  filter: t.maybe(t.Str),
-  indirizzo_he: t.maybe(t.Str),
-  cap_he: t.maybe(t.Str),
-  id_localita_he: t.maybe(t.Str),
-  id_prov_he: t.maybe(t.Str),
-  telefono_he: t.maybe(t.Str),
-  cellulare_he: t.maybe(t.Str),
-  altro_numero_he: t.maybe(t.Str)
+  id_fornitore: t.String,
+  ragionesociale: t.maybe(t.String),
+  telefono: t.maybe(t.String),
+  fax: t.maybe(t.String),
+  cellulare: t.maybe(t.String),
+  email: t.maybe(t.String),
+  internet: t.maybe(t.String),
+  indirizzo: t.maybe(t.String),
+  cap: t.maybe(t.String),
+  id_localita: t.maybe(t.String),
+  id_comune: t.maybe(t.String),
+  id_prov: t.maybe(t.String),
+  id_nazione: t.maybe(t.String),
+  codfis: t.maybe(t.String),
+  pariva: t.maybe(t.String),
+  id_banca: t.maybe(t.String),
+  id_agenziabanca: t.maybe(t.String),
+  ccb: t.maybe(t.String),
+  intestatarioccb: t.maybe(t.String),
+  note: t.maybe(t.String),
+  tmstmp: t.maybe(t.String),
+  id_padre: t.maybe(t.String),
+  id_cataStringo: t.maybe(t.String),
+  importante: t.maybe(t.String),
+  altro_numero: t.maybe(t.String),
+  proprietari: t.maybe(t.String),
+  Stringeet: t.maybe(t.String),
+  number: t.maybe(t.String),
+  num_pb: t.maybe(t.String),
+  num_ib: t.maybe(t.String),
+  num_bd: t.maybe(t.String),
+  num_abc: t.maybe(t.String),
+  num_1: t.maybe(t.String),
+  num_2: t.maybe(t.String),
+  num_3: t.maybe(t.String),
+  verificato: t.maybe(t.String),
+  id_errore: t.maybe(t.String),
+  venduto: t.maybe(t.String),
+  telefonoerrato: t.maybe(t.String),
+  nonrisponde: t.maybe(t.String),
+  entepubblico: t.maybe(t.String),
+  proprietario2: t.maybe(t.String),
+  famiglia: t.maybe(t.String),
+  fratelli: t.maybe(t.String),
+  figli: t.maybe(t.String),
+  filter: t.maybe(t.String),
+  indirizzo_he: t.maybe(t.String),
+  cap_he: t.maybe(t.String),
+  id_localita_he: t.maybe(t.String),
+  id_prov_he: t.maybe(t.String),
+  telefono_he: t.maybe(t.String),
+  cellulare_he: t.maybe(t.String),
+  altro_numero_he: t.maybe(t.String)
 });
 
 export default function migrateFromCsv(data) {
@@ -79,7 +80,7 @@ export default function migrateFromCsv(data) {
       });
       uniqueContacts.push(input.telefono);
     }
-    
+
     if (input.cellulare && uniqueContacts.indexOf(input.cellulare) === -1) {
       contacts.push({
         type: 'TELEFONO',
@@ -87,10 +88,10 @@ export default function migrateFromCsv(data) {
       });
       uniqueContacts.push(input.cellulare);
     }
-  
+
     if (input.num_pb) {
       const num_pb = input.num_pb.replace(/[^0-9]/, '');
-      
+
       if (num_pb !== '' && uniqueContacts.indexOf(num_pb) === -1) {
         contacts.push({
           type: 'TELEFONO',
@@ -99,10 +100,10 @@ export default function migrateFromCsv(data) {
         uniqueContacts.push(num_pb);
       }
     }
-  
+
     if (input.num_ib) {
       const num_ib = input.num_ib.replace(/[^0-9]/, '');
-    
+
       if (num_ib !== '' && uniqueContacts.indexOf(num_ib) === -1) {
         contacts.push({
           type: 'TELEFONO',
@@ -111,10 +112,10 @@ export default function migrateFromCsv(data) {
         uniqueContacts.push(num_ib);
       }
     }
-  
+
     if (input.num_bd) {
       const num_bd = input.num_bd.replace(/[^0-9]/, '');
-    
+
       if (num_bd !== '' && uniqueContacts.indexOf(num_bd) === -1) {
         contacts.push({
           type: 'TELEFONO',
@@ -123,10 +124,10 @@ export default function migrateFromCsv(data) {
         uniqueContacts.push(num_bd);
       }
     }
-  
+
     if (input.num_abc) {
       const num_abc = input.num_abc.replace(/[^0-9]/, '');
-    
+
       if (num_abc !== '' && uniqueContacts.indexOf(num_abc) === -1) {
         contacts.push({
           type: 'TELEFONO',
@@ -135,7 +136,7 @@ export default function migrateFromCsv(data) {
         uniqueContacts.push(num_abc);
       }
     }
-    
+
     if (input.telefono_he && uniqueContacts.indexOf(input.telefono_he) === -1) {
       contacts.push({
         type: 'TELEFONO',
@@ -143,7 +144,7 @@ export default function migrateFromCsv(data) {
       });
       uniqueContacts.push(input.telefono_he);
     }
-  
+
     if (input.cellulare_he && uniqueContacts.indexOf(input.cellulare_he) === -1) {
       contacts.push({
         type: 'TELEFONO',
@@ -151,7 +152,7 @@ export default function migrateFromCsv(data) {
       });
       uniqueContacts.push(input.cellulare_he);
     }
-  
+
     if (input.altro_numero_he && uniqueContacts.indexOf(input.altro_numero_he) === -1) {
       contacts.push({
         type: 'TELEFONO',
@@ -242,7 +243,7 @@ export function combineDuplicatesDocumentNumber(data) {
     const duplicates = peopleWithDocumentNumber.filter(filterSameDocumentDifferentPerson);
 
     duplicates.forEach(duplicated => {
-      merge(combined, omit(JSON.parse(JSON.stringify(duplicated)), ['id']));
+      merge(combined, omit(JSON.parse(JSON.Stringingify(duplicated)), ['id']));
       const ownerIdx = owners.findIndex(o => o.personId === duplicated.id);
       if (ownerIdx !== -1) {
         owners[ownerIdx] = t.update(owners[ownerIdx], {personId: {$set: combined.id}});

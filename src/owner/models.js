@@ -14,7 +14,7 @@ import _ from 'lodash';
 import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
-import squel from "squel/dist/squel";
+import squel from 'squel/dist/squel';
 
 export class Owner extends CouchbaseModel {
   constructor() {

@@ -2,7 +2,7 @@
 import program from 'commander';
 import fs from 'fs-extra';
 import couchbase from '../src/db/couchbase';
-import {startProcess} from "./lib/migrate-worksheets-states";
+import {startProcess} from './lib/migrate-worksheets-states';
 
 // region main entry
 program

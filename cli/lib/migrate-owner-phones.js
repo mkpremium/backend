@@ -2,7 +2,7 @@ import debug from 'debug';
 import {MigrateModelV3} from '../../src/migration/lib/migrate-model-v3';
 import {PersonRepository} from '../../src/owner/models';
 import t from 'tcomb';
-import {cleanObjectKeys, removeNullValues} from "../../src/migration/models/models-helper";
+import {cleanObjectKeys, removeNullValues} from '../../src/migration/models/models-helper';
 
 const debugMigrate = debug('app:migration:owners-add-phone');
 
@@ -30,7 +30,6 @@ class MigrateOwnerPhone extends MigrateModelV3 {
     const migrateOwnerId = input.id_fornitore;
     
     if (input.cellulare) {
-      
       debugMigrate('\nStart process for row with Id_Fornitore:', data['Id_Fornitore']);
       const personRepository = new PersonRepository();
       const person = await personRepository.findByMigrateOwnerId(migrateOwnerId, true);
@@ -48,9 +47,9 @@ class MigrateOwnerPhone extends MigrateModelV3 {
   static async addPersonContact(person, newPhone) {
     const personRepository = new PersonRepository();
     const updatedContacts = t.update(person.contacts, {$push: [{
-        type: 'TELEFONO',
-        value: newPhone
-      }]});
+      type: 'TELEFONO',
+      value: newPhone
+    }]});
     const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
     await personRepository.save(updatedPerson);
   }

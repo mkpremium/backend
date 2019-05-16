@@ -63,7 +63,6 @@ class MigrateVerifyOwner extends MigrateModelV3 {
     const {owner, input} = parse(data);
     const migrateId = owner._migrateId;
     if (input.verificato === '1') {
-      
       debugMigrate('\nStart process for row with Id_Fornitore:', data['Id_Fornitore']);
       const migrateOwner = await MigrateVerifyOwner.findByMigrateId(migrateId);
       await MigrateVerifyOwner.verifyOwner(migrateOwner);
@@ -72,7 +71,6 @@ class MigrateVerifyOwner extends MigrateModelV3 {
       const worksheetRepository = new WorksheetRepository();
       const worksheet = await worksheetRepository.findWorksheetByOwner(migrateOwner.id);
       if (worksheet && worksheet.status === WorkSheetStatus.DEFAULT) {
-        
         debugMigrate('Updating worksheet status, worksheet id: ', worksheet.id);
         const w = fromJSON(worksheet, t.WorkSheet);
         const updatedWorksheet = w.setStatus(WorkSheetStatus.WITH_OWNER);
@@ -107,7 +105,6 @@ class MigrateVerifyOwner extends MigrateModelV3 {
       const personRepository = new PersonRepository();
       const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
       await personRepository.save(updatedPerson);
-      
     } else {
       debugMigrate(`No phones to be verified.`);
     }

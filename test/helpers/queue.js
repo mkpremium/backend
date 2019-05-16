@@ -3,7 +3,7 @@ import app from '../../src/app';
 import _ from 'lodash';
 import {WorksheetQueueRepository} from '../../src/worksheet/models/queue';
 
-async function createQueueEndpoint(authenticatedManager, payload) {
+export async function createQueueEndpoint(authenticatedManager, payload) {
   const defaultData = _.extend({
     name: 'queue-' + new Date().getTime(),
     source: {

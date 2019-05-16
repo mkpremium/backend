@@ -2,7 +2,7 @@
 import program from 'commander';
 import fs from 'fs-extra';
 import couchbase from '../src/db/couchbase';
-import {migrate} from "./lib/migrate-portugal-fix-fields";
+import {migrate} from './lib/migrate-portugal-fix-fields';
 
 // region main entry
 program
