@@ -234,8 +234,6 @@ export class OwnerRepository extends Owner {
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
-  
-  
 
   async createOwnerAndPerson(body) {
     const ownerBody = t.OwnerBody(body);
@@ -439,7 +437,7 @@ GROUP BY t.business.status`;
       .where('t.`buildingId` = ?', buildingId)
       .where('t.`status` = ?', ownerStatus);
     
-    const results =  await this.query(qb);
+    const results = await this.query(qb);
     const ownerIds = _.map(results, 'id');
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
