@@ -20,10 +20,6 @@ describe('owner-contact.routes', () => {
     await operatorCreateManager();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
     authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
-    /* const migrate = new MigrateModel('owner', resolve(__dirname, '../../fixtures/sample_owners.csv'), app);
-    const results = await migrate.run();
-    person = results.find(o => o.contacts && o.contacts.length > 0);
-    owner = results.find(o => o.personId === person.id); */
   });
 
   describe('Update owner contact', () => {

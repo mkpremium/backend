@@ -4,14 +4,16 @@ import intersectionBy from 'lodash/intersectionBy';
 import times from 'lodash/times';
 import app from '../../../src/app';
 import {ScheduledEventsRepository} from '../../../src/scheduled-events/models';
-import {deleteAll, operatorCreate, operatorCreateBusiness, operatorLogin} from '../../common';
+import {deleteAll, operatorCreate, operatorCreateBusiness, operatorCreateManager, operatorLogin} from '../../common';
 import {WorksheetQueueRepository} from '../../../src/worksheet/models/queue';
-import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import {utc} from '../../../src/lib/date';
-import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
+import WorksheetHelper from '../../helpers/worksheet';
+import _ from 'lodash';
 
-describe('scheduledevents.routes', () => {
+describe('scheduled events.routes', () => {
+  const scheduledEventRepo = new ScheduledEventsRepository();
   let authenticatedOperator;
+  let authenticatedManager;
   let scheduledMeetingsEventObject;
   let scheduledCallsEventObject;
   let scheduledEventToBeUpdated;
@@ -21,38 +23,36 @@ describe('scheduledevents.routes', () => {
   let worksheet;
   before(async() => {
     await deleteAll();
+    await operatorCreateManager();
+    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
     const worksheetQueueRepo = new WorksheetQueueRepository();
-    const worksheetRepo = new WorksheetRepository();
-    const scheduledEventRepo = new ScheduledEventsRepository();
-    const worksheets = await Promise.all(times(5, () => worksheetRepo.save({})));
-    [worksheet] = worksheets;
+    
+    const worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);
+    const worksheetAndOwner = _.first(worksheetsWithOwner);
+    worksheet = worksheetAndOwner.worksheet;
+    owner = worksheetAndOwner.owner;
 
     queue = await worksheetQueueRepo.save({name: 'madrid'});
-    await Promise.mapSeries(worksheets, worksheet => worksheetQueueRepo.addWorksheetAndSave(queue.id, worksheet.id));
+    await Promise.mapSeries(worksheetsWithOwner, worksheetAndOwner =>
+      worksheetQueueRepo.addWorksheetAndSave(queue.id, worksheetAndOwner.worksheet.id));
 
     queue = await worksheetQueueRepo.findByIdOrThrow(queue.id);
     items = queue.worksheets;
 
-    const personRepo = new PersonRepository();
-    const person = await personRepo.save({name: 'TEST'});
-
-    const ownerRepo = new OwnerRepository();
-    owner = await ownerRepo.save({name: 'TEST', personId: person.id}, false);
-
     await operatorCreate('', queue.id);
     await operatorCreateBusiness();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
-
+  
     scheduledMeetingsEventObject = {
       type: 'MEETINGS',
       notifyAt: new Date('2018-05-28T06:30:00Z'),
       eventDate: new Date('2018-05-28T06:30:00Z'),
       notifyTo: authenticatedOperator.operator.id,
       event: {
-        ownerId: 'not-exist-in-db',
+        ownerId: worksheet.relatedOwnerIds[0],
         contactId: 'not-exist-in-db',
         worksheetId: worksheet.id,
-        buildingId: 'not-exist-in-db',
+        buildingId: worksheet.relatedBuildingIds[0],
         eventLocation: {
           lat: 0,
           long: 0
@@ -60,7 +60,7 @@ describe('scheduledevents.routes', () => {
         eventAddress: 'no exists'
       }
     };
-
+  
     scheduledCallsEventObject = {
       notifyTo: authenticatedOperator.operator.id,
       type: 'CALLS',
@@ -69,7 +69,7 @@ describe('scheduledevents.routes', () => {
       event: {
         contactId: 'not-exist-in-db',
         worksheetId: worksheet.id,
-        buildingId: 'not-exist-in-db'
+        buildingId: worksheet.relatedBuildingIds[0]
       }
     };
 
@@ -242,7 +242,8 @@ describe('scheduledevents.routes', () => {
           notifyAt: new Date('2018-02-28T16:24:39Z'),
           eventDate: new Date('2018-02-28T16:30:39Z'),
           event: {
-            ownerId: owner.id
+            ownerId: owner.id,
+            eventAddress: 'Some address'
           }
         })
         .expect(204);

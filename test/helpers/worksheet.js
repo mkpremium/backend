@@ -73,7 +73,7 @@ export const CreateWorksheetType = {
  * Creates worksheets, each with building and an owner associated.
  * @param authenticatedManager
  * @param type
- * @returns {Promise<void>} - array of objects, object has two properties: worksheet and owner
+ * @returns {Promise<Object<>>} - array of objects, object has two properties: worksheet and owner
  */
 async function createWorksheetsAndOwnerWithBuilding(authenticatedManager, type = CreateWorksheetType.VALID) {
   const worksheetRepository = new WorksheetRepository();

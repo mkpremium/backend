@@ -234,8 +234,6 @@ export class OwnerRepository extends Owner {
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
-  
-  
 
   async createOwnerAndPerson(body) {
     const ownerBody = t.OwnerBody(body);
@@ -426,5 +424,21 @@ GROUP BY t.business.status`;
     const qb = this.getQueryBuilder().where('t.`personId` = ?', personId);
     const results = await this.query(qb);
     return results && results.length && _.first(results);
+  }
+  
+  /**
+   *
+   * @param buildingId - the building id
+   * @param ownerStatus - owner status
+   * @returns {Promise<*>}
+   */
+  async findAllByBuildingId(buildingId, ownerStatus) {
+    const qb = this.getQueryBuilder()
+      .where('t.`buildingId` = ?', buildingId)
+      .where('t.`status` = ?', ownerStatus);
+    
+    const results = await this.query(qb);
+    const ownerIds = _.map(results, 'id');
+    return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
 }
