@@ -62,7 +62,7 @@ async function updateWorksheetStatusWithMeeting(newStatus, data, mapBusiness, wo
   const repo = new OwnerRepository();
 
   if (!owner.buildingId) {
-    debugMigrate('Owner with id:',owner.id, 'has building id null, proceed to set the building of worksheet...');
+    debugMigrate('Owner with id:', owner.id, 'has building id null, proceed to set the building of worksheet...');
 
     // update owner building with worksheet building
     const updatedOwner = t.update(owner, {buildingId: {$set: worksheet.relatedBuildingIds[0]}});

@@ -15,5 +15,3 @@ async function mainAction() {
   await couchbase();
   await synchronizeMetadataWithFirebase();
 }
-
-

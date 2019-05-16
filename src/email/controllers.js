@@ -1,7 +1,5 @@
 import debug from 'debug';
 import multer from 'multer';
-import uuid from 'uuid/v4';
-import _ from 'lodash';
 import {wrap} from 'express-promise-wrap';
 import {compose} from 'compose-middleware';
 import {mailer, storage} from '../../config';
@@ -17,7 +15,6 @@ async function sendMessage(message) {
 }
 
 function createMessage(from, data, attachment) {
-
   const {to, subject, text, html, cc, cco} = t.EmailBody(data);
 
   if (!from) {

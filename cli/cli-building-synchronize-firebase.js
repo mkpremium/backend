@@ -3,7 +3,7 @@ import program from 'commander';
 import Promise from 'bluebird';
 import couchbase from '../src/db/couchbase';
 import {ScheduledEventsRepository} from '../src/scheduled-events/models';
-import {denormalizeBuildingData, denormalizeBuildingMeeting} from '../src/firebase/lib/business';
+import {denormalizeBuildingData} from '../src/firebase/lib/business';
 
 program
   .action(mainAction)

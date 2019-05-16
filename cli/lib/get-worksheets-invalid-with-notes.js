@@ -1,8 +1,8 @@
 import debug from 'debug';
 import {BuildingRepository} from '../../src/building/models';
-import Promise from "bluebird";
-import {WorksheetRepository} from "../../src/worksheet/models/worksheet";
-import {WorkSheetStatus} from "../../src/types/worksheet";
+import Promise from 'bluebird';
+import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
+import {WorkSheetStatus} from '../../src/types/worksheet';
 import _ from 'lodash';
 
 const debugQuery = debug('app:query:invalid-worksheets');
@@ -30,7 +30,7 @@ export async function getList() {
           worksheetsInvalidWithAtLeastOneNote.push({
             worksheet: worksheet,
             notesIds: notesIds
-          })
+          });
         } else {
           worksheetIdsInvalidWithNoNotes.push(worksheet.id);
         }
@@ -42,10 +42,10 @@ export async function getList() {
     }
   });
   
-  debugQuery('Worksheets ids inválidas y con al menos una nota:',  JSON.stringify(worksheetsInvalidIdsWithAtLeastOneNote, null, 2));
-  debugQuery('Worksheets inválidas y con al menos una nota - info:',  JSON.stringify(worksheetsInvalidWithAtLeastOneNote, null, 2));
-  //debugQuery('Worksheets invalid without notes:',  JSON.stringify(worksheetIdsInvalidWithNoNotes, null, 2));
-  //debugQuery('Worksheets invalid without building:',  JSON.stringify(worksheetWithNoBuilding, null, 2));
+  debugQuery('Worksheets ids inválidas y con al menos una nota:', JSON.stringify(worksheetsInvalidIdsWithAtLeastOneNote, null, 2));
+  debugQuery('Worksheets inválidas y con al menos una nota - info:', JSON.stringify(worksheetsInvalidWithAtLeastOneNote, null, 2));
+  // debugQuery('Worksheets invalid without notes:',  JSON.stringify(worksheetIdsInvalidWithNoNotes, null, 2));
+  // debugQuery('Worksheets invalid without building:',  JSON.stringify(worksheetWithNoBuilding, null, 2));
   debugQuery('Process ended.');
 }
 

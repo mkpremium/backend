@@ -3,7 +3,6 @@ import t from 'tcomb';
 import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {cleanObjectKeys, removeNullValues} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import Promise from 'bluebird';
 import {WorkSheetStatus} from '../../src/types/worksheet';
 import {N1qlQuery} from 'couchbase';
 import {BuildingRepository} from '../../src/building/models';
@@ -13,7 +12,7 @@ import {OwnerStatus} from '../../src/types/enums';
 const debugMigrate = debug('app:migration:worksheet-states');
 
 export const Input = t.struct({
-  id_catastro: t.maybe(t.Str), // building._migrateId
+  id_catastro: t.maybe(t.Str) // building._migrateId
 });
 
 /**
@@ -27,10 +26,10 @@ export async function startProcess(inputFile) {
   const recordsWithErrors = [];
   const modifiedWorksheetsIds = [];
   await csvToJSON(inputFile, doOnEachRow);
-  
+
   async function doOnEachRow(record) {
     const input = Input(removeNullValues(cleanObjectKeys(record)));
-    
+
     try {
       const result = await processBuilding(input);
       recordsOK.push(result);
@@ -43,7 +42,7 @@ export async function startProcess(inputFile) {
       });
     }
   }
-  
+
   debugMigrate('Records with errors:', JSON.stringify(recordsWithErrors, null, 2));
   debugMigrate('Records OK:', JSON.stringify(recordsOK, null, 2));
   debugMigrate('Modified worksheet ids:', modifiedWorksheetsIds);
@@ -64,16 +63,15 @@ async function processBuilding(input) {
   const migrateId = getFieldNotNull(input, 'id_catastro');
   const [building] = await buildingRepository.findByMigratedId(migrateId);
   let worksheet = await worksheetRepository.findWorksheetByBuilding(building.id);
-  
+
   if (worksheet) {
     if (worksheet.status === WorkSheetStatus.NO_SALE) {
-      
       // look for owners related
       worksheet = await worksheetRepository.findByIdWIthIncludes(worksheet.id, ['relatedOwners']);
       const worksheetIsValid = isWorksheetValid(worksheet.relatedOwners);
       const worksheetHasAtLeastOneOwnerVerified = hasAtLeastOneOwnerVerified(worksheet.relatedOwners);
       let updatedWorksheet;
-      
+
       if (worksheetIsValid && worksheetHasAtLeastOneOwnerVerified) {
         updatedWorksheet = await updateWorksheetStatus(worksheet, WorkSheetStatus.WITH_OWNER);
       } else if (worksheetIsValid) {
@@ -81,15 +79,15 @@ async function processBuilding(input) {
       } else {
         updatedWorksheet = await updateWorksheetStatus(worksheet, WorkSheetStatus.INVALID);
       }
-      
+
       return {
         worksheet: updatedWorksheet,
         owners: worksheet.relatedOwners
-      }
+      };
     } else {
       throw new Error(`Worksheet id ${worksheet.id} has no status NO_SALE, current status: ${worksheet.status}.`);
     }
-  } {
+  } else {
     throw new Error(`Worksheet not found.`);
   }
 }
@@ -101,7 +99,7 @@ async function processBuilding(input) {
  * @returns {boolean}
  */
 export function hasAtLeastOneOwnerVerified(worksheetOwnerObjects) {
- return worksheetOwnerObjects.some((owner) => {
+  return worksheetOwnerObjects.some((owner) => {
     return owner.status === OwnerStatus.VERIFIED;
   });
 }
@@ -116,7 +114,7 @@ export function isWorksheetValid(worksheetOwnerWithPersonObjects) {
   return worksheetOwnerWithPersonObjects.some((owner) => {
     const person = owner.person;
     const contacts = person && person.contacts;
-  
+
     return contacts && contacts.length > 0;
   });
 }
@@ -132,7 +130,7 @@ export async function updateWorksheetStatus(worksheet, status) {
   const bucket = worksheetRepository.getBucketName();
   const updateStatus = N1qlQuery
     .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(status)} WHERE id = ${JSON.stringify(worksheet.id)}`);
-  
+
   await worksheetRepository.queryRaw(updateStatus);
   return worksheetRepository.findById(worksheet.id);
 }

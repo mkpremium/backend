@@ -1,7 +1,7 @@
 #!/usr/bin/env babel-node
 import program from 'commander';
 import couchbase from '../src/db/couchbase';
-import {getList} from "./lib/get-worksheets-invalid-with-notes";
+import {getList} from './lib/get-worksheets-invalid-with-notes';
 
 // region main entry
 program

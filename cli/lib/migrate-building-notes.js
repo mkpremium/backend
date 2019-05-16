@@ -82,7 +82,7 @@ function noteBody(data) {
   const street = data['CALLE'];
   
   if (street) {
-   note +=  ' - ' +  street;
+    note += ' - ' + street;
   }
   
   return note;

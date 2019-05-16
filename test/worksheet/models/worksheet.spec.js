@@ -3,7 +3,6 @@ import app from '../../../src/app';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
 import WorksheetHelper, {CreateWorksheetType} from '../../helpers/worksheet';
 import OwnerHelper from '../../helpers/owner';
-import {prettyPrint} from '../../helpers/util';
 import _ from 'lodash';
 import {OwnerStatus} from '../../../src/types/enums';
 import {WorkSheetStatus} from '../../../src/types/worksheet';

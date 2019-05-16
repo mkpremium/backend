@@ -25,7 +25,7 @@ export const Input = t.struct({
   tel10: t.maybe(t.Str),
   tel11: t.maybe(t.Str),
   tel12: t.maybe(t.Str),
-  tel13: t.maybe(t.Str),
+  tel13: t.maybe(t.Str)
 });
 
 /**
