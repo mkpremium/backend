@@ -69,7 +69,7 @@ export class CadastreRepository extends CouchbaseModel {
    * @param {CadastreAddressInput} address
    * @return {Promise<*>}
    */
-  async getCompleteInfo(address) {
+  async getBuildingByAddress(address) {
     CadastreAddressInput(address);
     const cacheKey = `complete:${cacheHash(address)}`;
     const cached = await this.findById(cacheKey);
@@ -79,6 +79,20 @@ export class CadastreRepository extends CouchbaseModel {
 
     const building = await this.api.fetchBuildingByAddress(address);
     building.location = await this.api.fetchLocationByCadastre(building.cadastre.reference);
+
+    await this.saveToExpire(cacheKey, building);
+
+    return building;
+  }
+
+  async getBuildingByCadastre(cadastreReference) {
+    const cacheKey = `complete:${cadastreReference}`;
+    const cached = await this.findById(cacheKey);
+    if (cached) {
+      return cached.value;
+    }
+    const building = await this.api.fetchBuildingByCadastre(cadastreReference);
+    building.location = await this.api.fetchLocationByCadastre(cadastreReference);
 
     await this.saveToExpire(cacheKey, building);
 
@@ -97,4 +111,9 @@ export class CadastreRepository extends CouchbaseModel {
     };
     return this.save({id, value: data}, false, options);
   }
+}
+
+export async function getBuildingByCadastre(cadastreReference) {
+  const repo = new CadastreRepository();
+  return repo.getBuildingByCadastre(cadastreReference);
 }

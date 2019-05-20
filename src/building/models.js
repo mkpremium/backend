@@ -108,13 +108,32 @@ export class BuildingRepository extends CouchbaseModel {
     return building;
   }
 
-  static async findByCadastre(cadastre) {
+  static async findByCadastreReference(cadastreReference) {
     const repo = new BuildingRepository();
     const qb = repo.getQueryBuilder()
       .where('cadastre IS NOT MISSING')
-      .where('cadastre.reference = ?', cadastre.reference)
+      .where('cadastre.reference = ?', cadastreReference)
       .limit(1);
     const [building] = await repo.query(qb);
+    return building;
+  }
+
+  /**
+   * Find building by cadastre reference / catastro
+   * @param cadastre
+   * @param required
+   * @returns {Promise<*>}
+   */
+  async findByCatastro(cadastre, required = true) {
+    const qb = this.getQueryBuilder()
+      .where('cadastre IS NOT MISSING')
+      .where('cadastre.reference = ?', cadastre.reference)
+      .limit(1);
+    const [building] = await this.query(qb);
+
+    if (required && !building) {
+      throw new Error(`No records buildings found by cadastreReference ${cadastre.reference}`);
+    }
     return building;
   }
 
@@ -133,9 +152,8 @@ export class BuildingRepository extends CouchbaseModel {
 
   static async createNewBuilding(data) {
     const json = toJSON(data);
-    const updatedJson = Object.assign(json, {
-      _migrateId: _.get(data, 'cadastre.reference', _.get(data, 'address.fullAddress'))
-    });
+    const _migrateId = lookUpMigrateId(data);
+    const updatedJson = Object.assign({}, json, {_migrateId});
     const building = Building(updatedJson);
     const repo = new BuildingRepository();
     return repo.save(building, emitModelEvents);
@@ -401,4 +419,12 @@ export function calculateElements({commons}, entities) {
     average,
     commons
   };
+}
+
+function lookUpMigrateId(data) {
+  const migrateId = _get('data', '_migrateId');
+  const reference = _.get(data, 'cadastre.reference');
+  const fullAddress = _.get(data, 'address.fullAddress');
+
+  return migrateId || reference || fullAddress;
 }

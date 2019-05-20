@@ -46,8 +46,8 @@ async function createBuildingByAddress(input) {
  * @param {BuildingByCadastre} input
  * @return {Promise<*>}
  */
-async function createBuildingByCadastre(input) {
-  const building = await BuildingRepository.findByCadastre(input.cadastre);
+export async function createBuildingByCadastre(input) {
+  const building = await BuildingRepository.findByCadastreReference(input.cadastre);
   if (building) {
     return {
       created: false,

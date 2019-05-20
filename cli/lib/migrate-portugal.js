@@ -384,8 +384,7 @@ async function generateObjects(input, previousBuilding) {
  */
 export async function findBuilding(catastro) {
   const buildingRepository = new BuildingRepository();
-  const building = await buildingRepository.findByCatastro(catastro, false);
-  return building && building[0];
+  return buildingRepository.findByCatastro(catastro, false);
 }
 
 /**

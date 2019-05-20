@@ -36,7 +36,7 @@ export class CadastreApi {
 
   async fetchStreets(province, city) {
     const items = await this
-      .fetchXmlItems(keys.STREET, {
+      .fetchXmlItems(keys.STREETS, {
         Provincia: province,
         Municipio: city,
         TipoVia: '',
@@ -58,9 +58,60 @@ export class CadastreApi {
       Planta: '',
       Puerta: ''
     };
-    const xml = await this.fetchXml(keys.BY_ADDRESS, params);
-    const {building, error} = camaro(xml, templates[keys.BY_ADDRESS]);
+    const xml = await this.fetchXml(keys.BUILDING_BY_ADDRESS, params);
+    const fetchedData = camaro(xml, templates[keys.BUILDING_BY_ADDRESS]);
 
+    return CadastreApi.parseBuilding(fetchedData);
+  }
+
+  async fetchBuildingByCadastre(cadastreReference) {
+    const params = CadastreApi.paramsEnvelope(cadastreReference);
+    const options = {
+      headers: {
+        'SOAPAction': 'http://tempuri.org/OVCServWeb/OVCCallejero/Consulta_DNPRC',
+        'Content-Type': 'text/xml',
+        'Content-Length': params.length
+      }
+    };
+
+    const xml = await this.fetchXml(keys.BUILDING_BY_CADASTRE, params, 'post', options);
+    const fetchedData = camaro(xml, templates[keys.BUILDING_BY_CADASTRE]);
+
+    return CadastreApi.parseBuilding(fetchedData);
+  }
+
+  async fetchLocationByCadastre(cadastreReference) {
+    const params = {
+      Provincia: '',
+      Municipio: '',
+      SRS: '',
+      RC: cadastreReference.substr(0, 14) // cadastre fails if more than 14 is send over
+    };
+
+    const xml = await this.fetchXml(keys.LOCATION_BY_CADASTRE, params);
+    const result = camaro(xml, templates[keys.LOCATION_BY_CADASTRE]);
+
+    if (result.error) {
+      throw newHttpError(500, 'Catastro api: ' + result.error);
+    }
+
+    return parseCoords(result);
+  }
+
+  /**
+   * @private
+   */
+  static parseXmlItems(xml, templateKey) {
+    const {items, error} = camaro(xml, templates[templateKey]);
+
+    if (error) {
+      throw newHttpError(500, 'Catastro api: ' + error);
+    }
+
+    return items;
+  }
+
+  static parseBuilding({building, error}) {
     if (error) {
       throw newHttpError(500, 'Catastro api: ' + error);
     }
@@ -88,37 +139,6 @@ export class CadastreApi {
     return building;
   }
 
-  async fetchLocationByCadastre(cadastreReference) {
-    const params = {
-      Provincia: '',
-      Municipio: '',
-      SRS: '',
-      RC: cadastreReference.substr(0, 14) // cadastre fails if more than 14 is send over
-    };
-
-    const xml = await this.fetchXml(keys.BY_CADASTRE, params);
-    const result = camaro(xml, templates[keys.BY_CADASTRE]);
-
-    if (result.error) {
-      throw newHttpError(500, 'Catastro api: ' + result.error);
-    }
-
-    return parseCoords(result);
-  }
-
-  /**
-   * @private
-   */
-  static parseXmlItems(xml, templateKey) {
-    const {items, error} = camaro(xml, templates[templateKey]);
-
-    if (error) {
-      throw newHttpError(500, 'Catastro api: ' + error);
-    }
-
-    return items;
-  }
-
   /**
    * @private
    */
@@ -131,7 +151,7 @@ export class CadastreApi {
   /**
    * @private
    */
-  async fetchXml(key, params) {
+  async fetchXml(key, params, method = 'get', options = {}) {
     let xml;
 
     if (this.fakeData[key]) {
@@ -140,14 +160,32 @@ export class CadastreApi {
       try {
         await Promise.delay(cadastrewaitTimeMS);
         debugApi('fetching', urls[key], {params});
-        const response = await this.client.get(urls[key], {params});
-        xml = response.data;
+        switch (method) {
+          case 'get':
+            const responseGet = await this.client.get(urls[key], {params});
+            xml = responseGet.data;
+            break;
+          case 'post':
+            const responsePost = await this.client.post(urls[key], params, options);
+            xml = responsePost.data;
+            break;
+        }
       } catch (e) {
-        console.error(e);
-        throw new Error('Cannot fetch provinces: ' + e.response.data);
+        throw new Error('Cannot fetch cadastre data: ' + e.response.data);
       }
     }
 
     return xml;
+  }
+
+  static paramsEnvelope(rc) {
+    return `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <Provincia xmlns="http://www.catastro.meh.es/"></Provincia>
+    <Municipio xmlns="http://www.catastro.meh.es/"></Municipio>
+    <RefCat xmlns="http://www.catastro.meh.es/">${rc}</RefCat>
+  </soap:Body>
+</soap:Envelope>`;
   }
 }

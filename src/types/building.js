@@ -320,13 +320,13 @@ export const Building = t.Building = t.struct(
     address: t.Address,
     buildingType: t.BuildingType,
     cadastre: t.maybe(t.Cadastre),
-    floorArea: t.Number,
-    landArea: t.Number,
-    roofArea: t.Number,
-    coefficient: t.Number,
+    floorArea: t.union([t.Number, t.String]),
+    landArea: t.union([t.Number, t.String]),
+    roofArea: t.union([t.Number, t.String]),
+    coefficient: t.union([t.Number, t.String]),
     use: t.maybe(t.String), // FIXME: define this as a t.enums
     propertyType: t.maybe(t.String), // FIXME: define this as a t.enums
-    buildingDate: t.Number,
+    buildingDate: t.union([t.Number, t.String]),
     location: t.Location,
     elements: t.maybe(t.Elements),
     entities: t.list(t.BuildingEntity),

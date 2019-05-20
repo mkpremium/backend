@@ -1,5 +1,12 @@
 import {CadastreApi} from '../../src/cadastre/api';
-import {fakeByAddress, fakeByCadastre, fakeCities, fakeProvinces, fakeStreets} from './constants';
+import {
+  fakeBuildingByAddress,
+  fakeBuildingByCadastre,
+  fakeByCadastre,
+  fakeCities,
+  fakeProvinces,
+  fakeStreets
+} from './constants';
 
 function findById(id) {
   return (item) => item.id === id;
@@ -9,9 +16,10 @@ describe('cadastre/api', () => {
   const api = new CadastreApi({
     PROVINCES: fakeProvinces,
     CITIES: fakeCities,
-    STREET: fakeStreets,
-    BY_ADDRESS: fakeByAddress,
-    BY_CADASTRE: fakeByCadastre
+    STREETS: fakeStreets,
+    BUILDING_BY_ADDRESS: fakeBuildingByAddress,
+    BUILDING_BY_CADASTRE: fakeBuildingByCadastre,
+    LOCATION_BY_CADASTRE: fakeByCadastre
   });
 
   describe('fetchCities', () => {
@@ -151,7 +159,7 @@ describe('cadastre/api', () => {
             'type': 'ALMACEN'
           }
         ],
-        'landArea': '2911',
+        'floorArea': '2911',
         'propertyType': 'UR',
         'use': 'Residencial'
       };
@@ -166,6 +174,48 @@ describe('cadastre/api', () => {
       location.should.be.an('object');
       location.lat.should.equal(41.36566014092729);
       location.lng.should.equal(2.128741678304813);
+    });
+  });
+
+  describe('fetchBuildingByCadastre', async() => {
+    it('able to fetch building info by using cadastreReference', async() => {
+      const resultBuilding = await api.fetchBuildingByCadastre('1448401VK4714G0001EH');
+      const building = {
+        'address': {
+          'city': "L'HOSPITALET DE LLOBREGAT",
+          'fullAddress': "CL UNIO DE LA 41 L'HOSPITALET DE LLOBREGAT",
+          'number': '41',
+          'postalCode': {
+            'number': '08902'
+          },
+          'province': 'BARCELONA',
+          'street': 'UNIO DE LA',
+          'type': 'CL'
+        },
+        'buildingDate': '2001',
+        'cadastre': {
+          'address': "CL UNIO DE LA 41(B) Es:1 Pl:-1 Pt:01 08902 L'HOSPITALET DE LLOBREGAT (BARCELONA)",
+          'reference': '7398504DF2779G0001LO'
+        },
+        'coefficient': '0,160000',
+        'elements': {
+          'average': 11,
+          'commons': 11,
+          'number': 1
+        },
+        'entities': [
+          {
+            'door': '01',
+            'plant': '-1',
+            'surface': '11',
+            'type': 'APARCAMIENTO'
+          }
+        ],
+        'floorArea': '22',
+        'propertyType': 'UR',
+        'use': 'Almacen-Estacionamiento'
+      };
+      resultBuilding.should.eql(building);
     });
   });
 });

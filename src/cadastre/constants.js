@@ -1,9 +1,10 @@
 export const keys = {
   PROVINCES: 'PROVINCES',
   CITIES: 'CITIES',
-  STREET: 'STREET',
-  BY_ADDRESS: 'BY_ADDRESS',
-  BY_CADASTRE: 'BY_CADASTRE'
+  STREETS: 'STREETS',
+  BUILDING_BY_ADDRESS: 'BUILDING_BY_ADDRESS',
+  BUILDING_BY_CADASTRE: 'BUILDING_BY_CADASTRE',
+  LOCATION_BY_CADASTRE: 'LOCATION_BY_CADASTRE'
 };
 
 export const streetTypes = {
@@ -105,10 +106,49 @@ export const streetTypes = {
 export const urls = {
   [keys.PROVINCES]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaProvincia',
   [keys.CITIES]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaMunicipio',
-  [keys.STREET]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaVia',
-  [keys.BY_ADDRESS]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/Consulta_DNPLOC',
-  [keys.BY_CADASTRE]: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC'
+  [keys.STREETS]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaVia',
+  [keys.BUILDING_BY_ADDRESS]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/Consulta_DNPLOC',
+  [keys.BUILDING_BY_CADASTRE]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
+  [keys.LOCATION_BY_CADASTRE]: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC'
 };
+
+const buildingTemplate = {
+  building: {
+    cadastre: {
+      rc: {
+        pc1: '//rc/pc1',
+        pc2: '//rc/pc2',
+        car: '//rc/car',
+        cc1: '//rc/cc1',
+        cc2: '//rc/cc2'
+      },
+      address: '//ldt'
+    },
+    address: {
+      number: '//dir/pnp',
+      type: '//dir/tv',
+      street: '//dir/nv',
+      city: '//nm',
+      province: '//np',
+      postalCode: {
+        number: '//dp'
+      }
+    },
+    use: '//debi/luso',
+    propertyType: '//idbi/cn',
+    entities: ['//cons', {
+      surface: 'number(dfcons/stl)',
+      type: 'lcd',
+      plant: 'dt/lourb/loint/pt',
+      door: 'dt/lourb/loint/pu'
+    }],
+    coefficient: '//cpt',
+    floorArea: 'number(//sfc)',
+    buildingDate: '//ant'
+  },
+  error: '//err/des'
+};
+
 export const templates = {
   [keys.PROVINCES]: {
     items: ['//prov', {
@@ -124,7 +164,7 @@ export const templates = {
     }],
     error: '//err/des'
   },
-  [keys.STREET]: {
+  [keys.STREETS]: {
     items: ['//calle', {
       id: 'dir/cv',
       type: 'dir/tv',
@@ -132,43 +172,9 @@ export const templates = {
     }],
     error: '//err/des'
   },
-  [keys.BY_ADDRESS]: {
-    building: {
-      cadastre: {
-        rc: {
-          pc1: '//rc/pc1',
-          pc2: '//rc/pc2',
-          car: '//rc/car',
-          cc1: '//rc/cc1',
-          cc2: '//rc/cc2'
-        },
-        address: '//ldt'
-      },
-      address: {
-        number: '//dir/pnp',
-        type: '//dir/tv',
-        street: '//dir/nv',
-        city: '//nm',
-        province: '//np',
-        postalCode: {
-          number: '//dp'
-        }
-      },
-      use: '//debi/luso',
-      propertyType: '//idbi/cn',
-      entities: ['//cons', {
-        surface: 'dfcons/stl',
-        type: 'lcd',
-        plant: 'dt/lourb/loint/pt',
-        door: 'dt/lourb/loint/pu'
-      }],
-      coefficient: '//cpt',
-      floorArea: '//sfc',
-      buildingDate: '//ant'
-    },
-    error: '//err/des'
-  },
-  [keys.BY_CADASTRE]: {
+  [keys.BUILDING_BY_ADDRESS]: buildingTemplate,
+  [keys.BUILDING_BY_CADASTRE]: buildingTemplate,
+  [keys.LOCATION_BY_CADASTRE]: {
     srs: '//geo/srs',
     xcen: '//geo/xcen',
     ycen: '//geo/ycen',

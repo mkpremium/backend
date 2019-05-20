@@ -189,7 +189,7 @@ export const Address = t.Address = t.struct(
   {
     type: t.maybe(t.String),
     street: t.String,
-    number: t.Number,
+    number: t.union([t.Number, t.String]),
     fullAddress: t.maybe(t.String),
     registerNumber: t.maybe(t.Number),
     postalCode: t.PostalCode,

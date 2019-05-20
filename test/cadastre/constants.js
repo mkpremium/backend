@@ -9666,7 +9666,7 @@ export const fakeByCadastre = `<?xml version="1.0" encoding="utf-8"?>
   </coordenadas>
 </consulta_coordenadas>`;
 
-export const fakeByAddress = `<?xml version="1.0" encoding="utf-8"?>
+export const fakeBuildingByAddress = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_dnp xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.catastro.meh.es/">
   <control>
     <cudnp>1</cudnp>
@@ -10046,6 +10046,89 @@ export const buildingInfo = `<?xml version="1.0" encoding="utf-8"?>
         <lcd>ELEMENTOS COMUNES</lcd>
         <dfcons>
           <stl>62</stl>
+        </dfcons>
+      </cons>
+    </lcons>
+  </bico>
+</consulta_dnp>`;
+
+export const fakeBuildingByCadastre = `<?xml version="1.0" encoding="utf-8"?>
+<consulta_dnp xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.catastro.meh.es/">
+  <control>
+    <cudnp>1</cudnp>
+    <cucons>2</cucons>
+    <cucul>0</cucul>
+  </control>
+  <bico>
+    <bi>
+      <idbi>
+        <cn>UR</cn>
+        <rc>
+          <pc1>7398504</pc1>
+          <pc2>DF2779G</pc2>
+          <car>0001</car>
+          <cc1>L</cc1>
+          <cc2>O</cc2>
+        </rc>
+      </idbi>
+      <dt>
+        <loine>
+          <cp>08</cp>
+          <cm>101</cm>
+        </loine>
+        <cmc>100</cmc>
+        <np>BARCELONA</np>
+        <nm>L'HOSPITALET DE LLOBREGAT</nm>
+        <locs>
+          <lous>
+            <lourb>
+              <dir>
+                <cv>345</cv>
+                <tv>CL</tv>
+                <nv>UNIO DE LA</nv>
+                <pnp>41</pnp>
+                <plp>B</plp>
+                <snp>0</snp>
+              </dir>
+              <loint>
+                <es>1</es>
+                <pt>-1</pt>
+                <pu>01</pu>
+              </loint>
+              <dp>08902</dp>
+              <dm>3</dm>
+            </lourb>
+          </lous>
+        </locs>
+      </dt>
+      <ldt>CL UNIO DE LA 41(B) Es:1 Pl:-1 Pt:01 08902 L'HOSPITALET DE LLOBREGAT (BARCELONA)</ldt>
+      <debi>
+        <luso>Almacen-Estacionamiento</luso>
+        <sfc>22</sfc>
+        <cpt>0,160000</cpt>
+        <ant>2001</ant>
+      </debi>
+    </bi>
+    <lcons>
+      <cons>
+        <lcd>APARCAMIENTO</lcd>
+        <dt>
+          <lourb>
+            <loint>
+              <es>1</es>
+              <pt>-1</pt>
+              <pu>01</pu>
+            </loint>
+          </lourb>
+        </dt>
+        <dfcons>
+          <stl>11</stl>
+        </dfcons>
+      </cons>
+      <cons>
+        <lcd>ELEMENTOS COMUNES</lcd>
+        <dfcons>
+          <stl>11</stl>
         </dfcons>
       </cons>
     </lcons>

@@ -26,7 +26,7 @@ async function getStreets(req, res) {
 
 async function getCompleteInfo(req, res) {
   const repo = new CadastreRepository();
-  const completeInfo = await repo.getCompleteInfo(req.body || {});
+  const completeInfo = await repo.getBuildingByAddress(req.body || {});
   res.json(completeInfo);
 }
 
