@@ -1,5 +1,6 @@
 import t from 'tcomb';
 import uuid from 'uuid/v4';
+import {RestringedHourObject} from '../operator/restringed-hours/types';
 
 export const OperatorRoles = {
   OPERATOR: 'OPERATOR',
@@ -160,6 +161,8 @@ t.OperatorProfile.prototype.getStateMessage = function() {
  *        type: array
  *        items:
  *          type: string
+ *      restringedHours:
+ *        $ref: "#/definitions/RestringedHours"
  *      features:
  *        type: array
  *        items:
@@ -185,6 +188,7 @@ t.Operator = t.struct(
     online: t.Bool,
 
     profile: t.OperatorProfile,
+    restringedHours: t.maybe(RestringedHourObject),
 
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),

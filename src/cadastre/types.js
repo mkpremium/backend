@@ -59,6 +59,10 @@ export const CadastreStreet = tcomb.struct(
  *         $ref: "#/definitions/Location"
  *       address:
  *         $ref: "#/definitions/Address"
+ *   CadastreReferenceInput:
+ *     properties:
+ *       cadastreReference:
+ *         type: string
  *
  */
 export const CadastreAddressInput = tcomb.struct(

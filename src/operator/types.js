@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import {RestringedHourObject} from './restringed-hours/types';
 
 /**
  * @swagger
@@ -140,7 +141,8 @@ t.OperatorView = t.struct(
     id: t.maybe(t.String),
     username: t.String,
     roles: t.list(t.OperatorRole),
-    profile: t.OperatorProfile
+    profile: t.OperatorProfile,
+    restringedHours: RestringedHourObject
   },
   {
     name: 'Operator',

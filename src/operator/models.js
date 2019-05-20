@@ -43,6 +43,17 @@ export class Operator extends CouchbaseModel {
     this.Struct = t.Operator;
   }
 
+  async operatorRestringedHours(operatorId) {
+    const operator = await this.findByIdOrThrow(operatorId);
+    return operator.restringedHours || {};
+  }
+
+  async writeOperatorRestringedHours(operatorId, restringedHours) {
+    const operator = await this.findByIdOrThrow(operatorId);
+    const updatedOperator = t.update(operator, {restringedHours: {$set: restringedHours}});
+    await this.save(updatedOperator);
+  }
+
   static async hashPassword(password) {
     if (/^\$2\w\$\d{2}\$/.test(password)) {
       return password;
