@@ -2,7 +2,7 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import {deleteAll} from '../test/common';
 import {createBuildingWithWorksheet} from '../src/worksheet/building/model';
-import {queryBuildingByCity, setBuildingsPlaceIdByCity} from './cli-building-set-place-id';
+import {queryBuildingByCity, setBuildingsPlaceIdByCity} from '../cli/cli-building-set-place-id';
 
 describe('setBuildingsPlaceIdByCity', () => {
   const baseBuilding = {
