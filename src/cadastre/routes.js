@@ -1,9 +1,9 @@
 import {Router} from 'express';
 import {
   getCitiesController,
-  getCompleteInfoController,
+  getBuildingByAddressController,
   getProvincesController,
-  getStreetsController
+  getStreetsController, getBuildingByCadastreController
 } from './controllers';
 
 const router = Router({});
@@ -123,6 +123,35 @@ router.get('/streets', getStreetsController);
  * @swagger
  * /cadastre/complete-info:
  *   post:
+ *     description: "**Use el endpoint \/cadastre\/building-by-address este dejara de estar disponible**"
+ *     security:
+ *       - admin: []
+ *       - operator: []
+ *       - manager: []
+ *       - comercial: []
+ *     tags: [Cadastre, Operator]
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *      - "application/json"
+ *     responses:
+ *       200:
+ *         description: Información de edificio
+ *         schema:
+ *           $ref: "#/definitions/Building"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/CadastreAddressInput"
+ */
+router.post('/complete-info', getBuildingByAddressController);
+
+/**
+ * @swagger
+ * /cadastre/building-by-address:
+ *   post:
  *     description: Devuelve location y address formateado para una dirección pasada
  *     security:
  *       - admin: []
@@ -136,9 +165,9 @@ router.get('/streets', getStreetsController);
  *      - "application/json"
  *     responses:
  *       200:
- *         description: Listado de calles
+ *         description: Información de edificio
  *         schema:
- *           $ref: "#/definitions/CadastreAddress"
+ *           $ref: "#/definitions/Building"
  *     parameters:
  *       - name: body
  *         in: body
@@ -146,6 +175,35 @@ router.get('/streets', getStreetsController);
  *         schema:
  *           $ref: "#/definitions/CadastreAddressInput"
  */
-router.post('/complete-info', getCompleteInfoController);
+router.post('/building-by-address', getBuildingByAddressController);
+
+/**
+ * @swagger
+ * /cadastre/building-by-cadastre:
+ *   post:
+ *     description: Devuelve location y address formateado para una referencia catastral pasada
+ *     security:
+ *       - admin: []
+ *       - operator: []
+ *       - manager: []
+ *       - comercial: []
+ *     tags: [Cadastre, Operator]
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     responses:
+ *       200:
+ *         description: Información de edificio
+ *         schema:
+ *           $ref: "#/definitions/Building"
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/CadastreReferenceInput"
+ */
+router.post('/building-by-cadastre', getBuildingByCadastreController);
 
 export default router;

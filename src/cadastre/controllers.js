@@ -24,13 +24,21 @@ async function getStreets(req, res) {
   res.json(streets);
 }
 
-async function getCompleteInfo(req, res) {
+async function getBuildingByAddress(req, res) {
   const repo = new CadastreRepository();
-  const completeInfo = await repo.getBuildingByAddress(req.body || {});
-  res.json(completeInfo);
+  const buildingInfo = await repo.getBuildingByAddress(req.body || {});
+  res.json(buildingInfo);
+}
+
+async function getBuildingByCadastre(req, res) {
+  const repo = new CadastreRepository();
+  const cadastreReference = _.get(req, 'body.cadastreReference', '');
+  const buildingInfo = await repo.getBuildingByCadastre(cadastreReference);
+  res.json(buildingInfo);
 }
 
 export const getProvincesController = wrap(getProvinces);
 export const getCitiesController = wrap(getCities);
 export const getStreetsController = wrap(getStreets);
-export const getCompleteInfoController = wrap(getCompleteInfo);
+export const getBuildingByAddressController = wrap(getBuildingByAddress);
+export const getBuildingByCadastreController = wrap(getBuildingByCadastre);
