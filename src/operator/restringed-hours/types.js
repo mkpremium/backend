@@ -7,7 +7,7 @@ function keyFormat(value) {
   return keyFormatRegex.test(value);
 }
 function hourFormat(value) {
-  return hourFormatRegex.test(value)
+  return hourFormatRegex.test(value);
 }
 
 const RestringedHourTime = t.refinement(t.String, hourFormat, 'RestringedHourTime');
@@ -20,7 +20,6 @@ const RestringedHour = t.struct({
 
 const RestringedHourValue = t.list(RestringedHour, 'RestringedHourValue');
 const RestringedHourKey = t.refinement(t.String, keyFormat, 'RestringedHourKey');
-
 
 /**
  * @swagger

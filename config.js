@@ -58,7 +58,7 @@ export const awsConfig = {
 };
 
 export const tests = {
-  skipCalls: JSON.parse(process.env.TEST_SKIP_CALLS || false)
+  skipCalls: JSON.parse(process.env.TEST_SKIP_CALLS || 'true')
 };
 
 export const isTest = () => process.env.NODE_ENV === 'test';

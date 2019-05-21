@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {wrap} from 'express-promise-wrap';
 import {CadastreRepository} from './models';
 import {CitiesInput, StreetsInput} from './types';

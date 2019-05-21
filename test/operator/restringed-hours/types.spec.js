@@ -13,20 +13,4 @@ describe('RestringedHours', () => {
     };
     RestringedHours({restringedHours});
   });
-
-  it('able to validate key format', function() {
-    const restringedHours = {
-      '2019-04': [
-        {start: '10:00', end: '11:00', 'description': 'Almorzando'},
-        {start: '15:00', end: '18:00', 'description': 'Estudiando'}
-      ],
-      '2019-04-05': [
-        {start: '10:00', end: '12:00'}
-      ]
-    };
-
-    const wrongCall = () => {RestringedHours({restringedHours})}
-
-
-  });
 });
