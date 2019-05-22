@@ -11,17 +11,30 @@ if (require.main === module) {
   program
     .arguments('')
     .version('0.0.1')
+    .option('-c --city <city>', 'Nombre municipio')
     .action(actionWrapper(main))
     .parse(process.argv);
 }
 
 async function main() {
-  await formatAllBuildingAddresses();
+  if (program.city) {
+    await formatCityBuildingAddresses(program.city);
+  } else {
+    await formatAllBuildingAddresses();
+  }
 }
 
 export async function formatAllBuildingAddresses() {
   const repo = new BuildingRepository();
   const buildingIds = await repo.getBuildingIds();
+  const options = {concurrency: 2};
+
+  return Promise.map(buildingIds, formatByBuildingAddress, options);
+}
+
+export async function formatCityBuildingAddresses(city) {
+  const repo = new BuildingRepository();
+  const buildingIds = await repo.getBuildingIdsByCity(city);
   const options = {concurrency: 2};
 
   return Promise.map(buildingIds, formatByBuildingAddress, options);

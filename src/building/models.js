@@ -381,6 +381,16 @@ export class BuildingRepository extends CouchbaseModel {
 
     return this.raw(query);
   }
+
+  async getBuildingIdsByCity(city) {
+    const bucket = this.getBucketName();
+    const query = `SELECT RAW id  FROM ${bucket} t
+                   WHERE t._documentType = 'building'
+                   AND t.address.city = '${city}'
+                   ORDER BY id`;
+
+    return this.raw(query);
+  }
 }
 
 function calculeStateTotals(results, neighborhoods) {
