@@ -10,8 +10,6 @@ import {
 } from './controllers';
 import {permissions} from '../middleware/jwt';
 
-import restringedHours from './restringed-hours';
-
 const router = Router();
 
 /**
@@ -290,6 +288,5 @@ router.get('/business', limitedListOperatorController);
  *           $ref: "#/definitions/Error"
  */
 router.get('/me', meController);
-restringedHours(router);
 
 export default router;

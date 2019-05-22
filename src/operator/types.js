@@ -142,7 +142,7 @@ t.OperatorView = t.struct(
     username: t.String,
     roles: t.list(t.OperatorRole),
     profile: t.OperatorProfile,
-    restringedHours: RestringedHourObject
+    restringedHours: t.maybe(RestringedHourObject)
   },
   {
     name: 'Operator',

@@ -17,5 +17,14 @@ async function writeOperatorRestringedHours(req, res) {
   res.status(204).send();
 }
 
+async function writeAnotherOperatorRestringedHours(req, res) {
+  const repo = new OperatorRepository();
+  const operatorId = req.params.id;
+  const restringedHours = _.get(req, 'body.restringedHours', {});
+  await repo.writeOperatorRestringedHours(operatorId, restringedHours);
+  res.status(204).send();
+}
+
 export const getOperatorRestringedHoursController = wrap(getOperatorRestringedHours);
 export const writeOperatorRestringedHoursController = wrap(writeOperatorRestringedHours);
+export const writeAnotherOperatorRestringedHoursController = wrap(writeAnotherOperatorRestringedHours);

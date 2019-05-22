@@ -1,11 +1,15 @@
 import {Router} from 'express';
-import {getOperatorRestringedHoursController, writeOperatorRestringedHoursController} from './controllers';
+import {
+  getOperatorRestringedHoursController,
+  writeAnotherOperatorRestringedHoursController,
+  writeOperatorRestringedHoursController
+} from './controllers';
 
 const router = Router({});
 
 /**
  * @swagger
- * /operator/restringed-hours:
+ * /operators/restringed-hours:
  *   get:
  *     description: Regresa el listado de horas restringidas para este usuario
  *     security:
@@ -28,7 +32,7 @@ router.get('/', getOperatorRestringedHoursController);
 
 /**
  * @swagger
- * /operator/restringed-hours:
+ * /operators/restringed-hours:
  *   put:
  *     description: Regresa el listado de horas restringidas para este usuario
  *     security:
@@ -52,5 +56,36 @@ router.get('/', getOperatorRestringedHoursController);
  *           $ref: "#/definitions/RestringedHoursResponse"
  */
 router.put('/', writeOperatorRestringedHoursController);
+
+/**
+ * @swagger
+ * /operators/restringed-hours/:id:
+ *   put:
+ *     description: Regresa el listado de horas restringidas para este usuario
+ *     security:
+ *       - admin: []
+ *       - operator: []
+ *       - manager: []
+ *       - comercial: []
+ *     tags: [Operator, Business, RestringedHours]
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     responses:
+ *       204:
+ *         description: Información de las horas restringidas
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/RestringedHoursResponse"
+ */
+router.put('/:id', writeAnotherOperatorRestringedHoursController);
 
 export default router;

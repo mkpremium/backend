@@ -1,4 +1,5 @@
 import routes from './routes';
+import restringedHoursRoutes from './restringed-hours/routes';
 
 import './types';
 import jwt from '../middleware/jwt';
@@ -12,4 +13,5 @@ export default (app) => {
   });
 
   app.use('/operators', secured, routes);
+  app.use('/operators/restringed-hours', secured, restringedHoursRoutes);
 };

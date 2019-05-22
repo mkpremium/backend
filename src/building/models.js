@@ -368,7 +368,7 @@ export class BuildingRepository extends CouchbaseModel {
 
     return this.queryRaw(N1qlQuery.fromString(query));
   }
-  
+
   /**
    *
    * @returns {Promise<*>}
@@ -378,8 +378,8 @@ export class BuildingRepository extends CouchbaseModel {
     const query = `SELECT RAW id  FROM ${bucket} t
                    WHERE t._documentType = 'building'
                    ORDER BY id`;
-    
-    return this.queryRaw(N1qlQuery.fromString(query));
+
+    return this.raw(query);
   }
 }
 
