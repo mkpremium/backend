@@ -120,7 +120,7 @@ export async function saveBuildingToFirebase(db, building, owner) {
     if (owner) {
       promises.push(comercialBuildingRef.child('Owner').set(owner));
     }
-    
+
     const owners = await findVerifiedOwners(building.id);
     if (owners && owners.length) {
       debugFb('saveBuildingToFirebase', 'saving verifiedOwners');
@@ -180,20 +180,25 @@ export async function saveBusinessUserToFirebase(operator) {
   const db = fbComerciales.database();
   const businessOperatorRef = db.ref(`${fbComerciales.prefixURL}Users/${operator.id}`);
   const snapshot = await businessOperatorRef.once('value');
+
+  const UserData = {
+    Name: operator.profile.fullName()
+  };
+  const RestringedHours = operator.restringedHours || {};
+
   if (snapshot.exists()) {
-    return businessOperatorRef
-      .child('UserData').set({
-        Name: operator.profile.fullName()
-      });
+    return Promise.all([
+      businessOperatorRef.child('UserData').set(UserData),
+      businessOperatorRef.child('RestringedHours').set(RestringedHours)
+    ]);
   }
   return businessOperatorRef
     .set({
       Meetings: {},
       RemindersMeetings: {},
       RemindersProposes: {},
-      UserData: {
-        Name: operator.profile.fullName()
-      }
+      UserData,
+      RestringedHours
     });
 }
 
@@ -219,19 +224,19 @@ export async function denormalizeBuildingData(operatorId, meeting) {
   if (!fbComerciales.enabled) {
     return;
   }
-  
+
   const db = fbComerciales.database();
   const promises = [];
   const {building, owner} = meeting;
   const ref = db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${building.id}`);
-  
+
   const firebaseBuilding = toFirebaseBuilding(building, owner);
   promises.push(ref.child('Data').set(firebaseBuilding));
-  
+
   if (owner) {
     promises.push(ref.child('Owner').set(owner));
   }
-  
+
   return Promise.all(promises);
 }
 

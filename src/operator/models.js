@@ -52,6 +52,7 @@ export class Operator extends CouchbaseModel {
     const operator = await this.findByIdOrThrow(operatorId);
     const updatedOperator = t.update(operator, {restringedHours: {$set: restringedHours}});
     await this.save(updatedOperator);
+    await firebaseUserAccount(updatedOperator);
   }
 
   static async hashPassword(password) {
