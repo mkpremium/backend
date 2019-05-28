@@ -27,6 +27,7 @@ import {ScheduledEventType} from './types';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
 import {OperatorActions} from '../stats/types';
 import {OperatorStats} from '../stats/models';
+import {SystemPreferencesRepository} from '../system-preferences/models';
 
 const debugModel = debug('app:model:scheduled-events');
 
@@ -138,22 +139,30 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     if (data.type !== ScheduledEventType.MEETINGS) {
       return true;
     }
-
     // non presencial meetings necesitan validación de tiempo y fecha
+
     if (!data.event.inPerson) {
       return true;
     }
 
-    if (!areAllowedMeetingMins(data.eventDate)) {
+    const pref = await SystemPreferencesRepository.getPreferences();
+
+    if (!pref.meetingRestrictions.enabled) {
+      return true;
+    }
+
+    if (!areAllowedMeetingMinutes(data.eventDate, pref.meetingRestrictions.allowedStartMinutes)) {
       throw newHttpError(
         400,
         `Las reuniones solo puede empezar a los 00 minutos o 30 minutos UTC: ${data.eventDate}|${data.eventDate.toISOString()}`
       );
     }
 
+    const previousTime = pref.meetingRestrictions.meetingTime + pref.meetingRestrictions.timeBetweenMeeting;
+    const meetingTime = pref.meetingRestrictions.meetingTime;
     const m = utc(data.eventDate);
-    const start = m.clone().subtract(1.5, 'hours').toISOString();
-    const end = m.clone().add(1, 'hours').toISOString();
+    const start = m.clone().subtract(previousTime, 'hours').toISOString();
+    const end = m.clone().add(meetingTime, 'hours').toISOString();
     console.log('areAllowedMeetingInRange', data.eventDate, start, end);
     const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end, data.id);
     if (meetingsInRange && meetingsInRange.length > 0) {
@@ -348,16 +357,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 }
 
-function areAllowedMeetingMins(time) {
+function areAllowedMeetingMinutes(time, allowedMinutes = [0, 30]) {
   const min = time.getMinutes();
 
-  if (min === 0) {
-    return true;
-  }
-
-  if (min === 30) {
-    return true;
-  }
-
-  return false;
+  return allowedMinutes.indexOf(min) !== -1;
 }
