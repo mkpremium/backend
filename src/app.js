@@ -31,6 +31,7 @@ import gearman from './gearman';
 import cadastre from './cadastre';
 
 import appErrorHandler from './lib/error-handler';
+import maintenanceMode from './system-preferences/maintenance-mode-middleware';
 
 const app = express();
 
@@ -47,6 +48,7 @@ Promise.all([
 ]).catch(err => {
   console.error(err);
 });
+maintenanceMode(app);
 gearman(app);
 operator(app);
 worksheet(app);

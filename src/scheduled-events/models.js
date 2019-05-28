@@ -147,7 +147,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
     const pref = await SystemPreferencesRepository.getPreferences();
 
-    if (!pref.meetingRestrictions.enabled) {
+    if (!pref.meetingRestrictions.enable) {
       return true;
     }
 

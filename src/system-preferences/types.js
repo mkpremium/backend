@@ -40,6 +40,7 @@ export const MeetingRestrictions = t.struct({
  */
 export const SystemPreferences = t.struct(
   {
+    id: t.String,
     maintenanceModeEnabled: t.Boolean,
     meetingRestrictions: MeetingRestrictions,
     _documentType: t.enums.of(['system-preferences'])
@@ -47,9 +48,10 @@ export const SystemPreferences = t.struct(
   {
     name: 'SystemPreferences',
     defaultProps: {
+      id: 'system-preferences',
       maintenanceModeEnabled: false,
       meetingRestrictions: {
-        enabled: true,
+        enable: true,
         meetingTime: 0.5,
         timeBetweenMeeting: 0,
         allowedStartMinutes: [0, 30]
@@ -58,3 +60,7 @@ export const SystemPreferences = t.struct(
     }
   }
 );
+
+SystemPreferences.prototype.setMaintenanceMode = function(enabled) {
+  return t.update(this, {maintenanceModeEnabled: {$set: enabled}});
+};
