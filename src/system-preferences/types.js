@@ -52,8 +52,8 @@ export const SystemPreferences = t.struct(
       maintenanceModeEnabled: false,
       meetingRestrictions: {
         enable: true,
-        meetingTime: 0.5,
-        timeBetweenMeeting: 0,
+        meetingTime: 1,
+        timeBetweenMeeting: 0.5,
         allowedStartMinutes: [0, 30]
       },
       _documentType: 'system-preferences'
