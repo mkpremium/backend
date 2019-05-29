@@ -2,7 +2,7 @@ import {wrap} from 'express-promise-wrap';
 import {SystemPreferencesRepository} from './models';
 
 async function getSystemPreferences(req, res) {
-  const pref = SystemPreferencesRepository.getPreferences();
+  const pref = await SystemPreferencesRepository.getPreferences();
   res.json(pref);
 }
 

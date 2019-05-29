@@ -27,6 +27,6 @@ export class SystemPreferencesRepository extends CouchbaseModel {
 
   static async writePreferences(pref) {
     const repo = new SystemPreferencesRepository();
-    return repo.save(pref);
+    return repo.save(SystemPreferences(pref));
   }
 }

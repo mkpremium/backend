@@ -29,6 +29,7 @@ import autocomplete from './autocomplete';
 import email from './email';
 import gearman from './gearman';
 import cadastre from './cadastre';
+import preferences from './system-preferences';
 
 import appErrorHandler from './lib/error-handler';
 import maintenanceMode from './system-preferences/maintenance-mode-middleware';
@@ -67,6 +68,7 @@ street(app);
 autocomplete(app);
 email(app);
 cadastre(app);
+preferences(app);
 
 app.use(appErrorHandler);
 
