@@ -8,6 +8,7 @@ import '../owner/types';
 import {Address} from './common';
 import {newHttpError} from '../lib/http-error';
 import {ScheduledEvent} from '../scheduled-events/types';
+import {utc} from "../lib/date";
 
 const debugWorksheet = debug('app:types:worksheet');
 
@@ -38,10 +39,14 @@ export const workSheetStatusTransition = function(status) {
         WorkSheetStatus.PUBLIC,
         WorkSheetStatus.ALREADY_SOLD
       ];
+    case WorkSheetStatus.NO_SALE:
+      return [
+        status,
+        WorkSheetStatus.WITH_OWNER
+      ];
     // end status
     case WorkSheetStatus.ALREADY_SOLD:
     case WorkSheetStatus.INVALID:
-    case WorkSheetStatus.NO_SALE:
     case WorkSheetStatus.MEETING:
     case WorkSheetStatus.PUBLIC:
       return [
@@ -120,7 +125,9 @@ export const Worksheet = t.WorkSheet = t.struct({
 
   _documentType: t.enums.of(['worksheet']),
 
-  buildingAddress: t.maybe(Address)
+  buildingAddress: t.maybe(Address),
+
+  statusChangedAt: t.maybe(t.Date)
 }, {
   name: 'WorkSheet',
   defaultProps: {
@@ -146,11 +153,15 @@ t.WorkSheet.prototype.setStatus = function(newStatus) {
 
   if (newStatus === this.status) {
     debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`);
+    return this;
   } else {
     debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`);
+    return t.update(this, {status: {$set: newStatus}, statusChangedAt: {$set: utc().toDate()}});
   }
+};
 
-  return t.update(this, {status: {$set: newStatus}});
+t.WorkSheet.prototype.setStatusChangedAt = function(newDate) {
+  return t.update(this, {statusChangedAt: {$set: newDate}});
 };
 
 /**
