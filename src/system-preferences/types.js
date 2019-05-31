@@ -1,4 +1,5 @@
 import * as t from 'tcomb';
+import {WorksheetStatus, WorkSheetStatus} from '../types/worksheet';
 
 const Positive = t.refinement(t.Number, n => n >= 0, 'Positive');
 
@@ -27,6 +28,13 @@ export const MeetingRestrictions = t.struct({
   allowedStartMinutes: t.list(Positive)
 }, 'MeetingRestrictions');
 
+export const FreezerSettings = t.struct({
+  enable: t.Boolean,
+  daysInFreezer: Positive,
+  fromState: WorksheetStatus,
+  toState: WorksheetStatus
+}, 'FreezerSettings');
+
 /**
  * @swagger
  * definitions:
@@ -43,6 +51,7 @@ export const SystemPreferences = t.struct(
     id: t.String,
     maintenanceModeEnabled: t.Boolean,
     meetingRestrictions: MeetingRestrictions,
+    freezer: FreezerSettings,
     _documentType: t.enums.of(['system-preferences'])
   },
   {
@@ -55,6 +64,12 @@ export const SystemPreferences = t.struct(
         meetingTime: 1,
         timeBetweenMeeting: 0.5,
         allowedStartMinutes: [0, 30]
+      },
+      freezer: {
+        enable: true,
+        daysInFreezer: 90,
+        fromState: WorkSheetStatus.NO_SALE,
+        toState: WorkSheetStatus.WITH_OWNER
       },
       _documentType: 'system-preferences'
     }

@@ -8,7 +8,7 @@ import '../owner/types';
 import {Address} from './common';
 import {newHttpError} from '../lib/http-error';
 import {ScheduledEvent} from '../scheduled-events/types';
-import {utc} from "../lib/date";
+import {utc} from '../lib/date';
 
 const debugWorksheet = debug('app:types:worksheet');
 
@@ -57,7 +57,7 @@ export const workSheetStatusTransition = function(status) {
   }
 };
 
-t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus');
+export const WorksheetStatus = t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus');
 
 t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
 
