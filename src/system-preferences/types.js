@@ -31,6 +31,7 @@ export const MeetingRestrictions = t.struct({
 export const FreezerSettings = t.struct({
   enable: t.Boolean,
   daysInFreezer: Positive,
+  provinces: t.list(t.String),
   fromState: WorksheetStatus,
   toState: WorksheetStatus
 }, 'FreezerSettings');
@@ -69,7 +70,8 @@ export const SystemPreferences = t.struct(
         enable: true,
         daysInFreezer: 90,
         fromState: WorkSheetStatus.NO_SALE,
-        toState: WorkSheetStatus.WITH_OWNER
+        toState: WorkSheetStatus.WITH_OWNER,
+        provinces: []
       },
       _documentType: 'system-preferences'
     }

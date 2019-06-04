@@ -279,6 +279,7 @@ export const Owner = t.Owner = t.struct(
     }
   }
 );
+
 t.OwnerWithInclude = t.Owner.extend({
   building: t.maybe(t.Building),
   person: t.maybe(t.Person)
@@ -288,6 +289,10 @@ t.Owner.prototype.fullName = function() {
   if (this.person) {
     return this.person.fullName();
   }
+};
+
+t.Owner.prototype.setStatus = function($set) {
+  return t.update(this, {status: {$set}});
 };
 
 /**

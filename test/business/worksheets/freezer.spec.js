@@ -1,11 +1,10 @@
 import {Worksheet, WorkSheetStatus} from '../../../src/types/worksheet';
 import {deleteAll} from '../../common';
-import {createBuildingWithWorksheet} from '../../../src/worksheet/building/model';
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import {moveWorksheetOutOfFreezer} from '../../../src/business/worksheets/freezer';
 
 import {expect} from 'chai';
-import {utc} from "../../../src/lib/date";
+import {utc} from '../../../src/lib/date';
 
 describe('moveWorksheetOutOfFreezer', () => {
   const building = {
@@ -35,7 +34,7 @@ describe('moveWorksheetOutOfFreezer', () => {
 
   let workSheetRepository = new WorksheetRepository();
 
-  async function countWorksheetStatus(){
+  async function countWorksheetStatus() {
     const queryBuilder = workSheetRepository
       .getQueryBuilder('count')
       .where('status = ? ', WorkSheetStatus.NO_SALE);
@@ -51,11 +50,12 @@ describe('moveWorksheetOutOfFreezer', () => {
   });
 
   it('should change to a state after 90 days', async() => {
+    const resultBefore = await countWorksheetStatus();
+    expect(resultBefore).to.equal(1);
     await moveWorksheetOutOfFreezer();
     const result = await countWorksheetStatus();
     expect(result).to.equal(0);
   });
 
   it('should not change to a new state before 90 days');
-
 });
