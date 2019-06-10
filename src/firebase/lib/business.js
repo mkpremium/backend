@@ -139,6 +139,20 @@ export async function saveBuildingToFirebase(db, building, owner) {
   }
 }
 
+export async function removeBuildingFromBusiness(buildingId, businessId) {
+  if (!fbComerciales.enabled) {
+    debugFb('removeBuildingFromBusiness', 'omitted, because fbComerciales.enabled =', fbComerciales.enabled);
+    return;
+  }
+
+  const db = fbComerciales.database();
+  const referencePath = `${fbComerciales.prefixURL}Users/${businessId}/Buildings/${buildingId}`;
+  const comercialBuildingRef = await db.ref(referencePath).once('value');
+  if (comercialBuildingRef.exists()) {
+    await db.ref(referencePath).set(null);
+  }
+}
+
 export async function relateMeetingToBuilding(db, {id, building}) {
   if (!fbComerciales.enabled) {
     return;

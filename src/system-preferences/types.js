@@ -1,5 +1,4 @@
 import * as t from 'tcomb';
-import {WorksheetStatus, WorkSheetStatus} from '../types/worksheet';
 
 const Positive = t.refinement(t.Number, n => n >= 0, 'Positive');
 
@@ -31,9 +30,7 @@ export const MeetingRestrictions = t.struct({
 export const FreezerSettings = t.struct({
   enable: t.Boolean,
   daysInFreezer: Positive,
-  provinces: t.list(t.String),
-  fromState: WorksheetStatus,
-  toState: WorksheetStatus
+  provinces: t.list(t.String)
 }, 'FreezerSettings');
 
 /**
@@ -69,8 +66,6 @@ export const SystemPreferences = t.struct(
       freezer: {
         enable: true,
         daysInFreezer: 90,
-        fromState: WorkSheetStatus.NO_SALE,
-        toState: WorkSheetStatus.WITH_OWNER,
         provinces: []
       },
       _documentType: 'system-preferences'

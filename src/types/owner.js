@@ -295,6 +295,13 @@ t.Owner.prototype.setStatus = function($set) {
   return t.update(this, {status: {$set}});
 };
 
+t.Owner.prototype.pullOutFreezer = function(newStatus) {
+  return t.update(this, {
+    status: {$set: newStatus},
+    business: {$set: null}
+  });
+};
+
 /**
  * @return {t.Owner}
  */

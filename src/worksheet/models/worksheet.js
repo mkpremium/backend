@@ -193,7 +193,7 @@ export class WorksheetRepository extends CouchbaseModel {
         }
         return worksheet.status;
       default:
-        worksheetDebug(`the status ${worksheet.status} don't have planned behavior`);
+        worksheetDebug(`worksheet ${worksheet.id} with status ${worksheet.status} don't have planned behavior`);
         return worksheet.status;
     }
   }

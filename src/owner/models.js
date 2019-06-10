@@ -16,6 +16,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
 import {Owner} from '../types/owner';
+import {putWorksheetOnFreezer} from '../business/worksheets/freezer';
 
 export class Person extends CouchbaseModel {
   constructor() {
@@ -294,7 +295,20 @@ export class OwnerRepository extends CouchbaseModel {
     const owner = await this.updateBusinessStatus(ownerId, status, updatedBy);
     const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person']);
     await saveBuildingOwnerToFirebase(updatedOwner);
+    await OwnerRepository.checkAndSendToFreezer(updatedOwner);
     return owner;
+  }
+
+  static async checkAndSendToFreezer(owner) {
+    const ownerStatusIsNoSale = owner.status !== OwnerStatus.NO_SALE;
+    const businessStatusIsNoSale = _.get(owner, 'business.status', '') !== OwnerBusinessStatus.NO_SALE;
+
+    if (businessStatusIsNoSale && ownerStatusIsNoSale) {
+      return;
+    }
+
+    const worksheet = await WorksheetRepository.findByBuilding(owner.buildingId);
+    return putWorksheetOnFreezer(worksheet);
   }
 
   async updateBusinessStatus(ownerId, status, updatedBy) {

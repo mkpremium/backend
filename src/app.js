@@ -49,8 +49,9 @@ Promise.all([
 ]).catch(err => {
   console.error(err);
 });
-maintenanceMode(app);
+webhooks(app);
 gearman(app);
+maintenanceMode(app);
 operator(app);
 worksheet(app);
 owner(app);
@@ -58,7 +59,6 @@ calls(app);
 scheduledEvents(app);
 history(app);
 migration(app);
-webhooks(app);
 notes(app);
 building(app);
 metadata(app);

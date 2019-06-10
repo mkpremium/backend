@@ -1,7 +1,7 @@
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 import app from '../../../src/app';
 import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
-import WorksheetHelper, {CreateWorksheetType} from '../../helpers/worksheet';
+import WorksheetHelper, {createOwnerByType, CreateWorksheetType} from '../../helpers/worksheet';
 import OwnerHelper from '../../helpers/owner';
 import _ from 'lodash';
 import {OwnerStatus} from '../../../src/types/enums';
@@ -157,6 +157,64 @@ describe('WorksheetRepository', () => {
       const worksheetUpdated = await WorksheetHelper
         .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
       worksheetUpdated.status.should.be.equal(WorkSheetStatus.INVALID);
+    });
+  });
+
+  describe('Update status for no sale owner', () => {
+    let authenticatedOperator, authenticatedManager, worksheetsWithOwner, queue;
+    before(async() => {
+      await deleteAll();
+      queue = await createQueue();
+      await operatorCreate('', queue.id);
+      await operatorCreateManager();
+      authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
+      authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+
+      worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);
+      const worksheetAndOwner = _.first(worksheetsWithOwner);
+      const worksheet = worksheetAndOwner.worksheet;
+      const repo = new WorksheetRepository();
+      const extraOwner1 = await createOwnerByType(
+        authenticatedManager,
+        worksheet.relatedBuildingIds[0],
+        CreateWorksheetType.INVALID_BAD_CONTACTS);
+      const extraOwner2 = await createOwnerByType(
+        authenticatedManager,
+        worksheet.relatedBuildingIds[0],
+        CreateWorksheetType.INVALID_BAD_CONTACTS);
+      await repo.addOwner(worksheet, extraOwner1);
+      await repo.addOwner(worksheet, extraOwner2);
+    });
+
+    it('Test update worksheet status', async() => {
+      const worksheetAndOwner = _.first(worksheetsWithOwner);
+      const worksheet = worksheetAndOwner.worksheet;
+      const owner = worksheetAndOwner.owner;
+
+      const verifyOwnerPayload = {
+        status: OwnerStatus.VERIFIED,
+        verified: true
+      };
+      await OwnerHelper.updateOwnerViaEndpoint(owner.id, verifyOwnerPayload, authenticatedOperator);
+      const updated = await OwnerHelper.findOwner(owner.id);
+      updated.status.should.be.equal(OwnerStatus.VERIFIED);
+
+      const worksheetUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetUpdated.status.should.be.equal(WorkSheetStatus.WITH_OWNER);
+
+      const publicOwnerPayload = {
+        status: OwnerStatus.NO_SALE,
+        verified: true
+      };
+      await OwnerHelper.updateOwnerViaEndpoint(owner.id, publicOwnerPayload, authenticatedOperator);
+      const publicOwner = await OwnerHelper.findOwner(owner.id);
+      publicOwner.status.should.be.equal(OwnerStatus.NO_SALE);
+
+      // calculate worksheet status
+      const worksheetPublicUpdated = await WorksheetHelper
+        .updateStatusViaModel(worksheet.id, authenticatedOperator.operator.id);
+      worksheetPublicUpdated.status.should.be.equal(WorkSheetStatus.NO_SALE);
     });
   });
 });
