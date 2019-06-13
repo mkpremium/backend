@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import _find from 'lodash/find';
 import _findIndex from 'lodash/findIndex';
 import _filter from 'lodash/filter';
@@ -159,10 +160,6 @@ export const Worksheet = t.WorkSheet = t.struct({
 });
 
 t.WorkSheet.prototype.setStatus = function(newStatus) {
-  if (workSheetStatusTransition(this.status).indexOf(newStatus) === -1) {
-    throw new Error(`worksheet ${this.id} cannot transition from ${this.status} to ${newStatus}`);
-  }
-
   if (newStatus === this.status) {
     debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`);
     return this;
@@ -170,6 +167,10 @@ t.WorkSheet.prototype.setStatus = function(newStatus) {
     debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`);
     return t.update(this, {status: {$set: newStatus}, statusChangedAt: {$set: utc().toDate()}});
   }
+};
+
+t.WorkSheet.prototype.fixStatus = function(newStatus) {
+  return t.update(this, {status: {$set: newStatus}});
 };
 
 t.WorkSheet.prototype.pullOutFreezer = function(newStatus) {
@@ -429,3 +430,7 @@ t.WorksheetQueue.prototype.findNextAvailableInQueue = function(currentItem = nul
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets;
   return _find(worksheets, {status: Queue.Status.AVAILABLE});
 };
+
+export function newWorksheet(data) {
+  return fromJSON(data, t.WorkSheet);
+}

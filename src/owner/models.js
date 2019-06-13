@@ -230,7 +230,6 @@ export class OwnerRepository extends CouchbaseModel {
 
   async updateContact(ownerId, contactId, data) {
     const owner = await this.findByIdOrThrow(ownerId);
-    await WorksheetRepository.canUpdateOwner(owner, owner);
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
@@ -269,8 +268,6 @@ export class OwnerRepository extends CouchbaseModel {
     const owner = await this.findByIdOrThrow(ownerId);
     let updatedOwner = t.update(owner, {$merge: Object.assign({}, data, {id: ownerId})});
 
-    await WorksheetRepository.canUpdateOwner(owner, updatedOwner);
-
     if (typeof data.verified !== 'undefined') {
       const owner = t.Owner(updatedOwner);
       updatedOwner = owner.verifyOwner(operatorId, data.verified);
@@ -295,20 +292,14 @@ export class OwnerRepository extends CouchbaseModel {
     const owner = await this.updateBusinessStatus(ownerId, status, updatedBy);
     const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person']);
     await saveBuildingOwnerToFirebase(updatedOwner);
-    await OwnerRepository.checkAndSendToFreezer(updatedOwner);
+    await OwnerRepository.recalculateWorksheetStatus(updatedOwner);
     return owner;
   }
 
-  static async checkAndSendToFreezer(owner) {
-    const ownerStatusIsNoSale = owner.status !== OwnerStatus.NO_SALE;
-    const businessStatusIsNoSale = _.get(owner, 'business.status', '') !== OwnerBusinessStatus.NO_SALE;
-
-    if (businessStatusIsNoSale && ownerStatusIsNoSale) {
-      return;
-    }
-
+  static async recalculateWorksheetStatus(owner) {
+    const repo = new WorksheetRepository();
     const worksheet = await WorksheetRepository.findByBuilding(owner.buildingId);
-    return putWorksheetOnFreezer(worksheet);
+    return repo.updateStatus(worksheet.id);
   }
 
   async updateBusinessStatus(ownerId, status, updatedBy) {

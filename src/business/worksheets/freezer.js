@@ -8,6 +8,8 @@ import {SystemPreferencesRepository} from '../../system-preferences/models';
 import {OwnerRepository} from '../../owner/models';
 import {OwnerStatus} from '../../types/enums';
 import {removeBuildingFromBusiness} from '../../firebase/lib/business';
+import {BuildingRepository} from '../../building/models';
+import {ScheduledTaskRepository} from '../../scheduled-events/models';
 
 const debugFreezer = debug('app:worksheets:freezer');
 
@@ -102,7 +104,12 @@ export async function moveOwnerStatus(buildingId) {
   });
 
   const saveOwner = owner => repository.save(owner, false);
-  const cleanBusiness = ({buildingId, businessId}) => removeBuildingFromBusiness(buildingId, businessId);
+
+  const cleanBusiness = async({buildingId, businessId}) => {
+    await removeBuildingFromBusiness(buildingId, businessId);
+    await cleanMeetings(buildingId);
+  };
+
   if (updatedOwners.length > 0) {
     await Promise.map(updatedOwners, saveOwner, {concurrency: 3});
   }
@@ -110,4 +117,23 @@ export async function moveOwnerStatus(buildingId) {
   if (businessToRemove.length > 0) {
     await Promise.map(businessToRemove, cleanBusiness, {concurrency: 2});
   }
+}
+
+async function cleanMeetings(buildingId) {
+  const worksheet = await WorksheetRepository.findByBuilding(buildingId);
+  const worksheetMeetings = await WorksheetRepository.findMeetings(worksheet.id);
+  const buildingMeetings = await BuildingRepository.findMeetings(buildingId);
+  const removed = {};
+  const options = {concurrency: 1};
+  const repo = new ScheduledTaskRepository();
+
+  await Promise.map(worksheetMeetings.concat(buildingMeetings), async(meeting) => {
+    if (removed[meeting.id]) {
+      return;
+    }
+
+    removed[meeting.id] = true;
+
+    return repo.deleteFirebaseMeeting(meeting);
+  }, options);
 }

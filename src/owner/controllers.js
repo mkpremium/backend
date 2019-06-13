@@ -31,7 +31,6 @@ async function updateOwner(req, res) {
 
   const [updatedOwner] = await repo.findByIdWithIncludes(id, ['building', 'person']);
   await saveBuildingOwnerToFirebase(updatedOwner);
-  await OwnerRepository.checkAndSendToFreezer(updatedOwner);
 
   res.status(204).send();
 }

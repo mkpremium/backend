@@ -75,6 +75,7 @@
     "gearmanode": "^0.9.2",
     "geojson": "^0.5.0",
     "geolib": "^2.0.24",
+    "jsontocsv": "^0.3.0",
     "jsonwebtoken": "^8.2.1",
     "klaw": "^2.1.1",
     "lodash": "^4.17.10",

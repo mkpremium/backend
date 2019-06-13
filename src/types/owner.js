@@ -373,6 +373,11 @@ export function ownerVerified(data) {
     owner.status === OwnerStatus.VERIFIED;
 }
 
+export function ownerVefifiedNoConfirmed(data) {
+  const owner = fromJSON(data, t.Owner);
+  return owner.status === OwnerStatus.VERIFIED;
+}
+
 export function publicEntity(data) {
   const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&

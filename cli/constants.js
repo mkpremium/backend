@@ -104,6 +104,10 @@ export const DbIndexes = [
   {
     name: 'worksheet_migration_related',
     query: '(_documentType, _relatedTo) WHERE _documentType = "worksheet"'
+  },
+  {
+    name: 'event_by_worksheet',
+    query: '(_documentType, event.worksheetId) WHERE _documentType = "scheduled-event"'
   }
 ];
 
