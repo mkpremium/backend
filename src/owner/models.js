@@ -16,7 +16,6 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
 import {Owner} from '../types/owner';
-import {putWorksheetOnFreezer} from '../business/worksheets/freezer';
 
 export class Person extends CouchbaseModel {
   constructor() {
