@@ -192,7 +192,7 @@ export class OperatorRepository extends Operator {
     return this.updateOperator(operator, updateOperator);
   }
 
-  async enablelist(query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {
+  async list(query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {
     const params = queryStruct(query);
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
