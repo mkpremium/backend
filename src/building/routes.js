@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {
   addEntityController,
   addMetadataToBuildingController,
-  addNegotiationProposalController,
+  addNegotiationProposalController, addOwnerToBuildingController,
   createMetadataUploadUrlController, removeEntityController, updateEntityController, updateNegotiationProposalController
 } from './controllers';
 
@@ -301,5 +301,55 @@ router.put('/:id/entities/:entityId', updateEntityController);
  *           $ref: "#/definitions/Error"
  */
 router.delete('/:id/entities/:entityId', removeEntityController);
+
+/**
+ * @swagger
+ * /buildings/{id}/owners:
+ *   post:
+ *     summary: Crea un nuevo propietario relacionado a la hoja de trabajo
+ *     tags: [Building, Manager, Operator, Business]
+ *     security:
+ *       - operator: []
+ *       - manager: []
+ *       - business: []
+ *       - admin: []
+ *     consumes:
+ *       - "application/json"
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Id del edificio
+ *         required: true
+ *         type: string
+ *         format: uuid/v4
+ *       - name: body
+ *         in: body
+ *         schema:
+ *           $ref: "#/definitions/OwnerBody"
+ *     responses:
+ *       201:
+ *         description: Operación exitosa
+ *         schema:
+ *           $ref: "#/definitions/Owner"
+ *       400:
+ *         description: Solicitud incorrecta
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       401:
+ *         description: Credenciales inválidos o cuenta deshabilitada
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       403:
+ *         description: Permisos insuficientes
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ *       404:
+ *         description: Edificio no encontrado
+ *         schema:
+ *           $ref: "#/definitions/Error"
+ */
+router.post('/:id/owners', addOwnerToBuildingController);
 
 export default router;

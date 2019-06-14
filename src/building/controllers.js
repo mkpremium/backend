@@ -1,6 +1,9 @@
 import {wrap} from 'express-promise-wrap';
 import {BuildingProposalRepository, BuildingRepository} from './models';
 import {getPrivateUploadUrl} from '../aws';
+import {WorksheetRepository} from '../worksheet/models/worksheet';
+import {OwnerRepository} from '../owner/models';
+import {History} from '../history/models';
 
 async function addMetadataToBuilding(req, res) {
   const buildingRepo = new BuildingRepository();
@@ -62,6 +65,17 @@ async function updateEntity(req, res) {
   res.status(200).json(entity);
 }
 
+async function addOwnerToBuilding(req, res) {
+  const worksheetRepo = new WorksheetRepository();
+  const ownerRepo = new OwnerRepository();
+  const worksheet = await worksheetRepo.findWorksheetByBuilding(req.params.id);
+  const owner = await ownerRepo.createOwnerAndPerson(req.body);
+  await worksheetRepo.addOwner(worksheet, owner);
+  await History.registerCreate({contextModel: owner, user: req.user});
+  await History.registerUpdate({contextModel: worksheet, user: req.user});
+  res.status(201).json(owner);
+}
+
 export const addMetadataToBuildingController = wrap(addMetadataToBuilding);
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl);
 export const addNegotiationProposalController = wrap(addNegotiationProposal);
@@ -69,3 +83,4 @@ export const updateNegotiationProposalController = wrap(updateNegotiationProposa
 export const addEntityController = wrap(addEntity);
 export const updateEntityController = wrap(updateEntity);
 export const removeEntityController = wrap(removeEntity);
+export const addOwnerToBuildingController = wrap(addOwnerToBuilding);

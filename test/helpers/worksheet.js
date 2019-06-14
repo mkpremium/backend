@@ -90,7 +90,7 @@ async function createWorksheetsAndOwnerWithBuilding(authenticatedManager, type =
   });
 }
 
-async function createOwnerByType(authenticatedManager, buildingId, type) {
+export async function createOwnerByType(authenticatedManager, buildingId, type) {
   switch (type) {
     case CreateWorksheetType.INVALID_NO_CONTACTS:
       return createOwnerViaEndpointNoContacts(authenticatedManager, buildingId);

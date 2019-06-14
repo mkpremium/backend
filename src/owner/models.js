@@ -15,13 +15,7 @@ import {saveBuildingOwnerToFirebase} from '../firebase/lib/business';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
-
-export class Owner extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = t.Owner;
-  }
-}
+import {Owner} from '../types/owner';
 
 export class Person extends CouchbaseModel {
   constructor() {
@@ -169,7 +163,12 @@ const OwnerBusinessStatsParams = t.struct({
   operatorId: t.maybe(t.String)
 });
 
-export class OwnerRepository extends Owner {
+export class OwnerRepository extends CouchbaseModel {
+  constructor() {
+    super();
+    this.Struct = t.Owner;
+  }
+
   async findByIdOrThrow(ownerId) {
     const owner = await this.findById(ownerId);
     if (!owner) {
@@ -230,7 +229,6 @@ export class OwnerRepository extends Owner {
 
   async updateContact(ownerId, contactId, data) {
     const owner = await this.findByIdOrThrow(ownerId);
-    await WorksheetRepository.canUpdateOwner(owner, owner);
     const personRepo = new PersonRepository();
     return personRepo.updateContact(owner.personId, contactId, data);
   }
@@ -241,7 +239,7 @@ export class OwnerRepository extends Owner {
     const buildingRepository = new BuildingRepository();
     const buildingId = ownerBody.buildingId;
     let building;
-    
+
     if (buildingId) {
       building = await buildingRepository.findByIdOrThrow(buildingId);
     }
@@ -255,21 +253,19 @@ export class OwnerRepository extends Owner {
     delete body.person;
 
     const owner = await this.save(body);
-    
+
     if (building) {
       const worksheetRepository = new WorksheetRepository();
       const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId);
       await worksheetRepository.addOnlyOwner(worksheet, owner);
     }
-    
+
     return owner;
   }
 
   async update(ownerId, data = {}, operatorId) {
     const owner = await this.findByIdOrThrow(ownerId);
     let updatedOwner = t.update(owner, {$merge: Object.assign({}, data, {id: ownerId})});
-
-    await WorksheetRepository.canUpdateOwner(owner, updatedOwner);
 
     if (typeof data.verified !== 'undefined') {
       const owner = t.Owner(updatedOwner);
@@ -295,7 +291,14 @@ export class OwnerRepository extends Owner {
     const owner = await this.updateBusinessStatus(ownerId, status, updatedBy);
     const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person']);
     await saveBuildingOwnerToFirebase(updatedOwner);
+    await OwnerRepository.recalculateWorksheetStatus(updatedOwner);
     return owner;
+  }
+
+  static async recalculateWorksheetStatus(owner) {
+    const repo = new WorksheetRepository();
+    const worksheet = await WorksheetRepository.findByBuilding(owner.buildingId);
+    return repo.updateStatus(worksheet.id);
   }
 
   async updateBusinessStatus(ownerId, status, updatedBy) {
@@ -425,7 +428,7 @@ GROUP BY t.business.status`;
     const results = await this.query(qb);
     return results && results.length && _.first(results);
   }
-  
+
   /**
    *
    * @param buildingId - the building id
@@ -436,9 +439,26 @@ GROUP BY t.business.status`;
     const qb = this.getQueryBuilder()
       .where('t.`buildingId` = ?', buildingId)
       .where('t.`status` = ?', ownerStatus);
-    
+
     const results = await this.query(qb);
     const ownerIds = _.map(results, 'id');
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+  }
+
+  async findOwnersByBuildingId(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('t.`buildingId` = ?', buildingId)
+    const results = await this.query(qb);
+
+    if (!results || results.length === 0) {
+      return [];
+    }
+
+    const ownerIds = _.map(results, 'id');
+
+    const qbOwners = this.getQueryBuilder().where(`id IN ${JSON.stringify(ownerIds)}`);
+    const resultOwners = await this.query(qbOwners);
+
+    return resultOwners.map(owner => fromJSON(owner, Owner));
   }
 }

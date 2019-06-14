@@ -1,4 +1,5 @@
 import t from 'tcomb';
+import fromJSON from 'tcomb/lib/fromJSON';
 import _find from 'lodash/find';
 import _findIndex from 'lodash/findIndex';
 import _filter from 'lodash/filter';
@@ -8,6 +9,7 @@ import '../owner/types';
 import {Address} from './common';
 import {newHttpError} from '../lib/http-error';
 import {ScheduledEvent} from '../scheduled-events/types';
+import {utc} from '../lib/date';
 
 const debugWorksheet = debug('app:types:worksheet');
 
@@ -26,6 +28,16 @@ export const NotFinalWorksheetStats = [
   WorkSheetStatus.WITH_OWNER
 ];
 
+export const worksheetStatusCanBeInsideFreezer = function(status) {
+  switch (status) {
+    case WorkSheetStatus.PUBLIC:
+    case WorkSheetStatus.INVALID:
+      return false;
+    default:
+      return true;
+  }
+};
+
 export const workSheetStatusTransition = function(status) {
   switch (status) {
     case WorkSheetStatus.DEFAULT:
@@ -38,11 +50,15 @@ export const workSheetStatusTransition = function(status) {
         WorkSheetStatus.PUBLIC,
         WorkSheetStatus.ALREADY_SOLD
       ];
+    case WorkSheetStatus.MEETING:
+    case WorkSheetStatus.NO_SALE:
+      return [
+        status,
+        WorkSheetStatus.WITH_OWNER
+      ];
     // end status
     case WorkSheetStatus.ALREADY_SOLD:
     case WorkSheetStatus.INVALID:
-    case WorkSheetStatus.NO_SALE:
-    case WorkSheetStatus.MEETING:
     case WorkSheetStatus.PUBLIC:
       return [
         status
@@ -52,7 +68,7 @@ export const workSheetStatusTransition = function(status) {
   }
 };
 
-t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus');
+export const WorksheetStatus = t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus');
 
 t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
 
@@ -120,7 +136,10 @@ export const Worksheet = t.WorkSheet = t.struct({
 
   _documentType: t.enums.of(['worksheet']),
 
-  buildingAddress: t.maybe(Address)
+  buildingAddress: t.maybe(Address),
+
+  statusChangedAt: t.maybe(t.Date),
+  inFreezer: t.Boolean
 }, {
   name: 'WorkSheet',
   defaultProps: {
@@ -135,22 +154,38 @@ export const Worksheet = t.WorkSheet = t.struct({
       askedByOwner: 0
     },
     calls: [],
-    _documentType: 'worksheet'
+    _documentType: 'worksheet',
+    inFreezer: false
   }
 });
 
 t.WorkSheet.prototype.setStatus = function(newStatus) {
-  if (workSheetStatusTransition(this.status).indexOf(newStatus) === -1) {
-    throw new Error(`worksheet ${this.id} cannot transition from ${this.status} to ${newStatus}`);
-  }
-
   if (newStatus === this.status) {
     debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`);
+    return this;
   } else {
     debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`);
+    return t.update(this, {status: {$set: newStatus}, statusChangedAt: {$set: utc().toDate()}});
   }
+};
 
+t.WorkSheet.prototype.fixStatus = function(newStatus) {
   return t.update(this, {status: {$set: newStatus}});
+};
+
+t.WorkSheet.prototype.pullOutFreezer = function(newStatus) {
+  const updated = this.setStatus(newStatus);
+
+  return t.update(updated, {inFreezer: {$set: false}});
+};
+
+t.WorkSheet.prototype.putOnFreezer = function() {
+  const $set = worksheetStatusCanBeInsideFreezer(this.status);
+  return t.update(this, {inFreezer: {$set}});
+};
+
+t.WorkSheet.prototype.setStatusChangedAt = function(newDate) {
+  return t.update(this, {statusChangedAt: {$set: newDate}});
 };
 
 /**
@@ -395,3 +430,7 @@ t.WorksheetQueue.prototype.findNextAvailableInQueue = function(currentItem = nul
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets;
   return _find(worksheets, {status: Queue.Status.AVAILABLE});
 };
+
+export function newWorksheet(data) {
+  return fromJSON(data, t.WorkSheet);
+}

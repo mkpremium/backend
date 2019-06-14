@@ -224,6 +224,15 @@ export class CouchbaseModel {
     return this.queryRaw(n1ql);
   }
 
+  async getAllIds() {
+    const bucket = this.getBucketName();
+    const query = `SELECT RAW id  FROM ${bucket} t
+                   WHERE t._documentType = '${this.getType()}'
+                   ORDER BY id`;
+
+    return this.raw(query);
+  }
+
   async queryRaw(query) {
     await this._promiseBucket;
     debugModel('queryRaw', query);

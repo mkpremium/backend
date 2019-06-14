@@ -1,10 +1,4 @@
-import couchbase from '../src/db/couchbase';
+import '../src/types';
+import worksheetFreezerCron from '../src/cron/worksheets/freezer-cron';
 
-import scheduledEventCronJob from '../src/scheduled-events/cron';
-import scheduledTasksCronJob from '../src/firebase/cron';
-
-const app = {locals: {}};
-
-couchbase(app);
-scheduledEventCronJob.start();
-scheduledTasksCronJob.start();
+worksheetFreezerCron.start();

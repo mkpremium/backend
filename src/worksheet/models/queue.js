@@ -215,7 +215,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem);
     const updatedQueue = t.update(queue, {worksheets: {$set: updatedWorksheets}});
 
-    queueDebug('takeWorksheetInQueue', worksheet.id, 'from queue', queue.id);
+    queueDebug('takeWorksheetInQueue', worksheet.id, worksheet.status, 'from queue', queue.id);
 
     await this.save(updatedQueue);
 
@@ -372,7 +372,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId);
     }
   }
-  
+
   /**
    * Makes a difference between the worksheet queue array of worksheets
    * and the worksheets that have said queue id set.
@@ -384,10 +384,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const worksheetsIdsInQueueArray = _map(queue.worksheets, 'worksheetId');
     const worksheetsWithQueueId = await worksheetRepo.findWorksheetsByQueueId(queue.id);
     const worksheetsIdsWithQueueId = _map(worksheetsWithQueueId, 'id');
-    
+
     return _difference(worksheetsIdsWithQueueId, worksheetsIdsInQueueArray);
   }
-  
+
   /**
    * Liberates worksheets that have a queue id but are not in such queue.
    * Use in command.
@@ -398,26 +398,26 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     if (!queueId) {
       return null;
     }
-  
+
     const worksheetRepo = new WorksheetRepository();
     const queue = await this.findByIdOrThrow(queueId);
     const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
-    
+
     if (worksheetsToBeLiberated.length) {
       await worksheetRepo.updateQueueId(worksheetsToBeLiberated);
     }
   }
-  
+
   /**
    * Gets all worksheets queues.
    * @returns {Promise<Array<Worksheet>>}
    */
   async findAll() {
     const qb = this.getQueryBuilder();
-  
+
     return this.query(qb);
   }
-  
+
   /**
    *
    * @returns {Promise<void>}
@@ -425,7 +425,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   async cleanAllWorksheetsNotInQueue() {
     const worksheetRepo = new WorksheetRepository();
     const queues = await this.findAll();
-  
+
     await Promise.all(queues.map(async(queue) => {
       const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue);
       if (worksheetsToBeLiberated.length) {

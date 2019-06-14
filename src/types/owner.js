@@ -279,6 +279,7 @@ export const Owner = t.Owner = t.struct(
     }
   }
 );
+
 t.OwnerWithInclude = t.Owner.extend({
   building: t.maybe(t.Building),
   person: t.maybe(t.Person)
@@ -288,6 +289,17 @@ t.Owner.prototype.fullName = function() {
   if (this.person) {
     return this.person.fullName();
   }
+};
+
+t.Owner.prototype.setStatus = function($set) {
+  return t.update(this, {status: {$set}});
+};
+
+t.Owner.prototype.pullOutFreezer = function(newStatus) {
+  return t.update(this, {
+    status: {$set: newStatus},
+    business: {$set: null}
+  });
 };
 
 /**
@@ -359,6 +371,11 @@ export function ownerVerified(data) {
   const owner = fromJSON(data, t.Owner);
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFIED;
+}
+
+export function ownerVefifiedNoConfirmed(data) {
+  const owner = fromJSON(data, t.Owner);
+  return owner.status === OwnerStatus.VERIFIED;
 }
 
 export function publicEntity(data) {

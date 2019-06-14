@@ -25,6 +25,7 @@ import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
 import {Building} from '../types/building';
 import {emitModelEvents} from '../../config';
+import {ScheduledEvents} from '../scheduled-events/models';
 
 const debugBuilding = debug('app:model:building');
 
@@ -106,6 +107,13 @@ export class BuildingRepository extends CouchbaseModel {
       .limit(1);
     const [building] = await repo.query(qb);
     return building;
+  }
+
+  static async findMeetings(buildingId) {
+    const meetingRepo = new ScheduledEvents();
+    const qb = meetingRepo.getQueryBuilder();
+    qb.where('event.buildingId = ?', buildingId);
+    return meetingRepo.query(qb);
   }
 
   static async findByCadastreReference(cadastreReference) {

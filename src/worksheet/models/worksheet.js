@@ -3,6 +3,7 @@ import uuid from 'uuid/v4';
 import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import debug from 'debug';
+import _ from 'lodash';
 import _get from 'lodash/get';
 import _head from 'lodash/head';
 import _some from 'lodash/some';
@@ -12,10 +13,7 @@ import _isNil from 'lodash/isNil';
 import fromJSON from 'tcomb/lib/fromJSON';
 
 import {CouchbaseModel} from '../../db/model';
-import {
-  addDateQueryToBuilder,
-  addBetweenQueryToBuilder
-} from '../../lib/query/helpers';
+import {addBetweenQueryToBuilder, addDateQueryToBuilder} from '../../lib/query/helpers';
 import {newHttpError} from '../../lib/http-error';
 import {OwnerRepository} from '../../owner/models';
 import {BuildingRepository} from '../../building/models';
@@ -24,15 +22,17 @@ import {ownersContactViews} from '../../owner/types';
 import {Worksheet, WorkSheetStatus} from '../../types/worksheet';
 import {
   isAllowedChangeState,
-  ownerNoSale,
+  isInvalid,
   ownerAlreadySold,
-  ownerVerified, publicEntity, isInvalid
+  ownerNoSale,
+  ownerVerified,
+  publicEntity
 } from '../../types/owner';
 import {ScheduledEvents} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
-import {BuildingState} from '../../types/enums';
+import {BuildingState, OwnerBusinessStatus} from '../../types/enums';
 import {WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse} from '../types';
 import _map from 'lodash/map';
 import {emitModelEvents} from '../../../config';
@@ -104,12 +104,16 @@ export class WorksheetRepository extends CouchbaseModel {
     return worksheet;
   }
 
-  // noinspection JSMethodCanBeStatic
   async findMeetings(worksheetId) {
     const meetingRepo = new ScheduledEvents();
     const qb = meetingRepo.getQueryBuilder();
     qb.where('event.worksheetId = ?', worksheetId);
     return meetingRepo.query(qb);
+  }
+
+  static async findMeetings(worksheetId) {
+    const repo = new WorksheetRepository();
+    return repo.findMeetings(worksheetId);
   }
 
   async findWorksheetByBuilding(buildingId) {
@@ -135,6 +139,67 @@ export class WorksheetRepository extends CouchbaseModel {
     return _head(results);
   }
 
+  calculateBusinessStatus(owner) {
+    switch (owner.business.status) {
+      case OwnerBusinessStatus.DISCARDED:
+        return WorkSheetStatus.PUBLIC;
+      case OwnerBusinessStatus.NO_SALE:
+        return WorkSheetStatus.NO_SALE;
+      case OwnerBusinessStatus.ALREADY_SOLD:
+        return WorkSheetStatus.INVALID;
+      default:
+        return WorkSheetStatus.MEETING;
+    }
+  }
+
+  async calculateFixedStatus(worksheet) {
+    worksheetDebug('calculateFixedStatus', worksheet.id, 'with status', worksheet.status);
+    worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
+    const isValidLength = worksheet.relatedOwners.length > 0;
+    const owners = isValidLength
+      ? await Promise.map(worksheet.relatedOwners, OwnerRepository.validateOwner)
+      : [];
+
+    const haveBusiness = isValidLength && _.find(owners, owner => !_.isEmpty(owner.business));
+    const someValidOwner = isValidLength && _some(owners, ownerVerified);
+    const isPublicEntity = isValidLength && _some(owners, publicEntity);
+    const everyInvalidOwner = isValidLength && _every(owners, isInvalid);
+    const noSale = isValidLength && _some(owners, ownerNoSale);
+    const alreadySold = isValidLength && _some(owners, ownerAlreadySold);
+    const meetings = await this.findMeetings(worksheet.id);
+    const hasMeeting = meetings.length > 0;
+
+    if (haveBusiness) {
+      return this.calculateBusinessStatus(haveBusiness);
+    }
+
+    if (isPublicEntity) {
+      return WorkSheetStatus.PUBLIC;
+    }
+
+    if (noSale) {
+      return WorkSheetStatus.NO_SALE;
+    }
+
+    if (alreadySold) {
+      return WorkSheetStatus.ALREADY_SOLD;
+    }
+
+    if (everyInvalidOwner) {
+      return WorkSheetStatus.INVALID;
+    }
+
+    if (hasMeeting) {
+      return WorkSheetStatus.MEETING;
+    }
+
+    if (someValidOwner) {
+      return WorkSheetStatus.WITH_OWNER;
+    }
+
+    return worksheet.status;
+  }
+
   async calculateNewStatus(worksheet) {
     worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
     const isValidLength = worksheet.relatedOwners.length > 0;
@@ -156,16 +221,16 @@ export class WorksheetRepository extends CouchbaseModel {
           return WorkSheetStatus.PUBLIC;
         }
 
-        if (hasMeeting) {
-          return WorkSheetStatus.MEETING;
-        }
-
         if (noSale) {
           return WorkSheetStatus.NO_SALE;
         }
 
         if (alreadySold) {
           return WorkSheetStatus.ALREADY_SOLD;
+        }
+
+        if (hasMeeting) {
+          return WorkSheetStatus.MEETING;
         }
 
         if (someValidOwner) {
@@ -193,7 +258,7 @@ export class WorksheetRepository extends CouchbaseModel {
         }
         return worksheet.status;
       default:
-        worksheetDebug(`the status ${worksheet.status} don't have planned behavior`);
+        worksheetDebug(`worksheet ${worksheet.id} with status ${worksheet.status} don't have planned behavior`);
         return worksheet.status;
     }
   }
@@ -201,7 +266,8 @@ export class WorksheetRepository extends CouchbaseModel {
   async updateStatus(worksheetId, operatorId) {
     const worksheetData = await this.findByIdWIthIncludes(worksheetId);
     const worksheet = fromJSON(worksheetData, t.WorkSheet);
-    const newStatus = await this.calculateNewStatus(worksheet);
+    // const newStatus = await this.calculateNewStatus(worksheet);
+    const newStatus = await this.calculateFixedStatus(worksheet);
     const updatedWorksheet = worksheet.setStatus(newStatus);
     if (canRegisterVerified(worksheet, newStatus, operatorId)) {
       await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER);
@@ -295,21 +361,6 @@ GROUP BY t.status`;
     WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`;
     const results = await this.queryRaw(N1qlQuery.fromString(baseQuery));
     return _get(results, '0.count', 0);
-  }
-
-  static async canUpdateOwner(owner, updatedOwner) {
-    const worksheetRepo = new WorksheetRepository();
-    const worksheet = await worksheetRepo.findWorksheetByOwner(owner.id);
-    if (worksheet && worksheet.status === WorkSheetStatus.WITH_OWNER && owner.isPrimaryVerified()) {
-      if (!isAllowedChangeState(updatedOwner)) {
-        throw newHttpError(
-          422,
-          `No se puede actualizar el owner. Es "${owner.type}" y fue verificado (${owner.confirmedByOperator})`
-        );
-      }
-    }
-
-    return true;
   }
 
   static async notifyWorkSheetChange(worksheetId) {
