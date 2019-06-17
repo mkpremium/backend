@@ -9,7 +9,7 @@ import {OwnerRepository} from '../../owner/models';
 import {OwnerStatus} from '../../types/enums';
 import {removeBuildingFromBusiness} from '../../firebase/lib/business';
 import {BuildingRepository} from '../../building/models';
-import {ScheduledTaskRepository} from '../../scheduled-events/models';
+import {ScheduledEventsRepository} from '../../scheduled-events/models';
 
 const debugFreezer = debug('app:worksheets:freezer');
 
@@ -125,7 +125,7 @@ async function cleanMeetings(buildingId) {
   const buildingMeetings = await BuildingRepository.findMeetings(buildingId);
   const removed = {};
   const options = {concurrency: 1};
-  const repo = new ScheduledTaskRepository();
+  const repo = new ScheduledEventsRepository();
 
   await Promise.map(worksheetMeetings.concat(buildingMeetings), async(meeting) => {
     if (removed[meeting.id]) {
@@ -134,6 +134,6 @@ async function cleanMeetings(buildingId) {
 
     removed[meeting.id] = true;
 
-    return repo.deleteFirebaseMeeting(meeting);
+    return repo.delete(meeting.id);
   }, options);
 }

@@ -176,7 +176,10 @@ t.WorkSheet.prototype.fixStatus = function(newStatus) {
 t.WorkSheet.prototype.pullOutFreezer = function(newStatus) {
   const updated = this.setStatus(newStatus);
 
-  return t.update(updated, {inFreezer: {$set: false}});
+  return t.update(updated, {
+    inFreezer: {$set: false},
+    lastAddedMeeting: {$set: null}
+  });
 };
 
 t.WorkSheet.prototype.putOnFreezer = function() {
