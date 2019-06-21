@@ -4,6 +4,8 @@ import Promise from 'bluebird';
 import program from 'commander';
 import {actionWrapper} from './lib';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
+import {WorkSheetStatus} from '../src/types/worksheet';
+import {BuildingRepository} from '../src/building/models';
 
 if (require.main === module) {
   program
@@ -22,12 +24,42 @@ export async function addChangeStatusDate() {
   const worksheetIds = await repo.getAllIds();
   const options = {concurrency: 2};
 
-  return Promise.map(worksheetIds, formatByBuildingAddress, options);
+  return Promise.map(worksheetIds, setStatusChangedAt, options);
 }
 
-async function formatByBuildingAddress(worksheetId) {
+async function setStatusChangedAt(worksheetId) {
   const worksheet = await findWorksheetById(worksheetId);
-  const updatedWorksheet = worksheet.setStatusChangedAt(worksheet.viewedAt);
+
+  if (worksheet.status === WorkSheetStatus.MEETING) {
+    return setStatusChangeByMeeting(worksheet);
+  } else {
+    return setStatusChangeDefault(worksheet);
+  }
+}
+
+async function setStatusChangeByMeeting(worksheet) {
+  const buildingMeetings = await BuildingRepository.findMeetings(worksheet.relatedBuildingIds[0]);
+
+  if (buildingMeetings.length > 0) {
+    const buildingMeeting = buildingMeetings[0];
+    return updateWorksheet(worksheet.setStatusChangedAt(buildingMeeting.eventDate));
+  } else {
+    const worksheetMeetings = await WorksheetRepository.findMeetings(worksheet.id);
+    if (worksheetMeetings.length > 0) {
+      const worksheetMeeting = worksheetMeetings[0];
+      return updateWorksheet(worksheet.setStatusChangedAt(worksheetMeeting.eventDate));
+    } else {
+      return setStatusChangeDefault(worksheet);
+    }
+  }
+}
+
+async function setStatusChangeDefault(worksheet) {
+  const dateToSet = worksheet.viewedAt
+    ? worksheet.viewedAt
+    : new Date('2019-03-01T00:00:00.000Z'); // hard coded first production day date
+
+  const updatedWorksheet = worksheet.setStatusChangedAt(dateToSet);
 
   return updateWorksheet(updatedWorksheet);
 }
