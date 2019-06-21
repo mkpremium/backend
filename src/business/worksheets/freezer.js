@@ -45,11 +45,12 @@ export async function moveFreezerWorksheets({days, provinces}) {
 }
 
 export async function moveNoSaleWorksheets({days, provinces}) {
-  const maxDays = utc().subtract(days, 'days').toDate();
+  const dateDaysAgo = utc().subtract(days, 'days').toDate();
   const repository = new WorksheetRepository();
   const queryBuilder = repository.getQueryBuilder()
     .where('status = ?', WorkSheetStatus.NO_SALE)
-    .where('statusChangedAt <= ?', maxDays)
+    .where('statusChangedAt IS NOT NULL')
+    .where('statusChangedAt <= ?', dateDaysAgo)
     .limit(100);
 
   if (provinces.length > 0) {
