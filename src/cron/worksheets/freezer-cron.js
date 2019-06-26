@@ -3,10 +3,11 @@ import debug from 'debug';
 import {utc} from '../../lib/date';
 import {moveWorksheetOutOfFreezer} from '../../business/worksheets/freezer';
 import {SystemPreferencesRepository} from '../../system-preferences/models';
+import {cronJobs} from '../../../config';
 
 const cronDebug = debug('app:cron:worksheets:freezer');
 const timeZone = 'UTC';
-const cronTime = '*/5 * * * *'; // every 5 minutes
+const cronTime = cronJobs.freezer;
 
 async function onTick() {
   const pref = await SystemPreferencesRepository.getPreferences();

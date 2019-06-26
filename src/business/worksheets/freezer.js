@@ -13,7 +13,12 @@ import {ScheduledEventsRepository} from '../../scheduled-events/models';
 
 const debugFreezer = debug('app:worksheets:freezer');
 
-export async function moveWorksheetOutOfFreezer() {
+let changeNothing;
+let limit = 100;
+
+export async function moveWorksheetOutOfFreezer(dryRun, argLimit = 100) {
+  changeNothing = dryRun;
+  limit = argLimit;
   const {freezer} = await SystemPreferencesRepository.getPreferences();
   debugFreezer('starting to move worksheets from freezer settings', freezer);
   await moveNoSaleWorksheets(freezer);
@@ -21,20 +26,15 @@ export async function moveWorksheetOutOfFreezer() {
   debugFreezer('end of freezer process');
 }
 
-export async function putWorksheetOnFreezer(worksheet) {
-  const repository = new WorksheetRepository();
-  const updatedWorksheet = fromJSON(worksheet, Worksheet).putOnFreezer();
-  return repository.save(updatedWorksheet, false);
-}
-
-export async function moveFreezerWorksheets({days, provinces}) {
-  const maxDays = utc().subtract(days, 'days').toDate();
+export async function moveFreezerWorksheets({daysInFreezer, provinces}) {
+  const maxDays = utc().subtract(daysInFreezer, 'days').toDate();
   const repository = new WorksheetRepository();
   const queryBuilder = repository.getQueryBuilder()
     .where('inFreezer = ?', true)
+    .where('statusChangedAt IS NOT NULL')
     .where('statusChangedAt <= ?', maxDays)
     .where(`status IN ${JSON.stringify([WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING])}`)
-    .limit(100);
+    .limit(limit);
 
   if (provinces.length > 0) {
     queryBuilder.where(`buildingAddress.province IN ${JSON.stringify(provinces)}`);
@@ -44,14 +44,14 @@ export async function moveFreezerWorksheets({days, provinces}) {
   return pullOutFreezer(worksheets);
 }
 
-export async function moveNoSaleWorksheets({days, provinces}) {
-  const dateDaysAgo = utc().subtract(days, 'days').toDate();
+export async function moveNoSaleWorksheets({daysInFreezer, provinces}) {
+  const dateDaysAgo = utc().subtract(daysInFreezer, 'days').toDate();
   const repository = new WorksheetRepository();
   const queryBuilder = repository.getQueryBuilder()
     .where('status = ?', WorkSheetStatus.NO_SALE)
     .where('statusChangedAt IS NOT NULL')
     .where('statusChangedAt <= ?', dateDaysAgo)
-    .limit(100);
+    .limit(limit);
 
   if (provinces.length > 0) {
     queryBuilder.where(`buildingAddress.province IN ${JSON.stringify(provinces)}`);
@@ -63,6 +63,13 @@ export async function moveNoSaleWorksheets({days, provinces}) {
 
 async function pullOutFreezer(worksheets) {
   if (!worksheets || worksheets.length === 0) {
+    return;
+  }
+
+  if (changeNothing) {
+    worksheets.forEach(worksheet => {
+      debugFreezer(`[dry-run] moving out freezer worksheet '${worksheet.id}' with status ${worksheet.status}, last status changed at: '${worksheet.statusChangedAt}'`);
+    });
     return;
   }
 
@@ -108,7 +115,11 @@ export async function moveOwnerStatus(buildingId) {
 
   const cleanBusiness = async({buildingId, businessId}) => {
     await removeBuildingFromBusiness(buildingId, businessId);
-    await cleanMeetings(buildingId);
+    try {
+      await cleanMeetings(buildingId);
+    } catch (e) {
+      debugFreezer('an error happen removing the meetings of building', buildingId, e);
+    }
   };
 
   if (updatedOwners.length > 0) {
