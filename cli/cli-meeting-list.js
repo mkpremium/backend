@@ -21,11 +21,11 @@ async function main() {
   }
 
   const worksheetMeetings = await WorksheetRepository.findMeetings(worksheetId);
-  const table = new Table({
-    head: ['Event Date', 'Created at', 'Id', 'Worksheet Id']
-  });
 
   if (worksheetMeetings.length > 0) {
+    const table = new Table({
+      head: ['Event Date', 'Created at', 'Id', 'Worksheet Id']
+    });
     worksheetMeetings.map(meetingToLine).forEach(line => table.push(line));
     console.log(table.toString());
   }
