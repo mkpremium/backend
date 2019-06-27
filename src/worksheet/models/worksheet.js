@@ -36,6 +36,7 @@ import {BuildingState, OwnerBusinessStatus} from '../../types/enums';
 import {WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse} from '../types';
 import _map from 'lodash/map';
 import {emitModelEvents} from '../../../config';
+import {ScheduledEventType} from '../../scheduled-events/types';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -107,6 +108,7 @@ export class WorksheetRepository extends CouchbaseModel {
   async findMeetings(worksheetId) {
     const meetingRepo = new ScheduledEvents();
     const qb = meetingRepo.getQueryBuilder();
+    qb.where('type = ?', ScheduledEventType.MEETINGS);
     qb.where('event.worksheetId = ?', worksheetId);
     return meetingRepo.query(qb);
   }

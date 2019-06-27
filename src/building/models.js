@@ -26,6 +26,7 @@ import {N1qlQuery} from 'couchbase';
 import {Building} from '../types/building';
 import {emitModelEvents} from '../../config';
 import {ScheduledEvents} from '../scheduled-events/models';
+import {ScheduledEventType} from '../scheduled-events/types';
 
 const debugBuilding = debug('app:model:building');
 
@@ -113,6 +114,7 @@ export class BuildingRepository extends CouchbaseModel {
     const meetingRepo = new ScheduledEvents();
     const qb = meetingRepo.getQueryBuilder();
     qb.where('event.buildingId = ?', buildingId);
+    qb.where('type = ?', ScheduledEventType.MEETINGS);
     return meetingRepo.query(qb);
   }
 
