@@ -3,7 +3,6 @@ import uuid from 'uuid/v4';
 import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import debug from 'debug';
-import _ from 'lodash';
 import _get from 'lodash/get';
 import _head from 'lodash/head';
 import _some from 'lodash/some';
@@ -21,7 +20,7 @@ import _uniq from 'lodash/uniq';
 import {ownersContactViews} from '../../owner/types';
 import {Worksheet, WorkSheetStatus} from '../../types/worksheet';
 import {
-  isAllowedChangeState,
+  haveOwnerBusiness,
   isInvalid,
   ownerAlreadySold,
   ownerNoSale,
@@ -162,7 +161,7 @@ export class WorksheetRepository extends CouchbaseModel {
       ? await Promise.map(worksheet.relatedOwners, OwnerRepository.validateOwner)
       : [];
 
-    const haveBusiness = isValidLength && _.find(owners, owner => !_.isEmpty(owner.business));
+    const haveBusiness = isValidLength && haveOwnerBusiness(owners);
     const someValidOwner = isValidLength && _some(owners, ownerVerified);
     const isPublicEntity = isValidLength && _some(owners, publicEntity);
     const everyInvalidOwner = isValidLength && _every(owners, isInvalid);

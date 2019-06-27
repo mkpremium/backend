@@ -4,6 +4,7 @@ import _find from 'lodash/find';
 import _get from 'lodash/get';
 import _every from 'lodash/every';
 import {OwnerStatus, OwnerType} from './enums';
+import _ from 'lodash';
 
 t.OwnerBusiness = t.struct({
   meetingWithOperatorId: t.String,
@@ -420,4 +421,60 @@ export function isAllowedChangeState(data) {
     OwnerStatus.VERIFIED,
     OwnerStatus.PUBLIC
   ].indexOf(owner.status) !== -1;
+}
+
+export function haveOwnerBusiness(owners) {
+  const ownerWithBusiness = owners.filter(owner => !_.isEmpty(owner.business));
+
+  switch (ownerWithBusiness.length) {
+    case 0:
+      return null;
+    case 1:
+      return ownerWithBusiness[0];
+    default: // more than 1
+      return goodOwnerBusiness(ownerWithBusiness);
+  }
+}
+
+function goodOwnerBusiness(owners) {
+  const sorted = owners.sort(sortByConfirmedAt);
+  return sorted[0];
+}
+
+function sortByConfirmedAt(a, b) {
+  const valueA = _.get(a, 'confirmedByOperator.confirmedAt', null);
+  const valueB = _.get(b, 'confirmedByOperator.confirmedAt', null);
+
+  if (valueB === null) {
+    return -1;
+  }
+
+  if (valueA === null) {
+    return 1;
+  }
+
+  if (valueA < valueB) {
+    return 1;
+  }
+
+  if (valueB > valueA) {
+    return -1;
+  }
+
+  return 0;
+}
+
+if (require.main === module) {
+  const original = [
+    {confirmedByOperator: {confirmedAt: '2019-03-08T16:36:33.390Z'}},
+    {confirmedByOperator: null},
+    {confirmedByOperator: {confirmedAt: '2019-03-11T13:38:01.453Z'}},
+    {confirmedByOperator: null},
+    {confirmedByOperator: null}
+  ];
+
+  console.log('ORIGINAL', original);
+
+  const sorted = original.sort(sortByConfirmedAt);
+  console.log('SORTED  ', sorted);
 }

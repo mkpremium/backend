@@ -13,7 +13,7 @@ async function onTick() {
   const pref = await SystemPreferencesRepository.getPreferences();
   if (pref.freezer.enable) {
     cronDebug(`Executing freezer cron at ${utc().startOf('minute').toISOString()}`);
-    await moveWorksheetOutOfFreezer();
+    await moveWorksheetOutOfFreezer(false, 500);
   }
 }
 
