@@ -182,6 +182,12 @@ t.WorkSheet.prototype.pullOutFreezer = function(newStatus) {
   });
 };
 
+t.WorkSheet.prototype.cleanMeetings = function() {
+  return t.update(this, {
+    lastAddedMeeting: {$set: null}
+  });
+};
+
 t.WorkSheet.prototype.putOnFreezer = function() {
   const $set = worksheetStatusCanBeInsideFreezer(this.status);
   return t.update(this, {inFreezer: {$set}});

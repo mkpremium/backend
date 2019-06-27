@@ -298,7 +298,7 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
 t.Meeting = t.struct({
   owner: isMaybeTesting(t.Object),
   notifyTo: t.String,
-  address: isMaybeTesting(t.String),
+  address: t.maybe(t.String),
   contact: isMaybeTesting(t.struct({
     name: t.String,
     email: t.maybe(t.String),
