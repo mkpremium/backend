@@ -22,6 +22,8 @@ const labels = {
   totalVerifiedNoConfirmed: 'Propietarios confirmados',
   totalOwnersWithDNI: 'Propietarios con DNI',
   someOwnerHaveDNI: 'Tiene propietarios con DNI',
+  metadataJPGCount: 'Total JPG',
+  metadataPDFCount: 'Total PDF',
   cadastreReference: 'Catastro',
   buildingProvince: 'Provincia',
   buildingCity: 'Municipio'
@@ -90,6 +92,8 @@ async function getWorksheetStats(worksheetId) {
   const buildingCity = _.get(worksheet, 'buildingAddress.city');
   const statusDiff = worksheetStatus !== calculateWorksheetStatus;
   const statusInvalid = statusDiff ? 'SI' : 'NO';
+  const metadataJPGCount = countMetadata(worksheet.relatedBuildings[0], true);
+  const metadataPDFCount = countMetadata(worksheet.relatedBuildings[0], false);
 
   return {
     worksheetId,
@@ -104,7 +108,9 @@ async function getWorksheetStats(worksheetId) {
     someOwnerHaveDNI,
     cadastreReference,
     buildingProvince,
-    buildingCity
+    buildingCity,
+    metadataJPGCount,
+    metadataPDFCount
   };
 }
 
@@ -156,4 +162,12 @@ function countVerifiedNoConfirmed(owners) {
 function calculateStatus(worksheet) {
   const repo = new WorksheetRepository();
   return repo.calculateFixedStatus(worksheet);
+}
+
+function countMetadata(building, onlyImages) {
+  const check = onlyImages
+    ? (m) => m.mimeType === 'image/jpeg'
+    : (m) => m.mimeType !== 'image/jpeg';
+
+  return building.metadata.filter(check).length;
 }

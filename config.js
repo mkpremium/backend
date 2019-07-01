@@ -149,4 +149,4 @@ export const proxyEnable = JSON.parse(process.env.PROXY_ENABLE || false);
 
 export const cronJobs = {
   freezer: process.env.CRONJOB_FREEZER || '*/5 * * * *' // every five minutes
-}
+};

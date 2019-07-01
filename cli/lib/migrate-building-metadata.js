@@ -43,10 +43,10 @@ async function addMetadata(filepath) {
   }
 }
 
-function filenameExistOnBuilding(building, filepath) {
+export function filenameExistOnBuilding(building, filepath) {
   const name = path.basename(filepath);
   const findBy = metadata => metadata.name === name;
-  
+
   return building.metadata &&
     building.metadata.length > 0 &&
     building.metadata.find(findBy);
@@ -58,7 +58,7 @@ async function uploadFileS3(filepath) {
     fileName: path.basename(filepath),
     fileType: mime.lookup(filepath)
   };
-  
+
   return uploadFile('metadata-migration', config, filepath);
 }
 

@@ -262,6 +262,25 @@ export async function deleteMeetingToOperator(db, meeting, operatorId) {
   return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null);
 }
 
+export async function deleteMetadataFromFirebase(metadataId, buildingId) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+  const db = fbComerciales.database();
+  const documentRef = db.ref(`${fbComerciales.prefixURL}Documents/${metadataId}`);
+  const buildingRef = db.ref(`${fbComerciales.prefixURL}Buildings/${buildingId}/Documents/ids/${metadataId}`);
+
+  const document = await documentRef.once('value');
+  if (document.exists()) {
+    await documentRef.set(null);
+  }
+
+  const building = await buildingRef.once('value');
+  if (building.exists()) {
+    await buildingRef.set(null);
+  }
+}
+
 export async function saveMetadataToFirebase(metadata) {
   if (!fbComerciales.enabled) {
     return;

@@ -14,6 +14,8 @@ async function onTick() {
   if (pref.freezer.enable) {
     cronDebug(`Executing freezer cron at ${utc().startOf('minute').toISOString()}`);
     await moveWorksheetOutOfFreezer(false, 500);
+  } else {
+    cronDebug(`Freeze cron called at ${utc().startOf('minute').toISOString()} but do nothing is disabled`);
   }
 }
 

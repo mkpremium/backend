@@ -16,7 +16,7 @@ const debugFreezer = debug('app:worksheets:freezer');
 let changeNothing;
 let limit = 100;
 
-export async function moveWorksheetOutOfFreezer(dryRun, argLimit = 100) {
+export async function moveWorksheetOutOfFreezer(dryRun = false, argLimit = 100) {
   changeNothing = dryRun;
   limit = argLimit;
   const {freezer} = await SystemPreferencesRepository.getPreferences();

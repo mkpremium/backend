@@ -9,6 +9,7 @@ import {CouchbaseModel} from '../db/model';
 import {newHttpError} from '../lib/http-error';
 import {cleanUrl, makePreview, uploadPreview} from '../aws';
 import {
+  deleteMetadataFromFirebase,
   saveMetadataToFirebase,
   saveProposal,
   updateBuildingToFirebase
@@ -167,6 +168,15 @@ export class BuildingRepository extends CouchbaseModel {
     const building = Building(updatedJson);
     const repo = new BuildingRepository();
     return repo.save(building, emitModelEvents);
+  }
+
+  async removeMetadataFromBuilding(building, metadata) {
+    const updatedMetadata = building.metadata.filter(m => m.id !== metadata.id);
+    const updatedBuilding = t.update(building, {metadata: {$set: updatedMetadata}});
+
+    await this.save(updatedBuilding);
+    await deleteMetadataFromFirebase(metadata.id, building.id);
+    return metadata;
   }
 
   async addMetadataToBuilding(building, params) {
