@@ -73,6 +73,7 @@ async function addOwnerToBuilding(req, res) {
   await worksheetRepo.addOwner(worksheet, owner);
   await History.registerCreate({contextModel: owner, user: req.user});
   await History.registerUpdate({contextModel: worksheet, user: req.user});
+  await worksheetRepo.syncWorksheetFirebase(worksheet);
   res.status(201).json(owner);
 }
 

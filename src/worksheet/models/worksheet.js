@@ -3,6 +3,7 @@ import uuid from 'uuid/v4';
 import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import debug from 'debug';
+import _ from 'lodash';
 import _get from 'lodash/get';
 import _head from 'lodash/head';
 import _some from 'lodash/some';
@@ -27,7 +28,7 @@ import {
   ownerVerified,
   publicEntity
 } from '../../types/owner';
-import {ScheduledEvents} from '../../scheduled-events/models';
+import {ScheduledEvents, ScheduledEventsRepository} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
@@ -201,69 +202,6 @@ export class WorksheetRepository extends CouchbaseModel {
     return worksheet.status;
   }
 
-  async calculateNewStatus(worksheet) {
-    worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
-    const isValidLength = worksheet.relatedOwners.length > 0;
-    const owners = isValidLength
-      ? await Promise.map(worksheet.relatedOwners, OwnerRepository.validateOwner)
-      : [];
-
-    const someValidOwner = isValidLength && _some(owners, ownerVerified);
-    const isPublicEntity = isValidLength && _some(owners, publicEntity);
-    const everyInvalidOwner = isValidLength && _every(owners, isInvalid);
-    const noSale = isValidLength && _some(owners, ownerNoSale);
-    const alreadySold = isValidLength && _some(owners, ownerAlreadySold);
-    const meetings = await this.findMeetings(worksheet.id);
-    const hasMeeting = meetings.length > 0;
-
-    switch (worksheet.status) {
-      case WorkSheetStatus.DEFAULT:
-        if (isPublicEntity) {
-          return WorkSheetStatus.PUBLIC;
-        }
-
-        if (noSale) {
-          return WorkSheetStatus.NO_SALE;
-        }
-
-        if (alreadySold) {
-          return WorkSheetStatus.ALREADY_SOLD;
-        }
-
-        if (hasMeeting) {
-          return WorkSheetStatus.MEETING;
-        }
-
-        if (someValidOwner) {
-          return WorkSheetStatus.WITH_OWNER;
-        }
-
-        if (everyInvalidOwner) {
-          return WorkSheetStatus.INVALID;
-        }
-
-        return worksheet.status;
-      case WorkSheetStatus.WITH_OWNER:
-        if (isPublicEntity) {
-          return WorkSheetStatus.PUBLIC;
-        }
-        if (noSale) {
-          return WorkSheetStatus.NO_SALE;
-        }
-        if (alreadySold) {
-          return WorkSheetStatus.ALREADY_SOLD;
-        }
-
-        if (hasMeeting) {
-          return WorkSheetStatus.MEETING;
-        }
-        return worksheet.status;
-      default:
-        worksheetDebug(`worksheet ${worksheet.id} with status ${worksheet.status} don't have planned behavior`);
-        return worksheet.status;
-    }
-  }
-
   async updateStatus(worksheetId, operatorId) {
     const worksheetData = await this.findByIdWIthIncludes(worksheetId);
     const worksheet = fromJSON(worksheetData, t.WorkSheet);
@@ -395,6 +333,16 @@ GROUP BY t.status`;
     const repo = new WorksheetRepository();
 
     return repo.save(worksheet, emitModelEvents);
+  }
+
+  async syncWorksheetFirebase(worksheet) {
+    const worksheetMeetings = await WorksheetRepository.findMeetings(worksheet.id);
+    const buildingMeetings = await BuildingRepository.findMeetings(worksheet.relatedBuildingIds[0]);
+    const allMeetingIds = (worksheetMeetings || []).concat(buildingMeetings || []).map(({id}) => id);
+    const meetings = _.chain(allMeetingIds).compact().uniq().value();
+    if (meetings.length > 0) {
+      return Promise.mapSeries(meetings, id => ScheduledEventsRepository.firebaseMeetingById(id));
+    }
   }
 
   async preSave(data) {

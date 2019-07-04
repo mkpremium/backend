@@ -124,6 +124,12 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await denormalizeBuildingMeeting(meeting.notifyTo, building.id, meeting);
   }
 
+  static async firebaseMeetingById(meetingId) {
+    const repo = new ScheduledEventsRepository();
+    const meeting = await repo.findByIdOrThrow(meetingId);
+    return repo.firebaseMeeting(meeting);
+  }
+
   async deleteFirebaseMeeting(scheduleEvent) {
     if (!fbComerciales.enabled) {
       return;

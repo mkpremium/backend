@@ -359,6 +359,7 @@ function noteWithTimestamp(note) {
 
 function toFirebaseMeeting(meeting) {
   return FirebaseMeeting({
+    Id: meeting.id,
     Owner: meeting.owner,
     Aspiration: 0,
     Street: meeting.address,

@@ -13,6 +13,7 @@ export const FirebaseBuildingData = t.struct({
 
 export const FirebaseMeeting = t.struct(
   {
+    Id: t.maybe(t.String),
     Aspiration: t.Number,
     Email: t.maybe(t.String),
     Favourite: t.Boolean,
