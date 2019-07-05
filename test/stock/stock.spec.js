@@ -1,16 +1,76 @@
 import {deleteAll} from '../common';
 import {StockRepository} from '../../src/stock/models';
 import {expect} from 'chai';
-import {createPurchaseStock, sellPurchasedBuilding} from '../../src/stock/application';
+import {closeSellStock, createPurchaseStock, sellPurchasedStock} from '../../src/stock/application';
 import {BuildingRepository} from '../../src/building/models';
 import {buildingData} from './stock.mock';
 import {newHttpError} from '../../src/lib/http-error';
+import {StockStatuses} from '../../src/stock/types';
 
 describe('building stock ', () => {
   let testBuilding;
+  let testBuilding2;
 
   before(async() => {
     await deleteAll();
+    testBuilding = await BuildingRepository.createNewBuilding(buildingData);
+    testBuilding2 = await BuildingRepository.createNewBuilding(buildingData);
+  });
+
+  it('createPurchaseStock should create a valid stock ', async() => {
+    const operatorId = '111111';
+    const params = {
+      buildingId: testBuilding.id,
+      reservationAmount: 1110.00,
+      reservationDate: new Date(),
+      transactionAmount: 1500.00,
+      transactionDate: new Date()
+    };
+    const stock = await createPurchaseStock(params, operatorId);
+    expect(stock).to.not.be.null;
+    expect(stock.currentStatus).to.equals(StockStatuses.PURCHASE);
+  });
+
+  it('Should sell stock from previous purchase stock', async() => {
+    const operatorId = '111111';
+    const params = {
+      buildingId: testBuilding.id,
+      reservationAmount: 2000.00,
+      reservationDate: new Date(),
+      transactionAmount: 3000.00,
+      transactionDate: new Date()
+    };
+    const stock = await sellPurchasedStock(params, operatorId);
+    expect(stock).to.not.be.null;
+    expect(stock.currentStatus).to.equals(StockStatuses.SELL);
+  });
+
+  it('Should not find a valid stock object', async() => {
+    const operatorId = '111111';
+    const params = {
+      buildingId: testBuilding2.id,
+      reservationAmount: 2000.00,
+      reservationDate: new Date(),
+      transactionAmount: 3000.00,
+      transactionDate: new Date()
+    };
+
+    let error;
+    try {
+      await sellPurchasedStock(params, operatorId);
+    } catch (err) {
+      error = err;
+    }
+    expect(error).to.not.be.null;
+  });
+
+  it('Should close a stock', async() => {
+    const operatorId = '111111';
+    const stock = await closeSellStock(testBuilding.id, operatorId);
+
+    expect(stock).to.not.be.null;
+    expect(stock.close.gain).to.equals(1500.00);
+    expect(stock.currentStatus).to.equals(StockStatuses.CLOSE);
   });
 
   it('createPurchaseStock should fail with invalid building', async() => {
@@ -23,40 +83,15 @@ describe('building stock ', () => {
       transactionDate: new Date()
     };
 
+    let error;
     try {
       await createPurchaseStock(params, operatorId);
     } catch (err) {
-      expect(err.code).to.equals(404);
-      expect(err.message).to.equals('El edificio randomFakeId no existe');
+      error = err;
     }
-  });
-
-  it('createPurchaseStock should create a valid stock ', async() => {
-    testBuilding = await BuildingRepository.createNewBuilding(buildingData);
-    const operatorId = '111111';
-    const params = {
-      buildingId: testBuilding.id,
-      reservationAmount: 1110.00,
-      reservationDate: new Date(),
-      transactionAmount: 1500.00,
-      transactionDate: new Date()
-    };
-    const stock = await createPurchaseStock(params, operatorId);
-    expect(stock).to.not.be.null;
-  });
-
-  it('Should sell stock from previous purchase stock', async() => {
-    const operatorId = '111111';
-    const params = {
-      buildingId: testBuilding.id,
-      reservationAmount: 2000.00,
-      reservationDate: new Date(),
-      transactionAmount: 3000.00,
-      transactionDate: new Date()
-    };
-    const stock = await sellPurchasedBuilding(params, operatorId);
-    console.log(stock);
-    expect(stock).to.not.be.null;
+    expect(error).to.not.be.null;
+    expect(error.code).to.equals(404);
+    expect(error.message).to.equals('El edificio randomFakeId no existe');
   });
 
   it('Sell Stock should fail with invalid building id', async() => {
@@ -69,11 +104,29 @@ describe('building stock ', () => {
       transactionDate: new Date()
     };
 
+    let error;
     try {
-      await sellPurchasedBuilding(params, operatorId);
+      await sellPurchasedStock(params, operatorId);
     } catch (err) {
-      expect(err.code).to.equals(404);
-      expect(err.message).to.equals('El edificio randomFakeId no existe');
+      error = err;
     }
+    expect(error).to.not.be.null;
+    expect(error.code).to.equals(404);
+    expect(error.message).to.equals('El edificio randomFakeId no existe');
+  });
+
+  it('Should close a stock fail on invalid building id', async() => {
+    const operatorId = '111111';
+    const buildingId = 'randomFakeId';
+
+    let error;
+    try {
+      await closeSellStock(buildingId, operatorId);
+    } catch (err) {
+      error = err;
+    }
+    expect(error).to.not.be.null;
+    expect(error.code).to.equals(404);
+    expect(error.message).to.equals('El edificio randomFakeId no existe');
   });
 });

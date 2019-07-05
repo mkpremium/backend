@@ -17,6 +17,16 @@ export class StockRepository extends CouchbaseModel {
 
     const results = await this.query(qb);
 
-    return fromJSON(_head(results), Stock);
+    if (results.length > 0) {
+      return fromJSON(_head(results), Stock);
+    }
+  }
+
+  async findByBuildingIdOrThrow(buildingId) {
+    const result = await this.findByBuildingId(buildingId);
+    if (!result) {
+      throw new Error(`No existe un stock asociado a ${buildingId}`);
+    }
+    return result;
   }
 }

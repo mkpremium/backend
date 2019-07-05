@@ -16,6 +16,7 @@ export const StockStatuses = {
 const StockStatus = t.enums.of(Object.values(StockStatuses));
 
 export const Stock = t.Stock = t.struct({
+  id: t.maybe(t.String),
   buildingId: t.String,
   currentStatus: StockStatus,
   purchase: Transaction,
@@ -33,7 +34,7 @@ export const Stock = t.Stock = t.struct({
   }
 });
 
-export const CreateStockParams = t.CreateStockParams = t.struct({
+export const TransactionParams = t.TransactionParams = t.struct({
   buildingId: t.String,
   reservationAmount: t.Number,
   reservationDate: t.Date,
