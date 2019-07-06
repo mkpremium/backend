@@ -1,5 +1,6 @@
 import debug from 'debug';
 import Promise from 'bluebird';
+import _ from 'lodash';
 import _get from 'lodash/get';
 import _isNil from 'lodash/isNil';
 
@@ -285,11 +286,23 @@ export async function saveMetadataToFirebase(metadata) {
   if (!fbComerciales.enabled) {
     return;
   }
+
   const db = fbComerciales.database();
   return Promise.all([
     db.ref(`${fbComerciales.prefixURL}Documents/${metadata.id}`).set(toFirebaseDocument(metadata)),
     db.ref(`${fbComerciales.prefixURL}Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true)
   ]);
+}
+
+export async function saveMetadataToUserBuilding(operatorId, metadata) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  const db = fbComerciales.database();
+  await db
+    .ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${metadata.buildingId}/Documents/${metadata.id}`)
+    .set(toFirebaseDocument(metadata));
 }
 
 export async function saveNoteToFirebase(note) {
@@ -315,6 +328,24 @@ export async function saveNoteToFirebase(note) {
     buildingNotesRef.child('LastNote').set(note.note),
     buildingNotesRef.child('ids').update({[note.id]: true})
   ]);
+}
+
+export async function businessRelatedToBuilding() {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  const db = fbComerciales.database();
+  const users = await db.ref(`${fbComerciales.prefixURL}Users`).once('value');
+
+  const businessRelatedToBuildings = {};
+  _.forEach(users.val(), (user, id) => {
+    Object.keys(user['Buildings'] || {}).forEach(buildingId => {
+      businessRelatedToBuildings[buildingId] = id;
+    });
+  });
+
+  return businessRelatedToBuildings;
 }
 
 export async function saveProposal(proposal) {
@@ -394,6 +425,7 @@ function toFirebaseBuilding(building, owner) {
 
 function toFirebaseDocument(metadata) {
   return t.FirebaseDocument({
+    BuildingId: metadata.buildingId,
     DocumentName: metadata.name,
     Url: metadata.url,
     Thumbnail: metadata.previewUrl,
