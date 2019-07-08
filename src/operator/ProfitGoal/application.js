@@ -1,4 +1,4 @@
-import {OperatorRepository} from './models';
+import {OperatorRepository} from '../models';
 import t from 'tcomb';
 
 export async function setProfitGoalToOperator(operatorId, profitAmount) {

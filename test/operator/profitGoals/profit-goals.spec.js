@@ -1,5 +1,5 @@
 import {deleteAll, operatorCreate} from '../../common';
-import {setProfitGoalToOperator} from '../../../src/operator/application';
+import {setProfitGoalToOperator} from '../../../src/operator/ProfitGoal/application';
 import {expect} from 'chai';
 
 describe('profit goals', () => {
@@ -7,7 +7,6 @@ describe('profit goals', () => {
   before(async() => {
     await deleteAll();
     operator = await operatorCreate();
-    console.log(operator);
   });
 
   it('Should define a goal for an existing operator', async() => {

@@ -8,7 +8,6 @@ export async function createPurchaseStock(params = {}, operatorId) {
   const buildingRepository = new BuildingRepository();
 
   const building = await buildingRepository.findByIdOrThrow(params.buildingId);
-  console.log("Building ", building);
 
   const stockRepository = new StockRepository();
 

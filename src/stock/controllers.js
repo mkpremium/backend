@@ -1,12 +1,27 @@
 import {wrap} from 'express-promise-wrap';
-import {StockRepository} from './models';
+import {closeSellStock, createPurchaseStock, getProfitGoalOperatorsRanking, sellPurchasedStock} from './application';
 
-export async function addBuildingToStock(req, res) {
-  const stockRepository = new StockRepository();
-  //  We create the stock object and add the purchase transaction to it
-  const stock = await stockRepository.createPurchaseStock(req.body, req.user.id);
-
+async function createPurchaseStockFromRequest(req, res) {
+  const stock = await createPurchaseStock(req.body, req.user.id);
   res.status(201).json(stock);
 }
 
-export const addBuildingToStockController = wrap(addBuildingToStock);
+async function sellPurchasedStockFromRequest(req, res) {
+  const stock = await sellPurchasedStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function closeSellStockFromRequest(req, res) {
+  const stock = await closeSellStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function getProfitsRanking(req,res){
+  const profitsRanking = await getProfitGoalOperatorsRanking();
+  res.status(201).json(profitsRanking);
+}
+
+export const createPurchaseStockController = wrap(createPurchaseStockFromRequest);
+export const sellPurchasedStockController = wrap(sellPurchasedStockFromRequest);
+export const closeSellStockController = wrap(closeSellStockFromRequest);
+export const getProfitsRakningController = wrap(getProfitsRanking);
