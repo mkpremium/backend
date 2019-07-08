@@ -1,7 +1,12 @@
 import {deleteAll} from '../common';
 import {StockRepository} from '../../src/stock/models';
 import {expect} from 'chai';
-import {closeSellStock, createPurchaseStock, sellPurchasedStock} from '../../src/stock/application';
+import {
+  closeSellStock,
+  createPurchaseStock,
+  getProfitGoalOperatorsRanking,
+  sellPurchasedStock
+} from '../../src/stock/application';
 import {BuildingRepository} from '../../src/building/models';
 import {buildingData} from './stock.mock';
 import {newHttpError} from '../../src/lib/http-error';
@@ -128,5 +133,13 @@ describe('building stock ', () => {
     expect(error).to.not.be.null;
     expect(error.code).to.equals(404);
     expect(error.message).to.equals('El edificio randomFakeId no existe');
+  });
+
+  it('Should return user list ranking', async() => {
+    const result = await getProfitGoalOperatorsRanking();
+    console.log(result);
+
+    expect(result.length).to.not.be.null;
+    expect(result.length > 0 ).to.be.true;
   });
 });

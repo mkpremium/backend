@@ -2,6 +2,7 @@ import {TransactionParams, StockStatuses, Transaction} from './types';
 import {StockRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import t from 'tcomb';
+import {OperatorRepository} from '../operator/models';
 
 export async function createPurchaseStock(params = {}, operatorId) {
   const buildingRepository = new BuildingRepository();
@@ -66,4 +67,9 @@ export async function closeSellStock(buildingId, operatorId) {
   };
   const updatedStock = t.update(stock, {close: {$set: close}, currentStatus: {$set: StockStatuses.CLOSE}});
   return stockRepository.save(updatedStock);
+}
+
+export async function getProfitGoalOperatorsRanking() {
+  const stockRepository = new StockRepository();
+  return stockRepository.listProfitRankings();
 }

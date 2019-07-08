@@ -88,6 +88,13 @@ t.OperatorProfile.prototype.getStateMessage = function() {
   }
 };
 
+export const ProfitGoal = t.ProfitGoal = t.struct(
+  {
+    amount: t.Number,
+    updatedAt: t.Date
+  }
+);
+
 /**
  * @swagger
  * definitions:
@@ -189,6 +196,8 @@ t.Operator = t.struct(
 
     profile: t.OperatorProfile,
     restringedHours: t.maybe(RestringedHourObject),
+
+    profitGoal: t.maybe(ProfitGoal),
 
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),

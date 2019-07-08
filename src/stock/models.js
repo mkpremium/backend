@@ -29,4 +29,18 @@ export class StockRepository extends CouchbaseModel {
     }
     return result;
   }
+
+  async listProfitRankings(params) {
+    const year = new Date().getFullYear();
+    const query = `
+      SELECT close.operatorId, SUM(close.gain) as total
+      FROM mkpremium
+      WHERE _documentType = 'stock'
+      AND close IS NOT NULL
+      AND DATE_PART_STR(close.transactionDate,'year') = ${year}
+      GROUP BY close.operatorId
+      ORDER BY total
+      `;
+    return this.raw(query);
+  }
 }
