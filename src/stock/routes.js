@@ -31,28 +31,28 @@ const router = Router();
  *     produces:
  *       - "application/json"
  *     parameters:
- *      - name: buildingId
- *        type: string
- *        in: body
- *        required: true
- *     - name: reservationAmount
- *        type: number
- *        in: body
- *        required: true
- *     - name: reservationDate
- *        type: string
- *        in: body
- *        format: dd-mm-YYYY
- *        required: true
- *     - name: transactionAmount
- *        type: number
- *        in: body
- *        required: true
- *     - name: transactionDate
- *        type: string
- *        in: body
- *        format: dd-mm-YYYY
- *        required: true
+ *       - name: buildingId
+ *         type: string
+ *         in: body
+ *         required: true
+ *       - name: reservationAmount
+ *         type: number
+ *         in: body
+ *         required: true
+ *       - name: reservationDate
+ *         type: string
+ *         in: body
+ *         format: dd-mm-YYYY
+ *         required: true
+ *       - name: transactionAmount
+ *         type: number
+ *         in: body
+ *         required: true
+ *       - name: transactionDate
+ *         type: string
+ *         in: body
+ *         format: dd-mm-YYYY
+ *         required: true
  *     responses:
  *       200:
  *         description: Operación exitosa
@@ -66,7 +66,6 @@ const router = Router();
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
- *
  */
 router.post('/purchase', createPurchaseStockController);
 
@@ -86,28 +85,28 @@ router.post('/purchase', createPurchaseStockController);
  *     produces:
  *       - "application/json"
  *     parameters:
- *      - name: buildingId
- *        type: string
- *        in: body
- *        required: true
- *     - name: reservationAmount
- *        type: number
- *        in: body
- *        required: true
- *     - name: reservationDate
- *        type: string
- *        in: body
- *        format: dd-mm-YYYY
- *        required: true
- *     - name: transactionAmount
- *        type: number
- *        in: body
- *        required: true
- *     - name: transactionDate
- *        type: string
- *        in: body
- *        format: dd-mm-YYYY
- *        required: true
+ *       - name: buildingId
+ *         type: string
+ *         in: body
+ *         required: true
+ *       - name: reservationAmount
+ *         type: number
+ *         in: body
+ *         required: true
+ *       - name: reservationDate
+ *         type: string
+ *         in: body
+ *         format: dd-mm-YYYY
+ *         required: true
+ *       - name: transactionAmount
+ *         type: number
+ *         in: body
+ *         required: true
+ *       - name: transactionDate
+ *         type: string
+ *         in: body
+ *         format: dd-mm-YYYY
+ *         required: true
  *     responses:
  *       200:
  *         description: Operación exitosa
@@ -121,7 +120,6 @@ router.post('/purchase', createPurchaseStockController);
  *         description: Credenciales inválidos o cuenta deshabilitada
  *         schema:
  *           $ref: "#/definitions/Error"
- *
  */
 router.post('/sell', sellPurchasedStockController);
 
@@ -141,10 +139,10 @@ router.post('/sell', sellPurchasedStockController);
  *     produces:
  *       - "application/json"
  *     parameters:
- *      - name: buildingId
- *        type: string
- *        in: body
- *        required: true
+ *       - name: buildingId
+ *         type: string
+ *         in: body
+ *         required: true
  *     responses:
  *       200:
  *         description: Operación exitosa
@@ -165,7 +163,7 @@ router.post('/close', closeSellStockController);
 
 /**
  * @swagger
- * /stock/close:
+ * /stock/ranking:
  *   get:
  *     tags: [Stock]
  *     summary: Obtiene el ranking de ganancias de los stock cerrados ordenados por usuario de mayor a menor

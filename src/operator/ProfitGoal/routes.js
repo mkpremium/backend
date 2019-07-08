@@ -19,14 +19,14 @@ const router = Router();
  *     produces:
  *       - "application/json"
  *     parameters:
- *      - name: profitAmount
- *        type: number
- *        in: body
- *        required: true
- *      - name: operatorId
- *        type: number
- *        in: body
- *        required: true
+ *       - name: profitAmount
+ *         type: number
+ *         in: body
+ *         required: true
+ *       - name: operatorId
+ *         type: number
+ *         in: body
+ *         required: true
  *     responses:
  *       200:
  *         description: Operación exitosa

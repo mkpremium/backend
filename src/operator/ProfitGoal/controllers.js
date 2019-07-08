@@ -1,3 +1,5 @@
+import {wrap} from 'express-promise-wrap';
+
 import {setProfitGoalToOperator} from './application';
 
 async function setProfitGoalToOperatorFromRequest(req, res) {
