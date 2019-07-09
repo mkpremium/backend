@@ -11,6 +11,7 @@ import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
 import {OwnerRepository} from '../../owner/models';
 import {OwnerStatus} from '../../types/enums';
+import {MetadataRepository} from '../../building/models';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -117,6 +118,21 @@ export async function saveBuildingToFirebase(db, building, owner) {
 
   if (comercialId) {
     const comercialBuildingRef = db.ref(`${fbComerciales.prefixURL}Users/${comercialId}/Buildings/${building.id}`);
+
+    const metadataRepository = new MetadataRepository();
+    const metadataArray = building.metadata;
+    promises.push(...Promise.map(metadataArray, async(metadataBuilding) => {
+      if (metadataBuilding.id) {
+        const metadata = await metadataRepository.findById(metadataBuilding.id);
+        if (metadata) {
+          await saveMetadataToFirebase(metadata);
+          if (comercialId) {
+            await saveMetadataToUserBuilding(comercialId, metadata);
+          }
+        }
+      }
+    }));
+
     promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding));
     if (owner) {
       promises.push(comercialBuildingRef.child('Owner').set(owner));
