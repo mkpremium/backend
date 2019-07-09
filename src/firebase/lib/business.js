@@ -300,7 +300,7 @@ export async function saveMetadataToUserBuilding(operatorId, metadata) {
   }
 
   const db = fbComerciales.database();
-  await db
+  return db
     .ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${metadata.buildingId}/Documents/${metadata.id}`)
     .set(toFirebaseDocument(metadata));
 }
