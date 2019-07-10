@@ -445,6 +445,16 @@ GROUP BY t.business.status`;
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
 
+  async findAllByBuildingIdWithVerifiedOwner(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('t.`buildingId` = ?', buildingId)
+      .where('t.`verified` = ?', 'GOOD');
+
+    const results = await this.query(qb);
+    const ownerIds = _.map(results, 'id');
+    return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+  }
+
   async findOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
       .where('t.`buildingId` = ?', buildingId)
