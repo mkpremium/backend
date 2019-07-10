@@ -86,7 +86,7 @@ export async function saveBuildingToFirebase_(building, owner) {
  */
 async function findVerifiedOwners(buildingId) {
   const ownerRepository = new OwnerRepository();
-  return ownerRepository.findAllByBuildingIdWithVerifiedOwner(buildingId);
+  return ownerRepository.findAllVerifiedOwnersByBuildingId(buildingId);
 }
 
 export async function saveBuildingToFirebase(db, building, owner) {

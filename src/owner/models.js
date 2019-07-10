@@ -445,19 +445,25 @@ GROUP BY t.business.status`;
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
 
-  async findAllByBuildingIdWithVerifiedOwner(buildingId) {
+  async findAllVerifiedOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
-      .where('t.`verified` = ?', 'GOOD');
+      .where('t.`buildingId` = ?', buildingId);
 
     const results = await this.query(qb);
     const ownerIds = _.map(results, 'id');
-    return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+    const owners = await this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+    return owners.filter(owner => this.isOwnerVerified(owner));
+  }
+
+  isOwnerVerified(owner){
+    const contacts = _.get(owner, 'person.contacts');
+    const goodContacts = contacts.filter(c => c.status === t.TypedContactInfoStatus.GOOD);
+    return goodContacts.length > 0;
   }
 
   async findOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
+      .where('t.`buildingId` = ?', buildingId);
     const results = await this.query(qb);
 
     if (!results || results.length === 0) {
