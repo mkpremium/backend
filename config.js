@@ -75,14 +75,14 @@ function isEnabled(value) {
 }
 
 export const firebaseComerciales = {
-  enabled: isEnabled(process.env.FIREBASE_COMERCIALES || 'false'),
+  enabled: isEnabled(process.env.FIREBASE_COMERCIALES || 'true'),
   serviceAccount: process.env.FIREBASE_COMERCIALES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
   databaseURL: process.env.FIREBASE_COMERCIALES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_COMERCIALES_PREFIX_URL || ''
 };
 
 export const firebaseInformadores = {
-  enabled: isEnabled(process.env.FIREBASE_INFORMADORES || 'false'),
+  enabled: isEnabled(process.env.FIREBASE_INFORMADORES || 'true'),
   serviceAccount: process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores,
   databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || ''
