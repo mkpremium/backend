@@ -1,8 +1,12 @@
 import {TransactionParams, StockStatuses, Transaction} from './types';
-import {StockRepository} from './models';
+import {StockFirebaseRepository, StockRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import t from 'tcomb';
-import {OperatorRepository} from '../operator/models';
+
+function createTransaction(params = {}, operatorId) {
+  params['operatorId'] = operatorId;
+  return Transaction(params);
+}
 
 export async function createPurchaseStock(params = {}, operatorId) {
   const buildingRepository = new BuildingRepository();
@@ -20,12 +24,12 @@ export async function createPurchaseStock(params = {}, operatorId) {
     currentStatus: StockStatuses.PURCHASE,
     purchase
   };
-  return stockRepository.save(stock);
-}
 
-function createTransaction(params = {}, operatorId) {
-  params['operatorId'] = operatorId;
-  return Transaction(params);
+  const stockFirebaseRepository = new StockFirebaseRepository();
+
+  await stockFirebaseRepository.savePurchaseStock(stock);
+
+  return stockRepository.save(stock);
 }
 
 export async function sellPurchasedStock(params = {}, operatorId) {
@@ -43,6 +47,11 @@ export async function sellPurchasedStock(params = {}, operatorId) {
     throw new Error(`El stock no se encuentra en estado ${StockStatuses.PURCHASE}`);
   }
   const updatedStock = t.update(stock, {sell: {$set: sell}, currentStatus: {$set: StockStatuses.SELL}});
+
+  const stockFirebaseRepository = new StockFirebaseRepository();
+
+  await stockFirebaseRepository.saveSellStock(updatedStock);
+
   return stockRepository.save(updatedStock);
 }
 
@@ -65,6 +74,11 @@ export async function closeSellStock(buildingId, operatorId) {
     transactionDate: new Date()
   };
   const updatedStock = t.update(stock, {close: {$set: close}, currentStatus: {$set: StockStatuses.CLOSE}});
+
+  const stockFirebaseRepository = new StockFirebaseRepository();
+
+  await stockFirebaseRepository.saveCloseStock(updatedStock);
+
   return stockRepository.save(updatedStock);
 }
 

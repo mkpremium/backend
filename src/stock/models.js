@@ -4,6 +4,8 @@ import {Stock} from './types';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _head from 'lodash/head';
 import t from 'tcomb';
+import {fbComerciales} from '../firebase/index';
+import {madrid} from '../lib/date';
 
 export class StockRepository extends CouchbaseModel {
   constructor() {
@@ -42,5 +44,50 @@ export class StockRepository extends CouchbaseModel {
       ORDER BY total
       `;
     return this.raw(query);
+  }
+}
+
+export class StockFirebaseRepository {
+  constructor() {
+    this.db = fbComerciales.database();
+  }
+
+  async savePurchaseStock(stock) {
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
+    const firebasePurchaseTransaction = this.toFirebaseTransaction(stock.purchase);
+    console.log('Firebase ùirchase', firebasePurchaseTransaction);
+    return stockRef.child('purchase').set(firebasePurchaseTransaction);
+  }
+
+  async saveSellStock(stock) {
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
+    const firebaseSellTransaction = this.toFirebaseTransaction(stock.sell);
+    return stockRef.child('sell').set(firebaseSellTransaction);
+  }
+
+  async saveCloseStock(stock) {
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
+    const firebaseClose = this.toFirebaseClose(stock.close);
+    return stockRef.child('close').set(firebaseClose);
+  }
+
+  getStockReference(operatorId, buildingId) {
+    return this.db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}/Stock`);
+  }
+
+  toFirebaseTransaction(transaction) {
+    return {
+      reservationDate: madrid(transaction.reservationDate).unix(),
+      reservationAmount: transaction.reservationAmount,
+      transactionDate: madrid(transaction.transactionDate).unix(),
+      transactionAmount: transaction.transactionAmount
+    };
+  }
+
+  toFirebaseClose(close) {
+    return {
+      gain: close.gain,
+      transactionDate: madrid(close.transactionDate).unix()
+    };
   }
 }

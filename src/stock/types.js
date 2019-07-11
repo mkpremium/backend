@@ -15,6 +15,7 @@ export const StockStatuses = {
 };
 const StockStatus = t.enums.of(Object.values(StockStatuses));
 
+
 export const Stock = t.Stock = t.struct({
   id: t.maybe(t.String),
   buildingId: t.String,
