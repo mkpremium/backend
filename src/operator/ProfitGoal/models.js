@@ -13,7 +13,7 @@ export class ProfitGoalFirebaseRepository {
   }
 
   getProfitGoalRoute(operatorId) {
-    return this.db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Profit`);
+    return this.db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/ProfitGoal`);
   }
 
   toFirebaseProfitGoal(profitGoal) {
