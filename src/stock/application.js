@@ -2,10 +2,15 @@ import {TransactionParams, StockStatuses, Transaction} from './types';
 import {StockFirebaseRepository, StockRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import t from 'tcomb';
-
+import fromJSON from 'tcomb/lib/fromJSON';
 function createTransaction(params = {}, operatorId) {
-  params['operatorId'] = operatorId;
-  return Transaction(params);
+  return Transaction({
+    operatorId: operatorId,
+    reservationAmount: params.reservationAmount,
+    reservationDate: new Date(params.reservationDate),
+    transactionAmount: params.transactionAmount,
+    transactionDate: new Date(params.transactionDate)
+  });
 }
 
 export async function createPurchaseStock(params = {}, operatorId) {
@@ -15,7 +20,7 @@ export async function createPurchaseStock(params = {}, operatorId) {
 
   const stockRepository = new StockRepository();
 
-  const createStockParams = TransactionParams(params);
+  const createStockParams = fromJSON(params,TransactionParams);
 
   const purchase = createTransaction(params, operatorId);
 
@@ -36,6 +41,8 @@ export async function sellPurchasedStock(params = {}, operatorId) {
   const buildingRepository = new BuildingRepository();
 
   await buildingRepository.findByIdOrThrow(params.buildingId);
+
+  const createStockParams = fromJSON(params,TransactionParams);
 
   const sell = createTransaction(params, operatorId);
 

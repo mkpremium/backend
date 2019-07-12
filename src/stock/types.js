@@ -3,9 +3,9 @@ import t from 'tcomb';
 export const Transaction = t.struct({
   operatorId: t.String,
   reservationAmount: t.Number,
-  reservationDate: t.String,
+  reservationDate: t.Date,
   transactionAmount: t.Number,
-  transactionDate: t.String
+  transactionDate: t.Date
 }, 'Transaction');
 
 export const StockStatuses = {
@@ -38,9 +38,9 @@ export const Stock = t.Stock = t.struct({
 export const TransactionParams = t.TransactionParams = t.struct({
   buildingId: t.String,
   reservationAmount: t.Number,
-  reservationDate: t.String,
+  reservationDate: t.Date,
   transactionAmount: t.Number,
-  transactionDate: t.String
+  transactionDate: t.Date
 });
 
 export default t;

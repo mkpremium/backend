@@ -96,7 +96,7 @@ router.post('/purchase', createPurchaseStockController);
  *       - name: reservationDate
  *         type: string
  *         in: body
- *         format: dd-mm-YYYY
+ *         format: YYYY-MM-DDTHH:mm:ss.sssZ
  *         required: true
  *       - name: transactionAmount
  *         type: number
@@ -105,7 +105,7 @@ router.post('/purchase', createPurchaseStockController);
  *       - name: transactionDate
  *         type: string
  *         in: body
- *         format: dd-mm-YYYY
+ *         format: YYYY-MM-DDTHH:mm:ss.sssZ
  *         required: true
  *     responses:
  *       200:
