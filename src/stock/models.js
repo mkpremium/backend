@@ -33,17 +33,18 @@ export class StockRepository extends CouchbaseModel {
   }
 
   async listProfitRankings(params) {
-    const year = new Date().getFullYear();
-    const query = `
+    const currentYear = new Date().getFullYear();
+    const profitsQuery = `
       SELECT close.operatorId, SUM(close.gain) as total
       FROM mkpremium
       WHERE _documentType = 'stock'
       AND close IS NOT NULL
-      AND DATE_PART_STR(close.transactionDate,'year') = ${year}
+      AND DATE_PART_STR(close.transactionDate,'year') = ${currentYear}
       GROUP BY close.operatorId
       ORDER BY total
       `;
-    return this.raw(query);
+
+    return this.raw(profitsQuery);
   }
 }
 
@@ -55,7 +56,6 @@ export class StockFirebaseRepository {
   async savePurchaseStock(stock) {
     const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
     const firebasePurchaseTransaction = this.toFirebaseTransaction(stock.purchase);
-    console.log('Firebase ùirchase', firebasePurchaseTransaction);
     return stockRef.child('purchase').set(firebasePurchaseTransaction);
   }
 

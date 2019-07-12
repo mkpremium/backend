@@ -224,6 +224,16 @@ export class CouchbaseModel {
     return this.queryRaw(n1ql);
   }
 
+  async whereIdInArray(array){
+    const bucket = this.getBucketName();
+    const query = `SELECT *  FROM ${bucket} t
+                   WHERE t._documentType = '${this.getType()}'
+                   AND id IN ${JSON.stringify(array)}`;
+    const results = await this.raw(query);
+    console.log("Results", results);
+    return results.map(r => fromJSON(r.t, this.Struct));
+  }
+
   async getAllIds() {
     const bucket = this.getBucketName();
     const query = `SELECT RAW id  FROM ${bucket} t

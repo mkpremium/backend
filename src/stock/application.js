@@ -3,6 +3,7 @@ import {StockFirebaseRepository, StockRepository} from './models';
 import {BuildingRepository} from '../building/models';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
+import {OperatorRepository} from '../operator/models';
 function createTransaction(params = {}, operatorId) {
   return Transaction({
     operatorId: operatorId,
@@ -20,7 +21,7 @@ export async function createPurchaseStock(params = {}, operatorId) {
 
   const stockRepository = new StockRepository();
 
-  const createStockParams = fromJSON(params,TransactionParams);
+  const createStockParams = fromJSON(params, TransactionParams);
 
   const purchase = createTransaction(params, operatorId);
 
@@ -42,7 +43,7 @@ export async function sellPurchasedStock(params = {}, operatorId) {
 
   await buildingRepository.findByIdOrThrow(params.buildingId);
 
-  const createStockParams = fromJSON(params,TransactionParams);
+  const createStockParams = fromJSON(params, TransactionParams);
 
   const sell = createTransaction(params, operatorId);
 
@@ -91,5 +92,37 @@ export async function closeSellStock(params, operatorId) {
 
 export async function getProfitGoalOperatorsRanking() {
   const stockRepository = new StockRepository();
-  return stockRepository.listProfitRankings();
+  const operatorsProfits = await stockRepository.listProfitRankings();
+  console.log('Operators profits', operatorsProfits);
+  if (operatorsProfits.length === 0) {
+    return [];
+  }
+
+  let operatorsProfitsMap = new Map();
+  let operatorsIds = [];
+
+  for (let x = 0; x < operatorsProfits.length; x++) {
+    operatorsIds.push(operatorsProfits[x].operatorId);
+
+    const profit = operatorsProfits[x] ? operatorsProfits[x].total : 0;
+    operatorsProfitsMap.set(operatorsProfits[x].operatorId, profit);
+  }
+
+  const operatorRepository = new OperatorRepository();
+  const operators = await operatorRepository.whereIdInArray(operatorsIds);
+  console.log('Ids', operatorsIds);
+
+  console.log('Operators ', operators);
+  return operators.map((operator, index) => {
+    return {
+      userId: operator.id,
+      userName: operator.username,
+      userCity: operator.profile.city,
+      goal: operator.profitGoal ? operator.profitGoal.amount : 0,
+      currentProfit: operatorsProfitsMap.get(operator.id),
+      percentageGoal: operator.profitGoal ? operatorsProfitsMap.get(operator.id) / operator.profitGoal.amount : 0,
+      awards: operator.awards,
+      rank: index + 1
+    };
+  });
 }

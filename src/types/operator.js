@@ -95,6 +95,14 @@ export const ProfitGoal = t.ProfitGoal = t.struct(
   }
 );
 
+export const Award = t.Award = t.struct(
+  {
+    awardId: t.String,
+    awardName: t.String,
+    awardedAt: t.Date
+  }
+);
+
 /**
  * @swagger
  * definitions:
@@ -198,7 +206,7 @@ t.Operator = t.struct(
     restringedHours: t.maybe(RestringedHourObject),
 
     profitGoal: t.maybe(ProfitGoal),
-
+    awards: t.maybe(t.list(Award)),
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
     _documentType: t.enums.of(['operator'])
