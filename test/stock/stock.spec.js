@@ -73,7 +73,9 @@ describe('building stock ', () => {
 
   it('Should close a stock', async() => {
     const operatorId = '830f18dd-13f4-44ad-8efb-198e9fa376d2';
-    const stock = await closeSellStock(testBuilding.id, operatorId);
+
+    const body = { buildingId: testBuilding.id };
+    const stock = await closeSellStock(body, operatorId);
 
     expect(stock).to.not.be.null;
     expect(stock.close.gain).to.equals(1500.00);
@@ -124,11 +126,11 @@ describe('building stock ', () => {
 
   it('Should close a stock fail on invalid building id', async() => {
     const operatorId = '830f18dd-13f4-44ad-8efb-198e9fa376d2';
-    const buildingId = 'randomFakeId';
+    const body = { buildingId: 'randomFakeId' };
 
     let error;
     try {
-      await closeSellStock(buildingId, operatorId);
+      await closeSellStock(body, operatorId);
     } catch (err) {
       error = err;
     }

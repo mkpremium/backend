@@ -62,14 +62,14 @@ export async function sellPurchasedStock(params = {}, operatorId) {
   return stockRepository.save(updatedStock);
 }
 
-export async function closeSellStock(buildingId, operatorId) {
+export async function closeSellStock(params, operatorId) {
   const buildingRepository = new BuildingRepository();
 
-  await buildingRepository.findByIdOrThrow(buildingId);
+  await buildingRepository.findByIdOrThrow(params.buildingId);
 
   const stockRepository = new StockRepository();
 
-  let stock = await stockRepository.findByBuildingIdOrThrow(buildingId);
+  let stock = await stockRepository.findByBuildingIdOrThrow(params.buildingId);
 
   if (stock.currentStatus !== StockStatuses.SELL) {
     throw new Error(`El stock no se encuentra en estado ${StockStatuses.SELL}`);
