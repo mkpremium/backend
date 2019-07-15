@@ -3,11 +3,13 @@ import program from 'commander';
 import fs from 'fs-extra';
 import couchbase from '../src/db/couchbase';
 import {migrate} from './lib/migrate-portugal';
+import {deleteAll} from './lib/migrate-utils';
 
 // region main entry
 program
   .arguments('[input-file]')
   .version('0.0.1')
+  .option('-C --clean', 'clean the database')
   .action(mainAction)
   .parse(process.argv);
 
@@ -32,6 +34,9 @@ function mainAction() {
 async function main(inputFile) {
   await validateFile(inputFile);
   await couchbase();
+  if (program.clean) {
+    await deleteAll();
+  }
   await migrate(inputFile);
 }
 
