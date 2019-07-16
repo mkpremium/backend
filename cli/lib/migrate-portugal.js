@@ -201,6 +201,7 @@ async function checkAndAddOwners(building, input) {
   const worksheet = await worksheetRepo.findWorksheetByBuilding(building.id);
   const worksheetWithOwners = await worksheetRepo.findByIdWIthIncludes(worksheet.id);
 
+  debugMigrate('Checking owner for worksheet with id:', worksheet.id);
   debugMigrate(`Checking owners [${owners.length}] for existent : ${building.id}`);
 
   function newAddOwner(owner) {
