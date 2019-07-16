@@ -71,9 +71,9 @@ export async function migrate(inputFile) {
   debugMigrate('Process started...');
   const buildingWithErrors = [];
   await csvToJSON(inputFile, doOnEachRow);
-
   async function doOnEachRow(personRecord, row) {
-    const input = Input(removeNullValues(cleanObjectKeys(personRecord)));
+    const cleanValues = removeNullValues(cleanObjectKeys(personRecord));
+    const input = Input(cleanValues);
     try {
       await processBuilding(input, row);
     } catch (error) {
@@ -97,8 +97,8 @@ export async function migrate(inputFile) {
  */
 async function processBuilding(input, row) {
   console.time('processBuilding');
-  debugMigrate(`\n[NEW ROW ${row}] Process Building record with id_finca:`, input.id_finca);
   const catastro = getFieldNotNull(input, 'id_finca');
+  debugMigrate(`\n[NEW ROW ${row}] Process Building record with id_finca:`, catastro);
 
   if (catastro) {
     const building = await findBuilding(catastro);
@@ -108,7 +108,7 @@ async function processBuilding(input, row) {
     } else {
       debugMigrate(`Building not found, proceed to create building, worksheet, person and owner...`);
       await createAll(input);
-      debugMigrate('\nProcess ended for building record with catastro / id_finca:', input.id_finca);
+      debugMigrate('\nProcess ended for building record with catastro / id_finca:', catastro);
       console.timeEnd('processBuilding');
     }
   }
@@ -384,7 +384,7 @@ async function generateObjects(input, previousBuilding) {
  */
 export async function findBuilding(catastro) {
   const buildingRepository = new BuildingRepository();
-  return buildingRepository.findByCatastro(catastro, false);
+  return buildingRepository.findByCatastro({reference: catastro}, false);
 }
 
 /**
