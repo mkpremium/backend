@@ -248,6 +248,20 @@ export class OperatorRepository extends Operator {
       performance: results[operator.id]
     }));
   }
+
+  async getOperatorsWithProfitGoal() {
+    const bucket = this.getBucketName();
+    const currentYear = new Date().getFullYear();
+
+    const operatorsProfitGoals = `
+      select * from ${bucket} t
+      where t._documentType = 'operator'
+      AND t.profitGoal IS NOT NULL
+      AND DATE_PART_STR(t.profitGoal.updatedAt,'year') = ${currentYear}
+      `;
+
+    return this.raw(operatorsProfitGoals);
+  }
 }
 
 export class OperatorRefreshTokenRepository extends CouchbaseModel {

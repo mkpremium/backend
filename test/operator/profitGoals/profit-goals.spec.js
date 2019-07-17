@@ -13,50 +13,57 @@ import {BuildingRepository} from '../../../src/building/models';
 import {buildingData} from '../../stock/stock.mock';
 
 describe('profit goals', () => {
-  let operator;
-  let testBuilding;
+  let operator1;
+  let operator2;
+  let testBuilding1;
+  let testBuilding2;
+
+  async function createTestPurchaseStock(buildingId, operatorId, transactionAmount) {
+    let params = {
+      buildingId: buildingId,
+      reservationAmount: 1110.00,
+      reservationDate: '2019-07-11T13:00:00.000Z',
+      transactionAmount: transactionAmount,
+      transactionDate: '2019-07-11T13:00:00.000Z'
+    };
+    await createPurchaseStock(params, operatorId);
+  }
+
+  async function sellTestPurchaseStock(buildingId, operatorId, transactionAmount){
+    let params = {
+      buildingId: buildingId,
+      reservationAmount: 2000.00,
+      reservationDate: '2019-07-11T13:00:00.000Z',
+      transactionAmount: transactionAmount,
+      transactionDate: '2019-07-11T13:00:00.000Z'
+    };
+    await sellPurchasedStock(params, operatorId);
+  }
+
   before(async() => {
     const operatorRepository = new OperatorRepository();
     await operatorRepository.deleteQuery();
-    operator = await operatorCreate();
+    operator1 = await operatorCreate('1');
 
-    testBuilding = await BuildingRepository.createNewBuilding(buildingData);
+    operator2 = await operatorCreate('2');
 
-    let params = {
-      buildingId: testBuilding.id,
-      reservationAmount: 1110.00,
-      reservationDate: '2019-07-11T13:00:00.000Z',
-      transactionAmount: 1500.00,
-      transactionDate: '2019-07-11T13:00:00.000Z'
-    };
-    await createPurchaseStock(params, operator.id);
+    testBuilding1 = await BuildingRepository.createNewBuilding(buildingData);
 
-    params = {
-      buildingId: testBuilding.id,
-      reservationAmount: 2000.00,
-      reservationDate: '2019-07-11T13:00:00.000Z',
-      transactionAmount: 3000.00,
-      transactionDate: '2019-07-11T13:00:00.000Z'
-    };
-    await sellPurchasedStock(params, operator.id);
-
-    params = {
-      buildingId: testBuilding.id
-    };
-    await closeSellStock(params, operator.id);
+    await createTestPurchaseStock(testBuilding1.id, operator1.id, 1500);
+    await sellTestPurchaseStock(testBuilding1.id, operator1.id, 3000);
   });
 
-  it('Should define a goal for an existing operator', async() => {
-    const result = await setProfitGoalToOperator(operator.id, 1500);
-
+  it('Should define a goal for an existing operator1', async() => {
+    const result = await setProfitGoalToOperator(operator1.id, 1500);
     expect(result.profitGoal).to.not.be.null;
     expect(result.profitGoal.amount).to.equal(1500);
   });
 
-  it('Should fail a goal for an non existing operator', async() => {
+  it('Should fail a goal for an non existing operator1', async() => {
     let error;
     try {
-      await setProfitGoalToOperator('fakeId', 1500);
+      const operator = await setProfitGoalToOperator('fakeId', 1500);
+      console.log(operator);
     } catch (err) {
       error = err;
     }
@@ -67,7 +74,25 @@ describe('profit goals', () => {
   });
 
   it('Should display a profit goal ranking', async() => {
+    await setProfitGoalToOperator(operator2.id, 1500);
+
+    let params = {
+      buildingId: testBuilding1.id
+    };
+    await closeSellStock(params, operator1.id);
+
+    testBuilding2 = await BuildingRepository.createNewBuilding(buildingData);
+    await createTestPurchaseStock(testBuilding2.id, operator2.id, 1000);
+    await sellTestPurchaseStock(testBuilding2.id, operator2.id, 1200);
+
+    params = {
+      buildingId: testBuilding2.id
+    };
+    await closeSellStock(params, operator2.id);
+
     const profitRanking = await getProfitGoalOperatorsRanking();
-    expect(profitRanking.length).to.be.equal(1);
+    console.log(profitRanking);
+    expect(profitRanking.length).to.be.equal(2);
+    expect(profitRanking[0].userId).to.be.equal(operator1.id);
   });
 });
