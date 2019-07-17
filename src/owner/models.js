@@ -116,13 +116,11 @@ export class PersonRepository extends Person {
       .where(expr);
     const results = await this.query(qb);
 
-    if (required && (!results || results.length === 0)) {
+      if (required && (!results || results.length === 0)) {
       throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
     }
-
     return results;
   }
-
 
 
   /**

@@ -66,8 +66,8 @@ async function processContacts(input) {
 
   if (dni) {
     const persons = await findPersons(dni);
-    if (persons.length === 0) {
-      debugMigrate(`Persons not found...`);
+    if (persons.length > 0) {
+      debugMigrate(`Persons found...`);
       await updatePersonAndWorksheet(input, persons);
       debugMigrate('\nProcess ended for person record with dni no:', input.no);
     } else {
@@ -164,11 +164,13 @@ async function updateWorksheet(person) {
   const owner = await ownerRepository.findByPersonId(person.id);
 
   if (!owner) {
-    throw new Error(`Owner not found.`);
+    debugMigrate(`Owner not found ${person.id}`);
+    return true;
   }
   let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
-  if (worksheet) {
-    throw new Error(`Worksheet not found.`);
+  if (!worksheet) {
+    debugMigrate(`Worksheet not found for ${owner.id}`);
+    return true;
   }
   worksheet = fromJSON(worksheet, t.WorkSheet);
 
@@ -180,7 +182,9 @@ async function updateWorksheet(person) {
 
     await worksheetRepository.queryRaw(updateAddress);
     debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status);
+    return false;
   }
+  return true;
 }
 
 /**
