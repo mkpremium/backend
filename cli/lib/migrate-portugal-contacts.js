@@ -169,12 +169,10 @@ async function updateWorksheet(person) {
     return true;
   }
 
-  if(owner.status === OwnerStatus.ERROR){
-    const updatedOwner = t.update(owner, { status: { $set: OwnerStatus.NON_VERIFIED});
+  if (owner.status === OwnerStatus.ERROR) {
+    const updatedOwner = t.update(owner, {status: {$set: OwnerStatus.NON_VERIFIED}});
     await ownerRepository.save(updatedOwner);
   }
-
-  //TODO if owner status invalid/undefined/null -> NO_VERIFICADO???
 
   let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
   if (!worksheet) {
