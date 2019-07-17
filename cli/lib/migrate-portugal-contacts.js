@@ -65,10 +65,10 @@ async function processContacts(input) {
   const dni = getFieldNotNull(input, 'no');
 
   if (dni) {
-    const person = await findPerson(dni);
-    if (person) {
-      debugMigrate(`Person found...`);
-      await updatePersonAndWorksheet(input, person);
+    const persons = await findPersons(dni);
+    if (persons.length === 0) {
+      debugMigrate(`Persons not found...`);
+      await updatePersonAndWorksheet(input, persons);
       debugMigrate('\nProcess ended for person record with dni no:', input.no);
     } else {
       debugMigrate(`Person not found, skip row no/dni:`, input.no);
@@ -88,15 +88,31 @@ async function findPerson(dni) {
 }
 
 /**
+ * Finds all persons by dni.
+ * @param dni
+ * @returns {Promise<*>}
+ */
+async function findPersons(dni) {
+  const personRepository = new PersonRepository();
+  return personRepository.findAllByDocumentNumber(dni, false);
+}
+
+/**
  *
  * @param input
  * @param person
  * @returns {Promise<void>}
  */
-async function updatePersonAndWorksheet(input, person) {
+async function updatePersonAndWorksheet(input, persons) {
+  for (let x = 0; x < persons.length; x++) {
+    const person = persons[x];
+    await updatePerson(input, person);
+    await updateWorksheet(person);
+  }
+}
+
+async function updatePerson(input, person) {
   const personRepository = new PersonRepository();
-  const ownerRepository = new OwnerRepository();
-  const worksheetRepository = new WorksheetRepository();
   const contacts = [];
   let phonesArray = [];
 
@@ -112,57 +128,58 @@ async function updatePersonAndWorksheet(input, person) {
     }
   }
 
-  if (contacts.length) {
-    const currentContactsObjectsArray = person.contacts || [];
-    const currentPhones = currentContactsObjectsArray.map((contact) => {
-      return contact.value;
-    });
-    debugMigrate(`currentPhones...${currentPhones}`);
-    const updatedContacts = currentContactsObjectsArray;
-    const migrationPhones = _.uniq(phonesArray);
-    debugMigrate(`migrationPhones...${migrationPhones}`);
-    const newPhones = _.difference(migrationPhones, currentPhones);
-
-    if (newPhones.length) {
-      debugMigrate(`new phones...${newPhones}`);
-
-      newPhones.map((phone) => {
-        updatedContacts.push({
-          type: 'TELEFONO',
-          value: phone
-        });
-      });
-
-      debugMigrate(`updatedContacts...${JSON.stringify(updatedContacts, null, 2)}`);
-      const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
-      await personRepository.save(updatedPerson);
-      const owner = await ownerRepository.findByPersonId(person.id);
-
-      if (owner) {
-        let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
-        if (worksheet) {
-          worksheet = fromJSON(worksheet, t.WorkSheet);
-
-          debugMigrate('worksheet id', worksheet.id, 'with status', worksheet.status);
-          if (worksheet.status === WorkSheetStatus.INVALID) {
-            const bucket = worksheetRepository.getBucketName();
-            const updateAddress = N1qlQuery
-              .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(WorkSheetStatus.DEFAULT)} WHERE id = ${JSON.stringify(worksheet.id)}`);
-
-            await worksheetRepository.queryRaw(updateAddress);
-            debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status);
-          }
-        } else {
-          throw new Error(`Worksheet not found.`);
-        }
-      } else {
-        throw new Error(`Owner not found.`);
-      }
-    } else {
-      debugMigrate(`No new phones to be added, proceed.`);
-    }
-  } else {
+  if (contacts.length === 0) {
     throw new Error(`No contacts found in csv.`);
+  }
+  const currentContactsObjectsArray = person.contacts || [];
+  const currentPhones = currentContactsObjectsArray.map((contact) => {
+    return contact.value;
+  });
+  debugMigrate(`currentPhones...${currentPhones}`);
+  const updatedContacts = currentContactsObjectsArray;
+  const migrationPhones = _.uniq(phonesArray);
+  debugMigrate(`migrationPhones...${migrationPhones}`);
+  const newPhones = _.difference(migrationPhones, currentPhones);
+
+  if (newPhones.length === 0) {
+    debugMigrate(`No new phones to be added, proceed.`);
+    return person;
+  }
+  debugMigrate(`new phones...${newPhones}`);
+
+  newPhones.map((phone) => {
+    updatedContacts.push({
+      type: 'TELEFONO',
+      value: phone
+    });
+  });
+
+  debugMigrate(`updatedContacts...${JSON.stringify(updatedContacts, null, 2)}`);
+  const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
+  await personRepository.save(updatedPerson);
+}
+async function updateWorksheet(person) {
+  const ownerRepository = new OwnerRepository();
+  const worksheetRepository = new WorksheetRepository();
+  const owner = await ownerRepository.findByPersonId(person.id);
+
+  if (!owner) {
+    throw new Error(`Owner not found.`);
+  }
+  let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
+  if (worksheet) {
+    throw new Error(`Worksheet not found.`);
+  }
+  worksheet = fromJSON(worksheet, t.WorkSheet);
+
+  debugMigrate('worksheet id', worksheet.id, 'with status', worksheet.status);
+  if (worksheet.status === WorkSheetStatus.INVALID) {
+    const bucket = worksheetRepository.getBucketName();
+    const updateAddress = N1qlQuery
+      .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(WorkSheetStatus.DEFAULT)} WHERE id = ${JSON.stringify(worksheet.id)}`);
+
+    await worksheetRepository.queryRaw(updateAddress);
+    debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status);
   }
 }
 
