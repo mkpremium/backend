@@ -8,6 +8,7 @@ import {WorkSheetStatus} from '../../src/types/worksheet';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
+import {OwnerStatus} from '../../src/types/enums';
 
 const debugMigrate = debug('app:migration:portugal:contacts');
 
@@ -167,6 +168,14 @@ async function updateWorksheet(person) {
     debugMigrate(`Owner not found ${person.id}`);
     return true;
   }
+
+  if(owner.status === OwnerStatus.ERROR){
+    const updatedOwner = t.update(owner, { status: { $set: OwnerStatus.NON_VERIFIED});
+    await ownerRepository.save(updatedOwner);
+  }
+
+  //TODO if owner status invalid/undefined/null -> NO_VERIFICADO???
+
   let worksheet = await worksheetRepository.findWorksheetByOwner(owner.id);
   if (!worksheet) {
     debugMigrate(`Worksheet not found for ${owner.id}`);
@@ -175,15 +184,7 @@ async function updateWorksheet(person) {
   worksheet = fromJSON(worksheet, t.WorkSheet);
 
   debugMigrate('worksheet id', worksheet.id, 'with status', worksheet.status);
-  if (worksheet.status === WorkSheetStatus.INVALID) {
-    const bucket = worksheetRepository.getBucketName();
-    const updateAddress = N1qlQuery
-      .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(WorkSheetStatus.DEFAULT)} WHERE id = ${JSON.stringify(worksheet.id)}`);
 
-    await worksheetRepository.queryRaw(updateAddress);
-    debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status);
-    return false;
-  }
   return true;
 }
 
