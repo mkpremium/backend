@@ -8,7 +8,7 @@ import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
 import {newHttpError} from '../lib/http-error';
-import {OperatorRoles} from '../types/operator';
+import {Award, OperatorRoles} from '../types/operator';
 import {OperatorStatsRepository} from '../stats/models';
 import {OperatorActions} from '../stats/types';
 import {firebaseSetup, firebaseUserAccount} from '../firebase';
@@ -261,6 +261,21 @@ export class OperatorRepository extends Operator {
       `;
 
     return this.raw(operatorsProfitGoals);
+  }
+
+  async addAnAward(operator, code) {
+    let newAward = {
+      code: code,
+      awardedAt: new Date()
+    };
+    let updatedOperator;
+    if (operator.awards) {
+      updatedOperator = t.update(operator, {awards: {$push: [newAward]}});
+    } else {
+      updatedOperator = t.update(operator, {awards: {$set: [newAward]}});
+    }
+
+    return this.save(updatedOperator);
   }
 }
 

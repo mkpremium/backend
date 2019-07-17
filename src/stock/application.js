@@ -77,9 +77,19 @@ export async function closeSellStock(params, operatorId) {
     throw new Error(`El stock no se encuentra en estado ${StockStatuses.SELL}`);
   }
 
+  const operatorRepository = new OperatorRepository();
+  const operator = await operatorRepository.findByIdOrThrow(operatorId);
+
+  const gain = stock.sell.transactionAmount - stock.purchase.transactionAmount;
+
+  // TODO move this to a constant file? or an object value
+  if(gain >= 500000){
+    await operatorRepository.addAnAward(operator, 'SUPER_SELL');
+  }
+
   let close = {
     operatorId,
-    gain: stock.sell.transactionAmount - stock.purchase.transactionAmount,
+    gain: gain,
     transactionDate: new Date()
   };
   const updatedStock = t.update(stock, {close: {$set: close}, currentStatus: {$set: StockStatuses.CLOSE}});

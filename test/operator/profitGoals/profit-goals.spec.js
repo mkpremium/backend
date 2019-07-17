@@ -41,6 +41,12 @@ describe('profit goals', () => {
   }
 
   before(async() => {
+    const buildingRepository = new BuildingRepository();
+    await buildingRepository.deleteQuery();
+
+    const stockRepository = new StockRepository();
+    await stockRepository.deleteQuery();
+
     const operatorRepository = new OperatorRepository();
     await operatorRepository.deleteQuery();
     operator1 = await operatorCreate('1');
