@@ -106,6 +106,25 @@ export class PersonRepository extends Person {
   }
 
   /**
+   * Find person by dni / document number
+   * @param documentNumber
+   * @param required
+   * @returns {Promise<void>}
+   */
+  async findAllByDocumentNumber(documentNumber, required = true) {
+    const expr = squel.expr().and('t.documentNumber = ?', documentNumber);
+    const qb = this.getQueryBuilder()
+      .where(expr);
+    const results = await this.query(qb);
+
+      if (required && (!results || results.length === 0)) {
+      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
+    }
+    return results;
+  }
+
+
+  /**
    * Find person migrateOwnerId
    * @param migrateOwnerId
    * @param required

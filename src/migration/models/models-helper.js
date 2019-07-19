@@ -7,7 +7,9 @@ export function cleanObjectKeys(object) {
   const keys = Object.keys(object);
   const newObject = {};
   keys.forEach(key => {
-    const newKey = key.toLowerCase().replace(' ', '_');
+    const newKey = key.toLowerCase()
+      .trim()
+      .replace(/\s/g, '_');
     newObject[newKey] = object[key];
   });
 

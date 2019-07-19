@@ -144,12 +144,16 @@ export class WorksheetRepository extends CouchbaseModel {
   calculateBusinessStatus(owner) {
     switch (owner.business.status) {
       case OwnerBusinessStatus.DISCARDED:
+        worksheetDebug('Owner business status is discarded so status is _PUBLIC');
         return WorkSheetStatus.PUBLIC;
       case OwnerBusinessStatus.NO_SALE:
+        worksheetDebug('Owner business status is NO_SALE so status is _NO_SALE');
         return WorkSheetStatus.NO_SALE;
       case OwnerBusinessStatus.ALREADY_SOLD:
+        worksheetDebug('Owner business status is ALREADY_SOLD so status is _INVALID');
         return WorkSheetStatus.INVALID;
       default:
+        worksheetDebug('Owner business status is defult so status is _MEETING');
         return WorkSheetStatus.MEETING;
     }
   }
@@ -170,35 +174,42 @@ export class WorksheetRepository extends CouchbaseModel {
     const alreadySold = isValidLength && _some(owners, ownerAlreadySold);
     const meetings = await this.findMeetings(worksheet.id);
     const hasMeeting = meetings.length > 0;
-
+    worksheetDebug('Begin to calculate worksheet status');
     if (haveBusiness) {
+      worksheetDebug('Begin to calculate worksheet status');
       return this.calculateBusinessStatus(haveBusiness);
     }
 
     if (isPublicEntity) {
+      worksheetDebug('Worksheet new status is _PUBLIC');
       return WorkSheetStatus.PUBLIC;
     }
 
     if (noSale) {
+      worksheetDebug('Worksheet new status is _NO_SALE');
       return WorkSheetStatus.NO_SALE;
     }
 
     if (alreadySold) {
+      worksheetDebug('Worksheet new status is _ALREADY_SOLD');
       return WorkSheetStatus.ALREADY_SOLD;
     }
 
     if (everyInvalidOwner) {
+      worksheetDebug('Worksheet new status is _INVALID');
       return WorkSheetStatus.INVALID;
     }
 
     if (hasMeeting) {
+      worksheetDebug('Worksheet new status is _MEETING');
       return WorkSheetStatus.MEETING;
     }
 
     if (someValidOwner) {
+      worksheetDebug('Worksheet new status is _WITH_OWNER');
       return WorkSheetStatus.WITH_OWNER;
     }
-
+    worksheetDebug(`Worksheet new status is same status ${worksheet.status}`);
     return worksheet.status;
   }
 
