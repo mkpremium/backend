@@ -48,7 +48,7 @@ deploy() {
   local app_name=$2
   local user=${3:-centos}
 
-  local temp_dist_file=$(mktemp)
+  local temp_dist_file=temp1
   local dist_file="${temp_dist_file}.tgz"
   local deploy_dir=/home/${user}/apps/${app_name}
 
