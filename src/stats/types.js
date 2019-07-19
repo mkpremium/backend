@@ -9,7 +9,7 @@ export const OperatorActions = {
   MEETING: 'meeting',
   SCHEDULE_CALL: 'schedule_call',
   VIEW_WORKSHEET: 'view_worksheet',
-
+  NON_PRESENTIAL_MEETING: 'non_presential_meeting',
   // Business
   PROPOSAL_SENT: 'proposal_sent',
   BUSINESS_MEETING: 'business_meeting'

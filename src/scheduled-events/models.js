@@ -195,7 +195,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
     await this.validateUniqueWorksheet(params);
-    const scheduledEvent = await this.save(params);
+    const scheduledEvent = await this.save(params); // <- this is the meeting
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new WorksheetRepository();
@@ -204,7 +204,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
       if (worksheet.lastAddedMeeting === null) {
-        await OperatorStats.registerAction(createdBy, OperatorActions.MEETING, {city});
+        const action = scheduledEvent.inPerson ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING;
+        await OperatorStats.registerAction(createdBy, action, {city});
         await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, {city});
       }
     }
