@@ -26,8 +26,11 @@ import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
 import {Building} from '../types/building';
 import {emitModelEvents} from '../../config';
-import {ScheduledEvents} from '../scheduled-events/models';
+import {ScheduledEvents, ScheduledEventsRepository} from '../scheduled-events/models';
 import {ScheduledEventType} from '../scheduled-events/types';
+import {updateProposalsOnScheduleEventsBuilding} from './application';
+import {WorksheetRepository} from '../worksheet/models/worksheet';
+import Promise from 'bluebird';
 
 const debugBuilding = debug('app:model:building');
 
@@ -215,9 +218,14 @@ export class BuildingRepository extends CouchbaseModel {
 
     await this.save(updatedBuilding);
 
+
     if (proposal.ownerId) {
       const ownerRepo = new OwnerRepository();
       await ownerRepo.updateBusinessStatusFirebase(proposal.ownerId, OwnerBusinessStatus.PROPOSAL_SENT, operatorId);
+      const worksheet = await WorksheetRepository.findByBuilding(building.id);
+
+      const worksheetRepository = new WorksheetRepository();
+      await worksheetRepository.syncWorksheetFirebase(worksheet);
     }
 
     const city = _get(building, 'address.city');

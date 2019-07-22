@@ -12,6 +12,7 @@ import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
 import {OwnerRepository} from '../../owner/models';
 import {OwnerStatus} from '../../types/enums';
 import {MetadataRepository} from '../../building/models';
+import {ScheduledEventsRepository} from '../../scheduled-events/models';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -375,6 +376,18 @@ export async function saveProposal(proposal) {
   const db = fbComerciales.database();
   const proposalRef = db.ref(`${fbComerciales.prefixURL}Proposes/${proposal.id}`);
   const buildingProposalsRef = db.ref(`${fbComerciales.prefixURL}Buildings/${buildingId}/Proposes`);
+
+  const scheduleEventsRepository = new ScheduledEventsRepository();
+  const meetings = await scheduleEventsRepository.findAllMeetingsByBuildingId(buildingId);
+
+  await Promise.all(meetings.map((meeting) => {
+    return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}/Proposal`).set(firebaseProposal);
+  }));
+
+  if (proposal.createdBy) {
+    await db.ref(`${fbComerciales.prefixURL}Users/${proposal.createdBy}/Buildings/${buildingId}/LastMeeting/Proposal`)
+      .set(firebaseProposal);
+  }
 
   return Promise.all([
     proposalRef.set(firebaseProposal),

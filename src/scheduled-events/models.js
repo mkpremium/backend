@@ -220,6 +220,12 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     return this.query(qb);
   }
 
+  async findAllMeetingsByBuildingId(buildingId){
+    const db = this.getQueryBuilder()
+      .where('event.buildingId = ?', buildingId);
+    return this.query(db);
+  }
+
   async validateUniqueWorksheet(params) {
     const worksheetId = _get(params, 'event.worksheetId');
     const type = _get(params, 'type');
