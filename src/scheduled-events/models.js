@@ -204,7 +204,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
       if (worksheet.lastAddedMeeting === null) {
-        const action = scheduledEvent.inPerson ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING;
+        const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING;
         await OperatorStats.registerAction(createdBy, action, {city});
         await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, {city});
       }

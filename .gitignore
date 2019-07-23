@@ -26,3 +26,8 @@ build
 .vscode
 .idea
 *.iml
+
+conf/
+.DS_STORE
+*.tgz
+conf/*
