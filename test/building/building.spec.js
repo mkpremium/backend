@@ -74,7 +74,6 @@ describe('Schedule event update propoposal', () => {
     };
     testBuilding = await BuildingRepository.createNewBuilding(buildingMock);
 
-
     const testWorksheet = await WorksheetRepository.createNewForBuilding(testBuilding);
     let ownerBody = {
       buildingId: testBuilding.id,
@@ -124,11 +123,15 @@ describe('Schedule event update propoposal', () => {
       accepted: false,
       createdAt: new Date(),
       createdBy: testOperator.id,
-      proposal: 2000,
+      proposal: 6000,
       state: 'pendiente',
       aspiration: -1
     };
-    const newProposal = await proposalRepository.save(newProposalMock, false);
-
+    // const newProposal = await proposalRepository.save(newProposalMock, false);
+    await buildingRepository.addNegotiationProposal(
+      testBuilding,
+      testOperator.id,
+      {'ownerId': testOwner.id, 'state': 'pendiente', 'proposal': 9000, 'aspiration': -1}
+    );
   });
 });

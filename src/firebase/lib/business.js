@@ -377,18 +377,6 @@ export async function saveProposal(proposal) {
   const proposalRef = db.ref(`${fbComerciales.prefixURL}Proposes/${proposal.id}`);
   const buildingProposalsRef = db.ref(`${fbComerciales.prefixURL}Buildings/${buildingId}/Proposes`);
 
-  const scheduleEventsRepository = new ScheduledEventsRepository();
-  const meetings = await scheduleEventsRepository.findAllMeetingsByBuildingId(buildingId);
-
-  await Promise.all(meetings.map((meeting) => {
-    return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}/Proposal`).set(firebaseProposal);
-  }));
-
-  if (proposal.createdBy) {
-    await db.ref(`${fbComerciales.prefixURL}Users/${proposal.createdBy}/Buildings/${buildingId}/LastMeeting/Proposal`)
-      .set(firebaseProposal);
-  }
-
   return Promise.all([
     proposalRef.set(firebaseProposal),
     buildingProposalsRef.child('ids').update({[proposal.id]: true}),
@@ -396,7 +384,7 @@ export async function saveProposal(proposal) {
   ]);
 }
 
-function toFirebaseProposal(proposal) {
+export function toFirebaseProposal(proposal) {
   const lastDate = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
   const sendDate = firebaseTimestampFormat(proposal.createdAt);
   return t.FirebaseBuildingProposal({
