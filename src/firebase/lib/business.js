@@ -384,6 +384,12 @@ export async function saveProposal(proposal) {
   ]);
 }
 
+export async function updateBuildingFirebaseProposal(building) {
+  if (building.recentProposal) {
+    await updateProposalToFirebase(building.recentProposal, building);
+  }
+}
+
 export async function updateProposalToFirebase(proposal, building) {
   const scheduleEventsRepository = new ScheduledEventsRepository();
   const meetings = await scheduleEventsRepository.findAllMeetingsByBuildingId(building.id);
