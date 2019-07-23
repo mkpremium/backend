@@ -222,7 +222,8 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async findAllMeetingsByBuildingId(buildingId){
     const db = this.getQueryBuilder()
-      .where('event.buildingId = ?', buildingId);
+      .where('event.buildingId = ?', buildingId)
+      .where('type = ?', ScheduledEventType.MEETINGS);
     return this.query(db);
   }
 
