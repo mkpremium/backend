@@ -12,7 +12,7 @@ import {
   deleteMetadataFromFirebase,
   saveMetadataToFirebase,
   saveProposal, toFirebaseProposal,
-  updateBuildingToFirebase
+  updateBuildingToFirebase, updateProposalToFirebase
 } from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
 import {BuildingState, OwnerBusinessStatus} from '../types/enums';
@@ -234,23 +234,7 @@ export class BuildingRepository extends CouchbaseModel {
       await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, {city});
     }
 
-    const scheduleEventsRepository = new ScheduledEventsRepository();
-    const meetings = await scheduleEventsRepository.findAllMeetingsByBuildingId(building.id);
-
-    const meetingsIds = meetings.map(meeting => { return meeting.id; });
-    debugBuilding(`Adding proposal to this meetings ${meetingsIds}`);
-
-    const firebaseProposal = toFirebaseProposal(proposal);
-    const db = fbComerciales.database();
-    await Promise.all(meetings.map((meeting) => {
-      return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}/Proposal`).set(firebaseProposal);
-    }));
-
-    debugBuilding(`Adding proposal to this user  ${proposal.createdBy} and building  ${building.id} `);
-    if (proposal.createdBy) {
-      await db.ref(`${fbComerciales.prefixURL}Users/${proposal.createdBy}/Buildings/${building.id}/LastMeeting/Proposal`)
-        .set(firebaseProposal);
-    }
+    await updateProposalToFirebase(proposal, building);
 
     return proposal;
   }

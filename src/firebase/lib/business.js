@@ -384,6 +384,26 @@ export async function saveProposal(proposal) {
   ]);
 }
 
+export async function updateProposalToFirebase(proposal, building) {
+  const scheduleEventsRepository = new ScheduledEventsRepository();
+  const meetings = await scheduleEventsRepository.findAllMeetingsByBuildingId(building.id);
+
+  const meetingsIds = meetings.map(meeting => { return meeting.id; });
+  debugFb(`Adding proposal to this meetings ${meetingsIds}`);
+
+  const firebaseProposal = toFirebaseProposal(proposal);
+  const db = fbComerciales.database();
+  await Promise.all(meetings.map((meeting) => {
+    return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}/Proposal`).set(firebaseProposal);
+  }));
+
+  debugFb(`Adding proposal to this user  ${proposal.createdBy} and building  ${building.id} `);
+  if (proposal.createdBy) {
+    await db.ref(`${fbComerciales.prefixURL}Users/${proposal.createdBy}/Buildings/${building.id}/LastMeeting/Proposal`)
+      .set(firebaseProposal);
+  }
+}
+
 export function toFirebaseProposal(proposal) {
   const lastDate = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
   const sendDate = firebaseTimestampFormat(proposal.createdAt);
