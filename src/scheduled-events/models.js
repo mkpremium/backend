@@ -20,7 +20,7 @@ import {
   relateMeetingToBuilding,
   relateMeetingToOperator,
   saveBuildingToFirebase,
-  saveMeetingToFirebase
+  saveMeetingToFirebase, updateBuildingFirebaseProposal
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
 import {ScheduledEventType} from './types';
@@ -122,6 +122,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await relateMeetingToBuilding(db, meeting);
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);
     await denormalizeBuildingMeeting(meeting.notifyTo, building.id, meeting);
+    await updateBuildingFirebaseProposal(building);
   }
 
   static async firebaseMeetingById(meetingId) {
@@ -218,6 +219,13 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const qb = this.getQueryBuilder()
       .where('type = ?', ScheduledEventType.MEETINGS);
     return this.query(qb);
+  }
+
+  async findAllMeetingsByBuildingId(buildingId){
+    const db = this.getQueryBuilder()
+      .where('event.buildingId = ?', buildingId)
+      .where('type = ?', ScheduledEventType.MEETINGS);
+    return this.query(db);
   }
 
   async validateUniqueWorksheet(params) {
