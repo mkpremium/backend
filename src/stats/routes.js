@@ -209,11 +209,6 @@ router.get('/owner', permissions.manager, ownerStatsController);
  *       - "application/json"
  *     produces:
  *       - "application/json"
- *     parameters:
- *       - name: city
- *         in: query
- *         type: string
- *         description: Nombre de la ciudad
  *     responses:
  *       200:
  *         schema:
@@ -244,11 +239,6 @@ router.get('/worksheets', permissions.manager, worksheetStatsController);
  *       - "application/json"
  *     produces:
  *       - "application/json"
- *     parameters:
- *       - name: operatorId
- *         in: query
- *         type: string
- *         description: Operador comercial ID
  *     responses:
  *       200:
  *         schema:

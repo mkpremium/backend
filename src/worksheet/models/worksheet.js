@@ -38,6 +38,8 @@ import _map from 'lodash/map';
 import {emitModelEvents} from '../../../config';
 import {ScheduledEventType} from '../../scheduled-events/types';
 
+import joinjs from 'join-js';
+
 const worksheetDebug = debug('app:model:worksheet');
 
 function canRegisterVerified(worksheet, newStatus, operatorId) {
@@ -269,25 +271,25 @@ export class WorksheetRepository extends CouchbaseModel {
     return this.save(updatedWorksheet);
   }
 
-  async worksheetStats(args = {}) {
-    const params = WorksheetStatsParams(args);
+  async worksheetStats() {
     const bucket = this.getBucketName();
-    const query = _isNil(params.city)
-      ? `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-GROUP BY t.status`
-      : `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-LET building = (SELECT RAW p FROM ${bucket} p USE KEYS t.relatedBuildingIds[0] WHERE p.id = t.relatedBuildingIds[0] LIMIT 1)
-WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-AND LOWER(building[0].address.city) = LOWER('${params.city}')
-GROUP BY t.status`;
+
+    const query = `SELECT t.buildingAddress.city, t.status, COUNT(*) as count FROM ${bucket} t
+    WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
+    GROUP BY t.status, t.buildingAddress.city`;
 
     const result = await this.queryRaw(N1qlQuery.fromString(query));
+
+    const cities = _.uniq(result.map(r => r.city));
+
     const totals = {};
 
-    Object.values(WorkSheetStatus).forEach(status => {
-      const total = _find(result, {status}) || {count: 0};
-      totals[status] = total.count;
+    cities.forEach(c => {
+      totals[c] = {};
+      Object.values(WorkSheetStatus).forEach(status => {
+        const total = _find(result, {city: c, status: status}) || {count: 0};
+        totals[c][status] = total.count;
+      });
     });
 
     return totals;

@@ -31,13 +31,13 @@ async function ownerStats(req, res) {
 
 async function worksheetStats(req, res) {
   const repo = new WorksheetRepository();
-  const results = await repo.worksheetStats(req.query);
+  const results = await repo.worksheetStats();
   res.json(results);
 }
 
 async function ownerBusinessStats(req, res) {
   const repo = new OwnerRepository();
-  const results = await repo.ownerBusinessStats(req.query);
+  const results = await repo.ownerBusinessStats();
   res.json(results);
 }
 

@@ -116,12 +116,11 @@ export class PersonRepository extends Person {
       .where(expr);
     const results = await this.query(qb);
 
-      if (required && (!results || results.length === 0)) {
+    if (required && (!results || results.length === 0)) {
       throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
     }
     return results;
   }
-
 
   /**
    * Find person migrateOwnerId
@@ -389,31 +388,27 @@ GROUP BY t.status, building[0].address.city`;
     return totals;
   }
 
-  async ownerBusinessStats(args = {}) {
-    const params = OwnerBusinessStatsParams(args);
+  async ownerBusinessStats() {
     const bucket = this.getBucketName();
-    const query = _isNil(params.operatorId)
-      ? `SELECT t.business.status, COUNT(*) as count
-FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-GROUP BY t.business.status`
-      : `SELECT t.business.status, COUNT(*) as count
-FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-AND t.business.meetingWithOperatorId = '${params.operatorId}'
-GROUP BY t.business.status`;
+    const query = `SELECT t.business.status, t.name, t.id, COUNT(*) as count
+                    FROM ${bucket} \`t\`
+                    WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
+                    GROUP BY t.business.status, t.name, t.id`;
     const result = await this.queryRaw(N1qlQuery.fromString(query));
-    const totals = {};
+    const owners = _.uniqBy(result.map(r => { return {'id': r.id, 'name': r.name, 'stats': {}}; }), 'id');
 
-    Object.values(OwnerBusinessStatus).forEach(status => {
-      let total = 0;
-      _.filter(result, {status}).forEach(({count}) => {
-        total += count;
+    owners.forEach(o => {
+      Object.values(OwnerBusinessStatus).forEach(status => {
+        let total = 0;
+        _.filter(result, {id: o.id, status: status}).forEach(({count}) => {
+          total += count;
+        });
+
+        o.stats[status] = total;
       });
-      totals[status] = total;
     });
 
-    return totals;
+    return owners;
   }
 
   async list(query = {}) {
@@ -466,7 +461,7 @@ GROUP BY t.business.status`;
 
   async findOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
+      .where('t.`buildingId` = ?', buildingId);
     const results = await this.query(qb);
 
     if (!results || results.length === 0) {
