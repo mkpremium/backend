@@ -394,13 +394,13 @@ GROUP BY t.status, building[0].address.city`;
                     FROM ${bucket} \`t\`
                     WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
                     GROUP BY t.business.status, t.business.meetingWithOperatorId`;
-    const result = await this.queryRaw(N1qlQuery.fromString(query));
-    const owners = _.uniqBy(result.map(r => { return {'id': r.id, 'name': r.name, 'stats': {}}; }), 'id');
+    const results = await this.queryRaw(N1qlQuery.fromString(query));
+    const owners = _.uniqBy(results.map(result => { return {'id': result.meetingWithOperatorId, 'stats': {}}; }), 'id');
 
     owners.forEach(owner => {
       Object.values(OwnerBusinessStatus).forEach(status => {
         let total = 0;
-        _.filter(result, {id: owner.id, status: status}).forEach(({count}) => {
+        _.filter(results, {id: owner.id, status: status}).forEach(({count}) => {
           total += count;
         });
 
