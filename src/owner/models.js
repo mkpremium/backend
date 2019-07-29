@@ -408,7 +408,7 @@ GROUP BY t.status, building[0].address.city`;
     owners.forEach(owner => {
       Object.values(OwnerBusinessStatus).forEach(status => {
         let total = 0;
-        _.filter(results, {id: owner.id, status: status}).forEach(({count}) => {
+        _.filter(results, {meetingWithOperatorId: owner.id, status: status}).forEach(({count}) => {
           total += count;
         });
 
