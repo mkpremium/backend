@@ -218,6 +218,12 @@ t.Operator = t.struct(
       roles: [],
       features: [],
       profile: {},
+      profitGoal: {
+        amount: 0,
+        get updatedAt() {
+          return new Date();
+        }
+      },
       awards: [],
       get createdAt() {
         return new Date();
