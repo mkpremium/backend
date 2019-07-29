@@ -390,21 +390,21 @@ GROUP BY t.status, building[0].address.city`;
 
   async ownerBusinessStats() {
     const bucket = this.getBucketName();
-    const query = `SELECT t.business.status, t.name, t.id, COUNT(*) as count
+    const query = `SELECT t.business.status, t.business.meetingWithOperatorId, COUNT(*) as count
                     FROM ${bucket} \`t\`
                     WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-                    GROUP BY t.business.status, t.name, t.id`;
+                    GROUP BY t.business.status, t.business.meetingWithOperatorId`;
     const result = await this.queryRaw(N1qlQuery.fromString(query));
     const owners = _.uniqBy(result.map(r => { return {'id': r.id, 'name': r.name, 'stats': {}}; }), 'id');
 
-    owners.forEach(o => {
+    owners.forEach(owner => {
       Object.values(OwnerBusinessStatus).forEach(status => {
         let total = 0;
-        _.filter(result, {id: o.id, status: status}).forEach(({count}) => {
+        _.filter(result, {id: owner.id, status: status}).forEach(({count}) => {
           total += count;
         });
 
-        o.stats[status] = total;
+        owner.stats[status] = total;
       });
     });
 

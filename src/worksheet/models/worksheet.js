@@ -274,21 +274,21 @@ export class WorksheetRepository extends CouchbaseModel {
   async worksheetStats() {
     const bucket = this.getBucketName();
 
-    const query = `SELECT t.buildingAddress.city, t.status, COUNT(*) as count FROM ${bucket} t
+    const query = `SELECT t.buildingAddress.province, t.status, COUNT(*) as count FROM ${bucket} t
     WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-    GROUP BY t.status, t.buildingAddress.city`;
+    GROUP BY t.status, t.buildingAddress.province`;
 
     const result = await this.queryRaw(N1qlQuery.fromString(query));
 
-    const cities = _.uniq(result.map(r => r.city));
+    const provinces = _.uniq(result.map(r => r.province));
 
     const totals = {};
 
-    cities.forEach(c => {
-      totals[c] = {};
+    provinces.forEach(province => {
+      totals[province] = {};
       Object.values(WorkSheetStatus).forEach(status => {
-        const total = _find(result, {city: c, status: status}) || {count: 0};
-        totals[c][status] = total.count;
+        const total = _find(result, {province: province, status: status}) || {count: 0};
+        totals[province][status] = total.count;
       });
     });
 
