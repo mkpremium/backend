@@ -1,4 +1,4 @@
-import {deleteAll, operatorCreate} from '../../common';
+import {deleteAll, operatorCreate, operatorLogin} from '../../common';
 import {setProfitGoalToOperator} from '../../../src/operator/ProfitGoal/application';
 import {expect} from 'chai';
 import {
@@ -12,12 +12,17 @@ import {StockRepository} from '../../../src/stock/models';
 import {BuildingRepository} from '../../../src/building/models';
 import {buildingData} from '../../stock/stock.mock';
 import {madrid} from '../../../src/lib/date';
+import app from '../../../src/app';
+import request from 'supertest';
 
 describe('profit goals', () => {
   let operator1;
   let operator2;
+  let operator3;
   let testBuilding1;
   let testBuilding2;
+
+  let authenticatedOperator;
 
   async function createTestPurchaseStock(buildingId, operatorId, transactionAmount) {
     let params = {
@@ -42,6 +47,7 @@ describe('profit goals', () => {
   }
 
   before(async() => {
+
     const buildingRepository = new BuildingRepository();
     await buildingRepository.deleteQuery();
 
@@ -50,9 +56,15 @@ describe('profit goals', () => {
 
     const operatorRepository = new OperatorRepository();
     await operatorRepository.deleteQuery();
+
+
     operator1 = await operatorCreate(madrid().unix());
 
     operator2 = await operatorCreate(madrid().unix()+1);
+
+    operator3 = await operatorCreate(madrid().unix()+2);
+
+    authenticatedOperator = await operatorLogin(app, {username: operator3.username, password: 'Passw0rd'});
 
     testBuilding1 = await BuildingRepository.createNewBuilding(buildingData);
 
@@ -101,5 +113,16 @@ describe('profit goals', () => {
     console.log(profitRanking);
     expect(profitRanking.length).to.be.equal(2);
     expect(profitRanking[0].userId).to.be.equal(operator1.id);
+  });
+
+  it('Should set a profit goal via @POST request', async() => {
+    await request(app)
+      .post('/operators/profit/goal')
+      .set('Authorization', authenticatedOperator.authorization)
+      .send({
+        profitAmount: 1500,
+        operatorId: operator3.id
+      })
+      .expect(200);
   });
 });
