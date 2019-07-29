@@ -3,7 +3,7 @@ import {wrap} from 'express-promise-wrap';
 import {setProfitGoalToOperator} from './application';
 
 async function setProfitGoalToOperatorFromRequest(req, res) {
-  const result = setProfitGoalToOperator(req.operatorId, req.profitAmount);
+  const result = setProfitGoalToOperator(req.operatorId, req.body.profitAmount);
   res.json(201).send(result);
 }
 
