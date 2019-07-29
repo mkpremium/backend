@@ -71,10 +71,10 @@ router.post('/purchase', createPurchaseStockController);
 
 /**
  * @swagger
- * /stock/sell:
+ * /stock/sell/cancel:
  *   post:
  *     tags: [Stock]
- *     summary: Actualiza un stock en estado purchased a sell
+ *     summary: Cancela un stock en sell status y lo revierte a un purchase status
  *     security:
  *       - operator: []
  *       - admin: []
@@ -88,24 +88,6 @@ router.post('/purchase', createPurchaseStockController);
  *       - name: buildingId
  *         type: string
  *         in: body
- *         required: true
- *       - name: reservationAmount
- *         type: number
- *         in: body
- *         required: true
- *       - name: reservationDate
- *         type: string
- *         in: body
- *         format: YYYY-MM-DDTHH:mm:ss.sssZ
- *         required: true
- *       - name: transactionAmount
- *         type: number
- *         in: body
- *         required: true
- *       - name: transactionDate
- *         type: string
- *         in: body
- *         format: YYYY-MM-DDTHH:mm:ss.sssZ
  *         required: true
  *     responses:
  *       200:
@@ -121,7 +103,7 @@ router.post('/purchase', createPurchaseStockController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/sell', sellPurchasedStockController);
+router.post('/sell/cancel', cancelSellStockController);
 
 /**
  * @swagger

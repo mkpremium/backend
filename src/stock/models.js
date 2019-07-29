@@ -32,6 +32,14 @@ export class StockRepository extends CouchbaseModel {
     return result;
   }
 
+  async findByBuildingIdOrThrow(buildingId) {
+    const result = await this.findByBuildingId(buildingId);
+    if (!result) {
+      throw new Error(`No existe un stock asociado a ${buildingId}`);
+    }
+    return result;
+  }
+
   async listProfitRankings(params) {
     const currentYear = new Date().getFullYear();
     const profitsQuery = `
