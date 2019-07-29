@@ -397,13 +397,12 @@ GROUP BY t.status, building[0].address.city`;
                     GROUP BY t.business.status, t.business.meetingWithOperatorId`;
     const results = await this.queryRaw(N1qlQuery.fromString(query));
 
-    const operatorRepository = new OperatorRepository();
-
-    let owners = results.map(async(result) => {
+    let owners = await Promise.all(results.map(async(result) => {
+      const operatorRepository = new OperatorRepository();
       const operator = await operatorRepository.findByIdOrThrow(result.meetingWithOperatorId);
 
-      return {'id': result.meetingWithOperatorId, 'name': operator.profile.firstName, 'stats': {}};
-    });
+      return {'id': result.meetingWithOperatorId, 'name': operator.username, 'stats': {}};
+    }));
     owners = _.uniqBy(owners, 'id');
 
     owners.forEach(owner => {
