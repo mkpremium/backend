@@ -16,6 +16,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
 import {Owner} from '../types/owner';
+import {OperatorRepository} from '../operator/models';
 
 export class Person extends CouchbaseModel {
   constructor() {
@@ -395,7 +396,15 @@ GROUP BY t.status, building[0].address.city`;
                     WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
                     GROUP BY t.business.status, t.business.meetingWithOperatorId`;
     const results = await this.queryRaw(N1qlQuery.fromString(query));
-    const owners = _.uniqBy(results.map(result => { return {'id': result.meetingWithOperatorId, 'stats': {}}; }), 'id');
+
+    const operatorRepository = new OperatorRepository();
+
+    let owners = results.map(async(result) => {
+      const operator = await operatorRepository.findByIdOrThrow(result.meetingWithOperatorId);
+
+      return {'id': result.meetingWithOperatorId, 'name': operator.profile.firstName, 'stats': {}};
+    });
+    owners = _.uniqBy(owners, 'id');
 
     owners.forEach(owner => {
       Object.values(OwnerBusinessStatus).forEach(status => {
