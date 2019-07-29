@@ -11,6 +11,7 @@ import {OperatorRepository} from '../../../src/operator/models';
 import {StockRepository} from '../../../src/stock/models';
 import {BuildingRepository} from '../../../src/building/models';
 import {buildingData} from '../../stock/stock.mock';
+import {madrid} from '../../../src/lib/date';
 
 describe('profit goals', () => {
   let operator1;
@@ -49,9 +50,9 @@ describe('profit goals', () => {
 
     const operatorRepository = new OperatorRepository();
     await operatorRepository.deleteQuery();
-    operator1 = await operatorCreate('1');
+    operator1 = await operatorCreate(madrid().unix());
 
-    operator2 = await operatorCreate('2');
+    operator2 = await operatorCreate(madrid().unix()+1);
 
     testBuilding1 = await BuildingRepository.createNewBuilding(buildingData);
 

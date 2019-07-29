@@ -1,4 +1,3 @@
-
 import {CouchbaseModel} from '../db/model';
 import {Stock} from './types';
 import fromJSON from 'tcomb/lib/fromJSON';
@@ -24,10 +23,11 @@ export class StockRepository extends CouchbaseModel {
     }
   }
 
-  async findByBuildingIdOrThrow(buildingId) {
+  async findByBuildingIdOrDefault(buildingId) {
     const result = await this.findByBuildingId(buildingId);
     if (!result) {
-      throw new Error(`No existe un stock asociado a ${buildingId}`);
+      console.log(`No existe un stock asociado a ${buildingId}`);
+      return null;
     }
     return result;
   }

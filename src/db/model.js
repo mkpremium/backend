@@ -281,7 +281,7 @@ export class CouchbaseModel {
         return;
       }
 
-      const e = new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`);
+      const e =  new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`);
       e.code = 400;
       throw e;
     }
