@@ -34,7 +34,7 @@ const GetStatsFilterBase = t.struct(
     operatorId: t.maybe(t.String),
     view: t.String,
     city: t.maybe(t.String),
-    province: t.maybe(t.string)
+    province: t.maybe(t.String)
   },
   {
     name: 'GetStatsFilter',
