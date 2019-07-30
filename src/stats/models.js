@@ -165,8 +165,8 @@ export class OperatorStatsRepository extends OperatorStats {
       qb.where('operatorId = ?', filter.operatorId);
     }
 
-    if (!_isNil(filter.city)) {
-      qb.where('city = ?', filter.city);
+    if (!_isNil(filter.province)) {
+      qb.where('province = ?', filter.province);
     }
 
     switch (filter.view) {
@@ -235,27 +235,27 @@ export class OperatorStatsRepository extends OperatorStats {
     switch (filter.view) {
       case 'day':
         qb
-          .field('city')
+          .field('province')
           .field('action')
           .field('DATE_FORMAT_STR(createdAt, "1111-11-11") as createdAtStr')
           .field('createdAt')
-          .group('city')
+          .group('province')
           .group('action')
           .group('createdAt')
-          .where('city IS NOT MISSING')
+          .where('province IS NOT MISSING')
           .where('action IS NOT MISSING')
           .where('createdAt IS NOT MISSING')
-          .order('city').order('createdAt');
+          .order('province').order('createdAt');
         break;
       case 'total':
       default:
         qb
-          .field('city')
+          .field('province')
           .field('action')
-          .group('city')
+          .group('province')
           .group('action')
-          .order('city')
-          .where('city IS NOT MISSING')
+          .order('province')
+          .where('province IS NOT MISSING')
           .where('action IS NOT MISSING');
         break;
     }
