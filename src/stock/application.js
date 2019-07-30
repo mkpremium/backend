@@ -28,16 +28,20 @@ export async function createPurchaseStock(params = {}, operatorId) {
 
   let stock = await stockRepository.findByBuildingIdOrDefault(params.buildingId);
 
+  if (stock.currentStatus === StockStatuses.CLOSE) {
+    throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`);
+  }
+
   if (!stock) {
     stock = {
       buildingId: createStockParams.buildingId,
       currentStatus: StockStatuses.PURCHASE,
       purchase
     };
-  }
-
-  if (stock.currentStatus === StockStatuses.CLOSE) {
-    throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`);
+  } else {
+    stock = t.update(stock, {
+      purchase: {$set: purchase}
+    });
   }
 
   const stockFirebaseRepository = new StockFirebaseRepository();
@@ -64,8 +68,10 @@ export async function sellPurchasedStock(params = {}, operatorId) {
     throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`);
   }
 
+  stock = t.update(stock, {sell: {$set: sell}});
+
   if (stock.currentStatus === StockStatuses.PURCHASE) {
-    stock = t.update(stock, {sell: {$set: sell}, currentStatus: {$set: StockStatuses.SELL}});
+    stock = t.update(stock, {currentStatus: {$set: StockStatuses.SELL}});
   }
 
   const stockFirebaseRepository = new StockFirebaseRepository();
@@ -85,6 +91,10 @@ export async function cancelSellStock(params) {
   }
 
   stock = t.update(stock, {sell: {$set: null}, currentStatus: {$set: StockStatuses.PURCHASE}});
+
+  const stockFirebaseRepository = new StockFirebaseRepository();
+
+  await stockFirebaseRepository.deleteSellStock(stock);
 
   return stockRepository.save(stock);
 }

@@ -98,4 +98,9 @@ export class StockFirebaseRepository {
       transactionDate: madrid(close.transactionDate).unix()
     };
   }
+
+  async deleteSellStock(stock) {
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
+    return stockRef.child('sell').remove();
+  }
 }
