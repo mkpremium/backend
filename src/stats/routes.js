@@ -68,7 +68,7 @@ router.get('/', permissions.manager, overAllController);
 
 /**
  * @swagger
- * /stats/provinces:
+ * /stats/cities:
  *   get:
  *     tags: [Stats, Manager]
  *     summary: "Obtiene las estadísticas diarias y totales por ciudad"
@@ -113,7 +113,7 @@ router.get('/', permissions.manager, overAllController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/provinces', permissions.manager, overProvincesController);
+router.get('/cities', permissions.manager, overProvincesController);
 
 /**
  * @swagger
