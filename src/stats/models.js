@@ -200,7 +200,7 @@ export class OperatorStatsRepository extends OperatorStats {
     return this.query(qb);
   }
 
-  async getCityStats(params) {
+  async getProvinceStats(params) {
     const filter = GetStatsFilter(params);
     const results = GetStatsFilterFixed.is(filter)
       ? await this.getCityStatsFixed(filter)

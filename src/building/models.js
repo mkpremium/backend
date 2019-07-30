@@ -221,9 +221,10 @@ export class BuildingRepository extends CouchbaseModel {
     }
 
     const city = _get(building, 'address.city');
+    const province = _get(building, 'address.province');
 
     if (building.proposals.length === 0) {
-      await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, {city});
+      await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, {city, province});
     }
 
     return proposal;

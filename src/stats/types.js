@@ -25,7 +25,7 @@ t.OperatorStats = t.struct(
     createdAt: t.Date,
     // Filters
     city: t.maybe(t.String),
-
+    province: t.maybe(t.String),
     _documentType: t.enums.of(['operator-stats'])
   },
   {

@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {
-  overAllController, overCitiesController,
+  overAllController, overProvincesController,
   ownerBusinessStatsController,
   ownerStatsController,
   performanceController, worksheetStatsController
@@ -68,7 +68,7 @@ router.get('/', permissions.manager, overAllController);
 
 /**
  * @swagger
- * /stats/cities:
+ * /stats/provinces:
  *   get:
  *     tags: [Stats, Manager]
  *     summary: "Obtiene las estadísticas diarias y totales por ciudad"
@@ -113,7 +113,7 @@ router.get('/', permissions.manager, overAllController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/cities', permissions.manager, overCitiesController);
+router.get('/provinces', permissions.manager, overProvincesController);
 
 /**
  * @swagger
