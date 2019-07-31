@@ -24,9 +24,9 @@ describe('scheduled events.routes', () => {
   before(async() => {
     await deleteAll();
     await operatorCreateManager();
-    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+    //authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
     const worksheetQueueRepo = new WorksheetQueueRepository();
-    
+
     const worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);
     const worksheetAndOwner = _.first(worksheetsWithOwner);
     worksheet = worksheetAndOwner.worksheet;
@@ -42,7 +42,7 @@ describe('scheduled events.routes', () => {
     await operatorCreate('', queue.id);
     await operatorCreateBusiness();
     authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
-  
+
     scheduledMeetingsEventObject = {
       type: 'MEETINGS',
       notifyAt: new Date('2018-05-28T06:30:00Z'),
@@ -60,7 +60,7 @@ describe('scheduled events.routes', () => {
         eventAddress: 'no exists'
       }
     };
-  
+
     scheduledCallsEventObject = {
       notifyTo: authenticatedOperator.operator.id,
       type: 'CALLS',

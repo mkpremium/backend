@@ -221,7 +221,8 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
     if (!operatorItem) {
       const city = _get(worksheet, 'relatedBuildings.0.address.city');
-      await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, {city});
+      const province = _get(worksheet, 'relatedBuildings.0.address.province');
+      await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, {city, province});
     }
 
     return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId);

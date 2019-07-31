@@ -1,5 +1,6 @@
 import debug from 'debug';
 import Promise from 'bluebird';
+import _ from 'lodash';
 import _get from 'lodash/get';
 import _isNil from 'lodash/isNil';
 
@@ -10,6 +11,8 @@ import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
 import {OwnerRepository} from '../../owner/models';
 import {OwnerStatus} from '../../types/enums';
+import {MetadataRepository} from '../../building/models';
+import {ScheduledEventsRepository} from '../../scheduled-events/models';
 
 const debugFb = debug('app:firebase:comerciales');
 
@@ -84,7 +87,7 @@ export async function saveBuildingToFirebase_(building, owner) {
  */
 async function findVerifiedOwners(buildingId) {
   const ownerRepository = new OwnerRepository();
-  return ownerRepository.findAllByBuildingId(buildingId, OwnerStatus.VERIFIED);
+  return ownerRepository.findAllVerifiedOwnersByBuildingId(buildingId);
 }
 
 export async function saveBuildingToFirebase(db, building, owner) {
@@ -116,6 +119,21 @@ export async function saveBuildingToFirebase(db, building, owner) {
 
   if (comercialId) {
     const comercialBuildingRef = db.ref(`${fbComerciales.prefixURL}Users/${comercialId}/Buildings/${building.id}`);
+
+    const metadataRepository = new MetadataRepository();
+    const metadataArray = building.metadata;
+    promises.push(...Promise.map(metadataArray, async(metadataBuilding) => {
+      if (metadataBuilding.id) {
+        const metadata = await metadataRepository.findById(metadataBuilding.id);
+        if (metadata) {
+          await saveMetadataToFirebase(metadata);
+          if (comercialId) {
+            await saveMetadataToUserBuilding(comercialId, metadata);
+          }
+        }
+      }
+    }));
+
     promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding));
     if (owner) {
       promises.push(comercialBuildingRef.child('Owner').set(owner));
@@ -155,8 +173,10 @@ export async function removeBuildingFromBusiness(buildingId, businessId) {
 
 export async function relateMeetingToBuilding(db, {id, building}) {
   if (!fbComerciales.enabled) {
+    debugFb(`Relate building ${building.id} with meeting ${id} ommited because comerciales is not enabled`);
     return;
   }
+  debugFb(`Relate building ${building.id} with meeting ${id}`);
   db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}/Meetings/ids/${id}`).set(true);
 }
 
@@ -175,8 +195,10 @@ export async function deleteMeetingToBuilding(db, {id, building}) {
 
 export async function saveMeetingToFirebase(db, meeting) {
   if (!fbComerciales.enabled) {
+    debugFb(`Saving meeting ${meeting.id} ommited because comerciales is not enabled`);
     return;
   }
+  debugFb(`Saving meeting ${meeting.id} to firebase`);
   db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}`).set(toFirebaseMeeting(meeting));
 }
 
@@ -218,17 +240,20 @@ export async function saveBusinessUserToFirebase(operator) {
 
 export async function relateMeetingToOperator(db, meeting, operatorId) {
   if (!fbComerciales.enabled) {
+    debugFb(`Relate meeting ${meeting.id} with operator ${operatorId} ommited because comerciales is not enabled`);
     return;
   }
   const meetingDay = meetingDayFormat(meeting.eventDate);
+  debugFb(`Relate meeting ${meeting.id} with operator ${operatorId}`);
   return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Meetings/Days/${meetingDay}`).update({[meeting.id]: true});
 }
 
 export async function denormalizeBuildingMeeting(operatorId, buildingId, meeting) {
   if (!fbComerciales.enabled) {
+    debugFb(`Denormalize building ${operatorId} with building ${buildingId} ommited because comerciales is not enabled`);
     return;
   }
-
+  debugFb(`Denormalize building ${operatorId} with building ${buildingId}`);
   const db = fbComerciales.database();
   const ref = db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}`);
   return ref.child('LastMeeting').set(toFirebaseMeeting(meeting));
@@ -285,11 +310,23 @@ export async function saveMetadataToFirebase(metadata) {
   if (!fbComerciales.enabled) {
     return;
   }
+
   const db = fbComerciales.database();
   return Promise.all([
     db.ref(`${fbComerciales.prefixURL}Documents/${metadata.id}`).set(toFirebaseDocument(metadata)),
     db.ref(`${fbComerciales.prefixURL}Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true)
   ]);
+}
+
+export async function saveMetadataToUserBuilding(operatorId, metadata) {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  const db = fbComerciales.database();
+  return db
+    .ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${metadata.buildingId}/Documents/${metadata.id}`)
+    .set(toFirebaseDocument(metadata));
 }
 
 export async function saveNoteToFirebase(note) {
@@ -317,6 +354,24 @@ export async function saveNoteToFirebase(note) {
   ]);
 }
 
+export async function businessRelatedToBuilding() {
+  if (!fbComerciales.enabled) {
+    return;
+  }
+
+  const db = fbComerciales.database();
+  const users = await db.ref(`${fbComerciales.prefixURL}Users`).once('value');
+
+  const businessRelatedToBuildings = {};
+  _.forEach(users.val(), (user, id) => {
+    Object.keys(user['Buildings'] || {}).forEach(buildingId => {
+      businessRelatedToBuildings[buildingId] = id;
+    });
+  });
+
+  return businessRelatedToBuildings;
+}
+
 export async function saveProposal(proposal) {
   if (!fbComerciales.enabled) {
     return;
@@ -336,7 +391,40 @@ export async function saveProposal(proposal) {
   ]);
 }
 
-function toFirebaseProposal(proposal) {
+export async function updateBuildingFirebaseProposal(building) {
+  if (!fbComerciales.enabled) {
+    debugFb(`Update building ${building.id} firebase proposal ommited because comerciales is not enabled`);
+    return;
+  }
+  if (building.recentProposal) {
+    debugFb(`Update building ${building.id}`);
+    await updateProposalToFirebase(building.recentProposal, building);
+  }else{
+    debugFb(`Wont Update building ${building.id} becaause it doesn't have a proposal ${building.recentProposal}`);
+  }
+}
+
+export async function updateProposalToFirebase(proposal, building) {
+  const scheduleEventsRepository = new ScheduledEventsRepository();
+  const meetings = await scheduleEventsRepository.findAllMeetingsByBuildingId(building.id);
+
+  const meetingsIds = meetings.map(meeting => { return meeting.id; });
+  debugFb(`Adding proposal to this meetings ${meetingsIds}`);
+
+  const firebaseProposal = toFirebaseProposal(proposal);
+  const db = fbComerciales.database();
+  await Promise.all(meetings.map((meeting) => {
+    return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}/Proposal`).set(firebaseProposal);
+  }));
+
+  debugFb(`Adding proposal to this user  ${proposal.createdBy} and building  ${building.id} `);
+  if (proposal.createdBy) {
+    await db.ref(`${fbComerciales.prefixURL}Users/${proposal.createdBy}/Buildings/${building.id}/LastMeeting/Proposal`)
+      .set(firebaseProposal);
+  }
+}
+
+export function toFirebaseProposal(proposal) {
   const lastDate = firebaseTimestampFormat(proposal.updatedAt || proposal.createdAt);
   const sendDate = firebaseTimestampFormat(proposal.createdAt);
   return t.FirebaseBuildingProposal({
@@ -359,6 +447,7 @@ function noteWithTimestamp(note) {
 
 function toFirebaseMeeting(meeting) {
   return FirebaseMeeting({
+    Id: meeting.id,
     Owner: meeting.owner,
     Aspiration: 0,
     Street: meeting.address,
@@ -393,6 +482,7 @@ function toFirebaseBuilding(building, owner) {
 
 function toFirebaseDocument(metadata) {
   return t.FirebaseDocument({
+    BuildingId: metadata.buildingId,
     DocumentName: metadata.name,
     Url: metadata.url,
     Thumbnail: metadata.previewUrl,

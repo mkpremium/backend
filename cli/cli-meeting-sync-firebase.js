@@ -3,9 +3,9 @@ import program from 'commander';
 import Promise from 'bluebird';
 import couchbase from '../src/db/couchbase';
 import {ScheduledEventsRepository} from '../src/scheduled-events/models';
-import {denormalizeBuildingMeeting} from '../src/firebase/lib/business';
 
 program
+  .option('-M --meeting <meeting>', 'meeting id')
   .action(mainAction)
   .parse(process.argv);
 
@@ -23,6 +23,21 @@ function mainAction() {
 async function main() {
   await couchbase();
 
+  if (program.meeting) {
+    return syncOneMeetings(program.meeting);
+  } else {
+    return syncAllMeetings();
+  }
+}
+
+async function syncOneMeetings(meetingId) {
+  const repo = new ScheduledEventsRepository();
+  const meeting = await repo.findByIdOrThrow(meetingId);
+
+  return syncMeetingFirebase(meeting);
+}
+
+async function syncAllMeetings() {
   const repo = new ScheduledEventsRepository();
   const meetings = await repo.findAllMeetings();
 
@@ -31,7 +46,6 @@ async function main() {
 
 async function syncMeetingFirebase(scheduledEvent) {
   const repo = new ScheduledEventsRepository();
-  const meeting = await repo.findMeeting(scheduledEvent);
-  const {building} = meeting;
-  return denormalizeBuildingMeeting(meeting.notifyTo, building.id, meeting);
+  await repo.firebaseMeeting(scheduledEvent);
+  
 }

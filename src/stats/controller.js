@@ -11,9 +11,9 @@ async function overAll(req, res) {
   res.json(results);
 }
 
-async function overCities(req, res) {
+async function overProvinces(req, res) {
   const repo = new OperatorStatsRepository();
-  const results = await repo.getCityStats(req.query);
+  const results = await repo.getProvinceStats(req.query);
   res.json(results);
 }
 
@@ -31,13 +31,13 @@ async function ownerStats(req, res) {
 
 async function worksheetStats(req, res) {
   const repo = new WorksheetRepository();
-  const results = await repo.worksheetStats(req.query);
+  const results = await repo.worksheetStats();
   res.json(results);
 }
 
 async function ownerBusinessStats(req, res) {
   const repo = new OwnerRepository();
-  const results = await repo.ownerBusinessStats(req.query);
+  const results = await repo.ownerBusinessStats();
   res.json(results);
 }
 
@@ -46,4 +46,4 @@ export const performanceController = wrap(performance);
 export const ownerStatsController = wrap(ownerStats);
 export const worksheetStatsController = wrap(worksheetStats);
 export const ownerBusinessStatsController = wrap(ownerBusinessStats);
-export const overCitiesController = wrap(overCities);
+export const overProvincesController = wrap(overProvinces);

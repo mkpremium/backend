@@ -20,7 +20,7 @@ import {
   relateMeetingToBuilding,
   relateMeetingToOperator,
   saveBuildingToFirebase,
-  saveMeetingToFirebase
+  saveMeetingToFirebase, updateBuildingFirebaseProposal
 } from '../firebase/lib/business';
 import {OwnerRepository} from '../owner/models';
 import {ScheduledEventType} from './types';
@@ -122,6 +122,13 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await relateMeetingToBuilding(db, meeting);
     await relateMeetingToOperator(db, meeting, meeting.notifyTo);
     await denormalizeBuildingMeeting(meeting.notifyTo, building.id, meeting);
+    await updateBuildingFirebaseProposal(building);
+  }
+
+  static async firebaseMeetingById(meetingId) {
+    const repo = new ScheduledEventsRepository();
+    const meeting = await repo.findByIdOrThrow(meetingId);
+    return repo.firebaseMeeting(meeting);
   }
 
   async deleteFirebaseMeeting(scheduleEvent) {
@@ -194,12 +201,13 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new WorksheetRepository();
       const worksheet = await worksheetRepo.findByIdWIthIncludes(_get(scheduledEvent, 'event.worksheetId'));
-      const city = _get(worksheet, 'relatedBuildings.0.address.city');
+      const {city, province} = _get(worksheet, 'relatedBuildings.0.address', {});
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
       if (worksheet.lastAddedMeeting === null) {
-        await OperatorStats.registerAction(createdBy, OperatorActions.MEETING, {city});
-        await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, {city});
+        const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING;
+        await OperatorStats.registerAction(createdBy, action, {city, province});
+        await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, {city, province});
       }
     }
 
@@ -212,6 +220,13 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const qb = this.getQueryBuilder()
       .where('type = ?', ScheduledEventType.MEETINGS);
     return this.query(qb);
+  }
+
+  async findAllMeetingsByBuildingId(buildingId){
+    const db = this.getQueryBuilder()
+      .where('event.buildingId = ?', buildingId)
+      .where('type = ?', ScheduledEventType.MEETINGS);
+    return this.query(db);
   }
 
   async validateUniqueWorksheet(params) {

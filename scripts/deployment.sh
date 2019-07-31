@@ -48,7 +48,7 @@ deploy() {
   local app_name=$2
   local user=${3:-centos}
 
-  local temp_dist_file=$(mktemp)
+  local temp_dist_file=temp1
   local dist_file="${temp_dist_file}.tgz"
   local deploy_dir=/home/${user}/apps/${app_name}
 
@@ -62,8 +62,10 @@ deploy() {
   tar czf ${dist_file} build
   echo -e "${bold}${dist_file}${normal}"
 
-  echo -en "Uploading distribution file  \t: "
-  rsync -arq ${dist_file} ${dist_host}:${dist_file}
+  echo -en "Uploading distribution file  \t:"
+  echo -en "${dist_file} ${dist_host}:${dist_file}"
+
+  scp ${dist_file} ${dist_host}:${dist_file}
   echo -e "${bold}OK${normal}"
 
   echo -e "Installing on remote          \t: "

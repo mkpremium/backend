@@ -1,6 +1,7 @@
 import t from 'tcomb';
 import uuid from 'uuid/v4';
 import {isMaybeTesting} from '../../config';
+import {OwnerWithInclude} from '../types/owner';
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -91,7 +92,7 @@ t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledE
  */
 const Event = t.struct(
   {
-    owner: t.maybe(t.OwnerWithInclude),
+    owner: t.maybe(OwnerWithInclude),
     ownerId: t.maybe(t.String),
     queueId: t.maybe(t.String),
     itemId: t.maybe(t.String),

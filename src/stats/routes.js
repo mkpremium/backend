@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {
-  overAllController, overCitiesController,
+  overAllController, overProvincesController,
   ownerBusinessStatsController,
   ownerStatsController,
   performanceController, worksheetStatsController
@@ -113,7 +113,7 @@ router.get('/', permissions.manager, overAllController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/cities', permissions.manager, overCitiesController);
+router.get('/cities', permissions.manager, overProvincesController);
 
 /**
  * @swagger
@@ -209,11 +209,6 @@ router.get('/owner', permissions.manager, ownerStatsController);
  *       - "application/json"
  *     produces:
  *       - "application/json"
- *     parameters:
- *       - name: city
- *         in: query
- *         type: string
- *         description: Nombre de la ciudad
  *     responses:
  *       200:
  *         schema:
@@ -244,11 +239,6 @@ router.get('/worksheets', permissions.manager, worksheetStatsController);
  *       - "application/json"
  *     produces:
  *       - "application/json"
- *     parameters:
- *       - name: operatorId
- *         in: query
- *         type: string
- *         description: Operador comercial ID
  *     responses:
  *       200:
  *         schema:

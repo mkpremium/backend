@@ -3,6 +3,7 @@ import uuid from 'uuid/v4';
 import {N1qlQuery} from 'couchbase';
 import t from 'tcomb';
 import debug from 'debug';
+import _ from 'lodash';
 import _get from 'lodash/get';
 import _head from 'lodash/head';
 import _some from 'lodash/some';
@@ -27,7 +28,7 @@ import {
   ownerVerified,
   publicEntity
 } from '../../types/owner';
-import {ScheduledEvents} from '../../scheduled-events/models';
+import {ScheduledEvents, ScheduledEventsRepository} from '../../scheduled-events/models';
 import {OperatorActions} from '../../stats/types';
 import {OperatorStats} from '../../stats/models';
 import {saveStreetBuildingToFirebase} from '../../firebase/lib/street';
@@ -36,6 +37,8 @@ import {WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse} from 
 import _map from 'lodash/map';
 import {emitModelEvents} from '../../../config';
 import {ScheduledEventType} from '../../scheduled-events/types';
+
+import joinjs from 'join-js';
 
 const worksheetDebug = debug('app:model:worksheet');
 
@@ -143,12 +146,16 @@ export class WorksheetRepository extends CouchbaseModel {
   calculateBusinessStatus(owner) {
     switch (owner.business.status) {
       case OwnerBusinessStatus.DISCARDED:
+        worksheetDebug('Owner business status is discarded so status is _PUBLIC');
         return WorkSheetStatus.PUBLIC;
       case OwnerBusinessStatus.NO_SALE:
+        worksheetDebug('Owner business status is NO_SALE so status is _NO_SALE');
         return WorkSheetStatus.NO_SALE;
       case OwnerBusinessStatus.ALREADY_SOLD:
+        worksheetDebug('Owner business status is ALREADY_SOLD so status is _INVALID');
         return WorkSheetStatus.INVALID;
       default:
+        worksheetDebug('Owner business status is defult so status is _MEETING');
         return WorkSheetStatus.MEETING;
     }
   }
@@ -169,99 +176,43 @@ export class WorksheetRepository extends CouchbaseModel {
     const alreadySold = isValidLength && _some(owners, ownerAlreadySold);
     const meetings = await this.findMeetings(worksheet.id);
     const hasMeeting = meetings.length > 0;
-
+    worksheetDebug('Begin to calculate worksheet status');
     if (haveBusiness) {
+      worksheetDebug('Begin to calculate worksheet status');
       return this.calculateBusinessStatus(haveBusiness);
     }
 
     if (isPublicEntity) {
+      worksheetDebug('Worksheet new status is _PUBLIC');
       return WorkSheetStatus.PUBLIC;
     }
 
     if (noSale) {
+      worksheetDebug('Worksheet new status is _NO_SALE');
       return WorkSheetStatus.NO_SALE;
     }
 
     if (alreadySold) {
+      worksheetDebug('Worksheet new status is _ALREADY_SOLD');
       return WorkSheetStatus.ALREADY_SOLD;
     }
 
     if (everyInvalidOwner) {
+      worksheetDebug('Worksheet new status is _INVALID');
       return WorkSheetStatus.INVALID;
     }
 
     if (hasMeeting) {
+      worksheetDebug('Worksheet new status is _MEETING');
       return WorkSheetStatus.MEETING;
     }
 
     if (someValidOwner) {
+      worksheetDebug('Worksheet new status is _WITH_OWNER');
       return WorkSheetStatus.WITH_OWNER;
     }
-
+    worksheetDebug(`Worksheet new status is same status ${worksheet.status}`);
     return worksheet.status;
-  }
-
-  async calculateNewStatus(worksheet) {
-    worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status);
-    const isValidLength = worksheet.relatedOwners.length > 0;
-    const owners = isValidLength
-      ? await Promise.map(worksheet.relatedOwners, OwnerRepository.validateOwner)
-      : [];
-
-    const someValidOwner = isValidLength && _some(owners, ownerVerified);
-    const isPublicEntity = isValidLength && _some(owners, publicEntity);
-    const everyInvalidOwner = isValidLength && _every(owners, isInvalid);
-    const noSale = isValidLength && _some(owners, ownerNoSale);
-    const alreadySold = isValidLength && _some(owners, ownerAlreadySold);
-    const meetings = await this.findMeetings(worksheet.id);
-    const hasMeeting = meetings.length > 0;
-
-    switch (worksheet.status) {
-      case WorkSheetStatus.DEFAULT:
-        if (isPublicEntity) {
-          return WorkSheetStatus.PUBLIC;
-        }
-
-        if (noSale) {
-          return WorkSheetStatus.NO_SALE;
-        }
-
-        if (alreadySold) {
-          return WorkSheetStatus.ALREADY_SOLD;
-        }
-
-        if (hasMeeting) {
-          return WorkSheetStatus.MEETING;
-        }
-
-        if (someValidOwner) {
-          return WorkSheetStatus.WITH_OWNER;
-        }
-
-        if (everyInvalidOwner) {
-          return WorkSheetStatus.INVALID;
-        }
-
-        return worksheet.status;
-      case WorkSheetStatus.WITH_OWNER:
-        if (isPublicEntity) {
-          return WorkSheetStatus.PUBLIC;
-        }
-        if (noSale) {
-          return WorkSheetStatus.NO_SALE;
-        }
-        if (alreadySold) {
-          return WorkSheetStatus.ALREADY_SOLD;
-        }
-
-        if (hasMeeting) {
-          return WorkSheetStatus.MEETING;
-        }
-        return worksheet.status;
-      default:
-        worksheetDebug(`worksheet ${worksheet.id} with status ${worksheet.status} don't have planned behavior`);
-        return worksheet.status;
-    }
   }
 
   async updateStatus(worksheetId, operatorId) {
@@ -320,25 +271,25 @@ export class WorksheetRepository extends CouchbaseModel {
     return this.save(updatedWorksheet);
   }
 
-  async worksheetStats(args = {}) {
-    const params = WorksheetStatsParams(args);
+  async worksheetStats() {
     const bucket = this.getBucketName();
-    const query = _isNil(params.city)
-      ? `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-GROUP BY t.status`
-      : `SELECT t.status, COUNT(*) as count FROM ${bucket} t
-LET building = (SELECT RAW p FROM ${bucket} p USE KEYS t.relatedBuildingIds[0] WHERE p.id = t.relatedBuildingIds[0] LIMIT 1)
-WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-AND LOWER(building[0].address.city) = LOWER('${params.city}')
-GROUP BY t.status`;
+
+    const query = `SELECT t.buildingAddress.province, t.status, COUNT(*) as count FROM ${bucket} t
+    WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
+    GROUP BY t.status, t.buildingAddress.province`;
 
     const result = await this.queryRaw(N1qlQuery.fromString(query));
+
+    const provinces = _.uniq(result.map(r => r.province));
+
     const totals = {};
 
-    Object.values(WorkSheetStatus).forEach(status => {
-      const total = _find(result, {status}) || {count: 0};
-      totals[status] = total.count;
+    provinces.forEach(province => {
+      totals[province] = {};
+      Object.values(WorkSheetStatus).forEach(status => {
+        const total = _find(result, {province: province, status: status}) || {count: 0};
+        totals[province][status] = total.count;
+      });
     });
 
     return totals;
@@ -395,6 +346,16 @@ GROUP BY t.status`;
     const repo = new WorksheetRepository();
 
     return repo.save(worksheet, emitModelEvents);
+  }
+
+  async syncWorksheetFirebase(worksheet) {
+    const worksheetMeetings = await WorksheetRepository.findMeetings(worksheet.id);
+    const buildingMeetings = await BuildingRepository.findMeetings(worksheet.relatedBuildingIds[0]);
+    const allMeetingIds = (worksheetMeetings || []).concat(buildingMeetings || []).map(({id}) => id);
+    const meetings = _.chain(allMeetingIds).compact().uniq().value();
+    if (meetings.length > 0) {
+      return Promise.mapSeries(meetings, id => ScheduledEventsRepository.firebaseMeetingById(id));
+    }
   }
 
   async preSave(data) {

@@ -281,7 +281,7 @@ export const Owner = t.Owner = t.struct(
   }
 );
 
-t.OwnerWithInclude = t.Owner.extend({
+export const OwnerWithInclude = t.OwnerWithInclude = t.Owner.extend({
   building: t.maybe(t.Building),
   person: t.maybe(t.Person)
 });

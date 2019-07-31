@@ -16,6 +16,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
 import {Owner} from '../types/owner';
+import {OperatorRepository} from '../operator/models';
 
 export class Person extends CouchbaseModel {
   constructor() {
@@ -102,6 +103,24 @@ export class PersonRepository extends Person {
     }
 
     return _head(results);
+  }
+
+  /**
+   * Find person by dni / document number
+   * @param documentNumber
+   * @param required
+   * @returns {Promise<void>}
+   */
+  async findAllByDocumentNumber(documentNumber, required = true) {
+    const expr = squel.expr().and('t.documentNumber = ?', documentNumber);
+    const qb = this.getQueryBuilder()
+      .where(expr);
+    const results = await this.query(qb);
+
+    if (required && (!results || results.length === 0)) {
+      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
+    }
+    return results;
   }
 
   /**
@@ -370,31 +389,34 @@ GROUP BY t.status, building[0].address.city`;
     return totals;
   }
 
-  async ownerBusinessStats(args = {}) {
-    const params = OwnerBusinessStatsParams(args);
+  async ownerBusinessStats() {
     const bucket = this.getBucketName();
-    const query = _isNil(params.operatorId)
-      ? `SELECT t.business.status, COUNT(*) as count
-FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-GROUP BY t.business.status`
-      : `SELECT t.business.status, COUNT(*) as count
-FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-AND t.business.meetingWithOperatorId = '${params.operatorId}'
-GROUP BY t.business.status`;
-    const result = await this.queryRaw(N1qlQuery.fromString(query));
-    const totals = {};
+    const query = `SELECT t.business.status, t.business.meetingWithOperatorId, COUNT(*) as count
+                    FROM ${bucket} \`t\`
+                    WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
+                    GROUP BY t.business.status, t.business.meetingWithOperatorId`;
+    const results = await this.queryRaw(N1qlQuery.fromString(query));
 
-    Object.values(OwnerBusinessStatus).forEach(status => {
-      let total = 0;
-      _.filter(result, {status}).forEach(({count}) => {
-        total += count;
+    let owners = await Promise.all(results.map(async(result) => {
+      const operatorRepository = new OperatorRepository();
+      const operator = await operatorRepository.findByIdOrThrow(result.meetingWithOperatorId);
+
+      return {'id': result.meetingWithOperatorId, 'name': operator.username, 'stats': {}};
+    }));
+    owners = _.uniqBy(owners, 'id');
+
+    owners.forEach(owner => {
+      Object.values(OwnerBusinessStatus).forEach(status => {
+        let total = 0;
+        _.filter(results, {meetingWithOperatorId: owner.id, status}).forEach(({count}) => {
+          total += count;
+        });
+
+        owner.stats[status] = total;
       });
-      totals[status] = total;
     });
 
-    return totals;
+    return owners;
   }
 
   async list(query = {}) {
@@ -445,9 +467,29 @@ GROUP BY t.business.status`;
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
 
+  async findAllVerifiedOwnersByBuildingId(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('t.`buildingId` = ?', buildingId);
+
+    const results = await this.query(qb);
+    const ownerIds = _.map(results, 'id');
+    const owners = await this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+    return this.getVerifiedOwners(owners);
+  }
+
+  getVerifiedOwners(owners){
+    return owners.filter(owner => this.isOwnerVerified(owner));
+  }
+
+  isOwnerVerified(owner){
+    const contacts = _.get(owner, 'person.contacts');
+    const goodContacts = contacts.filter(c => c.status === 'GOOD');
+    return goodContacts.length > 0;
+  }
+
   async findOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
+      .where('t.`buildingId` = ?', buildingId);
     const results = await this.query(qb);
 
     if (!results || results.length === 0) {

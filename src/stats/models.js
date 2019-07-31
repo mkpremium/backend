@@ -33,7 +33,8 @@ const GetStatsFilterBase = t.struct(
   {
     operatorId: t.maybe(t.String),
     view: t.String,
-    city: t.maybe(t.String)
+    city: t.maybe(t.String),
+    province: t.maybe(t.String)
   },
   {
     name: 'GetStatsFilter',
@@ -165,8 +166,8 @@ export class OperatorStatsRepository extends OperatorStats {
       qb.where('operatorId = ?', filter.operatorId);
     }
 
-    if (!_isNil(filter.city)) {
-      qb.where('city = ?', filter.city);
+    if (!_isNil(filter.province)) {
+      qb.where('province = ?', filter.province);
     }
 
     switch (filter.view) {
@@ -200,27 +201,27 @@ export class OperatorStatsRepository extends OperatorStats {
     return this.query(qb);
   }
 
-  async getCityStats(params) {
+  async getProvinceStats(params) {
     const filter = GetStatsFilter(params);
     const results = GetStatsFilterFixed.is(filter)
-      ? await this.getCityStatsFixed(filter)
-      : await this.getCityStatsByDateRange(filter.dateBetween, filter);
+      ? await this.getProvinceStatsFixed(filter)
+      : await this.getProvinceStatsByDateRange(filter.dateBetween, filter);
 
     switch (filter.view) {
       case 'day':
-        return _.mapValues(_groupBy(results, 'city'), operatorStats);
+        return _.mapValues(_groupBy(results, 'province'), operatorStats);
       case 'total':
       default:
-        return _.chain(results).groupBy('city').mapValues(calculateCounters).value();
+        return _.chain(results).groupBy('province').mapValues(calculateCounters).value();
     }
   }
 
-  async getCityStatsFixed(filter) {
+  async getProvinceStatsFixed(filter) {
     const dateBetween = getDateBetweenByFixed(filter.range);
-    return this.getCityStatsByDateRange(dateBetween, filter);
+    return this.getProvinceStatsByDateRange(dateBetween, filter);
   }
 
-  async getCityStatsByDateRange(dateRange, filter) {
+  async getProvinceStatsByDateRange(dateRange, filter) {
     const qb = this.getQueryBuilder('count');
     addBetweenQueryToBuilder(qb, 'createdAt', dateRange);
 
@@ -228,34 +229,34 @@ export class OperatorStatsRepository extends OperatorStats {
       qb.where('operatorId = ?', filter.operatorId);
     }
 
-    if (!_isNil(filter.city)) {
-      qb.where('city = ?', filter.city);
+    if (!_isNil(filter.province)) {
+      qb.where('province = ?', filter.province);
     }
 
     switch (filter.view) {
       case 'day':
         qb
-          .field('city')
+          .field('province')
           .field('action')
           .field('DATE_FORMAT_STR(createdAt, "1111-11-11") as createdAtStr')
           .field('createdAt')
-          .group('city')
+          .group('province')
           .group('action')
           .group('createdAt')
-          .where('city IS NOT MISSING')
+          .where('province IS NOT MISSING')
           .where('action IS NOT MISSING')
           .where('createdAt IS NOT MISSING')
-          .order('city').order('createdAt');
+          .order('province').order('createdAt');
         break;
       case 'total':
       default:
         qb
-          .field('city')
+          .field('province')
           .field('action')
-          .group('city')
+          .group('province')
           .group('action')
-          .order('city')
-          .where('city IS NOT MISSING')
+          .order('province')
+          .where('province IS NOT MISSING')
           .where('action IS NOT MISSING');
         break;
     }
