@@ -196,13 +196,12 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async addScheduledMeetingEvent(data = {}, createdBy) {
     const params = Object.assign({}, data, {createdBy, type: 'MEETINGS'});
     await this.validateUniqueWorksheet(params);
-    const scheduledEvent = await this.save(params); // <- this is the meeting
+    const scheduledEvent = await this.save(params);
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new WorksheetRepository();
       const worksheet = await worksheetRepo.findByIdWIthIncludes(_get(scheduledEvent, 'event.worksheetId'));
-      const city = _get(worksheet, 'relatedBuildings.0.address.city');
-      const province = _get(worksheet, 'relatedBuildings.0.address.province');
+      const {city, province} = _get(worksheet, 'relatedBuildings.0.address', {});
       const updatedWorksheet = t.update(worksheet, {lastAddedMeeting: {$set: scheduledEvent}});
       await worksheetRepo.save(updatedWorksheet, false);
       if (worksheet.lastAddedMeeting === null) {

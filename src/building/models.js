@@ -228,8 +228,7 @@ export class BuildingRepository extends CouchbaseModel {
       await worksheetRepository.syncWorksheetFirebase(worksheet);
     }
 
-    const city = _get(building, 'address.city');
-    const province = _get(building, 'address.province');
+    const {city, province} = _get(building, 'address', {});
 
     if (building.proposals.length === 0) {
       await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, {city, province});
