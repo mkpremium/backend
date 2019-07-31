@@ -28,10 +28,6 @@ export async function createPurchaseStock(params = {}, operatorId) {
 
   let stock = await stockRepository.findByBuildingIdOrDefault(params.buildingId);
 
-  if (stock.currentStatus === StockStatuses.CLOSE) {
-    throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`);
-  }
-
   if (!stock) {
     stock = {
       buildingId: createStockParams.buildingId,
@@ -39,6 +35,10 @@ export async function createPurchaseStock(params = {}, operatorId) {
       purchase
     };
   } else {
+    if (stock.currentStatus === StockStatuses.CLOSE) {
+      throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`);
+    }
+
     stock = t.update(stock, {
       purchase: {$set: purchase}
     });
