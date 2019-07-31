@@ -16,7 +16,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
 import {Owner} from '../types/owner';
-import {ContactInfoStatus} from '../types/common';
+import {OperatorRepository} from '../operator/models';
 
 export class Person extends CouchbaseModel {
   constructor() {
@@ -117,12 +117,11 @@ export class PersonRepository extends Person {
       .where(expr);
     const results = await this.query(qb);
 
-      if (required && (!results || results.length === 0)) {
+    if (required && (!results || results.length === 0)) {
       throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`);
     }
     return results;
   }
-
 
   /**
    * Find person migrateOwnerId
@@ -390,31 +389,34 @@ GROUP BY t.status, building[0].address.city`;
     return totals;
   }
 
-  async ownerBusinessStats(args = {}) {
-    const params = OwnerBusinessStatsParams(args);
+  async ownerBusinessStats() {
     const bucket = this.getBucketName();
-    const query = _isNil(params.operatorId)
-      ? `SELECT t.business.status, COUNT(*) as count
-FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-GROUP BY t.business.status`
-      : `SELECT t.business.status, COUNT(*) as count
-FROM ${bucket} \`t\`
-WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-AND t.business.meetingWithOperatorId = '${params.operatorId}'
-GROUP BY t.business.status`;
-    const result = await this.queryRaw(N1qlQuery.fromString(query));
-    const totals = {};
+    const query = `SELECT t.business.status, t.business.meetingWithOperatorId, COUNT(*) as count
+                    FROM ${bucket} \`t\`
+                    WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
+                    GROUP BY t.business.status, t.business.meetingWithOperatorId`;
+    const results = await this.queryRaw(N1qlQuery.fromString(query));
 
-    Object.values(OwnerBusinessStatus).forEach(status => {
-      let total = 0;
-      _.filter(result, {status}).forEach(({count}) => {
-        total += count;
+    let owners = await Promise.all(results.map(async(result) => {
+      const operatorRepository = new OperatorRepository();
+      const operator = await operatorRepository.findByIdOrThrow(result.meetingWithOperatorId);
+
+      return {'id': result.meetingWithOperatorId, 'name': operator.username, 'stats': {}};
+    }));
+    owners = _.uniqBy(owners, 'id');
+
+    owners.forEach(owner => {
+      Object.values(OwnerBusinessStatus).forEach(status => {
+        let total = 0;
+        _.filter(results, {meetingWithOperatorId: owner.id, status}).forEach(({count}) => {
+          total += count;
+        });
+
+        owner.stats[status] = total;
       });
-      totals[status] = total;
     });
 
-    return totals;
+    return owners;
   }
 
   async list(query = {}) {
