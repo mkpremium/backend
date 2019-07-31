@@ -58,22 +58,34 @@ export class StockRepository extends CouchbaseModel {
 
 export class StockFirebaseRepository {
   constructor() {
+    if (!fbComerciales.enabled) {
+      return;
+    }
     this.db = fbComerciales.database();
   }
 
   async savePurchaseStock(stock) {
+    if (!fbComerciales.enabled) {
+      return;
+    }
     const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
     const firebasePurchaseTransaction = this.toFirebaseTransaction(stock.purchase);
     return stockRef.child('purchase').set(firebasePurchaseTransaction);
   }
 
   async saveSellStock(stock) {
+    if (!fbComerciales.enabled) {
+      return;
+    }
     const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
     const firebaseSellTransaction = this.toFirebaseTransaction(stock.sell);
     return stockRef.child('sell').set(firebaseSellTransaction);
   }
 
   async saveCloseStock(stock) {
+    if (!fbComerciales.enabled) {
+      return;
+    }
     const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
     const firebaseClose = this.toFirebaseClose(stock.close);
     return stockRef.child('close').set(firebaseClose);
@@ -100,6 +112,9 @@ export class StockFirebaseRepository {
   }
 
   async deleteSellStock(stock) {
+    if (!fbComerciales.enabled) {
+      return;
+    }
     const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
     return stockRef.child('sell').remove();
   }

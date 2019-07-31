@@ -5,6 +5,7 @@ import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {OperatorRepository} from '../operator/models';
 import _ from 'lodash';
+import {SuperSellAward} from '../operator/Awards/SuperSellAward';
 function createTransaction(params = {}, operatorId) {
   return Transaction({
     operatorId: operatorId,
@@ -155,9 +156,8 @@ export async function closeSellStock(params, operatorId) {
 
   const gain = stock.sell.transactionAmount - stock.purchase.transactionAmount;
 
-  // TODO move this to a constant file? or an object value
-  if (gain >= 500000) {
-    await operatorRepository.addAnAward(operator, 'SUPER_SELL');
+  if (SuperSellAward.hasSuperSellAward(gain)) {
+    await operatorRepository.addAnAward(operator, SuperSellAward.getSuperSellAward());
   }
 
   let close = {
