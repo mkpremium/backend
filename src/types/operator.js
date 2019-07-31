@@ -88,6 +88,20 @@ t.OperatorProfile.prototype.getStateMessage = function() {
   }
 };
 
+export const ProfitGoal   = t.struct(
+  {
+    amount: t.Number,
+    updatedAt: t.Date
+  }
+);
+
+export const Award = t.Award = t.struct(
+  {
+    code: t.String,
+    awardedAt: t.Date
+  }
+);
+
 /**
  * @swagger
  * definitions:
@@ -190,6 +204,8 @@ t.Operator = t.struct(
     profile: t.OperatorProfile,
     restringedHours: t.maybe(RestringedHourObject),
 
+    profitGoal: t.maybe(ProfitGoal),
+    awards: t.list(Award),
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
     _documentType: t.enums.of(['operator'])
@@ -202,6 +218,13 @@ t.Operator = t.struct(
       roles: [],
       features: [],
       profile: {},
+      profitGoal: {
+        amount: 0,
+        get updatedAt() {
+          return new Date();
+        }
+      },
+      awards: [],
       get createdAt() {
         return new Date();
       },

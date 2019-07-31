@@ -1,0 +1,51 @@
+import {wrap} from 'express-promise-wrap';
+import {
+  cancelSellStock,
+  closeSellStock,
+  createPurchaseStock,
+  getProfitGoalOperatorsRanking,
+  sellPurchasedStock, updatePurchasedStock, updatePurchaseStock
+} from './application';
+
+async function createPurchaseStockFromRequest(req, res) {
+  const stock = await createPurchaseStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function updatePurchaseStockFromRequest(req, res) {
+  const stock = await updatePurchaseStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function sellPurchasedStockFromRequest(req, res) {
+  const stock = await sellPurchasedStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function updatePurchasedStockFromRequest(req, res) {
+  const stock = await updatePurchasedStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function cancelSellStockFromRequest(req, res) {
+  const stock = await cancelSellStock(req.body);
+  return res.status(200).json(stock);
+}
+
+async function closeSellStockFromRequest(req, res) {
+  const stock = await closeSellStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function getProfitsRanking(req,res){
+  const profitsRanking = await getProfitGoalOperatorsRanking();
+  res.status(201).json(profitsRanking);
+}
+
+export const createPurchaseStockController = wrap(createPurchaseStockFromRequest);
+export const updatePurchaseStockController = wrap(updatePurchaseStockFromRequest);
+export const sellPurchasedStockController = wrap(sellPurchasedStockFromRequest);
+export const updatePurchasedStockController = wrap(updatePurchasedStockFromRequest);
+export const closeSellStockController = wrap(closeSellStockFromRequest);
+export const cancelSellStockController = wrap(cancelSellStockFromRequest);
+export const getProfitsRakningController = wrap(getProfitsRanking);

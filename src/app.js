@@ -30,7 +30,7 @@ import email from './email';
 import gearman from './gearman';
 import cadastre from './cadastre';
 import preferences from './system-preferences';
-
+import stock from './stock';
 import appErrorHandler from './lib/error-handler';
 import maintenanceMode from './system-preferences/maintenance-mode-middleware';
 
@@ -69,7 +69,7 @@ autocomplete(app);
 email(app);
 cadastre(app);
 preferences(app);
-
+stock(app);
 app.use(appErrorHandler);
 
 export default app;

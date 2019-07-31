@@ -28,6 +28,6 @@ build
 *.iml
 
 conf/
+*.csv
 .DS_STORE
 *.tgz
-conf/*
