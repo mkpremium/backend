@@ -16,6 +16,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {OwnerListQuery} from './types';
 import squel from 'squel/dist/squel';
 import {Owner} from '../types/owner';
+import {ContactInfoStatus} from '../types/common';
 
 export class Person extends CouchbaseModel {
   constructor() {
@@ -464,9 +465,29 @@ GROUP BY t.business.status`;
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
 
+  async findAllVerifiedOwnersByBuildingId(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('t.`buildingId` = ?', buildingId);
+
+    const results = await this.query(qb);
+    const ownerIds = _.map(results, 'id');
+    const owners = await this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+    return this.getVerifiedOwners(owners);
+  }
+
+  getVerifiedOwners(owners){
+    return owners.filter(owner => this.isOwnerVerified(owner));
+  }
+
+  isOwnerVerified(owner){
+    const contacts = _.get(owner, 'person.contacts');
+    const goodContacts = contacts.filter(c => c.status === 'GOOD');
+    return goodContacts.length > 0;
+  }
+
   async findOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
+      .where('t.`buildingId` = ?', buildingId);
     const results = await this.query(qb);
 
     if (!results || results.length === 0) {

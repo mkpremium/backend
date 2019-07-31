@@ -62,7 +62,7 @@ t.SimplePhoneNumber = t.struct(
   }
 );
 
-t.TypedContactInfoStatus = t.enums({
+export const ContactInfoStatus = t.TypedContactInfoStatus = t.enums({
   UNDEFINED: 'UNDEFINED',
   GOOD: 'GOOD',
   BAD: 'BAD'
