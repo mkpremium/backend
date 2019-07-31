@@ -152,7 +152,7 @@ export async function getProfitGoalOperatorsRanking() {
 
   const unsortedOperatorsRanking = operators.map((operator) => {
     const currentOperatorProfit = operatorsProfitsMap.get(operator.t.id) | 0;
-    const currentPercentageGoal = operator.t.profitGoal.amount
+    const currentPercentageGoal = operator.t.profitGoal.amount > 0
       ? (currentOperatorProfit / operator.t.profitGoal.amount) * 1 : 0;
     return {
       userId: operator.t.id,
