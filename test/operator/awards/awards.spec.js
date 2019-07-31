@@ -47,7 +47,7 @@ describe('Awards', () => {
     operator1 = await operatorCreate('1');
     testBuilding1 = await BuildingRepository.createNewBuilding(buildingData);
     testBuilding2 = await BuildingRepository.createNewBuilding(buildingData);
-    await setProfitGoalToOperator(operator1.id, 500000);
+    await setProfitGoalToOperator({ operatorId: operator1.id, profitAmount: 500000});
     await createTestPurchaseStock(testBuilding1.id, operator1.id, 100000);
     await sellTestPurchaseStock(testBuilding1.id, operator1.id, 600000);
     await closeSellStock({ buildingId: testBuilding1.id }, operator1.id);

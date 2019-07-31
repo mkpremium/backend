@@ -230,7 +230,7 @@ export class CouchbaseModel {
                    WHERE t._documentType = '${this.getType()}'
                    AND id IN ${JSON.stringify(array)}`;
     const results = await this.raw(query);
-    console.log("Results", results);
+
     return results.map(r => fromJSON(r.t, this.Struct));
   }
 

@@ -71,7 +71,7 @@ describe('profit goals', () => {
   });
 
   it('Should define a goal for an existing operator1', async() => {
-    const result = await setProfitGoalToOperator(operator1.id, 1500);
+    const result = await setProfitGoalToOperator({operatorId: operator1.id, profitAmount: 1500});
     expect(result.profitGoal).to.not.be.null;
     expect(result.profitGoal.amount).to.equal(1500);
   });
@@ -79,7 +79,7 @@ describe('profit goals', () => {
   it('Should fail a goal for an non existing operator1', async() => {
     let error;
     try {
-      const operator = await setProfitGoalToOperator('fakeId', 1500);
+      const operator = await setProfitGoalToOperator({operatorId: 'fakeId', profitAmount: 1500});
       console.log(operator);
     } catch (err) {
       error = err;
@@ -91,7 +91,7 @@ describe('profit goals', () => {
   });
 
   it('Should display a profit goal ranking', async() => {
-    await setProfitGoalToOperator(operator2.id, 1500);
+    await setProfitGoalToOperator({ operatorId: operator2.id, profitAmount: 1500});
 
     let params = {
       buildingId: testBuilding1.id

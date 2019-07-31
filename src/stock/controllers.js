@@ -4,11 +4,16 @@ import {
   closeSellStock,
   createPurchaseStock,
   getProfitGoalOperatorsRanking,
-  sellPurchasedStock
+  sellPurchasedStock, updatePurchasedStock, updatePurchaseStock
 } from './application';
 
 async function createPurchaseStockFromRequest(req, res) {
   const stock = await createPurchaseStock(req.body, req.user.id);
+  res.status(201).json(stock);
+}
+
+async function updatePurchaseStockFromRequest(req, res) {
+  const stock = await updatePurchaseStock(req.body, req.user.id);
   res.status(201).json(stock);
 }
 
@@ -33,7 +38,9 @@ async function getProfitsRanking(req,res){
 }
 
 export const createPurchaseStockController = wrap(createPurchaseStockFromRequest);
+export const updatePurchaseStockController = wrap(updatePurchaseStockFromRequest);
 export const sellPurchasedStockController = wrap(sellPurchasedStockFromRequest);
+export const updatePurchasedStockController = wrap(updatePurchasedStock);
 export const closeSellStockController = wrap(closeSellStockFromRequest);
 export const cancelSellStockController = wrap(cancelSellStockFromRequest);
 export const getProfitsRakningController = wrap(getProfitsRanking);
