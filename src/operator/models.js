@@ -258,6 +258,7 @@ export class OperatorRepository extends Operator {
       where t._documentType = 'operator'
       AND t.profitGoal IS NOT NULL
       AND DATE_PART_STR(t.profitGoal.updatedAt,'year') = ${currentYear}
+      AND (ANY V IN roles SATISFIES V = 'BUSINESS' END)
       `;
 
     return this.raw(operatorsProfitGoals);
