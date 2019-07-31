@@ -467,6 +467,26 @@ GROUP BY t.status, building[0].address.city`;
     return this.findByIdWithIncludes(ownerIds, ['person', 'building']);
   }
 
+  async findAllVerifiedOwnersByBuildingId(buildingId) {
+    const qb = this.getQueryBuilder()
+      .where('t.`buildingId` = ?', buildingId);
+
+    const results = await this.query(qb);
+    const ownerIds = _.map(results, 'id');
+    const owners = await this.findByIdWithIncludes(ownerIds, ['person', 'building']);
+    return this.getVerifiedOwners(owners);
+  }
+
+  getVerifiedOwners(owners){
+    return owners.filter(owner => this.isOwnerVerified(owner));
+  }
+
+  isOwnerVerified(owner){
+    const contacts = _.get(owner, 'person.contacts');
+    const goodContacts = contacts.filter(c => c.status === 'GOOD');
+    return goodContacts.length > 0;
+  }
+
   async findOwnersByBuildingId(buildingId) {
     const qb = this.getQueryBuilder()
       .where('t.`buildingId` = ?', buildingId);

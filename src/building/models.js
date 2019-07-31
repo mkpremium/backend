@@ -11,8 +11,8 @@ import {cleanUrl, makePreview, uploadPreview} from '../aws';
 import {
   deleteMetadataFromFirebase,
   saveMetadataToFirebase,
-  saveProposal,
-  updateBuildingToFirebase
+  saveProposal, toFirebaseProposal,
+  updateBuildingToFirebase, updateProposalToFirebase
 } from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
 import {BuildingState, OwnerBusinessStatus} from '../types/enums';
@@ -26,8 +26,12 @@ import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
 import {Building} from '../types/building';
 import {emitModelEvents} from '../../config';
-import {ScheduledEvents} from '../scheduled-events/models';
+import {ScheduledEvents, ScheduledEventsRepository} from '../scheduled-events/models';
 import {ScheduledEventType} from '../scheduled-events/types';
+import {updateProposalsOnScheduleEventsBuilding} from './application';
+import {WorksheetRepository} from '../worksheet/models/worksheet';
+import Promise from 'bluebird';
+import {fbComerciales} from '../firebase';
 
 const debugBuilding = debug('app:model:building');
 
@@ -218,6 +222,10 @@ export class BuildingRepository extends CouchbaseModel {
     if (proposal.ownerId) {
       const ownerRepo = new OwnerRepository();
       await ownerRepo.updateBusinessStatusFirebase(proposal.ownerId, OwnerBusinessStatus.PROPOSAL_SENT, operatorId);
+      const worksheet = await WorksheetRepository.findByBuilding(building.id);
+
+      const worksheetRepository = new WorksheetRepository();
+      await worksheetRepository.syncWorksheetFirebase(worksheet);
     }
 
     const city = _get(building, 'address.city');
@@ -226,6 +234,8 @@ export class BuildingRepository extends CouchbaseModel {
     if (building.proposals.length === 0) {
       await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, {city, province});
     }
+
+    await updateProposalToFirebase(proposal, building);
 
     return proposal;
   }

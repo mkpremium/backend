@@ -47,4 +47,5 @@ async function syncAllMeetings() {
 async function syncMeetingFirebase(scheduledEvent) {
   const repo = new ScheduledEventsRepository();
   await repo.firebaseMeeting(scheduledEvent);
+  
 }
