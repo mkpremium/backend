@@ -27,7 +27,7 @@ export async function createPurchaseStock(params = {}, operatorId) {
 
   const stockRepository = new StockRepository();
 
-  const stockExist = stockRepository.findByBuildingIdOrDefault(params.buildingId);
+  const stockExist = await stockRepository.findByBuildingIdOrDefault(params.buildingId);
 
   if (stockExist) {
     throw new Error('There is an stock related to that building');
