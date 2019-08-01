@@ -68,8 +68,10 @@ export async function updatePurchaseStock(params = {}, operatorId) {
   }
 
   stock = t.update(stock, {
-    purchase: {$set: purchase}
+    purchase: {$set: purchase},
+    currentStatus: {$set: StockStatuses.SELL}
   });
+
 
   const result = await stockRepository.save(stock);
 
