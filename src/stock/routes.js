@@ -4,7 +4,7 @@ import {
   closeSellStockController,
   createPurchaseStockController,
   getProfitsRakningController,
-  sellPurchasedStockController, updatePurchasedStockController, updatePurchaseStockController
+  sellPurchasedStockController, updatePurchaseStockController, updateSellStockController
 } from './controllers';
 
 const router = Router();
@@ -230,7 +230,7 @@ router.post('/sell', sellPurchasedStockController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/sell', updatePurchasedStockController);
+router.put('/sell', updateSellStockController);
 
 /**
  * @swagger
@@ -304,7 +304,6 @@ router.post('/sell/cancel', cancelSellStockController);
  *
  */
 router.post('/close', closeSellStockController);
-
 
 /**
  * @swagger

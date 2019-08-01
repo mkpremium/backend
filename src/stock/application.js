@@ -68,8 +68,7 @@ export async function updatePurchaseStock(params = {}, operatorId) {
   }
 
   stock = t.update(stock, {
-    purchase: {$set: purchase},
-    currentStatus: {$set: StockStatuses.SELL}
+    purchase: {$set: purchase}
   });
 
 
@@ -99,7 +98,10 @@ export async function sellPurchasedStock(params = {}, operatorId) {
     throw new Error(`El stock no encuentra en estado ${StockStatuses.PURCHASE}`);
   }
 
-  stock = t.update(stock, {sell: {$set: sell}, currentStatus: {$set: StockStatuses.SELL}});
+  stock = t.update(stock, {
+    sell: {$set: sell},
+    currentStatus: {$set: StockStatuses.SELL}
+  });
 
   const result = await stockRepository.save(stock);
 
@@ -108,7 +110,7 @@ export async function sellPurchasedStock(params = {}, operatorId) {
   return result;
 }
 
-export async function updatePurchasedStock(params = {}, operatorId) {
+export async function updateSellStock(params = {}, operatorId) {
   const buildingRepository = new BuildingRepository();
 
   const stockFirebaseRepository = new StockFirebaseRepository();
@@ -126,7 +128,10 @@ export async function updatePurchasedStock(params = {}, operatorId) {
     throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`);
   }
 
-  stock = t.update(stock, {sell: {$set: sell}});
+  stock = t.update(stock, {
+    sell: {$set: sell},
+    currentStatus: {$set: StockStatuses.SELL}
+  });
 
   const result = await stockRepository.save(stock);
 
@@ -146,7 +151,10 @@ export async function cancelSellStock(params) {
     throw new Error(`El stock no se encuentra en estado ${StockStatuses.SELL}`);
   }
 
-  stock = t.update(stock, {sell: {$set: null}, currentStatus: {$set: StockStatuses.PURCHASE}});
+  stock = t.update(stock, {
+    sell: {$set: null},
+    currentStatus: {$set: StockStatuses.PURCHASE}
+  });
 
   const result = await stockRepository.save(stock);
 
