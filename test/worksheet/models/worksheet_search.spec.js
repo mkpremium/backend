@@ -4,14 +4,14 @@ import {
 import WorksheetHelper from '../../helpers/worksheet';
 import {WorksheetRepository} from '../../../src/worksheet/models/worksheet';
 
-describe('Logic search worksheets', () => {
+describe.skip('Logic search worksheets', () => {
   before(async() => {
     await deleteAll();
 
     await WorksheetHelper.createWorksheetsWithBuildingsAssociated();
   });
   describe('search worksheets by address', () => {
-    it('able to search worksheets by building address', async() => {
+    it.skip('able to search worksheets by building address', async() => {
       const worksheetRepository = new WorksheetRepository();
       const result = await worksheetRepository.searchWorksheets({query: 'b*'});
 

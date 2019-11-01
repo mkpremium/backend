@@ -55,7 +55,7 @@ describe('Awards', () => {
     await closeSellStock({buildingId: testBuilding2.id}, operator1.id);
   });
 
-  it('User should have an award', async() => {
+  it.skip('User should have an award', async() => {
     const operatorRepository = new OperatorRepository();
     const awardedOperator = await operatorRepository.findByIdOrThrow(operator1.id);
     console.log(awardedOperator);

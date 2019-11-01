@@ -10,7 +10,7 @@ import {utc} from '../../../src/lib/date';
 import WorksheetHelper from '../../helpers/worksheet';
 import _ from 'lodash';
 
-describe('scheduled events.routes', () => {
+describe.skip('scheduled events.routes', () => {
   const scheduledEventRepo = new ScheduledEventsRepository();
   let authenticatedOperator;
   let authenticatedManager;

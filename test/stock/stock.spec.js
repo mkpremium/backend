@@ -103,7 +103,7 @@ describe('building stock ', () => {
     expect(stock.currentStatus).to.equals(StockStatuses.CLOSE);
   });
 
-  it('should fail to create purchaseStock with invalid building', async() => {
+  it.skip('should fail to create purchaseStock with invalid building', async() => {
     const params = {
       buildingId: 'randomFakeId',
       reservationAmount: 1110.00,

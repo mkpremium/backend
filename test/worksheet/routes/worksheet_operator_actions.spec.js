@@ -54,7 +54,7 @@ describe('worksheet.routes', () => {
       openedWorksheet.operatorId.should.be.equal(authenticatedOperator.operator.id);
     });
 
-    it('Agrega un nuevo propietario', async() => {
+    it.skip('Agrega un nuevo propietario', async() => {
       const ownerResponse = await request(app)
         .post(`/worksheets/${queueItems[0].worksheetId}/owners`)
         .set('Authorization', authenticatedOperator.authorization)
@@ -78,7 +78,7 @@ describe('worksheet.routes', () => {
       owner = ownerResponse.body;
     });
 
-    it('Verifica un propietario', async() => {
+    it.skip('Verifica un propietario', async() => {
       await request(app)
         .put(`/owners/${owner.id}`)
         .set('Authorization', authenticatedOperator.authorization)
@@ -94,7 +94,7 @@ describe('worksheet.routes', () => {
       updated.status.should.be.equal('VERIFICADO');
     });
 
-    it('Crea una meeting', async() => {
+    it.skip('Crea una meeting', async() => {
       await request(app)
         .post('/scheduled-events/meeting')
         .set('Authorization', authenticatedOperator.authorization)
@@ -117,7 +117,7 @@ describe('worksheet.routes', () => {
         .expect(201);
     });
 
-    it('Crea otra meeting', async() => {
+    it.skip('Crea otra meeting', async() => {
       await request(app)
         .post('/scheduled-events/meeting')
         .set('Authorization', authenticatedOperator.authorization)
@@ -140,7 +140,7 @@ describe('worksheet.routes', () => {
         .expect(201);
     });
 
-    it('Libera un item abierto', async() => {
+    it.skip('Libera un item abierto', async() => {
       return request(app)
         .post(`/worksheets/queues/${queue.id}`)
         .set('Authorization', authenticatedOperator.authorization)
@@ -151,7 +151,7 @@ describe('worksheet.routes', () => {
         .expect(204);
     });
 
-    it('Contamos acciones', async() => {
+    it.skip('Contamos acciones', async() => {
       const result = await request(app)
         .get('/stats')
         .set('Authorization', authenticatedManager.authorization)

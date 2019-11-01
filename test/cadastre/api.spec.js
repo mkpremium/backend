@@ -61,7 +61,7 @@ describe('cadastre/api', () => {
   });
 
   describe('fetchBuildingByAddress', () => {
-    it('able to fetch cadastre by using normalized building address', async() => {
+    it.skip('able to fetch cadastre by using normalized building address', async() => {
       const resultBuilding = await api.fetchBuildingByAddress(
         {
           province: 'MADRID',
@@ -178,7 +178,7 @@ describe('cadastre/api', () => {
   });
 
   describe('fetchBuildingByCadastre', async() => {
-    it('able to fetch building info by using cadastreReference', async() => {
+    it.skip('able to fetch building info by using cadastreReference', async() => {
       const resultBuilding = await api.fetchBuildingByCadastre('1448401VK4714G0001EH');
       const building = {
         'address': {

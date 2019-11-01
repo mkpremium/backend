@@ -17,7 +17,7 @@ describe('WorksheetRepository', () => {
     });
   });
 
-  describe('Test worksheet status changes from DEFAULT to PUBLIC', () => {
+  describe.skip('Test worksheet status changes from DEFAULT to PUBLIC', () => {
     let authenticatedOperator, authenticatedManager, worksheetsWithOwner, queue;
     before(async() => {
       await deleteAll();
@@ -55,7 +55,7 @@ describe('WorksheetRepository', () => {
     });
   });
 
-  describe('Test worksheet status changes from DEFAULT, WITH_OWNER to PUBLIC', () => {
+  describe.skip('Test worksheet status changes from DEFAULT, WITH_OWNER to PUBLIC', () => {
     let authenticatedOperator, authenticatedManager, worksheetsWithOwner, queue;
     before(async() => {
       await deleteAll();
@@ -107,7 +107,7 @@ describe('WorksheetRepository', () => {
     });
   });
 
-  describe('Update status for invalid Worksheets', () => {
+  describe.skip('Update status for invalid Worksheets', () => {
     let authenticatedOperator, authenticatedManager, worksheetsNoContacts, worksheetsBadContacts, queue;
     before(async() => {
       await deleteAll();

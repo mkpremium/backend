@@ -40,7 +40,8 @@ describe('Owner repository test', () => {
   it('Owner should be verified', async() => {
     const ownerRepository = new OwnerRepository();
     const actual = ownerRepository.isOwnerVerified(owner);
-    expect(actual).to.be.true();
+    // eslint-disable-next-line no-unused-expressions
+    expect(actual).to.be.true;
   });
 
   it('Should return if owner is verified or not', async() => {

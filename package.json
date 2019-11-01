@@ -10,7 +10,7 @@
     "prestart_migration": "npm run lint",
     "start_all": "better-npm-run start:all",
     "pretest": "npm run lint",
-    "test": "mocha --require test/setup.js --recursive --exit --timeout 10000",
+    "test": "NODE_ENV=test mocha",
     "build": "scripts/build.sh",
     "predeploy": "npm run build",
     "socket": "better-npm-run socket",

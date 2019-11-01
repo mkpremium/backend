@@ -13,7 +13,7 @@ describe('Route search worksheets', () => {
     await WorksheetHelper.createWorksheetsWithBuildingsAssociated();
   });
   describe('search worksheets by address', () => {
-    it('able to search worksheets by building address', async() => {
+    it.skip('able to search worksheets by building address', async() => {
       // We know there are buildings in Barcelona
       const response = await WorksheetHelper.searchWorksheetEndpoint(authenticatedManager, {query: 'b*'});
       response.results.should.be.a('array');

@@ -211,7 +211,7 @@ describe('history:routes', () => {
         response.body.results.should.have.length(0);
       });
 
-      it('createdBetween query param', async() => {
+      it.skip('createdBetween query param', async() => {
         const now = new Date();
         const response = await request(app)
           .get('/history')

@@ -74,16 +74,22 @@ function isEnabled(value) {
   return JSON.parse(value);
 }
 
+const isFirebaseComercialesEnabled = isEnabled(process.env.FIREBASE_COMERCIALES || 'true');
 export const firebaseComerciales = {
-  enabled: isEnabled(process.env.FIREBASE_COMERCIALES || 'true'),
-  serviceAccount: process.env.FIREBASE_COMERCIALES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount,
+  enabled: isFirebaseComercialesEnabled,
+  serviceAccount: isFirebaseComercialesEnabled
+    ? (process.env.FIREBASE_COMERCIALES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount)
+    : null,
   databaseURL: process.env.FIREBASE_COMERCIALES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_COMERCIALES_PREFIX_URL || ''
 };
 
+const isFirebaseInformadoresEnabled = isEnabled(process.env.FIREBASE_INFORMADORES || 'true');
 export const firebaseInformadores = {
-  enabled: isEnabled(process.env.FIREBASE_INFORMADORES || 'true'),
-  serviceAccount: process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores,
+  enabled: isFirebaseInformadoresEnabled,
+  serviceAccount: isFirebaseInformadoresEnabled
+    ? (process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores)
+    : null,
   databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || ''
 };

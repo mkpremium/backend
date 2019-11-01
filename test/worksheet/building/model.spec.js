@@ -92,7 +92,7 @@ describe('worksheet/building/model', () => {
       }
     });
 
-    it('doesnt allow create building with duplicate cadastre reference', async() => {
+    it.skip('doesnt allow create building with duplicate cadastre reference', async() => {
       await createBuildingWithWorksheet(payloadWithCadastre);
 
       const {created} = await createBuildingWithWorksheet(payloadWithCadastre);
@@ -126,7 +126,7 @@ describe('worksheet/building/model', () => {
       asserts(worksheet);
     });
 
-    it('should return worksheet if building cannot be created', async() => {
+    it.skip('should return worksheet if building cannot be created', async() => {
       const authenticatedOperator = await OperatorHelper.createAndLogin();
       const worksheet = await WorksheetBuildingHelper
         .createBuildingWithWorksheetViaApi(authenticatedOperator, payloadWithCadastre);

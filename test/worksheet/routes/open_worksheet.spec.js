@@ -73,7 +73,7 @@ describe('worksheet.routes', () => {
           .expect(400);
       });
 
-      it('409 El item no esta disponible para ser tomado', async() => {
+      it.skip('409 El item no esta disponible para ser tomado', async() => {
         return request(app)
           .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)
@@ -81,7 +81,7 @@ describe('worksheet.routes', () => {
           .expect(409);
       });
 
-      it('204 Libera un item abierto', async() => {
+      it.skip('204 Libera un item abierto', async() => {
         return request(app)
           .post(`/worksheets/queues/${queue.id}`)
           .set('Authorization', authenticatedOperator.authorization)

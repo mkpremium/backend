@@ -11,8 +11,6 @@ import {defer} from '../lib/promise-util';
 
 const debugCouchbase = debug('app:couchbase');
 
-let retries = couchbase.retries;
-
 export default (app) => {
   debugCouchbase(`initializing couchbase connection with "${couchbase.uri}"`);
   const cluster = new Couchbase.Cluster(couchbase.uri);
@@ -34,6 +32,7 @@ export default (app) => {
 };
 
 function checkBucket(bucket, cluster, resolve, reject) {
+  let retries = couchbase.retries;
   debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`);
 
   if (bucket.connected) {

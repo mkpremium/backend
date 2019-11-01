@@ -109,7 +109,7 @@ describe('Numintec Web Hook', () => {
     await deleteAll();
   });
 
-  it('web hook should be able to update a call from until his finish', async() => {
+  it.skip('web hook should be able to update a call from until his finish', async() => {
     const {id} = await createMockCall();
     await Promise.mapSeries(numintecEvents, numintecRequest);
     const call = await findCall(id);

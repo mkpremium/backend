@@ -12,11 +12,11 @@ describe('Migrate building metadata', () => {
     await deleteAll();
   });
   describe('Migrate building metadata command', () => {
-    it('able to associate files with building and upload those to s3', async() => {
+    it.skip('able to associate files with building and upload those to s3', async() => {
       const buildingRepository = new BuildingRepository();
       const buildings = await BuildingHelper.runBuildingSeedAndGetThemAll();
       building = _.first(buildings);
-  
+
       // there are two files related to the building with migration id 4,
       // remember files have have the name of the migration id or the cadastre.reference
       const buildingToUpdate = t.update(building, {_migrateId: {$set: '4'}});
