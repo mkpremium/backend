@@ -2,7 +2,6 @@ import {CouchbaseModel} from '../db/model';
 import {Stock} from './types';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _head from 'lodash/head';
-import t from 'tcomb';
 import {fbComerciales} from '../firebase/index';
 import {madrid} from '../lib/date';
 

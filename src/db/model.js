@@ -154,13 +154,10 @@ export class CouchbaseModel {
         throw new Error(`method ${method} not allowed (select, delete)`);
     }
 
-    switch (method) {
-      case 'update':
-        qb.table(couchbase.bucket, prefix);
-        break;
-      default:
-        qb.from(couchbase.bucket, prefix);
-        break;
+    if (method === 'update') {
+      qb.table(couchbase.bucket, prefix);
+    } else {
+      qb.from(couchbase.bucket, prefix);
     }
 
     qb
@@ -224,7 +221,7 @@ export class CouchbaseModel {
     return this.queryRaw(n1ql);
   }
 
-  async whereIdInArray(array){
+  async whereIdInArray(array) {
     const bucket = this.getBucketName();
     const query = `SELECT *  FROM ${bucket} t
                    WHERE t._documentType = '${this.getType()}'
@@ -281,7 +278,7 @@ export class CouchbaseModel {
         return;
       }
 
-      const e =  new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`);
+      const e = new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`);
       e.code = 400;
       throw e;
     }
@@ -324,11 +321,10 @@ export class CouchbaseModel {
 
       return null;
     } catch (e) {
-      switch (e.code) {
-        case 13: // Key does not exists on the server
-          return null;
-        default:
-          throw e;
+      if (e.code === 13) {
+        return null;
+      } else {
+        throw e;
       }
     }
   }

@@ -11,7 +11,7 @@ import {cleanUrl, makePreview, uploadPreview} from '../aws';
 import {
   deleteMetadataFromFirebase,
   saveMetadataToFirebase,
-  saveProposal, toFirebaseProposal,
+  saveProposal,
   updateBuildingToFirebase, updateProposalToFirebase
 } from '../firebase/lib/business';
 import {updateList} from '../lib/tcomb-utils';
@@ -26,12 +26,10 @@ import _ from 'lodash';
 import {N1qlQuery} from 'couchbase';
 import {Building} from '../types/building';
 import {emitModelEvents} from '../../config';
-import {ScheduledEvents, ScheduledEventsRepository} from '../scheduled-events/models';
+import {ScheduledEvents} from '../scheduled-events/models';
 import {ScheduledEventType} from '../scheduled-events/types';
-import {updateProposalsOnScheduleEventsBuilding} from './application';
 import {WorksheetRepository} from '../worksheet/models/worksheet';
-import Promise from 'bluebird';
-import {fbComerciales} from '../firebase';
+import '../firebase';
 
 const debugBuilding = debug('app:model:building');
 

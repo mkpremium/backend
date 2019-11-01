@@ -7,8 +7,6 @@ import {buildingData} from '../../stock/stock.mock';
 import {setProfitGoalToOperator} from '../../../src/operator/ProfitGoal/application';
 import {StockRepository} from '../../../src/stock/models';
 
-
-
 describe('Awards', () => {
   let operator1;
   let testBuilding1;
@@ -25,7 +23,7 @@ describe('Awards', () => {
     return createPurchaseStock(params, operatorId);
   }
 
-  async function sellTestPurchaseStock(buildingId, operatorId, transactionAmount){
+  async function sellTestPurchaseStock(buildingId, operatorId, transactionAmount) {
     let params = {
       buildingId: buildingId,
       reservationAmount: 2000.00,
@@ -47,14 +45,14 @@ describe('Awards', () => {
     operator1 = await operatorCreate('1');
     testBuilding1 = await BuildingRepository.createNewBuilding(buildingData);
     testBuilding2 = await BuildingRepository.createNewBuilding(buildingData);
-    await setProfitGoalToOperator({ operatorId: operator1.id, profitAmount: 500000});
+    await setProfitGoalToOperator({operatorId: operator1.id, profitAmount: 500000});
     await createTestPurchaseStock(testBuilding1.id, operator1.id, 100000);
     await sellTestPurchaseStock(testBuilding1.id, operator1.id, 600000);
-    await closeSellStock({ buildingId: testBuilding1.id }, operator1.id);
+    await closeSellStock({buildingId: testBuilding1.id}, operator1.id);
 
     await createTestPurchaseStock(testBuilding2.id, operator1.id, 100000);
     await sellTestPurchaseStock(testBuilding2.id, operator1.id, 600000);
-    await closeSellStock({ buildingId: testBuilding2.id }, operator1.id);
+    await closeSellStock({buildingId: testBuilding2.id}, operator1.id);
   });
 
   it('User should have an award', async() => {

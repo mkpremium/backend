@@ -7,31 +7,6 @@ import {expect} from 'chai';
 import {utc} from '../../../src/lib/date';
 
 describe('moveWorksheetOutOfFreezer', () => {
-  const building = {
-    location: {
-      lat: 40.412253,
-      lng: -3.705473
-    },
-    address: {
-      type: 'Transversal',
-      street: '44',
-      number: 10082,
-      fullAddress: 'Transversal 44 # 100 - 82',
-      postalCode: {
-        number: 80001,
-        verified: true
-      },
-      city: 'Barranquilla',
-      province: 'Atlantico',
-      zone: 'Norte',
-      neighborhood: 'Miramar'
-    },
-    cadastre: {
-      reference: 'aaaaabbbbcvccc',
-      address: 'TV 44 # 100 - 82'
-    }
-  };
-
   let workSheetRepository = new WorksheetRepository();
 
   async function countWorksheetStatus() {

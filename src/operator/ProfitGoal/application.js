@@ -6,7 +6,7 @@ import fromJSON from 'tcomb/lib/fromJSON';
 import {ProfitGoalRequest} from './types';
 
 export async function setProfitGoalToOperator(data) {
-  const {operatorId, profitAmount } = fromJSON(data, ProfitGoalRequest);
+  const {operatorId, profitAmount} = fromJSON(data, ProfitGoalRequest);
 
   const operatorRepository = new OperatorRepository();
 

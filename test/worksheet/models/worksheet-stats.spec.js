@@ -21,5 +21,4 @@ describe('Worksheet stats', () => {
 
     console.log(result);
   });
-
 });

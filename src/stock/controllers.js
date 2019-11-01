@@ -39,7 +39,7 @@ async function closeSellStockFromRequest(req, res) {
   res.status(201).json(stock);
 }
 
-async function getProfitsRanking(req,res){
+async function getProfitsRanking(req, res) {
   const profitsRanking = await getProfitGoalOperatorsRanking();
   res.status(201).json(profitsRanking);
 }

@@ -5,7 +5,6 @@ import {
   cancelSellStock,
   closeSellStock,
   createPurchaseStock,
-  getProfitGoalOperatorsRanking,
   sellPurchasedStock
 } from '../../src/stock/application';
 import {BuildingRepository} from '../../src/building/models';
@@ -76,7 +75,6 @@ describe('building stock ', () => {
     expect(stock).to.not.equal(null);
     expect(stock.currentStatus).to.equals(StockStatuses.SELL);
   });
-
 
   it('Should not find a valid stock object', async() => {
     const params = {

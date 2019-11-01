@@ -24,7 +24,7 @@ describe('scheduled events.routes', () => {
   before(async() => {
     await deleteAll();
     await operatorCreateManager();
-    //authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+    // authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
     const worksheetQueueRepo = new WorksheetQueueRepository();
 
     const worksheetsWithOwner = await WorksheetHelper.createWorksheetsAndOwnerWithBuilding(authenticatedManager);

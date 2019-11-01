@@ -1,11 +1,7 @@
-import {expect} from 'chai';
 import {BuildingProposalRepository, BuildingRepository} from '../../src/building/models';
-import t from 'tcomb';
 import {OperatorRepository} from '../../src/operator/models';
 import {operatorCreate} from '../common';
 import {ScheduledEventsRepository} from '../../src/scheduled-events/models';
-import {updateProposalsOnScheduleEventsBuilding} from '../../src/building/application';
-import {ScheduledEventType} from '../../src/scheduled-events/types';
 import {OwnerStatus, OwnerType} from '../../src/types/enums';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
 import {OwnerRepository} from '../../src/owner/models';
@@ -14,7 +10,6 @@ describe('Schedule event update propoposal', () => {
   let testOwner;
   let testBuilding;
   let testOperator;
-  let testScheduledEvent;
 
   const operatorRepository = new OperatorRepository();
   const buildingRepository = new BuildingRepository();
@@ -113,20 +108,10 @@ describe('Schedule event update propoposal', () => {
       eventDate: new Date('2018-02-29T16:30:00Z')
     };
 
-    testScheduledEvent = await scheduleEventsRepository.addScheduledMeetingEvent(params, testOperator.id);
+    await scheduleEventsRepository.addScheduledMeetingEvent(params, testOperator.id);
   });
 
   it('Should update proposals building property on related schedule-event', async() => {
-    const newProposalMock = {
-      ownerId: testOwner.id,
-      buildingId: testBuilding.id,
-      accepted: false,
-      createdAt: new Date(),
-      createdBy: testOperator.id,
-      proposal: 6000,
-      state: 'pendiente',
-      aspiration: -1
-    };
     // const newProposal = await proposalRepository.save(newProposalMock, false);
     await buildingRepository.addNegotiationProposal(
       testBuilding,

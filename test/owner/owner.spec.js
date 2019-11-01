@@ -1,7 +1,6 @@
 
 import {OwnerRepository} from '../../src/owner/models';
 import {expect} from 'chai';
-import {deleteAll} from '../common';
 describe('Owner repository test', () => {
   let ownersMock = [
     {
@@ -27,21 +26,21 @@ describe('Owner repository test', () => {
 
   let owner = {
     person: {
-      contacts : [
+      contacts: [
         {
           status: 'GOOD'
         },
         {
-          status : 'BAAD'
+          status: 'BAAD'
         }
       ]
     }
   };
 
-  it('Owner should be verified', async() =>{
+  it('Owner should be verified', async() => {
     const ownerRepository = new OwnerRepository();
     const actual = ownerRepository.isOwnerVerified(owner);
-    expect(actual).to.be.true;
+    expect(actual).to.be.true();
   });
 
   it('Should return if owner is verified or not', async() => {

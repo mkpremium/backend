@@ -32,8 +32,8 @@ export const buildingData = {
   'floorArea': '2911',
   'propertyType': 'UR',
   'use': 'Residencial',
-  'location':{
-    'lat':11,
-    'lng':12
+  'location': {
+    'lat': 11,
+    'lng': 12
   }
 };

@@ -178,10 +178,6 @@ const OwnerStatsParams = t.struct({
   city: t.maybe(t.String)
 });
 
-const OwnerBusinessStatsParams = t.struct({
-  operatorId: t.maybe(t.String)
-});
-
 export class OwnerRepository extends CouchbaseModel {
   constructor() {
     super();
@@ -477,11 +473,11 @@ GROUP BY t.status, building[0].address.city`;
     return this.getVerifiedOwners(owners);
   }
 
-  getVerifiedOwners(owners){
+  getVerifiedOwners(owners) {
     return owners.filter(owner => this.isOwnerVerified(owner));
   }
 
-  isOwnerVerified(owner){
+  isOwnerVerified(owner) {
     const contacts = _.get(owner, 'person.contacts');
     const goodContacts = contacts.filter(c => c.status === 'GOOD');
     return goodContacts.length > 0;

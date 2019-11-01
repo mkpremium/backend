@@ -88,7 +88,7 @@ t.OperatorProfile.prototype.getStateMessage = function() {
   }
 };
 
-export const ProfitGoal   = t.struct(
+export const ProfitGoal = t.struct(
   {
     amount: t.Number,
     updatedAt: t.Date

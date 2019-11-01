@@ -28,7 +28,6 @@ export async function synchronizeMetadataWithFirebase() {
     await Promise.map(buildings, async(building) => {
       const metadataArray = building.metadata;
       await Promise.map(metadataArray, async(metadataBuilding) => {
-
         if (metadataBuilding.id) {
           const metadata = await metadataRepository.findById(metadataBuilding.id);
           const operatorId = businessRelatedToBuildings[metadata.buildingId];

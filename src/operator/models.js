@@ -8,7 +8,7 @@ import {CouchbaseModel} from '../db/model';
 
 import {saltFactor, jwt} from '../../config';
 import {newHttpError} from '../lib/http-error';
-import {Award, OperatorRoles} from '../types/operator';
+import {OperatorRoles} from '../types/operator';
 import {OperatorStatsRepository} from '../stats/models';
 import {OperatorActions} from '../stats/types';
 import {firebaseSetup, firebaseUserAccount} from '../firebase';

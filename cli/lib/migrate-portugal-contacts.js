@@ -4,10 +4,8 @@ import {OwnerRepository, PersonRepository} from '../../src/owner/models';
 import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
 import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper';
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import {WorkSheetStatus} from '../../src/types/worksheet';
 import fromJSON from 'tcomb/lib/fromJSON';
 import _ from 'lodash';
-import {N1qlQuery} from 'couchbase';
 import {OwnerStatus} from '../../src/types/enums';
 
 const debugMigrate = debug('app:migration:portugal:contacts');
@@ -76,16 +74,6 @@ async function processContacts(input) {
       throw new Error(`Person not found .`);
     }
   }
-}
-
-/**
- * Finds person by dni.
- * @param dni
- * @returns {Promise<*>}
- */
-async function findPerson(dni) {
-  const personRepository = new PersonRepository();
-  return personRepository.findByDocumentNumber(dni, false);
 }
 
 /**

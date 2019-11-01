@@ -222,7 +222,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     return this.query(qb);
   }
 
-  async findAllMeetingsByBuildingId(buildingId){
+  async findAllMeetingsByBuildingId(buildingId) {
     const db = this.getQueryBuilder()
       .where('event.buildingId = ?', buildingId)
       .where('type = ?', ScheduledEventType.MEETINGS);

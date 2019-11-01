@@ -10,7 +10,6 @@ import {fbComerciales} from '../index';
 import {firebaseTimestampFormat, meetingDayFormat} from '../../lib/date';
 import {FirebaseBuildingData, FirebaseMeeting} from '../types/business';
 import {OwnerRepository} from '../../owner/models';
-import {OwnerStatus} from '../../types/enums';
 import {MetadataRepository} from '../../building/models';
 import {ScheduledEventsRepository} from '../../scheduled-events/models';
 
@@ -399,7 +398,7 @@ export async function updateBuildingFirebaseProposal(building) {
   if (building.recentProposal) {
     debugFb(`Update building ${building.id}`);
     await updateProposalToFirebase(building.recentProposal, building);
-  }else{
+  } else {
     debugFb(`Wont Update building ${building.id} becaause it doesn't have a proposal ${building.recentProposal}`);
   }
 }

@@ -1,4 +1,4 @@
-import {deleteAll, operatorCreate, operatorLogin} from '../../common';
+import {operatorCreate, operatorLogin} from '../../common';
 import {setProfitGoalToOperator} from '../../../src/operator/ProfitGoal/application';
 import {expect} from 'chai';
 import {
@@ -72,7 +72,7 @@ describe('profit goals', () => {
 
   it('Should define a goal for an existing operator1', async() => {
     const result = await setProfitGoalToOperator({operatorId: operator1.id, profitAmount: 1500});
-    expect(result.profitGoal).to.not.be.null;
+    expect(result.profitGoal).to.not.be.null();
     expect(result.profitGoal.amount).to.equal(1500);
   });
 
@@ -85,13 +85,13 @@ describe('profit goals', () => {
       error = err;
     }
 
-    expect(error).to.not.be.null;
+    expect(error).to.not.be.null();
     expect(error.message).to.equal('El operator fakeId no existe');
     expect(error.code).to.equal(404);
   });
 
   it('Should display a profit goal ranking', async() => {
-    await setProfitGoalToOperator({ operatorId: operator2.id, profitAmount: 1500});
+    await setProfitGoalToOperator({operatorId: operator2.id, profitAmount: 1500});
 
     let params = {
       buildingId: testBuilding1.id

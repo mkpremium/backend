@@ -4,7 +4,6 @@ import {BuildingRepository} from '../building/models';
 import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {OperatorRepository} from '../operator/models';
-import _ from 'lodash';
 import {SuperSellAward} from '../operator/Awards/SuperSellAward';
 function createTransaction(params = {}, operatorId) {
   return Transaction({
@@ -20,10 +19,6 @@ export async function createPurchaseStock(params = {}, operatorId) {
   const createStockParams = fromJSON(params, TransactionParams);
 
   const purchase = createTransaction(params, operatorId);
-
-  const buildingRepository = new BuildingRepository();
-
-  const building = await buildingRepository.findByIdOrThrow(params.buildingId);
 
   const stockRepository = new StockRepository();
 
@@ -49,17 +44,11 @@ export async function createPurchaseStock(params = {}, operatorId) {
 }
 
 export async function updatePurchaseStock(params = {}, operatorId) {
-  const createStockParams = fromJSON(params, TransactionParams);
-
   const purchase = createTransaction(params, operatorId);
-
-  const buildingRepository = new BuildingRepository();
 
   const stockFirebaseRepository = new StockFirebaseRepository();
 
   const stockRepository = new StockRepository();
-
-  const building = await buildingRepository.findByIdOrThrow(params.buildingId);
 
   let stock = await stockRepository.findByBuildingIdOrThrow(params.buildingId);
 
@@ -70,7 +59,6 @@ export async function updatePurchaseStock(params = {}, operatorId) {
   stock = t.update(stock, {
     purchase: {$set: purchase}
   });
-
 
   const result = await stockRepository.save(stock);
 
@@ -83,8 +71,6 @@ export async function sellPurchasedStock(params = {}, operatorId) {
   const buildingRepository = new BuildingRepository();
 
   await buildingRepository.findByIdOrThrow(params.buildingId);
-
-  const createStockParams = fromJSON(params, TransactionParams);
 
   const sell = createTransaction(params, operatorId);
 
@@ -116,8 +102,6 @@ export async function updateSellStock(params = {}, operatorId) {
   const stockFirebaseRepository = new StockFirebaseRepository();
 
   await buildingRepository.findByIdOrThrow(params.buildingId);
-
-  const createStockParams = fromJSON(params, TransactionParams);
 
   const sell = createTransaction(params, operatorId);
 
@@ -219,7 +203,7 @@ export async function getProfitGoalOperatorsRanking() {
   const unsortedOperatorsRanking = operators.map((operator) => {
     const currentOperatorProfit = operatorsProfitsMap.get(operator.t.id) | 0;
     const currentPercentageGoal = operator.t.profitGoal.amount > 0
-      ? (currentOperatorProfit / operator.t.profitGoal.amount) * 1 : 0;
+      ? (currentOperatorProfit / operator.t.profitGoal.amount) : 0;
     return {
       userId: operator.t.id,
       userName: operator.t.username,

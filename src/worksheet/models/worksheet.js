@@ -38,8 +38,6 @@ import _map from 'lodash/map';
 import {emitModelEvents} from '../../../config';
 import {ScheduledEventType} from '../../scheduled-events/types';
 
-import joinjs from 'join-js';
-
 const worksheetDebug = debug('app:model:worksheet');
 
 function canRegisterVerified(worksheet, newStatus, operatorId) {
@@ -57,10 +55,6 @@ function canRegisterVerified(worksheet, newStatus, operatorId) {
 
   return true;
 }
-
-const WorksheetStatsParams = t.struct({
-  city: t.maybe(t.String)
-});
 
 export class WorksheetRepository extends CouchbaseModel {
   constructor() {
