@@ -31,8 +31,7 @@ export default (app) => {
   return promise;
 };
 
-function checkBucket(bucket, cluster, resolve, reject) {
-  let retries = couchbase.retries;
+function checkBucket(bucket, cluster, resolve, reject, retries = couchbase.retries) {
   debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`);
 
   if (bucket.connected) {
@@ -41,11 +40,10 @@ function checkBucket(bucket, cluster, resolve, reject) {
     attachModel(bucket, cluster);
     resolve(bucket);
   } else {
-    retries--;
     if (retries <= 0) {
       reject(new Error(`It's possible an error trying to connect bucket ${bucket._name} check your setup`));
     } else {
-      setTimeout(() => checkBucket(bucket, cluster, resolve, reject), couchbase.timeout);
+      setTimeout(() => checkBucket(bucket, cluster, resolve, reject, retries - 1), couchbase.timeout);
     }
   }
 }
