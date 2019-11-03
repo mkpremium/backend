@@ -22,16 +22,6 @@ jobs:
           name: Install dependencies
           command: npm install
 
-      - run:
-          name: Firebase setup
-          command: >-
-              sudo apt-get update && sudo apt-get install -y python-dev &&
-              curl -O https://bootstrap.pypa.io/get-pip.py &&
-              sudo python get-pip.py &&
-              sudo pip install awscli --upgrade &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/circleci/firebaseComerciales.json firebaseComerciales.json &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/circleci/firebaseInformadores.json firebaseInformadores.json
-
       # run tests!
       - run:
           name: Running testing
@@ -48,73 +38,8 @@ jobs:
       - store_test_results:
           path: junit.xml
 
-  deploy:
-    docker:
-      - image: circleci/node:8.11.1
-    environment:
-      - NODE_ENV: "production"
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      - run:
-          name: Install dependencies
-          command: npm install
-
-      - add_ssh_keys
-
-      - run:
-          name: Firebase setup
-          command: >-
-              sudo apt-get update && sudo apt-get install -y python-dev &&
-              curl -O https://bootstrap.pypa.io/get-pip.py &&
-              sudo python get-pip.py &&
-              sudo pip install awscli --upgrade &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/firebaseComerciales.json firebaseComerciales.json &&
-              aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/firebaseInformadores.json firebaseInformadores.json
-
-      - run:
-          name: MK Premium PM2 Setup
-          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/banks-pm2.json banks-pm2.json
-
-      - run:
-          name: MK Banks PM2 Setup
-          command: aws s3 cp --region eu-west-3 s3://mkpremium/config/bitdistrict-m1/mkpremium-pm2.json mkpremium-pm2.json
-
-      - run:
-          name: install deps
-          command: sudo apt install -y rsync
-
-      - run:
-          name: Adding deploy host keys to known hosts
-          command: ssh-keyscan -H ec2-34-248-103-55.eu-west-1.compute.amazonaws.com >>  ~/.ssh/known_hosts
-
-      - run:
-          name: Building & Deploying MK Premium Files
-          command: TERM=xterm npm run deploy -- centos@ec2-34-248-103-55.eu-west-1.compute.amazonaws.com mkpremium
-
-      - run:
-          name: Building & Deploying MK Banks Files
-          command: TERM=xterm npm run deploy -- centos@ec2-34-248-103-55.eu-west-1.compute.amazonaws.com banks
-
 workflows:
   version: 2
-  # testing is done on any branch that is not master
-  testing:
+  build:
     jobs:
       - test
-#      - test:
-#          filters:
-#            branches:
-#              ignore:
-#                - master
-  # Deployment should happen just on master branch
-#  deploying:
-#    jobs:
-#      - deploy:
-#          filters:
-#            branches:
-#              only:
-#                - master
