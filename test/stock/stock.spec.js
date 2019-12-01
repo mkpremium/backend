@@ -27,7 +27,7 @@ describe('building stock ', () => {
     operator = await operatorCreate(madrid().unix());
   });
 
-  it('createPurchaseStock should create a valid stock ', async() => {
+  it('createPurchaseStock should create a valid stock', async() => {
     const params = {
       buildingId: testBuilding.id,
       reservationAmount: 1110.00,

@@ -5,6 +5,7 @@ import t from 'tcomb';
 import fromJSON from 'tcomb/lib/fromJSON';
 import {OperatorRepository} from '../operator/models';
 import {SuperSellAward} from '../operator/Awards/SuperSellAward';
+
 function createTransaction(params = {}, operatorId) {
   return Transaction({
     operatorId: operatorId,
@@ -34,10 +35,9 @@ export async function createPurchaseStock(params = {}, operatorId) {
     purchase
   };
 
-  const stockFirebaseRepository = new StockFirebaseRepository();
-
   const result = await stockRepository.save(stock);
 
+  const stockFirebaseRepository = new StockFirebaseRepository();
   await stockFirebaseRepository.savePurchaseStock(stock);
 
   return result;
@@ -76,8 +76,6 @@ export async function sellPurchasedStock(params = {}, operatorId) {
 
   const stockRepository = new StockRepository();
 
-  const stockFirebaseRepository = new StockFirebaseRepository();
-
   let stock = await stockRepository.findByBuildingIdOrThrow(params.buildingId);
 
   if (stock.currentStatus !== StockStatuses.PURCHASE) {
@@ -91,6 +89,7 @@ export async function sellPurchasedStock(params = {}, operatorId) {
 
   const result = await stockRepository.save(stock);
 
+  const stockFirebaseRepository = new StockFirebaseRepository();
   await stockFirebaseRepository.saveSellStock(stock);
 
   return result;
@@ -127,8 +126,6 @@ export async function updateSellStock(params = {}, operatorId) {
 export async function cancelSellStock(params) {
   const stockRepository = new StockRepository();
 
-  const stockFirebaseRepository = new StockFirebaseRepository();
-
   let stock = await stockRepository.findByBuildingIdOrThrow(params.buildingId);
 
   if (stock.currentStatus !== StockStatuses.SELL) {
@@ -142,6 +139,7 @@ export async function cancelSellStock(params) {
 
   const result = await stockRepository.save(stock);
 
+  const stockFirebaseRepository = new StockFirebaseRepository();
   await stockFirebaseRepository.deleteSellStock(stock);
 
   return result;
@@ -156,14 +154,11 @@ export async function closeSellStock(params, operatorId) {
 
   const operatorRepository = new OperatorRepository();
 
-  const stockFirebaseRepository = new StockFirebaseRepository();
-
   let stock = await stockRepository.findByBuildingIdOrDefault(params.buildingId);
 
   if (stock.currentStatus !== StockStatuses.SELL) {
     throw new Error(`El stock no se encuentra en estado ${StockStatuses.SELL}`);
   }
-
   const operator = await operatorRepository.findByIdOrThrow(operatorId);
 
   const gain = stock.sell.transactionAmount - stock.purchase.transactionAmount;
@@ -178,9 +173,9 @@ export async function closeSellStock(params, operatorId) {
     transactionDate: new Date()
   };
   const updatedStock = t.update(stock, {close: {$set: close}, currentStatus: {$set: StockStatuses.CLOSE}});
-
   const result = stockRepository.save(updatedStock);
 
+  const stockFirebaseRepository = new StockFirebaseRepository();
   await stockFirebaseRepository.saveCloseStock(updatedStock);
 
   return result;
