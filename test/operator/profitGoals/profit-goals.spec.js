@@ -1,4 +1,4 @@
-import {operatorCreate, operatorLogin} from '../../common';
+import {operatorCreate, operatorCreateBusiness, operatorLogin} from '../../common';
 import {setProfitGoalToOperator} from '../../../src/operator/ProfitGoal/application';
 import {expect} from 'chai';
 import {
@@ -58,7 +58,7 @@ describe('profit goals', () => {
 
     operator1 = await operatorCreate(madrid().unix());
 
-    operator2 = await operatorCreate(madrid().unix() + 1);
+    operator2 = await operatorCreateBusiness(madrid().unix() + 1);
 
     operator3 = await operatorCreate(madrid().unix() + 2);
 
@@ -90,7 +90,7 @@ describe('profit goals', () => {
     expect(error.code).to.equal(404);
   });
 
-  it.skip('Should display a profit goal ranking', async() => {
+  it('Should display a profit goal ranking', async() => {
     await setProfitGoalToOperator({operatorId: operator2.id, profitAmount: 1500});
 
     let params = {
