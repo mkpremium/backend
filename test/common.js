@@ -1,57 +1,19 @@
 import Promise from 'bluebird';
 import request from 'supertest';
-import {OperatorRefreshTokenRepository, OperatorRepository} from '../src/operator/models';
-import {WorksheetRepository} from '../src/worksheet/models/worksheet';
-import {WorksheetQueueRepository} from '../src/worksheet/models/queue';
-import {OwnerRepository, PersonRepository} from '../src/owner/models';
-import {Calls, CallsRawEvents} from '../src/calls/models';
-import {History} from '../src/history/models';
-import {ScheduledEventsRepository} from '../src/scheduled-events/models';
-import {BuildingRepository} from '../src/building/models';
-import {OperatorStats} from '../src/stats/models';
-import {CityRepository, NeighborhoodRepository} from '../src/street/models';
+import {OperatorRepository} from '../src/operator/models';
 import {cleanFirebase} from '../migrations/firebase-clean';
 import {cleanQueue} from '../cli/lib/migrate-utils';
-import {CadastreRepository} from '../src/cadastre/models';
-import {StockRepository} from '../src/stock/models';
+import {CouchbaseModel} from '../src/db/model';
+import initCouchbase from '../src/db/couchbase';
 
 export async function deleteAll() {
-  const operator = new OperatorRepository();
-  const worksheet = new WorksheetRepository();
-  const queue = new WorksheetQueueRepository();
-  const people = new PersonRepository();
-  const owner = new OwnerRepository();
-  const history = new History();
-  const calls = new Calls();
-  const callUnknownEvents = new CallsRawEvents();
-  const scheduledEvent = new ScheduledEventsRepository();
-  const building = new BuildingRepository();
-  const stats = new OperatorStats();
-  const neighborhood = new NeighborhoodRepository();
-  const city = new CityRepository();
-  const cadastre = new CadastreRepository();
-  const refresh = new OperatorRefreshTokenRepository();
-  const stock = new StockRepository();
-  await OperatorRepository._promiseBucket;
+  initCouchbase();
+
+  await CouchbaseModel.prototype._promiseBucket;
 
   return Promise.all([
     cleanFirebase(),
-    operator.deleteQuery(),
-    worksheet.deleteQuery(),
-    queue.deleteQuery(),
-    people.deleteQuery(),
-    owner.deleteQuery(),
-    building.deleteQuery(),
-    history.deleteQuery(),
-    calls.deleteQuery(),
-    scheduledEvent.deleteQuery(),
-    callUnknownEvents.deleteQuery(),
-    stats.deleteQuery(),
-    neighborhood.deleteQuery(),
-    city.deleteQuery(),
-    cadastre.deleteQuery(),
-    refresh.deleteQuery(),
-    stock.deleteQuery(),
+    CouchbaseModel.prototype._bucket.removeAll(),
     cleanQueue()
   ]);
 }
