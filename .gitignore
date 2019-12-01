@@ -19,9 +19,6 @@ build
 # Email attachments
 .uploads
 
-# Docker local
-/docker-compose.yml
-
 # Editors
 .vscode
 .idea
@@ -31,3 +28,5 @@ conf/
 *.csv
 .DS_STORE
 *.tgz
+
+deployments

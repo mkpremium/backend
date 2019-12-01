@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   queue_ui:
@@ -7,14 +7,10 @@ services:
       - "8085:80"
     depends_on:
       - gearman
-    networks:
-      - mkpremium
   gearman:
     image: "artefactual/gearmand"
     ports:
       - "4730:4730"
-    networks:
-      - mkpremium
   db:
     image: "rkmax/couchbase:bitdistrict-5.5.2"
     ports:
@@ -25,8 +21,3 @@ services:
       - "11211:11211"
       - "18091:18091"
       - "18092:18092"
-    networks:
-      - mkpremium
-networks:
-  mkpremium:
-    external: false
