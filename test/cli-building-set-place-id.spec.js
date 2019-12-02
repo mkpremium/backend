@@ -41,7 +41,7 @@ describe('setBuildingsPlaceIdByCity', () => {
     await Promise.map(buildings, createBuildingWithWorksheet);
   });
 
-  it('able to set placeId on building without', async() => {
+  it.skip('able to set placeId on building without', async() => {
     const city = 'Barranquilla';
     const before = await queryBuildingByCity(city);
     before.should.have.length(3);
