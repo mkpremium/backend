@@ -1,8 +1,32 @@
 version: '3'
 
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mk-backend:local
+
+    environment:
+      PORT: "9003"
+      COUCHBASE_URI: "couchbase://couchbase_db"
+      COUCHBASE_BUCKET: "mkpremium"
+      COUCHBASE_USER: "couchbase"
+      COUCHBASE_PASS: "couchbase"
+      DEBUG: "app:*"
+
+    volumes:
+      - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
+
+    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "/app/build/bin/www.js"]
+    ports:
+      - "9003:9003"
+
   couchbase_db:
-    image: "mkpremium:couchbase-test"
+    build:
+      context: ./docker/couchbase
+      dockerfile: Dockerfile
+    image: "mkpremium:couchbase-local"
 
     ports:
       - "8091:8091"

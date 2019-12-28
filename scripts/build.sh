@@ -1,29 +1,19 @@
 #!/usr/bin/env bash
 
-set -e
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+set -ex
 
 # Clean current build
-rm -rf build/*
+rm -rf build/
 
 # Build assets
 npx babel ./ \
   --out-dir ./build \
   -s -q \
   --copy-files \
-  --ignore node_modules,development,docker,iml,lock
-
-rm -rf ./build/{.git,.circleci,.idea}
-
-# Node setup
-cp ./.nvmrc ./build/
+  --ignore node_modules,docker,test
 
 # Build the package.json
-${DIR}/package.js
+scripts/package.js
 
-# Just for local testing
-# cp .env build/
-# cd build
-# ln -s ${DIR}/../node_modules .
-
+cd build
+npm i
