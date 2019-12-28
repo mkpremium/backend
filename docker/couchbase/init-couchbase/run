@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+readonly scripts_dir=`dirname $0`
+
+echo "Starting to wait"
+${scripts_dir}/wait-for-it.sh  "localhost:8091" -- ${scripts_dir}/init-couchbase.sh
