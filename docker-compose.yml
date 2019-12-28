@@ -1,18 +1,19 @@
 version: '3'
 
 services:
-  backend:
+  www:
     build:
       context: .
       dockerfile: Dockerfile
     image: mk-backend:local
 
     environment:
-      PORT: "9003"
+      APP_PORT: "9003"
       COUCHBASE_URI: "couchbase://couchbase_db"
       COUCHBASE_BUCKET: "mkpremium"
       COUCHBASE_USER: "couchbase"
       COUCHBASE_PASS: "couchbase"
+      SOCKET_ENABLED: "false"
       DEBUG: "app:*"
 
     volumes:
