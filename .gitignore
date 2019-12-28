@@ -28,5 +28,3 @@ conf/
 *.csv
 .DS_STORE
 *.tgz
-
-deployments

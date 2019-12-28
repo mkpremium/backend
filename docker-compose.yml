@@ -1,23 +1,13 @@
 version: '3'
 
 services:
-  queue_ui:
-    image: "koryonik/gearman-ui"
+  couchbase_db:
+    image: "mkpremium:couchbase-test"
+
     ports:
-      - "8085:80"
-    depends_on:
-      - gearman
-  gearman:
-    image: "artefactual/gearmand"
-    ports:
-      - "4730:4730"
-  db:
-    image: "rkmax/couchbase:bitdistrict-5.5.2"
-    ports:
-      - "8091-8094:8091-8094"
-      - "9110:9110"
-      - "11207:11207"
-      - "11210:11210"
-      - "11211:11211"
-      - "18091:18091"
-      - "18092:18092"
+      - "8091:8091"
+
+    ulimits:
+      nofile: 40960
+      core: 100000000
+      memlock: 100000000
