@@ -2,7 +2,10 @@
 
 set -e
 
-readonly scripts_dir=`dirname $0`
+echo "Ensuring that couchbase-server is running"
+sv start couchbase-server || exit 1
+
+cd `dirname $0`
 
 echo "Starting to wait"
-${scripts_dir}/wait-for-it.sh  "localhost:8091" -- ${scripts_dir}/init-couchbase.sh
+exec ./wait-for-it.sh  "localhost:8091" -- ./init-couchbase.sh
