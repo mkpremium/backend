@@ -1,2 +1,6 @@
 node_modules
 npm-debug.log
+.env
+firebaseComerciales.json
+firebaseInformadores.json
+.idea

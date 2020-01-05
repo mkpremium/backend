@@ -15,6 +15,7 @@ services:
       COUCHBASE_PASS: "couchbase"
       SOCKET_ENABLED: "false"
       DEBUG: "app:*"
+      MIGRATION_MODULE: "true"
 
     volumes:
       - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
