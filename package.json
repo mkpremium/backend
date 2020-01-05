@@ -5,24 +5,29 @@
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "start": "better-npm-run start",
+    "pretest": "npm run lint",
+    "test": "NODE_ENV=test mocha",
+
+    "start_all": "better-npm-run start:all",
     "prestart_banks": "npm run lint",
     "start_banks": "better-npm-run start_banks",
     "prestart_migration": "npm run lint",
-    "start_all": "better-npm-run start:all",
-    "pretest": "npm run lint",
-    "test": "NODE_ENV=test mocha",
     "build": "scripts/build.sh",
     "predeploy": "npm run build",
-    "socket": "better-npm-run socket",
     "deploy": "scripts/deployment.sh",
+
+    "socket": "better-npm-run socket",
     "cronjobs": "better-npm-run cronjobs",
+
     "seed_all": "better-npm-run seed_all",
     "seed_metadata": "better-npm-run seed_metadata",
     "seed_family": "better-npm-run seed_family",
     "seed_people": "better-npm-run seed_people",
     "seed_denormalize": "better-npm-run seed_denormalize",
+
     "banks_worker_0": "better-npm-run banks_worker_0",
     "banks_worker_1": "better-npm-run banks_worker_1",
+
     "migration_worker_0": "better-npm-run migration_worker_0",
     "migration_worker_1": "better-npm-run migration_worker_1"
   },
