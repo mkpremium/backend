@@ -15,7 +15,7 @@ import {madrid} from '../../../src/lib/date';
 import app from '../../../src/app';
 import request from 'supertest';
 
-describe('profit goals', () => {
+describe.only('profit goals', () => {
   let operator1;
   let operator2;
   let operator3;
