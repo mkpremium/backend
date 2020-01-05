@@ -9,18 +9,13 @@ import {OwnerRepository, PersonRepository} from '../src/owner/models';
 import Promise from 'bluebird';
 import {WorksheetRepository} from '../src/worksheet/models/worksheet';
 import {OwnerType} from '../src/types/enums';
-import {defaultFiles} from './defaults';
 
-async function seedFamily(files) {
-  const app = {
-    locals: {
-      bucket: await couchbase()
-    }
-  };
-  return processFamilyMembers(files, app);
+async function seedFamily() {
+  await couchbase();
+  return processFamilyMembers();
 }
 
-export async function processFamilyMembers(files, app) {
+export async function processFamilyMembers() {
   const repo = new WorksheetRepository();
   const worksheets = await repo.query();
   const worksheetIds = _.map(worksheets, _.property('id'));
@@ -161,7 +156,7 @@ async function createOwners(owner, people, type) {
 }
 
 if (require.main === module) {
-  seedFamily(defaultFiles)
+  seedFamily()
     .then(() => process.exit(0))
     .catch(err => {
       console.error(err);
