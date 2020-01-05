@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   createOperatorController,
   limitedListOperatorController,
@@ -7,10 +7,10 @@ import {
   meController,
   refreshTokenController,
   updateOperatorController
-} from './controllers';
-import {permissions} from '../middleware/jwt';
+} from './controllers'
+import { permissions } from '../middleware/jwt'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -52,7 +52,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/login', loginController);
+router.post('/login', loginController)
 
 /**
  * @swagger
@@ -96,7 +96,7 @@ router.post('/login', loginController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/refresh-token', refreshTokenController);
+router.post('/refresh-token', refreshTokenController)
 
 /**
  * @swagger
@@ -144,7 +144,7 @@ router.post('/refresh-token', refreshTokenController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/', permissions.allManagers, createOperatorController);
+router.post('/', permissions.allManagers, createOperatorController)
 
 /**
  * @swagger
@@ -189,7 +189,7 @@ router.post('/', permissions.allManagers, createOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id', permissions.allManagers, updateOperatorController);
+router.put('/:id', permissions.allManagers, updateOperatorController)
 
 /**
  * @swagger
@@ -228,7 +228,7 @@ router.put('/:id', permissions.allManagers, updateOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.admin, listOperatorController);
+router.get('/', permissions.admin, listOperatorController)
 
 /**
  * @swagger
@@ -263,7 +263,7 @@ router.get('/', permissions.admin, listOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/business', limitedListOperatorController);
+router.get('/business', limitedListOperatorController)
 
 /**
  * @swagger
@@ -287,6 +287,6 @@ router.get('/business', limitedListOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/me', meController);
+router.get('/me', meController)
 
-export default router;
+export default router

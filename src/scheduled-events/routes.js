@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import { Router } from 'express'
 
 import {
   addScheduledCallEventController,
@@ -8,9 +8,9 @@ import {
   updateScheduledEventController,
   deleteScheduledEventController,
   weekScheduleEventMeetingsController
-} from './controllers';
+} from './controllers'
 
-const router = Router();
+const router = Router()
 /**
  * @swagger
  * tags:
@@ -70,7 +70,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/week', weekScheduleEventMeetingsController);
+router.get('/week', weekScheduleEventMeetingsController)
 
 /**
  * @swagger
@@ -102,7 +102,7 @@ router.get('/week', weekScheduleEventMeetingsController);
  *      404:
  *        description: Evento no encontrada
  */
-router.get('/:id', findScheduledEventController);
+router.get('/:id', findScheduledEventController)
 
 /**
  * @swagger
@@ -177,7 +177,7 @@ router.get('/:id', findScheduledEventController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', listScheduledEventController);
+router.get('/', listScheduledEventController)
 
 /**
  * @swagger
@@ -219,7 +219,7 @@ router.get('/', listScheduledEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.post('/meeting', addScheduledMeetingEventController);
+router.post('/meeting', addScheduledMeetingEventController)
 
 /**
  * @swagger
@@ -261,7 +261,7 @@ router.post('/meeting', addScheduledMeetingEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.post('/call', addScheduledCallEventController);
+router.post('/call', addScheduledCallEventController)
 
 /**
  * @swagger
@@ -302,7 +302,7 @@ router.post('/call', addScheduledCallEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.put('/:id', updateScheduledEventController);
+router.put('/:id', updateScheduledEventController)
 
 /**
  * @swagger
@@ -339,6 +339,6 @@ router.put('/:id', updateScheduledEventController);
  *        schema:
  *          $ref: "#/definitions/Error"
 */
-router.delete('/:id', deleteScheduledEventController);
+router.delete('/:id', deleteScheduledEventController)
 
-export default router;
+export default router

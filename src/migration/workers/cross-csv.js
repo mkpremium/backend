@@ -1,13 +1,13 @@
-import {dirname, resolve} from 'path';
-import {exec} from 'child_process';
-import {wrap} from '../../lib/workers';
-import gearman from 'gearmanode';
+import { dirname, resolve } from 'path'
+import { exec } from 'child_process'
+import { wrap } from '../../lib/workers'
+import gearman from 'gearmanode'
 
-import {gearmanConfig} from '../../../config';
+import { gearmanConfig } from '../../../config'
 
-const worker = gearman.worker(gearmanConfig);
+const worker = gearman.worker(gearmanConfig)
 
-function buildQuery({calls, owners, buildings}) {
+function buildQuery ({ calls, owners, buildings }) {
   return `SELECT
     llamadas.id_chiamatafornitore as id_chiamatafornitore,
     llamadas.Id_Catastro,
@@ -44,27 +44,27 @@ function buildQuery({calls, owners, buildings}) {
     JOIN ${buildings} edificios
       ON (llamadas.proprietari = edificios.PROPRIETARI)
   WHERE llamadas.visitare = 1
-  COLLATE NOCASE`;
+  COLLATE NOCASE`
 }
 
-async function cross(input, job, opts) {
-  opts.retryJobOnError = false;
-  const base = dirname(input.calls);
-  const output = resolve(base, 'cross_table.csv');
-  const query = buildQuery(input);
+async function cross (input, job, opts) {
+  opts.retryJobOnError = false
+  const base = dirname(input.calls)
+  const output = resolve(base, 'cross_table.csv')
+  const query = buildQuery(input)
 
-  const files = Object.assign({}, input, {cross: output});
-  const writeFile = `q -O -H -d ";" "${query}" >> ${output}`;
+  const files = Object.assign({}, input, { cross: output })
+  const writeFile = `q -O -H -d ";" "${query}" >> ${output}`
 
   return new Promise((resolve, reject) => {
     exec(`${writeFile}`, err => {
       if (err && err.code) {
-        reject(err);
+        reject(err)
       } else {
-        resolve(files);
+        resolve(files)
       }
-    });
-  });
+    })
+  })
 }
 
-worker.addFunction('cross', wrap(cross));
+worker.addFunction('cross', wrap(cross))

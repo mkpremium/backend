@@ -1,6 +1,6 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
-import {OperatorFirebaseStates} from '../types/operator';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
+import { OperatorFirebaseStates } from '../types/operator'
 
 t.Neighborhood = t.struct(
   {
@@ -14,13 +14,13 @@ t.Neighborhood = t.struct(
   {
     name: 'Neighborhood',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       _documentType: 'neighborhood'
     }
   }
-);
+)
 
 t.City = t.struct(
   {
@@ -32,63 +32,63 @@ t.City = t.struct(
   {
     name: 'City',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       _documentType: 'city'
     }
   }
-);
+)
 
 t.ChangeUserNeighborhoodBody = t.struct({
   userId: t.String,
   neighborhood: t.String,
   city: t.String
-}, 'ChangeUserNeighborhoodBody');
+}, 'ChangeUserNeighborhoodBody')
 
-t.ChangeUserNeighborhoodBody.prototype.toParams = function() {
-  const {neighborhood, city} = this;
-  return {neighborhood, city};
-};
+t.ChangeUserNeighborhoodBody.prototype.toParams = function () {
+  const { neighborhood, city } = this
+  return { neighborhood, city }
+}
 
 t.ChangeUserStateBody = t.struct({
   userId: t.String,
   state: t.OperatorFirebaseStates
-});
+})
 
-t.ChangeUserStateBody.prototype.toParams = function() {
-  const {state} = this;
-  const enable = state !== OperatorFirebaseStates.BLOCKED;
+t.ChangeUserStateBody.prototype.toParams = function () {
+  const { state } = this
+  const enable = state !== OperatorFirebaseStates.BLOCKED
 
   return {
     enable,
-    profile: {state}
-  };
-};
+    profile: { state }
+  }
+}
 
 t.QueryNeighborhoodCenter = t.struct({
   Barrio: t.maybe(t.String),
   Ciudad: t.maybe(t.String)
-}, 'QueryNeighborhoodCenter');
+}, 'QueryNeighborhoodCenter')
 
 t.QueryBuildingsLocation = t.struct({
   city: t.String
-});
+})
 
 t.QueryLoginCredentials = t.struct({
   name: t.String,
   password: t.String
-});
+})
 
-t.QueryLoginCredentials.prototype.toParams = function() {
+t.QueryLoginCredentials.prototype.toParams = function () {
   return {
     username: this.name,
     password: this.password
-  };
-};
+  }
+}
 
 t.QueryLocationsAtDay = t.struct({
   date: t.String
-});
+})
 
-export default t;
+export default t

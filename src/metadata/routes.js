@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {downloadMetadataFileController} from './controllers';
+import { Router } from 'express'
+import { downloadMetadataFileController } from './controllers'
 
-const router = Router();
+const router = Router()
 /**
  * @swagger
  * tags:
@@ -41,6 +41,6 @@ const router = Router();
  *           $ref: "#/definitions/Error"
  *
  */
-router.get('/:id/download', downloadMetadataFileController);
+router.get('/:id/download', downloadMetadataFileController)
 
-export default router;
+export default router

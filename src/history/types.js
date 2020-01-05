@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 /**
  * @swagger
@@ -33,11 +33,11 @@ t.History = t.struct({
   name: 'History',
   defaultProps: {
     _documentType: 'history',
-    get createdAt() {
-      return new Date();
+    get createdAt () {
+      return new Date()
     }
   }
-});
+})
 
 /**
  * @swagger
@@ -66,7 +66,7 @@ t.HistoryListResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 t.HistoryListQuery = t.ListQuery.extend(
   {
@@ -82,4 +82,4 @@ t.HistoryListQuery = t.ListQuery.extend(
       createdBetween: ','
     }
   }
-);
+)

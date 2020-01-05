@@ -1,11 +1,11 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   getOperatorRestringedHoursController,
   writeAnotherOperatorRestringedHoursController,
   writeOperatorRestringedHoursController
-} from './controllers';
+} from './controllers'
 
-const router = Router({});
+const router = Router({})
 
 /**
  * @swagger
@@ -28,7 +28,7 @@ const router = Router({});
  *         schema:
  *           $ref: "#/definitions/RestringedHoursResponse"
  */
-router.get('/', getOperatorRestringedHoursController);
+router.get('/', getOperatorRestringedHoursController)
 
 /**
  * @swagger
@@ -55,7 +55,7 @@ router.get('/', getOperatorRestringedHoursController);
  *         schema:
  *           $ref: "#/definitions/RestringedHoursResponse"
  */
-router.put('/', writeOperatorRestringedHoursController);
+router.put('/', writeOperatorRestringedHoursController)
 
 /**
  * @swagger
@@ -86,6 +86,6 @@ router.put('/', writeOperatorRestringedHoursController);
  *         schema:
  *           $ref: "#/definitions/RestringedHoursResponse"
  */
-router.put('/:id', writeAnotherOperatorRestringedHoursController);
+router.put('/:id', writeAnotherOperatorRestringedHoursController)
 
-export default router;
+export default router

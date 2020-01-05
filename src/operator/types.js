@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import {RestringedHourObject} from './restringed-hours/types';
+import t from 'tcomb'
+import { RestringedHourObject } from './restringed-hours/types'
 
 /**
  * @swagger
@@ -17,7 +17,7 @@ import {RestringedHourObject} from './restringed-hours/types';
 t.Credentials = t.struct({
   username: t.String,
   password: t.String
-}, 'Credentials');
+}, 'Credentials')
 
 /**
  * @swagger
@@ -71,12 +71,12 @@ t.AuthenticatedResponse = t.struct({
     databaseURL: t.String
   }, 'firebase')),
   roles: t.list(t.String)
-}, 'AuthenticatedResponse');
+}, 'AuthenticatedResponse')
 
 t.OperatorListQuery = t.ListQuery.extend({
   enable: t.maybe(t.Boolean),
   role: t.maybe(t.String)
-});
+})
 
 t.OperatorLimitedListQuery = t.ListQuery.extend(
   {
@@ -88,7 +88,7 @@ t.OperatorLimitedListQuery = t.ListQuery.extend(
       role: 'BUSINESS'
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -117,7 +117,7 @@ t.OperatorListResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -152,7 +152,7 @@ t.OperatorView = t.struct(
       profile: {}
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -181,4 +181,4 @@ t.OperatorListViewResponse = t.struct(
       results: []
     }
   }
-);
+)

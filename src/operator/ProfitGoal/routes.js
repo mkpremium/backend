@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {setProfitGoalToOperatorController} from './controllers';
+import { Router } from 'express'
+import { setProfitGoalToOperatorController } from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -42,6 +42,6 @@ const router = Router();
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/goal', setProfitGoalToOperatorController);
+router.post('/goal', setProfitGoalToOperatorController)
 
-export default router;
+export default router

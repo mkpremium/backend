@@ -1,16 +1,16 @@
-import debug from 'debug';
-import routes from './routes';
-import {migrationEnabled} from '../../config';
+import debug from 'debug'
+import routes from './routes'
+import { migrationEnabled } from '../../config'
 
-const debugMigration = debug('app:migration');
+const debugMigration = debug('app:migration')
 
 export default (app) => {
-  debugMigration('enabled', migrationEnabled);
+  debugMigration('enabled', migrationEnabled)
   if (!migrationEnabled) {
-    return;
+    return
   }
 
-  app.set('view engine', 'ejs');
-  app.set('tmpdir', '/tmp');
-  app.use('/migration', routes);
-};
+  app.set('view engine', 'ejs')
+  app.set('tmpdir', '/tmp')
+  app.use('/migration', routes)
+}

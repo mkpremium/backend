@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
 
 /**
  * @swagger
@@ -54,20 +54,20 @@ t.Calls = t.struct(
       status: 'DESCONOCIDO',
       _documentType: 'calls',
       origin: 'SYSTEM',
-      get date() {
-        return new Date();
+      get date () {
+        return new Date()
       },
       events: [],
       notes: []
     }
-  });
+  })
 
 t.CallService = t.struct({
   from: t.String,
   to: t.String,
   service_id: t.Integer,
   return_id: t.Boolean
-}, 'CallService');
+}, 'CallService')
 
 /**
  * @swagger
@@ -79,7 +79,7 @@ t.CallService = t.struct({
  */
 t.CallBody = t.struct({
   contactId: t.maybe(t.String)
-}, 'CallBody');
+}, 'CallBody')
 
 /**
  * @swagger
@@ -91,7 +91,7 @@ t.CallBody = t.struct({
  */
 t.HangupSuccessResponse = t.struct({
   status: t.maybe(t.String)
-}, 'HangupSuccessResponse');
+}, 'HangupSuccessResponse')
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ t.CallErrorResponse = t.struct({
   status: t.maybe(t.String),
   error_code: t.maybe(t.Integer),
   description: t.String
-}, 'CallErrorResponse');
+}, 'CallErrorResponse')
 
 t.CallsRawEvents = t.struct(
   {
@@ -121,15 +121,15 @@ t.CallsRawEvents = t.struct(
   , {
     name: 'CallsRawEvents',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get date() {
-        return new Date();
+      get date () {
+        return new Date()
       },
       _documentType: 'calls-raw-events'
     }
-  });
+  })
 
 /**
  * @swagger
@@ -145,8 +145,8 @@ t.AddCallNote = t.struct({
 }, {
   name: 'AddCallNote',
   defaultProps: {
-    get id() {
-      return uuid();
+    get id () {
+      return uuid()
     }
   }
-});
+})

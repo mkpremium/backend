@@ -1,13 +1,13 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   cancelSellStockController,
   closeSellStockController,
   createPurchaseStockController,
   getProfitsRakningController,
   sellPurchasedStockController, updatePurchaseStockController, updateSellStockController
-} from './controllers';
+} from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -68,7 +68,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/purchase', createPurchaseStockController);
+router.post('/purchase', createPurchaseStockController)
 
 /**
  * @swagger
@@ -122,7 +122,7 @@ router.post('/purchase', createPurchaseStockController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/purchase', updatePurchaseStockController);
+router.put('/purchase', updatePurchaseStockController)
 
 /**
  * @swagger
@@ -176,7 +176,7 @@ router.put('/purchase', updatePurchaseStockController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/sell', sellPurchasedStockController);
+router.post('/sell', sellPurchasedStockController)
 
 /**
  * @swagger
@@ -230,7 +230,7 @@ router.post('/sell', sellPurchasedStockController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/sell', updateSellStockController);
+router.put('/sell', updateSellStockController)
 
 /**
  * @swagger
@@ -266,7 +266,7 @@ router.put('/sell', updateSellStockController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/sell/cancel', cancelSellStockController);
+router.post('/sell/cancel', cancelSellStockController)
 
 /**
  * @swagger
@@ -303,7 +303,7 @@ router.post('/sell/cancel', cancelSellStockController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/close', closeSellStockController);
+router.post('/close', closeSellStockController)
 
 /**
  * @swagger
@@ -335,6 +335,6 @@ router.post('/close', closeSellStockController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.get('/ranking', getProfitsRakningController);
+router.get('/ranking', getProfitsRakningController)
 
-export default router;
+export default router

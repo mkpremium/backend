@@ -1,22 +1,22 @@
-import Promise from 'bluebird';
-import debug from 'debug';
-import socketJwt from '../middleware/socketJwt';
-import socketIO from 'socket.io';
-import _get from 'lodash/get';
-import {WorksheetQueueRepository} from '../worksheet/models/queue';
-import {Calls} from '../calls/models';
-import {OperatorRepository} from '../operator/models';
+import Promise from 'bluebird'
+import debug from 'debug'
+import socketJwt from '../middleware/socketJwt'
+import socketIO from 'socket.io'
+import _get from 'lodash/get'
+import { WorksheetQueueRepository } from '../worksheet/models/queue'
+import { Calls } from '../calls/models'
+import { OperatorRepository } from '../operator/models'
 
-const socketDebug = debug('app:socket');
-const SYSTEM_ID = 'system'; // bite me :lel:
+const socketDebug = debug('app:socket')
+const SYSTEM_ID = 'system' // bite me :lel:
 
 export class SocketServer {
-  constructor(server) {
+  constructor (server) {
     // region es6
-    this.onConnection = this.onConnection.bind(this);
+    this.onConnection = this.onConnection.bind(this)
     // endregion
 
-    this.timers = {};
+    this.timers = {}
 
     this.io = socketIO(server, {
       serveClient: true,
@@ -24,90 +24,90 @@ export class SocketServer {
       pingInterval: 10000,
       pingTimeout: 5000,
       cookie: false
-    });
+    })
 
-    this.io.use(socketJwt(this.io.sockets));
-    this.io.on('connection', this.onConnection);
+    this.io.use(socketJwt(this.io.sockets))
+    this.io.on('connection', this.onConnection)
   }
 
-  onConnection(socket) {
-    const msg = `user ${socket.id} ${socket.user.id}/${socket.user.operator.name}`;
-    socketDebug('welcome', msg);
-    this.io.emit('welcome', msg); // TODO: send to only users with role X
+  onConnection (socket) {
+    const msg = `user ${socket.id} ${socket.user.id}/${socket.user.operator.name}`
+    socketDebug('welcome', msg)
+    this.io.emit('welcome', msg) // TODO: send to only users with role X
 
     if (this.io.sockets[socket.user.id]) {
-      const oldSocket = this.io.sockets[socket.user.id];
-      oldSocket.emit('forced-disconnect');
+      const oldSocket = this.io.sockets[socket.user.id]
+      oldSocket.emit('forced-disconnect')
       Promise
         .delay(500)
         .then(() => {
-          oldSocket.disconnect();
-        });
+          oldSocket.disconnect()
+        })
     }
 
-    this.io.sockets[socket.user.id] = socket;
-    const isSystem = socket.user.permissions.indexOf(SYSTEM_ID) !== -1;
+    this.io.sockets[socket.user.id] = socket
+    const isSystem = socket.user.permissions.indexOf(SYSTEM_ID) !== -1
 
-    socketDebug('socket', socket.id, 'can broadcast events?', isSystem);
+    socketDebug('socket', socket.id, 'can broadcast events?', isSystem)
 
     if (isSystem) {
       socket.on('event', (data, ack) => {
-        socketDebug('broadcasting', data.payload.type);
-        this.io.emit(data.payload.type, data);
+        socketDebug('broadcasting', data.payload.type)
+        this.io.emit(data.payload.type, data)
         if (ack) {
-          ack(true);
+          ack(true)
         }
-      });
+      })
     } else {
       OperatorRepository.setOnline(socket.user.id, true)
         .catch(err => {
-          console.error('when online', err);
-        });
+          console.error('when online', err)
+        })
     }
 
     if (this.timers[socket.user.id]) {
-      clearTimeout(this.timers[socket.user.id]);
-      delete this.timers[socket.user.id];
+      clearTimeout(this.timers[socket.user.id])
+      delete this.timers[socket.user.id]
     }
 
     socket.on('disconnect', () => {
-      const queueId = _get(socket, 'operator.profile.queueId', null);
-      const operatorId = _get(socket, 'user.operator.id', null);
+      const queueId = _get(socket, 'operator.profile.queueId', null)
+      const operatorId = _get(socket, 'user.operator.id', null)
 
       const scheduleRelease = () => {
         this.timers[socket.user.id] = setTimeout(() => {
           releaseTakenWorksheets(operatorId, queueId)
             .then(needReschedule => {
               if (needReschedule) {
-                scheduleRelease();
+                scheduleRelease()
               }
             })
-            .catch(err => console.error(err));
-        }, 60 * 1000);
-      };
+            .catch(err => console.error(err))
+        }, 60 * 1000)
+      }
 
       if (!isSystem && this.io.sockets[socket.user.id].id === socket.id && queueId) {
-        socketDebug('scheduling release taken worksheets for', socket.user.id);
-        scheduleRelease();
+        socketDebug('scheduling release taken worksheets for', socket.user.id)
+        scheduleRelease()
       }
 
       OperatorRepository
         .setOnline(socket.user.id, this.io.sockets[socket.user.id].connected)
         .catch(err => {
-          console.error('when online', err);
-        });
-    });
+          console.error('when online', err)
+        })
+    })
   }
 }
 
-async function releaseTakenWorksheets(operatorId, queueId) {
-  const modelCall = new Calls();
-  const queueRepo = new WorksheetQueueRepository();
-  const activeCall = await modelCall.findActiveCallByOperatorId(operatorId);
+async function releaseTakenWorksheets (operatorId, queueId) {
+  const modelCall = new Calls()
+  const queueRepo = new WorksheetQueueRepository()
+  const activeCall = await modelCall.findActiveCallByOperatorId(operatorId)
   if (activeCall) {
-    return true;
+    return true
   } else {
-    await queueRepo.releaseTakenWorksheetInQueue(queueId, operatorId);
-    return false;
+    await queueRepo.releaseTakenWorksheetInQueue(queueId, operatorId)
+    return false
   }
 }

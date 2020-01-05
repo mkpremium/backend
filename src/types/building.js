@@ -1,6 +1,6 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
-import {buildingEntitiesDefaultStatus, buildingEntitiesStatus} from '../migration/models/building_entity';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
+import { buildingEntitiesDefaultStatus, buildingEntitiesStatus } from '../migration/models/building_entity'
 
 /**
  * @swagger
@@ -15,7 +15,7 @@ import {buildingEntitiesDefaultStatus, buildingEntitiesStatus} from '../migratio
 export const BuildingCadastre = t.Cadastre = t.struct({
   reference: t.String,
   address: t.String
-}, 'Cadastre');
+}, 'Cadastre')
 
 /**
  * @swagger
@@ -30,7 +30,7 @@ export const BuildingCadastre = t.Cadastre = t.struct({
 export const BuildingLocation = t.Location = t.struct({
   lat: t.maybe(t.Number),
   lng: t.maybe(t.Number)
-}, 'Location');
+}, 'Location')
 
 /**
  * @swagger
@@ -48,7 +48,7 @@ t.Elements = t.struct({
   number: t.Number,
   average: t.Number,
   commons: t.Number
-}, 'Elements');
+}, 'Elements')
 
 /**
  * @swagger
@@ -74,15 +74,15 @@ t.BuildingOwner = t.struct(
       phones: []
     }
   }
-);
+)
 
 const BuildingProposalStatus = {
   DEAL: 'aceptada',
   SENT: 'enviada',
   PENDING: 'pendiente'
-};
+}
 
-t.BuildingProposalStatus = t.enums.of(Object.values(BuildingProposalStatus));
+t.BuildingProposalStatus = t.enums.of(Object.values(BuildingProposalStatus))
 
 /**
  * @swagger
@@ -157,18 +157,18 @@ t.BuildingProposal = t.struct(
     defaultProps: {
       state: BuildingProposalStatus.PENDING,
       accepted: false,
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       _documentType: 'building-proposal'
     }
   }
-);
+)
 
-t.BuildingEntityStatus = t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus));
+t.BuildingEntityStatus = t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus))
 
 /**
  * @swagger
@@ -237,15 +237,15 @@ t.BuildingEntity = t.struct(
       status: buildingEntitiesDefaultStatus,
       surface: 0,
       rent: 0,
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdBy() {
-        return new Date();
+      get createdBy () {
+        return new Date()
       }
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -267,7 +267,7 @@ t.BuildingMetadataPreview = t.struct({
   name: t.maybe(t.String),
   mimeType: t.maybe(t.String),
   previewUrl: t.maybe(t.String)
-});
+})
 
 /**
  * @swagger
@@ -347,8 +347,8 @@ export const Building = t.Building = t.struct(
   {
     name: 'Building',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       floorArea: 0,
       landArea: 0,
@@ -364,4 +364,4 @@ export const Building = t.Building = t.struct(
       _documentType: 'building'
     }
   }
-);
+)

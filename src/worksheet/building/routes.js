@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {createBuildingController} from './controllers';
+import { Router } from 'express'
+import { createBuildingController } from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -34,6 +34,6 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/', createBuildingController);
+router.post('/', createBuildingController)
 
-export default router;
+export default router

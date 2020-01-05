@@ -1,5 +1,5 @@
-import squel from 'squel';
-import '../../../src/lib/squel/let';
+import squel from 'squel'
+import '../../../src/lib/squel/let'
 
 describe('LET Query for Couchbase', () => {
   it('USE KEY Block', () => {
@@ -8,14 +8,14 @@ describe('LET Query for Couchbase', () => {
       .useKey('t.`worksheetId`')
       .field('a.*')
       .from('mkpremium AS a')
-      .where('t.`worksheetId` = a.`id`');
+      .where('t.`worksheetId` = a.`id`')
 
     const letPerson = squel
       .useKey()
       .useKey('p.`personId`')
       .field('p.*')
       .from('mkpremium AS p')
-      .where('t.`worksheetId` = p.`id`');
+      .where('t.`worksheetId` = p.`id`')
     squel
       .let()
       .letQuery('leta', letQuery)
@@ -24,6 +24,6 @@ describe('LET Query for Couchbase', () => {
       .field('leta')
       .field('letb')
       .from('mkpremium AS t')
-      .where('t.id IN ?', [111]).toString();
-  });
-});
+      .where('t.id IN ?', [111]).toString()
+  })
+})

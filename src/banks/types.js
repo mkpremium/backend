@@ -1,6 +1,6 @@
-import t from 'tcomb';
-import '../types';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import '../types'
+import uuid from 'uuid/v4'
 
 /**
  * @swagger
@@ -30,7 +30,7 @@ t.BanksAddress = t.struct(
   {
     name: 'BanksAddress'
   }
-);
+)
 
 t.CadastreResponse = t.struct(
   {
@@ -41,7 +41,7 @@ t.CadastreResponse = t.struct(
   {
     name: 'CadastreResponse'
   }
-);
+)
 
 /**
  * @swagger
@@ -77,7 +77,7 @@ t.BankFilterUserInput = t.struct(
   {
     name: 'BankFilterUserInput'
   }
-);
+)
 
 /**
  * @swagger
@@ -98,7 +98,7 @@ t.BankFilterUpdateInput = t.struct({
   action: t.enums.of(['blacklisted', 'whitelisted']),
   bankFileDataIds: t.maybe(t.list(t.String)),
   cadastreReferences: t.maybe(t.list(t.String))
-}, 'BankFilterUpdateInput');
+}, 'BankFilterUpdateInput')
 
 /**
  * @swagger
@@ -110,7 +110,7 @@ t.BankFilterUpdateInput = t.struct({
  */
 t.BankFileExportInput = t.struct({
   buy: t.Boolean
-}, 'BankFileExportInput');
+}, 'BankFileExportInput')
 
 t.BankFilterResult = t.struct(
   {
@@ -123,7 +123,7 @@ t.BankFilterResult = t.struct(
   {
     name: 'BankFilterResult'
   }
-);
+)
 
 /**
  * @swagger
@@ -170,11 +170,11 @@ t.BankFile = t.struct(
   {
     name: 'BankFile',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       processed: 0,
       total: 0,
@@ -187,7 +187,7 @@ t.BankFile = t.struct(
       _documentType: 'bank-file'
     }
   }
-);
+)
 
 t.BankFileResponse = t.struct({
   id: t.String,
@@ -196,7 +196,7 @@ t.BankFileResponse = t.struct({
   total: t.Number,
   errors: t.Number,
   userInput: t.maybe(t.BankFilterUserInput)
-}, 'BankFileResponse');
+}, 'BankFileResponse')
 
 t.ListBankFileResponse = t.struct(
   {
@@ -207,7 +207,7 @@ t.ListBankFileResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -278,8 +278,8 @@ export const BankFileData = t.BankFileData = t.struct(
   {
     name: 'BankFileDataRepository',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       priceZoneRaw: 0,
       priceZone: 0,
@@ -304,7 +304,7 @@ export const BankFileData = t.BankFileData = t.struct(
       _documentType: 'bank-file-data'
     }
   }
-);
+)
 
 t.ListBankFileData = t.struct(
   {
@@ -315,7 +315,7 @@ t.ListBankFileData = t.struct(
       results: []
     }
   }
-);
+)
 
 t.BanksCityData = t.struct(
   {
@@ -331,8 +331,8 @@ t.BanksCityData = t.struct(
   {
     name: 'BanksCityData',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       price: 0,
       priceCity: 0,
@@ -341,7 +341,7 @@ t.BanksCityData = t.struct(
       _documentType: 'bank-city-data'
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -358,4 +358,4 @@ t.BanksCityData = t.struct(
  *           $ref: "#/definitions/BankFile"
  */
 
-export default t;
+export default t

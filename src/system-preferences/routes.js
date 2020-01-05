@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {getSystemPreferencesController, writeSystemPreferencesController} from './controllers';
+import { Router } from 'express'
+import { getSystemPreferencesController, writeSystemPreferencesController } from './controllers'
 
-const router = Router({});
+const router = Router({})
 
 /**
  * @swagger
@@ -21,7 +21,7 @@ const router = Router({});
  *         schema:
  *           $ref: "#/definitions/SystemPreferences"
  */
-router.get('/', getSystemPreferencesController);
+router.get('/', getSystemPreferencesController)
 
 /**
  * @swagger
@@ -45,6 +45,6 @@ router.get('/', getSystemPreferencesController);
  *       204:
  *         description: Listado de provincias
  */
-router.post('/', writeSystemPreferencesController);
+router.post('/', writeSystemPreferencesController)
 
-export default router;
+export default router

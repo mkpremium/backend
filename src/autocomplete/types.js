@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 t.AutoCompleteQuery = t.struct(
   {
@@ -10,6 +10,6 @@ t.AutoCompleteQuery = t.struct(
       query: '*'
     }
   }
-);
+)
 
-export default t;
+export default t

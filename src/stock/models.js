@@ -1,46 +1,46 @@
-import {CouchbaseModel} from '../db/model';
-import {Stock} from './types';
-import fromJSON from 'tcomb/lib/fromJSON';
-import _head from 'lodash/head';
-import {fbComerciales} from '../firebase/index';
-import {madrid} from '../lib/date';
+import { CouchbaseModel } from '../db/model'
+import { Stock } from './types'
+import fromJSON from 'tcomb/lib/fromJSON'
+import _head from 'lodash/head'
+import { fbComerciales } from '../firebase/index'
+import { madrid } from '../lib/date'
 
 export class StockRepository extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = Stock;
+  constructor () {
+    super()
+    this.Struct = Stock
   }
 
-  async findByBuildingId(buildingId) {
+  async findByBuildingId (buildingId) {
     const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ? ', buildingId);
+      .where('t.`buildingId` = ? ', buildingId)
 
-    const results = await this.query(qb);
+    const results = await this.query(qb)
 
     if (results.length > 0) {
-      return fromJSON(_head(results), Stock);
+      return fromJSON(_head(results), Stock)
     }
   }
 
-  async findByBuildingIdOrDefault(buildingId) {
-    const result = await this.findByBuildingId(buildingId);
+  async findByBuildingIdOrDefault (buildingId) {
+    const result = await this.findByBuildingId(buildingId)
     if (!result) {
-      console.log(`No existe un stock asociado a ${buildingId}`);
-      return null;
+      console.log(`No existe un stock asociado a ${buildingId}`)
+      return null
     }
-    return result;
+    return result
   }
 
-  async findByBuildingIdOrThrow(buildingId) {
-    const result = await this.findByBuildingId(buildingId);
+  async findByBuildingIdOrThrow (buildingId) {
+    const result = await this.findByBuildingId(buildingId)
     if (!result) {
-      throw new Error(`No existe un stock asociado a ${buildingId}`);
+      throw new Error(`No existe un stock asociado a ${buildingId}`)
     }
-    return result;
+    return result
   }
 
-  async listProfitRankings(params) {
-    const currentYear = new Date().getFullYear();
+  async listProfitRankings (params) {
+    const currentYear = new Date().getFullYear()
     const profitsQuery = `
       SELECT close.operatorId, SUM(close.gain) as total
       FROM mkpremium
@@ -49,72 +49,72 @@ export class StockRepository extends CouchbaseModel {
       AND DATE_PART_STR(close.transactionDate,'year') = ${currentYear}
       GROUP BY close.operatorId
       ORDER BY total
-      `;
+      `
 
-    return this.raw(profitsQuery);
+    return this.raw(profitsQuery)
   }
 }
 
 export class StockFirebaseRepository {
-  constructor() {
+  constructor () {
     if (!fbComerciales.enabled) {
-      return;
+      return
     }
-    this.db = fbComerciales.database();
+    this.db = fbComerciales.database()
   }
 
-  async savePurchaseStock(stock) {
+  async savePurchaseStock (stock) {
     if (!fbComerciales.enabled) {
-      return;
+      return
     }
-    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
-    const firebasePurchaseTransaction = this.toFirebaseTransaction(stock.purchase);
-    return stockRef.child('purchase').set(firebasePurchaseTransaction);
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId)
+    const firebasePurchaseTransaction = this.toFirebaseTransaction(stock.purchase)
+    return stockRef.child('purchase').set(firebasePurchaseTransaction)
   }
 
-  async saveSellStock(stock) {
+  async saveSellStock (stock) {
     if (!fbComerciales.enabled) {
-      return;
+      return
     }
-    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
-    const firebaseSellTransaction = this.toFirebaseTransaction(stock.sell);
-    return stockRef.child('sell').set(firebaseSellTransaction);
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId)
+    const firebaseSellTransaction = this.toFirebaseTransaction(stock.sell)
+    return stockRef.child('sell').set(firebaseSellTransaction)
   }
 
-  async saveCloseStock(stock) {
+  async saveCloseStock (stock) {
     if (!fbComerciales.enabled) {
-      return;
+      return
     }
-    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
-    const firebaseClose = this.toFirebaseClose(stock.close);
-    return stockRef.child('close').set(firebaseClose);
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId)
+    const firebaseClose = this.toFirebaseClose(stock.close)
+    return stockRef.child('close').set(firebaseClose)
   }
 
-  getStockReference(operatorId, buildingId) {
-    return this.db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}/Stock`);
+  getStockReference (operatorId, buildingId) {
+    return this.db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${buildingId}/Stock`)
   }
 
-  toFirebaseTransaction(transaction) {
+  toFirebaseTransaction (transaction) {
     return {
       reservationDate: madrid(transaction.reservationDate).unix(),
       reservationAmount: transaction.reservationAmount,
       transactionDate: madrid(transaction.transactionDate).unix(),
       transactionAmount: transaction.transactionAmount
-    };
+    }
   }
 
-  toFirebaseClose(close) {
+  toFirebaseClose (close) {
     return {
       gain: close.gain,
       transactionDate: madrid(close.transactionDate).unix()
-    };
+    }
   }
 
-  async deleteSellStock(stock) {
+  async deleteSellStock (stock) {
     if (!fbComerciales.enabled) {
-      return;
+      return
     }
-    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId);
-    return stockRef.child('sell').remove();
+    const stockRef = await this.getStockReference(stock.purchase.operatorId, stock.buildingId)
+    return stockRef.child('sell').remove()
   }
 }

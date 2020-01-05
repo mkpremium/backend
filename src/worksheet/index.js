@@ -1,12 +1,12 @@
-import routes from './routes';
-import buildingRoutes from './building/routes';
+import routes from './routes'
+import buildingRoutes from './building/routes'
 
-import './types';
-import jwt from '../middleware/jwt';
+import './types'
+import jwt from '../middleware/jwt'
 
 export default (app) => {
-  const secured = jwt();
+  const secured = jwt()
 
-  app.use('/worksheets', secured, routes);
-  app.use('/worksheets/buildings', secured, buildingRoutes);
-};
+  app.use('/worksheets', secured, routes)
+  app.use('/worksheets/buildings', secured, buildingRoutes)
+}

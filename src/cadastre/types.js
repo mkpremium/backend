@@ -1,5 +1,5 @@
-import * as tcomb from 'tcomb';
-import {streetTypes} from './constants';
+import * as tcomb from 'tcomb'
+import { streetTypes } from './constants'
 
 export const CadastreCache = tcomb.struct(
   {
@@ -13,9 +13,9 @@ export const CadastreCache = tcomb.struct(
       _documentType: 'cadastre-cache'
     }
   }
-);
+)
 
-export const CadastreStreetType = tcomb.enums.of(Object.keys(streetTypes));
+export const CadastreStreetType = tcomb.enums.of(Object.keys(streetTypes))
 
 /**
  * @swagger
@@ -37,7 +37,7 @@ export const CadastreStreet = tcomb.struct(
   {
     name: 'CadastreStreet'
   }
-);
+)
 
 /**
  * @swagger
@@ -75,12 +75,12 @@ export const CadastreAddressInput = tcomb.struct(
   {
     name: 'NormalizedAddress'
   }
-);
+)
 export const CitiesInput = tcomb.struct({
   province: tcomb.String
-}, 'CitiesInput');
+}, 'CitiesInput')
 
 export const StreetsInput = tcomb.struct({
   province: tcomb.String,
   city: tcomb.String
-}, 'StreetsInput');
+}, 'StreetsInput')

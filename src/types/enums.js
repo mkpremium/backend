@@ -1,16 +1,16 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 t.BuildingType = t.enums({
   VERTICAL: 'vertical',
   HORIZONTAL: 'horizontal'
-}, 'BuildingType');
+}, 'BuildingType')
 
 export const BuildingState = {
   BUENO: 'BUENO',
   MALO: 'MALO'
-};
+}
 
-t.BuildingState = t.enums(BuildingState, 'BuildingState');
+t.BuildingState = t.enums(BuildingState, 'BuildingState')
 
 t.TypeContact = t.enums({
   TELEFONO: 'TELEFONO',
@@ -18,7 +18,7 @@ t.TypeContact = t.enums({
   MOVIL: 'MOVIL',
   EMAIL: 'EMAIL',
   SITIO_WEB: 'SITIO_WEB'
-}, 'TypeContact');
+}, 'TypeContact')
 
 export const OwnerType = {
   NONE: 'NINGUNO',
@@ -29,7 +29,7 @@ export const OwnerType = {
   RELATED: 'HERMANOS',
   CHILDREN: 'HIJOS',
   SAME_HOUSE: 'MISMA CASA'
-};
+}
 
 export const OwnerStatus = {
   NON_VERIFIED: 'NO_VERIFICADO',
@@ -38,7 +38,7 @@ export const OwnerStatus = {
   ALREADY_SOLD: 'YA_VENDIO',
   ERROR: 'ERRONEO',
   PUBLIC: 'ENTE_PUBLICO'
-};
+}
 
 export const OwnerBusinessStatus = {
   PENDING: 'PENDIENTE',
@@ -50,23 +50,23 @@ export const OwnerBusinessStatus = {
   ALREADY_SOLD: 'VENDIDO',
   NO_SALE: 'NO VENDE',
   DISCARDED: 'DESCARTADO'
-};
+}
 
-t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType');
-t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus');
-t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus');
+t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType')
+t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
+t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus')
 
 t.Gender = t.enums({
   NINGUNO: 'NINGUNO',
   FEMENINO: 'FEMENINO',
   MASCULINO: 'MASCULINO'
-});
+})
 
 t.PersonType = t.enums({
   NATURAL: 'NATURAL',
   JURIDICA: 'JURIDICA',
   NONE: 'NINGUNO'
-});
+})
 
 t.EventType = t.enums({
   add: 'add',
@@ -74,7 +74,7 @@ t.EventType = t.enums({
   remove: 'revome',
   read: 'read',
   custom: 'custom'
-});
+})
 
 t.RecordAction = t.enums.of([
   'UPDATE',
@@ -86,7 +86,7 @@ t.RecordAction = t.enums.of([
   'RELEASE',
   'TAKE',
   'ERROR'
-]);
+])
 
 t.RecordContext = t.enums({
   OWNER: 'Propietario',
@@ -98,13 +98,13 @@ t.RecordContext = t.enums({
   OPERATORS: 'Operadores',
   WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
   SYSTEM_QUEUE: 'Colas del sistema'
-});
+})
 
 export const CallStatus = {
   early: 'INICIADA',
   confirmed: 'EN_PROGRESO',
   terminated: 'FINALIZADA',
   unknown: 'DESCONOCIDO'
-};
+}
 
-t.CallStatus = t.enums.of(Object.values(CallStatus), 'CallStatus');
+t.CallStatus = t.enums.of(Object.values(CallStatus), 'CallStatus')

@@ -1,41 +1,41 @@
-import _ from 'lodash';
-import t from 'tcomb';
+import _ from 'lodash'
+import t from 'tcomb'
 
-const recordContexts = t.RecordContext.meta.map;
+const recordContexts = t.RecordContext.meta.map
 
-function getModelName(contextModel) {
-  if (!contextModel) return 'UNDEFINED';
-  return contextModel._documentType || contextModel;
+function getModelName (contextModel) {
+  if (!contextModel) return 'UNDEFINED'
+  return contextModel._documentType || contextModel
 }
 
-function getModelId(contextModel) {
-  if (!contextModel) return 'UNDEFINED';
-  return contextModel.id || '-';
+function getModelId (contextModel) {
+  if (!contextModel) return 'UNDEFINED'
+  return contextModel.id || '-'
 }
 
-function getRecordContext(model, plural = false) {
+function getRecordContext (model, plural = false) {
   switch (model) {
     case 'worksheet':
-      if (plural) return recordContexts.WORKSHEETS;
-      return recordContexts.WORKSHEET;
+      if (plural) return recordContexts.WORKSHEETS
+      return recordContexts.WORKSHEET
     case 'worksheet-queue':
-      if (plural) return recordContexts.SYSTEM_QUEUE;
-      return recordContexts.WORKSHEET_QUEUE;
+      if (plural) return recordContexts.SYSTEM_QUEUE
+      return recordContexts.WORKSHEET_QUEUE
     case 'operator':
-      if (plural) return recordContexts.OPERATORS;
-      return recordContexts.OPERATOR;
+      if (plural) return recordContexts.OPERATORS
+      return recordContexts.OPERATOR
     case 'owner':
-      if (plural) return recordContexts.OWNERS;
-      return recordContexts.OWNER;
+      if (plural) return recordContexts.OWNERS
+      return recordContexts.OWNER
     case 'owner-contact':
-      return recordContexts.OWNER_CONTACT;
+      return recordContexts.OWNER_CONTACT
     default:
-      return 'UNDEFINED';
+      return 'UNDEFINED'
   }
 }
 
-function getRecordDescription(model, username) {
-  const recordContext = getRecordContext(model);
+function getRecordDescription (model, username) {
+  const recordContext = getRecordContext(model)
   return {
     DELETE: `${username} ha eliminado ${recordContext}`,
     CREATE: `${username} ha creado ${recordContext}`,
@@ -45,14 +45,14 @@ function getRecordDescription(model, username) {
     LIST: `${username} ha listado ${getRecordContext(model, true)}`,
     TAKE: `${username} ha tomado ${recordContext}`,
     RELEASE: `${username} ha liberado ${recordContext}`
-  };
+  }
 }
 
-export function getHistoryStruct({type, contextModel, user}) {
-  const model = getModelName(contextModel);
-  const username = _.get(user, 'operator.username', user.id);
-  const recordType = contextModel ? type : 'ERROR';
-  const id = getModelId(contextModel);
+export function getHistoryStruct ({ type, contextModel, user }) {
+  const model = getModelName(contextModel)
+  const username = _.get(user, 'operator.username', user.id)
+  const recordType = contextModel ? type : 'ERROR'
+  const id = getModelId(contextModel)
 
   return {
     modelName: model,
@@ -60,5 +60,5 @@ export function getHistoryStruct({type, contextModel, user}) {
     operatorId: user.id,
     type: recordType,
     description: getRecordDescription(model, username)[type]
-  };
+  }
 }

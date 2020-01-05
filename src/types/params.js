@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 t.ListQuery = t.struct(
   {
@@ -12,4 +12,4 @@ t.ListQuery = t.struct(
       offset: 0
     }
   }
-);
+)

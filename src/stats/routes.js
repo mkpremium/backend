@@ -1,13 +1,13 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   overAllController, overProvincesController,
   ownerBusinessStatsController,
   ownerStatsController,
   performanceController, worksheetStatsController
-} from './controller';
-import {permissions} from '../middleware/jwt';
+} from './controller'
+import { permissions } from '../middleware/jwt'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -64,7 +64,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.manager, overAllController);
+router.get('/', permissions.manager, overAllController)
 
 /**
  * @swagger
@@ -113,7 +113,7 @@ router.get('/', permissions.manager, overAllController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/cities', permissions.manager, overProvincesController);
+router.get('/cities', permissions.manager, overProvincesController)
 
 /**
  * @swagger
@@ -159,7 +159,7 @@ router.get('/cities', permissions.manager, overProvincesController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/performance', permissions.manager, performanceController);
+router.get('/performance', permissions.manager, performanceController)
 
 /**
  * @swagger
@@ -194,7 +194,7 @@ router.get('/performance', permissions.manager, performanceController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/owner', permissions.manager, ownerStatsController);
+router.get('/owner', permissions.manager, ownerStatsController)
 
 /**
  * @swagger
@@ -224,7 +224,7 @@ router.get('/owner', permissions.manager, ownerStatsController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/worksheets', permissions.manager, worksheetStatsController);
+router.get('/worksheets', permissions.manager, worksheetStatsController)
 
 /**
  * @swagger
@@ -254,6 +254,6 @@ router.get('/worksheets', permissions.manager, worksheetStatsController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/owner-business', permissions.manager, ownerBusinessStatsController);
+router.get('/owner-business', permissions.manager, ownerBusinessStatsController)
 
-export default router;
+export default router

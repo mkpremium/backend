@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   worksheetFindByIdController,
   worksheetListController,
@@ -11,10 +11,10 @@ import {
   updateQueueController,
   deleteQueueController,
   getScheduledWorksheetsController, removeScheduledWorksheetController, searchWorksheetController
-} from './controllers';
-import {permissions} from '../middleware/jwt';
+} from './controllers'
+import { permissions } from '../middleware/jwt'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -101,7 +101,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', worksheetListController);
+router.get('/', worksheetListController)
 
 /**
  * @swagger
@@ -125,7 +125,7 @@ router.get('/', worksheetListController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/queues', permissions.manager, queueListController);
+router.get('/queues', permissions.manager, queueListController)
 
 /**
  * @swagger
@@ -164,7 +164,7 @@ router.get('/queues', permissions.manager, queueListController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/queues', permissions.manager, createQueueController);
+router.post('/queues', permissions.manager, createQueueController)
 
 /**
  * @swagger
@@ -201,7 +201,7 @@ router.post('/queues', permissions.manager, createQueueController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/queues/:id', getQueueController);
+router.get('/queues/:id', getQueueController)
 
 /**
  * @swagger
@@ -228,7 +228,7 @@ router.get('/queues/:id', getQueueController);
  *       200:
  *         description: Operación exitosa
  */
-router.get('/queues/:id/taken', queueTakenFindByOperatorController);
+router.get('/queues/:id/taken', queueTakenFindByOperatorController)
 
 /**
  * @swagger
@@ -271,7 +271,7 @@ router.get('/queues/:id/taken', queueTakenFindByOperatorController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/queues/:id', actionsOnWorksheetQueueController);
+router.post('/queues/:id', actionsOnWorksheetQueueController)
 
 /**
  * @swagger
@@ -316,7 +316,7 @@ router.post('/queues/:id', actionsOnWorksheetQueueController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.put('/queues/:id', permissions.manager, updateQueueController);
+router.put('/queues/:id', permissions.manager, updateQueueController)
 
 /**
  * @swagger
@@ -350,7 +350,7 @@ router.put('/queues/:id', permissions.manager, updateQueueController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.delete('/queues/:id', permissions.manager, deleteQueueController);
+router.delete('/queues/:id', permissions.manager, deleteQueueController)
 
 /**
  * @swagger
@@ -376,7 +376,7 @@ router.delete('/queues/:id', permissions.manager, deleteQueueController);
  *           items:
  *             $ref: "#/definitions/QueueItem"
  */
-router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController);
+router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController)
 
 /**
  * @swagger
@@ -419,7 +419,7 @@ router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheets
  *           $ref: "#/definitions/Error"
  *
  */
-router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController);
+router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController)
 
 /**
  * @swagger
@@ -459,7 +459,7 @@ router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWork
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/search', searchWorksheetController);
+router.get('/search', searchWorksheetController)
 
 /**
  * @swagger
@@ -490,7 +490,7 @@ router.get('/search', searchWorksheetController);
  *       404:
  *         description: Ficha no encontrada
  */
-router.get('/:id', worksheetFindByIdController);
+router.get('/:id', worksheetFindByIdController)
 
 /**
  * @swagger
@@ -539,6 +539,6 @@ router.get('/:id', worksheetFindByIdController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/:id/owners', addOwnerToWorksheetController);
+router.post('/:id/owners', addOwnerToWorksheetController)
 
-export default router;
+export default router

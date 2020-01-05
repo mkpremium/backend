@@ -1,13 +1,13 @@
-import t from 'tcomb';
-import {WorksheetQueueCount} from '../types/worksheet';
+import t from 'tcomb'
+import { WorksheetQueueCount } from '../types/worksheet'
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
   RELEASE: 'RELEASE',
   NEXT: 'NEXT'
-};
+}
 
-t.QueueRequestAction = t.enums(QueueRequestAction);
+t.QueueRequestAction = t.enums(QueueRequestAction)
 
 /**
  * @swagger
@@ -34,31 +34,31 @@ const QueueRequestParams = t.struct(
       action: QueueRequestAction.TAKE
     }
   }
-);
+)
 
 const QueueRequestItemParams = QueueRequestParams.extend(
   {
     queueItemId: t.String
   }
-);
+)
 
 const QueueRequestWorksheetParams = QueueRequestParams.extend(
   {
     worksheetId: t.String
   }
-);
+)
 
-t.QueueRequestParams = t.union([QueueRequestParams, QueueRequestItemParams, QueueRequestWorksheetParams]);
-t.QueueRequestParams.dispatch = function(x) {
+t.QueueRequestParams = t.union([QueueRequestParams, QueueRequestItemParams, QueueRequestWorksheetParams])
+t.QueueRequestParams.dispatch = function (x) {
   switch (x.action) {
     case QueueRequestAction.NEXT:
-      return QueueRequestParams;
+      return QueueRequestParams
     case QueueRequestAction.RELEASE:
-      return QueueRequestWorksheetParams;
+      return QueueRequestWorksheetParams
     default:
-      return QueueRequestItemParams;
+      return QueueRequestItemParams
   }
-};
+}
 
 export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
   {
@@ -73,14 +73,14 @@ export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
       viewedBetween: ','
     }
   }
-);
+)
 
 t.WorksheeQueueListQuery = t.ListQuery.extend({
   status: t.maybe(t.WorkSheetQueueStatus),
   operatorId: t.maybe(t.String),
   date: t.maybe(t.String),
   dateRange: t.list(t.String)
-});
+})
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ t.WorkSheetLitResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -138,7 +138,7 @@ t.QueueListResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
   {
@@ -151,7 +151,7 @@ export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
       limit: 20
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -175,4 +175,4 @@ export const WorksheetSearchResponse = t.struct(
       results: []
     }
   }
-);
+)

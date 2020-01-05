@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
 
 /**
  * @swagger
@@ -19,7 +19,7 @@ import uuid from 'uuid/v4';
 t.NoteBody = t.struct({
   note: t.String,
   context: t.Object
-}, 'NoteBody');
+}, 'NoteBody')
 
 t.NoteListQuery = t.ListQuery.extend(
   {
@@ -34,7 +34,7 @@ t.NoteListQuery = t.ListQuery.extend(
       createdBetween: ','
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -72,15 +72,15 @@ export const TNote = t.Note = t.struct(
     name: 'Note',
     defaultProps: {
       _documentType: 'note',
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       }
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -109,4 +109,4 @@ t.NoteListResponse = t.struct(
       results: []
     }
   }
-);
+)

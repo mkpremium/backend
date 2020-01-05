@@ -1,6 +1,6 @@
-import * as t from 'tcomb';
+import * as t from 'tcomb'
 
-const Positive = t.refinement(t.Number, n => n >= 0, 'Positive');
+const Positive = t.refinement(t.Number, n => n >= 0, 'Positive')
 
 /**
  * @swagger
@@ -25,13 +25,13 @@ export const MeetingRestrictions = t.struct({
   meetingTime: Positive,
   timeBetweenMeeting: Positive,
   allowedStartMinutes: t.list(Positive)
-}, 'MeetingRestrictions');
+}, 'MeetingRestrictions')
 
 export const FreezerSettings = t.struct({
   enable: t.Boolean,
   daysInFreezer: Positive,
   provinces: t.list(t.String)
-}, 'FreezerSettings');
+}, 'FreezerSettings')
 
 /**
  * @swagger
@@ -71,8 +71,8 @@ export const SystemPreferences = t.struct(
       _documentType: 'system-preferences'
     }
   }
-);
+)
 
-SystemPreferences.prototype.setMaintenanceMode = function(enabled) {
-  return t.update(this, {maintenanceModeEnabled: {$set: enabled}});
-};
+SystemPreferences.prototype.setMaintenanceMode = function (enabled) {
+  return t.update(this, { maintenanceModeEnabled: { $set: enabled } })
+}

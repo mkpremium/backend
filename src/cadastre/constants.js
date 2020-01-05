@@ -5,7 +5,7 @@ export const keys = {
   BUILDING_BY_ADDRESS: 'BUILDING_BY_ADDRESS',
   BUILDING_BY_CADASTRE: 'BUILDING_BY_CADASTRE',
   LOCATION_BY_CADASTRE: 'LOCATION_BY_CADASTRE'
-};
+}
 
 export const streetTypes = {
   AC: ['ACCESO'],
@@ -101,7 +101,7 @@ export const streetTypes = {
   VI: ['VIA'],
   VL: ['VIAL'],
   VR: ['VEREDA']
-};
+}
 
 export const urls = {
   [keys.PROVINCES]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/ConsultaProvincia',
@@ -110,7 +110,7 @@ export const urls = {
   [keys.BUILDING_BY_ADDRESS]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx/Consulta_DNPLOC',
   [keys.BUILDING_BY_CADASTRE]: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
   [keys.LOCATION_BY_CADASTRE]: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC'
-};
+}
 
 const buildingTemplate = {
   building: {
@@ -147,7 +147,7 @@ const buildingTemplate = {
     buildingDate: '//ant'
   },
   error: '//err/des'
-};
+}
 
 export const templates = {
   [keys.PROVINCES]: {
@@ -180,4 +180,4 @@ export const templates = {
     ycen: '//geo/ycen',
     error: '//err/des'
   }
-};
+}

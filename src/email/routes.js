@@ -1,8 +1,8 @@
-import {Router} from 'express';
-import {createEmailController} from './controllers';
+import { Router } from 'express'
+import { createEmailController } from './controllers'
 
-const router = Router();
+const router = Router()
 
-router.post('/', createEmailController);
+router.post('/', createEmailController)
 
-export default router;
+export default router

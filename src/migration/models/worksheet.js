@@ -1,6 +1,6 @@
-import t from 'tcomb';
-import {cleanObjectKeys, removeNullValues} from './models-helper';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import { cleanObjectKeys, removeNullValues } from './models-helper'
+import uuid from 'uuid/v4'
 
 const WorksheetInputDTO = t.struct({
   id_chiamatafornitore: t.maybe(t.String),
@@ -58,10 +58,10 @@ const WorksheetInputDTO = t.struct({
   prezzomax: t.maybe(t.String),
   prezzorichiesto: t.maybe(t.String),
   differenzialeprezzi: t.maybe(t.String)
-});
+})
 
-export default function migrateFromCsv(data) {
-  const input = WorksheetInputDTO(removeNullValues(cleanObjectKeys(data)));
+export default function migrateFromCsv (data) {
+  const input = WorksheetInputDTO(removeNullValues(cleanObjectKeys(data)))
 
   return t.WorkSheet({
     id: uuid(),
@@ -70,5 +70,5 @@ export default function migrateFromCsv(data) {
       maximumToPay: parseFloat(input.prezzomax || 0),
       askedByOwner: parseFloat(input.prezzorichiesto || 0)
     }
-  });
+  })
 }

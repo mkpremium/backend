@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {searchPeopleController} from './controllers';
+import { Router } from 'express'
+import { searchPeopleController } from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -49,6 +49,6 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/SearchResponse"
  */
-router.get('/search', searchPeopleController);
+router.get('/search', searchPeopleController)
 
-export default router;
+export default router

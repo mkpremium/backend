@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import {cleanDataAndRemoveNullValues} from './models-helper';
+import t from 'tcomb'
+import { cleanDataAndRemoveNullValues } from './models-helper'
 
 const BuildingEntityDTO = t.struct({
   id_statoedificioentita: t.maybe(t.String),
@@ -22,36 +22,36 @@ const BuildingEntityDTO = t.struct({
   inquilino: t.maybe(t.String),
   richiestauscita: t.maybe(t.String),
   m2t: t.maybe(t.String)
-});
+})
 
-export const buildingEntitiesDefaultStatus = 'SIN DATOS';
+export const buildingEntitiesDefaultStatus = 'SIN DATOS'
 export const buildingEntitiesStatus = {
-  '2': 'VACIO',
-  '4': 'INDEFINIDO',
-  '5': 'A TERMINO',
-  '6': 'OKUPAS'
-};
+  2: 'VACIO',
+  4: 'INDEFINIDO',
+  5: 'A TERMINO',
+  6: 'OKUPAS'
+}
 
-export default function migrateFromCsv(data) {
-  const input = BuildingEntityDTO(cleanDataAndRemoveNullValues(data));
+export default function migrateFromCsv (data) {
+  const input = BuildingEntityDTO(cleanDataAndRemoveNullValues(data))
 
   const number = value => {
     if (value) {
-      return Number(value.replace(',', '.'));
+      return Number(value.replace(',', '.'))
     }
 
-    return 0;
-  };
+    return 0
+  }
 
   return t.BuildingEntity({
     name: input.entita,
     type: input.tipoentita,
     surface: number(input.m2),
     rent: number(input.mensile),
-    expiration: input.data_limite ? new Date(input.data_limite) : void 0,
+    expiration: input.data_limite ? new Date(input.data_limite) : undefined,
     status: buildingEntitiesStatus[input.id_situazione],
 
     _migrateBuildingId: input.id_catastro,
     _migrateIdStatus: input.id_situazione
-  });
+  })
 }

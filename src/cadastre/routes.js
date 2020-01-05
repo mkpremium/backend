@@ -1,12 +1,12 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   getCitiesController,
   getBuildingByAddressController,
   getProvincesController,
   getStreetsController, getBuildingByCadastreController
-} from './controllers';
+} from './controllers'
 
-const router = Router({});
+const router = Router({})
 
 /**
  * @swagger
@@ -37,7 +37,7 @@ const router = Router({});
  *       name:
  *         type: string
  */
-router.get('/provinces', getProvincesController);
+router.get('/provinces', getProvincesController)
 
 /**
  * @swagger
@@ -73,7 +73,7 @@ router.get('/provinces', getProvincesController);
  *       name:
  *         type: string
  */
-router.get('/cities', getCitiesController);
+router.get('/cities', getCitiesController)
 
 /**
  * @swagger
@@ -117,7 +117,7 @@ router.get('/cities', getCitiesController);
  *       type:
  *         type: string
  */
-router.get('/streets', getStreetsController);
+router.get('/streets', getStreetsController)
 
 /**
  * @swagger
@@ -146,7 +146,7 @@ router.get('/streets', getStreetsController);
  *         schema:
  *           $ref: "#/definitions/CadastreAddressInput"
  */
-router.post('/complete-info', getBuildingByAddressController);
+router.post('/complete-info', getBuildingByAddressController)
 
 /**
  * @swagger
@@ -175,7 +175,7 @@ router.post('/complete-info', getBuildingByAddressController);
  *         schema:
  *           $ref: "#/definitions/CadastreAddressInput"
  */
-router.post('/building-by-address', getBuildingByAddressController);
+router.post('/building-by-address', getBuildingByAddressController)
 
 /**
  * @swagger
@@ -204,6 +204,6 @@ router.post('/building-by-address', getBuildingByAddressController);
  *         schema:
  *           $ref: "#/definitions/CadastreReferenceInput"
  */
-router.post('/building-by-cadastre', getBuildingByCadastreController);
+router.post('/building-by-cadastre', getBuildingByCadastreController)
 
-export default router;
+export default router

@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 /**
  * @swagger
@@ -18,6 +18,6 @@ import t from 'tcomb';
 t.SignedUrlRequest = t.struct({
   fileName: t.String,
   fileType: t.String
-});
+})
 
-export default t;
+export default t

@@ -1,20 +1,20 @@
-import XLSX from 'xlsx';
-import fromJSON from 'tcomb/lib/fromJSON';
-import _difference from 'lodash/difference';
-import _uniq from 'lodash/uniq';
-import _pick from 'lodash/pick';
-import _each from 'lodash/each';
-import {CouchbaseModel} from '../db/model';
-import t, {BankFileData} from './types';
-import {newHttpError} from '../lib/http-error';
-import {calculateFilter, retrievePricesAndLocationInfo} from './lib/services';
-import {BANK_WORKER_NAMES} from './worker/workers';
-import {defer} from '../lib/promise-util';
+import XLSX from 'xlsx'
+import fromJSON from 'tcomb/lib/fromJSON'
+import _difference from 'lodash/difference'
+import _uniq from 'lodash/uniq'
+import _pick from 'lodash/pick'
+import _each from 'lodash/each'
+import { CouchbaseModel } from '../db/model'
+import t, { BankFileData } from './types'
+import { newHttpError } from '../lib/http-error'
+import { calculateFilter, retrievePricesAndLocationInfo } from './lib/services'
+import { BANK_WORKER_NAMES } from './worker/workers'
+import { defer } from '../lib/promise-util'
 
 const invertedList = {
   blacklisted: 'whitelisted',
   whitelisted: 'blacklisted'
-};
+}
 
 const extraFieldLabels = {
   rot: 'Rotación',
@@ -24,38 +24,38 @@ const extraFieldLabels = {
   priceInvest: 'Precio de inversión',
   priceSell: 'Precio de venta',
   errorMessage: 'Errores'
-};
+}
 
-function updateListed(action, userInput, cadastreReferences) {
-  const action1 = action;
-  const action2 = invertedList[action];
+function updateListed (action, userInput, cadastreReferences) {
+  const action1 = action
+  const action2 = invertedList[action]
   return {
     [action1]: _uniq(userInput[action1].concat(cadastreReferences)),
     [action2]: _difference(userInput[action2], cadastreReferences)
-  };
+  }
 }
 
-function setLabels(values) {
-  const result = {};
+function setLabels (values) {
+  const result = {}
   _each(values, (value, key) => {
     const format = (value) => {
       if (key === 'errorMessage') {
-        return value;
+        return value
       }
       if (key === 'rot') {
-        return Number(value).toFixed(2);
+        return Number(value).toFixed(2)
       } else {
-        return Math.round(Number(value));
+        return Math.round(Number(value))
       }
-    };
-    result[extraFieldLabels[key] || key] = format(value);
-  });
+    }
+    result[extraFieldLabels[key] || key] = format(value)
+  })
 
-  return result;
+  return result
 }
 
-function exportedFields(bankFileData) {
-  const bankFileRowData = bankFileData.bankFileRowData;
+function exportedFields (bankFileData) {
+  const bankFileRowData = bankFileData.bankFileRowData
   const extraFields = _pick(JSON.parse(JSON.stringify(bankFileData)), [
     'rot',
     'm2',
@@ -64,278 +64,278 @@ function exportedFields(bankFileData) {
     'priceInvest',
     'priceSell',
     'errorMessage'
-  ]);
-  const extraFieldsLabeled = setLabels(extraFields);
+  ])
+  const extraFieldsLabeled = setLabels(extraFields)
 
-  return Object.assign({}, bankFileRowData, extraFieldsLabeled);
+  return Object.assign({}, bankFileRowData, extraFieldsLabeled)
 }
 
 export class BankFileRepository extends CouchbaseModel {
-  constructor(gearman) {
-    super();
-    this.gearman = gearman;
-    this.Struct = t.BankFile;
+  constructor (gearman) {
+    super()
+    this.gearman = gearman
+    this.Struct = t.BankFile
   }
 
-  async exportFile(bankFileId, args) {
-    const params = fromJSON(args, t.BankFileExportInput);
-    const filename = `/tmp/${bankFileId}.xlsx`;
-    const bankFile = await this.findByIdOrThrow(bankFileId);
-    const repoData = new BankFileDataRepository();
-    const data = await repoData.findByFileBankIdAndBuy(bankFileId, params.buy);
-    const rows = data.map(exportedFields);
+  async exportFile (bankFileId, args) {
+    const params = fromJSON(args, t.BankFileExportInput)
+    const filename = `/tmp/${bankFileId}.xlsx`
+    const bankFile = await this.findByIdOrThrow(bankFileId)
+    const repoData = new BankFileDataRepository()
+    const data = await repoData.findByFileBankIdAndBuy(bankFileId, params.buy)
+    const rows = data.map(exportedFields)
 
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
-    XLSX.writeFile(wb, filename);
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.json_to_sheet(rows)
+    XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1')
+    XLSX.writeFile(wb, filename)
 
     return {
       bankFile,
       exported: filename
-    };
+    }
   }
 
-  async _doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences) {
+  async _doFilterAction (bankFile, args, bankFileDataRows, bankFileCadastreReferences) {
     const updatedUserInput = t.update(bankFile.userInput, {
       $merge: updateListed(args.action, bankFile.userInput, bankFileCadastreReferences)
-    });
-    const updatedBankFile = t.update(bankFile, {userInput: {$set: updatedUserInput}});
+    })
+    const updatedBankFile = t.update(bankFile, { userInput: { $set: updatedUserInput } })
 
-    await calculateFilter(bankFile.id, updatedBankFile.userInput);
+    await calculateFilter(bankFile.id, updatedBankFile.userInput)
 
-    return this.save(updatedBankFile);
+    return this.save(updatedBankFile)
   }
 
-  async doFilterAction(params, body) {
-    const args = t.BankFilterUpdateInput(Object.assign({}, params, body));
-    const repoData = new BankFileDataRepository();
-    const bankFile = await this.findByIdOrThrow(args.id);
-    let bankFileDataRows = [];
-    let bankFileCadastreReferences = [];
+  async doFilterAction (params, body) {
+    const args = t.BankFilterUpdateInput(Object.assign({}, params, body))
+    const repoData = new BankFileDataRepository()
+    const bankFile = await this.findByIdOrThrow(args.id)
+    let bankFileDataRows = []
+    let bankFileCadastreReferences = []
     if (args.bankFileDataIds) {
-      bankFileDataRows = await repoData.findByIds(args.bankFileDataIds);
-      bankFileCadastreReferences = bankFileDataRows.map(({cadastreReference}) => cadastreReference);
+      bankFileDataRows = await repoData.findByIds(args.bankFileDataIds)
+      bankFileCadastreReferences = bankFileDataRows.map(({ cadastreReference }) => cadastreReference)
     } else if (args.cadastreReferences) {
-      bankFileCadastreReferences = args.cadastreReferences;
-      bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences);
+      bankFileCadastreReferences = args.cadastreReferences
+      bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences)
     }
 
-    return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences);
+    return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences)
   }
 
-  async doFilterActionXLSX(params, file) {
-    const workbook = XLSX.readFile(file.path);
-    const [firstSheet] = workbook.SheetNames;
-    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-    const [cadastreCol] = Object.keys(sheet[0]);
-    const bankFileCadastreReferences = sheet.map(row => row[cadastreCol]);
-    const args = t.BankFilterUpdateInput(Object.assign({bankFileDataIds: []}, params));
-    const repoData = new BankFileDataRepository();
-    const bankFile = await this.findByIdOrThrow(args.id);
-    const bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences);
+  async doFilterActionXLSX (params, file) {
+    const workbook = XLSX.readFile(file.path)
+    const [firstSheet] = workbook.SheetNames
+    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet])
+    const [cadastreCol] = Object.keys(sheet[0])
+    const bankFileCadastreReferences = sheet.map(row => row[cadastreCol])
+    const args = t.BankFilterUpdateInput(Object.assign({ bankFileDataIds: [] }, params))
+    const repoData = new BankFileDataRepository()
+    const bankFile = await this.findByIdOrThrow(args.id)
+    const bankFileDataRows = await repoData.findByCadastreReference(bankFile.id, bankFileCadastreReferences)
 
-    return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences);
+    return this._doFilterAction(bankFile, args, bankFileDataRows, bankFileCadastreReferences)
   }
 
-  async calculateFilter(bankFileId, params) {
-    fromJSON(params, t.BankFilterUserInput);
-    const bankFile = await this.findByIdOrThrow(bankFileId);
-    const bankFileUserInput = t.update(bankFile.userInput, {$merge: params});
-    const updateBankFile = t.update(bankFile, {userInput: {$set: bankFileUserInput}});
-    const updatedBankFile = await this.save(updateBankFile);
-    const results = await calculateFilter(bankFileId, updatedBankFile.userInput);
-    return fromJSON({results}, t.ListBankFileData);
+  async calculateFilter (bankFileId, params) {
+    fromJSON(params, t.BankFilterUserInput)
+    const bankFile = await this.findByIdOrThrow(bankFileId)
+    const bankFileUserInput = t.update(bankFile.userInput, { $merge: params })
+    const updateBankFile = t.update(bankFile, { userInput: { $set: bankFileUserInput } })
+    const updatedBankFile = await this.save(updateBankFile)
+    const results = await calculateFilter(bankFileId, updatedBankFile.userInput)
+    return fromJSON({ results }, t.ListBankFileData)
   }
 
-  async processFile(file) {
+  async processFile (file) {
     const params = {
       mimetype: file.mimetype,
       filename: file.originalname,
       filepath: file.path
-    };
-    const bankFile = await this.save(params);
-    const payload = JSON.stringify(bankFile);
-    const options = {background: true};
+    }
+    const bankFile = await this.save(params)
+    const payload = JSON.stringify(bankFile)
+    const options = { background: true }
 
-    const {promise, resolve, reject} = defer();
-    const job = this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, payload, options);
-    job.on('submited', () => resolve(bankFile));
-    job.on('error', err => reject(err));
-    return promise;
+    const { promise, resolve, reject } = defer()
+    const job = this.gearman.submitJob(BANK_WORKER_NAMES.LOAD, payload, options)
+    job.on('submited', () => resolve(bankFile))
+    job.on('error', err => reject(err))
+    return promise
   }
 
-  async update(bankFile, $merge) {
-    const updatedBankFile = t.update(bankFile, {$merge});
-    return this.save(updatedBankFile);
+  async update (bankFile, $merge) {
+    const updatedBankFile = t.update(bankFile, { $merge })
+    return this.save(updatedBankFile)
   }
 
-  async setProcessed(bankFile, processed) {
-    return this.update(bankFile, {processed});
+  async setProcessed (bankFile, processed) {
+    return this.update(bankFile, { processed })
   }
 
-  async setTotal(bankFile, total) {
-    return this.update(bankFile, {total});
+  async setTotal (bankFile, total) {
+    return this.update(bankFile, { total })
   }
 
-  static single(bankFile) {
-    return fromJSON(bankFile, t.BankFileResponse);
+  static single (bankFile) {
+    return fromJSON(bankFile, t.BankFileResponse)
   }
 
-  static multiple(bankFiles) {
-    return fromJSON({results: bankFiles}, t.ListBankFileResponse);
+  static multiple (bankFiles) {
+    return fromJSON({ results: bankFiles }, t.ListBankFileResponse)
   }
 
-  async list() {
-    const qb = this.getQueryBuilder();
+  async list () {
+    const qb = this.getQueryBuilder()
     qb
       .order('createdAt', false)
-      .limit(5);
+      .limit(5)
 
-    const results = await this.query(qb);
+    const results = await this.query(qb)
 
-    return BankFileRepository.multiple(results);
+    return BankFileRepository.multiple(results)
   }
 
-  async _deleteBankFile(bankFileId) {
-    await this.findByIdOrThrow(bankFileId);
-    const qb = this.getQueryBuilder('delete');
-    qb.where('id = ?', bankFileId);
-    await this.deleteQuery(qb);
+  async _deleteBankFile (bankFileId) {
+    await this.findByIdOrThrow(bankFileId)
+    const qb = this.getQueryBuilder('delete')
+    qb.where('id = ?', bankFileId)
+    await this.deleteQuery(qb)
   }
 
-  async deleteBankFile(bankFileId) {
-    const dataRepo = new BankFileDataRepository();
-    await this._deleteBankFile(bankFileId);
-    await dataRepo.deleteByBankFileId(bankFileId);
+  async deleteBankFile (bankFileId) {
+    const dataRepo = new BankFileDataRepository()
+    await this._deleteBankFile(bankFileId)
+    await dataRepo.deleteByBankFileId(bankFileId)
   }
 }
 
 export class BankFileDataRepository extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = BankFileData;
+  constructor () {
+    super()
+    this.Struct = BankFileData
   }
 
-  async updateCounter(bankFileId) {
-    const repoFile = new BankFileRepository();
-    const counter = repoFile.getCounter();
-    const file = await repoFile.findById(bankFileId);
-    const value = await counter.count(bankFileId, 1);
-    return repoFile.setProcessed(file, value);
+  async updateCounter (bankFileId) {
+    const repoFile = new BankFileRepository()
+    const counter = repoFile.getCounter()
+    const file = await repoFile.findById(bankFileId)
+    const value = await counter.count(bankFileId, 1)
+    return repoFile.setProcessed(file, value)
   }
 
-  async updateErrorCounter(bankFileId) {
-    const repoFile = new BankFileRepository();
-    const counter = repoFile.getCounter();
-    const file = await repoFile.findById(bankFileId);
-    const value = await counter.count(`${bankFileId}:errors`, 1);
-    const updatedFile = await repoFile.update(file, {errors: value});
-    await repoFile.sendEvent(`${bankFileId}:error`, updatedFile);
-    return updatedFile;
+  async updateErrorCounter (bankFileId) {
+    const repoFile = new BankFileRepository()
+    const counter = repoFile.getCounter()
+    const file = await repoFile.findById(bankFileId)
+    const value = await counter.count(`${bankFileId}:errors`, 1)
+    const updatedFile = await repoFile.update(file, { errors: value })
+    await repoFile.sendEvent(`${bankFileId}:error`, updatedFile)
+    return updatedFile
   }
 
-  async findByFileBankIdAndBuy(bankFileId, buy) {
+  async findByFileBankIdAndBuy (bankFileId, buy) {
     const qb = this
       .getQueryBuilder()
       .where('bankFileId = ?', bankFileId)
-      .where('buy = ?', buy);
+      .where('buy = ?', buy)
 
-    return this.query(qb);
+    return this.query(qb)
   }
 
-  async findByFileBankId(bankFileId, processed) {
+  async findByFileBankId (bankFileId, processed) {
     const qb = this
       .getQueryBuilder()
-      .where('bankFileId = ?', bankFileId);
+      .where('bankFileId = ?', bankFileId)
 
     if (typeof processed !== 'undefined') {
-      qb.where('processed = ?', processed);
+      qb.where('processed = ?', processed)
     }
 
-    return this.query(qb);
+    return this.query(qb)
   }
 
-  async findByCadastreReference(bankFileId, cadastreReferences) {
+  async findByCadastreReference (bankFileId, cadastreReferences) {
     if (cadastreReferences.length < 1) {
-      throw newHttpError(400, 'cadastreReferences debe incluir al menos un valor');
+      throw newHttpError(400, 'cadastreReferences debe incluir al menos un valor')
     }
 
-    const references = `[${cadastreReferences.map(id => `'${id}'`).join(', ')}]`;
+    const references = `[${cadastreReferences.map(id => `'${id}'`).join(', ')}]`
     const qb = this
       .getQueryBuilder()
       .where('bankFileId = ?', bankFileId)
-      .where(`cadastreReference IN ${references}`);
-    return this.query(qb);
+      .where(`cadastreReference IN ${references}`)
+    return this.query(qb)
   }
 
-  async findByIds(bankFileDataIds) {
+  async findByIds (bankFileDataIds) {
     if (bankFileDataIds.length < 1) {
-      throw newHttpError(400, 'bankFileDataIds debe incluir al menos un valor');
+      throw newHttpError(400, 'bankFileDataIds debe incluir al menos un valor')
     }
-    const ids = `[${bankFileDataIds.map(id => `'${id}'`).join(', ')}]`;
+    const ids = `[${bankFileDataIds.map(id => `'${id}'`).join(', ')}]`
     const qb = this
       .getQueryBuilder()
-      .where(`id IN ${ids}`);
-    return this.query(qb);
+      .where(`id IN ${ids}`)
+    return this.query(qb)
   }
 
-  async process(bankFileData) {
-    let $merge = {};
-    let updatedBankFileData;
+  async process (bankFileData) {
+    let $merge = {}
+    let updatedBankFileData
     try {
-      $merge = await retrievePricesAndLocationInfo(bankFileData.cadastreReference);
+      $merge = await retrievePricesAndLocationInfo(bankFileData.cadastreReference)
       updatedBankFileData = t.update(bankFileData, {
         $merge,
-        processed: {$set: true}
-      });
+        processed: { $set: true }
+      })
     } catch (e) {
-      console.error('process have failed', e);
+      console.error('process have failed', e)
       updatedBankFileData = t.update(bankFileData, {
-        error: {$set: true},
-        errorMessage: {$set: e.message}
-      });
-      await this.updateErrorCounter(updatedBankFileData.bankFileId);
+        error: { $set: true },
+        errorMessage: { $set: e.message }
+      })
+      await this.updateErrorCounter(updatedBankFileData.bankFileId)
     }
 
-    await this.save(updatedBankFileData);
-    await this.updateCounter(updatedBankFileData.bankFileId);
+    await this.save(updatedBankFileData)
+    await this.updateCounter(updatedBankFileData.bankFileId)
   }
 
-  async update(bankFileData, $merge) {
-    const updatedBankFileData = t.update(bankFileData, {$merge});
-    return this.save(updatedBankFileData);
+  async update (bankFileData, $merge) {
+    const updatedBankFileData = t.update(bankFileData, { $merge })
+    return this.save(updatedBankFileData)
   }
 
-  async findByIdOrThrow(id) {
-    const bankFileData = await this.findById(id);
+  async findByIdOrThrow (id) {
+    const bankFileData = await this.findById(id)
     if (!bankFileData) {
-      throw newHttpError(404, `BankFileData ${id} no existe`);
+      throw newHttpError(404, `BankFileData ${id} no existe`)
     }
 
-    return bankFileData;
+    return bankFileData
   }
 
-  deleteByBankFileId(bankFileId) {
-    const qb = this.getQueryBuilder('delete');
-    qb.where('bankFileId = ?', bankFileId);
-    return this.deleteQuery(qb);
+  deleteByBankFileId (bankFileId) {
+    const qb = this.getQueryBuilder('delete')
+    qb.where('bankFileId = ?', bankFileId)
+    return this.deleteQuery(qb)
   }
 }
 
 export class BanksCityDataRepository extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = t.BanksCityData;
+  constructor () {
+    super()
+    this.Struct = t.BanksCityData
   }
 
-  static async findByName(name) {
-    const repo = new BanksCityDataRepository();
-    const qb = repo.getQueryBuilder();
+  static async findByName (name) {
+    const repo = new BanksCityDataRepository()
+    const qb = repo.getQueryBuilder()
     qb
       .where('name = ?', name)
-      .limit(1);
-    const [result] = await repo.query(qb);
-    return result;
+      .limit(1)
+    const [result] = await repo.query(qb)
+    return result
   }
 }

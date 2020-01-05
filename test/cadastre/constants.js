@@ -197,7 +197,7 @@ export const fakeProvinces = `<?xml version="1.0" encoding="utf-8"?>
       <np>ZARAGOZA</np>
     </prov>
   </provinciero>
-</consulta_provinciero>`;
+</consulta_provinciero>`
 
 export const fakeCities = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_municipiero xmlns="http://www.catastro.meh.es/">
@@ -3627,7 +3627,7 @@ export const fakeCities = `<?xml version="1.0" encoding="utf-8"?>
       </loine>
     </muni>
   </municipiero>
-</consulta_municipiero>`;
+</consulta_municipiero>`
 
 export const fakeStreets = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_callejero xmlns="http://www.catastro.meh.es/">
@@ -9642,7 +9642,7 @@ export const fakeStreets = `<?xml version="1.0" encoding="utf-8"?>
       </dir>
     </calle>
   </callejero>
-</consulta_callejero>`;
+</consulta_callejero>`
 
 export const fakeByCadastre = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_coordenadas xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.catastro.meh.es/">
@@ -9664,7 +9664,7 @@ export const fakeByCadastre = `<?xml version="1.0" encoding="utf-8"?>
       <ldt>CL UNIO DE LA 41 L'HOSPITALET DE LLOBREGAT (BARCELONA)</ldt>
     </coord>
   </coordenadas>
-</consulta_coordenadas>`;
+</consulta_coordenadas>`
 
 export const fakeBuildingByAddress = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_dnp xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.catastro.meh.es/">
@@ -9873,7 +9873,7 @@ export const fakeBuildingByAddress = `<?xml version="1.0" encoding="utf-8"?>
       </cons>
     </lcons>
   </bico>
-</consulta_dnp>`;
+</consulta_dnp>`
 
 export const buildingInfo = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_dnp xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.catastro.meh.es/">
@@ -10050,7 +10050,7 @@ export const buildingInfo = `<?xml version="1.0" encoding="utf-8"?>
       </cons>
     </lcons>
   </bico>
-</consulta_dnp>`;
+</consulta_dnp>`
 
 export const fakeBuildingByCadastre = `<?xml version="1.0" encoding="utf-8"?>
 <consulta_dnp xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.catastro.meh.es/">
@@ -10133,4 +10133,4 @@ export const fakeBuildingByCadastre = `<?xml version="1.0" encoding="utf-8"?>
       </cons>
     </lcons>
   </bico>
-</consulta_dnp>`;
+</consulta_dnp>`

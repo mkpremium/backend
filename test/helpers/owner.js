@@ -1,7 +1,7 @@
-import {OwnerRepository, PersonRepository} from '../../src/owner/models';
-import request from 'supertest';
-import app from '../../src/app';
-const chance = require('chance').Chance();
+import { OwnerRepository, PersonRepository } from '../../src/owner/models'
+import request from 'supertest'
+import app from '../../src/app'
+const chance = require('chance').Chance()
 
 /**
  * Creates a dummy verified and principal owner
@@ -9,29 +9,29 @@ const chance = require('chance').Chance();
  * @param buildingId
  * @returns {Promise<*>}
  */
-export async function createOwnerViaEndpointValid(authenticatedManager, buildingId) {
+export async function createOwnerViaEndpointValid (authenticatedManager, buildingId) {
   return createOwnerViaEndpoint_(authenticatedManager, buildingId, [
     {
       value: '12345678',
       status: 'UNDEFINED'
     }
-  ]);
+  ])
 }
 
-export async function createOwnerViaEndpointNoContacts(authenticatedManager, buildingId) {
-  return createOwnerViaEndpoint_(authenticatedManager, buildingId, []);
+export async function createOwnerViaEndpointNoContacts (authenticatedManager, buildingId) {
+  return createOwnerViaEndpoint_(authenticatedManager, buildingId, [])
 }
 
-export async function createOwnerViaEndpointBadContacts(authenticatedManager, buildingId) {
+export async function createOwnerViaEndpointBadContacts (authenticatedManager, buildingId) {
   return createOwnerViaEndpoint_(authenticatedManager, buildingId, [
     {
       value: '12345678',
       status: 'BAD'
     }
-  ]);
+  ])
 }
 
-export async function createOwnerViaEndpoint_(authenticatedManager, buildingId, contacts) {
+export async function createOwnerViaEndpoint_ (authenticatedManager, buildingId, contacts) {
   const ownerWithPersonToSave = {
     type: 'PRINCIPAL',
     status: 'VERIFICADO',
@@ -42,10 +42,10 @@ export async function createOwnerViaEndpoint_(authenticatedManager, buildingId, 
       personType: 'NATURAL',
       contacts
     }
-  };
+  }
 
   if (buildingId) {
-    ownerWithPersonToSave.buildingId = buildingId;
+    ownerWithPersonToSave.buildingId = buildingId
   }
 
   return request(app)
@@ -54,8 +54,8 @@ export async function createOwnerViaEndpoint_(authenticatedManager, buildingId, 
     .send(ownerWithPersonToSave)
     .expect(201)
     .then(response => {
-      return response.body;
-    });
+      return response.body
+    })
 }
 
 /**
@@ -65,30 +65,30 @@ export async function createOwnerViaEndpoint_(authenticatedManager, buildingId, 
  * @param authenticatedOperator
  * @returns {Promise<Test|*|void>}
  */
-export async function updateOwnerViaEndpoint(ownerId, payload, authenticatedOperator) {
+export async function updateOwnerViaEndpoint (ownerId, payload, authenticatedOperator) {
   return request(app)
     .put(`/owners/${ownerId}`)
     .set('Authorization', authenticatedOperator.authorization)
     .send(payload)
-    .expect(204);
+    .expect(204)
 }
 
 /**
  *
  * @param ownerId
  */
-export function findOwner(ownerId) {
-  const ownerRepo = new OwnerRepository();
-  return ownerRepo.findById(ownerId);
+export function findOwner (ownerId) {
+  const ownerRepo = new OwnerRepository()
+  return ownerRepo.findById(ownerId)
 }
 
 /**
  * Find person by owner.personId
  * @param personId
  */
-export function findOwnerPerson(personId) {
-  const personRepository = new PersonRepository();
-  return personRepository.findById(personId);
+export function findOwnerPerson (personId) {
+  const personRepository = new PersonRepository()
+  return personRepository.findById(personId)
 }
 
 module.exports = {
@@ -98,4 +98,4 @@ module.exports = {
   updateOwnerViaEndpoint,
   findOwner,
   findOwnerPerson
-};
+}

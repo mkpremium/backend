@@ -1,22 +1,22 @@
-import request from 'supertest';
-import app from '../../../src/app';
-import {OwnerRepository, PersonRepository} from '../../../src/owner/models';
-import {deleteAll, operatorCreate, operatorCreateManager, operatorLogin} from '../../common';
+import request from 'supertest'
+import app from '../../../src/app'
+import { OwnerRepository, PersonRepository } from '../../../src/owner/models'
+import { deleteAll, operatorCreate, operatorCreateManager, operatorLogin } from '../../common'
 
 describe('owner.routes', () => {
-  const personRepo = new PersonRepository();
-  let authenticatedOperator;
-  let authenticatedManager;
-  let ownerWithPersonToSave;
-  let ownerToUpdate;
-  let savedPerson;
+  const personRepo = new PersonRepository()
+  let authenticatedOperator
+  let authenticatedManager
+  let ownerWithPersonToSave
+  let ownerToUpdate
+  let savedPerson
 
-  before(async() => {
-    await deleteAll();
-    await operatorCreate();
-    await operatorCreateManager();
-    authenticatedOperator = await operatorLogin(app, {username: 'operator', password: 'Passw0rd'});
-    authenticatedManager = await operatorLogin(app, {username: 'manager', password: 'Passw0rd'});
+  before(async () => {
+    await deleteAll()
+    await operatorCreate()
+    await operatorCreateManager()
+    authenticatedOperator = await operatorLogin(app, { username: 'operator', password: 'Passw0rd' })
+    authenticatedManager = await operatorLogin(app, { username: 'manager', password: 'Passw0rd' })
 
     ownerWithPersonToSave = {
       type: 'PRINCIPAL',
@@ -27,34 +27,34 @@ describe('owner.routes', () => {
         name: 'person-test',
         personType: 'NATURAL'
       }
-    };
-  });
+    }
+  })
 
   describe('POST /owners @request', () => {
-    it('201 Registrar owner con person - Operación exitosa', async() => {
+    it('201 Registrar owner con person - Operación exitosa', async () => {
       await request(app)
         .post('/owners')
         .set('Authorization', authenticatedManager.authorization)
         .send(ownerWithPersonToSave) // TODO: currently buildingId are optional because the migration data
-        .expect(201);
-    });
-    
-    it('201 Registrar owner con personId - Operación exitosa', async() => {
-      savedPerson = await personRepo.save(ownerWithPersonToSave.person);
-      delete ownerWithPersonToSave.person;
-      ownerWithPersonToSave.personId = savedPerson.id;
+        .expect(201)
+    })
+
+    it('201 Registrar owner con personId - Operación exitosa', async () => {
+      savedPerson = await personRepo.save(ownerWithPersonToSave.person)
+      delete ownerWithPersonToSave.person
+      ownerWithPersonToSave.personId = savedPerson.id
       await request(app)
         .post('/owners')
         .set('Authorization', authenticatedManager.authorization)
         .send(ownerWithPersonToSave)
-        .expect(201);
-    });
-  });
+        .expect(201)
+    })
+  })
 
-  describe.skip('PUT /owners/:id @request', async() => {
-    it('204 Operación exitosa', async() => {
-      const ownerRepo = new OwnerRepository();
-      ownerToUpdate = await ownerRepo.save(ownerWithPersonToSave);
+  describe.skip('PUT /owners/:id @request', async () => {
+    it('204 Operación exitosa', async () => {
+      const ownerRepo = new OwnerRepository()
+      ownerToUpdate = await ownerRepo.save(ownerWithPersonToSave)
       await request(app)
         .put(`/owners/${ownerToUpdate.id}`)
         .set('Authorization', authenticatedOperator.authorization)
@@ -62,14 +62,14 @@ describe('owner.routes', () => {
           status: 'NO_VERIFICADO',
           note: 'This is a sample note'
         })
-        .expect(204);
-      
-      const updated = await ownerRepo.findById(ownerToUpdate.id);
-      updated.status.should.be.equal('NO_VERIFICADO');
-      updated.note.should.be.equal('This is a sample note');
-    });
+        .expect(204)
 
-    it('204 Verificar un propietario', async() => {
+      const updated = await ownerRepo.findById(ownerToUpdate.id)
+      updated.status.should.be.equal('NO_VERIFICADO')
+      updated.note.should.be.equal('This is a sample note')
+    })
+
+    it('204 Verificar un propietario', async () => {
       await request(app)
         .put(`/owners/${ownerToUpdate.id}`)
         .set('Authorization', authenticatedOperator.authorization)
@@ -78,19 +78,19 @@ describe('owner.routes', () => {
           verified: true,
           note: 'This is a sample note'
         })
-        .expect(204);
+        .expect(204)
 
-      const ownerRepo = new OwnerRepository();
-      const updated = await ownerRepo.findById(ownerToUpdate.id);
-      updated.status.should.be.equal('VERIFICADO');
-      updated.note.should.be.equal('This is a sample note');
-    });
+      const ownerRepo = new OwnerRepository()
+      const updated = await ownerRepo.findById(ownerToUpdate.id)
+      updated.status.should.be.equal('VERIFICADO')
+      updated.note.should.be.equal('This is a sample note')
+    })
 
-    it('404 Propietario no existe', async() => {
+    it('404 Propietario no existe', async () => {
       return request(app)
         .put('/owners/blah-blah')
         .set('Authorization', authenticatedOperator.authorization)
-        .expect(404);
-    });
-  });
-});
+        .expect(404)
+    })
+  })
+})

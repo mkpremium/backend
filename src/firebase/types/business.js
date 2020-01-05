@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 export const FirebaseBuildingData = t.struct({
   Aspiration: t.Number,
@@ -9,7 +9,7 @@ export const FirebaseBuildingData = t.struct({
   Cadastre: t.Any,
   lat: t.Number,
   lng: t.Number
-}, 'FirebaseBuildingData');
+}, 'FirebaseBuildingData')
 
 export const FirebaseMeeting = t.struct(
   {
@@ -35,7 +35,7 @@ export const FirebaseMeeting = t.struct(
       Aspiration: 0
     }
   }
-);
+)
 
 t.FirebaseDocument = t.struct(
   {
@@ -52,7 +52,7 @@ t.FirebaseDocument = t.struct(
       ThumbNail: ''
     }
   }
-);
+)
 
 t.FirebaseBuildingProposal = t.struct(
   {
@@ -68,7 +68,7 @@ t.FirebaseBuildingProposal = t.struct(
   {
     name: 'FirebaseBuildingProposal'
   }
-);
+)
 
 t.FirebaseBuildingEntity = t.struct({
   Entity: t.String,
@@ -77,6 +77,6 @@ t.FirebaseBuildingEntity = t.struct({
   Situation: t.String,
   Surface: t.Number,
   Type: t.maybe(t.String)
-}, 'FirebaseBuildingEntity');
+}, 'FirebaseBuildingEntity')
 
-export default t;
+export default t

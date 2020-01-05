@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 t.FirebaseUserStreet = t.struct({
   Nombre: t.String,
@@ -11,7 +11,7 @@ t.FirebaseUserStreet = t.struct({
   Numero_Agente: t.Number,
   Numero_Nivel: t.Number,
   Timestamp: t.Number
-}, 'FirebaseUserStreet');
+}, 'FirebaseUserStreet')
 
 t.FirebaseStreetBuildingData = t.struct({
   Id_Estado: t.maybe(t.String),
@@ -29,6 +29,6 @@ t.FirebaseStreetBuildingData = t.struct({
   Gps_Lat: t.Number,
   Gps_Lon: t.Number,
   Timestamp: t.Number
-}, 'FirebaseStreetBuildingData');
+}, 'FirebaseStreetBuildingData')
 
-export default t;
+export default t

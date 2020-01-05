@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import {deleteAll} from '../test/common';
-import {createBuildingWithWorksheet} from '../src/worksheet/building/model';
-import {queryBuildingByCity, setBuildingsPlaceIdByCity} from '../cli/cli-building-set-place-id';
+import _ from 'lodash'
+import Promise from 'bluebird'
+import { deleteAll } from '../test/common'
+import { createBuildingWithWorksheet } from '../src/worksheet/building/model'
+import { queryBuildingByCity, setBuildingsPlaceIdByCity } from '../cli/cli-building-set-place-id'
 
 describe('setBuildingsPlaceIdByCity', () => {
   const baseBuilding = {
@@ -24,31 +24,31 @@ describe('setBuildingsPlaceIdByCity', () => {
       zone: 'Norte',
       neighborhood: 'Miramar'
     }
-  };
+  }
 
-  const buildings = _.times(3, function(i) {
-    const reference = `aaaabbbcccc00045${i}`;
+  const buildings = _.times(3, function (i) {
+    const reference = `aaaabbbcccc00045${i}`
     return Object.assign({}, baseBuilding, {
       cadastre: {
         reference,
         address: 'TV 44 # 100 - 82'
       }
-    });
-  });
+    })
+  })
 
-  before(async() => {
-    await deleteAll();
-    await Promise.map(buildings, createBuildingWithWorksheet);
-  });
+  before(async () => {
+    await deleteAll()
+    await Promise.map(buildings, createBuildingWithWorksheet)
+  })
 
-  it.skip('able to set placeId on building without', async() => {
-    const city = 'Barranquilla';
-    const before = await queryBuildingByCity(city);
-    before.should.have.length(3);
+  it.skip('able to set placeId on building without', async () => {
+    const city = 'Barranquilla'
+    const before = await queryBuildingByCity(city)
+    before.should.have.length(3)
 
-    await setBuildingsPlaceIdByCity(city);
+    await setBuildingsPlaceIdByCity(city)
 
-    const after = await queryBuildingByCity(city);
-    after.should.have.length(0);
-  });
-});
+    const after = await queryBuildingByCity(city)
+    after.should.have.length(0)
+  })
+})

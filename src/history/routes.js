@@ -1,8 +1,8 @@
-import {Router} from 'express';
-import {listHistoryController} from './controllers';
-import {permissions} from '../middleware/jwt';
+import { Router } from 'express'
+import { listHistoryController } from './controllers'
+import { permissions } from '../middleware/jwt'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -64,6 +64,6 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', permissions.operator, listHistoryController);
+router.get('/', permissions.operator, listHistoryController)
 
-export default router;
+export default router

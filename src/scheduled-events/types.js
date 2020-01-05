@@ -1,14 +1,14 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
-import {isMaybeTesting} from '../../config';
-import {OwnerWithInclude} from '../types/owner';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
+import { isMaybeTesting } from '../../config'
+import { OwnerWithInclude } from '../types/owner'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
   MEETINGS: 'MEETINGS'
-};
+}
 
-t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType');
+t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType')
 
 /**
  * @swagger
@@ -111,13 +111,13 @@ const Event = t.struct(
     defaultProps: {
       inPerson: true
     }
-  });
+  })
 
 export const ScheduleTaskType = {
   UPDATE_BUILDING: 'update-building'
-};
+}
 
-t.ScheduleTaskType = t.enums.of(Object.values(ScheduleTaskType));
+t.ScheduleTaskType = t.enums.of(Object.values(ScheduleTaskType))
 t.ScheduledTask = t.struct(
   {
     id: t.String,
@@ -130,16 +130,16 @@ t.ScheduledTask = t.struct(
   {
     name: 'ScheduledTask',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       _documentType: 'scheduled-task'
     }
   }
-);
+)
 
 export const ScheduledEvent = t.ScheduledEvent = t.struct(
   {
@@ -158,12 +158,12 @@ export const ScheduledEvent = t.ScheduledEvent = t.struct(
     defaultProps: {
       _documentType: 'scheduled-event',
       event: {},
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       }
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -249,7 +249,7 @@ t.ScheduleEventsListResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -273,7 +273,7 @@ t.UpdateScheduledEvent = t.struct({
   notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date),
   event: t.maybe(Event)
-}, 'UpdateScheduledEvent');
+}, 'UpdateScheduledEvent')
 
 t.ScheduledEventListQuery = t.ListQuery.extend(
   {
@@ -294,7 +294,7 @@ t.ScheduledEventListQuery = t.ListQuery.extend(
       eventDateBetween: ','
     }
   }
-);
+)
 
 t.Meeting = t.struct({
   owner: isMaybeTesting(t.Object),
@@ -311,6 +311,6 @@ t.Meeting = t.struct({
   eventDate: t.Date,
   inPerson: t.Boolean,
   createdBy: isMaybeTesting(t.String)
-}, 'Meeting');
+}, 'Meeting')
 
-export default t;
+export default t

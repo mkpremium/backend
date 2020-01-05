@@ -1,7 +1,7 @@
-import uuid from 'uuid/v4';
+import uuid from 'uuid/v4'
 
-import t from 'tcomb';
-import {removeNullValues, cleanObjectKeys} from './models-helper';
+import t from 'tcomb'
+import { removeNullValues, cleanObjectKeys } from './models-helper'
 
 export const BuildingInputDTO = t.struct({
   id: t.Str,
@@ -41,41 +41,41 @@ export const BuildingInputDTO = t.struct({
   numero_3: t.maybe(t.Str),
   surfaceroof: t.maybe(t.Str),
   filter: t.maybe(t.Str)
-}, 'BuildingInputDTO');
+}, 'BuildingInputDTO')
 
-export default function migrateFromCsv(data) {
-  const input = BuildingInputDTO(removeNullValues(cleanObjectKeys(data)));
+export default function migrateFromCsv (data) {
+  const input = BuildingInputDTO(removeNullValues(cleanObjectKeys(data)))
 
   const postalCode = () => ({
     verified: !!input.postcode2,
     number: ('' + Number(input.postcode || input.postcode2)).padStart(5, '0')
-  });
+  })
   const ownerPhones = () => {
-    const phones = [];
+    const phones = []
 
     if (input.numero_pb) {
       phones.push({
         number: input.numero_pb,
         note: 'Número de paginas blancas'
-      });
+      })
     }
 
     if (input.numero_bd) {
       phones.push({
         number: input.numero_bd,
         note: 'Número de Access'
-      });
+      })
     }
 
     if (input.numero_abc) {
       phones.push({
         number: input.numero_abc,
         note: 'Número de ABC teléfonos'
-      });
+      })
     }
 
-    return phones;
-  };
+    return phones
+  }
   const owner = () => ({
     name: input.proprietari,
     address: {
@@ -83,24 +83,24 @@ export default function migrateFromCsv(data) {
       city: input.poblacio || input.municipality
     },
     phones: ownerPhones()
-  });
+  })
 
   const number = value => {
     if (value) {
-      const number = Number(value.replace(',', '.'));
-      return isNaN(number) ? 0 : number;
+      const number = Number(value.replace(',', '.'))
+      return isNaN(number) ? 0 : number
     }
 
-    return 0;
-  };
+    return 0
+  }
 
   const neighborhood = value => {
     if (/#/.test(value)) {
-      return value.split('#')[0].trim();
+      return value.split('#')[0].trim()
     } else {
-      return null;
+      return null
     }
-  };
+  }
 
   return t.Building({
     id: uuid(),
@@ -141,5 +141,5 @@ export default function migrateFromCsv(data) {
     },
     owner: owner(),
     state: input.numero_ib
-  });
+  })
 }

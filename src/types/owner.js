@@ -1,15 +1,15 @@
-import fromJSON from 'tcomb/lib/fromJSON';
-import t from 'tcomb';
-import _find from 'lodash/find';
-import _get from 'lodash/get';
-import _every from 'lodash/every';
-import {OwnerStatus, OwnerType} from './enums';
-import _ from 'lodash';
+import fromJSON from 'tcomb/lib/fromJSON'
+import t from 'tcomb'
+import _find from 'lodash/find'
+import _get from 'lodash/get'
+import _every from 'lodash/every'
+import { OwnerStatus, OwnerType } from './enums'
+import _ from 'lodash'
 
 t.OwnerBusiness = t.struct({
   meetingWithOperatorId: t.String,
   status: t.String
-}, 'OwnerBusiness');
+}, 'OwnerBusiness')
 
 /**
  * @swagger
@@ -55,7 +55,7 @@ t.OwnerBody = t.struct(
       person: {}
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -88,7 +88,7 @@ t.OwnerUpdate = t.struct({
   buildingId: t.maybe(t.String),
   person: t.maybe(t.Object),
   confirmed: t.maybe(t.Boolean)
-}, 'OwnerUpdate');
+}, 'OwnerUpdate')
 
 /**
  * @swagger
@@ -186,29 +186,29 @@ t.Person = t.struct(
       _verifiedOwnerMigrateId: null
     }
   }
-);
+)
 
-t.Person.prototype.findFirstGoodContact = function() {
-  const contact = _find(this.contacts, {status: 'GOOD'}, {});
-  return _get(contact, 'value');
-};
+t.Person.prototype.findFirstGoodContact = function () {
+  const contact = _find(this.contacts, { status: 'GOOD' }, {})
+  return _get(contact, 'value')
+}
 
-t.Person.prototype.findContactById = function(id) {
-  return _find(this.contacts, {id});
-};
+t.Person.prototype.findContactById = function (id) {
+  return _find(this.contacts, { id })
+}
 
-t.Person.prototype.findContactValueById = function(id) {
-  const contact = this.findContactById(id);
-  return contact ? contact.value : null;
-};
+t.Person.prototype.findContactValueById = function (id) {
+  const contact = this.findContactById(id)
+  return contact ? contact.value : null
+}
 
-t.Person.prototype.fullName = function() {
-  return `${this.name}`.trim();
-};
+t.Person.prototype.fullName = function () {
+  return `${this.name}`.trim()
+}
 
-t.Person.prototype.contactValueExists = function(value) {
-  return !!_find(this.contacts, {value});
-};
+t.Person.prototype.contactValueExists = function (value) {
+  return !!_find(this.contacts, { value })
+}
 
 /**
  * @swagger
@@ -241,7 +241,7 @@ t.OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
   confirmedAt: t.maybe(t.Date)
-}, 'confirmed');
+}, 'confirmed')
 
 export const Owner = t.Owner = t.struct(
   {
@@ -279,60 +279,60 @@ export const Owner = t.Owner = t.struct(
       _verifiedMigrateId: null
     }
   }
-);
+)
 
 export const OwnerWithInclude = t.OwnerWithInclude = t.Owner.extend({
   building: t.maybe(t.Building),
   person: t.maybe(t.Person)
-});
+})
 
-t.Owner.prototype.fullName = function() {
+t.Owner.prototype.fullName = function () {
   if (this.person) {
-    return this.person.fullName();
+    return this.person.fullName()
   }
-};
+}
 
-t.Owner.prototype.setStatus = function($set) {
-  return t.update(this, {status: {$set}});
-};
+t.Owner.prototype.setStatus = function ($set) {
+  return t.update(this, { status: { $set } })
+}
 
-t.Owner.prototype.pullOutFreezer = function(newStatus) {
+t.Owner.prototype.pullOutFreezer = function (newStatus) {
   return t.update(this, {
-    status: {$set: newStatus},
-    business: {$set: null}
-  });
-};
+    status: { $set: newStatus },
+    business: { $set: null }
+  })
+}
 
 /**
  * @return {t.Owner}
  */
-t.OwnerWithInclude.prototype.calculateOwnerValidStatus = function() {
+t.OwnerWithInclude.prototype.calculateOwnerValidStatus = function () {
   if (!this.person) {
-    throw new Error(`owner ${this.id} cannot calculateOwnerStatus`);
+    throw new Error(`owner ${this.id} cannot calculateOwnerStatus`)
   }
 
-  const contacts = _get(this, 'person.contacts', []);
-  const hasNoContacts = contacts.length === 0;
+  const contacts = _get(this, 'person.contacts', [])
+  const hasNoContacts = contacts.length === 0
 
   const isBadContact = contact =>
-    this.confirmedByOperator.value && contact.status === 'BAD';
+    this.confirmedByOperator.value && contact.status === 'BAD'
 
-  const ownerIsInvalid = hasNoContacts || _every(contacts, isBadContact);
+  const ownerIsInvalid = hasNoContacts || _every(contacts, isBadContact)
 
   if (ownerIsInvalid) {
-    return t.update(this, {status: {$set: OwnerStatus.ERROR}});
+    return t.update(this, { status: { $set: OwnerStatus.ERROR } })
   }
 
-  return this;
-};
+  return this
+}
 
-t.Owner.prototype.findFirstGoodContact = function() {
+t.Owner.prototype.findFirstGoodContact = function () {
   if (this.person) {
-    return this.person.prototype.findFirstGoodContact();
+    return this.person.prototype.findFirstGoodContact()
   }
-};
+}
 
-t.Owner.prototype.verifyOwner = function(confirmedBy, value = true, extra = {}) {
+t.Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   return t.update(this, {
     $merge: Object.assign({}, extra, {
       confirmedByOperator: {
@@ -341,140 +341,140 @@ t.Owner.prototype.verifyOwner = function(confirmedBy, value = true, extra = {}) 
         confirmedAt: new Date()
       }
     })
-  });
-};
+  })
+}
 
-t.Owner.prototype.isPrimaryVerified = function() {
-  return isPrimaryVerified(this);
-};
+t.Owner.prototype.isPrimaryVerified = function () {
+  return isPrimaryVerified(this)
+}
 
-export function familyOwner(data) {
-  const owner = fromJSON(data, t.Owner);
+export function familyOwner (data) {
+  const owner = fromJSON(data, t.Owner)
   return [
     OwnerType.PRINCIPAL,
     OwnerType.SECONDARY
-  ].indexOf(owner.type) !== -1;
+  ].indexOf(owner.type) !== -1
 }
 
-export function isPrimary(data) {
-  const owner = fromJSON(data, t.Owner);
-  return owner.type === OwnerType.PRINCIPAL;
+export function isPrimary (data) {
+  const owner = fromJSON(data, t.Owner)
+  return owner.type === OwnerType.PRINCIPAL
 }
 
-export function isPrimaryVerified(data) {
-  const owner = fromJSON(data, t.Owner);
+export function isPrimaryVerified (data) {
+  const owner = fromJSON(data, t.Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFIED &&
-    owner.type === OwnerType.PRINCIPAL;
+    owner.type === OwnerType.PRINCIPAL
 }
 
-export function ownerVerified(data) {
-  const owner = fromJSON(data, t.Owner);
+export function ownerVerified (data) {
+  const owner = fromJSON(data, t.Owner)
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.VERIFIED;
+    owner.status === OwnerStatus.VERIFIED
 }
 
-export function ownerVefifiedNoConfirmed(data) {
-  const owner = fromJSON(data, t.Owner);
-  return owner.status === OwnerStatus.VERIFIED;
+export function ownerVefifiedNoConfirmed (data) {
+  const owner = fromJSON(data, t.Owner)
+  return owner.status === OwnerStatus.VERIFIED
 }
 
-export function publicEntity(data) {
-  const owner = fromJSON(data, t.Owner);
+export function publicEntity (data) {
+  const owner = fromJSON(data, t.Owner)
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.PUBLIC;
+    owner.status === OwnerStatus.PUBLIC
 }
 
-export function publicEntityNotVerify(data) {
-  const owner = fromJSON(data, t.Owner);
-  return owner.status === OwnerStatus.PUBLIC;
+export function publicEntityNotVerify (data) {
+  const owner = fromJSON(data, t.Owner)
+  return owner.status === OwnerStatus.PUBLIC
 }
 
-export function isInvalidVerified(data) {
-  const owner = fromJSON(data, t.Owner);
+export function isInvalidVerified (data) {
+  const owner = fromJSON(data, t.Owner)
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.ERROR;
+    owner.status === OwnerStatus.ERROR
 }
 
-export function isInvalid(data) {
-  const owner = fromJSON(data, t.Owner);
-  return owner.status === OwnerStatus.ERROR;
+export function isInvalid (data) {
+  const owner = fromJSON(data, t.Owner)
+  return owner.status === OwnerStatus.ERROR
 }
 
-export function ownerNoSale(data) {
-  const owner = fromJSON(data, t.Owner);
+export function ownerNoSale (data) {
+  const owner = fromJSON(data, t.Owner)
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.NO_SALE;
+    owner.status === OwnerStatus.NO_SALE
 }
 
-export function ownerAlreadySold(data) {
-  const owner = fromJSON(data, t.Owner);
+export function ownerAlreadySold (data) {
+  const owner = fromJSON(data, t.Owner)
   return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.ALREADY_SOLD;
+    owner.status === OwnerStatus.ALREADY_SOLD
 }
 
-export function isAllowedChangeState(data) {
-  const owner = fromJSON(data, t.Owner);
+export function isAllowedChangeState (data) {
+  const owner = fromJSON(data, t.Owner)
   return [
     OwnerStatus.ALREADY_SOLD,
     OwnerStatus.NO_SALE,
     OwnerStatus.VERIFIED,
     OwnerStatus.PUBLIC
-  ].indexOf(owner.status) !== -1;
+  ].indexOf(owner.status) !== -1
 }
 
-export function haveOwnerBusiness(owners) {
-  const ownerWithBusiness = owners.filter(owner => !_.isEmpty(owner.business));
+export function haveOwnerBusiness (owners) {
+  const ownerWithBusiness = owners.filter(owner => !_.isEmpty(owner.business))
 
   switch (ownerWithBusiness.length) {
     case 0:
-      return null;
+      return null
     case 1:
-      return ownerWithBusiness[0];
+      return ownerWithBusiness[0]
     default: // more than 1
-      return goodOwnerBusiness(ownerWithBusiness);
+      return goodOwnerBusiness(ownerWithBusiness)
   }
 }
 
-function goodOwnerBusiness(owners) {
-  const sorted = owners.sort(sortByConfirmedAt);
-  return sorted[0];
+function goodOwnerBusiness (owners) {
+  const sorted = owners.sort(sortByConfirmedAt)
+  return sorted[0]
 }
 
-function sortByConfirmedAt(a, b) {
-  const valueA = _.get(a, 'confirmedByOperator.confirmedAt', null);
-  const valueB = _.get(b, 'confirmedByOperator.confirmedAt', null);
+function sortByConfirmedAt (a, b) {
+  const valueA = _.get(a, 'confirmedByOperator.confirmedAt', null)
+  const valueB = _.get(b, 'confirmedByOperator.confirmedAt', null)
 
   if (valueB === null) {
-    return -1;
+    return -1
   }
 
   if (valueA === null) {
-    return 1;
+    return 1
   }
 
   if (valueA < valueB) {
-    return 1;
+    return 1
   }
 
   if (valueB > valueA) {
-    return -1;
+    return -1
   }
 
-  return 0;
+  return 0
 }
 
 if (require.main === module) {
   const original = [
-    {confirmedByOperator: {confirmedAt: '2019-03-08T16:36:33.390Z'}},
-    {confirmedByOperator: null},
-    {confirmedByOperator: {confirmedAt: '2019-03-11T13:38:01.453Z'}},
-    {confirmedByOperator: null},
-    {confirmedByOperator: null}
-  ];
+    { confirmedByOperator: { confirmedAt: '2019-03-08T16:36:33.390Z' } },
+    { confirmedByOperator: null },
+    { confirmedByOperator: { confirmedAt: '2019-03-11T13:38:01.453Z' } },
+    { confirmedByOperator: null },
+    { confirmedByOperator: null }
+  ]
 
-  console.log('ORIGINAL', original);
+  console.log('ORIGINAL', original)
 
-  const sorted = original.sort(sortByConfirmedAt);
-  console.log('SORTED  ', sorted);
+  const sorted = original.sort(sortByConfirmedAt)
+  console.log('SORTED  ', sorted)
 }

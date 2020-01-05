@@ -1,17 +1,17 @@
-import t from 'tcomb';
-import fromJSON from 'tcomb/lib/fromJSON';
-import _find from 'lodash/find';
-import _findIndex from 'lodash/findIndex';
-import _filter from 'lodash/filter';
-import {Queue} from './constants';
-import debug from 'debug';
-import '../owner/types';
-import {Address} from './common';
-import {newHttpError} from '../lib/http-error';
-import {ScheduledEvent} from '../scheduled-events/types';
-import {utc} from '../lib/date';
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
+import _find from 'lodash/find'
+import _findIndex from 'lodash/findIndex'
+import _filter from 'lodash/filter'
+import { Queue } from './constants'
+import debug from 'debug'
+import '../owner/types'
+import { Address } from './common'
+import { newHttpError } from '../lib/http-error'
+import { ScheduledEvent } from '../scheduled-events/types'
+import { utc } from '../lib/date'
 
-const debugWorksheet = debug('app:types:worksheet');
+const debugWorksheet = debug('app:types:worksheet')
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -21,27 +21,27 @@ export const WorkSheetStatus = {
   ALREADY_SOLD: 'YA_VENDIO',
   MEETING: 'MEETING',
   PUBLIC: 'ENTE_PUBLICO'
-};
+}
 
 export const NotFinalWorksheetStats = [
   WorkSheetStatus.DEFAULT,
   WorkSheetStatus.WITH_OWNER
-];
+]
 
-export const worksheetStatusCanBeInsideFreezer = function(status) {
+export const worksheetStatusCanBeInsideFreezer = function (status) {
   switch (status) {
     case WorkSheetStatus.PUBLIC:
     case WorkSheetStatus.INVALID:
-      return false;
+      return false
     default:
-      return true;
+      return true
   }
-};
+}
 
-export const workSheetStatusTransition = function(status) {
+export const workSheetStatusTransition = function (status) {
   switch (status) {
     case WorkSheetStatus.DEFAULT:
-      return Object.values(WorkSheetStatus);
+      return Object.values(WorkSheetStatus)
     case WorkSheetStatus.WITH_OWNER:
       return [
         status,
@@ -49,33 +49,33 @@ export const workSheetStatusTransition = function(status) {
         WorkSheetStatus.MEETING,
         WorkSheetStatus.PUBLIC,
         WorkSheetStatus.ALREADY_SOLD
-      ];
+      ]
     case WorkSheetStatus.MEETING:
     case WorkSheetStatus.NO_SALE:
       return [
         status,
         WorkSheetStatus.WITH_OWNER
-      ];
+      ]
     // end status
     case WorkSheetStatus.ALREADY_SOLD:
     case WorkSheetStatus.INVALID:
     case WorkSheetStatus.PUBLIC:
       return [
         status
-      ];
+      ]
     default:
-      throw new Error(`Unknown worksheet transition status "${status}"`);
+      throw new Error(`Unknown worksheet transition status "${status}"`)
   }
-};
+}
 
-export const WorksheetStatus = t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus');
+export const WorksheetStatus = t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
 
-t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus');
+t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
 
 t.WorkSheetCall = t.struct({
   ownerId: t.String,
   realizedAt: t.Date
-}, 'WorkSheetCall');
+}, 'WorkSheetCall')
 
 /**
  * @swagger
@@ -157,45 +157,45 @@ export const Worksheet = t.WorkSheet = t.struct({
     _documentType: 'worksheet',
     inFreezer: false
   }
-});
+})
 
-t.WorkSheet.prototype.setStatus = function(newStatus) {
+t.WorkSheet.prototype.setStatus = function (newStatus) {
   if (newStatus === this.status) {
-    debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`);
-    return this;
+    debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`)
+    return this
   } else {
-    debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`);
-    return t.update(this, {status: {$set: newStatus}, statusChangedAt: {$set: utc().toDate()}});
+    debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`)
+    return t.update(this, { status: { $set: newStatus }, statusChangedAt: { $set: utc().toDate() } })
   }
-};
+}
 
-t.WorkSheet.prototype.fixStatus = function(newStatus) {
-  return t.update(this, {status: {$set: newStatus}});
-};
+t.WorkSheet.prototype.fixStatus = function (newStatus) {
+  return t.update(this, { status: { $set: newStatus } })
+}
 
-t.WorkSheet.prototype.pullOutFreezer = function(newStatus) {
-  const updated = this.setStatus(newStatus);
+t.WorkSheet.prototype.pullOutFreezer = function (newStatus) {
+  const updated = this.setStatus(newStatus)
 
   return t.update(updated, {
-    inFreezer: {$set: false},
-    lastAddedMeeting: {$set: null}
-  });
-};
+    inFreezer: { $set: false },
+    lastAddedMeeting: { $set: null }
+  })
+}
 
-t.WorkSheet.prototype.cleanMeetings = function() {
+t.WorkSheet.prototype.cleanMeetings = function () {
   return t.update(this, {
-    lastAddedMeeting: {$set: null}
-  });
-};
+    lastAddedMeeting: { $set: null }
+  })
+}
 
-t.WorkSheet.prototype.putOnFreezer = function() {
-  const $set = worksheetStatusCanBeInsideFreezer(this.status);
-  return t.update(this, {inFreezer: {$set}});
-};
+t.WorkSheet.prototype.putOnFreezer = function () {
+  const $set = worksheetStatusCanBeInsideFreezer(this.status)
+  return t.update(this, { inFreezer: { $set } })
+}
 
-t.WorkSheet.prototype.setStatusChangedAt = function(newDate) {
-  return t.update(this, {statusChangedAt: {$set: newDate}});
-};
+t.WorkSheet.prototype.setStatusChangedAt = function (newDate) {
+  return t.update(this, { statusChangedAt: { $set: newDate } })
+}
 
 /**
  * @swagger
@@ -241,12 +241,12 @@ t.QueueItem = t.struct(
     name: 'QueueItem',
     defaultProps: {
       status: Queue.Status.AVAILABLE,
-      get addedAt() {
-        return new Date();
+      get addedAt () {
+        return new Date()
       }
     }
   }
-);
+)
 
 t.QueueItemExtraInfo = t.QueueItem.extend({
   totalContacts: t.Number,
@@ -256,52 +256,52 @@ t.QueueItemExtraInfo = t.QueueItem.extend({
   buildingAddress: t.maybe(t.String),
   note: t.maybe(t.String),
   lastCall: t.maybe(t.WorkSheetCall)
-});
+})
 
-t.QueueItem.prototype.canBeOpened = function(operatorId) {
+t.QueueItem.prototype.canBeOpened = function (operatorId) {
   if (operatorId && this.operatorId) {
-    return operatorId === this.operatorId;
+    return operatorId === this.operatorId
   }
-  return Queue.StatusAvailable.indexOf(this.status) !== -1;
-};
+  return Queue.StatusAvailable.indexOf(this.status) !== -1
+}
 
-t.QueueItem.prototype.canBeReleased = function(operatorId) {
+t.QueueItem.prototype.canBeReleased = function (operatorId) {
   if (operatorId && this.operatorId) {
-    return operatorId === this.operatorId;
+    return operatorId === this.operatorId
   }
 
-  return false;
-};
+  return false
+}
 
-t.QueueItem.prototype.take = function(operatorId = null) {
+t.QueueItem.prototype.take = function (operatorId = null) {
   return t.update(this, {
-    status: {$set: Queue.Status.OPENED},
-    operatorId: {$set: operatorId}
-  });
-};
+    status: { $set: Queue.Status.OPENED },
+    operatorId: { $set: operatorId }
+  })
+}
 
-t.QueueItem.prototype.release = function() {
+t.QueueItem.prototype.release = function () {
   return t.update(this, {
-    status: {$set: Queue.Status.AVAILABLE},
-    operatorId: {$set: null},
-    event: {$set: null}
-  });
-};
+    status: { $set: Queue.Status.AVAILABLE },
+    operatorId: { $set: null },
+    event: { $set: null }
+  })
+}
 
-t.QueueItem.prototype.schedule = function(operatorId, scheduledEvent) {
+t.QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   return t.update(this, {
-    status: {$set: Queue.Status.SCHEDULED},
-    operatorId: {$set: operatorId},
-    event: {$set: scheduledEvent}
-  });
-};
+    status: { $set: Queue.Status.SCHEDULED },
+    operatorId: { $set: operatorId },
+    event: { $set: scheduledEvent }
+  })
+}
 
-t.QueueItem.prototype.releaseSchedule = function(operatorId) {
+t.QueueItem.prototype.releaseSchedule = function (operatorId) {
   if (this.status === Queue.Status.SCHEDULED && this.operatorId === operatorId) {
-    return this.release();
+    return this.release()
   }
-  throw newHttpError(400, 'No puede liberar este item');
-};
+  throw newHttpError(400, 'No puede liberar este item')
+}
 
 /**
  * @swagger
@@ -322,7 +322,7 @@ const WorksheetQueueSource = t.struct({
   province: t.maybe(t.String),
   zone: t.maybe(t.String),
   neighborhood: t.maybe(t.String)
-}, 'source');
+}, 'source')
 
 /**
  * @swagger
@@ -347,7 +347,7 @@ t.WorksheetQueueBody = t.struct(
       source: {}
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -384,13 +384,13 @@ t.WorksheetQueue = t.struct(
       _documentType: 'worksheet-queue'
     }
   }
-);
+)
 
 export const WorksheetQueueCount = t.WorksheetQueue.extend(
   {
     possibleNumberOfWorksheets: t.Number
   }
-);
+)
 
 t.WorksheetQueueExtraInfo = t.struct(
   {
@@ -411,35 +411,35 @@ t.WorksheetQueueExtraInfo = t.struct(
       _documentType: 'worksheet-queue'
     }
   }
-);
+)
 
-t.WorksheetQueue.prototype.findItemById = function(id) {
-  return _find(this.worksheets, {id});
-};
+t.WorksheetQueue.prototype.findItemById = function (id) {
+  return _find(this.worksheets, { id })
+}
 
-t.WorksheetQueue.prototype.findItemByWorksheetId = function(worksheetId) {
-  return _find(this.worksheets, {worksheetId});
-};
+t.WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
+  return _find(this.worksheets, { worksheetId })
+}
 
-t.WorksheetQueue.prototype.findItemByOperatorId = function(operatorId) {
-  return _find(this.worksheets, {operatorId});
-};
+t.WorksheetQueue.prototype.findItemByOperatorId = function (operatorId) {
+  return _find(this.worksheets, { operatorId })
+}
 
-t.WorksheetQueue.prototype.findOpenedItemByOperatorId = function(operatorId) {
-  return _find(this.worksheets, {operatorId, status: Queue.Status.OPENED});
-};
+t.WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
+  return _find(this.worksheets, { operatorId, status: Queue.Status.OPENED })
+}
 
-t.WorksheetQueue.prototype.findScheduledItemsByOperatorId = function(operatorId) {
-  return _filter(this.worksheets, {operatorId, status: Queue.Status.SCHEDULED});
-};
+t.WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
+  return _filter(this.worksheets, { operatorId, status: Queue.Status.SCHEDULED })
+}
 
-t.WorksheetQueue.prototype.findNextAvailableInQueue = function(currentItem = null) {
-  const currentItemId = currentItem ? currentItem.id : -1;
-  const currentIndex = _findIndex(this.worksheets, {id: currentItemId});
-  const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets;
-  return _find(worksheets, {status: Queue.Status.AVAILABLE});
-};
+t.WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null) {
+  const currentItemId = currentItem ? currentItem.id : -1
+  const currentIndex = _findIndex(this.worksheets, { id: currentItemId })
+  const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets
+  return _find(worksheets, { status: Queue.Status.AVAILABLE })
+}
 
-export function newWorksheet(data) {
-  return fromJSON(data, t.WorkSheet);
+export function newWorksheet (data) {
+  return fromJSON(data, t.WorkSheet)
 }

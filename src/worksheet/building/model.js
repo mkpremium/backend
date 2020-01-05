@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import {BuildingByCadastre, CreateBuildingInput} from './types';
-import {BuildingRepository} from '../../building/models';
-import {WorksheetRepository} from '../models/worksheet';
+import _ from 'lodash'
+import { BuildingByCadastre, CreateBuildingInput } from './types'
+import { BuildingRepository } from '../../building/models'
+import { WorksheetRepository } from '../models/worksheet'
 
 /**
  *
@@ -9,16 +9,16 @@ import {WorksheetRepository} from '../models/worksheet';
  * @return {Promise<*>}
  */
 
-export async function createBuildingWithWorksheet(data = {}) {
-  const input = CreateBuildingInput(data);
-  const {created, building} = BuildingByCadastre.is(input)
+export async function createBuildingWithWorksheet (data = {}) {
+  const input = CreateBuildingInput(data)
+  const { created, building } = BuildingByCadastre.is(input)
     ? await createBuildingByCadastre(data)
-    : await createBuildingByAddress(data);
+    : await createBuildingByAddress(data)
   const worksheet = created
     ? await WorksheetRepository.createNewForBuilding(building)
-    : await WorksheetRepository.findByBuilding(building.id);
+    : await WorksheetRepository.findByBuilding(building.id)
 
-  return {created, worksheet};
+  return { created, worksheet }
 }
 
 /**
@@ -26,18 +26,18 @@ export async function createBuildingWithWorksheet(data = {}) {
  * @param {BuildingByAddress} input
  * @return {Promise<*>}
  */
-async function createBuildingByAddress(input) {
-  const building = await BuildingRepository.findByAddress(_.get(input, 'address.fullAddress', ''));
+async function createBuildingByAddress (input) {
+  const building = await BuildingRepository.findByAddress(_.get(input, 'address.fullAddress', ''))
   if (building) {
     return {
       created: false,
       building
-    };
+    }
   } else {
     return {
       created: true,
       building: await BuildingRepository.createNewBuilding(input)
-    };
+    }
   }
 }
 
@@ -46,17 +46,17 @@ async function createBuildingByAddress(input) {
  * @param {BuildingByCadastre} input
  * @return {Promise<*>}
  */
-export async function createBuildingByCadastre(input) {
-  const building = await BuildingRepository.findByCadastreReference(input.cadastre);
+export async function createBuildingByCadastre (input) {
+  const building = await BuildingRepository.findByCadastreReference(input.cadastre)
   if (building) {
     return {
       created: false,
       building
-    };
+    }
   } else {
     return {
       created: true,
       building: await BuildingRepository.createNewBuilding(input)
-    };
+    }
   }
 }

@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {addNoteController, listNotesController} from './controllers';
+import { Router } from 'express'
+import { addNoteController, listNotesController } from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -64,7 +64,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', listNotesController);
+router.get('/', listNotesController)
 
 /**
  * @swagger
@@ -100,6 +100,6 @@ router.get('/', listNotesController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/', addNoteController);
+router.post('/', addNoteController)
 
-export default router;
+export default router

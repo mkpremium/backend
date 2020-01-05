@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   addOwnerContactController,
   addOwnerController,
@@ -6,9 +6,9 @@ import {
   updateBusinessStatusController,
   updateOwnerContactController,
   updateOwnerController
-} from './controllers';
+} from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -54,7 +54,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/', addOwnerController);
+router.post('/', addOwnerController)
 
 /**
  * @swagger
@@ -91,7 +91,7 @@ router.post('/', addOwnerController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id', updateOwnerController);
+router.put('/:id', updateOwnerController)
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.put('/:id', updateOwnerController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id/business-status', updateBusinessStatusController);
+router.put('/:id/business-status', updateBusinessStatusController)
 
 /**
  * @swagger
@@ -173,7 +173,7 @@ router.put('/:id/business-status', updateBusinessStatusController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id/contacts/:contactId', updateOwnerContactController);
+router.put('/:id/contacts/:contactId', updateOwnerContactController)
 
 /**
  * @swagger
@@ -210,7 +210,7 @@ router.put('/:id/contacts/:contactId', updateOwnerContactController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/:id/contacts', addOwnerContactController);
+router.post('/:id/contacts', addOwnerContactController)
 
 /**
  * @swagger
@@ -250,6 +250,6 @@ router.post('/:id/contacts', addOwnerContactController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/', listOwnerController);
+router.get('/', listOwnerController)
 
-export default router;
+export default router

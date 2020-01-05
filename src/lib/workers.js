@@ -1,36 +1,36 @@
-function error(e) {
+function error (e) {
   if (e.response) {
-    console.error(e.response.data || e.response.body || e.message);
+    console.error(e.response.data || e.response.body || e.message)
   } else {
-    console.error(e);
+    console.error(e)
   }
 }
 
-export function wrap(workerCallback) {
+export function wrap (workerCallback) {
   const wrapper = (job) => {
     const opts = {
       retryJobOnError: true
-    };
-    let input;
+    }
+    let input
     try {
-      input = JSON.parse(job.payload);
+      input = JSON.parse(job.payload)
     } catch (e) {
-      error(e);
-      process.exit(255);
+      error(e)
+      process.exit(255)
     }
     workerCallback(input, job, opts)
       .then(result => {
-        const data = result ? JSON.stringify(result) : null;
-        job.workComplete(data);
+        const data = result ? JSON.stringify(result) : null
+        job.workComplete(data)
       })
       .catch(err => {
-        error(err);
+        error(err)
         if (opts.retryJobOnError) {
-          process.exit(255);
+          process.exit(255)
         } else {
-          job.reportError();
+          job.reportError()
         }
-      });
-  };
-  return wrapper;
+      })
+  }
+  return wrapper
 }

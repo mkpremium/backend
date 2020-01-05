@@ -1,7 +1,7 @@
-import {Router} from 'express';
-import {suggestionController} from './controllers';
+import { Router } from 'express'
+import { suggestionController } from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -44,6 +44,6 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Autocomplete"
  */
-router.get('/:field', suggestionController);
+router.get('/:field', suggestionController)
 
-export default router;
+export default router

@@ -1,10 +1,10 @@
-import routes from './routes';
-import jwt from '../middleware/jwt';
-import swagger from './swagger';
+import routes from './routes'
+import jwt from '../middleware/jwt'
+import swagger from './swagger'
 
 export default (app) => {
-  const secured = jwt();
-  app.use('/banks', secured, routes);
+  const secured = jwt()
+  app.use('/banks', secured, routes)
 
   /**
    * @swagger
@@ -25,5 +25,5 @@ export default (app) => {
    *      al endpoint de inicio de sesión y guardara el token por usted
    */
 
-  swagger(app);
-};
+  swagger(app)
+}

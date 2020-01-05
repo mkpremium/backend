@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 /**
  * Helper to reduce the boilerplate to update inmutables t.list
@@ -7,7 +7,7 @@ import t from 'tcomb';
  * @param newValues {*}
  * @return {*}
  */
-export function updateList(list, currentItem, newValues) {
-  const index = list.indexOf(currentItem);
-  return t.update(list, {[index]: {$set: newValues}});
+export function updateList (list, currentItem, newValues) {
+  const index = list.indexOf(currentItem)
+  return t.update(list, { [index]: { $set: newValues } })
 }

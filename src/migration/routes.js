@@ -1,9 +1,9 @@
-import {Router} from 'express';
-import {migrationViewController, uploadFilesController} from './controllers';
+import { Router } from 'express'
+import { migrationViewController, uploadFilesController } from './controllers'
 
-const router = Router();
+const router = Router()
 
-router.get('/', migrationViewController);
-router.post('/', uploadFilesController);
+router.get('/', migrationViewController)
+router.post('/', uploadFilesController)
 
-export default router;
+export default router

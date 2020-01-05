@@ -1,27 +1,27 @@
-import Promise from 'bluebird';
-import io from 'socket.io-client';
-import t from 'tcomb';
-import debug from 'debug';
-import uuid from 'uuid/v4';
+import Promise from 'bluebird'
+import io from 'socket.io-client'
+import t from 'tcomb'
+import debug from 'debug'
+import uuid from 'uuid/v4'
 
-import {socket as socketConfig} from '../../config';
-import './types';
-import {OperatorRepository} from '../operator/models';
-import {defer} from '../lib/promise-util';
+import { socket as socketConfig } from '../../config'
+import './types'
+import { OperatorRepository } from '../operator/models'
+import { defer } from '../lib/promise-util'
 
-const SYSTEM_ID = 'system';
-const debugClient = debug('app:socket:server-client');
+const SYSTEM_ID = 'system'
+const debugClient = debug('app:socket:server-client')
 
-let buffer = [];
+let buffer = []
 
 export class SocketClient {
-  constructor(socket) {
-    this.socket = socket;
-    this.on = this.socket.on;
+  constructor (socket) {
+    this.socket = socket
+    this.on = this.socket.on
   }
 
-  static buildEvent(type, body) {
-    const documentType = body._documentType || body.model;
+  static buildEvent (type, body) {
+    const documentType = body._documentType || body.model
     return t.SocketEvent({
       model: documentType,
       id: body.id,
@@ -30,39 +30,39 @@ export class SocketClient {
         data: body
       },
       timestamp: new Date()
-    });
+    })
   }
 
-  async sendEvent(type, body) {
+  async sendEvent (type, body) {
     if (!this.socket) {
-      throw new Error('No conectado al servidor de sockets');
+      throw new Error('No conectado al servidor de sockets')
     }
 
-    const event = SocketClient.buildEvent(type, body);
-    const {promise, resolve, reject} = defer();
+    const event = SocketClient.buildEvent(type, body)
+    const { promise, resolve, reject } = defer()
 
-    debugClient('emitting', event.payload.type);
+    debugClient('emitting', event.payload.type)
 
     if (this.socket.connected) {
       this.socket.emit('event', event, ack => {
         if (!ack) {
-          reject(Error('Evento no pudo ser enviando'));
+          reject(Error('Evento no pudo ser enviando'))
         } else {
-          resolve(ack);
+          resolve(ack)
         }
-      });
+      })
     } else {
-      console.error(new Error('Evento no pudo ser enviando, socket no conectado se guarda en buffer'));
-      buffer.push({resolve, reject, event});
-      resolve(false);
+      console.error(new Error('Evento no pudo ser enviando, socket no conectado se guarda en buffer'))
+      buffer.push({ resolve, reject, event })
+      resolve(false)
     }
 
-    return promise;
+    return promise
   }
 }
 
-export async function connectServer(name = 'mkpremium', onReconnect) {
-  const id = uuid();
+export async function connectServer (name = 'mkpremium', onReconnect) {
+  const id = uuid()
   const payload = {
     id,
     permissions: [
@@ -72,46 +72,46 @@ export async function connectServer(name = 'mkpremium', onReconnect) {
       id,
       name
     }
-  };
+  }
 
-  const token = await OperatorRepository.createToken(payload);
+  const token = await OperatorRepository.createToken(payload)
   const options = {
     transports: ['websocket'],
     query: {
       token
     },
     reconnectionAttempts: socketConfig.reconnectionAttempts
-  };
-  let retries = options.reconnectionAttempts;
+  }
+  let retries = options.reconnectionAttempts
 
   return new Promise((resolve, reject) => {
-    const serverUri = `${socketConfig.server}:${socketConfig.port}`;
-    const socket = io(serverUri, options);
+    const serverUri = `${socketConfig.server}:${socketConfig.port}`
+    const socket = io(serverUri, options)
 
     socket.on('connect', () => {
-      debugClient('Server client connected', name);
-      const client = new SocketClient(socket);
-      resolve(client);
+      debugClient('Server client connected', name)
+      const client = new SocketClient(socket)
+      resolve(client)
       if (onReconnect) {
-        onReconnect(Promise.resolve(client));
+        onReconnect(Promise.resolve(client))
       }
       for (let i = 0; i < buffer.length; i++) {
-        socket.emit('event', buffer[i].event);
+        socket.emit('event', buffer[i].event)
       }
 
-      buffer = [];
-    });
+      buffer = []
+    })
 
     socket.on('connect_error', (error) => {
-      debugClient('connect_error', name, error.message);
+      debugClient('connect_error', name, error.message)
       if (retries <= 0) {
-        reject(new Error(`It's possible an error trying to connect socket service check your setup`));
+        reject(new Error('It\'s possible an error trying to connect socket service check your setup'))
       }
-    });
+    })
 
     socket.on('reconnect_attempt', () => {
-      debugClient('reconnect_attempt', name);
-      retries--;
-    });
-  });
+      debugClient('reconnect_attempt', name)
+      retries--
+    })
+  })
 }

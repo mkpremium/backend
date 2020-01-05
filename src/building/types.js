@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
 
 /**
  * @swagger
@@ -54,13 +54,13 @@ export const BuildingMetadata = t.BuildingMetadata = t.struct(
   {
     name: 'BuildingMetadata',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       _documentType: 'metadata'
     }
   }
-);
+)

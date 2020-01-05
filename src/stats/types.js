@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
 
 export const OperatorActions = {
   // Operator
@@ -13,9 +13,9 @@ export const OperatorActions = {
   // Business
   PROPOSAL_SENT: 'proposal_sent',
   BUSINESS_MEETING: 'business_meeting'
-};
+}
 
-t.OperatorActions = t.enums.of(Object.values(OperatorActions));
+t.OperatorActions = t.enums.of(Object.values(OperatorActions))
 
 t.OperatorStats = t.struct(
   {
@@ -31,16 +31,16 @@ t.OperatorStats = t.struct(
   {
     name: 'OperatorStats',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       _documentType: 'operator-stats'
     }
   }
-);
+)
 
 t.OperatorPerformace = t.struct(
   {
@@ -55,16 +55,16 @@ t.OperatorPerformace = t.struct(
   {
     name: 'OperatorStats',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       _documentType: 'operator-stats-performance'
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -111,6 +111,6 @@ t.OperatorResults = t.struct(
       onLine: false
     }
   }
-);
+)
 
-export default t;
+export default t

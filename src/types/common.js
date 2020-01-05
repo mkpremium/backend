@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
 
 /**
  * @swagger
@@ -22,7 +22,7 @@ t.PostalCode = t.struct(
       verified: false
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -40,7 +40,7 @@ t.SimpleAddress = t.struct({
   number: t.maybe(t.String),
   city: t.maybe(t.String),
   postalCode: t.maybe(t.String)
-}, 'SimpleAddress');
+}, 'SimpleAddress')
 
 /**
  * @swagger
@@ -60,13 +60,13 @@ t.SimplePhoneNumber = t.struct(
   {
     name: 'SimplePhoneNumber'
   }
-);
+)
 
 export const ContactInfoStatus = t.TypedContactInfoStatus = t.enums({
   UNDEFINED: 'UNDEFINED',
   GOOD: 'GOOD',
   BAD: 'BAD'
-});
+})
 
 /**
  * @swagger
@@ -123,15 +123,15 @@ t.TypedContactInfo = t.struct(
   {
     name: 'TypedContactInfo',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       type: 'TELEFONO',
       status: 'UNDEFINED',
       note: null
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -159,7 +159,7 @@ t.TypedContactInfoUpdate = t.struct(
   {
     name: 'TypedContactInfoUpdate'
   }
-);
+)
 
 /**
  * @swagger
@@ -206,4 +206,4 @@ export const Address = t.Address = t.struct(
       province: ''
     }
   }
-);
+)

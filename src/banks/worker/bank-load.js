@@ -1,93 +1,93 @@
-import gearman from 'gearmanode';
-import Promise from 'bluebird';
-import XLSX from 'xlsx';
+import gearman from 'gearmanode'
+import Promise from 'bluebird'
+import XLSX from 'xlsx'
 
-import couchbase from '../../db/couchbase';
-import {gearmanConfig} from '../../../config';
+import couchbase from '../../db/couchbase'
+import { gearmanConfig } from '../../../config'
 
-import {wrap} from '../../lib/workers';
+import { wrap } from '../../lib/workers'
 
-import {BankFileDataRepository, BankFileRepository} from '../models';
-import {BANK_WORKER_NAMES} from './workers';
-import socket from '../../socket';
+import { BankFileDataRepository, BankFileRepository } from '../models'
+import { BANK_WORKER_NAMES } from './workers'
+import socket from '../../socket'
 
-function toNumber(value, defaultValue) {
-  const number = Number(value || defaultValue);
+function toNumber (value, defaultValue) {
+  const number = Number(value || defaultValue)
   if (isNaN(number)) {
-    return defaultValue;
+    return defaultValue
   } else {
-    return number;
+    return number
   }
 }
 
 class BankLoadWorker {
-  constructor() {
+  constructor () {
     this.db = Promise.all([
       couchbase(),
       socket.initModel('bank-load')
-    ]);
-    this.client = gearman.client(gearmanConfig);
-    this.worker = gearman.worker(gearmanConfig);
+    ])
+    this.client = gearman.client(gearmanConfig)
+    this.worker = gearman.worker(gearmanConfig)
 
-    this._getAsyncProcessRow = this._getAsyncProcessRow.bind(this);
-    this._processRow = this._processRow.bind(this);
-    this._workerBankFile = this._workerBankFile.bind(this);
-    this._setTotal = this._setTotal.bind(this);
+    this._getAsyncProcessRow = this._getAsyncProcessRow.bind(this)
+    this._processRow = this._processRow.bind(this)
+    this._workerBankFile = this._workerBankFile.bind(this)
+    this._setTotal = this._setTotal.bind(this)
   }
 
-  async _processRow(row, bankFileId, cadastreCol, bankPriceCol) {
-    const repo = new BankFileDataRepository();
+  async _processRow (row, bankFileId, cadastreCol, bankPriceCol) {
+    const repo = new BankFileDataRepository()
     const bankFileData = await repo.save({
       bankFileId,
       bankFileRowData: row,
       cadastreReference: row[cadastreCol] || 'NO_VALUE_FOUND',
       priceBank: toNumber(row[bankPriceCol], 0)
-    });
+    })
 
-    const payload = JSON.stringify({id: bankFileData.id});
+    const payload = JSON.stringify({ id: bankFileData.id })
     const options = {
       unique: payload.id,
       background: true
-    };
-    this.client.submitJob(BANK_WORKER_NAMES.PROCESS, payload, options);
+    }
+    this.client.submitJob(BANK_WORKER_NAMES.PROCESS, payload, options)
   }
 
-  _getAsyncProcessRow(bankFileId, cadastreCol, bankPriceCol) {
-    return async(row) => {
+  _getAsyncProcessRow (bankFileId, cadastreCol, bankPriceCol) {
+    return async (row) => {
       try {
-        await this._processRow(row, bankFileId, cadastreCol, bankPriceCol);
+        await this._processRow(row, bankFileId, cadastreCol, bankPriceCol)
       } catch (e) {
-        console.error('ignorada la fila', e);
+        console.error('ignorada la fila', e)
       }
-    };
+    }
   }
 
-  async _setTotal(bankFile, total) {
-    const repo = new BankFileRepository();
-    return repo.setTotal(bankFile, total);
+  async _setTotal (bankFile, total) {
+    const repo = new BankFileRepository()
+    return repo.setTotal(bankFile, total)
   }
 
-  async _workerBankFile(bankFile, _, opts) {
-    opts.retryJobOnError = false;
-    const workbook = XLSX.readFile(bankFile.filepath);
-    const [firstSheet] = workbook.SheetNames;
-    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-    const [cadastreCol, bankPriceCol] = Object.keys(sheet[0]);
-    await this._setTotal(bankFile, sheet.length);
-    await Promise.each(sheet, this._getAsyncProcessRow(bankFile.id, cadastreCol, bankPriceCol));
+  async _workerBankFile (bankFile, _, opts) {
+    opts.retryJobOnError = false
+    const workbook = XLSX.readFile(bankFile.filepath)
+    const [firstSheet] = workbook.SheetNames
+    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet])
+    const [cadastreCol, bankPriceCol] = Object.keys(sheet[0])
+    await this._setTotal(bankFile, sheet.length)
+    await Promise.each(sheet, this._getAsyncProcessRow(bankFile.id, cadastreCol, bankPriceCol))
   }
 
-  async run() {
-    await this.db;
-    this.worker.addFunction(BANK_WORKER_NAMES.LOAD, wrap(this._workerBankFile));
+  async run () {
+    await this.db
+    this.worker.addFunction(BANK_WORKER_NAMES.LOAD, wrap(this._workerBankFile))
   }
 
-  static init() {
-    const worker = new BankLoadWorker();
+  static init () {
+    const worker = new BankLoadWorker()
     worker
       .run()
-      .catch(console.log.bind(console));
+      .catch(console.log.bind(console))
   }
 }
 
-BankLoadWorker.init();
+BankLoadWorker.init()

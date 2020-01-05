@@ -1,7 +1,7 @@
-import squel from 'squel';
+import squel from 'squel'
 
 class SelectLetQuery extends squel.cls.QueryBuilder {
-  constructor(options, block) {
+  constructor (options, block) {
     super(options, block || [
       new squel.cls.StringBlock(options, 'SELECT'),
       new squel.cls.GetFieldBlock(options),
@@ -12,12 +12,12 @@ class SelectLetQuery extends squel.cls.QueryBuilder {
       new squel.cls.OrderByBlock(options),
       new squel.cls.OffsetBlock(options),
       new squel.cls.LimitBlock(options)
-    ]);
+    ])
   }
 }
 
 class SelectUseKeyQuery extends squel.cls.QueryBuilder {
-  constructor(options, block) {
+  constructor (options, block) {
     super(options, block || [
       new squel.cls.StringBlock(options, 'SELECT'),
       new squel.cls.GetFieldBlock(options),
@@ -28,63 +28,63 @@ class SelectUseKeyQuery extends squel.cls.QueryBuilder {
       new squel.cls.OrderByBlock(options),
       new squel.cls.OffsetBlock(options),
       new squel.cls.LimitBlock(options)
-    ]);
+    ])
   }
 }
 
 class UseKeyBlock extends squel.cls.Block {
-  useKey(name) {
-    this._keyName = name;
+  useKey (name) {
+    this._keyName = name
   }
 
-  _toParamString(options) {
+  _toParamString (options) {
     if (!this._keyName) {
       return {
         text: '',
         values: []
-      };
+      }
     }
     return {
       text: `USE KEYS ${this._keyName}`,
       values: []
-    };
+    }
   }
 }
 
 class LetBlock extends squel.cls.Block {
-  constructor(options) {
-    super(options);
-    this._exprs = [];
+  constructor (options) {
+    super(options)
+    this._exprs = []
   }
 
-  letQuery(name, expr) {
-    this._exprs.push({name, expr});
+  letQuery (name, expr) {
+    this._exprs.push({ name, expr })
   }
 
-  _toParamString(options) {
+  _toParamString (options) {
     if (!this._exprs.length === 0) {
       return {
         text: '',
         values: []
-      };
+      }
     }
 
-    const text = this._exprs.map(({name, expr}) => `${name} = (${expr})`).join(', ');
-    let values = [];
-    this._exprs.forEach(({expr}) => {
-      values.concat(expr.toParam().values);
-    });
+    const text = this._exprs.map(({ name, expr }) => `${name} = (${expr})`).join(', ')
+    const values = []
+    this._exprs.forEach(({ expr }) => {
+      values.concat(expr.toParam().values)
+    })
     return {
       text: `LET ${text}`,
       values
-    };
+    }
   }
 }
 
-squel.let = function(options) {
-  return new SelectLetQuery(options);
-};
+squel.let = function (options) {
+  return new SelectLetQuery(options)
+}
 
-squel.useKey = function(options) {
-  return new SelectUseKeyQuery(options);
-};
+squel.useKey = function (options) {
+  return new SelectUseKeyQuery(options)
+}

@@ -1,32 +1,32 @@
-import {CouchbaseModel} from '../db/model';
-import {SystemPreferences} from './types';
+import { CouchbaseModel } from '../db/model'
+import { SystemPreferences } from './types'
 
-const systemPreferencesKey = 'system-preferences';
+const systemPreferencesKey = 'system-preferences'
 
 export class SystemPreferencesRepository extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = SystemPreferences;
+  constructor () {
+    super()
+    this.Struct = SystemPreferences
   }
 
-  async getPreferences(key = systemPreferencesKey) {
-    const pref = await this.findById(key);
+  async getPreferences (key = systemPreferencesKey) {
+    const pref = await this.findById(key)
 
     // return default value
     if (!pref) {
-      return SystemPreferences({});
+      return SystemPreferences({})
     }
 
-    return pref;
+    return pref
   }
 
-  static async getPreferences(key) {
-    const repo = new SystemPreferencesRepository();
-    return repo.getPreferences(key);
+  static async getPreferences (key) {
+    const repo = new SystemPreferencesRepository()
+    return repo.getPreferences(key)
   }
 
-  static async writePreferences(pref) {
-    const repo = new SystemPreferencesRepository();
-    return repo.save(SystemPreferences(pref));
+  static async writePreferences (pref) {
+    const repo = new SystemPreferencesRepository()
+    return repo.save(SystemPreferences(pref))
   }
 }

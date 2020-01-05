@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 t.SocketEvent = t.struct({
   model: t.String,
@@ -8,4 +8,4 @@ t.SocketEvent = t.struct({
     data: t.Any
   }),
   timestamp: t.Date
-}, 'SocketEvent');
+}, 'SocketEvent')

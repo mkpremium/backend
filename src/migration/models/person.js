@@ -1,8 +1,8 @@
-import uuid from 'uuid/v4';
-import _get from 'lodash/get';
-import _uniq from 'lodash/uniq';
-import t from 'tcomb';
-import {removeNullValues, cleanObjectKeys} from './models-helper';
+import uuid from 'uuid/v4'
+import _get from 'lodash/get'
+import _uniq from 'lodash/uniq'
+import t from 'tcomb'
+import { removeNullValues, cleanObjectKeys } from './models-helper'
 
 export const PersonInputDTO = t.struct({
   id: t.maybe(t.String),
@@ -37,77 +37,77 @@ export const PersonInputDTO = t.struct({
   sexo: t.maybe(t.String),
   tel_he: t.maybe(t.String),
   movil_he: t.maybe(t.String)
-}, 'BuildingInputDTO');
+}, 'BuildingInputDTO')
 
-function isEmpty(val) {
-  return typeof val === 'undefined' || val == null || val === '';
+function isEmpty (val) {
+  return typeof val === 'undefined' || val == null || val === ''
 }
 
-function birthDate(input) {
+function birthDate (input) {
   if (isEmpty(input.ano_naci) || isEmpty(input.mes_naci) || isEmpty(input.dia_naci)) {
-    return null;
+    return null
   }
-  return new Date(`${input.ano_naci}-${input.mes_naci}-${input.dia_naci}`);
+  return new Date(`${input.ano_naci}-${input.mes_naci}-${input.dia_naci}`)
 }
 
-function address(input, codes) {
-  const postalCode = input.cod_post ? input.cod_post.padStart(5, '0') : null;
-  const info = postalCode ? codes.findByPostalCode(postalCode) : null;
-  const city = info ? info.nombre_entidad_singular : null;
+function address (input, codes) {
+  const postalCode = input.cod_post ? input.cod_post.padStart(5, '0') : null
+  const info = postalCode ? codes.findByPostalCode(postalCode) : null
+  const city = info ? info.nombre_entidad_singular : null
   return ({
     fullAddress: input.domicili,
     floor: input.piso,
     number: input.puerta,
     postalCode,
     city
-  });
+  })
 }
 
-function gender(input) {
-  const value = input.sexo || '';
+function gender (input) {
+  const value = input.sexo || ''
   switch (value.toUpperCase()) {
     case 'H':
-      return 'MASCULINO';
+      return 'MASCULINO'
     case 'M':
-      return 'FEMENINO';
+      return 'FEMENINO'
     default:
-      return 'NINGUNO';
+      return 'NINGUNO'
   }
 }
 
-function contacts(input) {
-  const contacts = [];
+function contacts (input) {
+  const contacts = []
 
   if (!isEmpty(input.telefono_pb)) {
-    contacts.push(input.telefono_pb);
+    contacts.push(input.telefono_pb)
   }
 
   if (!isEmpty(input.telefono_ib)) {
-    contacts.push(input.telefono_ib);
+    contacts.push(input.telefono_ib)
   }
 
   if (!isEmpty(input.telefono_abc)) {
-    contacts.push(input.telefono_abc);
-  }
-  
-  if (!isEmpty(input.tel_he)) {
-    contacts.push(input.tel_he);
-  }
-  
-  if (!isEmpty(input.movil_he)) {
-    contacts.push(input.movil_he);
+    contacts.push(input.telefono_abc)
   }
 
-  return _uniq(contacts).map(value => ({value}));
+  if (!isEmpty(input.tel_he)) {
+    contacts.push(input.tel_he)
+  }
+
+  if (!isEmpty(input.movil_he)) {
+    contacts.push(input.movil_he)
+  }
+
+  return _uniq(contacts).map(value => ({ value }))
 }
 
-export default function migrateFromCsv(data = {}, codes) {
-  const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)));
+export default function migrateFromCsv (data = {}, codes) {
+  const input = PersonInputDTO(removeNullValues(cleanObjectKeys(data)))
   const name = `${_get(input, 'apellido_1', '')} ${_get(input, 'apellido_2', '')} ${_get(input, 'nombre', '')}`
     .trim()
-    .replace(/\s+/g, ' ');
+    .replace(/\s+/g, ' ')
 
-  const addr = address(input, codes);
+  const addr = address(input, codes)
 
   return t.Person({
     id: uuid(),
@@ -124,5 +124,5 @@ export default function migrateFromCsv(data = {}, codes) {
     personType: 'NATURAL',
     _migrateId: input.id,
     _relatedTo: input.proprietari
-  });
+  })
 }

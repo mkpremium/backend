@@ -1,10 +1,10 @@
-import './types';
-import routes from './routes';
+import './types'
+import routes from './routes'
 
-import jwt from '../middleware/jwt';
+import jwt from '../middleware/jwt'
 
 export default (app) => {
-  const secured = jwt();
+  const secured = jwt()
 
-  app.use('/people', secured, routes);
-};
+  app.use('/people', secured, routes)
+}

@@ -1,4 +1,4 @@
-import Utm from 'utm-latlng';
+import Utm from 'utm-latlng'
 
 const SRS = {
   'EPSG:32627': 'WGS 84',
@@ -12,7 +12,7 @@ const SRS = {
   'EPSG:23029': 'ED50',
   'EPSG:23030': 'ED50',
   'EPSG:23031': 'ED50'
-};
+}
 const ZONE_NUM = {
   'EPSG:32627': 27,
   'EPSG:32628': 28,
@@ -25,9 +25,9 @@ const ZONE_NUM = {
   'EPSG:23029': 29,
   'EPSG:23030': 30,
   'EPSG:23031': 31
-};
+}
 
-export function parseCoords({srs, xcen, ycen}) {
-  const utm = new Utm(SRS[srs]);
-  return utm.convertUtmToLatLng(xcen, ycen, ZONE_NUM[srs], 'N');
+export function parseCoords ({ srs, xcen, ycen }) {
+  const utm = new Utm(SRS[srs])
+  return utm.convertUtmToLatLng(xcen, ycen, ZONE_NUM[srs], 'N')
 }

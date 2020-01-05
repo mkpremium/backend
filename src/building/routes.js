@@ -1,12 +1,12 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   addEntityController,
   addMetadataToBuildingController,
   addNegotiationProposalController, addOwnerToBuildingController,
   createMetadataUploadUrlController, removeEntityController, updateEntityController, updateNegotiationProposalController
-} from './controllers';
+} from './controllers'
 
-const router = Router();
+const router = Router()
 /**
  * @swagger
  * tags:
@@ -52,7 +52,7 @@ const router = Router();
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/create-url', createMetadataUploadUrlController);
+router.post('/create-url', createMetadataUploadUrlController)
 
 /**
  * @swagger
@@ -96,7 +96,7 @@ router.post('/create-url', createMetadataUploadUrlController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/:id/metadata', addMetadataToBuildingController);
+router.post('/:id/metadata', addMetadataToBuildingController)
 
 /**
  * @swagger
@@ -138,7 +138,7 @@ router.post('/:id/metadata', addMetadataToBuildingController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/:id/negotiation', addNegotiationProposalController);
+router.post('/:id/negotiation', addNegotiationProposalController)
 
 /**
  * @swagger
@@ -183,7 +183,7 @@ router.post('/:id/negotiation', addNegotiationProposalController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:building_id/negotiation/:id', updateNegotiationProposalController);
+router.put('/:building_id/negotiation/:id', updateNegotiationProposalController)
 
 /**
  * @swagger
@@ -222,7 +222,7 @@ router.put('/:building_id/negotiation/:id', updateNegotiationProposalController)
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/:id/entities', addEntityController);
+router.post('/:id/entities', addEntityController)
 
 /**
  * @swagger
@@ -264,7 +264,7 @@ router.post('/:id/entities', addEntityController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.put('/:id/entities/:entityId', updateEntityController);
+router.put('/:id/entities/:entityId', updateEntityController)
 
 /**
  * @swagger
@@ -300,7 +300,7 @@ router.put('/:id/entities/:entityId', updateEntityController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.delete('/:id/entities/:entityId', removeEntityController);
+router.delete('/:id/entities/:entityId', removeEntityController)
 
 /**
  * @swagger
@@ -350,6 +350,6 @@ router.delete('/:id/entities/:entityId', removeEntityController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/:id/owners', addOwnerToBuildingController);
+router.post('/:id/owners', addOwnerToBuildingController)
 
-export default router;
+export default router

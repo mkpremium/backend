@@ -1,31 +1,31 @@
-import debug from 'debug';
-import _isNil from 'lodash/isNil';
-import _groupBy from 'lodash/groupBy';
-import _ from 'lodash';
-import {CouchbaseModel} from '../db/model';
-import t, {OperatorActions} from './types';
+import debug from 'debug'
+import _isNil from 'lodash/isNil'
+import _groupBy from 'lodash/groupBy'
+import _ from 'lodash'
+import { CouchbaseModel } from '../db/model'
+import t, { OperatorActions } from './types'
 import {
   addBetweenQueryToBuilder,
   addDateQueryToBuilder,
   rangeStartEnd,
   dateRangeArray,
   splitDateRange
-} from '../lib/query/helpers';
-import {queryDateFormat, utc} from '../lib/date';
-import {operatorPerformance} from '../../config';
+} from '../lib/query/helpers'
+import { queryDateFormat, utc } from '../lib/date'
+import { operatorPerformance } from '../../config'
 
-const statDebug = debug('app:model:stats');
+const statDebug = debug('app:model:stats')
 
 export class OperatorStats extends CouchbaseModel {
-  constructor() {
-    super();
-    this.Struct = t.OperatorStats;
+  constructor () {
+    super()
+    this.Struct = t.OperatorStats
   }
 
-  static async registerAction(operatorId, action, filters = {}) {
-    statDebug('registerAction', action, operatorId);
-    const operatorStats = new OperatorStats();
-    return operatorStats.save(Object.assign({operatorId, action}, filters));
+  static async registerAction (operatorId, action, filters = {}) {
+    statDebug('registerAction', action, operatorId)
+    const operatorStats = new OperatorStats()
+    return operatorStats.save(Object.assign({ operatorId, action }, filters))
   }
 }
 
@@ -42,13 +42,13 @@ const GetStatsFilterBase = t.struct(
       view: 'total'
     }
   }
-);
+)
 
 const GetStatsFilterRange = GetStatsFilterBase.extend(
   {
     dateBetween: t.String
   }
-);
+)
 
 const GetStatsFilterFixed = GetStatsFilterBase.extend(
   {
@@ -66,108 +66,108 @@ const GetStatsFilterFixed = GetStatsFilterBase.extend(
       range: 'today'
     }
   }
-);
+)
 
 const GetStatsFilter = t.union([
   GetStatsFilterRange,
   GetStatsFilterFixed
-]);
+])
 
-GetStatsFilter.dispatch = function(x) {
+GetStatsFilter.dispatch = function (x) {
   if (typeof x.dateBetween !== 'undefined') {
-    return GetStatsFilterRange;
+    return GetStatsFilterRange
   }
 
-  return GetStatsFilterFixed;
-};
+  return GetStatsFilterFixed
+}
 
-function getDateBetweenByFixed(value, offset = 0) {
-  const today = utc();
-  const yesterday = today.clone().subtract(1, 'days');
-  const lastMonth = today.clone().subtract(1, 'months');
-  const lastYear = today.clone().subtract(1, 'year');
+function getDateBetweenByFixed (value, offset = 0) {
+  const today = utc()
+  const yesterday = today.clone().subtract(1, 'days')
+  const lastMonth = today.clone().subtract(1, 'months')
+  const lastYear = today.clone().subtract(1, 'year')
   switch (value) {
     case 'lastYear':
       return [
         queryDateFormat(lastYear.clone().subtract(offset, 'days').startOf('year')),
-        queryDateFormat(lastYear.clone().endOf('year'))].join(',');
+        queryDateFormat(lastYear.clone().endOf('year'))].join(',')
     case 'year':
       return [
         queryDateFormat(today.clone().subtract(offset, 'days').startOf('year')),
-        queryDateFormat(today.clone().endOf('day'))].join(',');
+        queryDateFormat(today.clone().endOf('day'))].join(',')
     case 'month':
       return [
         queryDateFormat(today.clone().subtract(offset, 'days').startOf('month')),
-        queryDateFormat(today.clone().endOf('day'))].join(',');
+        queryDateFormat(today.clone().endOf('day'))].join(',')
     case 'lastMonth':
       return [
         queryDateFormat(lastMonth.clone().subtract(offset, 'days').startOf('month')),
-        queryDateFormat(lastMonth.clone().endOf('month'))].join(',');
+        queryDateFormat(lastMonth.clone().endOf('month'))].join(',')
     case 'yesterday':
       return [
         queryDateFormat(yesterday.clone().subtract(offset, 'days')),
-        queryDateFormat(yesterday)].join(',');
+        queryDateFormat(yesterday)].join(',')
     case 'today':
     default:
       return [
         queryDateFormat(today.clone().subtract(offset, 'days')),
-        queryDateFormat(today)].join(',');
+        queryDateFormat(today)].join(',')
   }
 }
 
-function getDateRangeOffset(dateRange) {
-  const [start, end] = splitDateRange(dateRange);
-  const startOffset = start.subtract(operatorPerformance.numberOfDayOffset, 'days');
+function getDateRangeOffset (dateRange) {
+  const [start, end] = splitDateRange(dateRange)
+  const startOffset = start.subtract(operatorPerformance.numberOfDayOffset, 'days')
   return [
     queryDateFormat(startOffset),
     queryDateFormat(end)
-  ].join(',');
+  ].join(',')
 }
 
 export class OperatorStatsRepository extends OperatorStats {
-  async getOverAll(date = new Date()) {
-    const qb = this.getQueryBuilder('count');
-    addDateQueryToBuilder(qb, 'createdAt', date);
+  async getOverAll (date = new Date()) {
+    const qb = this.getQueryBuilder('count')
+    addDateQueryToBuilder(qb, 'createdAt', date)
 
     qb
       .field('operatorId')
       .field('action')
       .group('operatorId')
-      .group('action');
+      .group('action')
 
-    return this.query(qb);
+    return this.query(qb)
   }
 
-  async getStats(params) {
-    const filter = GetStatsFilter(params);
+  async getStats (params) {
+    const filter = GetStatsFilter(params)
     const results = GetStatsFilterFixed.is(filter)
       ? await this.getStatsFixed(filter)
-      : await this.getStatsByDateRange(filter.dateBetween, filter);
+      : await this.getStatsByDateRange(filter.dateBetween, filter)
 
     switch (filter.view) {
       case 'day':
-        return _.mapValues(_groupBy(results, 'operatorId'), operatorStats);
+        return _.mapValues(_groupBy(results, 'operatorId'), operatorStats)
       case 'total':
       default:
-        return _.chain(results).groupBy('operatorId').mapValues(calculateCounters).value();
+        return _.chain(results).groupBy('operatorId').mapValues(calculateCounters).value()
     }
   }
 
-  async getStatsFixed(filter) {
-    const dateBetween = getDateBetweenByFixed(filter.range);
-    return this.getStatsByDateRange(dateBetween, filter);
+  async getStatsFixed (filter) {
+    const dateBetween = getDateBetweenByFixed(filter.range)
+    return this.getStatsByDateRange(dateBetween, filter)
   }
 
-  async getStatsByDateRange(dateRange, filter) {
-    const qb = this.getQueryBuilder('count');
-    addBetweenQueryToBuilder(qb, 'createdAt', dateRange);
+  async getStatsByDateRange (dateRange, filter) {
+    const qb = this.getQueryBuilder('count')
+    addBetweenQueryToBuilder(qb, 'createdAt', dateRange)
 
     if (!_isNil(filter.operatorId)) {
-      qb.where('operatorId = ?', filter.operatorId);
+      qb.where('operatorId = ?', filter.operatorId)
     }
 
     if (!_isNil(filter.province)) {
-      qb.where('province = ?', filter.province);
+      qb.where('province = ?', filter.province)
     }
 
     switch (filter.view) {
@@ -183,8 +183,8 @@ export class OperatorStatsRepository extends OperatorStats {
           .where('action IS NOT MISSING')
           .where('operatorId IS NOT MISSING')
           .where('createdAt IS NOT MISSING')
-          .order('operatorId').order('createdAt');
-        break;
+          .order('operatorId').order('createdAt')
+        break
       case 'total':
       default:
         qb
@@ -194,43 +194,43 @@ export class OperatorStatsRepository extends OperatorStats {
           .group('action')
           .where('action IS NOT MISSING')
           .where('operatorId IS NOT MISSING')
-          .order('operatorId');
-        break;
+          .order('operatorId')
+        break
     }
 
-    return this.query(qb);
+    return this.query(qb)
   }
 
-  async getProvinceStats(params) {
-    const filter = GetStatsFilter(params);
+  async getProvinceStats (params) {
+    const filter = GetStatsFilter(params)
     const results = GetStatsFilterFixed.is(filter)
       ? await this.getProvinceStatsFixed(filter)
-      : await this.getProvinceStatsByDateRange(filter.dateBetween, filter);
+      : await this.getProvinceStatsByDateRange(filter.dateBetween, filter)
 
     switch (filter.view) {
       case 'day':
-        return _.mapValues(_groupBy(results, 'province'), operatorStats);
+        return _.mapValues(_groupBy(results, 'province'), operatorStats)
       case 'total':
       default:
-        return _.chain(results).groupBy('province').mapValues(calculateCounters).value();
+        return _.chain(results).groupBy('province').mapValues(calculateCounters).value()
     }
   }
 
-  async getProvinceStatsFixed(filter) {
-    const dateBetween = getDateBetweenByFixed(filter.range);
-    return this.getProvinceStatsByDateRange(dateBetween, filter);
+  async getProvinceStatsFixed (filter) {
+    const dateBetween = getDateBetweenByFixed(filter.range)
+    return this.getProvinceStatsByDateRange(dateBetween, filter)
   }
 
-  async getProvinceStatsByDateRange(dateRange, filter) {
-    const qb = this.getQueryBuilder('count');
-    addBetweenQueryToBuilder(qb, 'createdAt', dateRange);
+  async getProvinceStatsByDateRange (dateRange, filter) {
+    const qb = this.getQueryBuilder('count')
+    addBetweenQueryToBuilder(qb, 'createdAt', dateRange)
 
     if (!_isNil(filter.operatorId)) {
-      qb.where('operatorId = ?', filter.operatorId);
+      qb.where('operatorId = ?', filter.operatorId)
     }
 
     if (!_isNil(filter.province)) {
-      qb.where('province = ?', filter.province);
+      qb.where('province = ?', filter.province)
     }
 
     switch (filter.view) {
@@ -246,8 +246,8 @@ export class OperatorStatsRepository extends OperatorStats {
           .where('province IS NOT MISSING')
           .where('action IS NOT MISSING')
           .where('createdAt IS NOT MISSING')
-          .order('province').order('createdAt');
-        break;
+          .order('province').order('createdAt')
+        break
       case 'total':
       default:
         qb
@@ -257,97 +257,97 @@ export class OperatorStatsRepository extends OperatorStats {
           .group('action')
           .order('province')
           .where('province IS NOT MISSING')
-          .where('action IS NOT MISSING');
-        break;
+          .where('action IS NOT MISSING')
+        break
     }
 
-    return this.query(qb);
+    return this.query(qb)
   }
 
-  async getPerformanceByDateRange(dateRange, filter) {
-    const results = await this.getStatsByDateRange(getDateRangeOffset(dateRange), filter);
-    return [dateRange, results];
+  async getPerformanceByDateRange (dateRange, filter) {
+    const results = await this.getStatsByDateRange(getDateRangeOffset(dateRange), filter)
+    return [dateRange, results]
   }
 
-  async getPerformanceByFixed(filter) {
-    const dateRange = getDateBetweenByFixed(filter.range);
-    return this.getPerformanceByDateRange(dateRange, filter);
+  async getPerformanceByFixed (filter) {
+    const dateRange = getDateBetweenByFixed(filter.range)
+    return this.getPerformanceByDateRange(dateRange, filter)
   }
 
-  async getPerformance(params) {
-    const filter = GetStatsFilter(params);
+  async getPerformance (params) {
+    const filter = GetStatsFilter(params)
     const [dateRange, results] = GetStatsFilterFixed.is(filter)
       ? await this.getPerformanceByFixed(filter)
-      : await this.getPerformanceByDateRange(filter.dateBetween, filter);
-    const groupedResults = _groupBy(filterPerformanceEvents(results), 'operatorId');
-    return _.mapValues(groupedResults, operatorCalculation(dateRange));
+      : await this.getPerformanceByDateRange(filter.dateBetween, filter)
+    const groupedResults = _groupBy(filterPerformanceEvents(results), 'operatorId')
+    return _.mapValues(groupedResults, operatorCalculation(dateRange))
   }
 }
 
-function filterPerformanceEvents(results) {
+function filterPerformanceEvents (results) {
   return results
-    .filter(result => [OperatorActions.MEETING, OperatorActions.VIEW_WORKSHEET].indexOf(result.action) !== -1);
+    .filter(result => [OperatorActions.MEETING, OperatorActions.VIEW_WORKSHEET].indexOf(result.action) !== -1)
 }
 
-function operatorCalculation(dateRange) {
+function operatorCalculation (dateRange) {
   return (operatorActions) => {
     const dailyCalculations = _.chain(operatorActions)
       .groupBy('createdAtStr')
       .mapValues(dailyCalculation)
-      .value();
-    const ratios = {};
+      .value()
+    const ratios = {}
     dateRangeArray(dateRange).forEach(day => {
-      const dayDate = queryDateFormat(day);
-      const start = queryDateFormat(day.clone().subtract(operatorPerformance.numberOfDayOffset, 'days'));
-      const end = queryDateFormat(day);
-      const range = rangeStartEnd(start, end);
-      const values = [];
-      const valuesKeys = {};
+      const dayDate = queryDateFormat(day)
+      const start = queryDateFormat(day.clone().subtract(operatorPerformance.numberOfDayOffset, 'days'))
+      const end = queryDateFormat(day)
+      const range = rangeStartEnd(start, end)
+      const values = []
+      const valuesKeys = {}
       _.mapValues(dailyCalculations, (dailyCalculation, date) => {
         if (range.contains(utc(date))) {
-          values.push(dailyCalculation);
-          valuesKeys[date] = dailyCalculation;
+          values.push(dailyCalculation)
+          valuesKeys[date] = dailyCalculation
         }
-      });
+      })
       ratios[dayDate] = {
         values: valuesKeys,
         dayRatio: dailyCalculations[dayDate] || 0,
         meanRatio: _.sum(values) / Math.max(1, values.length)
-      };
-    });
-    return ratios;
-  };
+      }
+    })
+    return ratios
+  }
 }
 
-function calculateCounters(counters) {
-  const mappedCounters = {};
+function calculateCounters (counters) {
+  const mappedCounters = {}
   Object.values(OperatorActions).map(statKey => {
-    let total = 0;
-    _.filter(counters, {action: statKey}).forEach(({count}) => {
-      total += count;
-    });
+    let total = 0
+    _.filter(counters, { action: statKey }).forEach(({ count }) => {
+      total += count
+    })
 
-    mappedCounters[statKey] = total;
-  });
+    mappedCounters[statKey] = total
+  })
 
-  return mappedCounters;
+  return mappedCounters
 }
 
-function operatorStats(operatorStats) {
+function operatorStats (operatorStats) {
   return _.chain(operatorStats)
     .groupBy('createdAtStr')
     .mapValues(calculateCounters)
-    .value();
+    .value()
 }
 
-function dailyCalculation(dayActions) {
+function dailyCalculation (dayActions) {
   const meetings = _.chain(dayActions)
     .filter(['action', OperatorActions.MEETING])
     .sumBy('count')
-    .value();
+    .value()
   const views = _.chain(dayActions)
     .filter(['action', OperatorActions.VIEW_WORKSHEET])
     .sumBy('count')
-    .value();
-  return meetings / Math.max(1, views);
+    .value()
+  return meetings / Math.max(1, views)
 }

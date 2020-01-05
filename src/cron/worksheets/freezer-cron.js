@@ -1,21 +1,21 @@
-import {CronJob} from 'cron';
-import debug from 'debug';
-import {utc} from '../../lib/date';
-import {moveWorksheetOutOfFreezer} from '../../business/worksheets/freezer';
-import {SystemPreferencesRepository} from '../../system-preferences/models';
-import {cronJobs} from '../../../config';
+import { CronJob } from 'cron'
+import debug from 'debug'
+import { utc } from '../../lib/date'
+import { moveWorksheetOutOfFreezer } from '../../business/worksheets/freezer'
+import { SystemPreferencesRepository } from '../../system-preferences/models'
+import { cronJobs } from '../../../config'
 
-const cronDebug = debug('app:cron:worksheets:freezer');
-const timeZone = 'UTC';
-const cronTime = cronJobs.freezer;
+const cronDebug = debug('app:cron:worksheets:freezer')
+const timeZone = 'UTC'
+const cronTime = cronJobs.freezer
 
-async function onTick() {
-  const pref = await SystemPreferencesRepository.getPreferences();
+async function onTick () {
+  const pref = await SystemPreferencesRepository.getPreferences()
   if (pref.freezer.enable) {
-    cronDebug(`Executing freezer cron at ${utc().startOf('minute').toISOString()}`);
-    await moveWorksheetOutOfFreezer(false, 500);
+    cronDebug(`Executing freezer cron at ${utc().startOf('minute').toISOString()}`)
+    await moveWorksheetOutOfFreezer(false, 500)
   } else {
-    cronDebug(`Freeze cron called at ${utc().startOf('minute').toISOString()} but do nothing is disabled`);
+    cronDebug(`Freeze cron called at ${utc().startOf('minute').toISOString()} but do nothing is disabled`)
   }
 }
 
@@ -24,4 +24,4 @@ export default new CronJob({
   cronTime,
   timeZone,
   onTick
-});
+})

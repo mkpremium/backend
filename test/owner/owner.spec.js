@@ -1,13 +1,13 @@
 
-import {OwnerRepository} from '../../src/owner/models';
-import {expect} from 'chai';
+import { OwnerRepository } from '../../src/owner/models'
+import { expect } from 'chai'
 describe('Owner repository test', () => {
-  let ownersMock = [
+  const ownersMock = [
     {
       id: 'Im a verified owner',
       person: {
         contacts: [
-          {status: 'GOOD'}
+          { status: 'GOOD' }
         ]
       }
     },
@@ -15,16 +15,16 @@ describe('Owner repository test', () => {
       id: 'Im not a verified owner :(',
       person: {
         contacts: [
-          {status: 'BAAD'}
+          { status: 'BAAD' }
         ]
       }
     }
-  ];
-  before(async() => {
+  ]
+  before(async () => {
 
-  });
+  })
 
-  let owner = {
+  const owner = {
     person: {
       contacts: [
         {
@@ -35,19 +35,19 @@ describe('Owner repository test', () => {
         }
       ]
     }
-  };
+  }
 
-  it('Owner should be verified', async() => {
-    const ownerRepository = new OwnerRepository();
-    const actual = ownerRepository.isOwnerVerified(owner);
+  it('Owner should be verified', async () => {
+    const ownerRepository = new OwnerRepository()
+    const actual = ownerRepository.isOwnerVerified(owner)
     // eslint-disable-next-line no-unused-expressions
-    expect(actual).to.be.true;
-  });
+    expect(actual).to.be.true
+  })
 
-  it('Should return if owner is verified or not', async() => {
-    const ownerRepository = new OwnerRepository();
-    const verifiedOwners = ownerRepository.getVerifiedOwners(ownersMock);
-    expect(verifiedOwners.length).to.equal(1);
-    expect(verifiedOwners[0].id).to.equal('Im a verified owner');
-  });
-});
+  it('Should return if owner is verified or not', async () => {
+    const ownerRepository = new OwnerRepository()
+    const verifiedOwners = ownerRepository.getVerifiedOwners(ownersMock)
+    expect(verifiedOwners.length).to.equal(1)
+    expect(verifiedOwners[0].id).to.equal('Im a verified owner')
+  })
+})

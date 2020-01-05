@@ -3,7 +3,7 @@ export const Status = {
   OPENED: 'OPENED',
   SCHEDULED: 'SCHEDULED',
   CLOSED: 'CLOSED'
-};
+}
 
 export const Queue = {
   Status,
@@ -11,4 +11,4 @@ export const Queue = {
     Status.AVAILABLE,
     Status.SCHEDULED
   ]
-};
+}

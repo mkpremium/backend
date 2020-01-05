@@ -1,6 +1,6 @@
-import t from 'tcomb';
-import uuid from 'uuid/v4';
-import {RestringedHourObject} from '../operator/restringed-hours/types';
+import t from 'tcomb'
+import uuid from 'uuid/v4'
+import { RestringedHourObject } from '../operator/restringed-hours/types'
 
 export const OperatorRoles = {
   OPERATOR: 'OPERATOR',
@@ -10,23 +10,23 @@ export const OperatorRoles = {
   STREET: 'STREET',
   STREET_MANAGER: 'STREET_MANAGER',
   STREET_ADMIN: 'STREET_ADMIN'
-};
+}
 
 export const OperatorFirebaseStates = {
   ENABLED: 'A',
   BLOCKED: 'B',
   PAUSED: 'P'
-};
+}
 
 export const OperatorFeatures = {
   CHAT: 'Chat',
   STATS: 'Estadísticas',
   ALL: 'Todas'
-};
+}
 
-t.OperatorRole = t.enums.of(Object.values(OperatorRoles));
-t.OperatorFirebaseStates = t.enums.of(Object.values(OperatorFirebaseStates));
-t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures));
+t.OperatorRole = t.enums.of(Object.values(OperatorRoles))
+t.OperatorFirebaseStates = t.enums.of(Object.values(OperatorFirebaseStates))
+t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
 /**
  * @swagger
@@ -69,38 +69,38 @@ t.OperatorProfile = t.struct(
       state: OperatorFirebaseStates.ENABLED
     }
   }
-);
+)
 
-t.OperatorProfile.prototype.fullName = function() {
-  return `${this.firstName} ${this.lastName}`.trim();
-};
+t.OperatorProfile.prototype.fullName = function () {
+  return `${this.firstName} ${this.lastName}`.trim()
+}
 
-t.OperatorProfile.prototype.getStateMessage = function() {
+t.OperatorProfile.prototype.getStateMessage = function () {
   switch (this.state) {
     case OperatorFirebaseStates.BLOCKED:
-      return 'bloqueado';
+      return 'bloqueado'
     case OperatorFirebaseStates.ENABLED:
-      return 'activo';
+      return 'activo'
     case OperatorFirebaseStates.PAUSED:
-      return 'en pausa';
+      return 'en pausa'
     default:
-      return 'error de estado';
+      return 'error de estado'
   }
-};
+}
 
 export const ProfitGoal = t.struct(
   {
     amount: t.Number,
     updatedAt: t.Date
   }
-);
+)
 
 export const Award = t.Award = t.struct(
   {
     code: t.String,
     awardedAt: t.Date
   }
-);
+)
 
 /**
  * @swagger
@@ -220,18 +220,18 @@ t.Operator = t.struct(
       profile: {},
       profitGoal: {
         amount: 0,
-        get updatedAt() {
-          return new Date();
+        get updatedAt () {
+          return new Date()
         }
       },
       awards: [],
-      get createdAt() {
-        return new Date();
+      get createdAt () {
+        return new Date()
       },
       _documentType: 'operator'
     }
   }
-);
+)
 
 t.OperatorProfileUpdate = t.struct({
   firstName: t.maybe(t.String),
@@ -241,7 +241,7 @@ t.OperatorProfileUpdate = t.struct({
   state: t.maybe(t.OperatorFirebaseStates),
   queueId: t.maybe(t.String),
   email: t.maybe(t.String)
-});
+})
 
 t.OperatorUpdateRequest = t.struct(
   {
@@ -262,7 +262,7 @@ t.OperatorUpdateRequest = t.struct(
       profile: {}
     }
   }
-);
+)
 
 t.OperatorRequest = t.struct(
   {
@@ -287,7 +287,7 @@ t.OperatorRequest = t.struct(
       profile: {}
     }
   }
-);
+)
 
 t.OperatorRefreshToken = t.struct(
   {
@@ -299,10 +299,10 @@ t.OperatorRefreshToken = t.struct(
   {
     name: 'OperatorRefreshToken',
     defaultProps: {
-      get id() {
-        return uuid();
+      get id () {
+        return uuid()
       },
       _documentType: 'operator-refresh_token'
     }
   }
-);
+)

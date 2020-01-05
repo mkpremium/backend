@@ -1,7 +1,7 @@
-import uuid from 'uuid/v4';
-import * as t from 'tcomb';
-import {cleanObjectKeys, removeNullValues} from './models-helper';
-import {difference, isEmpty, merge, omit} from 'lodash';
+import uuid from 'uuid/v4'
+import * as t from 'tcomb'
+import { cleanObjectKeys, removeNullValues } from './models-helper'
+import { difference, isEmpty, merge, omit } from 'lodash'
 
 /* eslint camelcase: 0 */
 export const OwnerInputDTO = t.struct({
@@ -58,82 +58,82 @@ export const OwnerInputDTO = t.struct({
   telefono_he: t.maybe(t.String),
   cellulare_he: t.maybe(t.String),
   altro_numero_he: t.maybe(t.String)
-});
+})
 
-export default function migrateFromCsv(data) {
-  const input = OwnerInputDTO(removeNullValues(cleanObjectKeys(data)));
+export default function migrateFromCsv (data) {
+  const input = OwnerInputDTO(removeNullValues(cleanObjectKeys(data)))
 
   const personType = () => {
     return (input.num_1 === null && input.num_2 === null)
       ? 'JURIDICA'
-      : 'NATURAL';
-  };
+      : 'NATURAL'
+  }
 
   const contacts = () => {
-    const contacts = [];
-    const uniqueContacts = [];
+    const contacts = []
+    const uniqueContacts = []
 
     if (input.telefono) {
       contacts.push({
         type: 'TELEFONO',
         value: input.telefono
-      });
-      uniqueContacts.push(input.telefono);
+      })
+      uniqueContacts.push(input.telefono)
     }
 
     if (input.cellulare && uniqueContacts.indexOf(input.cellulare) === -1) {
       contacts.push({
         type: 'TELEFONO',
         value: input.cellulare.replace(/[^0-9]/, '')
-      });
-      uniqueContacts.push(input.cellulare);
+      })
+      uniqueContacts.push(input.cellulare)
     }
 
     if (input.num_pb) {
-      const num_pb = input.num_pb.replace(/[^0-9]/, '');
+      const num_pb = input.num_pb.replace(/[^0-9]/, '')
 
       if (num_pb !== '' && uniqueContacts.indexOf(num_pb) === -1) {
         contacts.push({
           type: 'TELEFONO',
           value: num_pb
-        });
-        uniqueContacts.push(num_pb);
+        })
+        uniqueContacts.push(num_pb)
       }
     }
 
     if (input.num_ib) {
-      const num_ib = input.num_ib.replace(/[^0-9]/, '');
+      const num_ib = input.num_ib.replace(/[^0-9]/, '')
 
       if (num_ib !== '' && uniqueContacts.indexOf(num_ib) === -1) {
         contacts.push({
           type: 'TELEFONO',
           value: num_ib
-        });
-        uniqueContacts.push(num_ib);
+        })
+        uniqueContacts.push(num_ib)
       }
     }
 
     if (input.num_bd) {
-      const num_bd = input.num_bd.replace(/[^0-9]/, '');
+      const num_bd = input.num_bd.replace(/[^0-9]/, '')
 
       if (num_bd !== '' && uniqueContacts.indexOf(num_bd) === -1) {
         contacts.push({
           type: 'TELEFONO',
           value: num_bd
-        });
-        uniqueContacts.push(num_bd);
+        })
+        uniqueContacts.push(num_bd)
       }
     }
 
     if (input.num_abc) {
-      const num_abc = input.num_abc.replace(/[^0-9]/, '');
+      const num_abc = input.num_abc.replace(/[^0-9]/, '')
 
       if (num_abc !== '' && uniqueContacts.indexOf(num_abc) === -1) {
         contacts.push({
           type: 'TELEFONO',
           value: num_abc
-        });
-        uniqueContacts.push(num_abc);
+        })
+        uniqueContacts.push(num_abc)
       }
     }
 
@@ -141,60 +141,60 @@ export default function migrateFromCsv(data) {
       contacts.push({
         type: 'TELEFONO',
         value: input.telefono_he
-      });
-      uniqueContacts.push(input.telefono_he);
+      })
+      uniqueContacts.push(input.telefono_he)
     }
 
     if (input.cellulare_he && uniqueContacts.indexOf(input.cellulare_he) === -1) {
       contacts.push({
         type: 'TELEFONO',
         value: input.cellulare_he
-      });
-      uniqueContacts.push(input.cellulare_he);
+      })
+      uniqueContacts.push(input.cellulare_he)
     }
 
     if (input.altro_numero_he && uniqueContacts.indexOf(input.altro_numero_he) === -1) {
       contacts.push({
         type: 'TELEFONO',
         value: input.altro_numero_he
-      });
-      uniqueContacts.push(input.altro_numero_he);
+      })
+      uniqueContacts.push(input.altro_numero_he)
     }
 
     if (input.email && uniqueContacts.indexOf(input.email) === -1) {
       contacts.push({
         type: 'EMAIL',
         value: input.email
-      });
-      uniqueContacts.push(input.email);
+      })
+      uniqueContacts.push(input.email)
     }
 
     if (input.fax && input.fax !== 'WEBAPP' && uniqueContacts.indexOf(input.fax) === -1) {
       contacts.push({
         type: 'FAX',
         value: input.fax
-      });
+      })
     }
 
-    return contacts;
-  };
+    return contacts
+  }
 
   const ownerType = () => {
     if (isEmpty(input.codfis)) {
-      return 'NINGUNO';
+      return 'NINGUNO'
     }
 
     switch (input.codfis[0]) {
       case 'V':
-        return 'VECINO';
+        return 'VECINO'
       case 'P':
-        return 'PRINCIPAL';
+        return 'PRINCIPAL'
       case 'S':
-        return 'SECUNDARIO';
+        return 'SECUNDARIO'
     }
-  };
+  }
 
-  const name = input.ragionesociale || `NO Name ${input.id_fornitore}`;
+  const name = input.ragionesociale || `NO Name ${input.id_fornitore}`
 
   const person = t.Person({
     id: uuid(),
@@ -207,7 +207,7 @@ export default function migrateFromCsv(data) {
     contacts: contacts(),
     _migrateOwnerId: input.id_fornitore,
     _relatedTo: input.proprietari
-  });
+  })
 
   const owner = t.Owner({
     id: uuid(),
@@ -218,43 +218,43 @@ export default function migrateFromCsv(data) {
     name,
     _relatedTo: input.proprietari,
     _migrateId: input.id_fornitore
-  });
+  })
 
-  return {owner, person, input};
+  return { owner, person, input }
 }
 
-export function combineDuplicatesDocumentNumber(data) {
-  const combinedData = [];
-  const owners = data.filter(({_documentType}) => _documentType === 'owner');
-  const people = data.filter(({_documentType}) => _documentType === 'person');
-  const peopleWithoutDocumentNumber = people.filter(({documentNumber}) => isEmpty(documentNumber));
-  const peopleWithDocumentNumber = people.filter(({documentNumber}) => !isEmpty(documentNumber));
+export function combineDuplicatesDocumentNumber (data) {
+  const combinedData = []
+  const owners = data.filter(({ _documentType }) => _documentType === 'owner')
+  const people = data.filter(({ _documentType }) => _documentType === 'person')
+  const peopleWithoutDocumentNumber = people.filter(({ documentNumber }) => isEmpty(documentNumber))
+  const peopleWithDocumentNumber = people.filter(({ documentNumber }) => !isEmpty(documentNumber))
 
-  let peopleToProcess = [].concat(peopleWithDocumentNumber);
+  let peopleToProcess = [].concat(peopleWithDocumentNumber)
 
   while (peopleToProcess.length > 0) {
-    const [person] = peopleToProcess;
-    let combined = Object.assign({}, person);
+    const [person] = peopleToProcess
+    const combined = Object.assign({}, person)
 
-    const filterSameDocumentDifferentPerson = ({documentNumber, id}) => {
-      return documentNumber === person.documentNumber && id !== person.id;
-    };
+    const filterSameDocumentDifferentPerson = ({ documentNumber, id }) => {
+      return documentNumber === person.documentNumber && id !== person.id
+    }
 
-    const duplicates = peopleWithDocumentNumber.filter(filterSameDocumentDifferentPerson);
+    const duplicates = peopleWithDocumentNumber.filter(filterSameDocumentDifferentPerson)
 
     duplicates.forEach(duplicated => {
-      merge(combined, omit(JSON.parse(JSON.Stringingify(duplicated)), ['id']));
-      const ownerIdx = owners.findIndex(o => o.personId === duplicated.id);
+      merge(combined, omit(JSON.parse(JSON.Stringingify(duplicated)), ['id']))
+      const ownerIdx = owners.findIndex(o => o.personId === duplicated.id)
       if (ownerIdx !== -1) {
-        owners[ownerIdx] = t.update(owners[ownerIdx], {personId: {$set: combined.id}});
+        owners[ownerIdx] = t.update(owners[ownerIdx], { personId: { $set: combined.id } })
       }
-    });
+    })
 
-    combinedData.push(combined);
-    peopleToProcess = difference(peopleToProcess, duplicates.concat([person]));
+    combinedData.push(combined)
+    peopleToProcess = difference(peopleToProcess, duplicates.concat([person]))
   }
 
   return combinedData
     .concat(peopleWithoutDocumentNumber)
-    .concat(owners);
+    .concat(owners)
 }

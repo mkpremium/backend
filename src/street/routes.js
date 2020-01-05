@@ -1,20 +1,20 @@
-import {Router} from 'express';
-import {oldAppErrorHandler} from '../lib/error-handler';
+import { Router } from 'express'
+import { oldAppErrorHandler } from '../lib/error-handler'
 import {
   getBuildingsLocationController, getCityInfoController, getLocationsAtDayController,
   getNeighborhoodCenterController, oldLoginController,
   updateNeighborhoodController,
   updateOperatorStateController
-} from './controllers';
+} from './controllers'
 
-const router = Router();
-router.post('/api/users', oldLoginController);
-router.post('/api/changeUserNeighborhood', updateNeighborhoodController);
-router.post('/api/changeUserState', updateOperatorStateController);
-router.post('/api/getNeighborhoodCenter', getNeighborhoodCenterController);
-router.post('/api/getBuildingsGeojson', getBuildingsLocationController);
-router.post('/api/getCityInfo', getCityInfoController);
-router.post('/api/getLocationsAtDay', getLocationsAtDayController);
-router.use(oldAppErrorHandler);
+const router = Router()
+router.post('/api/users', oldLoginController)
+router.post('/api/changeUserNeighborhood', updateNeighborhoodController)
+router.post('/api/changeUserState', updateOperatorStateController)
+router.post('/api/getNeighborhoodCenter', getNeighborhoodCenterController)
+router.post('/api/getBuildingsGeojson', getBuildingsLocationController)
+router.post('/api/getCityInfo', getCityInfoController)
+router.post('/api/getLocationsAtDay', getLocationsAtDayController)
+router.use(oldAppErrorHandler)
 
-export default router;
+export default router

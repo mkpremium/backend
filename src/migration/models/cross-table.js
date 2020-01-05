@@ -1,5 +1,5 @@
-import t from 'tcomb';
-import {cleanObjectKeys, removeNullValues} from './models-helper';
+import t from 'tcomb'
+import { cleanObjectKeys, removeNullValues } from './models-helper'
 
 const CrossInputDTO = t.struct({
   id_chiamatafornitore: t.maybe(t.String),
@@ -11,7 +11,7 @@ const CrossInputDTO = t.struct({
   ragionesociale: t.maybe(t.String),
   codfis: t.maybe(t.String),
   pariva: t.maybe(t.String)
-}, 'CrossInputDTO');
+}, 'CrossInputDTO')
 
 const CrossDTO = t.struct({
   ownerId: t.maybe(t.String),
@@ -22,21 +22,21 @@ const CrossDTO = t.struct({
   verified: t.Boolean,
   contactName: t.maybe(t.String),
   contactDocument: t.maybe(t.String)
-}, 'CrossDTO');
+}, 'CrossDTO')
 
-export default function migrateFromCsv(data) {
-  const input = CrossInputDTO(removeNullValues(cleanObjectKeys(data)));
+export default function migrateFromCsv (data) {
+  const input = CrossInputDTO(removeNullValues(cleanObjectKeys(data)))
 
   const verified = () => {
     switch (input.verificato) {
       case '1':
-        return true;
+        return true
       case '0':
-        return false;
+        return false
       default:
-        return Boolean(input.verificato);
+        return Boolean(input.verificato)
     }
-  };
+  }
 
   return CrossDTO({
     worksheetId: input.id_chiamatafornitore,
@@ -47,5 +47,5 @@ export default function migrateFromCsv(data) {
     ownerName: input.proprietari,
     contactName: input.ragionesociale,
     contactDocument: input.pariva
-  });
+  })
 }

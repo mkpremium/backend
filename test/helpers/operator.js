@@ -1,20 +1,20 @@
-import app from '../../src/app';
-import {defaultPassword, operatorCreate, operatorLogin} from '../common';
+import app from '../../src/app'
+import { defaultPassword, operatorCreate, operatorLogin } from '../common'
 
 export class OperatorHelper {
-  static async create(role) {
+  static async create (role) {
     switch (role) {
       case 'operator':
       default:
-        return operatorCreate();
+        return operatorCreate()
     }
   }
 
-  static async createAndLogin(role = 'operator') {
-    const operator = await OperatorHelper.create(role);
+  static async createAndLogin (role = 'operator') {
+    const operator = await OperatorHelper.create(role)
     return operatorLogin(app, {
       username: operator.username,
       password: defaultPassword
-    });
+    })
   }
 }

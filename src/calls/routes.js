@@ -1,14 +1,14 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   callController,
   hangupController,
   webhookController,
   addNoteController
-} from './controllers';
-import {permissions} from '../middleware/jwt';
+} from './controllers'
+import { permissions } from '../middleware/jwt'
 
-const call = Router();
-const webhook = Router();
+const call = Router()
+const webhook = Router()
 /**
  * @swagger
  * tags:
@@ -50,7 +50,7 @@ const webhook = Router();
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-call.post('/owner/:ownerId', permissions.operator, callController);
+call.post('/owner/:ownerId', permissions.operator, callController)
 
 /**
  * @swagger
@@ -73,7 +73,7 @@ call.post('/owner/:ownerId', permissions.operator, callController);
  *         schema:
  *           $ref: "#/definitions/CallErrorResponse"
  */
-call.post('/hangup', permissions.operator, hangupController);
+call.post('/hangup', permissions.operator, hangupController)
 
 /**
  * @swagger
@@ -103,9 +103,9 @@ call.post('/hangup', permissions.operator, hangupController);
  *       400:
  *         description: Error en la peticion
  */
-call.post('/note/:callId', permissions.operator, addNoteController);
+call.post('/note/:callId', permissions.operator, addNoteController)
 
-webhook.post('/', webhookController);
+webhook.post('/', webhookController)
 
-export const callRouter = call;
-export const webhookCallsRouter = webhook;
+export const callRouter = call
+export const webhookCallsRouter = webhook

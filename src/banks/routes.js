@@ -1,13 +1,13 @@
-import {Router} from 'express';
+import { Router } from 'express'
 import {
   actionBankFileDataController, actionBankFileDataWithXLSXController,
   calculateFiltersController, exportBankFileController,
   getBankFileController,
   listBankFilesController, removeBankFileController, updateBankCityDataController,
   uploadBankFileController
-} from './controllers';
+} from './controllers'
 
-const router = Router();
+const router = Router()
 
 /**
  * @swagger
@@ -45,7 +45,7 @@ const router = Router();
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/files', listBankFilesController);
+router.get('/files', listBankFilesController)
 
 /**
  * @swagger
@@ -80,7 +80,7 @@ router.get('/files', listBankFilesController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/files', uploadBankFileController);
+router.post('/files', uploadBankFileController)
 
 /**
  * @swagger
@@ -111,7 +111,7 @@ router.post('/files', uploadBankFileController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.get('/files/:id', getBankFileController);
+router.get('/files/:id', getBankFileController)
 
 /**
  * @swagger
@@ -146,7 +146,7 @@ router.get('/files/:id', getBankFileController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/files/:id/calculate-filters', calculateFiltersController);
+router.post('/files/:id/calculate-filters', calculateFiltersController)
 
 /**
  * @swagger
@@ -178,7 +178,7 @@ router.post('/files/:id/calculate-filters', calculateFiltersController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/files/:id/export', exportBankFileController);
+router.post('/files/:id/export', exportBankFileController)
 
 /**
  * @swagger
@@ -218,7 +218,7 @@ router.post('/files/:id/export', exportBankFileController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.post('/files/:id/:action', actionBankFileDataController);
+router.post('/files/:id/:action', actionBankFileDataController)
 
 /**
  * @swagger
@@ -262,7 +262,7 @@ router.post('/files/:id/:action', actionBankFileDataController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/files/:id/:action/xlsx', actionBankFileDataWithXLSXController);
+router.post('/files/:id/:action/xlsx', actionBankFileDataWithXLSXController)
 
 /**
  * @swagger
@@ -296,7 +296,7 @@ router.post('/files/:id/:action/xlsx', actionBankFileDataWithXLSXController);
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.delete('/files/:id', removeBankFileController);
+router.delete('/files/:id', removeBankFileController)
 
 /**
  * @swagger
@@ -329,6 +329,6 @@ router.delete('/files/:id', removeBankFileController);
  *           $ref: "#/definitions/Error"
  *
  */
-router.post('/cities/xlsx', updateBankCityDataController);
+router.post('/cities/xlsx', updateBankCityDataController)
 
-export default router;
+export default router

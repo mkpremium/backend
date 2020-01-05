@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
-import t from 'tcomb';
-import fromJSON from 'tcomb/lib/fromJSON';
-import _flatten from 'lodash/flatten';
-import {isTest} from '../../config';
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
+import _flatten from 'lodash/flatten'
+import { isTest } from '../../config'
 
 /**
  * @swagger
@@ -59,7 +59,7 @@ t.OwnerCompactView = t.struct(
       }
     }
   }
-);
+)
 
 /**
  * @swagger
@@ -72,7 +72,7 @@ t.OwnerCompactView = t.struct(
  */
 t.OwnerUpdateBusinessStatus = t.struct({
   status: t.OwnerBusinessStatus
-}, 'OwnerUpdateBusinessStatus');
+}, 'OwnerUpdateBusinessStatus')
 
 /**
  * @swagger
@@ -96,7 +96,7 @@ t.OwnerLitResponse = t.struct(
       results: []
     }
   }
-);
+)
 
 export const OwnerListQuery = t.OwnerListQuery = t.ListQuery.extend(
   {
@@ -107,22 +107,22 @@ export const OwnerListQuery = t.OwnerListQuery = t.ListQuery.extend(
     defaultProps: {
     }
   }
-);
+)
 
-export function ownersContactViews(owners, worksheet) {
-  function mapOwner(owner) {
-    return ownerContactsView(owner, worksheet.relatedBuildings[0]);
+export function ownersContactViews (owners, worksheet) {
+  function mapOwner (owner) {
+    return ownerContactsView(owner, worksheet.relatedBuildings[0])
   }
 
-  return _flatten(owners.map(mapOwner));
+  return _flatten(owners.map(mapOwner))
 }
 
-export function ownerContactsView(owner, building) {
+export function ownerContactsView (owner, building) {
   return owner.person.contacts
     .map((contact) => fromJSON(Object.assign({}, owner, {
       person: owner.person,
       contact
-    }), t.OwnerCompactView));
+    }), t.OwnerCompactView))
 }
 
-export default t;
+export default t

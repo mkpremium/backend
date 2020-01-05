@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 t.EmailBody = t.struct({
   to: t.String,
@@ -13,6 +13,6 @@ t.EmailBody = t.struct({
   defaultProps: {
     body: ''
   }
-});
+})
 
-export default t;
+export default t

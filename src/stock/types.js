@@ -1,4 +1,4 @@
-import t from 'tcomb';
+import t from 'tcomb'
 
 export const Transaction = t.struct({
   operatorId: t.String,
@@ -6,14 +6,14 @@ export const Transaction = t.struct({
   reservationDate: t.Date,
   transactionAmount: t.Number,
   transactionDate: t.Date
-}, 'Transaction');
+}, 'Transaction')
 
 export const StockStatuses = {
   PURCHASE: 'PURCHASE',
   SELL: 'SELL',
   CLOSE: 'CLOSE'
-};
-const StockStatus = t.enums.of(Object.values(StockStatuses));
+}
+const StockStatus = t.enums.of(Object.values(StockStatuses))
 
 export const Stock = t.Stock = t.struct({
   id: t.maybe(t.String),
@@ -32,7 +32,7 @@ export const Stock = t.Stock = t.struct({
   defaultProps: {
     _documentType: 'stock'
   }
-});
+})
 
 export const TransactionParams = t.TransactionParams = t.struct({
   buildingId: t.String,
@@ -40,6 +40,6 @@ export const TransactionParams = t.TransactionParams = t.struct({
   reservationDate: t.Date,
   transactionAmount: t.Number,
   transactionDate: t.Date
-});
+})
 
-export default t;
+export default t
