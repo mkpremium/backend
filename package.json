@@ -7,7 +7,6 @@
     "start": "better-npm-run start",
     "pretest": "npm run lint",
     "test": "NODE_ENV=test mocha",
-
     "start_all": "better-npm-run start:all",
     "prestart_banks": "npm run lint",
     "start_banks": "better-npm-run start_banks",
@@ -15,19 +14,15 @@
     "build": "scripts/build.sh",
     "predeploy": "npm run build",
     "deploy": "scripts/deployment.sh",
-
     "socket": "better-npm-run socket",
     "cronjobs": "better-npm-run cronjobs",
-
     "seed_all": "better-npm-run seed_all",
     "seed_metadata": "better-npm-run seed_metadata",
     "seed_family": "better-npm-run seed_family",
     "seed_people": "better-npm-run seed_people",
     "seed_denormalize": "better-npm-run seed_denormalize",
-
     "banks_worker_0": "better-npm-run banks_worker_0",
     "banks_worker_1": "better-npm-run banks_worker_1",
-
     "migration_worker_0": "better-npm-run migration_worker_0",
     "migration_worker_1": "better-npm-run migration_worker_1"
   },
@@ -131,7 +126,7 @@
     "foreman": "^2.0.0",
     "heapdump": "^0.3.9",
     "minimist": "^1.2.0",
-    "mocha": "^5.1.1",
+    "mocha": "^6.0.2",
     "mocha-circleci-reporter": "0.0.2",
     "nodemon": "^1.17.4",
     "sinon": "^4.5.0",
