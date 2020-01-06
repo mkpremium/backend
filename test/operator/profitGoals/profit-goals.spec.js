@@ -71,9 +71,12 @@ describe.only('profit goals', () => {
   })
 
   it('Should define a goal for an existing operator1', async () => {
-    const result = await setProfitGoalToOperator({ operatorId: operator1.id, profitAmount: 1500 })
-    expect(result.profitGoal).to.not.be.null
-    expect(result.profitGoal.amount).to.equal(1500)
+    const now = new Date()
+    const nowStub = () => now
+
+    const result = await setProfitGoalToOperator({ operatorId: operator1.id, profitAmount: 1500 }, nowStub)
+
+    expect(result.profitGoal).to.deep.equal({amount: 1500, updatedAt: now})
   })
 
   it('Should fail a goal for an non existing operator1', async () => {
