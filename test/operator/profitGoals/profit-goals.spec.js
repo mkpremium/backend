@@ -70,13 +70,13 @@ describe.only('profit goals', () => {
     await sellTestPurchaseStock(testBuilding1.id, operator1.id, 3000)
   })
 
-  it.skip('Should define a goal for an existing operator1', async () => {
+  it('Should define a goal for an existing operator1', async () => {
     const result = await setProfitGoalToOperator({ operatorId: operator1.id, profitAmount: 1500 })
-    expect(result.profitGoal).to.not.be.null()
+    expect(result.profitGoal).to.not.be.null
     expect(result.profitGoal.amount).to.equal(1500)
   })
 
-  it.skip('Should fail a goal for an non existing operator1', async () => {
+  it('Should fail a goal for an non existing operator1', async () => {
     let error
     try {
       const operator = await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
@@ -85,7 +85,7 @@ describe.only('profit goals', () => {
       error = err
     }
 
-    expect(error).to.not.be.null()
+    expect(error).to.not.be.null
     expect(error.message).to.equal('El operator fakeId no existe')
     expect(error.code).to.equal(404)
   })
