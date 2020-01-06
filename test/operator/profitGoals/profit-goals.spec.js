@@ -31,26 +31,28 @@ describe.only('profit goals', () => {
     salesAgent = await operatorCreateBusiness(madrid().unix() + 1)
   })
 
-  it('defines goal for an existing sales agent', async () => {
-    const now = new Date()
-    const nowStub = () => now
+  describe('setProfitGoalToOperator', () => {
+    it('defines goal for an existing sales agent', async () => {
+      const now = new Date()
+      const nowStub = () => now
 
-    const result = await setProfitGoalToOperator({ operatorId: salesAgent.id, profitAmount: 1500 }, nowStub)
+      const result = await setProfitGoalToOperator({ operatorId: salesAgent.id, profitAmount: 1500 }, nowStub)
 
-    expect(result.profitGoal).to.deep.equal({amount: 1500, updatedAt: now})
-  })
+      expect(result.profitGoal).to.deep.equal({amount: 1500, updatedAt: now})
+    })
 
-  it('throws an error when setting profit goal for an non existing sales agent', async () => {
-    let error
-    try {
-      await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
-    } catch (err) {
-      error = err
-    }
+    it('throws an error when setting profit goal for an non existing sales agent', async () => {
+      let error
+      try {
+        await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
+      } catch (err) {
+        error = err
+      }
 
-    expect(error).to.not.be.null
-    expect(error.message).to.equal('El operator fakeId no existe')
-    expect(error.code).to.equal(404)
+      expect(error).to.not.be.null
+      expect(error.message).to.equal('El operator fakeId no existe')
+      expect(error.code).to.equal(404)
+    })
   })
 
   describe('ranking', () => {
@@ -79,21 +81,23 @@ describe.only('profit goals', () => {
     })
   })
 
-  it('Should set a profit goal via @POST request', async () => {
-    const operator3 = await operatorCreate(madrid().unix() + 2)
-    const authenticatedOperator = await operatorLogin(app, { username: operator3.username, password: 'Passw0rd' })
+  describe('endpoint', () => {
+    it('Should set a profit goal via @POST request', async () => {
+      const operator3 = await operatorCreate(madrid().unix() + 2)
+      const authenticatedOperator = await operatorLogin(app, { username: operator3.username, password: 'Passw0rd' })
 
-    await request(app)
-      .post('/operators/profit/goal')
-      .set('Authorization', authenticatedOperator.authorization)
-      .send({
-        profitAmount: salesAgentProfitGoal,
-        operatorId: salesAgent.id
-      })
-      .expect(201)
-      .then(response => {
-        expect(response.body.profitGoal.amount).to.be.equal(salesAgentProfitGoal)
-      })
+      await request(app)
+        .post('/operators/profit/goal')
+        .set('Authorization', authenticatedOperator.authorization)
+        .send({
+          profitAmount: salesAgentProfitGoal,
+          operatorId: salesAgent.id
+        })
+        .expect(201)
+        .then(response => {
+          expect(response.body.profitGoal.amount).to.be.equal(salesAgentProfitGoal)
+        })
+    })
   })
 
   async function purchaseBuildingBySalesAgent (building, agent, transactionAmount) {
