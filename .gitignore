@@ -9,7 +9,7 @@ test-results.xml
 coverage
 
 # Environment values
-.env
+/.env
 firebase*.json
 *-pm2.json
 

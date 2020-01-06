@@ -31,16 +31,11 @@ services:
     image: "mkpremium:couchbase-local"
 
     ports:
-      - "8091:8091"
-      - "8092:8092"
-      - "8093:8093"
-      - "8094:8094"
-      - "9110:9110"
-      - "11207:11207"
-      - "11210:11210"
-      - "11211:11211"
-      - "18091:18091"
-      - "18092:18092"
+      - "8091:8091" # REST/HTTP including Web UI
+      - "8092:8092" # Views and XDCR access
+      - "8093:8093" # Query service REST/HTTP traffic
+      - "8094:8094" # Search service REST/HTTP traffic
+      - "11210:11210" # Data Service
 
     ulimits:
       nofile: 40960
