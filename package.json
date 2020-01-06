@@ -2,9 +2,7 @@
   "name": "bitdistrict-backend",
   "main": "server.js",
   "scripts": {
-    "lint": "standard 'src/**/*.js' && standard --env mocha 'test/**/*.js'",
-    "lint:fix": "standard --fix 'src/**/*.js' && standard --fix --env mocha 'test/**/*.js'",
-
+    "lint": "./scripts/lint.sh",
     "start": "better-npm-run start",
     "pretest": "npm run lint",
     "test": "NODE_ENV=test mocha",
