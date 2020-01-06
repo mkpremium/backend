@@ -15,8 +15,8 @@ require('../src/types')
 
 const chai = require('chai')
 const sc = require('sinon-chai')
-// const http = require('chai-http');
+const chaiAsPromised = require('chai-as-promised')
 
 chai.should()
 chai.use(sc)
-// chai.use(http);
+chai.use(chaiAsPromised)

@@ -4,7 +4,7 @@ import { setProfitGoalToOperator } from './application'
 
 async function setProfitGoalToOperatorFromRequest (req, res) {
   const result = await setProfitGoalToOperator(req.body)
-  res.json(201).send(result)
+  res.status(201).json(result)
 }
 
 export const setProfitGoalToOperatorController = wrap(setProfitGoalToOperatorFromRequest)

@@ -124,6 +124,9 @@ describe.only('profit goals', () => {
         profitAmount: 1500,
         operatorId: operator3.id
       })
-      .expect(200)
+      .expect(201)
+      .then(response => {
+        expect(response.body.profitGoal.amount).to.be.equal(1500)
+      })
   })
 })
