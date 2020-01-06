@@ -1,12 +1,12 @@
-import {OwnerBusinessStatus} from '../src/types/enums';
-import {WorkSheetStatus} from '../src/types/worksheet';
-import {couchbase} from '../config';
+import {OwnerBusinessStatus} from '../src/types/enums'
+import {WorkSheetStatus} from '../src/types/worksheet'
+import {couchbase} from '../config'
 
 export const Files = {
   BUILDINGS: 'EDIFICIOS.csv',
   OWNERS: 'PROPIETARIOS.csv',
   WORKSHEET_RELATIONS: 'CROSS_TABLE.csv'
-};
+}
 
 export const DbIndexes = [
   {
@@ -109,7 +109,7 @@ export const DbIndexes = [
     name: 'event_by_worksheet',
     query: '(_documentType, event.worksheetId) WHERE _documentType = "scheduled-event"'
   }
-];
+]
 
 // Id;Estado
 // 10;INICIO
@@ -130,18 +130,18 @@ const _MapBusinessStates = {
   21: OwnerBusinessStatus.NO_SALE,
   28: OwnerBusinessStatus.PROPOSAL_ACCEPTED,
   29: OwnerBusinessStatus.PURCHASED
-};
+}
 
 const worksheetToFirebaseBusiness = {
   [WorkSheetStatus.MEETING]: OwnerBusinessStatus.PENDING
-};
-
-export function mapBusinessStates(value) {
-  return _MapBusinessStates[value] || OwnerBusinessStatus.PENDING;
 }
 
-export function onlyForBusiness(value) {
-  return worksheetToFirebaseBusiness[value];
+export function mapBusinessStates (value) {
+  return _MapBusinessStates[value] || OwnerBusinessStatus.PENDING
+}
+
+export function onlyForBusiness (value) {
+  return worksheetToFirebaseBusiness[value]
 }
 
 export const DBIndexesFullTextSearch = [
@@ -292,4 +292,4 @@ export const DBIndexesFullTextSearch = [
       'sourceParams': {}
     }
   }
-];
+]

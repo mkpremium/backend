@@ -1,10 +1,10 @@
-require('babel-register');
-const defaultFiles = require('./defaults').defaultFiles;
-const seed = require('./seed_all').seed;
+require('babel-register')
+const defaultFiles = require('./defaults').defaultFiles
+const seed = require('./seed_all').seed
 
 seed(defaultFiles)
   .then(() => process.exit(0))
   .catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+    console.error(err)
+    process.exit(1)
+  })

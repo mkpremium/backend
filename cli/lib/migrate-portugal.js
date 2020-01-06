@@ -1,23 +1,23 @@
-import debug from 'debug';
-import t from 'tcomb';
-import {OwnerRepository, PersonRepository} from '../../src/owner/models';
-import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
-import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper';
-import uuid from 'uuid/v4';
-import _ from 'lodash';
-import axios from 'axios';
-import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import {BuildingRepository} from '../../src/building/models';
-import Promise from 'bluebird';
+import debug from 'debug'
+import t from 'tcomb'
+import {OwnerRepository, PersonRepository} from '../../src/owner/models'
+import {csvToJSON} from '../../src/migration/lib/migrate-model-v3'
+import {cleanObjectKeys, removeNullValue, removeNullValues} from '../../src/migration/models/models-helper'
+import uuid from 'uuid/v4'
+import _ from 'lodash'
+import axios from 'axios'
+import {WorksheetRepository} from '../../src/worksheet/models/worksheet'
+import {BuildingRepository} from '../../src/building/models'
+import Promise from 'bluebird'
 
-const debugMigrate = debug('app:migration:portugal');
+const debugMigrate = debug('app:migration:portugal')
 
 const requester = axios.create({
   baseURL: 'https://maps.googleapis.com/maps/api/geocode',
   params: {
     key: 'AIzaSyCUI2ZE7LZzG0V3ioe9gu8mJZKtFmQYPrY'
   }
-});
+})
 
 export const Input = t.struct({
   id_finca: t.maybe(t.Str),
@@ -60,33 +60,33 @@ export const Input = t.struct({
   propietario10: t.maybe(t.Str),
   dni10: t.maybe(t.Str),
   direccion10: t.maybe(t.Str)
-});
+})
 
 /**
  *
  * @param inputFile
  * @returns {Promise<void>}
  */
-export async function migrate(inputFile) {
-  debugMigrate('Process started...');
-  const buildingWithErrors = [];
-  await csvToJSON(inputFile, doOnEachRow);
-  async function doOnEachRow(personRecord, row) {
-    const cleanValues = removeNullValues(cleanObjectKeys(personRecord));
-    const input = Input(cleanValues);
+export async function migrate (inputFile) {
+  debugMigrate('Process started...')
+  const buildingWithErrors = []
+  await csvToJSON(inputFile, doOnEachRow)
+  async function doOnEachRow (personRecord, row) {
+    const cleanValues = removeNullValues(cleanObjectKeys(personRecord))
+    const input = Input(cleanValues)
     try {
-      await processBuilding(input, row);
+      await processBuilding(input, row)
     } catch (error) {
-      console.error(error, ' in record with id_finca:', input.id_finca);
+      console.error(error, ' in record with id_finca:', input.id_finca)
       buildingWithErrors.push({
         edificio: input.id_finca,
         error: error && error.toString()
-      });
+      })
     }
   }
 
-  debugMigrate('Building with errors:', JSON.stringify(buildingWithErrors, null, 2));
-  debugMigrate('Process ended.');
+  debugMigrate('Building with errors:', JSON.stringify(buildingWithErrors, null, 2))
+  debugMigrate('Process ended.')
 }
 
 /**
@@ -95,21 +95,21 @@ export async function migrate(inputFile) {
  * @param row
  * @returns {Promise<void>}
  */
-async function processBuilding(input, row) {
-  console.time('processBuilding');
-  const catastro = getFieldNotNull(input, 'id_finca');
-  debugMigrate(`\n[NEW ROW ${row}] Process Building record with id_finca:`, catastro);
+async function processBuilding (input, row) {
+  console.time('processBuilding')
+  const catastro = getFieldNotNull(input, 'id_finca')
+  debugMigrate(`\n[NEW ROW ${row}] Process Building record with id_finca:`, catastro)
 
   if (catastro) {
-    const building = await findBuilding(catastro);
+    const building = await findBuilding(catastro)
     if (building) {
-      debugMigrate(`Building found...skip row with catastro:`, catastro);
-      await checkAndAddOwners(building, input);
+      debugMigrate(`Building found...skip row with catastro:`, catastro)
+      await checkAndAddOwners(building, input)
     } else {
-      debugMigrate(`Building not found, proceed to create building, worksheet, person and owner...`);
-      await createAll(input);
-      debugMigrate('\nProcess ended for building record with catastro / id_finca:', catastro);
-      console.timeEnd('processBuilding');
+      debugMigrate(`Building not found, proceed to create building, worksheet, person and owner...`)
+      await createAll(input)
+      debugMigrate('\nProcess ended for building record with catastro / id_finca:', catastro)
+      console.timeEnd('processBuilding')
     }
   }
 }
@@ -119,30 +119,30 @@ async function processBuilding(input, row) {
  * @param input
  * @returns {Promise<*>}
  */
-async function getGeoData(input) {
-  const base = input.tipo_de_via ? input.tipo_de_via : '';
-  const address = `${base} ${input.calle} ${input.no}`.trim();
-  const url = 'json';
-  debugMigrate('getting geo data...', 'requester GET', url, {address});
+async function getGeoData (input) {
+  const base = input.tipo_de_via ? input.tipo_de_via : ''
+  const address = `${base} ${input.calle} ${input.no}`.trim()
+  const url = 'json'
+  debugMigrate('getting geo data...', 'requester GET', url, {address})
   try {
-    let postalCode = '';
-    let latitude = 0;
-    let longitude = 0;
-    const result = await requester.get(url, {params: {address}});
+    let postalCode = ''
+    let latitude = 0
+    let longitude = 0
+    const result = await requester.get(url, {params: {address}})
 
     if (result.data) {
-      const data = _.first(result.data.results);
-      const location = data && data.geometry && data.geometry.location;
-      latitude = location && location.lat;
-      longitude = location && location.lng;
-      const searchAddressComponents = data && data['address_components'];
+      const data = _.first(result.data.results)
+      const location = data && data.geometry && data.geometry.location
+      latitude = location && location.lat
+      longitude = location && location.lng
+      const searchAddressComponents = data && data['address_components']
 
       if (searchAddressComponents) {
-        searchAddressComponents.map(function(searchAddressComponent) {
+        searchAddressComponents.map(function (searchAddressComponent) {
           if (searchAddressComponent.types[0] === 'postal_code') {
-            postalCode = searchAddressComponent.short_name;
+            postalCode = searchAddressComponent.short_name
           }
-        });
+        })
       }
     }
 
@@ -150,19 +150,19 @@ async function getGeoData(input) {
       latitude: latitude,
       longitude: longitude,
       postalCode
-    };
+    }
   } catch (exception) {
-    debugMigrate('geo data', 'requester error', axiosException(exception));
-    return null;
+    debugMigrate('geo data', 'requester error', axiosException(exception))
+    return null
   }
 }
 
-function axiosException(err) {
+function axiosException (err) {
   if (err.response) {
-    return [err.response.status, err.response.data];
+    return [err.response.status, err.response.data]
   }
 
-  return [];
+  return []
 }
 
 /**
@@ -170,69 +170,69 @@ function axiosException(err) {
  * @param input
  * @returns {Promise<void>}
  */
-async function createAll(input) {
-  const ownerRepository = new OwnerRepository();
-  const personRepository = new PersonRepository();
-  const {owners, building, worksheet} = await generateObjects(input);
+async function createAll (input) {
+  const ownerRepository = new OwnerRepository()
+  const personRepository = new PersonRepository()
+  const {owners, building, worksheet} = await generateObjects(input)
 
-  debugMigrate('Creating building with id:', building.id);
-  const buildingRepository = new BuildingRepository();
-  await buildingRepository.save(building, false);
+  debugMigrate('Creating building with id:', building.id)
+  const buildingRepository = new BuildingRepository()
+  await buildingRepository.save(building, false)
 
-  debugMigrate('Creating worksheet with id:', worksheet.id);
-  const worksheetRepository = new WorksheetRepository();
-  await worksheetRepository.save(worksheet, false);
+  debugMigrate('Creating worksheet with id:', worksheet.id)
+  const worksheetRepository = new WorksheetRepository()
+  await worksheetRepository.save(worksheet, false)
 
-  await Promise.map(owners, async(ownerAndPerson) => {
-    await personRepository.save(ownerAndPerson.person);
-    debugMigrate('Created person with id: ', ownerAndPerson.person.id);
+  await Promise.map(owners, async (ownerAndPerson) => {
+    await personRepository.save(ownerAndPerson.person)
+    debugMigrate('Created person with id: ', ownerAndPerson.person.id)
 
-    await ownerRepository.save(ownerAndPerson.owner);
-    debugMigrate('Created owner with id: ', ownerAndPerson.owner.id);
-  });
+    await ownerRepository.save(ownerAndPerson.owner)
+    debugMigrate('Created owner with id: ', ownerAndPerson.owner.id)
+  })
 }
 
-async function checkAndAddOwners(building, input) {
-  const worksheetRepo = new WorksheetRepository();
-  const ownerRepository = new OwnerRepository();
-  const personRepository = new PersonRepository();
-  const {owners} = await generateObjects(input, building);
+async function checkAndAddOwners (building, input) {
+  const worksheetRepo = new WorksheetRepository()
+  const ownerRepository = new OwnerRepository()
+  const personRepository = new PersonRepository()
+  const {owners} = await generateObjects(input, building)
 
-  const worksheet = await worksheetRepo.findWorksheetByBuilding(building.id);
-  const worksheetWithOwners = await worksheetRepo.findByIdWIthIncludes(worksheet.id);
+  const worksheet = await worksheetRepo.findWorksheetByBuilding(building.id)
+  const worksheetWithOwners = await worksheetRepo.findByIdWIthIncludes(worksheet.id)
 
-  debugMigrate('Checking owner for worksheet with id:', worksheet.id);
-  debugMigrate(`Checking owners [${owners.length}] for existent : ${building.id}`);
+  debugMigrate('Checking owner for worksheet with id:', worksheet.id)
+  debugMigrate(`Checking owners [${owners.length}] for existent : ${building.id}`)
 
-  function newAddOwner(owner) {
-    function inRelatedOwners(relatedOwner) {
+  function newAddOwner (owner) {
+    function inRelatedOwners (relatedOwner) {
       return !_.isEmpty(relatedOwner.person.documentNumber) &&
         !_.isEmpty(owner.person.documentNumber) &&
-        relatedOwner.person.documentNumber === owner.person.documentNumber;
+        relatedOwner.person.documentNumber === owner.person.documentNumber
     }
 
     if (worksheetWithOwners.relatedOwners.length === 0) {
-      return true;
+      return true
     }
 
-    return !worksheetWithOwners.relatedOwners.find(inRelatedOwners);
+    return !worksheetWithOwners.relatedOwners.find(inRelatedOwners)
   }
 
   if (owners.length === 0) {
-    return;
+    return
   }
 
-  await Promise.map(owners, async(ownerAndPerson) => {
+  await Promise.map(owners, async (ownerAndPerson) => {
     if (newAddOwner(ownerAndPerson.owner)) {
-      await ownerRepository.save(ownerAndPerson.owner);
-      debugMigrate('Created owner with id:', ownerAndPerson.owner.id);
+      await ownerRepository.save(ownerAndPerson.owner)
+      debugMigrate('Created owner with id:', ownerAndPerson.owner.id)
 
-      await personRepository.save(ownerAndPerson.person);
-      debugMigrate('Created person with id:', ownerAndPerson.person.id);
+      await personRepository.save(ownerAndPerson.person)
+      debugMigrate('Created person with id:', ownerAndPerson.person.id)
     } else {
-      debugMigrate('Skipping owner/person documentNumber:', ownerAndPerson.person.documentNumber);
+      debugMigrate('Skipping owner/person documentNumber:', ownerAndPerson.person.documentNumber)
     }
-  });
+  })
 }
 
 /**
@@ -242,12 +242,12 @@ async function checkAndAddOwners(building, input) {
  */
 const number = value => {
   if (value) {
-    const number = Number(value.replace(',', '.'));
-    return isNaN(number) ? 0 : number;
+    const number = Number(value.replace(',', '.'))
+    return isNaN(number) ? 0 : number
   }
 
-  return 0;
-};
+  return 0
+}
 
 /**
  *
@@ -255,17 +255,17 @@ const number = value => {
  * @param previousBuilding
  * @returns {Promise<{owners: Array, building: *, worksheet: *}>}
  */
-async function generateObjects(input, previousBuilding) {
-  const buildingId = uuid();
-  const owners = [];
+async function generateObjects (input, previousBuilding) {
+  const buildingId = uuid()
+  const owners = []
 
   for (let i = 1; i <= 10; i++) {
-    const name = _.get(input, 'propietario' + i, '');
+    const name = _.get(input, 'propietario' + i, '')
 
     if (name) {
       const address = {
         fullAddress: _.get(input, 'direccion' + i, '')
-      };
+      }
 
       const person = t.Person({
         id: uuid(),
@@ -276,7 +276,7 @@ async function generateObjects(input, previousBuilding) {
         personType: 'NONE',
         _relatedTo: owners.length ? owners[0].person.name : name,
         _migrateId: input.id_finca
-      });
+      })
 
       const owner = t.OwnerWithInclude({
         id: uuid(),
@@ -288,44 +288,44 @@ async function generateObjects(input, previousBuilding) {
         _relatedTo: person._relatedTo,
         _migrateId: person._migrateId,
         buildingId: buildingId
-      });
+      })
 
       owners.push({
         owner,
         person
-      });
+      })
     }
   }
 
-  async function cachedGeoData() {
+  async function cachedGeoData () {
     if (previousBuilding) {
       return {
         postalCode: previousBuilding.address.postalCode.number,
         latitude: previousBuilding.location.lat,
         longitude: previousBuilding.location.lat
-      };
+      }
     }
 
-    return getGeoData(input);
+    return getGeoData(input)
   }
 
-  const geoData = await cachedGeoData();
-  let relatedTo = '';
-  let ownerForBuilding = null;
-  let ownerId = null;
+  const geoData = await cachedGeoData()
+  let relatedTo = ''
+  let ownerForBuilding = null
+  let ownerId = null
   if (owners.length) {
-    relatedTo = owners[0].owner._relatedTo;
-    ownerId = owners[0].owner.id;
+    relatedTo = owners[0].owner._relatedTo
+    ownerId = owners[0].owner.id
     ownerForBuilding = {
       name: owners[0].person.name,
       address: {
         fullAddress: owners[0].person._address.fullAddress
       }
-    };
+    }
   }
 
-  const baseFullAddress = input.tipo_de_via || '';
-  const fullAddress = `${baseFullAddress} ${input.calle} ${input.no}, ${input.ciudad}`;
+  const baseFullAddress = input.tipo_de_via || ''
+  const fullAddress = `${baseFullAddress} ${input.calle} ${input.no}, ${input.ciudad}`
 
   const building = t.Building({
     id: buildingId,
@@ -363,7 +363,7 @@ async function generateObjects(input, previousBuilding) {
     },
     use: null,
     propertyType: null
-  });
+  })
 
   const worksheet = t.WorkSheet({
     id: uuid(),
@@ -373,9 +373,9 @@ async function generateObjects(input, previousBuilding) {
     buildingAddress: building.address,
     status: 'INVALID',
     queueId: null
-  });
+  })
 
-  return {owners, building, worksheet};
+  return {owners, building, worksheet}
 }
 
 /**
@@ -383,9 +383,9 @@ async function generateObjects(input, previousBuilding) {
  * @param catastro
  * @returns {Promise<*>}
  */
-export async function findBuilding(catastro) {
-  const buildingRepository = new BuildingRepository();
-  return buildingRepository.findByCatastro({reference: catastro}, false);
+export async function findBuilding (catastro) {
+  const buildingRepository = new BuildingRepository()
+  return buildingRepository.findByCatastro({reference: catastro}, false)
 }
 
 /**
@@ -394,10 +394,10 @@ export async function findBuilding(catastro) {
  * @param field
  * @returns {*}
  */
-export function getFieldNotNull(input, field) {
-  const value = removeNullValue(input[field]);
+export function getFieldNotNull (input, field) {
+  const value = removeNullValue(input[field])
   if (value === null) {
-    debugMigrate(`Invalid ${field} '${input[field]}', skip record\n: ${input}`);
+    debugMigrate(`Invalid ${field} '${input[field]}', skip record\n: ${input}`)
   }
-  return value;
+  return value
 }

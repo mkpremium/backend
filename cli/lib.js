@@ -1,7 +1,7 @@
-import path from 'path';
-import lodash from 'lodash';
-import fs from 'fs-extra';
-import {exec} from 'child_process';
+import path from 'path'
+import lodash from 'lodash'
+import fs from 'fs-extra'
+import {exec} from 'child_process'
 
 /**
  * Check if the list of passed files exists on the passed directory
@@ -10,25 +10,25 @@ import {exec} from 'child_process';
  * @param inputs
  * @returns {Promise<{}>} a list of absolute file paths
  */
-export async function checkInputs(inputDir, inputs) {
-  async function fileExists(file) {
-    const filepath = path.join(inputDir, file);
-    const exist = await fs.pathExists(filepath);
+export async function checkInputs (inputDir, inputs) {
+  async function fileExists (file) {
+    const filepath = path.join(inputDir, file)
+    const exist = await fs.pathExists(filepath)
     if (!exist) {
-      throw new Error(`there's no file ${file} on the passed directory ${inputDir}`);
+      throw new Error(`there's no file ${file} on the passed directory ${inputDir}`)
     }
-    return path.resolve(filepath);
+    return path.resolve(filepath)
   }
 
-  const fullPaths = await Promise.all(inputs.map(fileExists));
+  const fullPaths = await Promise.all(inputs.map(fileExists))
 
-  return lodash.zipObject(inputs, fullPaths);
+  return lodash.zipObject(inputs, fullPaths)
 }
 
-export async function checkInputFile(inputFile) {
-  const exist = await fs.pathExists(inputFile);
+export async function checkInputFile (inputFile) {
+  const exist = await fs.pathExists(inputFile)
   if (!exist) {
-    throw new Error(`there's no file ${inputFile}`);
+    throw new Error(`there's no file ${inputFile}`)
   }
 }
 
@@ -39,11 +39,11 @@ export async function checkInputFile(inputFile) {
  * @param expectedHeaders
  * @returns {Promise<void>}
  */
-export async function validateHeaders(inputFile, expectedHeaders) {
-  const headers = await head(inputFile);
-  const headerWithoutLines = headers.replace(/[\n\r]/g, '');
+export async function validateHeaders (inputFile, expectedHeaders) {
+  const headers = await head(inputFile)
+  const headerWithoutLines = headers.replace(/[\n\r]/g, '')
   if (headerWithoutLines !== expectedHeaders) {
-    throw new Error(`${inputFile} should have the following first line '${expectedHeaders}', but found '${headerWithoutLines}'`);
+    throw new Error(`${inputFile} should have the following first line '${expectedHeaders}', but found '${headerWithoutLines}'`)
   }
 }
 
@@ -53,27 +53,27 @@ export async function validateHeaders(inputFile, expectedHeaders) {
  * @param number
  * @returns {Promise<string>}
  */
-export async function head(filename, number = 1) {
+export async function head (filename, number = 1) {
   return new Promise((resolve, reject) => {
     exec(`head -n${number} '${filename}'`, (err, stdout) => {
       if (err) {
-        reject(err);
+        reject(err)
       } else {
-        resolve(stdout);
+        resolve(stdout)
       }
-    });
-  });
+    })
+  })
 }
 
-export function actionWrapper(fn) {
+export function actionWrapper (fn) {
   return () => {
     fn.apply(null, arguments)
       .then(() => {
-        process.exit(0);
+        process.exit(0)
       })
       .catch(err => {
-        console.error(err);
-        process.exit(1);
-      });
-  };
+        console.error(err)
+        process.exit(1)
+      })
+  }
 }

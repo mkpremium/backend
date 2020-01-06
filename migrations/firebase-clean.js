@@ -1,12 +1,12 @@
-import Promise from 'bluebird';
-import {fbInformadores, fbComerciales} from '../src/firebase';
-import {firebaseComerciales, firebaseInformadores} from '../config';
+import Promise from 'bluebird'
+import {fbInformadores, fbComerciales} from '../src/firebase'
+import {firebaseComerciales, firebaseInformadores} from '../config'
 
-async function cleanStreet() {
+async function cleanStreet () {
   if (!firebaseInformadores.enabled) {
-    return;
+    return
   }
-  const db = fbInformadores.database();
+  const db = fbInformadores.database()
 
   return Promise.all([
     db.ref(`${fbInformadores.prefixURL}AdminUsers`).set(null),
@@ -19,14 +19,14 @@ async function cleanStreet() {
     db.ref(`${fbInformadores.prefixURL}Locations`).set(null),
     db.ref(`${fbInformadores.prefixURL}Parameters`).set(null),
     db.ref(`${fbInformadores.prefixURL}Statistics`).set(null)
-  ]);
+  ])
 }
 
-async function cleanBusiness() {
+async function cleanBusiness () {
   if (!firebaseComerciales.enabled) {
-    return;
+    return
   }
-  const db = fbComerciales.database();
+  const db = fbComerciales.database()
 
   return Promise.all([
     db.ref(`${fbComerciales.prefixURL}Buildings`).set(null),
@@ -38,21 +38,21 @@ async function cleanBusiness() {
     db.ref(`${fbComerciales.prefixURL}Reminders`).set(null),
     db.ref(`${fbComerciales.prefixURL}Users`).set(null),
     db.ref(`${fbComerciales.prefixURL}UsersRef`).set(null)
-  ]);
+  ])
 }
 
-export async function cleanFirebase() {
+export async function cleanFirebase () {
   return Promise.all([
     cleanStreet(),
     cleanBusiness()
-  ]);
+  ])
 }
 
 if (require.main === module) {
   cleanFirebase()
     .then(() => process.exit(0))
     .catch(err => {
-      console.error(err);
-      process.exit(1);
-    });
+      console.error(err)
+      process.exit(1)
+    })
 }

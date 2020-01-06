@@ -1,34 +1,34 @@
 #!/usr/bin/env babel-node
-import program from 'commander';
-import {checkInputFile} from './lib';
-import {migrateBuildingEntities} from './lib/migrate-building-entities';
+import program from 'commander'
+import {checkInputFile} from './lib'
+import {migrateBuildingEntities} from './lib/migrate-building-entities'
 
 program
   .arguments('[input-file]')
   .version('0.0.1')
   .action(mainAction)
-  .parse(process.argv);
+  .parse(process.argv)
 
 // region main entry
-function mainAction() {
+function mainAction () {
   if (program.args.length === 0) {
-    console.error('input-file is required.');
-    program.help();
+    console.error('input-file is required.')
+    program.help()
   }
 
   main.apply(null, arguments)
     .then(() => {
-      process.exit(0);
+      process.exit(0)
     })
     .catch(err => {
-      console.error(err);
-      process.exit(1);
-    });
+      console.error(err)
+      process.exit(1)
+    })
 }
 
 // endregion
 
-async function main(inputFile) {
-  await checkInputFile(inputFile);
-  await migrateBuildingEntities(inputFile);
+async function main (inputFile) {
+  await checkInputFile(inputFile)
+  await migrateBuildingEntities(inputFile)
 }

@@ -1,45 +1,45 @@
 #!/usr/bin/env node
 
-import http from 'http';
-import debug from 'debug';
+import http from 'http'
+import debug from 'debug'
 
-import {port} from '../config';
-import app from '../src/app';
+import {port} from '../config'
+import app from '../src/app'
 
-const server = http.createServer(app);
-const serverDebug = debug('app:server');
+const server = http.createServer(app)
+const serverDebug = debug('app:server')
 
-server.listen(port);
-server.on('error', errorHandler);
-server.on('listen', listenHandler);
+server.listen(port)
+server.on('error', errorHandler)
+server.on('listen', listenHandler)
 
-function listenHandler() {
-  const addr = server.address();
+function listenHandler () {
+  const addr = server.address()
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  serverDebug('Listening on ' + bind);
+    : 'port ' + addr.port
+  serverDebug('Listening on ' + bind)
 }
 
-function errorHandler(error) {
+function errorHandler (error) {
   if (error.syscall !== 'listen') {
-    throw error;
+    throw error
   }
 
   const bind = typeof port === 'string'
     ? 'Pipe ' + port
-    : 'Port ' + port;
+    : 'Port ' + port
 
   // handle specific listen errors with friendly messages
   // noinspection FallThroughInSwitchStatementJS
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
+      console.error(bind + ' requires elevated privileges')
+      process.exit(1)
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
+      console.error(bind + ' is already in use')
+      process.exit(1)
     default:
-      throw error;
+      throw error
   }
 }

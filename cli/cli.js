@@ -1,7 +1,7 @@
 #!/usr/bin/env babel-node
-import program from 'commander';
+import program from 'commander'
 
-require('dotenv').config();
+require('dotenv').config()
 
 program
   .version('0.0.1')
@@ -21,4 +21,4 @@ program
   .command('metadata', 'Procesos que tienen que ver la metadata de los edificios')
   .command('building', 'Procesos que tienen que ver con el edificio')
   .command('migrate-persons-v2 [input-file]', 'Migración de personas diferente formato de archivo.')
-  .parse(process.argv);
+  .parse(process.argv)

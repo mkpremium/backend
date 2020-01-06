@@ -1,20 +1,20 @@
-import debug from 'debug';
-import t from 'tcomb';
-import {OwnerRepository, PersonRepository} from '../../src/owner/models';
-import {csvToJSON} from '../../src/migration/lib/migrate-model-v3';
-import {cleanObjectKeys, removeNullValues} from '../../src/migration/models/models-helper';
-import uuid from 'uuid/v4';
-import _ from 'lodash';
-import {WorksheetRepository} from '../../src/worksheet/models/worksheet';
-import {BuildingRepository} from '../../src/building/models';
-import {readCodigosPostalesMunicipios} from '../../csv/codigos_postales_municipios';
-import {findWorksheetCatastroId, getFieldNotNull} from './migrate-persons';
-import {OwnerType} from '../../src/types/enums';
-import {N1qlQuery} from 'couchbase';
-import {WorkSheetStatus} from '../../src/types/worksheet';
+import debug from 'debug'
+import t from 'tcomb'
+import {OwnerRepository, PersonRepository} from '../../src/owner/models'
+import {csvToJSON} from '../../src/migration/lib/migrate-model-v3'
+import {cleanObjectKeys, removeNullValues} from '../../src/migration/models/models-helper'
+import uuid from 'uuid/v4'
+import _ from 'lodash'
+import {WorksheetRepository} from '../../src/worksheet/models/worksheet'
+import {BuildingRepository} from '../../src/building/models'
+import {readCodigosPostalesMunicipios} from '../../csv/codigos_postales_municipios'
+import {findWorksheetCatastroId, getFieldNotNull} from './migrate-persons'
+import {OwnerType} from '../../src/types/enums'
+import {N1qlQuery} from 'couchbase'
+import {WorkSheetStatus} from '../../src/types/worksheet'
 
-const debugMigrate = debug('app:migration:person-v2');
-export const phonesPropertyNames = ['movil_1', 'fijo', 'movil_2'];
+const debugMigrate = debug('app:migration:person-v2')
+export const phonesPropertyNames = ['movil_1', 'fijo', 'movil_2']
 
 export const PersonInput = t.struct({
   nombre: t.maybe(t.Str),
@@ -34,28 +34,28 @@ export const PersonInput = t.struct({
   fijo: t.maybe(t.Str),
   movil_2: t.maybe(t.Str),
   id_catastro: t.maybe(t.Str)
-});
+})
 
 /**
  *
  * @param inputFile
  * @returns {Promise<void>}
  */
-export async function migratePersons(inputFile) {
-  debugMigrate('Process started...');
-  const codes = await readCodigosPostalesMunicipios();
-  await csvToJSON(inputFile, doOnEachRow);
+export async function migratePersons (inputFile) {
+  debugMigrate('Process started...')
+  const codes = await readCodigosPostalesMunicipios()
+  await csvToJSON(inputFile, doOnEachRow)
 
-  async function doOnEachRow(personRecord) {
-    const inputPerson = PersonInput(removeNullValues(cleanObjectKeys(personRecord)));
+  async function doOnEachRow (personRecord) {
+    const inputPerson = PersonInput(removeNullValues(cleanObjectKeys(personRecord)))
     try {
-      await processPerson(inputPerson, codes);
+      await processPerson(inputPerson, codes)
     } catch (error) {
-      console.error(error, ' in record with dni:', inputPerson.dni, ' and id catastro:', inputPerson.id_catastro);
+      console.error(error, ' in record with dni:', inputPerson.dni, ' and id catastro:', inputPerson.id_catastro)
     }
   }
 
-  debugMigrate('Process ended.');
+  debugMigrate('Process ended.')
 }
 
 /**
@@ -64,20 +64,20 @@ export async function migratePersons(inputFile) {
  * @param codes
  * @returns {Promise<void>}
  */
-async function processPerson(inputPerson, codes) {
-  debugMigrate('\n[NEW ROW] Process Person record with dni:', inputPerson.dni, ' and id catastro:', inputPerson.id_catastro);
-  const personDNI = getFieldNotNull(inputPerson, 'dni');
+async function processPerson (inputPerson, codes) {
+  debugMigrate('\n[NEW ROW] Process Person record with dni:', inputPerson.dni, ' and id catastro:', inputPerson.id_catastro)
+  const personDNI = getFieldNotNull(inputPerson, 'dni')
 
   if (personDNI) {
-    const person = await findPerson(personDNI);
+    const person = await findPerson(personDNI)
     if (person) {
-      debugMigrate(`Person found...`);
-      await updatePersonContacts(person, inputPerson);
-      debugMigrate(`Updated person contacts...continue to process relationship with worksheet...`);
-      await processRelationWithWorksheet(person, inputPerson);
+      debugMigrate(`Person found...`)
+      await updatePersonContacts(person, inputPerson)
+      debugMigrate(`Updated person contacts...continue to process relationship with worksheet...`)
+      await processRelationWithWorksheet(person, inputPerson)
     } else {
-      debugMigrate(`Person not found, proceed to create person and relations...`);
-      await createPerson(inputPerson, codes);
+      debugMigrate(`Person not found, proceed to create person and relations...`)
+      await createPerson(inputPerson, codes)
     }
   }
 }
@@ -88,17 +88,17 @@ async function processPerson(inputPerson, codes) {
  * @param inputPerson
  * @returns {Promise<void>}
  */
-async function processRelationWithWorksheet(person, inputPerson) {
-  const ownerRepository = new OwnerRepository();
-  const owner = await ownerRepository.findByPersonId(person.id);
+async function processRelationWithWorksheet (person, inputPerson) {
+  const ownerRepository = new OwnerRepository()
+  const owner = await ownerRepository.findByPersonId(person.id)
 
   if (owner) {
-    debugMigrate(`Owner existed id...${owner.id}`);
-    await processRelationOfOwnerWithBuilding(owner, person, inputPerson);
+    debugMigrate(`Owner existed id...${owner.id}`)
+    await processRelationOfOwnerWithBuilding(owner, person, inputPerson)
   } else {
     debugMigrate(`No records of ${ownerRepository._getMeta().defaultProps._documentType}
-    found by personId: ${person.id}, proceed to create owner.`);
-    await createOwnerAndRelations(person, inputPerson);
+    found by personId: ${person.id}, proceed to create owner.`)
+    await createOwnerAndRelations(person, inputPerson)
   }
 }
 
@@ -111,26 +111,26 @@ async function processRelationWithWorksheet(person, inputPerson) {
  * @param inputPerson
  * @returns {Promise<void>}
  */
-async function processRelationOfOwnerWithBuilding(owner, person, inputPerson) {
-  const buildingRepository = new BuildingRepository();
-  let building = await buildingRepository.findById(owner.buildingId);
-  const catastroId = inputPerson.id_catastro;
+async function processRelationOfOwnerWithBuilding (owner, person, inputPerson) {
+  const buildingRepository = new BuildingRepository()
+  let building = await buildingRepository.findById(owner.buildingId)
+  const catastroId = inputPerson.id_catastro
 
   if (building._migrateId !== catastroId) {
-    debugMigrate(`Owner existed, but the related building does not have the same catastro id found in csv person record.`);
+    debugMigrate(`Owner existed, but the related building does not have the same catastro id found in csv person record.`)
     // search building by catastro
-    building = await buildingRepository.findBuildingByMetadataMigration(catastroId);
+    building = await buildingRepository.findBuildingByMetadataMigration(catastroId)
 
     if (building) {
       debugMigrate(`Process to create new relationship, meaning create a new owner and relationship with building with id:
-       ${building.id}`);
-      await createOwnerAndRelations(person, inputPerson);
+       ${building.id}`)
+      await createOwnerAndRelations(person, inputPerson)
     } else {
       debugMigrate(`No records of ${buildingRepository._getMeta().defaultProps._documentType}
-                    found by catastro: ${catastroId}, ignoring record.`);
+                    found by catastro: ${catastroId}, ignoring record.`)
     }
   } else {
-    debugMigrate(`Owner related building has same catastro id, process is completed.`);
+    debugMigrate(`Owner related building has same catastro id, process is completed.`)
   }
 }
 
@@ -140,36 +140,36 @@ async function processRelationOfOwnerWithBuilding(owner, person, inputPerson) {
  * @param inputPerson
  * @returns {Promise<void>}
  */
-export async function updatePersonContacts(person, inputPerson) {
-  const currentContactsObjectsArray = person.contacts || [];
+export async function updatePersonContacts (person, inputPerson) {
+  const currentContactsObjectsArray = person.contacts || []
   const currentPhones = currentContactsObjectsArray.map((contact) => {
-    return contact.value;
-  });
-  debugMigrate(`currentPhones...${currentPhones}`);
-  const updatedContacts = currentContactsObjectsArray;
-  const migrationPhones = getUniquePhones(inputPerson) || [];
-  debugMigrate(`migrationPhones...${migrationPhones}`);
-  const newPhones = _.difference(migrationPhones, currentPhones);
+    return contact.value
+  })
+  debugMigrate(`currentPhones...${currentPhones}`)
+  const updatedContacts = currentContactsObjectsArray
+  const migrationPhones = getUniquePhones(inputPerson) || []
+  debugMigrate(`migrationPhones...${migrationPhones}`)
+  const newPhones = _.difference(migrationPhones, currentPhones)
 
   if (newPhones.length) {
-    debugMigrate(`new phones...${newPhones}`);
+    debugMigrate(`new phones...${newPhones}`)
 
     newPhones.map((phone) => {
       updatedContacts.push({
         type: 'TELEFONO',
         value: phone
-      });
-    });
+      })
+    })
 
-    debugMigrate(`updatedContacts...${JSON.stringify(updatedContacts, null, 2)}`);
+    debugMigrate(`updatedContacts...${JSON.stringify(updatedContacts, null, 2)}`)
 
     if (updatedContacts.length) {
-      const personRepository = new PersonRepository();
-      const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}});
-      await personRepository.save(updatedPerson);
+      const personRepository = new PersonRepository()
+      const updatedPerson = t.update(person, {contacts: {$merge: updatedContacts}})
+      await personRepository.save(updatedPerson)
     }
   } else {
-    debugMigrate(`No new phones to be added, proceed.`);
+    debugMigrate(`No new phones to be added, proceed.`)
   }
 }
 
@@ -179,29 +179,29 @@ export async function updatePersonContacts(person, inputPerson) {
  * @param codes
  * @returns {Promise<void>}
  */
-export async function createPerson(inputPerson, codes) {
-  const worksheet = await findWorksheetCatastroId(inputPerson);
-  debugMigrate(`[createPerson] Worksheet found, id ${worksheet.id}`);
-  const {person, owner} = await migrateFromCsv(inputPerson, worksheet, codes);
-  const personRepository = new PersonRepository();
-  await personRepository.save(person);
-  debugMigrate(`Created person with id ${person.id}`);
-  const ownerRepository = new OwnerRepository();
-  await ownerRepository.save(owner);
-  debugMigrate(`[createPerson] Created owner with id ${owner.id}`);
-  const worksheetRepository = new WorksheetRepository();
-  await worksheetRepository.addOwner(worksheet, owner);
-  debugMigrate(`[createPerson] Added owner to worksheet with id ${worksheet.id}`);
-  debugMigrate('worksheet id', worksheet.id, 'with status', worksheet.status);
+export async function createPerson (inputPerson, codes) {
+  const worksheet = await findWorksheetCatastroId(inputPerson)
+  debugMigrate(`[createPerson] Worksheet found, id ${worksheet.id}`)
+  const {person, owner} = await migrateFromCsv(inputPerson, worksheet, codes)
+  const personRepository = new PersonRepository()
+  await personRepository.save(person)
+  debugMigrate(`Created person with id ${person.id}`)
+  const ownerRepository = new OwnerRepository()
+  await ownerRepository.save(owner)
+  debugMigrate(`[createPerson] Created owner with id ${owner.id}`)
+  const worksheetRepository = new WorksheetRepository()
+  await worksheetRepository.addOwner(worksheet, owner)
+  debugMigrate(`[createPerson] Added owner to worksheet with id ${worksheet.id}`)
+  debugMigrate('worksheet id', worksheet.id, 'with status', worksheet.status)
 
   // we can do this because the person created has at least one contact
   if (worksheet.status === WorkSheetStatus.INVALID) {
-    const bucket = worksheetRepository.getBucketName();
+    const bucket = worksheetRepository.getBucketName()
     const updateAddress = N1qlQuery
-      .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(WorkSheetStatus.DEFAULT)} WHERE id = ${JSON.stringify(worksheet.id)}`);
+      .fromString(`UPDATE ${bucket} t SET status = ${JSON.stringify(WorkSheetStatus.DEFAULT)} WHERE id = ${JSON.stringify(worksheet.id)}`)
 
-    await worksheetRepository.queryRaw(updateAddress);
-    debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status);
+    await worksheetRepository.queryRaw(updateAddress)
+    debugMigrate('worksheet status updated, worksheet id', worksheet.id, 'previous status:', worksheet.status)
   }
 }
 
@@ -211,16 +211,16 @@ export async function createPerson(inputPerson, codes) {
  * @param inputPerson
  * @returns {Promise<void>}
  */
-export async function createOwnerAndRelations(person, inputPerson) {
-  const worksheet = await findWorksheetCatastroId(inputPerson);
-  debugMigrate(`[createOwnerAndRelations] Worksheet found, id ${worksheet.id}`);
-  const owner = generateOwner(inputPerson, person, worksheet);
-  const ownerRepository = new OwnerRepository();
-  await ownerRepository.save(owner);
-  debugMigrate(`[createOwnerAndRelations] Created owner with id ${owner.id}`);
-  const worksheetRepository = new WorksheetRepository();
-  await worksheetRepository.addOwner(worksheet, owner);
-  debugMigrate(`[createOwnerAndRelations] Added owner to worksheet with id ${worksheet.id}`);
+export async function createOwnerAndRelations (person, inputPerson) {
+  const worksheet = await findWorksheetCatastroId(inputPerson)
+  debugMigrate(`[createOwnerAndRelations] Worksheet found, id ${worksheet.id}`)
+  const owner = generateOwner(inputPerson, person, worksheet)
+  const ownerRepository = new OwnerRepository()
+  await ownerRepository.save(owner)
+  debugMigrate(`[createOwnerAndRelations] Created owner with id ${owner.id}`)
+  const worksheetRepository = new WorksheetRepository()
+  await worksheetRepository.addOwner(worksheet, owner)
+  debugMigrate(`[createOwnerAndRelations] Added owner to worksheet with id ${worksheet.id}`)
 }
 
 /**
@@ -228,9 +228,9 @@ export async function createOwnerAndRelations(person, inputPerson) {
  * @param personDNI - is the field dni in the csv
  * @returns {Promise<*>}
  */
-async function findPerson(personDNI) {
-  const personRepository = new PersonRepository();
-  return personRepository.findByDocumentNumber(personDNI, false);
+async function findPerson (personDNI) {
+  const personRepository = new PersonRepository()
+  return personRepository.findByDocumentNumber(personDNI, false)
 }
 
 /**
@@ -239,18 +239,18 @@ async function findPerson(personDNI) {
  * @returns {Array}
  */
 const generateContactsNoDuplicates = (inputPerson) => {
-  const contacts = [];
-  let phones = getUniquePhones(inputPerson);
+  const contacts = []
+  let phones = getUniquePhones(inputPerson)
 
   phones.map((phone) => {
     contacts.push({
       type: 'TELEFONO',
       value: phone
-    });
-  });
+    })
+  })
 
-  return contacts;
-};
+  return contacts
+}
 
 /**
  * Creates the person and owner structs base on the csv record of a person
@@ -259,10 +259,10 @@ const generateContactsNoDuplicates = (inputPerson) => {
  * @param codes
  * @returns {{owner: *, person: *}}
  */
-export function migrateFromCsv(inputPerson, worksheet, codes) {
-  const name = inputPerson.nombre_completo;
+export function migrateFromCsv (inputPerson, worksheet, codes) {
+  const name = inputPerson.nombre_completo
 
-  const address = generateAddress(inputPerson, codes);
+  const address = generateAddress(inputPerson, codes)
 
   const person = t.Person({
     id: uuid(),
@@ -277,10 +277,10 @@ export function migrateFromCsv(inputPerson, worksheet, codes) {
     gender: gender(inputPerson),
     personType: 'NATURAL',
     _relatedTo: worksheet._relatedTo
-  });
-  const owner = generateOwner(inputPerson, person, worksheet);
+  })
+  const owner = generateOwner(inputPerson, person, worksheet)
 
-  return {owner, person};
+  return {owner, person}
 }
 
 /**
@@ -290,7 +290,7 @@ export function migrateFromCsv(inputPerson, worksheet, codes) {
  * @param worksheet
  * @returns {*}
  */
-function generateOwner(inputPerson, person, worksheet) {
+function generateOwner (inputPerson, person, worksheet) {
   return t.Owner({
     id: uuid(),
     type: OwnerType.FAMILY,
@@ -300,7 +300,7 @@ function generateOwner(inputPerson, person, worksheet) {
     name: person.name,
     _relatedTo: worksheet._relatedTo,
     buildingId: _.first(worksheet.relatedBuildingIds)
-  });
+  })
 }
 
 /**
@@ -308,16 +308,16 @@ function generateOwner(inputPerson, person, worksheet) {
  * @param inputPerson
  * @returns {Array}
  */
-function getUniquePhones(inputPerson) {
-  let phones = [];
+function getUniquePhones (inputPerson) {
+  let phones = []
 
   phonesPropertyNames.map((propertyName) => {
     if (inputPerson[propertyName]) {
-      phones.push(inputPerson[propertyName]);
+      phones.push(inputPerson[propertyName])
     }
-  });
+  })
 
-  return _.uniq(phones);
+  return _.uniq(phones)
 }
 
 /**
@@ -326,17 +326,17 @@ function getUniquePhones(inputPerson) {
  * @param codes
  * @returns {{fullAddress: *, floor: *, number: *, postalCode: *, city: null}}
  */
-function generateAddress(input, codes) {
-  const postalCode = input.cp ? input.cp.padStart(5, '0') : null;
-  const info = postalCode ? codes.findByPostalCode(postalCode) : null;
-  const city = info ? info['nombre_entidad_singular'] : input.provincia;
+function generateAddress (input, codes) {
+  const postalCode = input.cp ? input.cp.padStart(5, '0') : null
+  const info = postalCode ? codes.findByPostalCode(postalCode) : null
+  const city = info ? info['nombre_entidad_singular'] : input.provincia
   return ({
     fullAddress: [input.tipo_via, input.nombre_via, input.num_via].join(' '),
     floor: input.piso,
     number: input.puerta,
     postalCode,
     city
-  });
+  })
 }
 
 /**
@@ -344,15 +344,15 @@ function generateAddress(input, codes) {
  * @param inputPerson
  * @returns {string}
  */
-function gender(inputPerson) {
-  const value = inputPerson.sexo || '';
+function gender (inputPerson) {
+  const value = inputPerson.sexo || ''
   switch (value.toUpperCase()) {
     case 'H':
-      return 'MASCULINO';
+      return 'MASCULINO'
     case 'M':
-      return 'FEMENINO';
+      return 'FEMENINO'
     default:
-      return 'NINGUNO';
+      return 'NINGUNO'
   }
 }
 
@@ -361,8 +361,8 @@ function gender(inputPerson) {
  * @param value
  * @returns {boolean}
  */
-function isEmpty(value) {
-  return typeof value === 'undefined' || value == null || value === '';
+function isEmpty (value) {
+  return typeof value === 'undefined' || value == null || value === ''
 }
 
 /**
@@ -370,9 +370,9 @@ function isEmpty(value) {
  * @param inputPerson
  * @returns {*}
  */
-export function birthDate(inputPerson) {
+export function birthDate (inputPerson) {
   if (isEmpty(inputPerson.ano_naci) || isEmpty(inputPerson.mes_naci) || isEmpty(inputPerson.dia_naci)) {
-    return null;
+    return null
   }
-  return new Date(`${inputPerson.ano_naci}-${inputPerson.mes_naci}-${inputPerson.dia_naci}`);
+  return new Date(`${inputPerson.ano_naci}-${inputPerson.mes_naci}-${inputPerson.dia_naci}`)
 }
