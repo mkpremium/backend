@@ -1,5 +1,7 @@
 FROM node:8.9.4
 
+RUN ["npm", "install", "-g", "npm"]
+
 RUN ["mkdir", "/app"]
 WORKDIR /app
 
