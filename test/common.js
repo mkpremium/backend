@@ -18,13 +18,15 @@ export async function deleteAll () {
   ])
 }
 
-export async function operatorLogin (app, credentials = { username: 'admin', password: 'Passw0rd' }) {
+export const defaultPassword = 'Passw0rd'
+
+export async function operatorLogin (app, credentials = {username: 'admin', password: 'Passw0rd'}) {
   const response = await request(app)
     .post('/operators/login')
     .send(credentials)
     .expect(200)
 
-  return Object.assign({}, response.body, { authorization: `Bearer ${response.body.token}` })
+  return Object.assign({}, response.body, {authorization: `Bearer ${response.body.token}`})
 }
 
 export async function createFullOperator (object) {
@@ -33,7 +35,7 @@ export async function createFullOperator (object) {
 }
 
 export async function operatorCreate (index = '', queueId) {
-  return createFullOperator({
+  return createFullOperator(buildOperator({
     username: `operator${index}`,
     password: 'Passw0rd',
     agentNumber: `operator${index}`,
@@ -47,7 +49,27 @@ export async function operatorCreate (index = '', queueId) {
       city: 'barcelona',
       email: 'operator@example.com'
     }
-  })
+  }))
+}
+
+const defaultOperatorPrototype = {
+  username: `operator`,
+  password: defaultPassword,
+  agentNumber: `operator`,
+  roles: ['OPERATOR'],
+  profile: {
+    queueId: 'queueId',
+    firstName: 'operator',
+    lastName: 'operator',
+    city: 'barcelona',
+    email: 'operator@example.com'
+  }
+}
+
+export const buildOperator = (operator = {}, prototype = defaultOperatorPrototype) => {
+  return {
+    ...prototype, ...operator
+  }
 }
 
 export async function operatorCreateAdmin (queueId) {
@@ -85,19 +107,12 @@ export async function operatorCreateStreet () {
 }
 
 export async function operatorCreateBusiness () {
-  return createFullOperator({
+  return createFullOperator(buildOperator({
     username: 'business',
-    password: 'Passw0rd',
-    agentNumber: 'business',
     roles: [
       'BUSINESS'
-    ],
-    profile: {
-      firstName: 'business',
-      lastName: 'operator',
-      city: 'barcelona'
-    }
-  })
+    ]
+  }))
 }
 
 export async function operatorCreateManager (queueId) {
@@ -132,5 +147,3 @@ export async function operatorCreateStreetManager () {
     }
   })
 }
-
-export const defaultPassword = 'Passw0rd'

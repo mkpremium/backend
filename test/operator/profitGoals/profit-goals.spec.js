@@ -16,74 +16,34 @@ import app from '../../../src/app'
 import request from 'supertest'
 
 describe.only('profit goals', () => {
-  let operator1
-  let operator2
-  let operator3
-  let testBuilding1
-  let testBuilding2
+  let salesAgent
 
-  let authenticatedOperator
+  const salesAgentProfitGoal = 1500
+  const buildingRepository = new BuildingRepository()
+  const stockRepository = new StockRepository()
+  const operatorRepository = new OperatorRepository()
 
-  async function createTestPurchaseStock (buildingId, operatorId, transactionAmount) {
-    const params = {
-      buildingId: buildingId,
-      reservationAmount: 1110.00,
-      reservationDate: '2019-07-11T13:00:00.000Z',
-      transactionAmount: transactionAmount,
-      transactionDate: '2019-07-11T13:00:00.000Z'
-    }
-    await createPurchaseStock(params, operatorId)
-  }
-
-  async function sellTestPurchaseStock (buildingId, operatorId, transactionAmount) {
-    const params = {
-      buildingId: buildingId,
-      reservationAmount: 2000.00,
-      reservationDate: '2019-07-11T13:00:00.000Z',
-      transactionAmount: transactionAmount,
-      transactionDate: '2019-07-11T13:00:00.000Z'
-    }
-    await sellPurchasedStock(params, operatorId)
-  }
-
-  before(async () => {
-    const buildingRepository = new BuildingRepository()
+  beforeEach(async () => {
     await buildingRepository.deleteQuery()
-
-    const stockRepository = new StockRepository()
     await stockRepository.deleteQuery()
-
-    const operatorRepository = new OperatorRepository()
     await operatorRepository.deleteQuery()
 
-    operator1 = await operatorCreate(madrid().unix())
-
-    operator2 = await operatorCreateBusiness(madrid().unix() + 1)
-
-    operator3 = await operatorCreate(madrid().unix() + 2)
-
-    authenticatedOperator = await operatorLogin(app, { username: operator3.username, password: 'Passw0rd' })
-
-    testBuilding1 = await BuildingRepository.createNewBuilding(buildingData)
-
-    await createTestPurchaseStock(testBuilding1.id, operator1.id, 1500)
-    await sellTestPurchaseStock(testBuilding1.id, operator1.id, 3000)
+    salesAgent = await operatorCreateBusiness(madrid().unix() + 1)
   })
 
-  it('Should define a goal for an existing operator1', async () => {
+  it('defines goal for an existing sales agent', async () => {
     const now = new Date()
     const nowStub = () => now
 
-    const result = await setProfitGoalToOperator({ operatorId: operator1.id, profitAmount: 1500 }, nowStub)
+    const result = await setProfitGoalToOperator({ operatorId: salesAgent.id, profitAmount: 1500 }, nowStub)
 
     expect(result.profitGoal).to.deep.equal({amount: 1500, updatedAt: now})
   })
 
-  it('Should fail a goal for an non existing operator1', async () => {
+  it('throws an error when setting profit goal for an non existing sales agent', async () => {
     let error
     try {
-      const operator = await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
-      console.log(operator)
+      await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
     } catch (err) {
       error = err
     }
@@ -93,40 +53,68 @@ describe.only('profit goals', () => {
     expect(error.code).to.equal(404)
   })
 
-  it('Should display a profit goal ranking', async () => {
-    await setProfitGoalToOperator({ operatorId: operator2.id, profitAmount: 1500 })
+  describe('ranking', () => {
+    it('calculates profit goal percentage achievement', async () => {
+      await setProfitGoalToOperator({ operatorId: salesAgent.id, profitAmount: salesAgentProfitGoal })
 
-    let params = {
-      buildingId: testBuilding1.id
-    }
-    await closeSellStock(params, operator1.id)
+      const testBuilding = await BuildingRepository.createNewBuilding(buildingData)
 
-    testBuilding2 = await BuildingRepository.createNewBuilding(buildingData)
-    await createTestPurchaseStock(testBuilding2.id, operator2.id, 1000)
-    await sellTestPurchaseStock(testBuilding2.id, operator2.id, 1200)
+      const buildingPurchaseAmount = 1000
+      const buildingSellingAmount = 1200
+      await purchaseBuildingBySalesAgent(testBuilding, salesAgent, buildingPurchaseAmount)
+      await sellBuilding(testBuilding, salesAgent, buildingSellingAmount)
 
-    params = {
-      buildingId: testBuilding2.id
-    }
-    await closeSellStock(params, operator2.id)
+      await closeSellStock({buildingId: testBuilding.id}, salesAgent.id)
 
-    const profitRanking = await getProfitGoalOperatorsRanking()
-    console.log(profitRanking)
-    expect(profitRanking.length).to.be.greaterThan(0)
-    expect(profitRanking.find(u => u.userId === operator1.id)).to.not.be.equal(null)
+      const profitRanking = await getProfitGoalOperatorsRanking()
+
+      expect(profitRanking.length).to.be.equal(1)
+      expect(profitRanking[0].userId).to.be.equal(salesAgent.id)
+      expect(profitRanking[0].goal).to.be.equal(salesAgentProfitGoal)
+
+      const expectedCurrentProfit = buildingSellingAmount - buildingPurchaseAmount
+      expect(profitRanking[0].currentProfit).to.be.equal(expectedCurrentProfit)
+      expect(profitRanking[0].percentageGoal)
+        .to.be.closeTo(expectedCurrentProfit / salesAgentProfitGoal, 0.00001)
+    })
   })
 
   it('Should set a profit goal via @POST request', async () => {
+    const operator3 = await operatorCreate(madrid().unix() + 2)
+    const authenticatedOperator = await operatorLogin(app, { username: operator3.username, password: 'Passw0rd' })
+
     await request(app)
       .post('/operators/profit/goal')
       .set('Authorization', authenticatedOperator.authorization)
       .send({
-        profitAmount: 1500,
-        operatorId: operator3.id
+        profitAmount: salesAgentProfitGoal,
+        operatorId: salesAgent.id
       })
       .expect(201)
       .then(response => {
-        expect(response.body.profitGoal.amount).to.be.equal(1500)
+        expect(response.body.profitGoal.amount).to.be.equal(salesAgentProfitGoal)
       })
   })
+
+  async function purchaseBuildingBySalesAgent (building, agent, transactionAmount) {
+    const params = {
+      buildingId: building.id,
+      reservationAmount: 1110.00,
+      reservationDate: '2019-07-11T13:00:00.000Z',
+      transactionAmount: transactionAmount,
+      transactionDate: '2019-07-11T13:00:00.000Z'
+    }
+    await createPurchaseStock(params, agent.id)
+  }
+
+  async function sellBuilding (building, agent, transactionAmount) {
+    const params = {
+      buildingId: building.id,
+      reservationAmount: 2000.00,
+      reservationDate: '2019-07-11T13:00:00.000Z',
+      transactionAmount: transactionAmount,
+      transactionDate: '2019-07-11T13:00:00.000Z'
+    }
+    await sellPurchasedStock(params, agent.id)
+  }
 })
