@@ -1,5 +1,5 @@
 {
-  "name": "bitdistrict-backend",
+  "name": "mk-backend",
   "main": "server.js",
   "scripts": {
     "lint": "./scripts/lint.sh",
@@ -43,9 +43,9 @@
     "seed_metadata": "babel-node $NODE_DEBUG_OPTION migrations/seed_meta.js"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.7.0",
     "aws-sdk": "^2.313.0",
     "axios": "^0.18.0",
-    "babel-runtime": "^6.26.0",
     "bcrypt": "^2.0.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.15.0",
@@ -105,12 +105,11 @@
     "xmldoc": "^1.1.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-shebang": "^1.0.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-register": "^6.26.0",
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/node": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/register": "^7.7.7",
     "better-npm-run": "^0.1.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",

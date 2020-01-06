@@ -1,5 +1,5 @@
-require('babel-register')
-require('babel-polyfill')
+require('@babel/register')
+require('@babel/polyfill')
 
 // disable gearman winston log
 const w = require('winston')
