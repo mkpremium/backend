@@ -20,7 +20,7 @@ export async function deleteAll () {
 
 export const defaultPassword = 'Passw0rd'
 
-export async function operatorLogin (app, credentials = {username: 'admin', password: 'Passw0rd'}) {
+export async function operatorLogin (app, credentials = {username: 'admin', password: defaultPassword}) {
   const response = await request(app)
     .post('/operators/login')
     .send(credentials)
@@ -34,21 +34,12 @@ export async function createFullOperator (object) {
   return repo.save(object, false)
 }
 
-export async function operatorCreate (index = '', queueId) {
+export async function operatorCreate () {
   return createFullOperator(buildOperator({
-    username: `operator${index}`,
-    password: 'Passw0rd',
-    agentNumber: `operator${index}`,
+    username: 'operator',
     roles: [
       'OPERATOR'
-    ],
-    profile: {
-      queueId,
-      firstName: 'operator',
-      lastName: 'operator',
-      city: 'barcelona',
-      email: 'operator@example.com'
-    }
+    ]
   }))
 }
 

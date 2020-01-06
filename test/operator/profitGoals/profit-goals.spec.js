@@ -1,4 +1,4 @@
-import { operatorCreate, operatorCreateBusiness, operatorLogin } from '../../common'
+import { defaultPassword, operatorCreate, operatorCreateBusiness, operatorLogin } from '../../common'
 import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/application'
 import { expect } from 'chai'
 import {
@@ -11,7 +11,6 @@ import { OperatorRepository } from '../../../src/operator/models'
 import { StockRepository } from '../../../src/stock/models'
 import { BuildingRepository } from '../../../src/building/models'
 import { buildingData } from '../../stock/stock.mock'
-import { madrid } from '../../../src/lib/date'
 import app from '../../../src/app'
 import request from 'supertest'
 
@@ -28,7 +27,7 @@ describe.only('profit goals', () => {
     await stockRepository.deleteQuery()
     await operatorRepository.deleteQuery()
 
-    salesAgent = await operatorCreateBusiness(madrid().unix() + 1)
+    salesAgent = await operatorCreateBusiness()
   })
 
   describe('setProfitGoalToOperator', () => {
@@ -82,9 +81,10 @@ describe.only('profit goals', () => {
   })
 
   describe('endpoint', () => {
-    it('Should set a profit goal via @POST request', async () => {
-      const operator3 = await operatorCreate(madrid().unix() + 2)
-      const authenticatedOperator = await operatorLogin(app, { username: operator3.username, password: 'Passw0rd' })
+    it('sets profit goal to a sales agent', async () => {
+      const operator = await operatorCreate()
+      const authenticatedOperator = await operatorLogin(app,
+        {username: operator.username, password: defaultPassword})
 
       await request(app)
         .post('/operators/profit/goal')
