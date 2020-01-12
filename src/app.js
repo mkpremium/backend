@@ -35,6 +35,12 @@ import appErrorHandler from './lib/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 
 const app = express()
+const couchbasePromise = couchbase(app)
+
+app.get('/_health', (req, res) => {
+  if (couchbasePromise.isFulfilled()) res.sendStatus(200)
+  else res.sendStatus(503)
+})
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -44,7 +50,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(cors())
 swagger(app)
 Promise.all([
-  couchbase(app),
+  couchbasePromise,
   socket.initModel()
 ]).catch(err => {
   console.error(err)
