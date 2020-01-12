@@ -1,16 +1,19 @@
-import app from '../src/app'
+import app, { dependenciesPromise } from '../src/app'
 import request from 'supertest'
+import { expect } from 'chai'
 
 describe('Backend Application', () => {
-  it('starts unhealthy until it gets connection to Couchbase', async () => {
+  it('is not ready until all dependencies are resolved', async () => {
+    expect(app.get('IS_READY')).to.be.false
     await request(app)
-      .get('/_health')
+      .get('/_ready')
       .expect(503)
 
-    await app.locals.bucketPromise
+    await dependenciesPromise
 
+    expect(app.get('IS_READY')).to.be.true
     await request(app)
-      .get('/_health')
+      .get('/_ready')
       .expect(200)
   })
 })

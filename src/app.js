@@ -4,10 +4,8 @@ import morgan from 'morgan'
 import cors from 'cors'
 
 import couchbase from './db/couchbase'
-
 // app aware types
 import './types'
-
 // modules
 import operator from './operator'
 import worksheet from './worksheet'
@@ -35,26 +33,31 @@ import appErrorHandler from './lib/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 
 const app = express()
-const couchbasePromise = couchbase(app)
+app.set('IS_READY', false)
+export const dependenciesPromise = Promise.all([
+  couchbase(app),
+  socket.initModel()
+])
 
-app.get('/_health', (req, res) => {
-  if (couchbasePromise.isFulfilled()) res.sendStatus(200)
+dependenciesPromise.then(() => {
+  app.set('IS_READY', true)
+}).catch(err => {
+  console.error(err)
+})
+
+app.get('/_ready', (req, res) => {
+  if (app.get('IS_READY')) res.sendStatus(200)
   else res.sendStatus(503)
 })
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'))
 }
 app.use(cors())
+
 swagger(app)
-Promise.all([
-  couchbasePromise,
-  socket.initModel()
-]).catch(err => {
-  console.error(err)
-})
 webhooks(app)
 gearman(app)
 maintenanceMode(app)
