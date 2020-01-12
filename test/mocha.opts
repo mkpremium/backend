@@ -1,4 +1,0 @@
---require test/setup.js
---recursive
---exit
---timeout 10000
