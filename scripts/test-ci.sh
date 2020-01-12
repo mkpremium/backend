@@ -9,3 +9,4 @@ docker-compose up -d couchbase_db
 sleep 45
 
 npm run test
+npm run test:e2e
