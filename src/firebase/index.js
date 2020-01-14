@@ -44,7 +44,7 @@ function choseFirebaseSetup (roles) {
 export async function firebaseSetup (operator) {
   const { fb, databaseURL } = choseFirebaseSetup(operator.roles)
 
-  if (!fb) {
+  if (!fb || !fb.enabled) {
     return
   }
 
