@@ -1,28 +1,21 @@
-import app, { dependenciesPromise } from '../../src/app'
-import request from 'supertest'
-import { defaultPassword, operatorLogin, operatorCreateBusiness, deleteAll } from '../../test/common'
+import { operatorCreateBusiness } from '../../test/common'
+import { authenticatedGet, initApplication } from '../rest-api-helper'
 import { expect } from 'chai'
 
 describe('Sales agent profit ranking', () => {
   it('list sales agents ranking', async () => {
-    await dependenciesPromise
+    const app = await initApplication()
 
-    await deleteAll()
+    const businessUser = await operatorCreateBusiness()
 
-    const operator = await operatorCreateBusiness()
-    const authenticatedOperator = await operatorLogin(app,
-      {username: operator.username, password: defaultPassword})
-
-    await request(app)
-      .get('/stock/ranking')
-      .set('Authorization', authenticatedOperator.authorization)
-      .expect(201)
+    await authenticatedGet('/stock/ranking', businessUser, app)
       .then(response => {
+        expect(response.status).to.be.equal(201)
         expect(response.body).to.be.deep.equal([
           {
-            userId: operator.id,
-            userName: operator.username,
-            userCity: operator.profile.city,
+            userId: businessUser.id,
+            userName: businessUser.username,
+            userCity: businessUser.profile.city,
             goal: 0,
             currentProfit: 0,
             percentageGoal: 0,
