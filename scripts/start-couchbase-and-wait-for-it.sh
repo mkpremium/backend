@@ -9,7 +9,7 @@ curr_attempt=1
 while :
 do
   echo "Checking primary index, attempt: ${curr_attempt}"
-  docker-compose exec couchbase_db /opt/couchbase/bin/cbindex -auth couchbase:couchbase -type list | grep Index:mkpremium/mkpremium_primary
+  docker-compose exec -T couchbase_db /opt/couchbase/bin/cbindex -auth couchbase:couchbase -type list | grep Index:mkpremium/mkpremium_primary
 
   if [[ $? -eq 0 ]]; then
     echo "Primary index ready on attempt ${curr_attempt}"
