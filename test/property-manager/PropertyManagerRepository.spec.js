@@ -5,7 +5,7 @@ import { OperatorRepository } from '../../src/operator/models'
 import { buildOperator } from '../common'
 import { OperatorRoles } from '../../src/types/operator'
 
-describe('PropertyManagerRepository', () => {
+describe.only('PropertyManagerRepository', () => {
   let couchbaseBucket, propertyManagerRepository, operatorRepository
 
   before(async () => {
@@ -28,9 +28,10 @@ describe('PropertyManagerRepository', () => {
     it('returns only active property managers', async () => {
       await operatorRepository.save(buildOperator({
         id: 'property-manager-user-id',
+        username: 'property-manager-user-name',
         profile: {
-          firstName: 'Property',
-          lastName: 'Manager',
+          firstName: 'ignored',
+          lastName: 'ignored',
           city: 'Barcelona'
         },
         roles: [OperatorRoles.BUSINESS]
@@ -41,7 +42,7 @@ describe('PropertyManagerRepository', () => {
       expect(result).to.have.lengthOf(1)
       expect(result[0]).to.be.deep.equal({
         id: 'property-manager-user-id',
-        name: 'Property Manager',
+        userName: 'property-manager-user-name',
         city: 'Barcelona'
       })
     })

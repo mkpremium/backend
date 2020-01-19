@@ -3,7 +3,7 @@ import { authenticatedGet, initApplication } from '../rest-api-helper'
 import { expect } from 'chai'
 
 describe('Sales agent profit ranking', () => {
-  it('list sales agents ranking', async () => {
+  it('list sales agents ranking with default profit goal', async () => {
     const app = await initApplication()
 
     const businessUser = await operatorCreateBusiness()
@@ -16,7 +16,7 @@ describe('Sales agent profit ranking', () => {
             userId: businessUser.id,
             userName: businessUser.username,
             userCity: businessUser.profile.city,
-            goal: 0,
+            goal: 500000,
             currentProfit: 0,
             percentageGoal: 0,
             awards: [],

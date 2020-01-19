@@ -15,7 +15,7 @@ describe.only('PropertyManagerRankingService', () => {
 
   const barcelonaPropertyManagerWithoutProfitGoal = {
     id: 'property-manager-user-id',
-    name: 'Property Manager Full Name',
+    userName: 'Property Manager Full Name',
     city: 'Barcelona'
   }
 
@@ -59,7 +59,7 @@ describe.only('PropertyManagerRankingService', () => {
 
     expect(ranking[0]).to.include({
       userId: barcelonaPropertyManagerWithoutProfitGoal.id,
-      userName: barcelonaPropertyManagerWithoutProfitGoal.name,
+      userName: barcelonaPropertyManagerWithoutProfitGoal.userName,
       userCity: barcelonaPropertyManagerWithoutProfitGoal.city
     })
   })

@@ -23,7 +23,7 @@ export class PropertyManagerRankingService {
 
       return {
         userId: pm.id,
-        userName: pm.name,
+        userName: pm.userName,
         userCity: pm.city,
         goal,
         currentProfit: profit,

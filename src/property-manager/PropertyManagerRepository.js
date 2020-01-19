@@ -1,12 +1,12 @@
 import { N1qlQuery } from 'couchbase'
 
 const ACTIVE_PROPERTY_MANAGERS_QUERY = `
-    SELECT id, profile.city, profile.firstName || ' ' || profile.lastName as name
+    SELECT id, profile.city, username as userName
     FROM mkpremium as propertyManager
     WHERE propertyManager._documentType = 'operator'
     AND enable = true
     AND (ANY V IN roles SATISFIES V = 'BUSINESS' END)
-    `
+`
 
 export class PropertyManagerRepository {
   constructor (couchbaseBucket) {
