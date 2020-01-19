@@ -1,4 +1,4 @@
-import { TransactionParams, StockStatuses, Transaction } from './types'
+import { StockStatuses, Transaction, TransactionParams } from './types'
 import { StockFirebaseRepository, StockRepository } from './models'
 import { BuildingRepository } from '../building/models'
 import t from 'tcomb'
@@ -179,43 +179,4 @@ export async function closeSellStock (params, operatorId) {
   await stockFirebaseRepository.saveCloseStock(updatedStock)
 
   return result
-}
-
-export async function getProfitGoalOperatorsRanking () {
-  const operatorRepository = new OperatorRepository()
-  const operators = await operatorRepository.getOperatorsWithProfitGoal()
-
-  const stockRepository = new StockRepository()
-  const operatorsProfits = await stockRepository.listProfitRankings()
-
-  const operatorsProfitsMap = new Map()
-
-  for (let x = 0; x < operatorsProfits.length; x++) {
-    const profit = operatorsProfits[x] ? operatorsProfits[x].total : 0
-    operatorsProfitsMap.set(operatorsProfits[x].operatorId, profit)
-  }
-
-  const unsortedOperatorsRanking = operators.map((operator) => {
-    const currentOperatorProfit = operatorsProfitsMap.get(operator.t.id) | 0
-    const currentPercentageGoal = operator.t.profitGoal.amount > 0
-      ? (currentOperatorProfit / operator.t.profitGoal.amount) : 0
-    return {
-      userId: operator.t.id,
-      userName: operator.t.username,
-      userCity: operator.t.profile.city,
-      goal: operator.t.profitGoal.amount,
-      currentProfit: currentOperatorProfit,
-      percentageGoal: currentPercentageGoal,
-      awards: operator.t.awards,
-      rank: 0
-    }
-  })
-
-  const sortedOperatorsRanking = unsortedOperatorsRanking
-    .sort((a, b) => a.percentageGoal < b.percentageGoal)
-
-  return sortedOperatorsRanking.map((operator, index) => {
-    operator.rank = index + 1
-    return operator
-  })
 }
