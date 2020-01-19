@@ -11,7 +11,7 @@ export class PropertyManagerRankingService {
     const propertyManagers = await this.propertyManagersRepository.getActivePropertyManagers()
 
     const now = this.now()
-    const propertyManagerStockPerformanceForCurrentYear = await this.stockRepository.getStatsByPropertyManagerInPeriod(
+    const propertyManagerStockPerformanceForCurrentYear = await this.stockRepository.getTotalProfitInPeriodByPropertyManager(
       now.clone().startOf('year'), now.clone().endOf('year')
     )
 

@@ -23,14 +23,14 @@ describe.only('PropertyManagerRankingService', () => {
     getActivePropertyManagers: null
   }
   const stockRepository = {
-    getStatsByPropertyManagerInPeriod: null
+    getTotalProfitInPeriodByPropertyManager: null
   }
 
   let rankingService
 
   beforeEach(() => {
     propertyManagersRepository.getActivePropertyManagers = sinon.stub().returns(Promise.resolve([]))
-    stockRepository.getStatsByPropertyManagerInPeriod = sinon.stub().returns(Promise.resolve([]))
+    stockRepository.getTotalProfitInPeriodByPropertyManager = sinon.stub().returns(Promise.resolve([]))
 
     rankingService = new PropertyManagerRankingService(
       propertyManagersRepository,
@@ -48,7 +48,7 @@ describe.only('PropertyManagerRankingService', () => {
   it('gets closed stock grouped by property manager', async () => {
     await rankingService.ranking()
 
-    expect(stockRepository.getStatsByPropertyManagerInPeriod).to.have.been
+    expect(stockRepository.getTotalProfitInPeriodByPropertyManager).to.have.been
       .calledWith(matchingMoment(firstMomentCurrentYear), matchingMoment(lastMomentCurrentYear))
   })
 
@@ -101,7 +101,7 @@ describe.only('PropertyManagerRankingService', () => {
   describe('profit calculation', () => {
     it('gets profits from property manager stocks total gains', async () => {
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
-      stockRepository.getStatsByPropertyManagerInPeriod.returns(Promise.resolve([
+      stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
           propertyManagerId: barcelonaPropertyManagerWithoutProfitGoal.id,
           profitAmount: 50000
@@ -119,7 +119,7 @@ describe.only('PropertyManagerRankingService', () => {
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([
         {...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: {amount: 120}}
       ]))
-      stockRepository.getStatsByPropertyManagerInPeriod.returns(Promise.resolve([
+      stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
           propertyManagerId: barcelonaPropertyManagerWithoutProfitGoal.id,
           profitAmount: 60
@@ -147,7 +147,7 @@ describe.only('PropertyManagerRankingService', () => {
         propertyManagerWith20PercentAchievedProfitGoal, propertyManagerWith50PercentAchievedProfitGoal
       ]))
 
-      stockRepository.getStatsByPropertyManagerInPeriod.returns(Promise.resolve([
+      stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
           propertyManagerId: propertyManagerWith20PercentAchievedProfitGoal.id,
           profitAmount: 24
