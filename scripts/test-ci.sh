@@ -2,11 +2,7 @@
 
 set -e
 
-docker-compose up -d couchbase_db
-
-# wait-for-it will not be enough as it takes some time to the container
-# to initialize the cluster
-sleep 45
+scripts/start-couchbase-and-wait-for-it.sh
 
 npm run test
 npm run test:e2e
