@@ -1,7 +1,7 @@
 import { N1qlQuery } from 'couchbase'
 
 const ACTIVE_PROPERTY_MANAGERS_QUERY = `
-    SELECT id, profile.city, username as userName
+    SELECT id, profile.city, username as userName, profitGoal.amount as profitGoal
     FROM mkpremium as propertyManager
     WHERE propertyManager._documentType = 'operator'
     AND enable = true

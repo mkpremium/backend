@@ -34,7 +34,11 @@ describe.only('PropertyManagerRepository', () => {
           lastName: 'ignored',
           city: 'Barcelona'
         },
-        roles: [OperatorRoles.BUSINESS]
+        roles: [OperatorRoles.BUSINESS],
+        profitGoal: {
+          amount: 100,
+          updatedAt: new Date()
+        }
       }))
 
       const result = await propertyManagerRepository.getActivePropertyManagers()
@@ -43,7 +47,8 @@ describe.only('PropertyManagerRepository', () => {
       expect(result[0]).to.be.deep.equal({
         id: 'property-manager-user-id',
         userName: 'property-manager-user-name',
-        city: 'Barcelona'
+        city: 'Barcelona',
+        profitGoal: 100
       })
     })
   })

@@ -36,7 +36,7 @@ export class PropertyManagerRankingService {
 }
 
 const propertyManagerProfitGoalAmount = pm => {
-  if (pm.profitGoal === undefined) return pm.city === 'Lisboa' ? 700000 : 500000
+  if (!pm.profitGoal) return pm.city === 'Lisboa' ? 700000 : 500000
 
-  return pm.profitGoal.amount
+  return pm.profitGoal
 }

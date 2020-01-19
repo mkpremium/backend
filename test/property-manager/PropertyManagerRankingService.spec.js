@@ -88,13 +88,13 @@ describe.only('PropertyManagerRankingService', () => {
     })
 
     it('applies property manager profit goal', async () => {
-      const propertyManagerProfitGoal = {amount: 100000}
+      const propertyManagerProfitGoal = 100000
       const propertyManagerWithProfitGoal = {...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: propertyManagerProfitGoal}
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([propertyManagerWithProfitGoal]))
 
       const ranking = await rankingService.ranking()
 
-      expect(ranking[0].goal).to.be.equal(propertyManagerProfitGoal.amount)
+      expect(ranking[0].goal).to.be.equal(propertyManagerProfitGoal)
     })
   })
 
@@ -117,7 +117,7 @@ describe.only('PropertyManagerRankingService', () => {
   describe('ranking calculation', () => {
     it('calculates percentageGoal based on profit calculation and property manager profit goal', async () => {
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([
-        {...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: {amount: 120}}
+        {...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: 120}
       ]))
       stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
@@ -135,12 +135,12 @@ describe.only('PropertyManagerRankingService', () => {
       const propertyManagerWith20PercentAchievedProfitGoal = {
         ...barcelonaPropertyManagerWithoutProfitGoal,
         id: '20%',
-        profitGoal: {amount: 120}
+        profitGoal: 120
       }
       const propertyManagerWith50PercentAchievedProfitGoal = {
         ...barcelonaPropertyManagerWithoutProfitGoal,
         id: '50%',
-        profitGoal: {amount: 120}
+        profitGoal: 120
       }
 
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([
