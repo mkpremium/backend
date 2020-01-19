@@ -41,6 +41,11 @@ export const dependenciesPromise = Promise.all([
 
 dependenciesPromise.then(() => {
   app.set('IS_READY', true)
+  const dependenciesContainer = {
+    couchbaseBucket: app.locals.bucket
+  }
+
+  stock(app, dependenciesContainer)
 }).catch(err => {
   console.error(err)
 })
@@ -78,7 +83,6 @@ autocomplete(app)
 email(app)
 cadastre(app)
 preferences(app)
-stock(app)
 app.use(appErrorHandler)
 
 export default app

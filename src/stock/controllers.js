@@ -3,11 +3,17 @@ import {
   cancelSellStock,
   closeSellStock,
   createPurchaseStock,
-  getProfitGoalOperatorsRanking,
   sellPurchasedStock,
   updatePurchaseStock,
   updateSellStock
 } from './application'
+
+export const getRankingController = (propertyManagerRankingService) => {
+  return wrap(async (req, res) => {
+    const ranking = await propertyManagerRankingService.ranking()
+    res.status(201).json(ranking)
+  })
+}
 
 async function createPurchaseStockFromRequest (req, res) {
   const stock = await createPurchaseStock(req.body, req.user.id)
@@ -39,15 +45,9 @@ async function closeSellStockFromRequest (req, res) {
   res.status(201).json(stock)
 }
 
-async function getProfitsRanking (req, res) {
-  const profitsRanking = await getProfitGoalOperatorsRanking()
-  res.status(201).json(profitsRanking)
-}
-
 export const createPurchaseStockController = wrap(createPurchaseStockFromRequest)
 export const updatePurchaseStockController = wrap(updatePurchaseStockFromRequest)
 export const sellPurchasedStockController = wrap(sellPurchasedStockFromRequest)
 export const updateSellStockController = wrap(updateSellStockFromRequest)
 export const closeSellStockController = wrap(closeSellStockFromRequest)
 export const cancelSellStockController = wrap(cancelSellStockFromRequest)
-export const getProfitsRakningController = wrap(getProfitsRanking)

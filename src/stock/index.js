@@ -1,8 +1,8 @@
-import routes from './routes.js'
+import {addStockRoutes} from './routes.js'
 import './types'
 import jwt from '../middleware/jwt'
 
-export default (app) => {
+export default (app, { couchbaseBucket }) => {
   const secured = jwt()
-  app.use('/stock', secured, routes)
+  app.use('/stock', secured, addStockRoutes(couchbaseBucket))
 }
