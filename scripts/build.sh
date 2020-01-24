@@ -8,12 +8,14 @@ rm -rf build/
 # Build assets
 npx babel ./ \
   --out-dir ./build \
-  -s -q \
+  -s \
   --copy-files \
-  --ignore node_modules,docker,test
+  --ignore node_modules,docker,test,test-e2e
 
 # Build the package.json
 scripts/package.js
 
 cd build
 npm i
+
+rm -r .idea .circleci conf docker docs test test-e2e
