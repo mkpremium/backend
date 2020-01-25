@@ -8,49 +8,14 @@ bold=$(tput bold)
 normal=$(tput sgr0)
 name=$(basename $0)
 
-validate_nvm() {
-  local host=$1
-  local remote_dir=$2
-
-  local local_file=`readlink -f ${DIR}/../build/.nvmrc`
-  local md5sum=`ssh ${host} "md5sum ${remote_dir}/.nvmrc" | awk '{print $1}'`
-  local md5file=${DIR}/../build/MD5SUM
-
-  echo "${local_file}  ${md5sum}" > ${md5file}
-
-  md5sum -c --quiet ${md5file} &> /dev/null
-}
-
-summary() {
-  cat <<EOH
-${bold}NAME${normal}
-  $name - Build and deploy the files to the <ssh-host>:${deploy_dir}
-
-${bold}SYNOPSIS${normal}
-  sh $name <ssh-host> <app-name> [user (default: centos)]
-
-${bold}DESCRIPTION${normal}
-  Build and deploy the files to the ssh-host that pass as first argument
-  should be a hostname that you have configure in your ~/.ssh/config that points to the correct instance
-  and have the correct credentials to successfully connect.
-
-  Example:
-
-    sh $name bitdistrict-m1 app-name
-
-  Exit Status:
-  Returns 0 unless the instructions cannot be completed
-EOH
-}
-
 deploy() {
   local dist_host=$1
-  local app_name=$2
-  local user=${3:-centos}
+  local app_name=mkpremium
+  local user=ubuntu
 
-  local temp_dist_file=temp1
-  local dist_file="${temp_dist_file}.tgz"
-  local deploy_dir=/home/${user}/apps/${app_name}
+  local deploy_id=`date +"%Y-%m-%d_%H-%M-%ST%Z"`
+  local dist_file="build_${deploy_id}.tgz"
+  local deploy_dir=/home/${user}/${app_name}/${deploy_id}
 
   echo -e "Replacing config files for       \t: ${bold}${dist_host}${normal}"
   cp -r conf/${dist_host}/. build/
@@ -73,16 +38,15 @@ deploy() {
 source ~/.nvm/nvm.sh
 mkdir -p ${deploy_dir}
 tar xzf ${dist_file} -C ${deploy_dir} --strip-components=1 > /dev/null
+rm ${dist_file}
 cd ${deploy_dir}
 nvm install
 npm install
-type pm2 2> /dev/null && pm2 reload --update-env ${app_name}-pm2.json
+unlink ~/${app_name}/current || true
+ln -s ${deploy_dir} ~/${app_name}/current
+pm2 stop all
+pm2 start ~/${app_name}/current/${app_name}-pm2.json
 EOF
 }
-
-if [ $# -lt 2 ]; then
-    summary
-    exit 1
-fi
 
 deploy "$@"
