@@ -24,7 +24,7 @@ build
 .idea
 *.iml
 
-conf/
+conf
 *.csv
 .DS_STORE
 *.tgz
