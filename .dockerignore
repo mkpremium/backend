@@ -4,3 +4,6 @@ npm-debug.log
 firebaseComerciales.json
 firebaseInformadores.json
 .idea
+build
+conf
+docker
