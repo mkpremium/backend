@@ -16,6 +16,8 @@ npx babel ./ \
 scripts/package.js
 
 cd build
+
+git rev-parse HEAD > GIT_COMMIT
 npm i
 
 rm -r .idea .circleci conf docker docs test test-e2e
