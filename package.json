@@ -11,8 +11,11 @@
     "prestart_banks": "npm run lint",
     "start_banks": "better-npm-run start_banks",
     "prestart_migration": "npm run lint",
+
     "build": "scripts/build-without-dependencies.sh",
     "deploy:uat": "scripts/deployment.sh mkpremium-uat",
+    "deploy:prod": "scripts/deployment.sh mkpremium-prod",
+
     "socket": "better-npm-run socket",
     "cronjobs": "better-npm-run cronjobs",
     "seed_all": "better-npm-run seed_all",

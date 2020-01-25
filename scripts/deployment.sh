@@ -44,6 +44,8 @@ nvm install
 npm install
 unlink ~/${app_name}/current || true
 ln -s ${deploy_dir} ~/${app_name}/current
+echo "`date` deployed version ${deploy_id}" >> ~/${app_name}/deploy_history
+
 pm2 stop all
 pm2 start ~/${app_name}/current/${app_name}-pm2.json
 EOF

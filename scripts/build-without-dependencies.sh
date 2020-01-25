@@ -18,4 +18,4 @@ scripts/package.js
 cd build
 git rev-parse HEAD > GIT_COMMIT
 
-rm -r .idea .circleci conf docker docs test test-e2e
+rm -r .idea .circleci conf docker docs test test-e2e node_modules
