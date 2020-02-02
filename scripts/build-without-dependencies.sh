@@ -16,6 +16,8 @@ npx babel ./ \
 scripts/package.js
 
 cd build
+# Create folder for uploads (email attachments)
+mkdir .uploads
 git rev-parse HEAD > GIT_COMMIT
 
 rm -r .idea .circleci conf docker docs test test-e2e node_modules
