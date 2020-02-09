@@ -121,7 +121,7 @@ export async function saveBuildingToFirebase (db, building, owner) {
 
     const metadataRepository = new MetadataRepository()
     const metadataArray = building.metadata
-    promises.push(...Promise.map(metadataArray, async (metadataBuilding) => {
+    metadataArray.map(async (metadataBuilding) => {
       if (metadataBuilding.id) {
         const metadata = await metadataRepository.findById(metadataBuilding.id)
         if (metadata) {
@@ -131,7 +131,7 @@ export async function saveBuildingToFirebase (db, building, owner) {
           }
         }
       }
-    }))
+    }).forEach(p => promises.push(p))
 
     promises.push(comercialBuildingRef.child('Data').set(firebaseBuilding))
     if (owner) {
