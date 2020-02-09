@@ -20,4 +20,4 @@ cd build
 mkdir .uploads
 git rev-parse HEAD > GIT_COMMIT
 
-rm -r .idea .circleci conf docker docs test test-e2e node_modules
+rm -rf .idea .circleci conf docker docs test test-e2e node_modules
