@@ -23,7 +23,7 @@ import {
   saveMeetingToFirebase, updateBuildingFirebaseProposal
 } from '../firebase/lib/business'
 import { OwnerRepository } from '../owner/models'
-import { ScheduledEventType } from './types'
+import { ScheduledEvent, ScheduledEventType } from './types'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OperatorActions } from '../stats/types'
 import { OperatorStats } from '../stats/models'
@@ -34,7 +34,7 @@ const debugModel = debug('app:model:scheduled-events')
 export class ScheduledEvents extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.ScheduledEvent
+    this.Struct = ScheduledEvent
   }
 }
 
