@@ -5,7 +5,7 @@ import { OperatorRepository } from '../../src/operator/models'
 import { buildOperator } from '../common'
 import { OperatorRoles } from '../../src/types/operator'
 
-describe.only('PropertyManagerRepository', () => {
+describe('PropertyManagerRepository', () => {
   let couchbaseBucket, propertyManagerRepository, operatorRepository
 
   before(async () => {

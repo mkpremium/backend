@@ -8,7 +8,7 @@ const matchingMoment = (momentToMatch) => sinon.match(
   (actual) => actual.toString() === momentToMatch.toString()
 )
 
-describe.only('PropertyManagerRankingService', () => {
+describe('PropertyManagerRankingService', () => {
   const now = () => moment('2020-01-12') // January 12, 2020
   const firstMomentCurrentYear = moment('2020-01-01')
   const lastMomentCurrentYear = moment('2020-12-31').endOf('day')

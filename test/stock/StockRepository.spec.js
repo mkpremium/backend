@@ -7,7 +7,7 @@ import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../s
 import { BuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 
-describe.only('StockRepository', () => {
+describe('StockRepository', () => {
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
 

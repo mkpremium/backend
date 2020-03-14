@@ -7,7 +7,7 @@ import { BuildingRepository } from '../../../src/building/models'
 import app from '../../../src/app'
 import request from 'supertest'
 
-describe.only('profit goals', () => {
+describe('profit goals', () => {
   let salesAgent
 
   const salesAgentProfitGoal = 1500
