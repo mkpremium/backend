@@ -1,18 +1,18 @@
-import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
-import _omit from 'lodash/omit'
-import _get from 'lodash/get'
 import bcrypt from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
-import { CouchbaseModel } from '../db/model'
+import _get from 'lodash/get'
+import _omit from 'lodash/omit'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
 
-import { saltFactor, jwt } from '../../config'
+import { jwt, saltFactor } from '../../config'
+import { CouchbaseModel } from '../db/model'
+import { firebaseSetup, firebaseUserAccount } from '../firebase'
 import { newHttpError } from '../lib/http-error'
-import { OperatorRoles, Operator as OperatorType } from '../types/operator'
+import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { firebaseSetup, firebaseUserAccount } from '../firebase'
-import { bearerTokenExtractor } from '../middleware/jwt'
+import { Operator as OperatorType, OperatorFirebaseFeatures, OperatorRole, OperatorRoles } from '../types/operator'
 import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
@@ -76,7 +76,7 @@ class Operator extends CouchbaseModel {
   }
 
   async createOperator (data) {
-    const params = fromJSON(data, t.OperatorRequest)
+    const params = fromJSON(data, OperatorRequest)
     const operator = await super.save(params)
     await firebaseUserAccount(operator)
     return operator
@@ -332,3 +332,28 @@ export class OperatorRefreshTokenRepository extends CouchbaseModel {
     return repo.deleteQuery(qb)
   }
 }
+
+const OperatorRequest = t.struct(
+  {
+    username: t.StringNotEmpty,
+    password: t.Password,
+    email: t.maybe(t.String),
+    agentNumber: t.maybe(t.String),
+    level: t.maybe(t.Number),
+    features: t.list(OperatorFirebaseFeatures),
+    serviceId: t.maybe(t.String),
+    enable: t.Bool,
+    roles: t.list(OperatorRole),
+
+    profile: t.OperatorProfile
+  },
+  {
+    name: 'OperatorRequest',
+    defaultProps: {
+      enable: true,
+      roles: [],
+      features: [],
+      profile: {}
+    }
+  }
+)

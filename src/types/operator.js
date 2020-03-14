@@ -26,7 +26,7 @@ export const OperatorFeatures = {
 
 export const OperatorRole = t.enums.of(Object.values(OperatorRoles))
 export const OperatorFirebaseStatesEnum = t.enums.of(Object.values(OperatorFirebaseStates))
-const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
+export const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
 /**
  * @swagger
@@ -242,31 +242,6 @@ t.OperatorProfileUpdate = t.struct({
   queueId: t.maybe(t.String),
   email: t.maybe(t.String)
 })
-
-t.OperatorRequest = t.struct(
-  {
-    username: t.StringNotEmpty,
-    password: t.Password,
-    email: t.maybe(t.String),
-    agentNumber: t.maybe(t.String),
-    level: t.maybe(t.Number),
-    features: t.list(OperatorFirebaseFeatures),
-    serviceId: t.maybe(t.String),
-    enable: t.Bool,
-    roles: t.list(OperatorRole),
-
-    profile: t.OperatorProfile
-  },
-  {
-    name: 'OperatorRequest',
-    defaultProps: {
-      enable: true,
-      roles: [],
-      features: [],
-      profile: {}
-    }
-  }
-)
 
 t.OperatorRefreshToken = t.struct(
   {
