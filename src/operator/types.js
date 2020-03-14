@@ -106,7 +106,7 @@ t.OperatorLimitedListQuery = t.ListQuery.extend(
  *         items:
  *           $ref: "#/definitions/Operator"
  */
-t.OperatorListResponse = t.struct(
+export const OperatorListResponse = t.struct(
   {
     total: t.Number,
     results: t.list(Operator)

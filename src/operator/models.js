@@ -13,6 +13,7 @@ import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { firebaseSetup, firebaseUserAccount } from '../firebase'
 import { bearerTokenExtractor } from '../middleware/jwt'
+import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
   {
@@ -191,7 +192,7 @@ export class OperatorRepository extends Operator {
     return this.updateOperator(operator, updateOperator)
   }
 
-  async list (query = {}, responseStruct = t.OperatorListResponse, queryStruct = t.OperatorListQuery) {
+  async list (query = {}, responseStruct = OperatorListResponse, queryStruct = t.OperatorListQuery) {
     const params = queryStruct(query)
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
