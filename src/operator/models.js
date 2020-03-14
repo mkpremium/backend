@@ -38,7 +38,7 @@ function defaultCounters () {
   return mappedCounters
 }
 
-export class Operator extends CouchbaseModel {
+class Operator extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = OperatorType
