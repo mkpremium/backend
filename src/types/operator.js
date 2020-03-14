@@ -243,27 +243,6 @@ t.OperatorProfileUpdate = t.struct({
   email: t.maybe(t.String)
 })
 
-t.OperatorUpdateRequest = t.struct(
-  {
-    username: t.maybe(t.String),
-    password: t.maybe(t.Password),
-    email: t.maybe(t.String),
-    agentNumber: t.maybe(t.String),
-    level: t.maybe(t.Number),
-    features: t.maybe(t.list(t.OperatorFirebaseFeatures)),
-    serviceId: t.maybe(t.String),
-    enable: t.maybe(t.Bool),
-    roles: t.maybe(t.list(t.OperatorRole)),
-    profile: t.maybe(t.OperatorProfileUpdate)
-  },
-  {
-    name: 'OperatorRequest',
-    defaultProps: {
-      profile: {}
-    }
-  }
-)
-
 t.OperatorRequest = t.struct(
   {
     username: t.StringNotEmpty,
