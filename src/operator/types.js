@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { OperatorRole } from '../types/operator'
+import { Operator, OperatorRole } from '../types/operator'
 import { RestringedHourObject } from './restringed-hours/types'
 
 /**
@@ -109,7 +109,7 @@ t.OperatorLimitedListQuery = t.ListQuery.extend(
 t.OperatorListResponse = t.struct(
   {
     total: t.Number,
-    results: t.list(t.Operator)
+    results: t.list(Operator)
   },
   {
     name: 'OperatorListResponse',

@@ -8,7 +8,7 @@ import { CouchbaseModel } from '../db/model'
 
 import { saltFactor, jwt } from '../../config'
 import { newHttpError } from '../lib/http-error'
-import { OperatorRoles } from '../types/operator'
+import { OperatorRoles, Operator as OperatorType } from '../types/operator'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { firebaseSetup, firebaseUserAccount } from '../firebase'
@@ -40,7 +40,7 @@ function defaultCounters () {
 export class Operator extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.Operator
+    this.Struct = OperatorType
   }
 
   async operatorRestringedHours (operatorId) {

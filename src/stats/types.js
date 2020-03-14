@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { Operator } from '../types/operator'
 
 export const OperatorActions = {
   // Operator
@@ -96,7 +97,7 @@ t.OperatorPerformace = t.struct(
  */
 t.OperatorResults = t.struct(
   {
-    operator: t.Operator,
+    operator: Operator,
     onLine: t.Boolean,
     counters: t.struct({
       callsMade: t.Number,

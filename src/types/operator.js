@@ -187,7 +187,7 @@ export const Award = t.Award = t.struct(
  *      disabledAt:
  *        type: string
  */
-t.Operator = t.struct(
+export const Operator = t.struct(
   {
     id: t.maybe(t.String),
     username: t.String,
