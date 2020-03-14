@@ -12,7 +12,7 @@ import { newHttpError } from '../lib/http-error'
 import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Operator as OperatorType, OperatorFirebaseFeatures, OperatorRole, OperatorRoles } from '../types/operator'
+import { Operator as OperatorType, OperatorRole, OperatorRoles } from '../types/operator'
 import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
@@ -340,7 +340,6 @@ const OperatorRequest = t.struct(
     email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
-    features: t.list(OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
     enable: t.Bool,
     roles: t.list(OperatorRole),
