@@ -1,6 +1,5 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { Operator } from '../types/operator'
 
 export const OperatorActions = {
   // Operator
@@ -63,53 +62,6 @@ t.OperatorPerformace = t.struct(
         return new Date()
       },
       _documentType: 'operator-stats-performance'
-    }
-  }
-)
-
-/**
- * @swagger
- * definitions:
- *   OperatorResultCounters:
- *     properties:
- *       callsMade:
- *         type: number
- *         description: Cantidad de llamadas realizadas
- *       callsAnswered:
- *         type: number
- *         description: Cantidad de llamadas recibidas
- *       verifiedOwners:
- *         type: number
- *         description: Cantidad de propietarios verificados
- *       meetingsMade:
- *         type: number
- *         description: Cantidad de citas realizadas
- *   OperatorResults:
- *     properties:
- *       operator:
- *         $ref: "#/definitions/Operator"
- *       onLine:
- *         type: boolean
- *         description: Indica si el operator esta en linea (conectado al socket)
- *       counters:
- *         $ref: "#/definitions/OperatorResultCounters"
- *
- */
-t.OperatorResults = t.struct(
-  {
-    operator: Operator,
-    onLine: t.Boolean,
-    counters: t.struct({
-      callsMade: t.Number,
-      callsAnswered: t.Number,
-      verifiedOwners: t.Number,
-      meetingsMade: t.Number
-    }, 'counters')
-  },
-  {
-    name: 'OperatorStats',
-    defaultProps: {
-      onLine: false
     }
   }
 )
