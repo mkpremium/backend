@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { OperatorFirebaseStates } from '../types/operator'
+import { OperatorFirebaseStates, OperatorFirebaseStatesEnum } from '../types/operator'
 
 t.Neighborhood = t.struct(
   {
@@ -53,7 +53,7 @@ t.ChangeUserNeighborhoodBody.prototype.toParams = function () {
 
 t.ChangeUserStateBody = t.struct({
   userId: t.String,
-  state: t.OperatorFirebaseStates
+  state: OperatorFirebaseStatesEnum
 })
 
 t.ChangeUserStateBody.prototype.toParams = function () {

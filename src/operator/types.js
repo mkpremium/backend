@@ -1,4 +1,5 @@
 import t from 'tcomb'
+import { OperatorRole } from '../types/operator'
 import { RestringedHourObject } from './restringed-hours/types'
 
 /**
@@ -140,7 +141,7 @@ t.OperatorView = t.struct(
   {
     id: t.maybe(t.String),
     username: t.String,
-    roles: t.list(t.OperatorRole),
+    roles: t.list(OperatorRole),
     profile: t.OperatorProfile,
     restringedHours: t.maybe(RestringedHourObject)
   },

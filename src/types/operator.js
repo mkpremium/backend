@@ -24,9 +24,9 @@ export const OperatorFeatures = {
   ALL: 'Todas'
 }
 
-t.OperatorRole = t.enums.of(Object.values(OperatorRoles))
-t.OperatorFirebaseStates = t.enums.of(Object.values(OperatorFirebaseStates))
-t.OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
+export const OperatorRole = t.enums.of(Object.values(OperatorRoles))
+export const OperatorFirebaseStatesEnum = t.enums.of(Object.values(OperatorFirebaseStates))
+const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
 /**
  * @swagger
@@ -59,7 +59,7 @@ t.OperatorProfile = t.struct(
     lastName: t.String,
     city: t.maybe(t.String),
     neighborhood: t.maybe(t.String),
-    state: t.maybe(t.OperatorFirebaseStates),
+    state: t.maybe(OperatorFirebaseStatesEnum),
     queueId: t.maybe(t.String),
     email: t.maybe(t.String)
   },
@@ -195,10 +195,10 @@ t.Operator = t.struct(
     email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
-    features: t.list(t.OperatorFirebaseFeatures),
+    features: t.list(OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
     enable: t.Bool,
-    roles: t.list(t.OperatorRole),
+    roles: t.list(OperatorRole),
     online: t.Bool,
 
     profile: t.OperatorProfile,
@@ -238,7 +238,7 @@ t.OperatorProfileUpdate = t.struct({
   lastName: t.maybe(t.String),
   city: t.maybe(t.String),
   neighborhood: t.maybe(t.String),
-  state: t.maybe(t.OperatorFirebaseStates),
+  state: t.maybe(OperatorFirebaseStatesEnum),
   queueId: t.maybe(t.String),
   email: t.maybe(t.String)
 })
@@ -250,10 +250,10 @@ t.OperatorRequest = t.struct(
     email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
-    features: t.list(t.OperatorFirebaseFeatures),
+    features: t.list(OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
     enable: t.Bool,
-    roles: t.list(t.OperatorRole),
+    roles: t.list(OperatorRole),
 
     profile: t.OperatorProfile
   },
