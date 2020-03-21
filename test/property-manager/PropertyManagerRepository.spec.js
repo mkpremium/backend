@@ -52,4 +52,31 @@ describe('PropertyManagerRepository', () => {
       })
     })
   })
+
+  describe('featured owner management', () => {
+    it('sets and retrieves featured owner for a building and property agent', async () => {
+      await operatorRepository.save(buildOperator({
+        id: 'property-manager-user-id',
+        username: 'property-manager-user-name',
+        profile: {
+          firstName: 'ignored',
+          lastName: 'ignored',
+          city: 'Barcelona'
+        },
+        roles: [OperatorRoles.BUSINESS],
+        profitGoal: {
+          amount: 100,
+          updatedAt: new Date()
+        }
+      }))
+
+      const updatedPropertyManager = await propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager(
+        'property-manager-user-id',
+        'building-id',
+        'owner-id'
+      )
+
+      expect(updatedPropertyManager.featuredOwners).to.deep.contains({ownerId: 'owner-id', buildingId: 'building-id'})
+    })
+  })
 })

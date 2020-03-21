@@ -205,6 +205,10 @@ export const Operator = t.struct(
     restringedHours: t.maybe(RestringedHourObject),
 
     profitGoal: t.maybe(ProfitGoal),
+    featuredOwners: t.maybe(t.list(t.struct({
+      buildingId: t.String,
+      ownerId: t.String
+    }))),
     awards: t.list(Award),
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
