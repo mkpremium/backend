@@ -6,6 +6,7 @@ import cors from 'cors'
 import couchbase from './db/couchbase'
 // app aware types
 import './types'
+import { CouchbaseAdapter } from './db/CouchbaseAdapter'
 // modules
 import operator from './operator'
 import worksheet from './worksheet'
@@ -29,6 +30,8 @@ import gearman from './gearman'
 import cadastre from './cadastre'
 import preferences from './system-preferences'
 import stock from './stock'
+import featuredOwner from './featuredOwner'
+import user from './user'
 import appErrorHandler from './lib/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 
@@ -42,10 +45,13 @@ export const dependenciesPromise = Promise.all([
 dependenciesPromise.then(() => {
   app.set('IS_READY', true)
   const dependenciesContainer = {
-    couchbaseBucket: app.locals.bucket
+    couchbaseBucket: app.locals.bucket,
+    couchbaseAdapter: new CouchbaseAdapter(app.locals.bucket)
   }
 
   stock(app, dependenciesContainer)
+  featuredOwner(app, dependenciesContainer)
+  user(app, dependenciesContainer)
 }).catch(err => {
   console.error(err)
 })

@@ -1,9 +1,9 @@
-import routes from './routes'
-import restringedHoursRoutes from './restringed-hours/routes'
+import jwt from '../middleware/jwt'
 import profitGoalsRoutes from './ProfitGoal/routes'
+import restringedHoursRoutes from './restringed-hours/routes'
+import routes from './routes'
 
 import './types'
-import jwt from '../middleware/jwt'
 
 export default (app) => {
   const secured = jwt().unless({

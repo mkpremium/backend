@@ -3,6 +3,7 @@
   "main": "server.js",
   "scripts": {
     "lint": "./scripts/lint.sh",
+    "lint:fix": "./scripts/lint.sh --fix",
     "start": "better-npm-run start",
     "pretest": "npm run lint",
     "test": "./scripts/run-test.sh test",
