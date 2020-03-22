@@ -94,7 +94,6 @@
     "source-map-support": "^0.5.9",
     "squel": "^5.12.1",
     "strip-bom": "latest",
-    "supertest": "^3.0.0",
     "swagger-jsdoc": "^1.9.7",
     "swagger-ui-dist": "^3.13.6",
     "tcomb": "^3.2.25",
@@ -129,7 +128,8 @@
     "mocha-circleci-reporter": "0.0.2",
     "nodemon": "^1.17.4",
     "sinon": "^9.0.1",
-    "sinon-chai": "^3.5.0"
+    "sinon-chai": "^3.5.0",
+    "supertest": "^4.0.2"
   },
   "private": true
 }
