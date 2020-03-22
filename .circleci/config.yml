@@ -20,7 +20,7 @@ jobs:
 
       - run:
           name: Test
-          command: ./scripts/test-ci.sh
+          command: MAX_ATTEMPTS=10 ./scripts/test-ci.sh
 
       - store_artifacts:
           path: ~/test-results/junit.xml

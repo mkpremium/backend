@@ -4,8 +4,10 @@ docker-compose up -d couchbase_db
 
 docker/wait-for-it.sh localhost:8091 -- echo "Waiting for primary index"
 
-readonly max_attempts=5
+readonly max_attempts=${MAX_ATTEMPTS:-5}
 curr_attempt=1
+echo "Waiting for primary index creation, it will try $max_attempts attempts"
+
 while :
 do
   echo "Checking primary index, attempt: ${curr_attempt}"
