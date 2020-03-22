@@ -64,7 +64,7 @@ async function limitedListOperator (req, res) {
   res.json(operators)
 }
 
-async function me (req, res) {
+async function selfCallCenterWorkInProgress (req, res) {
   const model = new Calls()
   const repoWorksheetQueue = new WorksheetQueueRepository()
 
@@ -79,6 +79,6 @@ export const loginController = wrap(login)
 export const createOperatorController = wrap(createOperator)
 export const listOperatorController = wrap(listOperator)
 export const limitedListOperatorController = wrap(limitedListOperator)
-export const meController = wrap(me)
+export const selfCallCenterWorkInProgressController = wrap(selfCallCenterWorkInProgress)
 export const refreshTokenController = wrap(refreshToken)
 export const updateOperatorController = wrap(updateOperator)

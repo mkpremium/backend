@@ -4,7 +4,7 @@ import {
   limitedListOperatorController,
   listOperatorController,
   loginController,
-  meController,
+  selfCallCenterWorkInProgressController,
   refreshTokenController,
   updateOperatorController
 } from './controllers'
@@ -287,6 +287,6 @@ router.get('/business', limitedListOperatorController)
  *         schema:
  *           $ref: "#/definitions/Error"
  */
-router.get('/me', meController)
+router.get('/me', selfCallCenterWorkInProgressController)
 
 export default router
