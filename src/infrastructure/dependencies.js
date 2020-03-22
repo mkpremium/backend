@@ -5,12 +5,12 @@ import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRep
 import { StockRepository } from '../stock/StockRepository'
 
 export const createDependenciesContainer = couchbaseBucket => {
-  const container = {}
   const couchbaseAdapter = new CouchbaseAdapter(couchbaseBucket)
 
   const propertyManagersRepository = new PropertyManagerRepository(couchbaseAdapter)
-  const stockRepository = new StockRepository(couchbaseBucket)
+  const stockRepository = new StockRepository(couchbaseAdapter)
 
+  const container = {}
   container.propertyManagerRankingService = new PropertyManagerRankingService(
     propertyManagersRepository,
     stockRepository
