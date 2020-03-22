@@ -2,7 +2,7 @@
 
 docker-compose up -d couchbase_db
 
-docker/wait-for-it.sh localhost:8091 -- echo "Waiting for primary index"
+docker/wait-for-it.sh -t 30 localhost:8091 -- echo "Waiting for primary index"
 
 readonly max_attempts=${MAX_ATTEMPTS:-5}
 curr_attempt=1
