@@ -2,20 +2,21 @@
 
 set -ex
 
+readonly build_folder=${BUILD_FOLDER:-/tmp/mkpremium-backend-build}
 # Clean current build
-rm -rf build/
+rm -rf ${build_folder}
 
 # Build assets
 npx babel ./ \
-  --out-dir ./build \
+  --out-dir ${build_folder} \
   -s \
   --copy-files \
   --ignore node_modules,docker,test,test-e2e
 
 # Build the package.json
-scripts/package.js
+BUILD_FOLDER=$build_folder scripts/package.js
 
-cd build
+cd ${build_folder}
 # Create folder for uploads (email attachments)
 mkdir .uploads
 git rev-parse HEAD > GIT_COMMIT
