@@ -1,4 +1,4 @@
-import { PropertyManagerRankingService } from '../../src/property-manager/PropertyManagerRankingService'
+import { PropertyManagerRankingService } from '../../src/PropertyManager/PropertyManagerRankingService'
 import { Promise } from 'bluebird'
 import { expect } from 'chai'
 import sinon from 'sinon'

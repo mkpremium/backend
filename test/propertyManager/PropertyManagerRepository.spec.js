@@ -1,4 +1,4 @@
-import { PropertyManagerRepository } from '../../src/property-manager/PropertyManagerRepository'
+import { PropertyManagerRepository } from '../../src/PropertyManager/PropertyManagerRepository'
 import { expect } from 'chai'
 import couchbase from '../../src/db/couchbase'
 import { OperatorRepository } from '../../src/operator/models'

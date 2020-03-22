@@ -8,8 +8,8 @@ import {
   updateSellStockController,
   getRankingController
 } from './controllers'
-import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
+import { PropertyManagerRankingService } from '../PropertyManager/PropertyManagerRankingService'
+import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRepository'
 import { StockRepository } from './StockRepository'
 
 export const addStockRoutes = (couchbaseBucket) => {

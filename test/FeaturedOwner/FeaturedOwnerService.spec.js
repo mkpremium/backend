@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { fake } from 'sinon'
-import { FeaturedOwnerService } from '../../src/property-manager/FeaturedOwnerService'
+import { FeaturedOwnerService } from '../../src/featuredOwner/FeaturedOwnerService'
 
 describe('FeaturedOwnerService', () => {
   it('stores featured owner for a building and a property manager', async () => {

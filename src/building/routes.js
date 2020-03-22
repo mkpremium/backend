@@ -2,8 +2,12 @@ import { Router } from 'express'
 import {
   addEntityController,
   addMetadataToBuildingController,
-  addNegotiationProposalController, addOwnerToBuildingController,
-  createMetadataUploadUrlController, removeEntityController, updateEntityController, updateNegotiationProposalController
+  addNegotiationProposalController,
+  addOwnerToBuildingController,
+  createMetadataUploadUrlController,
+  removeEntityController,
+  updateEntityController,
+  updateNegotiationProposalController
 } from './controllers'
 
 const router = Router()
