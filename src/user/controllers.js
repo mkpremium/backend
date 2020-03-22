@@ -1,8 +1,4 @@
-import { UserRepository } from './UserRepository'
-
-export const createMeController = couchbaseAdapter => {
-  const usersRepository = new UserRepository(couchbaseAdapter)
-
+export const createMeController = usersRepository => {
   return async (req, res) => {
     const user = await usersRepository.getUserOfId(req.user.operator.id)
     res.json({
