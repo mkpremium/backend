@@ -7,7 +7,6 @@ jobs:
   test:
     docker:
       - image: circleci/node:8.11.1
-      - image: rkmax/couchbase:bitdistrict
 
     working_directory: ~/repo
 
