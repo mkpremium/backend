@@ -6,7 +6,7 @@ import cors from 'cors'
 import couchbase from './db/couchbase'
 // app aware types
 import './types'
-import { CouchbaseAdapter } from './db/CouchbaseAdapter'
+import { createDependenciesContainer } from './infrastructure/dependencies'
 // modules
 import operator from './operator'
 import worksheet from './worksheet'
@@ -44,10 +44,8 @@ export const dependenciesPromise = Promise.all([
 
 dependenciesPromise.then(() => {
   app.set('IS_READY', true)
-  const dependenciesContainer = {
-    couchbaseBucket: app.locals.bucket,
-    couchbaseAdapter: new CouchbaseAdapter(app.locals.bucket)
-  }
+
+  const dependenciesContainer = createDependenciesContainer(app.locals.bucket)
 
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)

@@ -8,11 +8,8 @@ import {
   updateSellStockController,
   getRankingController
 } from './controllers'
-import { PropertyManagerRankingService } from '../PropertyManager/PropertyManagerRankingService'
-import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRepository'
-import { StockRepository } from './StockRepository'
 
-export const addStockRoutes = (couchbaseBucket) => {
+export const addStockRoutes = (propertyManagerRankingService) => {
   const router = Router()
 
   /**
@@ -341,12 +338,6 @@ export const addStockRoutes = (couchbaseBucket) => {
    *           $ref: "#/definitions/Error"
    *
    */
-  const propertyManagersRepository = new PropertyManagerRepository(couchbaseBucket)
-  const stockRepository = new StockRepository(couchbaseBucket)
-  const propertyManagerRankingService = new PropertyManagerRankingService(
-    propertyManagersRepository,
-    stockRepository
-  )
   router.get('/ranking', getRankingController(propertyManagerRankingService))
 
   return router

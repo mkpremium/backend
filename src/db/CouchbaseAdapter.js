@@ -24,4 +24,8 @@ export class CouchbaseAdapter {
 
     return fromJSON(result.value, structType)
   }
+
+  queryAsync (...args) {
+    return this.couchbaseBucket.queryAsync(...args)
+  }
 }

@@ -2,7 +2,7 @@ import {addStockRoutes} from './routes.js'
 import './types'
 import jwt from '../middleware/jwt'
 
-export default (app, { couchbaseBucket }) => {
+export default (app, { propertyManagerRankingService }) => {
   const secured = jwt()
-  app.use('/stock', secured, addStockRoutes(couchbaseBucket))
+  app.use('/stock', secured, addStockRoutes(propertyManagerRankingService))
 }

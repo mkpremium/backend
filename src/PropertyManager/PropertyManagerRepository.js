@@ -1,6 +1,5 @@
 import { N1qlQuery } from 'couchbase'
 import t from 'tcomb'
-import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
 import { Operator } from '../types/operator'
 
 const ACTIVE_PROPERTY_MANAGERS_QUERY = `
@@ -12,13 +11,12 @@ const ACTIVE_PROPERTY_MANAGERS_QUERY = `
 `
 
 export class PropertyManagerRepository {
-  constructor (couchbaseBucket) {
-    this.couchbaseBucket = couchbaseBucket
-    this.couchbaseAdapter = new CouchbaseAdapter(couchbaseBucket)
+  constructor (couchbaseAdapter) {
+    this.couchbaseAdapter = couchbaseAdapter
   }
 
   getActivePropertyManagers () {
-    return this.couchbaseBucket.queryAsync(
+    return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(ACTIVE_PROPERTY_MANAGERS_QUERY)
         .consistency(N1qlQuery.Consistency.STATEMENT_PLUS)
     )

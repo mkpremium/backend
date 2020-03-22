@@ -1,3 +1,4 @@
+import { CouchbaseAdapter } from '../../src/db/CouchbaseAdapter'
 import { PropertyManagerRepository } from '../../src/PropertyManager/PropertyManagerRepository'
 import { expect } from 'chai'
 import couchbase from '../../src/db/couchbase'
@@ -10,7 +11,7 @@ describe('PropertyManagerRepository', () => {
 
   before(async () => {
     couchbaseBucket = await couchbase()
-    propertyManagerRepository = new PropertyManagerRepository(couchbaseBucket)
+    propertyManagerRepository = new PropertyManagerRepository(new CouchbaseAdapter(couchbaseBucket))
     operatorRepository = new OperatorRepository()
   })
 
