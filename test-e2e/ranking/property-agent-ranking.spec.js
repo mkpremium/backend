@@ -2,8 +2,8 @@ import { operatorCreateBusiness } from '../../test/common'
 import { authenticatedGet, initApplication } from '../rest-api-helper'
 import { expect } from 'chai'
 
-describe('Sales agent profit ranking', () => {
-  it('list sales agents ranking with default profit goal', async () => {
+describe('Property manager profit ranking', () => {
+  it('list property managers ranking with default profit goal', async () => {
     const app = await initApplication()
 
     const businessUser = await operatorCreateBusiness()
