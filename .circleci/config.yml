@@ -2,7 +2,7 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
 jobs:
   test:
     docker:
@@ -13,23 +13,15 @@ jobs:
 
     steps:
       - checkout
-
-      - run:
-          name: Wait for couchbase
-          command: dockerize -wait tcp://localhost:8091 -timeout 1m
+      - setup_remote_docker
 
       - run:
           name: Install dependencies
           command: npm install
 
-      # run tests!
       - run:
-          name: Running testing
-          command: NODE_ENV=test npm test -- --reporter mocha-circleci-reporter
-
-      - run:
-          name: Testing build
-          command: npm run build
+          name: Test
+          command: ./scripts/test-ci.sh
 
       - store_artifacts:
           path: ~/test-results/junit.xml
