@@ -27,9 +27,10 @@ export class PropertyManagerRepository {
 
   async setFeaturedOwnerForBuildingAndPropertyManager (propertyAgentId, buildingId, ownerId) {
     const propertyAgent = await this.couchbaseAdapter.getEntity(Operator, propertyAgentId)
+    const agentFeaturedOwner = (propertyAgent.featuredOwners || []).filter(fo => fo.buildingId !== buildingId)
     const updatedPropertyAgent = t.update(propertyAgent, {
       featuredOwners: {
-        $set: [ {
+        $set: [ ...(agentFeaturedOwner), {
           buildingId, ownerId
         } ]
       }

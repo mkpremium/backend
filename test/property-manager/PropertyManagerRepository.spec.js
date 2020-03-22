@@ -34,7 +34,7 @@ describe('PropertyManagerRepository', () => {
           lastName: 'ignored',
           city: 'Barcelona'
         },
-        roles: [OperatorRoles.BUSINESS],
+        roles: [ OperatorRoles.BUSINESS ],
         profitGoal: {
           amount: 100,
           updatedAt: new Date()
@@ -44,7 +44,7 @@ describe('PropertyManagerRepository', () => {
       const result = await propertyManagerRepository.getActivePropertyManagers()
 
       expect(result).to.have.lengthOf(1)
-      expect(result[0]).to.be.deep.equal({
+      expect(result[ 0 ]).to.be.deep.equal({
         id: 'property-manager-user-id',
         userName: 'property-manager-user-name',
         city: 'Barcelona',
@@ -63,7 +63,7 @@ describe('PropertyManagerRepository', () => {
           lastName: 'ignored',
           city: 'Barcelona'
         },
-        roles: [OperatorRoles.BUSINESS],
+        roles: [ OperatorRoles.BUSINESS ],
         profitGoal: {
           amount: 100,
           updatedAt: new Date()
@@ -76,7 +76,83 @@ describe('PropertyManagerRepository', () => {
         'owner-id'
       )
 
-      expect(updatedPropertyManager.featuredOwners).to.deep.contains({ownerId: 'owner-id', buildingId: 'building-id'})
+      expect(updatedPropertyManager.featuredOwners).to.deep.contains({ ownerId: 'owner-id', buildingId: 'building-id' })
+    })
+
+    it('updates and retrieves featured owner for a building and property agent', async () => {
+      await operatorRepository.save(buildOperator({
+        id: 'property-manager-user-id',
+        username: 'property-manager-user-name',
+        profile: {
+          firstName: 'ignored',
+          lastName: 'ignored',
+          city: 'Barcelona'
+        },
+        roles: [ OperatorRoles.BUSINESS ],
+        profitGoal: {
+          amount: 100,
+          updatedAt: new Date()
+        },
+        featuredOwners: [
+          {
+            buildingId: 'building-id',
+            ownerId: 'owner-id'
+          }
+        ]
+      }))
+
+      const updatedPropertyManager = await propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager(
+        'property-manager-user-id',
+        'building-id',
+        'new-owner-id'
+      )
+
+      expect(updatedPropertyManager.featuredOwners).to.not.deep.contains({
+        ownerId: 'owner-id',
+        buildingId: 'building-id'
+      })
+      expect(updatedPropertyManager.featuredOwners).to.deep.contains({
+        ownerId: 'new-owner-id',
+        buildingId: 'building-id'
+      })
+    })
+
+    it('adds featured owner for a building and property agent keeping others', async () => {
+      await operatorRepository.save(buildOperator({
+        id: 'property-manager-user-id',
+        username: 'property-manager-user-name',
+        profile: {
+          firstName: 'ignored',
+          lastName: 'ignored',
+          city: 'Barcelona'
+        },
+        roles: [ OperatorRoles.BUSINESS ],
+        profitGoal: {
+          amount: 100,
+          updatedAt: new Date()
+        },
+        featuredOwners: [
+          {
+            buildingId: 'building-id',
+            ownerId: 'owner-id'
+          }
+        ]
+      }))
+
+      const updatedPropertyManager = await propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager(
+        'property-manager-user-id',
+        'other-building-id',
+        'other-owner-id'
+      )
+
+      expect(updatedPropertyManager.featuredOwners).to.deep.contains({
+        ownerId: 'owner-id',
+        buildingId: 'building-id'
+      })
+      expect(updatedPropertyManager.featuredOwners).to.deep.contains({
+        ownerId: 'other-owner-id',
+        buildingId: 'other-building-id'
+      })
     })
   })
 })
