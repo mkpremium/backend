@@ -1,13 +1,13 @@
 import { expect } from 'chai'
 import { fake } from 'sinon'
-import { AddFavoriteBuilding } from '../../src/user/AddFavoriteBuilding'
+import { AddFavoriteBuildingService } from '../../src/user/AddFavoriteBuildingService'
 
-describe('AddFavoriteBuilding', () => {
+describe('AddFavoriteBuildingService', () => {
   it('saves favorite building in user profile', async () => {
     const usersRepository = {
       addFavoriteBuildingToUserOfId: fake.returns(Promise.resolve())
     }
-    const addFavoriteBuildingService = new AddFavoriteBuilding(usersRepository)
+    const addFavoriteBuildingService = new AddFavoriteBuildingService(usersRepository)
 
     const result = await addFavoriteBuildingService.addFavoriteBuilding('user-id', 'building-id')
 

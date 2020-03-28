@@ -1,4 +1,4 @@
-export class AddFavoriteBuilding {
+export class AddFavoriteBuildingService {
   constructor (usersRepository) {
     this.usersRepository = usersRepository
   }
