@@ -16,7 +16,7 @@ describe('Property agent favourite buildings', () => {
       .then(response => {
         expect(response.status).to.be.equal(200)
         expect(response.body).to.be.deep.contains({
-          favouriteBuildings: [
+          favoriteBuildings: [
             'building-id'
           ]
         })
