@@ -229,6 +229,7 @@ export const Operator = t.struct(
           return new Date()
         }
       },
+      featuredOwners: [],
       favouriteBuildings: [],
       awards: [],
       get createdAt () {
