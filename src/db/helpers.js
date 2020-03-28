@@ -26,7 +26,9 @@ export async function upsertToDb (pk, data) {
 }
 
 export async function removeAll () {
-  const queryString = N1qlQuery.fromString(`DELETE FROM ${couchbase.bucket}`)
+  const queryString = N1qlQuery
+    .fromString(`DELETE FROM ${couchbase.bucket}`)
+    .consistency(N1qlQuery.Consistency.STATEMENT_PLUS)
   await this.query(queryString)
 }
 
