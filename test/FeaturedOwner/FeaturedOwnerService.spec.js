@@ -7,7 +7,6 @@ describe('FeaturedOwnerService', () => {
     const propertyManagerRepository = {
       setFeaturedOwnerForBuildingAndPropertyManager: fake.returns(Promise.resolve())
     }
-    propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager('property-agent-id', 'building-id', 'owner-id')
 
     const service = new FeaturedOwnerService(propertyManagerRepository)
 
@@ -17,6 +16,8 @@ describe('FeaturedOwnerService', () => {
       'owner-id'
     )
 
+    expect(propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager)
+      .to.have.been.calledWith('property-agent-id', 'building-id', 'owner-id')
     expect(result).to.be.true
   })
 })
