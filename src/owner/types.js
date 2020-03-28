@@ -61,6 +61,7 @@ t.OwnerCompactView = t.struct(
   }
 )
 
+// PRE-CIERRE not present in Firebase
 /**
  * @swagger
  * definitions:
