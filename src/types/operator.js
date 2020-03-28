@@ -212,7 +212,7 @@ export const Operator = t.struct(
     awards: t.list(Award),
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
-    favouriteBuildings: t.maybe(t.list(t.String)),
+    favoriteBuildings: t.maybe(t.list(t.String)),
     _documentType: t.enums.of(['operator'])
   },
   {
@@ -230,7 +230,7 @@ export const Operator = t.struct(
         }
       },
       featuredOwners: [],
-      favouriteBuildings: [],
+      favoriteBuildings: [],
       awards: [],
       get createdAt () {
         return new Date()

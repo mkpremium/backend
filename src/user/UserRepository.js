@@ -16,15 +16,15 @@ export class UserRepository {
       throw new UserNotFound(userId)
     }
 
-    const favouriteBuildings = user.favouriteBuildings
+    const favoriteBuildings = user.favoriteBuildings
 
-    if (favouriteBuildings.indexOf(buildingId) !== -1) {
+    if (favoriteBuildings.indexOf(buildingId) !== -1) {
       return
     }
 
     const updatedUser = t.update(user, {
-      favouriteBuildings: {
-        $set: [...favouriteBuildings, buildingId]
+      favoriteBuildings: {
+        $set: [...favoriteBuildings, buildingId]
       }
     })
 
