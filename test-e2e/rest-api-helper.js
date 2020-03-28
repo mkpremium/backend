@@ -2,6 +2,8 @@ import globalApp, { dependenciesPromise } from '../src/app'
 import { defaultPassword, deleteAll, operatorLogin } from '../test/common'
 import request from 'supertest'
 
+const DEFAULT_MILLISECONDS_TO_WAIT = 1000
+
 export const initApplication = async () => {
   await dependenciesPromise
 
@@ -16,6 +18,7 @@ export const authenticatedGet = async (endpoint, user, app) => {
 
   return request(app)
     .get(endpoint)
+    .timeout(DEFAULT_MILLISECONDS_TO_WAIT)
     .set('Authorization', authenticatedUser.authorization)
 }
 
@@ -25,6 +28,7 @@ export const authenticatedPost = async (endpoint, user, app, body) => {
 
   return request(app)
     .post(endpoint)
+    .timeout(DEFAULT_MILLISECONDS_TO_WAIT)
     .send(body)
     .set('Content-Type', 'application/json')
     .set('Authorization', authenticatedUser.authorization)
