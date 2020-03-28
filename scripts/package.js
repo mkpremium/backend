@@ -7,7 +7,7 @@ const packageJson = require('../package');
 const buildPackage = require('./build-package');
 
 const builtPackage = Object.assign({}, packageJson, buildPackage);
-const output = resolve(__dirname, `../${process.env.BUILD_FOLDER}/package.json`);
+const output = resolve(`${process.env.BUILD_FOLDER}/package.json`);
 
 fs.writeJsonSync(output, pickBy(builtPackage), {
   spaces: 2
