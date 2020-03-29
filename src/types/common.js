@@ -11,7 +11,7 @@ import uuid from 'uuid/v4'
  *       verified:
  *         type: boolean
  */
-t.PostalCode = t.struct(
+const PostalCode = t.struct(
   {
     number: t.maybe(t.union([t.String, t.Number])),
     verified: t.Boolean
@@ -192,7 +192,7 @@ export const Address = t.Address = t.struct(
     number: t.union([t.Number, t.String]),
     fullAddress: t.maybe(t.String),
     registerNumber: t.maybe(t.Number),
-    postalCode: t.PostalCode,
+    postalCode: PostalCode,
     city: t.String,
     province: t.maybe(t.String),
     zone: t.maybe(t.String),
