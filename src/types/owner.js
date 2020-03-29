@@ -6,7 +6,7 @@ import _every from 'lodash/every'
 import { OwnerStatus, OwnerType } from './enums'
 import _ from 'lodash'
 
-t.OwnerBusiness = t.struct({
+export const OwnerBusiness = t.struct({
   meetingWithOperatorId: t.String,
   status: t.String
 }, 'OwnerBusiness')
@@ -43,7 +43,7 @@ t.OwnerBody = t.struct(
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
     note: t.maybe(t.String),
-    business: t.maybe(t.OwnerBusiness)
+    business: t.maybe(OwnerBusiness)
   },
   {
     name: 'OwnerBody',
@@ -83,7 +83,7 @@ t.OwnerBody = t.struct(
 t.OwnerUpdate = t.struct({
   type: t.maybe(t.OwnerType),
   status: t.maybe(t.OwnerStatus),
-  business: t.maybe(t.OwnerBusiness),
+  business: t.maybe(OwnerBusiness),
   note: t.maybe(t.String),
   buildingId: t.maybe(t.String),
   person: t.maybe(t.Object),
@@ -250,7 +250,7 @@ export const Owner = t.struct(
     status: t.OwnerStatus,
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
-    business: t.maybe(t.OwnerBusiness),
+    business: t.maybe(OwnerBusiness),
     name: t.maybe(t.String),
 
     note: t.maybe(t.String),

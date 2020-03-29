@@ -3,6 +3,7 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import _flatten from 'lodash/flatten'
 import { isTest } from '../../config'
+import { OwnerBusiness } from '../types/owner'
 
 /**
  * @swagger
@@ -42,7 +43,7 @@ t.OwnerCompactView = t.struct(
     id: t.String,
     type: t.OwnerType,
     status: t.OwnerStatus,
-    business: t.maybe(t.OwnerBusiness),
+    business: t.maybe(OwnerBusiness),
     buildingId: isTest() ? t.maybe(t.String) : t.String,
     confirmedByOperator: t.OwnerConfirmed,
     person: t.struct({
@@ -61,7 +62,7 @@ t.OwnerCompactView = t.struct(
   }
 )
 
-// PRE-CIERRE not present in Firebase
+// PRE-CIERRE is not present in Firebase
 /**
  * @swagger
  * definitions:
