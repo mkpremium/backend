@@ -243,7 +243,7 @@ t.OwnerConfirmed = t.struct({
   confirmedAt: t.maybe(t.Date)
 }, 'confirmed')
 
-export const Owner = t.Owner = t.struct(
+export const Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
@@ -281,22 +281,22 @@ export const Owner = t.Owner = t.struct(
   }
 )
 
-export const OwnerWithInclude = t.OwnerWithInclude = t.Owner.extend({
+export const OwnerWithInclude = t.OwnerWithInclude = Owner.extend({
   building: t.maybe(t.Building),
   person: t.maybe(t.Person)
 })
 
-t.Owner.prototype.fullName = function () {
+Owner.prototype.fullName = function () {
   if (this.person) {
     return this.person.fullName()
   }
 }
 
-t.Owner.prototype.setStatus = function ($set) {
+Owner.prototype.setStatus = function ($set) {
   return t.update(this, { status: { $set } })
 }
 
-t.Owner.prototype.pullOutFreezer = function (newStatus) {
+Owner.prototype.pullOutFreezer = function (newStatus) {
   return t.update(this, {
     status: { $set: newStatus },
     business: { $set: null }
@@ -304,7 +304,7 @@ t.Owner.prototype.pullOutFreezer = function (newStatus) {
 }
 
 /**
- * @return {t.Owner}
+ * @return {Owner}
  */
 t.OwnerWithInclude.prototype.calculateOwnerValidStatus = function () {
   if (!this.person) {
@@ -326,13 +326,13 @@ t.OwnerWithInclude.prototype.calculateOwnerValidStatus = function () {
   return this
 }
 
-t.Owner.prototype.findFirstGoodContact = function () {
+Owner.prototype.findFirstGoodContact = function () {
   if (this.person) {
     return this.person.prototype.findFirstGoodContact()
   }
 }
 
-t.Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
+Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   return t.update(this, {
     $merge: Object.assign({}, extra, {
       confirmedByOperator: {
@@ -344,12 +344,12 @@ t.Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {})
   })
 }
 
-t.Owner.prototype.isPrimaryVerified = function () {
+Owner.prototype.isPrimaryVerified = function () {
   return isPrimaryVerified(this)
 }
 
 export function familyOwner (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return [
     OwnerType.PRINCIPAL,
     OwnerType.SECONDARY
@@ -357,64 +357,64 @@ export function familyOwner (data) {
 }
 
 export function isPrimary (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.type === OwnerType.PRINCIPAL
 }
 
 export function isPrimaryVerified (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFIED &&
     owner.type === OwnerType.PRINCIPAL
 }
 
 export function ownerVerified (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.VERIFIED
 }
 
 export function ownerVefifiedNoConfirmed (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.status === OwnerStatus.VERIFIED
 }
 
 export function publicEntity (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.PUBLIC
 }
 
 export function publicEntityNotVerify (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.status === OwnerStatus.PUBLIC
 }
 
 export function isInvalidVerified (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ERROR
 }
 
 export function isInvalid (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.status === OwnerStatus.ERROR
 }
 
 export function ownerNoSale (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.NO_SALE
 }
 
 export function ownerAlreadySold (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ALREADY_SOLD
 }
 
 export function isAllowedChangeState (data) {
-  const owner = fromJSON(data, t.Owner)
+  const owner = fromJSON(data, Owner)
   return [
     OwnerStatus.ALREADY_SOLD,
     OwnerStatus.NO_SALE,

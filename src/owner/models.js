@@ -181,7 +181,7 @@ const OwnerStatsParams = t.struct({
 export class OwnerRepository extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.Owner
+    this.Struct = Owner
   }
 
   async findByIdOrThrow (ownerId) {
@@ -196,7 +196,7 @@ export class OwnerRepository extends CouchbaseModel {
   /**
    *
    * @param {*} data
-   * @return {Promise<t.Owner>}
+   * @return {Promise<Owner>}
    */
   static async validateOwner (data) {
     const owner = fromJSON(data, t.OwnerWithInclude)
@@ -283,7 +283,7 @@ export class OwnerRepository extends CouchbaseModel {
     let updatedOwner = t.update(owner, { $merge: Object.assign({}, data, { id: ownerId }) })
 
     if (typeof data.verified !== 'undefined') {
-      const owner = t.Owner(updatedOwner)
+      const owner = Owner(updatedOwner)
       updatedOwner = owner.verifyOwner(operatorId, data.verified)
     }
 

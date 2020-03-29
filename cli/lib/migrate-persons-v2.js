@@ -5,6 +5,7 @@ import {csvToJSON} from '../../src/migration/lib/migrate-model-v3'
 import {cleanObjectKeys, removeNullValues} from '../../src/migration/models/models-helper'
 import uuid from 'uuid/v4'
 import _ from 'lodash'
+import { Owner } from '../../src/types/owner'
 import {WorksheetRepository} from '../../src/worksheet/models/worksheet'
 import {BuildingRepository} from '../../src/building/models'
 import {readCodigosPostalesMunicipios} from '../../csv/codigos_postales_municipios'
@@ -291,7 +292,7 @@ export function migrateFromCsv (inputPerson, worksheet, codes) {
  * @returns {*}
  */
 function generateOwner (inputPerson, person, worksheet) {
-  return t.Owner({
+  return Owner({
     id: uuid(),
     type: OwnerType.FAMILY,
     note: [inputPerson.tipo_via, inputPerson.nombre_via, inputPerson.num_via, inputPerson.provincia].join(' '),
