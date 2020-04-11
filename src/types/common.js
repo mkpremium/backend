@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { TypeContact } from './enums'
 
 /**
  * @swagger
@@ -52,7 +53,7 @@ t.SimpleAddress = t.struct({
  *       note:
  *         type: string
  */
-t.SimplePhoneNumber = t.struct(
+export const SimplePhoneNumber = t.SimplePhoneNumber = t.struct(
   {
     number: t.String,
     note: t.String
@@ -151,7 +152,7 @@ t.TypedContactInfo = t.struct(
  */
 t.TypedContactInfoUpdate = t.struct(
   {
-    type: t.maybe(t.TypeContact),
+    type: t.maybe(TypeContact),
     value: t.maybe(t.String),
     note: t.maybe(t.String),
     status: t.maybe(t.TypedContactInfoStatus)

@@ -211,7 +211,11 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       }
     }
 
-    await this.firebaseMeeting(scheduledEvent)
+    try {
+      await this.firebaseMeeting(scheduledEvent)
+    } catch (e) {
+      console.error(e)
+    }
 
     return scheduledEvent
   }

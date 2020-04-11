@@ -1,5 +1,7 @@
+import { BuildingRepository } from '../building/models'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
+import { OwnerRepository } from '../owner/models'
 import { PropertyManagerRankingService } from '../PropertyManager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRepository'
 import { StockRepository } from '../stock/StockRepository'
@@ -22,6 +24,8 @@ export const createDependenciesContainer = couchbaseBucket => {
   container.featuredOwnerService = new FeaturedOwnerService(propertyManagersRepository)
   container.usersRepository = usersRepository
   container.addFavoriteBuildingService = new AddFavoriteBuildingService(usersRepository)
+  container.buildingRepository = new BuildingRepository()
+  container.ownerRepository = new OwnerRepository()
 
   return container
 }

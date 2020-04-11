@@ -3,7 +3,7 @@ import t from 'tcomb'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import _every from 'lodash/every'
-import { OwnerStatus, OwnerType } from './enums'
+import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
 import _ from 'lodash'
 
 export const OwnerBusiness = t.struct({
@@ -34,11 +34,11 @@ export const OwnerBusiness = t.struct({
  *         type: string
  *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
  */
-t.OwnerBody = t.struct(
+export const OwnerBody = t.OwnerBody = t.struct(
   {
     type: t.maybe(t.OwnerType),
     verified: t.maybe(t.Boolean),
-    status: t.OwnerStatus,
+    status: OwnerStatusEnum,
     person: t.maybe(t.Object),
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
@@ -144,7 +144,7 @@ t.OwnerUpdate = t.struct({
  *         format: "DD-MM-YYYY"
  *
  */
-t.Person = t.struct(
+export const Person = t.Person = t.struct(
   {
     id: t.maybe(t.String),
     name: t.String,

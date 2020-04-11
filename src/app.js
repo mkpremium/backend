@@ -52,6 +52,7 @@ dependenciesPromise.then(() => {
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   user(app, dependenciesContainer)
+  app.locals.dependenciesContainer = dependenciesContainer
 }).catch(err => {
   console.error(err)
 })

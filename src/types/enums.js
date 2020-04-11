@@ -10,9 +10,9 @@ export const BuildingState = {
   MALO: 'MALO'
 }
 
-t.BuildingState = t.enums(BuildingState, 'BuildingState')
+export const BuildingStateEnum = t.BuildingState = t.enums(BuildingState, 'BuildingState')
 
-t.TypeContact = t.enums({
+export const TypeContact = t.TypeContact = t.enums({
   TELEFONO: 'TELEFONO',
   FAX: 'FAX',
   MOVIL: 'MOVIL',
@@ -53,7 +53,7 @@ export const OwnerBusinessStatus = {
 }
 
 t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType')
-t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
+export const OwnerStatusEnum = t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
 t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus')
 
 t.Gender = t.enums({

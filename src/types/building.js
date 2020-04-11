@@ -1,6 +1,8 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { buildingEntitiesDefaultStatus, buildingEntitiesStatus } from '../migration/models/building_entity'
+import { Address, SimplePhoneNumber } from './common'
+import { BuildingStateEnum } from './enums'
 
 /**
  * @swagger
@@ -66,7 +68,7 @@ t.BuildingOwner = t.struct(
   {
     name: t.maybe(t.String),
     address: t.SimpleAddress,
-    phones: t.list(t.SimplePhoneNumber)
+    phones: t.list(SimplePhoneNumber)
   },
   {
     name: 'BuildingOwner',
@@ -317,7 +319,7 @@ t.BuildingMetadataPreview = t.struct({
 export const Building = t.Building = t.struct(
   {
     id: t.String,
-    address: t.Address,
+    address: Address,
     buildingType: t.BuildingType,
     cadastre: t.maybe(t.Cadastre),
     floorArea: t.union([t.Number, t.String]),
@@ -327,12 +329,12 @@ export const Building = t.Building = t.struct(
     use: t.maybe(t.String), // FIXME: define this as a t.enums
     propertyType: t.maybe(t.String), // FIXME: define this as a t.enums
     buildingDate: t.union([t.Number, t.String]),
-    location: t.Location,
+    location: BuildingLocation,
     elements: t.maybe(t.Elements),
     entities: t.list(t.BuildingEntity),
     ownerId: t.maybe(t.String),
     owner: t.maybe(t.BuildingOwner), // TODO: move to owners collection
-    state: t.BuildingState,
+    state: BuildingStateEnum,
     proposals: t.list(t.String),
     recentProposal: t.maybe(t.BuildingProposal),
 
@@ -340,7 +342,7 @@ export const Building = t.Building = t.struct(
 
     Id_Estado: t.maybe(t.String), // Use to sync firebase informadores
 
-    _migrateId: t.String,
+    _migrateId: t.maybe(t.String),
     _relatedTo: t.maybe(t.String),
     _documentType: t.String
   },
