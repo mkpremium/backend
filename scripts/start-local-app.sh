@@ -2,6 +2,6 @@
 
 set -e
 
-docker-compose up -d couchbase_db
+./scripts/start-couchbase-and-wait-for-it.sh
 
 npm start
