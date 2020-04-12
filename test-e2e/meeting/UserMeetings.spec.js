@@ -19,7 +19,7 @@ describe('Users Meetings', () => {
   })
 
   it(`exposes endpoint to get user's meetings`, async () => {
-    await authenticatedGet(`/users/${businessUser.id}/meetings`, businessUser, app)
+    await authenticatedGet(`/me/meetings`, businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         expect(response.body).to.be.deep.equal([])
@@ -56,7 +56,7 @@ describe('Users Meetings', () => {
         meetingId = response.body.id
       })
 
-    await authenticatedGet(`/users/${businessUser.id}/meetings`, businessUser, app)
+    await authenticatedGet(`/me/meetings`, businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         const expectedMeeting = {

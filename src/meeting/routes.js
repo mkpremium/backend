@@ -3,7 +3,7 @@ import { getUserMeetingsController } from './controllers'
 
 export const meetingRoutes = getUserMeetingsService => {
   const router = new Router()
-  router.get('/users/:id/meetings', getUserMeetingsController(getUserMeetingsService))
+  router.get('/me/meetings', getUserMeetingsController(getUserMeetingsService))
 
   return router
 }
