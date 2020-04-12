@@ -8,6 +8,7 @@ import { authenticatedGet, authenticatedPost, initApplication } from '../rest-ap
 const testBuildingId = 'test-building-id'
 const testPhoneContactId = 'test-contact-id'
 const testContactPhone = '666666666'
+const testOwnerName = 'Owner Name'
 
 describe('Users Meetings', () => {
   let app, businessUser
@@ -65,7 +66,8 @@ describe('Users Meetings', () => {
           buildingId: building.id,
           inPerson: true,
           proposalValue: buildingProposal.proposal,
-          phoneNumber: testContactPhone
+          phoneNumber: testContactPhone,
+          contactName: testOwnerName
         }
         expect(response.body).to.be.deep.equal([ expectedMeeting ])
       })
@@ -99,7 +101,7 @@ const createOwner = async (app) => {
   return ownerRepository.createOwnerAndPerson({
     status: OwnerStatus.NON_VERIFIED,
     person: {
-      name: 'Owner Name',
+      name: testOwnerName,
       contacts: [
         {
           id: testPhoneContactId,
