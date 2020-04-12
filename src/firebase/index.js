@@ -19,7 +19,15 @@ function initializeFirebase ({ enabled, serviceAccount, databaseURL, prefixURL }
       prefixURL
     })
   } else {
-    return { enabled, prefixURL, database () {} }
+    return {
+      enabled,
+      prefixURL,
+      database () {
+        return {
+          ref: () => ({ set: () => null })
+        }
+      }
+    }
   }
 }
 

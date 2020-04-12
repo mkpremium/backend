@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { getUserMeetingsController } from './controllers'
 
-export const meetingRoutes = () => {
+export const meetingRoutes = getUserMeetingsService => {
   const router = new Router()
-  router.get('/users/:id/meetings', getUserMeetingsController())
+  router.get('/users/:id/meetings', getUserMeetingsController(getUserMeetingsService))
 
   return router
 }

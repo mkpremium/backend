@@ -23,10 +23,11 @@ describe('Users Meetings', () => {
       })
   })
 
-  it.skip(`retrieves users's meetings`, async () => {
+  it(`retrieves users's meetings`, async () => {
     const owner = await createOwner(app)
     const building = await createBuilding(app, owner)
     await associateBuildingWithOwner(app, owner, building.id)
+    await createProposalForBuilding(app, businessUser, building)
 
     const meetingDate = moment().add(1, 'day').hour(12).minute(0)
     const meeting = {
@@ -45,15 +46,21 @@ describe('Users Meetings', () => {
       'eventDate': meetingDate.toISOString()
     }
 
+    let meetingId
     await authenticatedPost(`/scheduled-events/meeting`, businessUser, app, meeting)
       .then(response => {
         expect(response.status).to.be.equal(201)
+        meetingId = response.body.id
       })
 
     await authenticatedGet(`/users/${businessUser.id}/meetings`, businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
-        expect(response.body).to.be.deep.equal([ {} ])
+        const expectedMeeting = {
+          id: meetingId,
+          meetingAddress: meeting.event.eventAddress
+        }
+        expect(response.body).to.be.deep.equal([ expectedMeeting ])
       })
   })
 })
@@ -90,8 +97,17 @@ const createOwner = async (app) => {
 }
 
 const associateBuildingWithOwner = (app, owner, buildingId) => {
-  const updatedOwner = t.update(owner, {buildingId: {$set: buildingId}})
-  const {ownerRepository} = app.locals.dependenciesContainer
+  const updatedOwner = t.update(owner, { buildingId: { $set: buildingId } })
+  const { ownerRepository } = app.locals.dependenciesContainer
 
   return ownerRepository.save(updatedOwner)
+}
+
+const createProposalForBuilding = (app, propertyAgent, building) => {
+  const { addProposalService } = app.locals.dependenciesContainer
+
+  return addProposalService.addProposal(building.id, propertyAgent.id, {
+    aspiration: -1,
+    proposal: 100000
+  })
 }
