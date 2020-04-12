@@ -1,7 +1,7 @@
 import { N1qlQuery } from 'couchbase'
 
-const GET_USER_MEETINGS = `
-SELECT id, event.eventAddress meetingAddress
+const GET_USER_MEETINGS_QUERY = `
+SELECT id, event.eventAddress meetingAddress, eventDate meetingAt, event.buildingId, event.inPerson
 FROM mkpremium
 WHERE _documentType = 'scheduled-event' AND type = 'MEETINGS'
 AND notifyTo = $1
@@ -14,7 +14,7 @@ export class UserMeetingsRepository {
 
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(GET_USER_MEETINGS).consistency(N1qlQuery.Consistency.STATEMENT_PLUS), [userId]
+      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY), [userId]
     )
   }
 }

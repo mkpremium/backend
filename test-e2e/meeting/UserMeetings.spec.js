@@ -58,7 +58,10 @@ describe('Users Meetings', () => {
         expect(response.status).to.be.equal(200)
         const expectedMeeting = {
           id: meetingId,
-          meetingAddress: meeting.event.eventAddress
+          meetingAddress: meeting.event.eventAddress,
+          meetingAt: meetingDate.toISOString(),
+          buildingId: building.id,
+          inPerson: true
         }
         expect(response.body).to.be.deep.equal([ expectedMeeting ])
       })
