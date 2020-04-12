@@ -27,7 +27,7 @@ describe('Users Meetings', () => {
     const owner = await createOwner(app)
     const building = await createBuilding(app, owner)
     await associateBuildingWithOwner(app, owner, building.id)
-    await createProposalForBuilding(app, businessUser, building)
+    const buildingProposal = await createProposalForBuilding(app, businessUser, building)
 
     const meetingDate = moment().add(1, 'day').hour(12).minute(0)
     const meeting = {
@@ -61,7 +61,8 @@ describe('Users Meetings', () => {
           meetingAddress: meeting.event.eventAddress,
           meetingAt: meetingDate.toISOString(),
           buildingId: building.id,
-          inPerson: true
+          inPerson: true,
+          proposalValue: buildingProposal.proposal
         }
         expect(response.body).to.be.deep.equal([ expectedMeeting ])
       })
