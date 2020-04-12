@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { buildingEntitiesDefaultStatus, buildingEntitiesStatus } from '../migration/models/building_entity'
-import { Address, SimplePhoneNumber } from './common'
+import { Address, SimpleAddress, SimplePhoneNumber } from './common'
 import { BuildingStateEnum } from './enums'
 
 /**
@@ -64,10 +64,10 @@ t.Elements = t.struct({
  *       phones:
  *          $ref: "#/definitions/SimplePhoneNumber"
  */
-t.BuildingOwner = t.struct(
+const BuildingOwner = t.struct(
   {
     name: t.maybe(t.String),
-    address: t.SimpleAddress,
+    address: SimpleAddress,
     phones: t.list(SimplePhoneNumber)
   },
   {
@@ -333,7 +333,7 @@ export const Building = t.Building = t.struct(
     elements: t.maybe(t.Elements),
     entities: t.list(t.BuildingEntity),
     ownerId: t.maybe(t.String),
-    owner: t.maybe(t.BuildingOwner), // TODO: move to owners collection
+    owner: t.maybe(BuildingOwner), // TODO: move to owners collection
     state: BuildingStateEnum,
     proposals: t.list(t.String),
     recentProposal: t.maybe(t.BuildingProposal),

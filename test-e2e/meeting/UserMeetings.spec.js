@@ -6,6 +6,8 @@ import { operatorCreateBusiness } from '../../test/common'
 import { authenticatedGet, authenticatedPost, initApplication } from '../rest-api-helper'
 
 const testBuildingId = 'test-building-id'
+const testPhoneContactId = 'test-contact-id'
+const testContactPhone = '666666666'
 
 describe('Users Meetings', () => {
   let app, businessUser
@@ -34,7 +36,7 @@ describe('Users Meetings', () => {
       'createdBy': businessUser.id,
       'notifyTo': businessUser.id,
       'event': {
-        'contactId': 'contact-id',
+        'contactId': testPhoneContactId,
         'ownerId': owner.id,
         'buildingId': building.id,
         'worksheetId': undefined,
@@ -62,7 +64,8 @@ describe('Users Meetings', () => {
           meetingAt: meetingDate.toISOString(),
           buildingId: building.id,
           inPerson: true,
-          proposalValue: buildingProposal.proposal
+          proposalValue: buildingProposal.proposal,
+          phoneNumber: testContactPhone
         }
         expect(response.body).to.be.deep.equal([ expectedMeeting ])
       })
@@ -75,6 +78,7 @@ const createBuilding = async (app, owner) => {
     id: testBuildingId,
     buildingType: 'VERTICAL',
     ownerId: owner.id,
+    owner: { id: owner.id, address: {} },
     address: {
       street: 'street, address',
       number: '2a',
@@ -95,7 +99,14 @@ const createOwner = async (app) => {
   return ownerRepository.createOwnerAndPerson({
     status: OwnerStatus.NON_VERIFIED,
     person: {
-      name: 'Owner Name'
+      name: 'Owner Name',
+      contacts: [
+        {
+          id: testPhoneContactId,
+          type: 'TELEFONO',
+          value: testContactPhone
+        }
+      ]
     }
   })
 }

@@ -80,7 +80,7 @@ export class MetadataRepository extends Metadata {
 export class BuildingRepository extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.Building
+    this.Struct = Building
   }
 
   async findByIdOrThrow (buildingId) {

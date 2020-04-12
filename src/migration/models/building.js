@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4'
 
 import t from 'tcomb'
+import { Building } from '../../types/building'
 import { removeNullValues, cleanObjectKeys } from './models-helper'
 
 export const BuildingInputDTO = t.struct({
@@ -102,7 +103,7 @@ export default function migrateFromCsv (data) {
     }
   }
 
-  return t.Building({
+  return Building({
     id: uuid(),
     _migrateId: input.id,
     _relatedTo: input.proprietari,

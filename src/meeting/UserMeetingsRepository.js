@@ -6,7 +6,9 @@ meeting.event.eventAddress meetingAddress,
 meeting.eventDate meetingAt,
 meeting.event.buildingId,
 meeting.event.inPerson,
-building.recentProposal.proposal proposalValue
+building.recentProposal.proposal proposalValue,
+meeting.event.contactId,
+meeting.event.owner.person.contacts
 FROM mkpremium meeting
 LEFT JOIN mkpremium building ON building.id = meeting.event.buildingId AND building._documentType = 'building'
 WHERE meeting._documentType = 'scheduled-event' AND meeting.type = 'MEETINGS'
@@ -20,7 +22,21 @@ export class UserMeetingsRepository {
 
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY), [userId]
+      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY), [ userId ]
+    ).then(meetings =>
+      meetings.map(
+        ({ id, meetingAddress, meetingAt, buildingId, inPerson, proposalValue, contactId, contacts }) => {
+          const phoneContact = contacts ? contacts.find(c => c.type === 'TELEFONO' && c.id === contactId) : undefined
+          return {
+            id,
+            meetingAddress,
+            meetingAt,
+            buildingId,
+            inPerson,
+            proposalValue,
+            phoneNumber: phoneContact ? phoneContact.value : undefined
+          }
+        })
     )
   }
 }

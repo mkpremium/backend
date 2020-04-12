@@ -35,7 +35,7 @@ const PostalCode = t.struct(
  *       city:
  *         type: string
  */
-t.SimpleAddress = t.struct({
+export const SimpleAddress = t.SimpleAddress = t.struct({
   fullAddress: t.maybe(t.String),
   floor: t.maybe(t.String),
   number: t.maybe(t.String),
@@ -113,10 +113,10 @@ export const ContactInfoStatus = t.TypedContactInfoStatus = t.enums({
  *         type: string
  *         enum: [UNDEFINED, GOOD, BAD]
  */
-t.TypedContactInfo = t.struct(
+export const TypedContactInfo = t.TypedContactInfo = t.struct(
   {
     id: t.String,
-    type: t.TypeContact,
+    type: TypeContact,
     value: t.String,
     note: t.maybe(t.String),
     status: t.TypedContactInfoStatus

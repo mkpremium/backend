@@ -15,7 +15,7 @@ import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { OwnerListQuery } from './types'
 import squel from 'squel/dist/squel'
-import { Owner } from '../types/owner'
+import { Owner, Person as PersonStruct } from '../types/owner'
 import { OperatorRepository } from '../operator/models'
 
 export class Person extends CouchbaseModel {
@@ -34,7 +34,7 @@ export const ContactStatus = {
 export class PersonRepository extends Person {
   constructor () {
     super()
-    this.Struct = t.Person
+    this.Struct = PersonStruct
   }
 
   async searchPeople (query) {

@@ -3,6 +3,7 @@ import t from 'tcomb'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import _every from 'lodash/every'
+import { TypedContactInfo } from './common'
 import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
 import _ from 'lodash'
 
@@ -153,7 +154,7 @@ export const Person = t.Person = t.struct(
     secondSurname: t.maybe(t.String),
     documentNumber: t.maybe(t.String), // Note: make unique one day
 
-    contacts: t.list(t.TypedContactInfo),
+    contacts: t.list(TypedContactInfo),
     addresses: t.list(t.SimpleAddress),
     _address: t.maybe(t.SimpleAddress),
     birthDate: t.maybe(t.Date),
