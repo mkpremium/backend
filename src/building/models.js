@@ -24,7 +24,7 @@ import { OperatorActions } from '../stats/types'
 import { OperatorStats } from '../stats/models'
 import _ from 'lodash'
 import { N1qlQuery } from 'couchbase'
-import { Building } from '../types/building'
+import { Building, BuildingMetadataPreview } from '../types/building'
 import { emitModelEvents } from '../../config'
 import { ScheduledEvents } from '../scheduled-events/models'
 import { ScheduledEventType } from '../scheduled-events/types'
@@ -194,7 +194,7 @@ export class BuildingRepository extends CouchbaseModel {
       url: cleanUrl(params.url)
     })
     const metadata = await metaRepo.save(body)
-    const updatedMetadata = t.update(building.metadata, { $push: [t.BuildingMetadataPreview(metadata)] })
+    const updatedMetadata = t.update(building.metadata, { $push: [BuildingMetadataPreview(metadata)] })
     const updatedBuilding = t.update(building, { metadata: { $merge: updatedMetadata } })
 
     await this.save(updatedBuilding)

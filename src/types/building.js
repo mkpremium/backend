@@ -264,7 +264,7 @@ t.BuildingEntity = t.struct(
  *           type: string
  *           description: "Url publica de amazon con un thumbnail del archivo (images, pdf)"
  */
-t.BuildingMetadataPreview = t.struct({
+export const BuildingMetadataPreview = t.struct({
   id: t.String,
   name: t.maybe(t.String),
   mimeType: t.maybe(t.String),
@@ -338,7 +338,7 @@ export const Building = t.Building = t.struct(
     proposals: t.list(t.String),
     recentProposal: t.maybe(t.BuildingProposal),
 
-    metadata: t.list(t.BuildingMetadataPreview),
+    metadata: t.list(BuildingMetadataPreview),
 
     Id_Estado: t.maybe(t.String), // Use to sync firebase informadores
 

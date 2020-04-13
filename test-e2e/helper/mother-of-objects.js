@@ -9,19 +9,22 @@ export const testOwnerName = 'Owner Name'
 export const createBuilding = async (app, owner, options) => {
   const { buildingRepository } = app.locals.dependenciesContainer
   const building = {
-    id: options.buildingId || testBuildingId,
-    buildingType: 'VERTICAL',
-    ownerId: owner.id,
-    owner: { id: owner.id, address: {} },
-    address: {
-      street: 'street, address',
-      number: '2a',
-      postalCode: {
-        verified: false
+    ...{
+      id: testBuildingId,
+      buildingType: 'VERTICAL',
+      ownerId: owner.id,
+      owner: { id: owner.id, address: {} },
+      address: {
+        street: 'street, address',
+        number: '2a',
+        postalCode: {
+          verified: false
+        },
+        city: 'BARCELONA'
       },
-      city: 'BARCELONA'
+      location: {}
     },
-    location: {}
+    ...options
   }
 
   return buildingRepository.save(building)
