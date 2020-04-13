@@ -1,4 +1,5 @@
 import t from 'tcomb'
+import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
 
 const testBuildingId = 'test-building-id'
@@ -62,4 +63,33 @@ export const createProposalForBuilding = (app, propertyAgent, building) => {
     aspiration: -1,
     proposal: 100000
   })
+}
+
+const testPurchaseReservationAmount = 50000
+const testPurchaseAmount = 100000
+const testSaleReservationAmount = 50001
+const testSaleAmount = 100001
+
+export const purchaseBuilding = async (app, { buildingId, propertyAgentId }) => {
+  return createPurchaseStock({
+    buildingId,
+    reservationAmount: testPurchaseReservationAmount,
+    reservationDate: new Date(),
+    transactionAmount: testPurchaseAmount,
+    transactionDate: new Date()
+  }, propertyAgentId)
+}
+
+export const sellBuilding = async (app, { buildingId, propertyAgentId }) => {
+  return sellPurchasedStock({
+    buildingId,
+    reservationAmount: testSaleReservationAmount,
+    reservationDate: new Date(),
+    transactionAmount: testSaleAmount,
+    transactionDate: new Date()
+  }, propertyAgentId)
+}
+
+export const closeBuildingStock = async (app, { buildingId, propertyAgentId }) => {
+  return closeSellStock({ buildingId }, propertyAgentId)
 }

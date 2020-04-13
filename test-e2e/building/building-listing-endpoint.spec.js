@@ -1,39 +1,14 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
 import { operatorCreateBusiness } from '../../test/common'
-import { createBuilding, createOwner } from '../helper/mother-of-objects'
+import {
+  closeBuildingStock,
+  createBuilding,
+  createOwner,
+  purchaseBuilding,
+  sellBuilding
+} from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
-
-const testPurchaseReservationAmount = 50000
-const testPurchaseAmount = 100000
-
-const testSaleReservationAmount = 50001
-const testSaleAmount = 100001
-
-const purchaseBuilding = async (app, {buildingId, propertyAgentId}) => {
-  return createPurchaseStock({
-    buildingId,
-    reservationAmount: testPurchaseReservationAmount,
-    reservationDate: new Date(),
-    transactionAmount: testPurchaseAmount,
-    transactionDate: new Date()
-  }, propertyAgentId)
-}
-
-const sellBuilding = async (app, {buildingId, propertyAgentId}) => {
-  return sellPurchasedStock({
-    buildingId,
-    reservationAmount: testSaleReservationAmount,
-    reservationDate: new Date(),
-    transactionAmount: testSaleAmount,
-    transactionDate: new Date()
-  }, propertyAgentId)
-}
-
-const closeBuildingStock = async (app, {buildingId, propertyAgentId}) => {
-  return closeSellStock({ buildingId }, propertyAgentId)
-}
 
 describe('Building listing endpoint', () => {
   let app, businessUser
