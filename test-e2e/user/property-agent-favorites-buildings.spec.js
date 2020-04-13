@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { operatorCreateBusiness } from '../../test/common'
-import { authenticatedGet, authenticatedPost, initApplication } from '../rest-api-helper'
+import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
 describe('Property agent favourite buildings', () => {
   it('stores property agent favourite buildings', async () => {

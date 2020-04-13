@@ -1,5 +1,5 @@
 import { operatorCreateBusiness } from '../../test/common'
-import { authenticatedGet, authenticatedPost, initApplication } from '../rest-api-helper'
+import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 import { expect } from 'chai'
 
 describe('Featured owner for a building and property manager', () => {

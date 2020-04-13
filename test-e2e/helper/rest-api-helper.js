@@ -1,5 +1,5 @@
-import globalApp, { dependenciesPromise } from '../src/app'
-import { defaultPassword, deleteAll, operatorLogin } from '../test/common'
+import globalApp, { dependenciesPromise } from '../../src/app'
+import { defaultPassword, deleteAll, operatorLogin } from '../../test/common'
 import request from 'supertest'
 
 const DEFAULT_MILLISECONDS_TO_WAIT = 1000

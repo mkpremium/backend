@@ -1,5 +1,5 @@
 import { operatorCreateBusiness } from '../../test/common'
-import { authenticatedGet, initApplication } from '../rest-api-helper'
+import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 import { expect } from 'chai'
 
 describe('Property manager profit ranking', () => {

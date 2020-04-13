@@ -3,7 +3,7 @@ import moment from 'moment'
 import t from 'tcomb'
 import { OwnerStatus } from '../../src/types/enums'
 import { operatorCreateBusiness } from '../../test/common'
-import { authenticatedGet, authenticatedPost, initApplication } from '../rest-api-helper'
+import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
 const testBuildingId = 'test-building-id'
 const testPhoneContactId = 'test-contact-id'
