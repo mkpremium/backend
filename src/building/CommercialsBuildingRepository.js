@@ -40,6 +40,10 @@ export class CommercialsBuildingRepository {
               reservationDate: moment(stock.sell.reservationDate).unix(),
               transactionAmount: stock.sell.transactionAmount,
               transactionDate: moment(stock.sell.transactionDate).unix()
+            } : undefined,
+            close: stock && stock.close ? {
+              gain: stock.close.gain,
+              transactionDate: moment(stock.close.transactionDate).unix()
             } : undefined
           }
         })

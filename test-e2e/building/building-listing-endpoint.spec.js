@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
+import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
 import { operatorCreateBusiness } from '../../test/common'
 import { createBuilding, createOwner } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
@@ -31,6 +31,10 @@ const sellBuilding = async (app, {buildingId, propertyAgentId}) => {
   }, propertyAgentId)
 }
 
+const closeBuildingStock = async (app, {buildingId, propertyAgentId}) => {
+  return closeSellStock({ buildingId }, propertyAgentId)
+}
+
 describe('Building listing endpoint', () => {
   let app, businessUser
 
@@ -58,6 +62,10 @@ describe('Building listing endpoint', () => {
       buildingId: building1.id,
       propertyAgentId: businessUser.id
     })).sell
+    const building1ClosedStock = (await closeBuildingStock(app, {
+      buildingId: building1.id,
+      propertyAgentId: businessUser.id
+    })).close
 
     const building2 = await createBuilding(app, owner, { id: 'test-building2' })
 
@@ -85,6 +93,10 @@ describe('Building listing endpoint', () => {
                 reservationDate: moment(building1Sale.reservationDate).unix(),
                 transactionAmount: building1Sale.transactionAmount,
                 transactionDate: moment(building1Sale.transactionDate).unix()
+              },
+              close: {
+                gain: building1ClosedStock.gain,
+                transactionDate: moment(building1ClosedStock.transactionDate).unix()
               }
             }
           },
