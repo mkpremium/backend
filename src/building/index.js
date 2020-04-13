@@ -1,8 +1,8 @@
 import './types'
-import routes from './routes'
+import { createBuildingRoutes } from './routes'
 import jwt from '../middleware/jwt'
 
 export default (app) => {
   const secured = jwt()
-  app.use('/buildings', secured, routes)
+  app.use('/buildings', secured, createBuildingRoutes())
 }
