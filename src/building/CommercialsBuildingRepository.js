@@ -8,6 +8,7 @@ SELECT
     stock,
     building.address,
     building.cadastre.reference cadastreReference,
+    building.floorArea,
     building.location,
     building.recentProposal.proposal lastProposal,
     building.\`use\`,
@@ -28,7 +29,7 @@ export class CommercialsBuildingRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(listBuildingsByIdQuery), [ ids ]
     ).then(buildings => buildings.map(
-      ({ id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use }) => {
+      ({ id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use, floorArea }) => {
         return ({
           id,
           metadata: metadata.map(({ mimeType, previewUrl }) => ({
@@ -72,6 +73,7 @@ export class CommercialsBuildingRepository {
           } : undefined,
           cadastreReference,
           negotiationStatus,
+          floorArea,
           usage: use !== null ? use : undefined
         })
       }

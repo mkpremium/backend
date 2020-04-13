@@ -47,7 +47,8 @@ describe('Building listing endpoint', () => {
         lat: -1,
         lng: 1
       },
-      use: 'RESIDENCIAL'
+      use: 'RESIDENCIAL',
+      floorArea: 500
     })
     const building1Purchase = (await purchaseBuilding(app, {
       buildingId: building1.id,
@@ -122,7 +123,8 @@ describe('Building listing endpoint', () => {
               latitude: building1.location.lat,
               longitude: building1.location.lng
             },
-            usage: building1.use
+            usage: building1.use,
+            floorArea: building1.floorArea
           },
           {
             id: building2.id,
@@ -132,7 +134,8 @@ describe('Building listing endpoint', () => {
               city: building2.address.city,
               street: building2.address.street,
               number: building2.address.number
-            }
+            },
+            floorArea: building2.floorArea
           }
         ])
       })
