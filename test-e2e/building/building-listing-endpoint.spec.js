@@ -42,6 +42,10 @@ describe('Building listing endpoint', () => {
           number: '28026'
         },
         city: 'MADRID'
+      },
+      location: {
+        lat: -1,
+        lng: 1
       }
     })
     const building1Purchase = (await purchaseBuilding(app, {
@@ -112,6 +116,10 @@ describe('Building listing endpoint', () => {
                 number: building1.address.postalCode.number
               },
               city: building1.address.city
+            },
+            geolocation: {
+              latitude: building1.location.lat,
+              longitude: building1.location.lng
             }
           },
           {
