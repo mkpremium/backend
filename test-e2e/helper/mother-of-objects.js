@@ -1,6 +1,7 @@
 import t from 'tcomb'
 import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
+import { WorksheetRepository } from '../../src/worksheet/models/worksheet'
 
 const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
@@ -31,6 +32,10 @@ export const createBuilding = async (app, owner, options) => {
   return buildingRepository.save(building)
 }
 
+export const createWorksheetForBuilding = async (app, building) => {
+  await WorksheetRepository.createNewForBuilding(building)
+}
+
 export const createOwner = async (app) => {
   const { ownerRepository } = app.locals.dependenciesContainer
 
@@ -56,7 +61,7 @@ export const associateBuildingWithOwner = (app, owner, buildingId) => {
   return ownerRepository.save(updatedOwner)
 }
 
-export const createProposalForBuilding = (app, {propertyAgentId, buildingId}) => {
+export const createProposalForBuilding = (app, { propertyAgentId, buildingId }) => {
   const { addProposalService } = app.locals.dependenciesContainer
 
   return addProposalService.addProposal(buildingId, propertyAgentId, {

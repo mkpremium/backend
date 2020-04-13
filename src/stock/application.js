@@ -1,3 +1,5 @@
+import { OwnerRepository } from '../owner/models'
+import { OwnerBusinessStatus } from '../types/enums'
 import { StockStatuses, Transaction, TransactionParams } from './types'
 import { StockFirebaseRepository, StockRepository } from './models'
 import { BuildingRepository } from '../building/models'
@@ -70,7 +72,7 @@ export async function updatePurchaseStock (params = {}, operatorId) {
 export async function sellPurchasedStock (params = {}, operatorId) {
   const buildingRepository = new BuildingRepository()
 
-  await buildingRepository.findByIdOrThrow(params.buildingId)
+  const building = await buildingRepository.findByIdOrThrow(params.buildingId)
 
   const sell = createTransaction(params, operatorId)
 
@@ -91,6 +93,9 @@ export async function sellPurchasedStock (params = {}, operatorId) {
 
   const stockFirebaseRepository = new StockFirebaseRepository()
   await stockFirebaseRepository.saveSellStock(stock)
+
+  const ownerRepository = new OwnerRepository()
+  await ownerRepository.updateBusinessStatusFirebase(building.ownerId, OwnerBusinessStatus.ALREADY_SOLD, operatorId)
 
   return result
 }

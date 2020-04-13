@@ -7,9 +7,11 @@ SELECT
     building.metadata,
     stock,
     building.recentProposal.proposal lastProposal,
-    building.cadastre.reference cadastreReference
+    building.cadastre.reference cadastreReference,
+    owner.business.status negotiationStatus
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
+LEFT JOIN mkpremium owner ON building.ownerId = owner.id AND owner._documentType = 'owner'
 WHERE building._documentType = 'building'
 AND building.id IN $1
 `
@@ -23,7 +25,7 @@ export class CommercialsBuildingRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(listBuildingsByIdQuery), [ ids ]
     ).then(buildings => buildings.map(
-      ({ id, metadata, stock, lastProposal, cadastreReference }) => {
+      ({ id, metadata, stock, lastProposal, cadastreReference, negotiationStatus }) => {
         return ({
           id,
           metadata: metadata.map(({ mimeType, previewUrl }) => ({
@@ -51,7 +53,8 @@ export class CommercialsBuildingRepository {
           latestProposal: lastProposal ? {
             amount: lastProposal
           } : undefined,
-          cadastreReference
+          cadastreReference,
+          negotiationStatus
         })
       }
     ))

@@ -2,9 +2,10 @@ import { expect } from 'chai'
 import moment from 'moment'
 import { operatorCreateBusiness } from '../../test/common'
 import {
+  associateBuildingWithOwner,
   closeBuildingStock,
   createBuilding,
-  createOwner, createProposalForBuilding,
+  createOwner, createProposalForBuilding, createWorksheetForBuilding,
   purchaseBuilding,
   sellBuilding
 } from '../helper/mother-of-objects'
@@ -22,12 +23,12 @@ describe('Building listing endpoint', () => {
     const owner = await createOwner(app)
     const building1 = await createBuilding(app, owner, {
       id: 'test-building1',
-      metadata: [{
+      metadata: [ {
         id: 'test-metadata-1',
         name: '5325108TG3452E0001YT.jpg',
         mimeType: 'image/jpeg',
         previewUrl: 'https://mkpremium-files.s3.eu-west-2.amazonaws.com/preview/ffe6fa34-28bf-4da8-9695-53b7bf421648.jpg'
-      }],
+      } ],
       cadastre: {
         address: '',
         reference: 'test-building1-cadastre-reference'
@@ -37,20 +38,25 @@ describe('Building listing endpoint', () => {
       buildingId: building1.id,
       propertyAgentId: businessUser.id
     })).purchase
-    const building1Sale = (await sellBuilding(app, {
-      buildingId: building1.id,
-      propertyAgentId: businessUser.id
-    })).sell
-    const building1ClosedStock = (await closeBuildingStock(app, {
-      buildingId: building1.id,
-      propertyAgentId: businessUser.id
-    })).close
+
     const building1Proposal = await createProposalForBuilding(app, {
       propertyAgentId: businessUser.id,
       buildingId: building1.id
     })
 
-    const building2 = await createBuilding(app, owner, { id: 'test-building2' })
+    await associateBuildingWithOwner(app, owner, building1.id)
+    await createWorksheetForBuilding(app, building1)
+    const building1Sale = (await sellBuilding(app, {
+      buildingId: building1.id,
+      propertyAgentId: businessUser.id
+    })).sell
+
+    const building1ClosedStock = (await closeBuildingStock(app, {
+      buildingId: building1.id,
+      propertyAgentId: businessUser.id
+    })).close
+
+    const building2 = await createBuilding(app, {...owner, id: 'other-owner'}, { id: 'test-building2' })
 
     await authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
       .then(response => {
@@ -85,7 +91,8 @@ describe('Building listing endpoint', () => {
             latestProposal: {
               amount: building1Proposal.proposal
             },
-            cadastreReference: building1.cadastre.reference
+            cadastreReference: building1.cadastre.reference,
+            negotiationStatus: 'VENDIDO'
           },
           {
             id: building2.id,
