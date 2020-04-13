@@ -11,7 +11,7 @@ import {
   updateNegotiationProposalController
 } from './controllers'
 
-export const createBuildingRoutes = () => {
+export const createBuildingRoutes = (listBuildingsService) => {
   const router = Router()
   /**
    * @swagger
@@ -358,7 +358,7 @@ export const createBuildingRoutes = () => {
    */
   router.post('/:id/owners', addOwnerToBuildingController)
 
-  router.get('/', createListBuildingsController())
+  router.get('/', createListBuildingsController(listBuildingsService))
 
   return router
 }

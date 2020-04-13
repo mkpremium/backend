@@ -52,6 +52,7 @@ dependenciesPromise.then(() => {
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   user(app, dependenciesContainer)
+  building(app, dependenciesContainer)
   app.locals.dependenciesContainer = dependenciesContainer
 }).catch(err => {
   console.error(err)
@@ -81,7 +82,6 @@ scheduledEvents(app)
 history(app)
 migration(app)
 notes(app)
-building(app)
 metadata(app)
 people(app)
 stats(app)

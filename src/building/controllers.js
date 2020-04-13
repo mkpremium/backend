@@ -5,9 +5,9 @@ import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerRepository } from '../owner/models'
 import { History } from '../history/models'
 
-export function createListBuildingsController () {
-  return (req, res) => {
-    res.send([])
+export function createListBuildingsController (listBuildingsService) {
+  return async (req, res) => {
+    res.send(await listBuildingsService.buildingsOfId(req.query.id))
   }
 }
 

@@ -6,10 +6,10 @@ export const testPhoneContactId = 'test-contact-id'
 export const testContactPhone = '666666666'
 export const testOwnerName = 'Owner Name'
 
-export const createBuilding = async (app, owner) => {
+export const createBuilding = async (app, owner, options) => {
   const { buildingRepository } = app.locals.dependenciesContainer
   const building = {
-    id: testBuildingId,
+    id: options.buildingId || testBuildingId,
     buildingType: 'VERTICAL',
     ownerId: owner.id,
     owner: { id: owner.id, address: {} },
