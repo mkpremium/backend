@@ -27,7 +27,11 @@ describe('Building listing endpoint', () => {
         name: '5325108TG3452E0001YT.jpg',
         mimeType: 'image/jpeg',
         previewUrl: 'https://mkpremium-files.s3.eu-west-2.amazonaws.com/preview/ffe6fa34-28bf-4da8-9695-53b7bf421648.jpg'
-      }]
+      }],
+      cadastre: {
+        address: '',
+        reference: 'test-building1-cadastre-reference'
+      }
     })
     const building1Purchase = (await purchaseBuilding(app, {
       buildingId: building1.id,
@@ -80,7 +84,8 @@ describe('Building listing endpoint', () => {
             },
             latestProposal: {
               amount: building1Proposal.proposal
-            }
+            },
+            cadastreReference: building1.cadastre.reference
           },
           {
             id: building2.id,

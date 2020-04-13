@@ -14,7 +14,7 @@ import { BuildingStateEnum } from './enums'
  *       address:
  *         type: string
  */
-export const BuildingCadastre = t.Cadastre = t.struct({
+export const BuildingCadastre = t.struct({
   reference: t.String,
   address: t.String
 }, 'Cadastre')
@@ -321,7 +321,7 @@ export const Building = t.Building = t.struct(
     id: t.String,
     address: Address,
     buildingType: t.BuildingType,
-    cadastre: t.maybe(t.Cadastre),
+    cadastre: t.maybe(BuildingCadastre),
     floorArea: t.union([t.Number, t.String]),
     landArea: t.union([t.Number, t.String]),
     roofArea: t.union([t.Number, t.String]),
