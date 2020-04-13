@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { createPurchaseStock } from '../../src/stock/application'
+import { createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
 import { operatorCreateBusiness } from '../../test/common'
 import { createBuilding, createOwner } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
@@ -8,12 +8,25 @@ import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 const testPurchaseReservationAmount = 50000
 const testPurchaseAmount = 100000
 
+const testSaleReservationAmount = 50001
+const testSaleAmount = 100001
+
 const purchaseBuilding = async (app, {buildingId, propertyAgentId}) => {
   return createPurchaseStock({
     buildingId,
     reservationAmount: testPurchaseReservationAmount,
     reservationDate: new Date(),
     transactionAmount: testPurchaseAmount,
+    transactionDate: new Date()
+  }, propertyAgentId)
+}
+
+const sellBuilding = async (app, {buildingId, propertyAgentId}) => {
+  return sellPurchasedStock({
+    buildingId,
+    reservationAmount: testSaleReservationAmount,
+    reservationDate: new Date(),
+    transactionAmount: testSaleAmount,
     transactionDate: new Date()
   }, propertyAgentId)
 }
@@ -41,6 +54,10 @@ describe('Building listing endpoint', () => {
       buildingId: building1.id,
       propertyAgentId: businessUser.id
     })).purchase
+    const building1Sale = (await sellBuilding(app, {
+      buildingId: building1.id,
+      propertyAgentId: businessUser.id
+    })).sell
 
     const building2 = await createBuilding(app, owner, { id: 'test-building2' })
 
@@ -62,6 +79,12 @@ describe('Building listing endpoint', () => {
                 reservationDate: moment(building1Purchase.reservationDate).unix(),
                 transactionAmount: building1Purchase.transactionAmount,
                 transactionDate: moment(building1Purchase.transactionDate).unix()
+              },
+              sell: {
+                reservationAmount: building1Sale.reservationAmount,
+                reservationDate: moment(building1Sale.reservationDate).unix(),
+                transactionAmount: building1Sale.transactionAmount,
+                transactionDate: moment(building1Sale.transactionDate).unix()
               }
             }
           },

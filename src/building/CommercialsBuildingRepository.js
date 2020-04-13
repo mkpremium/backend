@@ -34,6 +34,12 @@ export class CommercialsBuildingRepository {
               reservationDate: moment(stock.purchase.reservationDate).unix(),
               transactionAmount: stock.purchase.transactionAmount,
               transactionDate: moment(stock.purchase.transactionDate).unix()
+            } : undefined,
+            sell: stock && stock.sell ? {
+              reservationAmount: stock.sell.reservationAmount,
+              reservationDate: moment(stock.sell.reservationDate).unix(),
+              transactionAmount: stock.sell.transactionAmount,
+              transactionDate: moment(stock.sell.transactionDate).unix()
             } : undefined
           }
         })
