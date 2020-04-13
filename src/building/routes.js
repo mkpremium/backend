@@ -5,6 +5,7 @@ import {
   addNegotiationProposalController,
   addOwnerToBuildingController,
   createMetadataUploadUrlController,
+  createListBuildingsController,
   removeEntityController,
   updateEntityController,
   updateNegotiationProposalController
@@ -355,5 +356,7 @@ router.delete('/:id/entities/:entityId', removeEntityController)
  *           $ref: "#/definitions/Error"
  */
 router.post('/:id/owners', addOwnerToBuildingController)
+
+router.get('/', createListBuildingsController())
 
 export default router

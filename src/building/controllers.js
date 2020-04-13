@@ -5,6 +5,12 @@ import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerRepository } from '../owner/models'
 import { History } from '../history/models'
 
+export function createListBuildingsController () {
+  return (req, res) => {
+    res.send([])
+  }
+}
+
 async function addMetadataToBuilding (req, res) {
   const buildingRepo = new BuildingRepository()
   const buildingId = req.params.id
