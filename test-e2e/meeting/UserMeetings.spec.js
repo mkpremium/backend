@@ -32,7 +32,7 @@ describe('Users Meetings', () => {
     const owner = await createOwner(app)
     const building = await createBuilding(app, owner)
     await associateBuildingWithOwner(app, owner, building.id)
-    const buildingProposal = await createProposalForBuilding(app, businessUser, building)
+    const buildingProposal = await createProposalForBuilding(app, {propertyAgentId: businessUser.id, buildingId: building.id})
 
     const meetingDate = moment().add(1, 'day').hour(12).minute(0)
     const meeting = {

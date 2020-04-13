@@ -5,7 +5,8 @@ const listBuildingsByIdQuery = `
 SELECT
     building.id,
     building.metadata,
-    stock
+    stock,
+    building.recentProposal.proposal lastProposal
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 WHERE building._documentType = 'building'
@@ -21,7 +22,7 @@ export class CommercialsBuildingRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(listBuildingsByIdQuery), [ ids ]
     ).then(buildings => buildings.map(
-      ({ id, metadata, stock }) => {
+      ({ id, metadata, stock, lastProposal }) => {
         return ({
           id,
           metadata: metadata.map(({ mimeType, previewUrl }) => ({
@@ -45,7 +46,10 @@ export class CommercialsBuildingRepository {
               gain: stock.close.gain,
               transactionDate: moment(stock.close.transactionDate).unix()
             } : undefined
-          }
+          },
+          latestProposal: lastProposal ? {
+            amount: lastProposal
+          } : undefined
         })
       }
     ))

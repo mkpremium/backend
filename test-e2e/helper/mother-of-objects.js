@@ -56,10 +56,10 @@ export const associateBuildingWithOwner = (app, owner, buildingId) => {
   return ownerRepository.save(updatedOwner)
 }
 
-export const createProposalForBuilding = (app, propertyAgent, building) => {
+export const createProposalForBuilding = (app, {propertyAgentId, buildingId}) => {
   const { addProposalService } = app.locals.dependenciesContainer
 
-  return addProposalService.addProposal(building.id, propertyAgent.id, {
+  return addProposalService.addProposal(buildingId, propertyAgentId, {
     aspiration: -1,
     proposal: 100000
   })

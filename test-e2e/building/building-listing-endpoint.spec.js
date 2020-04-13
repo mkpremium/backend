@@ -4,7 +4,7 @@ import { operatorCreateBusiness } from '../../test/common'
 import {
   closeBuildingStock,
   createBuilding,
-  createOwner,
+  createOwner, createProposalForBuilding,
   purchaseBuilding,
   sellBuilding
 } from '../helper/mother-of-objects'
@@ -41,6 +41,10 @@ describe('Building listing endpoint', () => {
       buildingId: building1.id,
       propertyAgentId: businessUser.id
     })).close
+    const building1Proposal = await createProposalForBuilding(app, {
+      propertyAgentId: businessUser.id,
+      buildingId: building1.id
+    })
 
     const building2 = await createBuilding(app, owner, { id: 'test-building2' })
 
@@ -73,6 +77,9 @@ describe('Building listing endpoint', () => {
                 gain: building1ClosedStock.gain,
                 transactionDate: moment(building1ClosedStock.transactionDate).unix()
               }
+            },
+            latestProposal: {
+              amount: building1Proposal.proposal
             }
           },
           {
