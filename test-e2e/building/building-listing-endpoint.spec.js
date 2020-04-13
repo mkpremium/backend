@@ -32,6 +32,16 @@ describe('Building listing endpoint', () => {
       cadastre: {
         address: '',
         reference: 'test-building1-cadastre-reference'
+      },
+      address: {
+        neighborhood: 'ALMENDRALES',
+        type: 'CL',
+        street: 'OLVIDO',
+        number: 42,
+        postalCode: {
+          number: '28026'
+        },
+        city: 'MADRID'
       }
     })
     const building1Purchase = (await purchaseBuilding(app, {
@@ -56,7 +66,7 @@ describe('Building listing endpoint', () => {
       propertyAgentId: businessUser.id
     })).close
 
-    const building2 = await createBuilding(app, {...owner, id: 'other-owner'}, { id: 'test-building2' })
+    const building2 = await createBuilding(app, { ...owner, id: 'other-owner' }, { id: 'test-building2' })
 
     await authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
       .then(response => {
@@ -92,12 +102,27 @@ describe('Building listing endpoint', () => {
               amount: building1Proposal.proposal
             },
             cadastreReference: building1.cadastre.reference,
-            negotiationStatus: 'VENDIDO'
+            negotiationStatus: 'VENDIDO',
+            address: {
+              neighborhood: building1.address.neighborhood,
+              type: building1.address.type,
+              street: building1.address.street,
+              number: building1.address.number,
+              postalCode: {
+                number: building1.address.postalCode.number
+              },
+              city: building1.address.city
+            }
           },
           {
             id: building2.id,
             metadata: [],
-            stock: {}
+            stock: {},
+            address: {
+              city: building2.address.city,
+              street: building2.address.street,
+              number: building2.address.number
+            }
           }
         ])
       })
