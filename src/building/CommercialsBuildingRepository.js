@@ -44,7 +44,8 @@ export class CommercialsBuildingRepository {
       }) => {
         return ({
           id,
-          metadata: metadata.map(({ mimeType, previewUrl }) => ({
+          metadata: metadata.map(({ id, mimeType, previewUrl }) => ({
+            id,
             mimeType,
             thumbnailUrl: previewUrl
           })),
