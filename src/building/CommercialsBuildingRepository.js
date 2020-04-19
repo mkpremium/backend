@@ -15,7 +15,8 @@ SELECT
     owner.business.status negotiationStatus,
     owner.id ownerId,
     person.firstName ownerFirstName,
-    person.name ownerFullName
+    person.name ownerFullName,
+    person.contacts
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 LEFT JOIN mkpremium owner ON building.ownerId = owner.id AND owner._documentType = 'owner'
@@ -35,7 +36,7 @@ export class CommercialsBuildingRepository {
     ).then(buildings => buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use, floorArea,
-        ownerId, ownerFirstName, ownerFullName
+        ownerId, ownerFirstName, ownerFullName, contacts
       }) => {
         return ({
           id,
@@ -85,7 +86,8 @@ export class CommercialsBuildingRepository {
           owner: (ownerId && {
             id: ownerId,
             firstName: ownerFirstName,
-            name: ownerFullName
+            name: ownerFullName,
+            contacts: (contacts && contacts.map(({id, status, type, value}) => ({id, status, type, value})))
           }) || undefined
         })
       }

@@ -35,7 +35,7 @@ export const OwnerBusiness = t.struct({
  *         type: string
  *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
  */
-export const OwnerBody = t.OwnerBody = t.struct(
+export const OwnerBody = t.struct(
   {
     type: t.maybe(t.OwnerType),
     verified: t.maybe(t.Boolean),

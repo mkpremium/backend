@@ -7,7 +7,7 @@ import {
   createBuilding,
   createOwner, createProposalForBuilding, createWorksheetForBuilding,
   purchaseBuilding,
-  sellBuilding, testOwnerFirstName, testOwnerName
+  sellBuilding, testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 
@@ -128,7 +128,15 @@ describe('Building listing endpoint', () => {
             owner: {
               id: owner.id,
               firstName: testOwnerFirstName,
-              name: testOwnerName
+              name: testOwnerName,
+              contacts: [
+                {
+                  id: testPhoneContactId,
+                  status: 'GOOD',
+                  type: 'TELEFONO',
+                  value: testContactPhone
+                }
+              ]
             }
           },
           {

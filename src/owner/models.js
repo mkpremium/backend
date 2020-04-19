@@ -15,7 +15,7 @@ import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { OwnerListQuery } from './types'
 import squel from 'squel/dist/squel'
-import { Owner, Person as PersonStruct } from '../types/owner'
+import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { OperatorRepository } from '../operator/models'
 
 export class Person extends CouchbaseModel {
@@ -249,7 +249,7 @@ export class OwnerRepository extends CouchbaseModel {
   }
 
   async createOwnerAndPerson (body) {
-    const ownerBody = t.OwnerBody(body)
+    const ownerBody = OwnerBody(body)
     const personRepo = new PersonRepository()
     const buildingRepository = new BuildingRepository()
     const buildingId = ownerBody.buildingId

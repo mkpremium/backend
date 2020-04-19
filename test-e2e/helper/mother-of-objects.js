@@ -49,6 +49,7 @@ export const createOwner = async (app) => {
         {
           id: testPhoneContactId,
           type: 'TELEFONO',
+          status: 'GOOD',
           value: testContactPhone
         }
       ]
