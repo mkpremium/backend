@@ -1,4 +1,6 @@
+import moment from 'moment'
 import t from 'tcomb'
+import { ScheduledEventsRepository } from '../../src/scheduled-events/models'
 import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
 import { WorksheetRepository } from '../../src/worksheet/models/worksheet'
@@ -100,4 +102,31 @@ export const sellBuilding = async (app, { buildingId, propertyAgentId }) => {
 
 export const closeBuildingStock = async (app, { buildingId, propertyAgentId }) => {
   return closeSellStock({ buildingId }, propertyAgentId)
+}
+
+export const createMeeting = (app, {
+  propertyAgentId,
+  contactId,
+  buildingId,
+  ownerId
+}) => {
+  const meetingDate = moment().add(1, 'day').hour(12).minute(0)
+  const meeting = {
+    'createdBy': propertyAgentId,
+    'notifyTo': propertyAgentId,
+    'event': {
+      'contactId': contactId,
+      'ownerId': ownerId,
+      'buildingId': buildingId,
+      'worksheetId': undefined,
+      'eventAddress': 'Event Address',
+      'eventLocation': { lat: 0, long: 0 },
+      'inPerson': true
+    },
+    'notifyAt': meetingDate.toISOString(),
+    'eventDate': meetingDate.toISOString()
+  }
+
+  const repo = new ScheduledEventsRepository()
+  return repo.addScheduledMeetingEvent(meeting, propertyAgentId)
 }

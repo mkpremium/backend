@@ -4,25 +4,29 @@ import moment from 'moment'
 const listBuildingsByIdQuery = `
 SELECT
     building.id,
-    building.metadata,
-    stock,
-    building.address,
-    building.cadastre.reference cadastreReference,
-    building.floorArea,
-    building.location,
-    building.recentProposal.proposal lastProposal,
-    building.\`use\`,
-    owner.business.status negotiationStatus,
-    owner.id ownerId,
-    person.firstName ownerFirstName,
-    person.name ownerFullName,
-    person.contacts
+    MIN(building.metadata) metadata,
+    MIN(stock) stock,
+    MIN(building.address) address,
+    MIN(building.cadastre.reference) cadastreReference,
+    MIN(building.floorArea) floorArea,
+    MIN(building.location) location,
+    MIN(building.recentProposal.proposal) lastProposal,
+    MIN(building.\`use\`) \`use\`,
+    MIN(owner.business.status) negotiationStatus,
+    MIN(owner.id) ownerId,
+    MIN(person.firstName) ownerFirstName,
+    MIN(person.name) ownerFullName,
+    MIN(person.contacts) contacts,
+    MAX(buildingMeetings.eventDate) lastMeetingAt
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 LEFT JOIN mkpremium owner ON building.ownerId = owner.id AND owner._documentType = 'owner'
 LEFT JOIN mkpremium person ON person.id = owner.personId AND person._documentType = 'person'
+LEFT JOIN mkpremium buildingMeetings ON buildingMeetings.event.buildingId = building.id
+    AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
 WHERE building._documentType = 'building'
 AND building.id IN $1
+GROUP BY building.id
 `
 
 export class CommercialsBuildingRepository {
@@ -36,7 +40,7 @@ export class CommercialsBuildingRepository {
     ).then(buildings => buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use, floorArea,
-        ownerId, ownerFirstName, ownerFullName, contacts
+        ownerId, ownerFirstName, ownerFullName, contacts, lastMeetingAt
       }) => {
         return ({
           id,
@@ -79,15 +83,18 @@ export class CommercialsBuildingRepository {
             latitude: location.lat ? location.lat : undefined,
             longitude: location.lng ? location.lng : undefined
           } : undefined,
-          cadastreReference,
-          negotiationStatus,
+          cadastreReference: cadastreReference || undefined,
+          negotiationStatus: negotiationStatus || undefined,
           floorArea,
           usage: use !== null ? use : undefined,
           owner: (ownerId && {
             id: ownerId,
             firstName: ownerFirstName,
             name: ownerFullName,
-            contacts: (contacts && contacts.map(({id, status, type, value}) => ({id, status, type, value})))
+            contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value })))
+          }) || undefined,
+          lastMeeting: (lastMeetingAt && {
+            dateMeeting: moment(lastMeetingAt).unix()
           }) || undefined
         })
       }

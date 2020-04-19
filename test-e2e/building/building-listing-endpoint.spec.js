@@ -4,7 +4,7 @@ import { operatorCreateBusiness } from '../../test/common'
 import {
   associateBuildingWithOwner,
   closeBuildingStock,
-  createBuilding,
+  createBuilding, createMeeting,
   createOwner, createProposalForBuilding, createWorksheetForBuilding,
   purchaseBuilding,
   sellBuilding, testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
@@ -59,8 +59,14 @@ describe('Building listing endpoint', () => {
       propertyAgentId: businessUser.id,
       buildingId: building1.id
     })
-
     await associateBuildingWithOwner(app, owner, building1.id)
+
+    const building1LastMeeting = await createMeeting(app, {
+      propertyAgentId: businessUser.id,
+      contactId: testPhoneContactId,
+      buildingId: building1.id,
+      ownerId: owner.id
+    })
     await createWorksheetForBuilding(app, building1)
     const building1Sale = (await sellBuilding(app, {
       buildingId: building1.id,
@@ -137,6 +143,9 @@ describe('Building listing endpoint', () => {
                   value: testContactPhone
                 }
               ]
+            },
+            lastMeeting: {
+              dateMeeting: moment(building1LastMeeting.eventDate).unix()
             }
           },
           {
