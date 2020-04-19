@@ -7,7 +7,7 @@ import {
   createBuilding,
   createOwner, createProposalForBuilding, createWorksheetForBuilding,
   purchaseBuilding,
-  sellBuilding
+  sellBuilding, testOwnerFirstName, testOwnerName
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 
@@ -124,7 +124,12 @@ describe('Building listing endpoint', () => {
               longitude: building1.location.lng
             },
             usage: building1.use,
-            floorArea: building1.floorArea
+            floorArea: building1.floorArea,
+            owner: {
+              id: owner.id,
+              firstName: testOwnerFirstName,
+              name: testOwnerName
+            }
           },
           {
             id: building2.id,

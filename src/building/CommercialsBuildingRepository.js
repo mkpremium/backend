@@ -12,10 +12,14 @@ SELECT
     building.location,
     building.recentProposal.proposal lastProposal,
     building.\`use\`,
-    owner.business.status negotiationStatus
+    owner.business.status negotiationStatus,
+    owner.id ownerId,
+    person.firstName ownerFirstName,
+    person.name ownerFullName
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 LEFT JOIN mkpremium owner ON building.ownerId = owner.id AND owner._documentType = 'owner'
+LEFT JOIN mkpremium person ON person.id = owner.personId AND person._documentType = 'person'
 WHERE building._documentType = 'building'
 AND building.id IN $1
 `
@@ -29,7 +33,10 @@ export class CommercialsBuildingRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(listBuildingsByIdQuery), [ ids ]
     ).then(buildings => buildings.map(
-      ({ id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use, floorArea }) => {
+      ({
+        id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use, floorArea,
+        ownerId, ownerFirstName, ownerFullName
+      }) => {
         return ({
           id,
           metadata: metadata.map(({ mimeType, previewUrl }) => ({
@@ -74,7 +81,12 @@ export class CommercialsBuildingRepository {
           cadastreReference,
           negotiationStatus,
           floorArea,
-          usage: use !== null ? use : undefined
+          usage: use !== null ? use : undefined,
+          owner: (ownerId && {
+            id: ownerId,
+            firstName: ownerFirstName,
+            name: ownerFullName
+          }) || undefined
         })
       }
     ))

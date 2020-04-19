@@ -7,6 +7,7 @@ const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
 export const testContactPhone = '666666666'
 export const testOwnerName = 'Owner Name'
+export const testOwnerFirstName = 'Owner First Name'
 
 export const createBuilding = async (app, owner, options) => {
   const { buildingRepository } = app.locals.dependenciesContainer
@@ -43,6 +44,7 @@ export const createOwner = async (app) => {
     status: OwnerStatus.NON_VERIFIED,
     person: {
       name: testOwnerName,
+      firstName: testOwnerFirstName,
       contacts: [
         {
           id: testPhoneContactId,
