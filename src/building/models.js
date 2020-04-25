@@ -24,7 +24,7 @@ import { OperatorActions } from '../stats/types'
 import { OperatorStats } from '../stats/models'
 import _ from 'lodash'
 import { N1qlQuery } from 'couchbase'
-import { Building, BuildingMetadataPreview } from '../types/building'
+import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
 import { emitModelEvents } from '../../config'
 import { ScheduledEvents } from '../scheduled-events/models'
 import { ScheduledEventType } from '../scheduled-events/types'
@@ -52,7 +52,7 @@ export class Metadata extends CouchbaseModel {
 export class BuildingProposal extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.BuildingProposal
+    this.Struct = BuildingProposalStruct
   }
 }
 

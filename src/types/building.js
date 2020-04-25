@@ -137,7 +137,7 @@ t.BuildingProposalStatus = t.enums.of(Object.values(BuildingProposalStatus))
  *       proposal:
  *         type: number
  */
-t.BuildingProposal = t.struct(
+export const BuildingProposal = t.struct(
   {
     id: t.String,
     ownerId: t.maybe(t.String),
@@ -336,7 +336,7 @@ export const Building = t.Building = t.struct(
     owner: t.maybe(BuildingOwner), // TODO: move to owners collection
     state: BuildingStateEnum,
     proposals: t.list(t.String),
-    recentProposal: t.maybe(t.BuildingProposal),
+    recentProposal: t.maybe(BuildingProposal),
 
     metadata: t.list(BuildingMetadataPreview),
 
