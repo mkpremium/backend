@@ -17,6 +17,12 @@ export function createListBuildingsController (listBuildingsService) {
   }
 }
 
+export function createListBuildingProposalsController (listBuildingProposalsService) {
+  return async (req, res) => {
+    res.send(await listBuildingProposalsService.forBuilding(req.params.buildingId))
+  }
+}
+
 async function addMetadataToBuilding (req, res) {
   const buildingRepo = new BuildingRepository()
   const buildingId = req.params.id

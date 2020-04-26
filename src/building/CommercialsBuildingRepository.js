@@ -57,6 +57,18 @@ WHERE building._documentType = 'building' AND building.ownerId IS NOT NULL
 GROUP BY building.id
 `
 
+const listProposalsForBuildingIdQuery = `
+SELECT
+id,
+proposal,
+createdAt,
+updatedAt,
+aspiration
+FROM mkpremium
+WHERE _documentType = 'building-proposal'
+AND buildingId = $1
+`
+
 export class CommercialsBuildingRepository {
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
@@ -72,6 +84,12 @@ export class CommercialsBuildingRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(listBuildingsByAssignedPropertyAgentQuery), [ agentId ]
     ).then(this.mapToPropertyAgentBuildingView())
+  }
+
+  listProposalsForBuilding (buildingId) {
+    return this.couchbaseAdapter.queryAsync(
+      N1qlQuery.fromString(listProposalsForBuildingIdQuery), [ buildingId ]
+    )
   }
 
   mapToPropertyAgentBuildingView () {

@@ -8,10 +8,10 @@ import {
   createListBuildingsController,
   removeEntityController,
   updateEntityController,
-  updateNegotiationProposalController
+  updateNegotiationProposalController, createListBuildingProposalsController
 } from './controllers'
 
-export const createBuildingRoutes = (listBuildingsService) => {
+export const createBuildingRoutes = (listBuildingsService, listBuildingProposalsService) => {
   const router = Router()
   /**
    * @swagger
@@ -145,6 +145,8 @@ export const createBuildingRoutes = (listBuildingsService) => {
    *           $ref: "#/definitions/Error"
    */
   router.post('/:id/negotiation', addNegotiationProposalController)
+
+  router.get('/:buildingId/proposals', createListBuildingProposalsController(listBuildingProposalsService))
 
   /**
    * @swagger

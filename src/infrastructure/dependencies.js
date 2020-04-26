@@ -1,5 +1,6 @@
 import { AddProposalService } from '../building/AddProposalService'
 import { CommercialsBuildingRepository } from '../building/CommercialsBuildingRepository'
+import { ListBuildingProposalsService } from '../building/ListBuildingProposalsService'
 import { ListBuildingsService } from '../building/ListBuildingsService'
 import { BuildingRepository } from '../building/models'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
@@ -34,6 +35,7 @@ export const createDependenciesContainer = couchbaseBucket => {
   container.addProposalService = new AddProposalService(container.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
+  container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
 
   container.ownerRepository = new OwnerRepository()
 
