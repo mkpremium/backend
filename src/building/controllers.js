@@ -7,7 +7,13 @@ import { History } from '../history/models'
 
 export function createListBuildingsController (listBuildingsService) {
   return async (req, res) => {
-    res.send(await listBuildingsService.buildingsOfId(req.query.id))
+    if (req.query.id) {
+      res.send(await listBuildingsService.buildingsOfId(req.query.id))
+    } else if (req.query.propertyAgentId) {
+      res.send(await listBuildingsService.buildingsAssignedTo(req.query.propertyAgentId))
+    } else {
+      res.status(400).json({error: 'No id or propertyAgentId provided'})
+    }
   }
 }
 

@@ -6,4 +6,8 @@ export class ListBuildingsService {
   buildingsOfId (ids) {
     return this.buildingRepository.listById(typeof ids === 'string' ? [ids] : ids)
   }
+
+  buildingsAssignedTo (propertyAgentId) {
+    return this.buildingRepository.listAssignedToPropertyAgentOfId(propertyAgentId)
+  }
 }
