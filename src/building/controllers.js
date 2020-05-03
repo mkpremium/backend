@@ -9,10 +9,10 @@ export function createListBuildingsController (listBuildingsService) {
   return async (req, res) => {
     if (req.query.id) {
       res.send(await listBuildingsService.buildingsOfId(req.query.id))
-    } else if (req.user.operator.id) {
+    } else if (req.query.allAssignedToMe !== undefined) {
       res.send(await listBuildingsService.buildingsAssignedTo(req.user.operator.id))
     } else {
-      res.status(400).json({error: 'No id or req.user.operator.id provided'})
+      res.status(400).json({error: 'No id or allAssignedToMe provided'})
     }
   }
 }
