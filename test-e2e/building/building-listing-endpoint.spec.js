@@ -97,19 +97,19 @@ describe('Building listing endpoint', () => {
             stock: {
               purchase: {
                 reservationAmount: building1Purchase.reservationAmount,
-                reservationDate: moment(building1Purchase.reservationDate).unix(),
+                reservationDate: moment(building1Purchase.reservationDate).format(),
                 transactionAmount: building1Purchase.transactionAmount,
-                transactionDate: moment(building1Purchase.transactionDate).unix()
+                transactionDate: moment(building1Purchase.transactionDate).format()
               },
               sell: {
                 reservationAmount: building1Sale.reservationAmount,
-                reservationDate: moment(building1Sale.reservationDate).unix(),
+                reservationDate: moment(building1Sale.reservationDate).format(),
                 transactionAmount: building1Sale.transactionAmount,
-                transactionDate: moment(building1Sale.transactionDate).unix()
+                transactionDate: moment(building1Sale.transactionDate).format()
               },
               close: {
                 gain: building1ClosedStock.gain,
-                transactionDate: moment(building1ClosedStock.transactionDate).unix()
+                transactionDate: moment(building1ClosedStock.transactionDate).format()
               }
             },
             latestProposal: {
@@ -147,7 +147,7 @@ describe('Building listing endpoint', () => {
               ]
             },
             lastMeeting: {
-              dateMeeting: moment(building1LastMeeting.eventDate).unix()
+              dateMeeting: moment(building1LastMeeting.eventDate).format()
             }
           },
           {

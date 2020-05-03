@@ -108,19 +108,19 @@ export class CommercialsBuildingRepository {
           stock: {
             purchase: stock && stock.purchase ? {
               reservationAmount: stock.purchase.reservationAmount,
-              reservationDate: moment(stock.purchase.reservationDate).unix(),
+              reservationDate: moment(stock.purchase.reservationDate).format(),
               transactionAmount: stock.purchase.transactionAmount,
-              transactionDate: moment(stock.purchase.transactionDate).unix()
+              transactionDate: moment(stock.purchase.transactionDate).format()
             } : undefined,
             sell: stock && stock.sell ? {
               reservationAmount: stock.sell.reservationAmount,
-              reservationDate: moment(stock.sell.reservationDate).unix(),
+              reservationDate: moment(stock.sell.reservationDate).format(),
               transactionAmount: stock.sell.transactionAmount,
-              transactionDate: moment(stock.sell.transactionDate).unix()
+              transactionDate: moment(stock.sell.transactionDate).format()
             } : undefined,
             close: stock && stock.close ? {
               gain: stock.close.gain,
-              transactionDate: moment(stock.close.transactionDate).unix()
+              transactionDate: moment(stock.close.transactionDate).format()
             } : undefined
           },
           latestProposal: lastProposal ? {
@@ -151,7 +151,7 @@ export class CommercialsBuildingRepository {
             contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value })))
           }) || undefined,
           lastMeeting: (lastMeetingAt && {
-            dateMeeting: moment(lastMeetingAt).unix()
+            dateMeeting: moment(lastMeetingAt).format()
           }) || undefined
         })
       }
