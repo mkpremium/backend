@@ -6,8 +6,8 @@ export class OwnerRepository {
     this.couchbaseAdapter = couchbaseAdapter
   }
 
-  setOwnerFeaturedContact (ownerId, featuredContact) {
-    const owner = this.couchbaseAdapter.getEntity(Owner, ownerId)
+  async setOwnerFeaturedContact (ownerId, featuredContact) {
+    const owner = await this.couchbaseAdapter.getEntity(Owner, ownerId)
     if (!owner) {
       throw new OwnerNotFound(ownerId)
     }
