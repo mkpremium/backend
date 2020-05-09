@@ -1,12 +1,11 @@
-import fromJSON from 'tcomb/lib/fromJSON'
-import t from 'tcomb'
+import _ from 'lodash'
+import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
-import _every from 'lodash/every'
-import { FeaturedContact } from '../owner/SetOwnerFeaturedContactService'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
 import { TypedContactInfo } from './common'
 import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
-import _ from 'lodash'
 
 export const OwnerBusiness = t.struct({
   meetingWithOperatorId: t.String,
@@ -245,6 +244,12 @@ t.OwnerConfirmed = t.struct({
   confirmedAt: t.maybe(t.Date)
 }, 'confirmed')
 
+export const FeaturedContact = t.struct(
+  {
+    phoneId: t.maybe(t.String),
+    emailId: t.maybe(t.String)
+  }
+)
 export const Owner = t.struct(
   {
     id: t.maybe(t.String),

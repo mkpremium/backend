@@ -54,6 +54,8 @@ dependenciesPromise.then(() => {
   meeting(app, dependenciesContainer)
   user(app, dependenciesContainer)
   building(app, dependenciesContainer)
+  owner(app, dependenciesContainer)
+
   app.locals.dependenciesContainer = dependenciesContainer
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
 }).catch(err => {
@@ -78,7 +80,6 @@ gearman(app)
 maintenanceMode(app)
 operator(app)
 worksheet(app)
-owner(app)
 calls(app)
 scheduledEvents(app)
 history(app)

@@ -2,10 +2,11 @@ import { wrap } from 'express-promise-wrap'
 import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
 import { History } from '../history/models'
 import { newHttpError } from '../lib/http-error'
+import { FeaturedContact } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerRepository } from './models'
 import { OwnerNotFound } from './OwnerRepository'
-import { EmptyFeaturedContact, FeaturedContact } from './SetOwnerFeaturedContactService'
+import { EmptyFeaturedContact } from './SetOwnerFeaturedContactService'
 import t from './types'
 
 async function updateOwnerContact (req, res) {

@@ -1,4 +1,3 @@
-import t from './types'
 import _ from 'lodash'
 
 export class SetOwnerFeaturedContactService {
@@ -17,10 +16,3 @@ export class SetOwnerFeaturedContactService {
 
 export class EmptyFeaturedContact extends Error {
 }
-
-export const FeaturedContact = t.struct(
-  {
-    phoneId: t.maybe(t.String),
-    emailId: t.maybe(t.String)
-  }
-)

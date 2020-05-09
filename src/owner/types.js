@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
+import _flatten from 'lodash/flatten'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import _flatten from 'lodash/flatten'
 import { isTest } from '../../config'
 import { OwnerBusiness } from '../types/owner'
 
