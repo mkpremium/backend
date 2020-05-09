@@ -6,7 +6,9 @@ import { BuildingRepository } from '../building/models'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
-import { OwnerRepository } from '../owner/models'
+import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
+import { OwnerRepository } from '../owner/OwnerRepository'
+import { SetOwnerFeaturedContactService } from '../owner/SetOwnerFeaturedContactService'
 import { PropertyManagerRankingService } from '../PropertyManager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRepository'
 import { StockRepository } from '../stock/StockRepository'
@@ -17,7 +19,7 @@ import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 export const createLegacyDependenciesContainer = () => {
   const container = {}
 
-  container.ownerRepository = new OwnerRepository()
+  container.ownerRepository = new LegacyOwnerRepository()
 
   return container
 }
@@ -34,6 +36,9 @@ export const createDependenciesContainer = couchbaseBucket => {
     propertyManagersRepository,
     stockRepository
   )
+
+  const ownerRepository = new OwnerRepository(couchbaseAdapter)
+  container.setOwnerFeaturedContactService = new SetOwnerFeaturedContactService(ownerRepository)
 
   container.featuredOwnerService = new FeaturedOwnerService(propertyManagersRepository)
   container.usersRepository = usersRepository

@@ -1,8 +1,11 @@
 import { wrap } from 'express-promise-wrap'
-import { OwnerRepository } from './models'
-import { History } from '../history/models'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
+import { History } from '../history/models'
+import { newHttpError } from '../lib/http-error'
+import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { OwnerRepository } from './models'
+import { OwnerNotFound } from './OwnerRepository'
+import { EmptyFeaturedContact, FeaturedContact } from './SetOwnerFeaturedContactService'
 import t from './types'
 
 async function updateOwnerContact (req, res) {
@@ -78,3 +81,23 @@ export const addOwnerContactController = wrap(addOwnerContact)
 export const addOwnerController = wrap(addOwner)
 export const updateBusinessStatusController = wrap(updateBusinessStatus)
 export const listOwnerController = wrap(ownerList)
+
+export const createSetFeaturedContactController = setOwnerFeaturedContactService => {
+  return async (req, res) => {
+    try {
+      const featuredContact = FeaturedContact(req.body)
+      await setOwnerFeaturedContactService.setFeaturedContact(req.params.ownerId, featuredContact)
+
+      res.sendStatus(200)
+    } catch (e) {
+      if (e instanceof EmptyFeaturedContact) {
+        throw newHttpError(400, `Invalid featured contact request.`)
+      } else if (e instanceof OwnerNotFound) {
+        throw newHttpError(400, e.message)
+      } else {
+        console.error(e)
+        throw newHttpError(500, `Some error occurred while setting featured contact.`)
+      }
+    }
+  }
+}

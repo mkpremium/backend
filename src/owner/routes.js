@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   addOwnerContactController,
   addOwnerController,
+  createSetFeaturedContactController,
   listOwnerController,
   updateBusinessStatusController,
   updateOwnerContactController,
@@ -252,4 +253,8 @@ router.post('/:id/contacts', addOwnerContactController)
  */
 router.get('/', listOwnerController)
 
-export default router
+export default (setOwnerFeaturedContactService) => {
+  router.put('/:ownerId/featured-contact', createSetFeaturedContactController(setOwnerFeaturedContactService))
+
+  return router
+}

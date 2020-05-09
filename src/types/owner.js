@@ -3,6 +3,7 @@ import t from 'tcomb'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import _every from 'lodash/every'
+import { FeaturedContact } from '../owner/SetOwnerFeaturedContactService'
 import { TypedContactInfo } from './common'
 import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
 import _ from 'lodash'
@@ -257,6 +258,7 @@ export const Owner = t.struct(
     note: t.maybe(t.String),
 
     confirmedByOperator: t.OwnerConfirmed,
+    featuredContact: t.maybe(FeaturedContact),
 
     _migrateId: t.maybe(t.Any),
     _relatedTo: t.maybe(t.String),
