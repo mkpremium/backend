@@ -6,7 +6,7 @@ import cors from 'cors'
 import couchbase from './db/couchbase'
 // app aware types
 import './types'
-import { createDependenciesContainer } from './infrastructure/dependencies'
+import { createDependenciesContainer, createLegacyDependenciesContainer } from './infrastructure/dependencies'
 // modules
 import operator from './operator'
 import worksheet from './worksheet'
@@ -46,6 +46,7 @@ export const dependenciesPromise = Promise.all([
 dependenciesPromise.then(() => {
   app.set('IS_READY', true)
 
+  const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket)
 
   stock(app, dependenciesContainer)
@@ -54,6 +55,7 @@ dependenciesPromise.then(() => {
   user(app, dependenciesContainer)
   building(app, dependenciesContainer)
   app.locals.dependenciesContainer = dependenciesContainer
+  app.locals.legacyDependenciesContainer = legacyDependenciesContainer
 }).catch(err => {
   console.error(err)
 })

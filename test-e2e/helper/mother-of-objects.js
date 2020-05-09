@@ -40,7 +40,7 @@ export const createWorksheetForBuilding = async (app, building) => {
 }
 
 export const createOwner = async (app) => {
-  const { ownerRepository } = app.locals.dependenciesContainer
+  const { ownerRepository } = app.locals.legacyDependenciesContainer
 
   return ownerRepository.createOwnerAndPerson({
     status: OwnerStatus.NON_VERIFIED,
@@ -61,7 +61,7 @@ export const createOwner = async (app) => {
 
 export const associateBuildingWithOwner = (app, owner, buildingId) => {
   const updatedOwner = t.update(owner, { buildingId: { $set: buildingId } })
-  const { ownerRepository } = app.locals.dependenciesContainer
+  const { ownerRepository } = app.locals.legacyDependenciesContainer
 
   return ownerRepository.save(updatedOwner)
 }

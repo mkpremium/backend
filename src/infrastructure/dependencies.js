@@ -14,6 +14,14 @@ import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 
+export const createLegacyDependenciesContainer = () => {
+  const container = {}
+
+  container.ownerRepository = new OwnerRepository()
+
+  return container
+}
+
 export const createDependenciesContainer = couchbaseBucket => {
   const couchbaseAdapter = new CouchbaseAdapter(couchbaseBucket)
 
@@ -36,8 +44,6 @@ export const createDependenciesContainer = couchbaseBucket => {
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
-
-  container.ownerRepository = new OwnerRepository()
 
   return container
 }
