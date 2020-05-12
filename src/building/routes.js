@@ -8,10 +8,12 @@ import {
   createListBuildingsController,
   removeEntityController,
   updateEntityController,
-  updateNegotiationProposalController, createListBuildingProposalsController
+  updateNegotiationProposalController,
+  createListBuildingProposalsController,
+  createListVerifiedOwnersController
 } from './controllers'
 
-export const createBuildingRoutes = (listBuildingsService, listBuildingProposalsService) => {
+export const createBuildingRoutes = (listBuildingsService, listBuildingProposalsService, legacyOwnerRepository) => {
   const router = Router()
   /**
    * @swagger
@@ -359,6 +361,8 @@ export const createBuildingRoutes = (listBuildingsService, listBuildingProposals
    *           $ref: "#/definitions/Error"
    */
   router.post('/:id/owners', addOwnerToBuildingController)
+
+  router.get('/:buildingId/owners', createListVerifiedOwnersController(legacyOwnerRepository))
 
   router.get('/', createListBuildingsController(listBuildingsService))
 

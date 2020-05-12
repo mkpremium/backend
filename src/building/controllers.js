@@ -103,3 +103,16 @@ export const addEntityController = wrap(addEntity)
 export const updateEntityController = wrap(updateEntity)
 export const removeEntityController = wrap(removeEntity)
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
+
+export const createListVerifiedOwnersController = legacyOwnerRepository => {
+  return async (req, res) => {
+    const owners = await legacyOwnerRepository.findAllVerifiedOwnersByBuildingId(req.query.buildingId)
+    const result = owners.map(o => ({
+      id: o.id,
+      name: o.person.name,
+      contacts: (o.person.contacts || []).map(({id, status, type, value}) => ({id, status, type, value}))
+    }))
+
+    res.json(result)
+  }
+}

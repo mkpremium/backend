@@ -37,8 +37,8 @@ export const createDependenciesContainer = couchbaseBucket => {
     stockRepository
   )
 
-  const ownerRepository = new OwnerRepository(couchbaseAdapter)
-  container.setOwnerFeaturedContactService = new SetOwnerFeaturedContactService(ownerRepository)
+  container.ownerRepository = new OwnerRepository(couchbaseAdapter)
+  container.setOwnerFeaturedContactService = new SetOwnerFeaturedContactService(container.ownerRepository)
 
   container.featuredOwnerService = new FeaturedOwnerService(propertyManagersRepository)
   container.usersRepository = usersRepository

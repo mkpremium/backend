@@ -53,7 +53,7 @@ dependenciesPromise.then(() => {
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   user(app, dependenciesContainer)
-  building(app, dependenciesContainer)
+  building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
 
   app.locals.dependenciesContainer = dependenciesContainer
