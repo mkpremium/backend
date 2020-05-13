@@ -17,6 +17,7 @@ SELECT
     MIN(person.firstName) ownerFirstName,
     MIN(person.name) ownerFullName,
     MIN(person.contacts) contacts,
+    MIN(owner.featuredContact) featuredContact,
     MAX(buildingMeetings.eventDate) lastMeetingAt
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
@@ -45,6 +46,7 @@ SELECT
     MIN(person.firstName) ownerFirstName,
     MIN(person.name) ownerFullName,
     MIN(person.contacts) contacts,
+    MIN(owner.featuredContact) featuredContact,
     MAX(buildingMeetings.eventDate) lastMeetingAt
 FROM mkpremium building
 LEFT JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
@@ -96,7 +98,7 @@ export class CommercialsBuildingRepository {
     return buildings => buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, negotiationStatus, address, location, use, floorArea,
-        ownerId, ownerFirstName, ownerFullName, contacts, lastMeetingAt
+        ownerId, ownerFirstName, ownerFullName, contacts, lastMeetingAt, featuredContact
       }) => {
         return ({
           id,
@@ -152,7 +154,8 @@ export class CommercialsBuildingRepository {
           }) || undefined,
           lastMeeting: (lastMeetingAt && {
             dateMeeting: moment(lastMeetingAt).format()
-          }) || undefined
+          }) || undefined,
+          featuredContact: featuredContact || undefined
         })
       }
     )
