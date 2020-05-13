@@ -110,7 +110,8 @@ export const createListVerifiedOwnersController = legacyOwnerRepository => {
     const result = owners.map(o => ({
       id: o.id,
       name: o.person.name,
-      contacts: (o.person.contacts || []).map(({id, status, type, value}) => ({id, status, type, value}))
+      contacts: (o.person.contacts || []).map(({id, status, type, value}) => ({id, status, type, value})),
+      featuredContact: o.featuredContact
     }))
 
     res.json(result)
