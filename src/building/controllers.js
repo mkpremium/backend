@@ -106,7 +106,7 @@ export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createListVerifiedOwnersController = legacyOwnerRepository => {
   return async (req, res) => {
-    const owners = await legacyOwnerRepository.findAllVerifiedOwnersByBuildingId(req.query.buildingId)
+    const owners = await legacyOwnerRepository.findAllVerifiedOwnersByBuildingId(req.params.buildingId)
     const result = owners.map(o => ({
       id: o.id,
       name: o.person.name,
