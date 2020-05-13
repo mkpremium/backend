@@ -363,6 +363,7 @@ export const createBuildingRoutes = (listBuildingsService, listBuildingProposals
   router.post('/:id/owners', addOwnerToBuildingController)
 
   router.get('/:buildingId/owners', createListVerifiedOwnersController(legacyOwnerRepository))
+  router.get('/:buildingId/verified-owners', createListVerifiedOwnersController(legacyOwnerRepository))
 
   router.get('/', createListBuildingsController(listBuildingsService))
 
