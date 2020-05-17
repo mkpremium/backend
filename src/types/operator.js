@@ -102,44 +102,15 @@ export const Award = t.Award = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *  OperatorBody:
- *    required:
- *      - username
- *      - password
- *      - agentNumber
- *      - roles
- *      - profile
- *    properties:
- *      username:
- *        type: string
- *      password:
- *        type: string
- *      email:
- *        type: string
- *        description: Email para uso en firebase
- *      agentNumber:
- *        type: string
- *        description: "Numero de Agente en Firebase, código y extension en call center"
- *      enable:
- *        type: boolean
- *      profile:
- *        $ref: "#/definitions/OperatorProfile"
- *      roles:
- *        type: array
- *        items:
- *          type: string
- *      level:
- *        type: number
- *        description: Nivel en Firebase
- *      features:
- *        type: array
- *        items:
- *          type: string
- *        description: "Funciones o Permisos en Firebase"
- */
+const Signature = t.struct({
+  id: t.String,
+  image: t.String, // base64 png
+  description: t.String
+})
+const OperatorSignatures = t.struct({
+  user: Signature,
+  city: Signature
+})
 
 /**
  * @swagger
@@ -213,6 +184,7 @@ export const Operator = t.struct(
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
     favoriteBuildings: t.maybe(t.list(t.String)),
+    signatures: t.maybe(OperatorSignatures),
     _documentType: t.enums.of(['operator'])
   },
   {
