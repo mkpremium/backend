@@ -1,10 +1,11 @@
 export const createMeController = usersRepository => {
   return async (req, res) => {
-    const { favoriteBuildings, featuredOwners, restringedHours } = await usersRepository.getUserOfId(req.user.operator.id)
+    const { favoriteBuildings, featuredOwners, restringedHours, signatures } = await usersRepository.getUserOfId(req.user.operator.id)
     res.json({
       featuredOwners,
       favoriteBuildings,
-      restringedHours
+      restringedHours,
+      signatures
     })
   }
 }
