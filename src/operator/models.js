@@ -12,7 +12,7 @@ import { newHttpError } from '../lib/http-error'
 import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Operator as OperatorType, OperatorRole, OperatorRoles } from '../types/operator'
+import { Operator as OperatorType, OperatorProfile, OperatorRole, OperatorRoles } from '../types/operator'
 import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
@@ -107,7 +107,8 @@ class Operator extends CouchbaseModel {
         username: operator.username,
         city: operator.profile.city,
         queueId: operator.profile.queueId,
-        email: operator.profile.email
+        email: operator.profile.email,
+        language: operator.profile.language
       }
     }
 
@@ -344,7 +345,7 @@ const OperatorRequest = t.struct(
     enable: t.Bool,
     roles: t.list(OperatorRole),
 
-    profile: t.OperatorProfile
+    profile: OperatorProfile
   },
   {
     name: 'OperatorRequest',

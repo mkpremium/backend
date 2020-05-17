@@ -53,7 +53,7 @@ export const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeature
  *       - firstName
  *       - lastName
  */
-t.OperatorProfile = t.struct(
+export const OperatorProfile = t.OperatorProfile = t.struct(
   {
     firstName: t.String,
     lastName: t.String,
@@ -61,21 +61,23 @@ t.OperatorProfile = t.struct(
     neighborhood: t.maybe(t.String),
     state: t.maybe(OperatorFirebaseStatesEnum),
     queueId: t.maybe(t.String),
-    email: t.maybe(t.String)
+    email: t.maybe(t.String),
+    language: t.maybe(t.String)
   },
   {
     name: 'OperatorProfile',
     defaultProps: {
-      state: OperatorFirebaseStates.ENABLED
+      state: OperatorFirebaseStates.ENABLED,
+      language: 'es'
     }
   }
 )
 
-t.OperatorProfile.prototype.fullName = function () {
+OperatorProfile.prototype.fullName = function () {
   return `${this.firstName} ${this.lastName}`.trim()
 }
 
-t.OperatorProfile.prototype.getStateMessage = function () {
+OperatorProfile.prototype.getStateMessage = function () {
   switch (this.state) {
     case OperatorFirebaseStates.BLOCKED:
       return 'bloqueado'
@@ -172,7 +174,7 @@ export const Operator = t.struct(
     roles: t.list(OperatorRole),
     online: t.Bool,
 
-    profile: t.OperatorProfile,
+    profile: OperatorProfile,
     restringedHours: t.maybe(RestringedHourObject),
 
     profitGoal: t.maybe(ProfitGoal),
