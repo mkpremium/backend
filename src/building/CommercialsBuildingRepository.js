@@ -110,13 +110,13 @@ export class CommercialsBuildingRepository {
           stock: {
             purchase: stock && stock.purchase ? {
               reservationAmount: stock.purchase.reservationAmount,
-              reservationDate: moment(stock.purchase.reservationDate).format(),
+              reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
               transactionAmount: stock.purchase.transactionAmount,
               transactionDate: moment(stock.purchase.transactionDate).format()
             } : undefined,
             sell: stock && stock.sell ? {
               reservationAmount: stock.sell.reservationAmount,
-              reservationDate: moment(stock.sell.reservationDate).format(),
+              reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
               transactionAmount: stock.sell.transactionAmount,
               transactionDate: moment(stock.sell.transactionDate).format()
             } : undefined,
