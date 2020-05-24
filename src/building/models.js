@@ -209,7 +209,7 @@ export class BuildingRepository extends CouchbaseModel {
     })
     const proposalRepo = new BuildingProposalRepository()
     const proposal = await proposalRepo.save(paramsWithOperator)
-    const updateProposals = t.update(building.proposals, { $push: [proposal.id] })
+    const updateProposals = t.update(building.proposals || [], { $push: [proposal.id] })
     const updatedBuilding = t.update(building, {
       proposals: { $set: updateProposals },
       recentProposal: { $set: proposal }
