@@ -228,11 +228,11 @@ export class BuildingRepository extends CouchbaseModel {
 
     const { city, province } = _get(building, 'address', {})
 
-    if (building.proposals.length === 0) {
+    if (updatedBuilding.proposals.length === 0) {
       await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, { city, province })
     }
 
-    await updateProposalToFirebase(proposal, building)
+    await updateProposalToFirebase(proposal, updatedBuilding)
 
     return proposal
   }
