@@ -278,18 +278,6 @@ export class OwnerRepository extends CouchbaseModel {
     return owner
   }
 
-  async update (ownerId, data = {}, operatorId) {
-    const owner = await this.findByIdOrThrow(ownerId)
-    let updatedOwner = t.update(owner, { $merge: Object.assign({}, data, { id: ownerId }) })
-
-    if (typeof data.verified !== 'undefined') {
-      const owner = Owner(updatedOwner)
-      updatedOwner = owner.verifyOwner(operatorId, data.verified)
-    }
-
-    return this.save(updatedOwner)
-  }
-
   async initialBusinessStatus (ownerId, meetingWithOperatorId) {
     const owner = await this.findByIdOrThrow(ownerId)
     if (!owner.business) {

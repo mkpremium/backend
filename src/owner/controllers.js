@@ -2,9 +2,9 @@ import { wrap } from 'express-promise-wrap'
 import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
 import { History } from '../history/models'
 import { newHttpError } from '../lib/http-error'
-import { FeaturedContact } from '../types/owner'
+import { FeaturedContact, Owner } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
-import { OwnerRepository } from './models'
+import { OwnerRepository, PersonRepository } from './models'
 import { OwnerNotFound } from './OwnerRepository'
 import { EmptyFeaturedContact } from './SetOwnerFeaturedContactService'
 import t from './types'
@@ -30,11 +30,26 @@ async function updateOwner (req, res) {
   const contextModel = { _documentType: 'owner', id }
   const repo = new OwnerRepository()
   await WorksheetRepository.notifyWorkSheetChangeByOwner(id)
-  await repo.update(id, req.body, req.user.id)
+
+  const owner = await repo.findByIdOrThrow(id)
+  let updatedOwner = t.update(owner, { $merge: Object.assign({}, req.body, { id }) })
+  if (typeof req.body.verified !== 'undefined') {
+    const owner = Owner(updatedOwner)
+    owner.verifyOwner(req.user.id, req.body.verified)
+  }
+
   await History.registerUpdate({ contextModel, user: req.user })
 
-  const [updatedOwner] = await repo.findByIdWithIncludes(id, ['building', 'person'])
-  await saveBuildingOwnerToFirebase(updatedOwner)
+  if (owner.status !== updatedOwner.status) {
+    const personRepository = new PersonRepository()
+    const person = personRepository.findById(updatedOwner.personId)
+    const updatedPerson = t.update(person, {
+      $set: {
+        active: owner.status === 'VERIFICADO'
+      }
+    })
+    await personRepository.save(updatedPerson)
+  }
 
   res.status(204).send()
 }

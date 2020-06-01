@@ -162,6 +162,7 @@ export const Person = t.Person = t.struct(
     gender: t.maybe(t.Gender),
 
     personType: t.PersonType,
+    active: t.maybe(t.Boolean),
 
     _documentType: t.String,
 
