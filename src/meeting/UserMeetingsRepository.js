@@ -8,11 +8,16 @@ meeting.event.buildingId,
 meeting.event.inPerson,
 building.recentProposal.proposal proposalValue,
 meeting.event.contactId,
-meeting.event.owner.person.contacts,
-meeting.event.owner.person.name as contactName,
-building.metadata
+building.metadata,
+
+owner.name as contactName,
+person.contacts
 FROM mkpremium meeting
 LEFT JOIN mkpremium building ON building.id = meeting.event.buildingId AND building._documentType = 'building'
+
+LEFT JOIN mkpremium owner ON owner.id = meeting.event.owner.id AND owner._documentType = 'owner'
+LEFT JOIN mkpremium person ON person.id = owner.personId AND person._documentType = 'person' AND person.active = true
+
 WHERE meeting._documentType = 'scheduled-event' AND meeting.type = 'MEETINGS'
 AND meeting.notifyTo = $1
 `
@@ -33,7 +38,8 @@ export class UserMeetingsRepository {
             mimeType,
             thumbnailUrl: previewUrl
           }))
-          const phoneContact = contacts ? contacts.find(c => c.type === 'TELEFONO' && c.id === contactId) : undefined
+          const phoneContact = contacts ? contacts.find(c => c.type === 'TELEFONO' && (!contactId || c.id === contactId)) : undefined
+          const emailContact = contacts ? contacts.find(c => c.type === 'EMAIL' && (!contactId || c.id === contactId)) : undefined
           return {
             id,
             meetingAddress,
@@ -43,6 +49,7 @@ export class UserMeetingsRepository {
             proposalValue,
             contactName,
             phoneNumber: phoneContact ? phoneContact.value : undefined,
+            email: emailContact ? emailContact.value : undefined,
             thumbnail: thumbnails.length > 0 ? thumbnails[ 0 ] : undefined
           }
         })
