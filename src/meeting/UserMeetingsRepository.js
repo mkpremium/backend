@@ -38,7 +38,7 @@ export class UserMeetingsRepository {
             mimeType,
             thumbnailUrl: previewUrl
           }))
-          const phoneContact = contacts ? contacts.find(c => c.type === 'TELEFONO' && (!contactId || c.id === contactId)) : undefined
+          const phoneContact = contacts ? contacts.find(c => ['TELEFONO', 'MOVIL'].indexOf(c.type) !== -1 && (!contactId || c.id === contactId)) : undefined
           const emailContact = contacts ? contacts.find(c => c.type === 'EMAIL' && (!contactId || c.id === contactId)) : undefined
           return {
             id,
