@@ -145,8 +145,9 @@ export class CommercialsBuildingRepository {
           usage: use !== null ? use : undefined,
           owner: (featuredOwnerId && {
             id: featuredOwnerId,
-            firstName: featuredOwnerPerson && featuredOwnerPerson.name,
-            name: featuredOwnerPerson && featuredOwnerPerson.fullName,
+            firstName: featuredOwnerPerson ? featuredOwnerPerson.name : undefined,
+            featuredContact: featuredOwner ? featuredOwner.featuredContact : undefined,
+            name: featuredOwnerPerson ? featuredOwnerPerson.fullName : undefined,
             contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value })))
           }) || undefined,
           lastMeeting: (lastMeeting && {
