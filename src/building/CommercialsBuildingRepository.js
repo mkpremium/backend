@@ -1,4 +1,5 @@
 import { N1qlQuery } from 'couchbase'
+import _ from 'lodash'
 import moment from 'moment'
 
 const listBuildingsByIdQuery = `
@@ -64,7 +65,7 @@ export class CommercialsBuildingRepository {
   listById (ids) {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(listBuildingsByIdQuery), [ ids ]
-    ).then(this.mapToPropertyAgentBuildingView())
+    ).then(CommercialsBuildingRepository.mapToPropertyAgentBuildingView)
   }
 
   listAssignedToPropertyAgentOfId (agentId) {
@@ -84,18 +85,22 @@ export class CommercialsBuildingRepository {
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 
-  mapToPropertyAgentBuildingView () {
-    return buildings => buildings.map(
+  static mapToPropertyAgentBuildingView (buildings) {
+    return buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
         ownerId, buildingMeetings = [], verifiedOwners, personOwners
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
+        const ownersWithPerson = verifiedOwners.map(vo => ({...vo, person: personOwners.find(p => p.id === vo.personId)}))
+          .filter(vo => !!vo.person)
+
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-        const featuredOwnerId = ownerId || (lastMeeting ? lastMeeting.ownerId : undefined)
-        const featuredOwner = featuredOwnerId ? verifiedOwners.find(o => o.id === featuredOwnerId) : undefined
-        const featuredOwnerPerson = featuredOwner ? personOwners.find(p => p.id === featuredOwner.personId) : undefined
-        const contacts = featuredOwnerPerson && featuredOwnerPerson.contacts
+        const featuredOwnerId = ownerId ||
+                                _.get(lastMeeting, 'ownerId') ||
+                                _.get(verifiedOwners, '[0].id')
+        const featuredOwner = featuredOwnerId ? ownersWithPerson.find(o => o.id === featuredOwnerId) : undefined
+        const contacts = _.get(featuredOwner, 'person.contacts')
 
         return ({
           id,
@@ -145,15 +150,14 @@ export class CommercialsBuildingRepository {
           usage: use !== null ? use : undefined,
           owner: (featuredOwnerId && {
             id: featuredOwnerId,
-            firstName: featuredOwnerPerson ? featuredOwnerPerson.name : undefined,
-            featuredContact: featuredOwner ? featuredOwner.featuredContact : undefined,
-            name: featuredOwnerPerson ? featuredOwnerPerson.fullName : undefined,
-            contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value })))
+            firstName: _.get(featuredOwner, 'person.firstName'),
+            name: _.get(featuredOwner, 'person.fullName'),
+            contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
+            featuredContact: featuredOwner && featuredOwner.featuredContact ? featuredOwner.featuredContact : undefined
           }) || undefined,
           lastMeeting: (lastMeeting && {
             dateMeeting: moment(lastMeeting.eventDate).format()
-          }) || undefined,
-          featuredContact: featuredOwner && featuredOwner.featuredContact ? featuredOwner.featuredContact : undefined
+          }) || undefined
         })
       }
     )
