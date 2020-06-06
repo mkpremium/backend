@@ -4,7 +4,7 @@ import { createSetFeaturedOwnerController } from './controllers'
 export const featuredOwnerRoutes = featuredOwnerService => {
   const router = new Router()
 
-  router.post('/buildings/:id/set-featured-owner', createSetFeaturedOwnerController(featuredOwnerService))
+  router.post('/buildings/:buildingId/set-featured-owner', createSetFeaturedOwnerController(featuredOwnerService))
 
   return router
 }

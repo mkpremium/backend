@@ -1,7 +1,6 @@
 export const createSetFeaturedOwnerController = (featuredOwnerService) => async (req, res) => {
-  await featuredOwnerService.setFeaturedOwnerForBuildingAndPropertyManager(
-    req.user.operator.id,
-    req.params.id,
+  await featuredOwnerService.setBuildingFeaturedOwner(
+    req.params.buildingId,
     req.body.ownerId
   )
   res.sendStatus(200)

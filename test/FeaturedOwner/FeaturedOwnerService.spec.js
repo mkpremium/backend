@@ -5,19 +5,17 @@ import { FeaturedOwnerService } from '../../src/featuredOwner/FeaturedOwnerServi
 describe('FeaturedOwnerService', () => {
   it('stores featured owner for a building and a property manager', async () => {
     const propertyManagerRepository = {
-      setFeaturedOwnerForBuildingAndPropertyManager: fake.returns(Promise.resolve())
+      setBuildingFeaturedOwner: fake.returns(Promise.resolve())
     }
 
     const service = new FeaturedOwnerService(propertyManagerRepository)
 
-    const result = await service.setFeaturedOwnerForBuildingAndPropertyManager(
-      'property-agent-id',
+    await service.setBuildingFeaturedOwner(
       'building-id',
       'owner-id'
     )
 
-    expect(propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager)
-      .to.have.been.calledWith('property-agent-id', 'building-id', 'owner-id')
-    expect(result).to.be.true
+    expect(propertyManagerRepository.setBuildingFeaturedOwner)
+      .to.have.been.calledWith('building-id', 'owner-id')
   })
 })

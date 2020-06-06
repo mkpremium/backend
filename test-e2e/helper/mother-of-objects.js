@@ -12,7 +12,7 @@ export const testOwnerName = 'Owner Name'
 export const testOwnerFirstName = 'Owner First Name'
 
 export const createBuilding = async (app, owner, options) => {
-  const { buildingRepository } = app.locals.dependenciesContainer
+  const { buildingRepository } = app.locals.legacyDependenciesContainer
   const building = {
     ...{
       id: testBuildingId,

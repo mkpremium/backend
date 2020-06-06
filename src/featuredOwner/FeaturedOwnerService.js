@@ -1,10 +1,9 @@
 export class FeaturedOwnerService {
-  constructor (propertyManagerRepository) {
-    this.propertyManagerRepository = propertyManagerRepository
+  constructor (buildingsRepository) {
+    this.buildingsRepository = buildingsRepository
   }
 
-  async setFeaturedOwnerForBuildingAndPropertyManager (propertyAgentId, buildingId, ownerId) {
-    await this.propertyManagerRepository.setFeaturedOwnerForBuildingAndPropertyManager(propertyAgentId, buildingId, ownerId)
-    return true
+  async setBuildingFeaturedOwner (buildingId, ownerId) {
+    await this.buildingsRepository.setBuildingFeaturedOwner(buildingId, ownerId)
   }
 }

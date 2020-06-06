@@ -47,7 +47,7 @@ dependenciesPromise.then(() => {
   app.set('IS_READY', true)
 
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
-  const dependenciesContainer = createDependenciesContainer(app.locals.bucket)
+  const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer)
 
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)

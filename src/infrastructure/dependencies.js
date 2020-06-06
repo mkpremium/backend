@@ -2,7 +2,8 @@ import { AddProposalService } from '../building/AddProposalService'
 import { CommercialsBuildingRepository } from '../building/CommercialsBuildingRepository'
 import { ListBuildingProposalsService } from '../building/ListBuildingProposalsService'
 import { ListBuildingsService } from '../building/ListBuildingsService'
-import { BuildingRepository } from '../building/models'
+import { BuildingRepository as LegacyBuildingRepository } from '../building/models'
+import { BuildingsRepository } from '../building/BuildingsRepository'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
@@ -20,11 +21,12 @@ export const createLegacyDependenciesContainer = () => {
   const container = {}
 
   container.ownerRepository = new LegacyOwnerRepository()
+  container.buildingRepository = new LegacyBuildingRepository()
 
   return container
 }
 
-export const createDependenciesContainer = couchbaseBucket => {
+export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesContainer) => {
   const couchbaseAdapter = new CouchbaseAdapter(couchbaseBucket)
 
   const propertyManagersRepository = new PropertyManagerRepository(couchbaseAdapter)
@@ -40,12 +42,12 @@ export const createDependenciesContainer = couchbaseBucket => {
   container.ownerRepository = new OwnerRepository(couchbaseAdapter)
   container.setOwnerFeaturedContactService = new SetOwnerFeaturedContactService(container.ownerRepository)
 
-  container.featuredOwnerService = new FeaturedOwnerService(propertyManagersRepository)
+  const buildingRepository = new BuildingsRepository(couchbaseAdapter)
+  container.featuredOwnerService = new FeaturedOwnerService(buildingRepository)
   container.usersRepository = usersRepository
   container.addFavoriteBuildingService = new AddFavoriteBuildingService(usersRepository)
 
-  container.buildingRepository = new BuildingRepository()
-  container.addProposalService = new AddProposalService(container.buildingRepository)
+  container.addProposalService = new AddProposalService(legacyDependenciesContainer.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
