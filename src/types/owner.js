@@ -179,6 +179,7 @@ export const Person = t.Person = t.struct(
       addresses: [],
       gender: 'NINGUNO',
       _documentType: 'person',
+      active: true,
       personType: 'NATURAL',
       _secondMigration: false,
       birthDate: null,
