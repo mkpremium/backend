@@ -1,25 +1,19 @@
+import { initApplication } from '../../test-e2e/helper/rest-api-helper'
 import { operatorCreateBusiness } from '../common'
-import { StockRepository } from '../../src/stock/StockRepository'
 import moment from 'moment-timezone'
 import { expect } from 'chai'
-import couchbase from '../../src/db/couchbase'
-import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
+import { closeSellStock, createPurchaseStock } from '../../src/stock/application'
 import { BuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 
 describe('StockRepository', () => {
+  let app, stockRepository
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
 
-  let couchbaseBucket, stockRepository
-
-  before(async () => {
-    couchbaseBucket = await couchbase()
-    stockRepository = new StockRepository(couchbaseBucket)
-  })
-
   beforeEach(async () => {
-    await couchbaseBucket.removeAll()
+    app = await initApplication()
+    stockRepository = app.locals.dependenciesContainer.stockRepository
   })
 
   describe('getTotalProfitInPeriodByPropertyManager', () => {
@@ -30,7 +24,7 @@ describe('StockRepository', () => {
       const buildingPurchaseAmount = 1000
       const buildingSellingAmount = 1200
       await purchaseBuildingBySalesAgent(testBuilding, propertyManager, buildingPurchaseAmount)
-      await sellBuilding(testBuilding, propertyManager, buildingSellingAmount)
+      await sellBuilding(app, testBuilding, propertyManager, buildingSellingAmount)
 
       await closeSellStock({buildingId: testBuilding.id}, propertyManager.id)
 
@@ -55,7 +49,7 @@ function purchaseBuildingBySalesAgent (building, agent, transactionAmount) {
   return createPurchaseStock(params, agent.id)
 }
 
-function sellBuilding (building, agent, transactionAmount) {
+function sellBuilding (app, building, agent, transactionAmount) {
   const params = {
     buildingId: building.id,
     reservationAmount: 2000.00,
@@ -63,5 +57,7 @@ function sellBuilding (building, agent, transactionAmount) {
     transactionAmount: transactionAmount,
     transactionDate: '2019-07-11T13:00:00.000Z'
   }
-  return sellPurchasedStock(params, agent.id)
+  const { stockSalesService } = app.locals.dependenciesContainer
+
+  return stockSalesService.sellStock(params, agent.id)
 }

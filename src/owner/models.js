@@ -293,8 +293,8 @@ export class OwnerRepository extends CouchbaseModel {
   async updateBusinessStatusFirebase (ownerId, status, updatedBy) {
     const owner = await this.updateBusinessStatus(ownerId, status, updatedBy)
     const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person'])
-    await saveBuildingOwnerToFirebase(updatedOwner)
     await OwnerRepository.recalculateWorksheetStatus(updatedOwner)
+    await saveBuildingOwnerToFirebase(updatedOwner)
     return owner
   }
 
