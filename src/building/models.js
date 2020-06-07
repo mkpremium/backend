@@ -10,7 +10,6 @@ import { cleanUrl, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
 import '../firebase'
 import {
-  deleteMetadataFromFirebase,
   saveMetadataToFirebase,
   saveProposal
 } from '../firebase/lib/business'
@@ -162,7 +161,6 @@ export class BuildingRepository extends CouchbaseModel {
     const updatedBuilding = t.update(building, { metadata: { $set: updatedMetadata } })
 
     await this.save(updatedBuilding)
-    await deleteMetadataFromFirebase(metadata.id, building.id)
     return metadata
   }
 
