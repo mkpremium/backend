@@ -108,7 +108,7 @@ class Operator extends CouchbaseModel {
 
     const { refreshToken } = await OperatorRefreshTokenRepository.createToken(operator)
     const token = await OperatorRepository.createToken(tokenPayload)
-    const firebase = await firebaseSetup(operator)
+    const firebase = await firebaseSetup(operator.id)
 
     return t.AuthenticatedResponse({
       refreshToken,

@@ -1,9 +1,7 @@
 import admin from 'firebase-admin'
-import { firebaseComerciales, firebaseInformadores } from '../../config'
-import { isAdmin, isBusiness, isStreet } from '../lib/role-operators'
+import { firebaseComerciales } from '../../config'
 
 export const fbComerciales = initializeFirebase(firebaseComerciales, 'comerciales')
-export const fbInformadores = initializeFirebase(firebaseInformadores, 'informadores')
 
 function initializeFirebase ({ enabled, serviceAccount, databaseURL, prefixURL }, name) {
   if (enabled) {
@@ -29,33 +27,13 @@ function initializeFirebase ({ enabled, serviceAccount, databaseURL, prefixURL }
   }
 }
 
-function choseFirebaseSetup (roles) {
-  if (isBusiness(roles) || isAdmin(roles)) {
-    return {
-      fb: fbComerciales,
-      databaseURL: firebaseComerciales.databaseURL
-    }
-  }
-
-  if (isStreet(roles)) {
-    return {
-      fb: fbInformadores,
-      databaseURL: firebaseInformadores.databaseURL
-    }
-  }
-
-  return {}
-}
-
-export async function firebaseSetup (operator) {
-  const { fb, databaseURL } = choseFirebaseSetup(operator.roles)
-
-  if (!fb || !fb.enabled) {
+export async function firebaseSetup (operatorId) {
+  if (!fbComerciales.enabled) {
     return
   }
 
   return {
-    token: await fb.auth().createCustomToken(operator.id),
-    databaseURL
+    token: await fbComerciales.auth().createCustomToken(operatorId),
+    databaseURL: firebaseComerciales.databaseURL
   }
 }

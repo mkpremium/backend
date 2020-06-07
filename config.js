@@ -65,7 +65,6 @@ export const isTest = () => process.env.NODE_ENV === 'test'
 export const isMaybeTesting = v => isTest() ? t.maybe(v) : v
 
 const defaultFirebaseServiceAccount = join(__dirname, 'firebaseComerciales.json')
-const defaultFirebaseServiceAccountInformadores = join(__dirname, 'firebaseInformadores.json')
 
 function isEnabled (value) {
   if (_.isEmpty(value)) {
@@ -82,16 +81,6 @@ export const firebaseComerciales = {
     : null,
   databaseURL: process.env.FIREBASE_COMERCIALES_DATABASE_URL || '',
   prefixURL: process.env.FIREBASE_COMERCIALES_PREFIX_URL || ''
-}
-
-const isFirebaseInformadoresEnabled = isEnabled(process.env.FIREBASE_INFORMADORES || 'true')
-export const firebaseInformadores = {
-  enabled: isFirebaseInformadoresEnabled,
-  serviceAccount: isFirebaseInformadoresEnabled
-    ? (process.env.FIREBASE_INFORMADORES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccountInformadores)
-    : null,
-  databaseURL: process.env.FIREBASE_INFORMADORES_DATABASE_URL || '',
-  prefixURL: process.env.FIREBASE_INFORMADORES_PREFIX_URL || ''
 }
 
 const defaultUploadDir = join(__dirname, '.uploads')
