@@ -3,13 +3,12 @@ import {
   cancelSellStockController,
   closeSellStockController,
   createPurchaseStockController,
-  sellPurchasedStockController,
   updatePurchaseStockController,
   updateSellStockController,
-  getRankingController
+  getRankingController, createSellPurchasedStockController
 } from './controllers'
 
-export const addStockRoutes = (propertyManagerRankingService) => {
+export const addStockRoutes = (propertyManagerRankingService, stockSalesService) => {
   const router = Router()
 
   /**
@@ -179,7 +178,7 @@ export const addStockRoutes = (propertyManagerRankingService) => {
    *         schema:
    *           $ref: "#/definitions/Error"
    */
-  router.post('/sell', sellPurchasedStockController)
+  router.post('/sell', createSellPurchasedStockController(stockSalesService))
 
   /**
    * @swagger

@@ -13,7 +13,11 @@ import { OwnerRepository } from '../owner/OwnerRepository'
 import { SetOwnerFeaturedContactService } from '../owner/SetOwnerFeaturedContactService'
 import { PropertyManagerRankingService } from '../PropertyManager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRepository'
+
+import { StockSalesService } from '../stock/service/StockSalesService'
 import { StockRepository } from '../stock/StockRepository'
+import { StockRepository as LegacyStockRepository } from '../stock/models'
+
 import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
@@ -23,6 +27,7 @@ export const createLegacyDependenciesContainer = () => {
 
   container.ownerRepository = new LegacyOwnerRepository()
   container.buildingRepository = new LegacyBuildingRepository()
+  container.stockRepository = new LegacyStockRepository()
 
   return container
 }
@@ -57,6 +62,12 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     publish: (event) => {
     }
   })
+
+  container.stockSalesService = new StockSalesService(
+    container.updateBuildingNegotiationStatusService,
+    legacyDependenciesContainer.buildingRepository,
+    legacyDependenciesContainer.stockRepository
+  )
 
   return container
 }

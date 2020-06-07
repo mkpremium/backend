@@ -3,7 +3,6 @@ import {
   cancelSellStock,
   closeSellStock,
   createPurchaseStock,
-  sellPurchasedStock,
   updatePurchaseStock,
   updateSellStock
 } from './application'
@@ -25,9 +24,11 @@ async function updatePurchaseStockFromRequest (req, res) {
   res.status(201).json(stock)
 }
 
-async function sellPurchasedStockFromRequest (req, res) {
-  const stock = await sellPurchasedStock(req.body, req.user.id)
-  res.status(201).json(stock)
+export function createSellPurchasedStockController (stockSalesService) {
+  return async (req, res) => {
+    const stock = await stockSalesService.sellStock(req.body, req.user.id)
+    res.status(201).json(stock)
+  }
 }
 
 async function updateSellStockFromRequest (req, res) {
@@ -47,7 +48,6 @@ async function closeSellStockFromRequest (req, res) {
 
 export const createPurchaseStockController = wrap(createPurchaseStockFromRequest)
 export const updatePurchaseStockController = wrap(updatePurchaseStockFromRequest)
-export const sellPurchasedStockController = wrap(sellPurchasedStockFromRequest)
 export const updateSellStockController = wrap(updateSellStockFromRequest)
 export const closeSellStockController = wrap(closeSellStockFromRequest)
 export const cancelSellStockController = wrap(cancelSellStockFromRequest)

@@ -1,7 +1,7 @@
 import moment from 'moment'
 import t from 'tcomb'
 import { ScheduledEventsRepository } from '../../src/scheduled-events/models'
-import { closeSellStock, createPurchaseStock, sellPurchasedStock } from '../../src/stock/application'
+import { closeSellStock, createPurchaseStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
 import { WorksheetRepository } from '../../src/worksheet/models/worksheet'
 
@@ -91,7 +91,8 @@ export const purchaseBuilding = async (app, { buildingId, propertyAgentId }) => 
 }
 
 export const sellBuilding = async (app, { buildingId, propertyAgentId }) => {
-  return sellPurchasedStock({
+  const { stockSalesService } = app.locals.dependenciesContainer
+  return stockSalesService.sellStock({
     buildingId,
     reservationAmount: testSaleReservationAmount,
     reservationDate: new Date(),

@@ -8,7 +8,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { OperatorRepository } from '../operator/models'
 import { SuperSellAward } from '../operator/Awards/SuperSellAward'
 
-function createTransaction (params = {}, operatorId) {
+export function createTransaction (params = {}, operatorId) {
   return Transaction({
     operatorId: operatorId,
     reservationAmount: params.reservationAmount,
