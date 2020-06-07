@@ -1,9 +1,8 @@
 import t from 'tcomb'
-import { CouchbaseModel } from '../db/model'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { CouchbaseModel } from '../db/model'
 
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../lib/query/helpers'
-import { saveNoteToFirebase } from '../firebase/lib/business'
 import { TNote } from './types'
 
 export class Note extends CouchbaseModel {
@@ -14,18 +13,14 @@ export class Note extends CouchbaseModel {
 }
 
 export class NoteRepository extends Note {
-  async createNote (params = {}, createdBy) {
+  createNote (params = {}, createdBy) {
     const noteBody = t.NoteBody(params)
-    const note = await this.save(t.update(noteBody, { $merge: { createdBy } }))
-    await saveNoteToFirebase(note)
-    return note
+    return this.save(t.update(noteBody, { $merge: { createdBy } }))
   }
 
-  async createNoteMigration (params = {}) {
+  createNoteMigration (params = {}) {
     const noteBody = fromJSON(params, TNote)
-    const note = await this.save(noteBody)
-    await saveNoteToFirebase(note)
-    return note
+    return this.save(noteBody)
   }
 
   async listNotes (query = {}) {
