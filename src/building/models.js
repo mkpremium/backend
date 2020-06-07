@@ -9,7 +9,6 @@ import { emitModelEvents } from '../../config'
 import { cleanUrl, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
 import '../firebase'
-import { saveProposal } from '../firebase/lib/business'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { ScheduledEvents } from '../scheduled-events/models'
@@ -49,9 +48,7 @@ export class BuildingProposal extends CouchbaseModel {
 
 export class BuildingProposalRepository extends BuildingProposal {
   async save (data, sendEvent) {
-    const proposal = await super.save(data, sendEvent)
-    await saveProposal(proposal)
-    return proposal
+    return super.save(data, sendEvent)
   }
 
   async findByIdOrThrow (proposalId) {
