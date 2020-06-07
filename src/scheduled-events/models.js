@@ -3,8 +3,6 @@ import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../db/model'
-import { fbComerciales } from '../firebase'
-import { deleteMeetingToBuilding, deleteMeetingToFirebase, deleteMeetingToOperator } from '../firebase/lib/business'
 import { buildRangeFromWeek, meetingWeekFormat, utc } from '../lib/date'
 import { buildDistanceCalculator } from '../lib/geo'
 import { newHttpError } from '../lib/http-error'
@@ -67,38 +65,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     return scheduledEvent
   }
 
-  // noinspection JSMethodCanBeStatic
-  async findMeeting (scheduleEvent) {
-    const meetingObj = {
-      id: scheduleEvent.id,
-      notifyTo: scheduleEvent.notifyTo,
-      createdAt: scheduleEvent.createdAt,
-      createdBy: scheduleEvent.createdBy,
-      eventDate: scheduleEvent.eventDate,
-      address: _get(scheduleEvent, 'event.eventAddress'),
-      inPerson: _get(scheduleEvent, 'event.inPerson')
-    }
-    const ownerId = _get(scheduleEvent, 'event.ownerId')
-    const contactId = _get(scheduleEvent, 'event.contactId')
-
-    const ownerRepo = new OwnerRepository()
-
-    const [owner] = ownerId
-      ? await ownerRepo.findByIdWithIncludes(ownerId, ['person', 'building'])
-      : []
-    if (owner) {
-      meetingObj.owner = owner
-      const person = fromJSON(owner.person, t.Person)
-      meetingObj.contact = {
-        name: person.fullName(),
-        phone: person.findContactValueById(contactId)
-      }
-      meetingObj.building = owner.building
-    }
-
-    return fromJSON(meetingObj, t.Meeting)
-  }
-
   async firebaseMeeting (scheduleEvent) {
     const repo = new OwnerRepository()
     const ownerId = _get(scheduleEvent, 'event.ownerId')
@@ -109,17 +75,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const repo = new ScheduledEventsRepository()
     const meeting = await repo.findByIdOrThrow(meetingId)
     return repo.firebaseMeeting(meeting)
-  }
-
-  async deleteFirebaseMeeting (scheduleEvent) {
-    if (!fbComerciales.enabled) {
-      return
-    }
-    const db = fbComerciales.database()
-    const meeting = await this.findMeeting(scheduleEvent)
-    await deleteMeetingToFirebase(db, meeting)
-    await deleteMeetingToBuilding(db, meeting)
-    await deleteMeetingToOperator(db, meeting, meeting.notifyTo)
   }
 
   async validateMeeting (data) {
@@ -245,7 +200,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     })
 
     const updatedScheduledEvent = await this.save(updatedScheduledEventData)
-    await this.deleteFirebaseMeeting(scheduledEvent)
     await this.firebaseMeeting(updatedScheduledEvent)
 
     return updatedScheduledEvent
@@ -253,7 +207,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async delete (id) {
     const scheduledEvent = await this.findByIdOrThrow(id)
-    await this.deleteFirebaseMeeting(scheduledEvent)
     const qb = this.getQueryBuilder('delete').where('id = ?', id)
     await this.sendWeekEvent(scheduledEvent)
     await this.query(qb)

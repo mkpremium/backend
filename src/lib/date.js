@@ -11,7 +11,6 @@ export const buildRangeFromWeek = (week, year) => {
   ].join(',')
 }
 
-export const meetingDayFormat = date => m(date).format('DD-MM-YYYY')
 export const meetingWeekFormat = date => m(date).format('YYYY:WW')
 export const queryDateFormat = date => m(date).format('YYYY-MM-DD')
 
@@ -20,13 +19,4 @@ export function firebaseTimestampFormat (date) {
     return (new Date(date)).valueOf()
   }
   return 0
-}
-
-export function firebaseStringToNumber (number) {
-  const n = Number(number || 0)
-  if (isNaN(n)) {
-    return 0
-  } else {
-    return n
-  }
 }

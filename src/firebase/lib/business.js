@@ -1,7 +1,7 @@
 import Promise from 'bluebird'
 import debug from 'debug'
 import _ from 'lodash'
-import { firebaseTimestampFormat, meetingDayFormat } from '../../lib/date'
+import { firebaseTimestampFormat } from '../../lib/date'
 import { fbComerciales } from '../index'
 
 import t from '../types'
@@ -9,34 +9,6 @@ import t from '../types'
 const debugFb = debug('app:firebase:comerciales')
 
 export async function removeBuildingFromBusiness (buildingId, businessId) {
-}
-
-export async function deleteMeetingToBuilding (db, { id, building }) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-
-  if (!building) {
-    debugFb('deleteMeetingToBuilding', 'omitted meeting from building null')
-    return
-  }
-
-  return db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}/Meetings/ids/${id}`).set(null)
-}
-
-export async function deleteMeetingToFirebase (db, meeting) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-  return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}`).set(null)
-}
-
-export async function deleteMeetingToOperator (db, meeting, operatorId) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-  const meetingDay = meetingDayFormat(meeting.eventDate)
-  return db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Meetings/Days/${meetingDay}/${meeting.id}`).set(null)
 }
 
 export async function deleteMetadataFromFirebase (metadataId, buildingId) {
