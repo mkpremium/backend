@@ -11,31 +11,6 @@ import { FirebaseBuildingData } from '../types/business'
 
 const debugFb = debug('app:firebase:comerciales')
 
-export async function saveBuildingOwnerToFirebase (owner) {
-  debugFb('saveBuildingOwnerToFirebase', 'is enable', fbComerciales.enabled)
-  if (!fbComerciales.enabled) {
-    return
-  }
-  const db = fbComerciales.database()
-
-  if (owner.building) {
-    return saveBuildingToFirebase(db, owner.building, owner)
-  }
-
-  const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}`).once('value')
-  if (!snapshot.exists()) {
-    debugFb('saveBuildingOwnerToFirebase', `building ${owner.buildingId} doesn't exists yet`)
-    return
-  }
-
-  debugFb('saveBuildingOwnerToFirebase', `saving ${owner.id}`)
-  const ownerRef = db.ref(`${fbComerciales.prefixURL}Buildings/${owner.buildingId}/Owner`)
-  return ownerRef.set(owner)
-}
-
-export async function saveBuildingToFirebase (db, building, owner) {
-}
-
 export async function removeBuildingFromBusiness (buildingId, businessId) {
   if (!fbComerciales.enabled) {
     debugFb('removeBuildingFromBusiness', 'omitted, because fbComerciales.enabled =', fbComerciales.enabled)

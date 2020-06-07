@@ -1,22 +1,21 @@
 import { N1qlQuery } from 'couchbase'
-import t from 'tcomb'
+import _ from 'lodash'
 import _head from 'lodash/head'
 import _isArray from 'lodash/isArray'
 import _isEmpty from 'lodash/isEmpty'
 import _isNil from 'lodash/isNil'
+import squel from 'squel/dist/squel'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
+import { BuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { updateList } from '../lib/tcomb-utils'
-import { BuildingRepository } from '../building/models'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
-import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
-import _ from 'lodash'
-import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
-import fromJSON from 'tcomb/lib/fromJSON'
-import { OwnerListQuery } from './types'
-import squel from 'squel/dist/squel'
-import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { OperatorRepository } from '../operator/models'
+import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
+import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
+import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { OwnerListQuery } from './types'
 
 export class Person extends CouchbaseModel {
   constructor () {
@@ -294,7 +293,6 @@ export class OwnerRepository extends CouchbaseModel {
     const owner = await this.updateBusinessStatus(ownerId, status, updatedBy)
     const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person'])
     await OwnerRepository.recalculateWorksheetStatus(updatedOwner)
-    await saveBuildingOwnerToFirebase(updatedOwner)
     return owner
   }
 

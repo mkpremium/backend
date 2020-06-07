@@ -1,5 +1,4 @@
 import { wrap } from 'express-promise-wrap'
-import { saveBuildingOwnerToFirebase } from '../firebase/lib/business'
 import { History } from '../history/models'
 import { newHttpError } from '../lib/http-error'
 import { FeaturedContact, Owner } from '../types/owner'
@@ -18,9 +17,6 @@ async function updateOwnerContact (req, res) {
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
   await repo.updateContact(ownerId, contactId, req.body)
   await History.registerUpdate({ contextModel, user: req.user })
-
-  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person'])
-  await saveBuildingOwnerToFirebase(updatedOwner)
 
   res.status(204).send()
 }
@@ -61,7 +57,6 @@ async function addOwnerContact (req, res) {
   await History.registerCreate({ contextModel, user: req.user })
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
   const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person'])
-  await saveBuildingOwnerToFirebase(updatedOwner)
   res.json(updatedOwner)
 }
 
