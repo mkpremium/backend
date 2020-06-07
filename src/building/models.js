@@ -102,16 +102,6 @@ export class BuildingRepository extends CouchbaseModel {
     return result
   }
 
-  static async findByPlaceId (placeId) {
-    const repo = new BuildingRepository()
-    const qb = repo.getQueryBuilder()
-      .where('placeId IS NOT MISSING')
-      .where('placeId = ?', placeId)
-      .limit(1)
-    const [building] = await repo.query(qb)
-    return building
-  }
-
   static async findMeetings (buildingId) {
     const meetingRepo = new ScheduledEvents()
     const qb = meetingRepo.getQueryBuilder()
@@ -240,9 +230,6 @@ export class BuildingRepository extends CouchbaseModel {
     return proposal
   }
 
-  async removeEntity (building, entityId) {
-  }
-
   async addEntity (building, params) {
     const entity = fromJSON(params, t.BuildingEntity)
     const updatedEntities = t.update(building.entities, { $push: [entity] })
@@ -334,20 +321,6 @@ export class BuildingRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder().where('t.`id` = ?', id)
     const results = await this.query(qb)
     return results && results.length && _.first(results)
-  }
-
-  /**
-   *
-   * @param city
-   * @returns {Promise<*>}
-   */
-  async getCityBuildingIds (city) {
-    const bucket = this.getBucketName()
-    const query = `SELECT RAW id  FROM ${bucket} t
-                   WHERE t._documentType = 'building' AND t.address.city = '${city}'
-                   ORDER BY id`
-
-    return this.queryRaw(N1qlQuery.fromString(query))
   }
 
   /**
