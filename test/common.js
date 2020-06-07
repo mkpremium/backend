@@ -1,7 +1,6 @@
 import Promise from 'bluebird'
 import request from 'supertest'
 import { OperatorRepository } from '../src/operator/models'
-import { cleanQueue } from '../cli/lib/migrate-utils'
 import { CouchbaseModel } from '../src/db/model'
 import initCouchbase from '../src/db/couchbase'
 
@@ -11,8 +10,7 @@ export async function deleteAll () {
   await CouchbaseModel.prototype._promiseBucket
 
   return Promise.all([
-    CouchbaseModel.prototype._bucket.removeAll(),
-    cleanQueue()
+    CouchbaseModel.prototype._bucket.removeAll()
   ])
 }
 

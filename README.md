@@ -65,12 +65,6 @@ Utiliza [docker][2] y [docker-compose][3] para instalar los servicios necesarios
     
     > **Nota**: es posible que en su sistema deba usar `sudo` al usar los comandos docker y docker-compose
 
-6. Correr las migraciones
-
-  Solicite el archivo CSV si no lo tiene. Luego:
-
- `$ cli/cli-migrate-worksheets.js path/to/CSV/folder`
- 
 7. Correr el proyecto
  
   Ejecute: `$ npm start`

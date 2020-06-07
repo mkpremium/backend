@@ -6,9 +6,7 @@ sudo apt-get update
 sudo apt-get install certbot
 
 
-node -r dotenv/config cli/cli-migrate-worksheets.js --clean ~/picked_data/CSV/
 node -r dotenv/config cli/cli-onwers-verify.js ~/picked_data/CSV/PROPIETARIOS.csv
-node -r dotenv/config cli/cli-building-notes.js ~/picked_data/CSV/BUILDING_NOTES.csv
 
 
 crontab
