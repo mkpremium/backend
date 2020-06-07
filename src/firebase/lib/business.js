@@ -11,9 +11,6 @@ import { FirebaseBuildingData } from '../types/business'
 
 const debugFb = debug('app:firebase:comerciales')
 
-export async function updateBuildingToFirebase (building, owner) {
-}
-
 export async function saveBuildingOwnerToFirebase (owner) {
   debugFb('saveBuildingOwnerToFirebase', 'is enable', fbComerciales.enabled)
   if (!fbComerciales.enabled) {
@@ -232,9 +229,6 @@ export async function saveProposal (proposal) {
     buildingProposalsRef.child('ids').update({ [ proposal.id ]: true }),
     buildingProposalsRef.child('LastPropose').set(firebaseProposal)
   ])
-}
-
-export async function updateBuildingFirebaseProposal (building) {
 }
 
 export function toFirebaseProposal (proposal) {
