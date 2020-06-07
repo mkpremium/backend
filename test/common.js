@@ -1,18 +1,16 @@
 import Promise from 'bluebird'
 import request from 'supertest'
 import { OperatorRepository } from '../src/operator/models'
-import { cleanFirebase } from '../migrations/firebase-clean'
 import { cleanQueue } from '../cli/lib/migrate-utils'
 import { CouchbaseModel } from '../src/db/model'
 import initCouchbase from '../src/db/couchbase'
 
 export async function deleteAll () {
-  initCouchbase()
+  await initCouchbase()
 
   await CouchbaseModel.prototype._promiseBucket
 
   return Promise.all([
-    cleanFirebase(),
     CouchbaseModel.prototype._bucket.removeAll(),
     cleanQueue()
   ])
