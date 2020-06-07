@@ -72,19 +72,6 @@ async function addOwner (req, res) {
   res.status(201).json(owner)
 }
 
-async function updateBusinessStatus (req, res) {
-  t.OwnerUpdateBusinessStatus(req.body)
-  const ownerId = req.params.id
-  const status = req.body.status
-  const updatedBy = req.user.id
-
-  const repo = new OwnerRepository()
-  const owner = await repo.updateBusinessStatusFirebase(ownerId, status, updatedBy)
-
-  await History.registerCreate({ owner, user: req.user })
-  res.status(204).send()
-}
-
 async function ownerList (req, res) {
   const repo = new OwnerRepository()
   const owners = await repo.list(req.query)
@@ -95,7 +82,6 @@ export const updateOwnerContactController = wrap(updateOwnerContact)
 export const updateOwnerController = wrap(updateOwner)
 export const addOwnerContactController = wrap(addOwnerContact)
 export const addOwnerController = wrap(addOwner)
-export const updateBusinessStatusController = wrap(updateBusinessStatus)
 export const listOwnerController = wrap(ownerList)
 
 export const createSetFeaturedContactController = setOwnerFeaturedContactService => {
