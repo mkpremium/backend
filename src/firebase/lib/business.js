@@ -1,6 +1,5 @@
 import Promise from 'bluebird'
 import debug from 'debug'
-import _ from 'lodash'
 import { firebaseTimestampFormat } from '../../lib/date'
 import { fbComerciales } from '../index'
 
@@ -34,24 +33,6 @@ export async function saveNoteToFirebase (note) {
     buildingNotesRef.child('LastNote').set(note.note),
     buildingNotesRef.child('ids').update({ [ note.id ]: true })
   ])
-}
-
-export async function businessRelatedToBuilding () {
-  if (!fbComerciales.enabled) {
-    return
-  }
-
-  const db = fbComerciales.database()
-  const users = await db.ref(`${fbComerciales.prefixURL}Users`).once('value')
-
-  const businessRelatedToBuildings = {}
-  _.forEach(users.val(), (user, id) => {
-    Object.keys(user.Buildings || {}).forEach(buildingId => {
-      businessRelatedToBuildings[ buildingId ] = id
-    })
-  })
-
-  return businessRelatedToBuildings
 }
 
 export async function saveProposal (proposal) {
