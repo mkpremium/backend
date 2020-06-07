@@ -3,6 +3,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
 import _filter from 'lodash/filter'
+import { Building } from './building'
 import { Queue } from './constants'
 import debug from 'debug'
 import '../owner/types'
@@ -112,7 +113,7 @@ export const Worksheet = t.WorkSheet = t.struct({
   queueId: t.maybe(t.String),
 
   relatedBuildingIds: t.list(t.String),
-  relatedBuildings: t.list(t.Building),
+  relatedBuildings: t.list(Building),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.list(t.OwnerWithInclude),
 

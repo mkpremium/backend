@@ -1,6 +1,7 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { isMaybeTesting } from '../../config'
+import { Building } from '../types/building'
 import { OwnerWithInclude } from '../types/owner'
 
 export const ScheduledEventType = {
@@ -306,7 +307,7 @@ t.Meeting = t.struct({
     phone: t.maybe(t.String)
   }, 'contact')),
   id: t.String,
-  building: isMaybeTesting(t.Building),
+  building: isMaybeTesting(Building),
   createdAt: t.Date,
   eventDate: t.Date,
   inPerson: t.Boolean,

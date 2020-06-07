@@ -280,7 +280,7 @@ export const buildingNegotiationStatus = [
   'DESCARTADO'
 ]
 
-export const Building = t.Building = t.struct(
+export const Building = t.struct(
   {
     id: t.String,
     address: Address,

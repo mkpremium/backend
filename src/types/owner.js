@@ -4,6 +4,7 @@ import _find from 'lodash/find'
 import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { Building } from './building'
 import { TypedContactInfo } from './common'
 import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
 
@@ -292,7 +293,7 @@ export const Owner = t.struct(
 )
 
 export const OwnerWithInclude = t.OwnerWithInclude = Owner.extend({
-  building: t.maybe(t.Building),
+  building: t.maybe(Building),
   person: t.maybe(t.Person)
 })
 
