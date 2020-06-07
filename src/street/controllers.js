@@ -4,7 +4,6 @@ import { wrap } from 'express-promise-wrap'
 import { NeighborhoodRepository } from './models'
 import { BuildingRepository } from '../building/models'
 import { OperatorRepository } from '../operator/models'
-import { fbInformadores } from '../firebase'
 import { canManageOperator } from '../lib/role-operators'
 
 async function updateOperatorState (req, res, next) {
@@ -58,14 +57,6 @@ async function oldLogin (req, res, next) {
   next()
 }
 
-async function getLocationsAtDay (req, res, next) {
-  const db = fbInformadores.database()
-  const params = t.QueryLocationsAtDay(req.body)
-  const snapshot = await db.ref(`Locations/${params.date}`).once('value')
-  res.message = snapshot.val()
-  next()
-}
-
 function oldAppResponse (req, res) {
   res.json({
     Error: false,
@@ -87,4 +78,3 @@ export const getNeighborhoodCenterController = compose([wrap(getNeighborhoodCent
 export const getBuildingsLocationController = compose([wrap(getBuildingsLocation), oldAppResponse])
 export const getCityInfoController = compose([wrap(getCityInfo), oldAppResponse])
 export const oldLoginController = compose([wrap(oldLogin), oldLoginResponse])
-export const getLocationsAtDayController = compose([wrap(getLocationsAtDay), oldAppResponse])
