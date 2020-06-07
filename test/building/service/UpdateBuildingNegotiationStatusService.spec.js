@@ -1,18 +1,22 @@
 import { spy } from 'sinon'
 import { expect } from 'chai'
 import {
+  BuildingNegotiationStatusChanged,
   InvalidBuildingNegotiationStatus,
   UpdateBuildingNegotiationStatusService
 } from '../../../src/building/service/UpdateBuildingNegotiationStatusService'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
-  let buildingRepository, service
+  let buildingRepository, service, eventBus
 
   beforeEach(() => {
     buildingRepository = {
-      setBuildingNegotiationStatus: spy(() => undefined)
+      setBuildingNegotiationStatus: spy()
     }
-    service = new UpdateBuildingNegotiationStatusService(buildingRepository)
+    eventBus = {
+      publish: spy()
+    }
+    service = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
   })
 
   const validNegotiationStatuses = [
@@ -25,7 +29,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     'DESCARTADO'
   ]
   validNegotiationStatuses.forEach((status) => {
-    it(`accepts ${status} as valid negotiation status`, async () => {
+    it(`accepts "${status}" as a valid negotiation status`, async () => {
       await service.updateBuildingStatus('building-id', status)
 
       expect(buildingRepository.setBuildingNegotiationStatus).to.have.been.calledWith('building-id', status)
@@ -34,10 +38,16 @@ describe('UpdateBuildingNegotiationStatusService', () => {
 
   it('rejects invalid negotiation statuses', async () => {
     try {
-      await service.updateBuildingStatus('building-id', 'unknown status')
+      await service.updateBuildingStatus('building-id', 'UNKNOWN STATUS')
       expect.fail()
     } catch (e) {
       expect(e).to.be.an.instanceof(InvalidBuildingNegotiationStatus)
     }
+  })
+
+  it('publishes negotiation status changed event', async () => {
+    await service.updateBuildingStatus('building-id', 'COMPRADO')
+
+    expect(eventBus.publish).to.have.been.deep.calledWith(new BuildingNegotiationStatusChanged('building-id', 'COMPRADO'))
   })
 })

@@ -53,7 +53,10 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
 
-  container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository)
+  container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, {
+    publish: (event) => {
+    }
+  })
 
   return container
 }

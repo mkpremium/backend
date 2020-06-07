@@ -9,8 +9,9 @@ const validNegotiationStatuses = [
 ]
 
 export class UpdateBuildingNegotiationStatusService {
-  constructor (buildingRepository) {
+  constructor (buildingRepository, eventBus) {
     this.buildingRepository = buildingRepository
+    this.eventBus = eventBus
   }
 
   async updateBuildingStatus (buildingId, negotiationStatus) {
@@ -19,6 +20,14 @@ export class UpdateBuildingNegotiationStatusService {
     }
 
     await this.buildingRepository.setBuildingNegotiationStatus(buildingId, negotiationStatus)
+    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, negotiationStatus))
+  }
+}
+
+export class BuildingNegotiationStatusChanged {
+  constructor (buildingId, newNegotiationStatus) {
+    this.buildingId = buildingId
+    this.newNegotiationStatus = newNegotiationStatus
   }
 }
 
