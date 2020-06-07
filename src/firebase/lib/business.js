@@ -12,17 +12,6 @@ import { FirebaseBuildingData } from '../types/business'
 const debugFb = debug('app:firebase:comerciales')
 
 export async function removeBuildingFromBusiness (buildingId, businessId) {
-  if (!fbComerciales.enabled) {
-    debugFb('removeBuildingFromBusiness', 'omitted, because fbComerciales.enabled =', fbComerciales.enabled)
-    return
-  }
-
-  const db = fbComerciales.database()
-  const referencePath = `${fbComerciales.prefixURL}Users/${businessId}/Buildings/${buildingId}`
-  const comercialBuildingRef = await db.ref(referencePath).once('value')
-  if (comercialBuildingRef.exists()) {
-    await db.ref(referencePath).set(null)
-  }
 }
 
 export async function deleteMeetingToBuilding (db, { id, building }) {
