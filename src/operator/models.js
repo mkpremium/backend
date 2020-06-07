@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
-import _get from 'lodash/get'
 import _omit from 'lodash/omit'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 
 import { jwt, saltFactor } from '../../config'
 import { CouchbaseModel } from '../db/model'
-import { firebaseSetup, firebaseUserAccount } from '../firebase'
+import { firebaseSetup } from '../firebase'
 import { newHttpError } from '../lib/http-error'
 import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
@@ -53,7 +52,6 @@ class Operator extends CouchbaseModel {
     const operator = await this.findByIdOrThrow(operatorId)
     const updatedOperator = t.update(operator, { restringedHours: { $set: restringedHours } })
     await this.save(updatedOperator)
-    await firebaseUserAccount(updatedOperator)
   }
 
   static async hashPassword (password) {
@@ -77,9 +75,7 @@ class Operator extends CouchbaseModel {
 
   async createOperator (data) {
     const params = fromJSON(data, OperatorRequest)
-    const operator = await super.save(params)
-    await firebaseUserAccount(operator)
-    return operator
+    return super.save(params)
   }
 
   async updateOperator (operator, data) {
@@ -92,8 +88,6 @@ class Operator extends CouchbaseModel {
     })
 
     const updatedOperator = await this.save(updateOperator)
-    const newCity = JSON.stringify(_get(operator, 'profile.city')) !== JSON.stringify(_get(data, 'profile.city'))
-    await firebaseUserAccount(updatedOperator, newCity)
     return updatedOperator
   }
 

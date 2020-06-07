@@ -34,35 +34,6 @@ export async function deleteMeetingToFirebase (db, meeting) {
   return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}`).set(null)
 }
 
-export async function saveBusinessUserToFirebase (operator) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-  const db = fbComerciales.database()
-  const businessOperatorRef = db.ref(`${fbComerciales.prefixURL}Users/${operator.id}`)
-  const snapshot = await businessOperatorRef.once('value')
-
-  const UserData = {
-    Name: operator.profile.fullName()
-  }
-  const RestringedHours = operator.restringedHours || {}
-
-  if (snapshot.exists()) {
-    return Promise.all([
-      businessOperatorRef.child('UserData').set(UserData),
-      businessOperatorRef.child('RestringedHours').set(RestringedHours)
-    ])
-  }
-  return businessOperatorRef
-    .set({
-      Meetings: {},
-      RemindersMeetings: {},
-      RemindersProposes: {},
-      UserData,
-      RestringedHours
-    })
-}
-
 export async function denormalizeBuildingData (operatorId, meeting) {
   if (!fbComerciales.enabled) {
     return

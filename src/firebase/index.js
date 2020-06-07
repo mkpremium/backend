@@ -1,8 +1,6 @@
 import admin from 'firebase-admin'
 import { firebaseComerciales, firebaseInformadores } from '../../config'
-import { saveStreetUserToFirebase } from './lib/street'
 import { isAdmin, isBusiness, isStreet } from '../lib/role-operators'
-import { saveBusinessUserToFirebase } from './lib/business'
 
 export const fbComerciales = initializeFirebase(firebaseComerciales, 'comerciales')
 export const fbInformadores = initializeFirebase(firebaseInformadores, 'informadores')
@@ -59,15 +57,5 @@ export async function firebaseSetup (operator) {
   return {
     token: await fb.auth().createCustomToken(operator.id),
     databaseURL
-  }
-}
-
-export async function firebaseUserAccount (operator, newCity) {
-  if (isStreet(operator.roles)) {
-    return saveStreetUserToFirebase(operator, newCity)
-  }
-
-  if (isBusiness(operator.roles)) {
-    return saveBusinessUserToFirebase(operator)
   }
 }
