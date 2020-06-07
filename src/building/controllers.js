@@ -69,23 +69,6 @@ async function updateNegotiationProposal (req, res) {
   res.status(200).json(updatedProposal)
 }
 
-async function addEntity (req, res) {
-  const buildingRepo = new BuildingRepository()
-  const buildingId = req.params.id
-  const building = await buildingRepo.findByIdOrThrow(buildingId)
-  const entity = await buildingRepo.addEntity(building, req.body)
-  res.status(201).json(entity)
-}
-
-async function updateEntity (req, res) {
-  const buildingRepo = new BuildingRepository()
-  const buildingId = req.params.id
-  const { entityId } = req.params
-  const building = await buildingRepo.findByIdOrThrow(buildingId)
-  const entity = await buildingRepo.updateEntity(building, entityId, req.body)
-  res.status(200).json(entity)
-}
-
 async function addOwnerToBuilding (req, res) {
   const worksheetRepo = new WorksheetRepository()
   const ownerRepo = new OwnerRepository()
@@ -101,8 +84,6 @@ async function addOwnerToBuilding (req, res) {
 export const addMetadataToBuildingController = wrap(addMetadataToBuilding)
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
 export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
-export const addEntityController = wrap(addEntity)
-export const updateEntityController = wrap(updateEntity)
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createListVerifiedOwnersController = legacyOwnerRepository => {

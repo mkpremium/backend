@@ -1,7 +1,6 @@
 #!/usr/bin/env babel-node
 import program from 'commander'
 import {checkInputFile} from './lib'
-import {migrateBuildingEntities} from './lib/migrate-building-entities'
 
 program
   .arguments('[input-file]')
@@ -30,5 +29,4 @@ function mainAction () {
 
 async function main (inputFile) {
   await checkInputFile(inputFile)
-  await migrateBuildingEntities(inputFile)
 }

@@ -5,7 +5,6 @@ import _get from 'lodash/get'
 import mime from 'mime-types'
 import squel from 'squel'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { emitModelEvents } from '../../config'
 import { cleanUrl, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
@@ -13,13 +12,10 @@ import '../firebase'
 import {
   deleteMetadataFromFirebase,
   saveMetadataToFirebase,
-  saveProposal,
-  updateBuildingToFirebase
+  saveProposal
 } from '../firebase/lib/business'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
-import { updateList } from '../lib/tcomb-utils'
-import { OwnerRepository } from '../owner/models'
 import { ScheduledEvents } from '../scheduled-events/models'
 import { ScheduledEventType } from '../scheduled-events/types'
 import { OperatorStats } from '../stats/models'
@@ -230,51 +226,9 @@ export class BuildingRepository extends CouchbaseModel {
     return proposal
   }
 
-  async addEntity (building, params) {
-    const entity = fromJSON(params, t.BuildingEntity)
-    const updatedEntities = t.update(building.entities, { $push: [entity] })
-    const updatedBuilding = await this.updateEntities(building, updatedEntities)
-
-    const repo = new OwnerRepository()
-    const [owner] = await repo.findByBuildingWithIncludes(building.id)
-
-    await updateBuildingToFirebase(updatedBuilding, owner)
-
-    return entity
-  }
-
   async update (building, $merge) {
     const updatedBuilding = t.update(building, { $merge })
     return this.save(updatedBuilding)
-  }
-
-  async updateEntity (building, entityId, params) {
-    const entity = building.entities.find(({ id }) => id === entityId)
-    if (!entity) {
-      throw newHttpError(
-        404,
-        `No se puede encontrar la entidad ${entityId} para el edificio ${building.id}`
-      )
-    }
-    const updatedEntity = t.update(entity, { $merge: params })
-    const updatedEntities = updateList(building.entities, entity, updatedEntity)
-    const updatedBuilding = await this.updateEntities(building, updatedEntities)
-
-    const repo = new OwnerRepository()
-    const [owner] = await repo.findByBuildingWithIncludes(building.id)
-
-    await updateBuildingToFirebase(updatedBuilding, owner)
-
-    return updatedEntity
-  }
-
-  async updateEntities (building, updatedEntities) {
-    const updateBuilding = t.update(building, {
-      entities: { $set: updatedEntities },
-      elements: { $set: calculateElements(building.elements, updatedEntities) }
-    })
-
-    return this.save(updateBuilding)
   }
 
   async findWrongStateBuildingsByCity (city) {

@@ -1,7 +1,6 @@
 import {N1qlQuery} from 'couchbase'
 import couchbase from '../src/db/couchbase'
 import {RelatedModel} from '../src/migration/lib/related-model'
-import {MigrateEntities} from '../src/migration/lib/migrate-entities'
 import Promise from 'bluebird'
 import {cleanFirebase} from './firebase-clean'
 import {WorksheetRepository} from '../src/worksheet/models/worksheet'
@@ -29,13 +28,11 @@ export async function seed (files) {
   const migrateBuildings = new MigrateModelV2('building', files.buildings, app)
   const migrateOwners = new MigrateOwner(files.owners, app)
   const relations = new RelatedModel(files.cross, app)
-  const buildingEntities = new MigrateEntities(files.entities, app)
 
   await migrateBuildings.run()
   await migrateOwners.run()
 
   await relations.run()
-  await buildingEntities.run()
 }
 
 async function deleteAll () {
