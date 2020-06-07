@@ -9,10 +9,7 @@ import { emitModelEvents } from '../../config'
 import { cleanUrl, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
 import '../firebase'
-import {
-  saveMetadataToFirebase,
-  saveProposal
-} from '../firebase/lib/business'
+import { saveProposal } from '../firebase/lib/business'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { ScheduledEvents } from '../scheduled-events/models'
@@ -181,7 +178,6 @@ export class BuildingRepository extends CouchbaseModel {
     const updatedBuilding = t.update(building, { metadata: { $merge: updatedMetadata } })
 
     await this.save(updatedBuilding)
-    await saveMetadataToFirebase(metadata)
     return metadata
   }
 

@@ -11,29 +11,6 @@ const debugFb = debug('app:firebase:comerciales')
 export async function removeBuildingFromBusiness (buildingId, businessId) {
 }
 
-export async function saveMetadataToFirebase (metadata) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-
-  const db = fbComerciales.database()
-  return Promise.all([
-    db.ref(`${fbComerciales.prefixURL}Documents/${metadata.id}`).set(toFirebaseDocument(metadata)),
-    db.ref(`${fbComerciales.prefixURL}Buildings/${metadata.buildingId}/Documents/ids/${metadata.id}`).set(true)
-  ])
-}
-
-export async function saveMetadataToUserBuilding (operatorId, metadata) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-
-  const db = fbComerciales.database()
-  return db
-    .ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${metadata.buildingId}/Documents/${metadata.id}`)
-    .set(toFirebaseDocument(metadata))
-}
-
 export async function saveNoteToFirebase (note) {
   if (!fbComerciales.enabled) {
     debugFb('saveNoteToFirebase', 'note omitted to save into firebase, because fbComerciales.enabled =', fbComerciales.enabled)
@@ -115,15 +92,4 @@ function noteWithTimestamp (note) {
   const json = JSON.parse(JSON.stringify(note))
   const timestamp = firebaseTimestampFormat(note.createdAt)
   return Object.assign({}, json, { timestamp })
-}
-
-function toFirebaseDocument (metadata) {
-  return t.FirebaseDocument({
-    BuildingId: metadata.buildingId,
-    DocumentName: metadata.name,
-    Url: metadata.url,
-    Thumbnail: metadata.previewUrl,
-    mime: metadata.mimeType,
-    date: firebaseTimestampFormat(metadata.createdAt)
-  })
 }
