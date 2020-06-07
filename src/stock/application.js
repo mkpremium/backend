@@ -1,5 +1,3 @@
-import { OwnerRepository } from '../owner/models'
-import { OwnerBusinessStatus } from '../types/enums'
 import { StockStatuses, Transaction, TransactionParams } from './types'
 import { StockFirebaseRepository, StockRepository } from './models'
 import { BuildingRepository } from '../building/models'
@@ -65,37 +63,6 @@ export async function updatePurchaseStock (params = {}, operatorId) {
   const result = await stockRepository.save(stock)
 
   await stockFirebaseRepository.savePurchaseStock(stock)
-
-  return result
-}
-
-export async function sellPurchasedStock (params = {}, operatorId) {
-  const buildingRepository = new BuildingRepository()
-
-  const building = await buildingRepository.findByIdOrThrow(params.buildingId)
-
-  const sell = createTransaction(params, operatorId)
-
-  const stockRepository = new StockRepository()
-
-  let stock = await stockRepository.findByBuildingIdOrThrow(params.buildingId)
-
-  if (stock.currentStatus !== StockStatuses.PURCHASE) {
-    throw new Error(`El stock no encuentra en estado ${StockStatuses.PURCHASE}`)
-  }
-
-  stock = t.update(stock, {
-    sell: { $set: sell },
-    currentStatus: { $set: StockStatuses.SELL }
-  })
-
-  const result = await stockRepository.save(stock)
-
-  const stockFirebaseRepository = new StockFirebaseRepository()
-  await stockFirebaseRepository.saveSellStock(stock)
-
-  const ownerRepository = new OwnerRepository()
-  await ownerRepository.updateBusinessStatusFirebase(building.ownerId, OwnerBusinessStatus.ALREADY_SOLD, operatorId)
 
   return result
 }
