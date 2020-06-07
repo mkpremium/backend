@@ -13,6 +13,7 @@ SELECT
     building.recentProposal.proposal lastProposal,
     building.\`use\`,
     building.ownerId,
+    building.negotiationStatus,
 
     stock,
 
@@ -89,7 +90,7 @@ export class CommercialsBuildingRepository {
     return buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
-        ownerId, buildingMeetings = [], verifiedOwners, personOwners
+        ownerId, buildingMeetings = [], verifiedOwners, personOwners, negotiationStatus
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
         const ownersWithPerson = verifiedOwners.map(vo => ({...vo, person: personOwners.find(p => p.id === vo.personId)}))
@@ -145,7 +146,7 @@ export class CommercialsBuildingRepository {
             longitude: location.lng ? location.lng : undefined
           } : undefined,
           cadastreReference: cadastreReference || undefined,
-          negotiationStatus: featuredOwner ? featuredOwner.negotiationStatus : undefined,
+          negotiationStatus: negotiationStatus || (featuredOwner ? featuredOwner.negotiationStatus : undefined),
           floorArea,
           usage: use !== null ? use : undefined,
           owner: (featuredOwnerId && {

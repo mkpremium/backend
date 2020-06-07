@@ -4,6 +4,7 @@ import { ListBuildingProposalsService } from '../building/ListBuildingProposalsS
 import { ListBuildingsService } from '../building/ListBuildingsService'
 import { BuildingRepository as LegacyBuildingRepository } from '../building/models'
 import { BuildingsRepository } from '../building/BuildingsRepository'
+import { UpdateBuildingNegotiationStatusService } from '../building/service/UpdateBuildingNegotiationStatusService'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
@@ -51,6 +52,8 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
+
+  container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository)
 
   return container
 }

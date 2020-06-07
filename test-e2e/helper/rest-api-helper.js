@@ -33,3 +33,15 @@ export const authenticatedPost = async (endpoint, user, app, body) => {
     .set('Content-Type', 'application/json')
     .set('Authorization', authenticatedUser.authorization)
 }
+
+export const authenticatedPut = async (endpoint, user, app, body) => {
+  const authenticatedUser = await operatorLogin(app,
+    {username: user.username, password: defaultPassword})
+
+  return request(app)
+    .put(endpoint)
+    // .timeout(DEFAULT_MILLISECONDS_TO_WAIT)
+    .send(body)
+    .set('Content-Type', 'application/json')
+    .set('Authorization', authenticatedUser.authorization)
+}
