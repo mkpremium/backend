@@ -12,16 +12,6 @@ import { FirebaseBuildingData } from '../types/business'
 const debugFb = debug('app:firebase:comerciales')
 
 export async function updateBuildingToFirebase (building, owner) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-
-  const db = fbComerciales.database()
-
-  const snapshot = await db.ref(`${fbComerciales.prefixURL}Buildings/${building.id}`).once('value')
-  if (snapshot.exists()) {
-    return saveBuildingToFirebase(db, building, owner)
-  }
 }
 
 export async function saveBuildingOwnerToFirebase (owner) {

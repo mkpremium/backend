@@ -241,13 +241,6 @@ export class BuildingRepository extends CouchbaseModel {
   }
 
   async removeEntity (building, entityId) {
-    const updatedEntities = building.entities.filter(i => i.id !== entityId)
-    const updatedBuilding = await this.updateEntities(building, updatedEntities)
-
-    const repo = new OwnerRepository()
-    const [owner] = await repo.findByBuildingWithIncludes(building.id)
-
-    await updateBuildingToFirebase(updatedBuilding, owner)
   }
 
   async addEntity (building, params) {

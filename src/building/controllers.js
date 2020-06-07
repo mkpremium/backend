@@ -77,15 +77,6 @@ async function addEntity (req, res) {
   res.status(201).json(entity)
 }
 
-async function removeEntity (req, res) {
-  const buildingRepo = new BuildingRepository()
-  const buildingId = req.params.id
-  const entityId = req.params.entityId
-  const building = await buildingRepo.findByIdOrThrow(buildingId)
-  await buildingRepo.removeEntity(building, entityId)
-  res.status(204).send()
-}
-
 async function updateEntity (req, res) {
   const buildingRepo = new BuildingRepository()
   const buildingId = req.params.id
@@ -112,7 +103,6 @@ export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
 export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
 export const addEntityController = wrap(addEntity)
 export const updateEntityController = wrap(updateEntity)
-export const removeEntityController = wrap(removeEntity)
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createListVerifiedOwnersController = legacyOwnerRepository => {
