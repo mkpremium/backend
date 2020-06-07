@@ -1,12 +1,4 @@
-const validNegotiationStatuses = [
-  'PENDIENTE',
-  'PROPUESTA ENVIADA',
-  'COMPRADO',
-  'VENDIDO',
-  'NO VENDE',
-
-  'DESCARTADO'
-]
+import { buildingNegotiationStatus } from '../../types/building'
 
 export class UpdateBuildingNegotiationStatusService {
   constructor (buildingRepository, eventBus) {
@@ -15,7 +7,7 @@ export class UpdateBuildingNegotiationStatusService {
   }
 
   async updateBuildingStatus (buildingId, negotiationStatus) {
-    if (validNegotiationStatuses.indexOf(negotiationStatus) === -1) {
+    if (buildingNegotiationStatus.indexOf(negotiationStatus) === -1) {
       throw new InvalidBuildingNegotiationStatus(buildingId, negotiationStatus)
     }
 

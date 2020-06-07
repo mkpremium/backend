@@ -271,51 +271,15 @@ export const BuildingMetadataPreview = t.struct({
   previewUrl: t.maybe(t.String)
 })
 
-/**
- * @swagger
- * definitions:
- *   Building:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       address:
- *         $ref: "#/definitions/Address"
- *       buildingType:
- *         type: string
- *         enum: [VERTICAL, HORIZONTAL]
- *       cadastre:
- *         $ref: "#/definitions/Cadastre"
- *       floorArea:
- *         type: number
- *       landArea:
- *         type: number
- *       roofArea:
- *         type: number
- *       coefficient:
- *         type: number
- *       use:
- *         type: string
- *       propertyType:
- *         type: string
- *       buildingDate:
- *         type: number
- *       location:
- *         $ref: "#/definitions/Location"
- *       elements:
- *         $ref: "#/definitions/Elements"
- *       ownerId:
- *         type: string
- *       owner:
- *         $ref: "#/definitions/BuildingOwner"
- *       state:
- *         type: string
- *         enum: [BUENO, MALO]
- *       metadata:
- *         type: array
- *         items:
- *           $ref: "#/definitions/BuildingMetadataPreview"
- */
+export const buildingNegotiationStatus = [
+  'PENDIENTE',
+  'PROPUESTA ENVIADA',
+  'COMPRADO',
+  'VENDIDO',
+  'NO VENDE',
+  'DESCARTADO'
+]
+
 export const Building = t.Building = t.struct(
   {
     id: t.String,
@@ -337,6 +301,7 @@ export const Building = t.Building = t.struct(
     state: BuildingStateEnum,
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),
+    negotiationStatus: t.enums.of(buildingNegotiationStatus),
 
     metadata: t.list(BuildingMetadataPreview),
 
@@ -363,6 +328,7 @@ export const Building = t.Building = t.struct(
       Id_Estado: null,
       buildingType: 'VERTICAL',
       state: 'BUENO',
+      negotiationStatus: 'PENDIENTE',
       _documentType: 'building'
     }
   }
