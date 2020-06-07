@@ -1,35 +1,34 @@
-import t from 'tcomb'
+import { N1qlQuery } from 'couchbase'
 import debug from 'debug'
-import mime from 'mime-types'
-import fromJSON from 'tcomb/lib/fromJSON'
-import { toJSON } from '../lib/tcomb'
+import _ from 'lodash'
 import _get from 'lodash/get'
+import mime from 'mime-types'
 import squel from 'squel'
-import { CouchbaseModel } from '../db/model'
-import { newHttpError } from '../lib/http-error'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
+import { emitModelEvents } from '../../config'
 import { cleanUrl, makePreview, uploadPreview } from '../aws'
+import { CouchbaseModel } from '../db/model'
+import '../firebase'
 import {
   deleteMetadataFromFirebase,
   saveMetadataToFirebase,
   saveProposal,
-  updateBuildingToFirebase, updateProposalToFirebase
+  updateBuildingToFirebase
 } from '../firebase/lib/business'
+import { newHttpError } from '../lib/http-error'
+import { toJSON } from '../lib/tcomb'
 import { updateList } from '../lib/tcomb-utils'
-import { BuildingState, OwnerBusinessStatus } from '../types/enums'
-import { toGeoJSON } from '../street/views'
-import { NeighborhoodRepository } from '../street/models'
 import { OwnerRepository } from '../owner/models'
-import { BuildingMetadata } from './types'
-import { OperatorActions } from '../stats/types'
-import { OperatorStats } from '../stats/models'
-import _ from 'lodash'
-import { N1qlQuery } from 'couchbase'
-import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
-import { emitModelEvents } from '../../config'
 import { ScheduledEvents } from '../scheduled-events/models'
 import { ScheduledEventType } from '../scheduled-events/types'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
-import '../firebase'
+import { OperatorStats } from '../stats/models'
+import { OperatorActions } from '../stats/types'
+import { NeighborhoodRepository } from '../street/models'
+import { toGeoJSON } from '../street/views'
+import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
+import { BuildingState } from '../types/enums'
+import { BuildingMetadata } from './types'
 
 const debugBuilding = debug('app:model:building')
 
@@ -216,23 +215,9 @@ export class BuildingRepository extends CouchbaseModel {
     })
 
     await this.save(updatedBuilding)
-
-    if (proposal.ownerId) {
-      const ownerRepo = new OwnerRepository()
-      await ownerRepo.updateBusinessStatusFirebase(proposal.ownerId, OwnerBusinessStatus.PROPOSAL_SENT, operatorId)
-      const worksheet = await WorksheetRepository.findByBuilding(building.id)
-
-      const worksheetRepository = new WorksheetRepository()
-      await worksheetRepository.syncWorksheetFirebase(worksheet)
-    }
-
     const { city, province } = _get(building, 'address', {})
 
-    if (updatedBuilding.proposals.length === 0) {
-      await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, { city, province })
-    }
-
-    await updateProposalToFirebase(proposal, updatedBuilding)
+    await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, { city, province })
 
     return proposal
   }

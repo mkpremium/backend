@@ -1,33 +1,25 @@
 import debug from 'debug'
+import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import _get from 'lodash/get'
 import { CouchbaseModel } from '../db/model'
-import {
-  addDateQueryToBuilder,
-  addMinuteDateQueryToBuilder,
-  addBetweenQueryToBuilder,
-  addMinuteBetweenQueryToBuilder
-} from '../lib/query/helpers'
-import { newHttpError } from '../lib/http-error'
+import { fbComerciales } from '../firebase'
+import { deleteMeetingToBuilding, deleteMeetingToFirebase, deleteMeetingToOperator } from '../firebase/lib/business'
 import { buildRangeFromWeek, meetingWeekFormat, utc } from '../lib/date'
 import { buildDistanceCalculator } from '../lib/geo'
-import { fbComerciales } from '../firebase'
+import { newHttpError } from '../lib/http-error'
 import {
-  deleteMeetingToBuilding,
-  deleteMeetingToFirebase,
-  deleteMeetingToOperator, denormalizeBuildingMeeting,
-  relateMeetingToBuilding,
-  relateMeetingToOperator,
-  saveBuildingToFirebase,
-  saveMeetingToFirebase, updateBuildingFirebaseProposal
-} from '../firebase/lib/business'
+  addBetweenQueryToBuilder,
+  addDateQueryToBuilder,
+  addMinuteBetweenQueryToBuilder,
+  addMinuteDateQueryToBuilder
+} from '../lib/query/helpers'
 import { OwnerRepository } from '../owner/models'
-import { ScheduledEvent, ScheduledEventType } from './types'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
-import { OperatorActions } from '../stats/types'
 import { OperatorStats } from '../stats/models'
+import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
+import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { ScheduledEvent, ScheduledEventType } from './types'
 
 const debugModel = debug('app:model:scheduled-events')
 
@@ -108,21 +100,9 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async firebaseMeeting (scheduleEvent) {
-    const db = fbComerciales.database()
-
     const repo = new OwnerRepository()
     const ownerId = _get(scheduleEvent, 'event.ownerId')
     await repo.initialBusinessStatus(ownerId, scheduleEvent.notifyTo)
-
-    const meeting = await this.findMeeting(scheduleEvent)
-    const { building, owner } = meeting
-
-    await saveBuildingToFirebase(db, building, owner)
-    await saveMeetingToFirebase(db, meeting)
-    await relateMeetingToBuilding(db, meeting)
-    await relateMeetingToOperator(db, meeting, meeting.notifyTo)
-    await denormalizeBuildingMeeting(meeting.notifyTo, building.id, meeting)
-    await updateBuildingFirebaseProposal(building)
   }
 
   static async firebaseMeetingById (meetingId) {
@@ -224,13 +204,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const qb = this.getQueryBuilder()
       .where('type = ?', ScheduledEventType.MEETINGS)
     return this.query(qb)
-  }
-
-  async findAllMeetingsByBuildingId (buildingId) {
-    const db = this.getQueryBuilder()
-      .where('event.buildingId = ?', buildingId)
-      .where('type = ?', ScheduledEventType.MEETINGS)
-    return this.query(db)
   }
 
   async validateUniqueWorksheet (params) {

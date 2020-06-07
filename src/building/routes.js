@@ -2,7 +2,6 @@ import { Router } from 'express'
 import {
   addEntityController,
   addMetadataToBuildingController,
-  addNegotiationProposalController,
   addOwnerToBuildingController,
   createMetadataUploadUrlController,
   createListBuildingsController,
@@ -10,14 +9,17 @@ import {
   updateEntityController,
   updateNegotiationProposalController,
   createListBuildingProposalsController,
-  createListVerifiedOwnersController, createUpdateBuildingNegotiationStatusController
+  createListVerifiedOwnersController,
+  createUpdateBuildingNegotiationStatusController,
+  createAddNegotiationProposalController
 } from './controllers'
 
 export const createBuildingRoutes = (
   listBuildingsService,
   listBuildingProposalsService,
   legacyOwnerRepository,
-  updateBuildingNegotiationStatusService
+  updateBuildingNegotiationStatusService,
+  legacyBuildingRepository
 ) => {
   const router = Router()
   /**
@@ -151,7 +153,7 @@ export const createBuildingRoutes = (
    *         schema:
    *           $ref: "#/definitions/Error"
    */
-  router.post('/:id/negotiation', addNegotiationProposalController)
+  router.post('/:id/negotiation', createAddNegotiationProposalController(legacyBuildingRepository, updateBuildingNegotiationStatusService))
 
   router.get('/:buildingId/proposals', createListBuildingProposalsController(listBuildingProposalsService))
 

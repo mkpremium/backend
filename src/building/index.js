@@ -7,10 +7,10 @@ export default (app, {
   listBuildingProposalsService,
   updateBuildingNegotiationStatusService
 },
-{ ownerRepository }
+{ ownerRepository, buildingRepository }
 ) => {
   const secured = jwt()
   app.use('/buildings', secured, createBuildingRoutes(
     listBuildingsService, listBuildingProposalsService, ownerRepository,
-    updateBuildingNegotiationStatusService))
+    updateBuildingNegotiationStatusService, buildingRepository))
 }

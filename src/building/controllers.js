@@ -1,4 +1,5 @@
 import { wrap } from 'express-promise-wrap'
+import { OwnerBusinessStatus } from '../types/enums'
 import { BuildingProposalRepository, BuildingRepository } from './models'
 import { getPrivateUploadUrl } from '../aws'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
@@ -12,7 +13,7 @@ export function createListBuildingsController (listBuildingsService) {
     } else if (req.query.allAssignedToMe !== undefined) {
       res.send(await listBuildingsService.buildingsAssignedTo(req.user.operator.id))
     } else {
-      res.status(400).json({error: 'No id or allAssignedToMe provided'})
+      res.status(400).json({ error: 'No id or allAssignedToMe provided' })
     }
   }
 }
@@ -47,12 +48,15 @@ async function createMetadataUploadUrl (req, res) {
   res.json({ url })
 }
 
-async function addNegotiationProposal (req, res) {
-  const buildingRepo = new BuildingRepository()
-  const buildingId = req.params.id
-  const building = await buildingRepo.findByIdOrThrow(buildingId)
-  const proposal = await buildingRepo.addNegotiationProposal(building, req.user.id, req.body)
-  res.status(201).json(proposal)
+export function createAddNegotiationProposalController (legacyBuildingRepository, updateBuildingNegotiationStatusService) {
+  return async (req, res) => {
+    const buildingId = req.params.id
+    const building = await legacyBuildingRepository.findByIdOrThrow(buildingId)
+    const proposal = await legacyBuildingRepository.addNegotiationProposal(building, req.user.id, req.body)
+    await updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, OwnerBusinessStatus.PROPOSAL_SENT)
+
+    res.status(201).json(proposal)
+  }
 }
 
 async function updateNegotiationProposal (req, res) {
@@ -105,7 +109,6 @@ async function addOwnerToBuilding (req, res) {
 
 export const addMetadataToBuildingController = wrap(addMetadataToBuilding)
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
-export const addNegotiationProposalController = wrap(addNegotiationProposal)
 export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
 export const addEntityController = wrap(addEntity)
 export const updateEntityController = wrap(updateEntity)
@@ -118,7 +121,7 @@ export const createListVerifiedOwnersController = legacyOwnerRepository => {
     const result = owners.map(o => ({
       id: o.id,
       name: o.person.name,
-      contacts: (o.person.contacts || []).map(({id, status, type, value}) => ({id, status, type, value})),
+      contacts: (o.person.contacts || []).map(({ id, status, type, value }) => ({ id, status, type, value })),
       featuredContact: o.featuredContact
     }))
 
