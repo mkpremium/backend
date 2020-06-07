@@ -1,13 +1,10 @@
 import Promise from 'bluebird'
 import debug from 'debug'
 import _ from 'lodash'
-import _get from 'lodash/get'
-import _isNil from 'lodash/isNil'
 import { firebaseTimestampFormat, meetingDayFormat } from '../../lib/date'
 import { fbComerciales } from '../index'
 
 import t from '../types'
-import { FirebaseBuildingData } from '../types/business'
 
 const debugFb = debug('app:firebase:comerciales')
 
@@ -32,26 +29,6 @@ export async function deleteMeetingToFirebase (db, meeting) {
     return
   }
   return db.ref(`${fbComerciales.prefixURL}Meetings/${meeting.id}`).set(null)
-}
-
-export async function denormalizeBuildingData (operatorId, meeting) {
-  if (!fbComerciales.enabled) {
-    return
-  }
-
-  const db = fbComerciales.database()
-  const promises = []
-  const { building, owner } = meeting
-  const ref = db.ref(`${fbComerciales.prefixURL}Users/${operatorId}/Buildings/${building.id}`)
-
-  const firebaseBuilding = toFirebaseBuilding(building, owner)
-  promises.push(ref.child('Data').set(firebaseBuilding))
-
-  if (owner) {
-    promises.push(ref.child('Owner').set(owner))
-  }
-
-  return Promise.all(promises)
 }
 
 export async function deleteMeetingToOperator (db, meeting, operatorId) {
@@ -185,24 +162,6 @@ function noteWithTimestamp (note) {
   const json = JSON.parse(JSON.stringify(note))
   const timestamp = firebaseTimestampFormat(note.createdAt)
   return Object.assign({}, json, { timestamp })
-}
-
-function toFirebaseBuilding (building, owner) {
-  const { lat, lng } = building.location
-  let Street = _get(building, 'address.fullAddress')
-  if (_isNil(Street)) {
-    Street = _get(building, 'cadastre.address', '')
-  }
-  return FirebaseBuildingData({
-    Street,
-    Address: building.address,
-    Cadastre: building.cadastre,
-    Aspiration: 0,
-    Proposal: 0,
-    State: _get(owner, 'business.status', ''),
-    lat,
-    lng
-  })
 }
 
 function toFirebaseDocument (metadata) {
