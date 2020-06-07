@@ -31,8 +31,7 @@ import {
 import { ScheduledEvents, ScheduledEventsRepository } from '../../scheduled-events/models'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
-import { saveStreetBuildingToFirebase } from '../../firebase/lib/street'
-import { BuildingState, OwnerBusinessStatus } from '../../types/enums'
+import { OwnerBusinessStatus } from '../../types/enums'
 import { WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 import _map from 'lodash/map'
 import { emitModelEvents } from '../../../config'
@@ -223,26 +222,6 @@ export class WorksheetRepository extends CouchbaseModel {
     // await this.shouldMarkBuildingAndRequestMoreInfo(savedWorksheet);
 
     return savedWorksheet
-  }
-
-  // noinspection JSUnusedGlobalSymbols
-  async shouldMarkBuildingAndRequestMoreInfo (worksheet) {
-    const shouldContinue = worksheet.status === WorkSheetStatus.INVALID
-    worksheetDebug('shouldMarkBuildingAndRequestMoreInfo', worksheet.id, shouldContinue)
-    if (!shouldContinue) {
-      return
-    }
-
-    const buildingRepo = new BuildingRepository()
-
-    const wo = await this.findByIdWIthIncludes(worksheet.id)
-    return Promise.map(wo.relatedBuildings, (building) => {
-      const owner = _find(wo.relatedOwners, { buildingId: building.id })
-      return Promise.all([
-        saveStreetBuildingToFirebase(building, owner),
-        buildingRepo.update(building, { state: BuildingState.MALO })
-      ])
-    })
   }
 
   async sendWorksheetEvent (worksheetId) {
