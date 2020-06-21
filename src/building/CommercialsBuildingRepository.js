@@ -51,11 +51,10 @@ AND buildingId = $1
 
 const assignedBuildingsIdForAgentQuery = `
 SELECT
-    owner.buildingId
-FROM mkpremium owner
-WHERE owner._documentType = 'owner'
-    AND owner.status = 'VERIFICADO'
-    AND owner.business.meetingWithOperatorId = $1
+    building.id buildingId
+FROM mkpremium building
+WHERE building._documentType = 'building'
+    AND building.assignedAgentId = $1
 `
 
 export class CommercialsBuildingRepository {
