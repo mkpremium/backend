@@ -128,10 +128,6 @@ export class WorksheetRepository extends CouchbaseModel {
     return _head(results)
   }
 
-  calculateBusinessStatus (owner) {
-    return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(owner.business.status)
-  }
-
   static mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
     switch (negotiationStatus) {
       case OwnerBusinessStatus.DISCARDED:
