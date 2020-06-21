@@ -9,8 +9,7 @@ import { TypedContactInfo } from './common'
 import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
 
 export const OwnerBusiness = t.struct({
-  meetingWithOperatorId: t.String,
-  status: t.String
+  meetingWithOperatorId: t.String
 }, 'OwnerBusiness')
 
 /**
