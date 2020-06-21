@@ -62,20 +62,6 @@ t.OwnerCompactView = t.struct(
   }
 )
 
-// PRE-CIERRE is not present in Firebase
-/**
- * @swagger
- * definitions:
- *   OwnerUpdateBusinessStatus:
- *     properties:
- *       status:
- *         type: string
- *         enum: [PENDIENTE, PROPUESTA RECHAZADA, PROPUESTA ENVIADA, PRE-CIERRE, COMPRADO, VENDIDO, NO VENDE, DESCARTADO]
- */
-t.OwnerUpdateBusinessStatus = t.struct({
-  status: t.OwnerBusinessStatus
-}, 'OwnerUpdateBusinessStatus')
-
 /**
  * @swagger
  * definitions:
