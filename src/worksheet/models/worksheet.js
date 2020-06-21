@@ -25,15 +25,7 @@ import { ScheduledEvents } from '../../scheduled-events/models'
 import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
-import { OwnerBusinessStatus } from '../../types/enums'
-import {
-  haveOwnerBusiness,
-  isInvalid,
-  ownerAlreadySold,
-  ownerNoSale,
-  ownerVerified,
-  publicEntity
-} from '../../types/owner'
+import { OwnerBusinessStatus, OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
 import { WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 
@@ -78,7 +70,7 @@ export class WorksheetRepository extends CouchbaseModel {
     return worksheet
   }
 
-  async findByIdWIthIncludes (id, includes = ['relatedOwners', 'relatedBuildings']) {
+  async findByIdWIthIncludes (id, includes = [ 'relatedOwners', 'relatedBuildings' ]) {
     let worksheet = await this.findByIdOrThrow(id)
     if (includes.indexOf('relatedBuildings') !== -1 && worksheet.relatedBuildingIds.length > 0) {
       const buildingRepo = new BuildingRepository()
@@ -137,7 +129,11 @@ export class WorksheetRepository extends CouchbaseModel {
   }
 
   calculateBusinessStatus (owner) {
-    switch (owner.business.status) {
+    return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(owner.business.status)
+  }
+
+  static mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
+    switch (negotiationStatus) {
       case OwnerBusinessStatus.DISCARDED:
         worksheetDebug('Owner business status is discarded so status is _PUBLIC')
         return WorkSheetStatus.PUBLIC
@@ -154,74 +150,52 @@ export class WorksheetRepository extends CouchbaseModel {
   }
 
   async calculateFixedStatus (worksheet) {
-    worksheetDebug('calculateFixedStatus', worksheet.id, 'with status', worksheet.status)
-    worksheetDebug('calculateNewStatus', worksheet.id, 'with status', worksheet.status)
-    const isValidLength = worksheet.relatedOwners.length > 0
-    const owners = isValidLength
-      ? await Promise.map(worksheet.relatedOwners, OwnerRepository.validateOwner)
+    if (worksheet.relatedBuildings && worksheet.relatedBuildings.length > 0) {
+      return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(worksheet.relatedBuildings[ 0 ].negotiationStatus)
+    }
+
+    const ownersStatus = worksheet.relatedOwners
+      ? worksheet.relatedOwners.map(owner => ({
+        status: owner.status,
+        isConfirmedByOperator: !!owner.confirmedByOperator.value
+      }))
       : []
 
-    const haveBusiness = isValidLength && haveOwnerBusiness(owners)
-    const someValidOwner = isValidLength && _some(owners, ownerVerified)
-    const isPublicEntity = isValidLength && _some(owners, publicEntity)
-    const everyInvalidOwner = isValidLength && _every(owners, isInvalid)
-    const noSale = isValidLength && _some(owners, ownerNoSale)
-    const alreadySold = isValidLength && _some(owners, ownerAlreadySold)
-    const meetings = await this.findMeetings(worksheet.id)
-    const hasMeeting = meetings.length > 0
-    worksheetDebug('Begin to calculate worksheet status')
-    if (haveBusiness) {
-      worksheetDebug('Begin to calculate worksheet status')
-      return this.calculateBusinessStatus(haveBusiness)
-    }
+    switch (true) {
+      case _some(ownersStatus,
+        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.PUBLIC):
+        return WorkSheetStatus.PUBLIC
+      case _some(ownersStatus,
+        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.NO_SALE):
+        return WorkSheetStatus.NO_SALE
+      case _some(ownersStatus,
+        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.ALREADY_SOLD):
+        return WorkSheetStatus.ALREADY_SOLD
+      case _every(ownersStatus, ({ status }) => status === OwnerStatus.ERROR):
+        return WorkSheetStatus.INVALID
+      case _some(ownersStatus,
+        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
+        return WorkSheetStatus.WITH_OWNER
+      default:
+        const meetings = await this.findMeetings(worksheet.id)
+        if (meetings.length > 0) {
+          return WorkSheetStatus.MEETING
+        }
 
-    if (isPublicEntity) {
-      worksheetDebug('Worksheet new status is _PUBLIC')
-      return WorkSheetStatus.PUBLIC
+        return worksheet.status
     }
-
-    if (noSale) {
-      worksheetDebug('Worksheet new status is _NO_SALE')
-      return WorkSheetStatus.NO_SALE
-    }
-
-    if (alreadySold) {
-      worksheetDebug('Worksheet new status is _ALREADY_SOLD')
-      return WorkSheetStatus.ALREADY_SOLD
-    }
-
-    if (everyInvalidOwner) {
-      worksheetDebug('Worksheet new status is _INVALID')
-      return WorkSheetStatus.INVALID
-    }
-
-    if (hasMeeting) {
-      worksheetDebug('Worksheet new status is _MEETING')
-      return WorkSheetStatus.MEETING
-    }
-
-    if (someValidOwner) {
-      worksheetDebug('Worksheet new status is _WITH_OWNER')
-      return WorkSheetStatus.WITH_OWNER
-    }
-    worksheetDebug(`Worksheet new status is same status ${worksheet.status}`)
-    return worksheet.status
   }
 
   async updateStatus (worksheetId, operatorId) {
     const worksheetData = await this.findByIdWIthIncludes(worksheetId)
     const worksheet = fromJSON(worksheetData, t.WorkSheet)
-    // const newStatus = await this.calculateNewStatus(worksheet);
     const newStatus = await this.calculateFixedStatus(worksheet)
     const updatedWorksheet = worksheet.setStatus(newStatus)
     if (canRegisterVerified(worksheet, newStatus, operatorId)) {
       await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER)
     }
 
-    const savedWorksheet = await this.save(updatedWorksheet)
-    // await this.shouldMarkBuildingAndRequestMoreInfo(savedWorksheet);
-
-    return savedWorksheet
+    return this.save(updatedWorksheet)
   }
 
   async sendWorksheetEvent (worksheetId) {
@@ -234,10 +208,10 @@ export class WorksheetRepository extends CouchbaseModel {
   async addOwner (worksheet, owner) {
     const updatedWorksheet = t.update(worksheet, {
       relatedBuildingIds: {
-        $set: _uniq(worksheet.relatedBuildingIds.concat([owner.buildingId]))
+        $set: _uniq(worksheet.relatedBuildingIds.concat([ owner.buildingId ]))
       },
       relatedOwnerIds: {
-        $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
+        $set: _uniq(worksheet.relatedOwnerIds.concat([ owner.id ]))
       }
     })
 
@@ -258,10 +232,10 @@ export class WorksheetRepository extends CouchbaseModel {
     const totals = {}
 
     provinces.forEach(province => {
-      totals[province] = {}
+      totals[ province ] = {}
       Object.values(WorkSheetStatus).forEach(status => {
         const total = _find(result, { province: province, status: status }) || { count: 0 }
-        totals[province][status] = total.count
+        totals[ province ][ status ] = total.count
       })
     })
 
@@ -272,7 +246,7 @@ export class WorksheetRepository extends CouchbaseModel {
     const bucket = this.getBucketName()
     const sourceFilter = []
     Object.keys(source).forEach(key => {
-      const value = source[key]
+      const value = source[ key ]
       if (!_isNil(value)) {
         sourceFilter.push(`t.buildingAddress.${key} IS NOT MISSING`)
         sourceFilter.push(`t.buildingAddress.${key} = ${JSON.stringify(value)}`)
@@ -310,7 +284,7 @@ export class WorksheetRepository extends CouchbaseModel {
     const worksheet = Worksheet({
       id: uuid(),
       _relatedTo: _get(building, 'owner.name'),
-      relatedBuildingIds: [building.id],
+      relatedBuildingIds: [ building.id ],
       relatedOwnerIds: [],
       buildingAddress: building.address,
       status: WorkSheetStatus.INVALID,
@@ -342,7 +316,7 @@ export class WorksheetRepository extends CouchbaseModel {
       .limit(1)
 
     Object.keys(source).forEach(key => {
-      const value = source[key]
+      const value = source[ key ]
       if (!_isNil(value)) {
         qb.where(`t.buildingAddress.${key} IS NOT MISSING`)
         qb.where(`t.buildingAddress.${key} = ?`, value)
@@ -526,7 +500,7 @@ export class WorksheetRepository extends CouchbaseModel {
   async addOnlyOwner (worksheet, owner) {
     const updatedWorksheet = t.update(worksheet, {
       relatedOwnerIds: {
-        $set: _uniq(worksheet.relatedOwnerIds.concat([owner.id]))
+        $set: _uniq(worksheet.relatedOwnerIds.concat([ owner.id ]))
       }
     })
 

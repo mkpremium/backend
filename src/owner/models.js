@@ -191,22 +191,6 @@ export class OwnerRepository extends CouchbaseModel {
     return owner
   }
 
-  /**
-   *
-   * @param {*} data
-   * @return {Promise<Owner>}
-   */
-  static async validateOwner (data) {
-    const owner = fromJSON(data, t.OwnerWithInclude)
-    const ownerRepo = new OwnerRepository()
-    const updatedOwner = owner.calculateOwnerValidStatus()
-    if (updatedOwner.status !== owner.status) {
-      return ownerRepo.save(updatedOwner, false)
-    }
-
-    return Promise.resolve(owner)
-  }
-
   async findByMigratedId (migratedId) {
     const owners = await super.findByMigratedId(migratedId)
     if (owners.length === 0) {
@@ -214,13 +198,6 @@ export class OwnerRepository extends CouchbaseModel {
     }
 
     return fromJSON(owners[0], this.Struct)
-  }
-
-  async findByBuildingWithIncludes (buildingId, includes = ['person', 'building']) {
-    const qb = this.getQueryBuilder('let').where('buildingId = ?', buildingId)
-    ownerIncludes(qb, includes)
-    const result = await this.query(qb)
-    return result.map(mapOwnerIncludes)
   }
 
   // TODO: .map() should not be used for convert owner.person in object

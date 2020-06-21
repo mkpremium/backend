@@ -379,43 +379,14 @@ export function isPrimaryVerified (data) {
     owner.type === OwnerType.PRINCIPAL
 }
 
-export function ownerVerified (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.VERIFIED
-}
-
 export function ownerVefifiedNoConfirmed (data) {
   const owner = fromJSON(data, Owner)
   return owner.status === OwnerStatus.VERIFIED
 }
 
-export function publicEntity (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.PUBLIC
-}
-
 export function publicEntityNotVerify (data) {
   const owner = fromJSON(data, Owner)
   return owner.status === OwnerStatus.PUBLIC
-}
-
-export function isInvalid (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.status === OwnerStatus.ERROR
-}
-
-export function ownerNoSale (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.NO_SALE
-}
-
-export function ownerAlreadySold (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.ALREADY_SOLD
 }
 
 export function haveOwnerBusiness (owners) {
