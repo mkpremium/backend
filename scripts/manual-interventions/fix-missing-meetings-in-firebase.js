@@ -1,6 +1,6 @@
-const { dependenciesPromise } = require('../src/app')
+const { dependenciesPromise } = require('../../src/app')
 
-const { ScheduledEventsRepository } = require('../src/scheduled-events/models')
+const { ScheduledEventsRepository } = require('../../src/scheduled-events/models')
 const missingMeetings = require('../missing_meetings')
 
 dependenciesPromise.then(() => {
