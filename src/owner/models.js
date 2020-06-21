@@ -289,40 +289,6 @@ export class OwnerRepository extends CouchbaseModel {
     }
   }
 
-  async updateBusinessStatusFirebase (ownerId, status, updatedBy) {
-    const owner = await this.updateBusinessStatus(ownerId, status, updatedBy)
-    const [updatedOwner] = await this.findByIdWithIncludes(ownerId, ['building', 'person'])
-    await OwnerRepository.recalculateWorksheetStatus(updatedOwner)
-    return owner
-  }
-
-  static async recalculateWorksheetStatus (owner) {
-    const repo = new WorksheetRepository()
-    const worksheet = await WorksheetRepository.findByBuilding(owner.buildingId)
-    return repo.updateStatus(worksheet.id)
-  }
-
-  async updateBusinessStatus (ownerId, status, updatedBy) {
-    const owner = await this.findByIdOrThrow(ownerId)
-
-    const update = $set => {
-      const updatedOwner = t.update(owner, { business: { $set } })
-      return this.save(updatedOwner)
-    }
-
-    if (owner.business) {
-      const updatedBusiness = t.update(owner.business, { status: { $set: status } })
-      return update(updatedBusiness)
-    } else {
-      // no definido antes? no cita?
-      const business = {
-        status,
-        meetingWithOperatorId: updatedBy
-      }
-      return update(business)
-    }
-  }
-
   async addContact (ownerId, body) {
     const personRepo = new PersonRepository()
     const owner = await this.findByIdOrThrow(ownerId)
