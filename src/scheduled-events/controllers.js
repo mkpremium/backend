@@ -3,7 +3,7 @@ import { ScheduledEventsRepository } from './models'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { WorksheetQueueRepository } from '../worksheet/models/queue'
-import { canScheduleCall, canScheduleMeeting } from '../lib/role-operators'
+import { canScheduleCall } from '../lib/role-operators'
 
 async function listScheduledEvent (req, res) {
   const repo = new ScheduledEventsRepository()
@@ -41,15 +41,6 @@ async function addScheduledCallEvent (req, res) {
   res.status(201).json(scheduledEvent)
 }
 
-async function addScheduledMeetingEvent (req, res) {
-  const repo = new ScheduledEventsRepository()
-
-  canScheduleMeeting(req.user.operator, req.body.notifyTo)
-
-  const scheduledEvent = await repo.addScheduledMeetingEvent(req.body, req.user.id)
-  res.status(201).json(scheduledEvent)
-}
-
 async function updateScheduledEvent (req, res) {
   const id = req.params.id
   const repo = new ScheduledEventsRepository()
@@ -68,6 +59,12 @@ export const listScheduledEventController = wrap(listScheduledEvent)
 export const weekScheduleEventMeetingsController = wrap(weekScheduleEventMeetings)
 export const findScheduledEventController = wrap(findByIdScheduledEvent)
 export const addScheduledCallEventController = wrap(addScheduledCallEvent)
-export const addScheduledMeetingEventController = wrap(addScheduledMeetingEvent)
 export const updateScheduledEventController = wrap(updateScheduledEvent)
 export const deleteScheduledEventController = wrap(deleteScheduledEvent)
+
+export const createAddScheduledMeetingEventController = (createMeetingService) => {
+  return async (req, res) => {
+    const scheduledEvent = await createMeetingService.createMeeting(req.user.operator, req.body)
+    res.status(201).json(scheduledEvent)
+  }
+}

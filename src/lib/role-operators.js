@@ -1,21 +1,11 @@
 import _get from 'lodash/get'
-import { OperatorRoles } from '../types/operator'
 import _intersection from 'lodash/intersection'
+import { OperatorRoles } from '../types/operator'
 import { newHttpError } from './http-error'
-
-export function isStreet (roles) {
-  const { STREET, STREET_MANAGER, STREET_ADMIN } = OperatorRoles
-  return _intersection(roles, [STREET, STREET_MANAGER, STREET_ADMIN]).length > 0
-}
 
 export function isStreetAdmin (roles) {
   const { STREET_ADMIN } = OperatorRoles
   return _intersection(roles, [STREET_ADMIN]).length === 1
-}
-
-export function isStreetManager (roles) {
-  const { STREET_MANAGER } = OperatorRoles
-  return _intersection(roles, [STREET_MANAGER]).length === 1
 }
 
 export function canManageStreet (roles) {
@@ -102,16 +92,5 @@ export function canScheduleCall (operator, operatorId) {
     throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
   }
 
-  return true
-}
-
-export function canScheduleMeeting (operator, operatorId) {
-  if (!isManager(operator.roles)) {
-    if (!isOperator(operator.roles)) {
-      if (isBusiness(operator.roles) && operator.id !== operatorId) {
-        throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
-      }
-    }
-  }
   return true
 }

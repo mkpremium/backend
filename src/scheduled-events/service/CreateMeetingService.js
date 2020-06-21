@@ -1,0 +1,32 @@
+import { newHttpError } from '../../lib/http-error'
+import { isBusiness } from '../../lib/role-operators'
+
+export class CreateMeetingService {
+  constructor (scheduledEventsRepository, eventBus) {
+    this.scheduledEventsRepository = scheduledEventsRepository
+    this.eventBus = eventBus
+  }
+
+  async createMeeting (operator, requestBody) {
+    const meetingOperatorId = requestBody.notifyTo
+    this.checkOperatorPermissions(operator, meetingOperatorId)
+
+    const createdMeeting = await this.scheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
+    await this.eventBus.publish(new MeetingCreated(createdMeeting.notifyTo, createdMeeting.event.buildingId))
+
+    return createdMeeting
+  }
+
+  checkOperatorPermissions (operator, meetingOperatorId) {
+    if (isBusiness(operator.roles) && operator.id !== meetingOperatorId) {
+      throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
+    }
+  }
+}
+
+export class MeetingCreated {
+  constructor (operatorId, buildingId) {
+    this.operatorId = operatorId
+    this.buildingId = buildingId
+  }
+}

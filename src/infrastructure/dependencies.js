@@ -13,6 +13,8 @@ import { OwnerRepository } from '../owner/OwnerRepository'
 import { SetOwnerFeaturedContactService } from '../owner/SetOwnerFeaturedContactService'
 import { PropertyManagerRankingService } from '../PropertyManager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../PropertyManager/PropertyManagerRepository'
+import { ScheduledEventsRepository } from '../scheduled-events/models'
+import { CreateMeetingService } from '../scheduled-events/service/CreateMeetingService'
 
 import { StockSalesService } from '../stock/service/StockSalesService'
 import { StockRepository } from '../stock/StockRepository'
@@ -28,6 +30,7 @@ export const createLegacyDependenciesContainer = () => {
   container.ownerRepository = new LegacyOwnerRepository()
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
+  container.scheduledEventsRepository = new ScheduledEventsRepository()
 
   return container
 }
@@ -59,10 +62,16 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
 
-  container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, {
+  const eventBus = {
     publish: (event) => {
     }
-  })
+  }
+  container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
+
+  container.createMeetingService = new CreateMeetingService(
+    legacyDependenciesContainer.scheduledEventsRepository,
+    eventBus
+  )
 
   container.stockSalesService = new StockSalesService(
     container.updateBuildingNegotiationStatusService,
