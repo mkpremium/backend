@@ -60,13 +60,6 @@ async function addOwnerContact (req, res) {
   res.json(updatedOwner)
 }
 
-async function addOwner (req, res) {
-  const repo = new OwnerRepository()
-  const owner = await repo.createOwnerAndPerson(req.body)
-  await History.registerCreate({ contextModel: owner, user: req.user })
-  res.status(201).json(owner)
-}
-
 async function ownerList (req, res) {
   const repo = new OwnerRepository()
   const owners = await repo.list(req.query)
@@ -76,7 +69,6 @@ async function ownerList (req, res) {
 export const updateOwnerContactController = wrap(updateOwnerContact)
 export const updateOwnerController = wrap(updateOwner)
 export const addOwnerContactController = wrap(addOwnerContact)
-export const addOwnerController = wrap(addOwner)
 export const listOwnerController = wrap(ownerList)
 
 export const createSetFeaturedContactController = setOwnerFeaturedContactService => {
