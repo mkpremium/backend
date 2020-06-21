@@ -11,7 +11,7 @@ import { BuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { updateList } from '../lib/tcomb-utils'
-import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
+import { OwnerStatus } from '../types/enums'
 import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerListQuery } from './types'
@@ -251,18 +251,6 @@ export class OwnerRepository extends CouchbaseModel {
     }
 
     return owner
-  }
-
-  async initialBusinessStatus (ownerId, meetingWithOperatorId) {
-    const owner = await this.findByIdOrThrow(ownerId)
-    if (!owner.business) {
-      const business = {
-        status: OwnerBusinessStatus.PENDING,
-        meetingWithOperatorId
-      }
-      const updatedOwner = t.update(owner, { business: { $set: business } })
-      return this.save(updatedOwner, false)
-    }
   }
 
   async addContact (ownerId, body) {
