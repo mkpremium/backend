@@ -1,16 +1,16 @@
-import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
+import debug from 'debug'
+import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
-import _filter from 'lodash/filter'
-import { Building } from './building'
-import { Queue } from './constants'
-import debug from 'debug'
-import '../owner/types'
-import { Address } from './common'
-import { newHttpError } from '../lib/http-error'
-import { ScheduledEvent } from '../scheduled-events/types'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
 import { utc } from '../lib/date'
+import { newHttpError } from '../lib/http-error'
+import '../owner/types'
+import { ScheduledEvent } from '../scheduled-events/types'
+import { Building } from './building'
+import { Address } from './common'
+import { Queue } from './constants'
 
 const debugWorksheet = debug('app:types:worksheet')
 
@@ -24,11 +24,6 @@ export const WorkSheetStatus = {
   PUBLIC: 'ENTE_PUBLICO'
 }
 
-export const NotFinalWorksheetStats = [
-  WorkSheetStatus.DEFAULT,
-  WorkSheetStatus.WITH_OWNER
-]
-
 export const worksheetStatusCanBeInsideFreezer = function (status) {
   switch (status) {
     case WorkSheetStatus.PUBLIC:
@@ -39,37 +34,7 @@ export const worksheetStatusCanBeInsideFreezer = function (status) {
   }
 }
 
-export const workSheetStatusTransition = function (status) {
-  switch (status) {
-    case WorkSheetStatus.DEFAULT:
-      return Object.values(WorkSheetStatus)
-    case WorkSheetStatus.WITH_OWNER:
-      return [
-        status,
-        WorkSheetStatus.NO_SALE,
-        WorkSheetStatus.MEETING,
-        WorkSheetStatus.PUBLIC,
-        WorkSheetStatus.ALREADY_SOLD
-      ]
-    case WorkSheetStatus.MEETING:
-    case WorkSheetStatus.NO_SALE:
-      return [
-        status,
-        WorkSheetStatus.WITH_OWNER
-      ]
-    // end status
-    case WorkSheetStatus.ALREADY_SOLD:
-    case WorkSheetStatus.INVALID:
-    case WorkSheetStatus.PUBLIC:
-      return [
-        status
-      ]
-    default:
-      throw new Error(`Unknown worksheet transition status "${status}"`)
-  }
-}
-
-export const WorksheetStatus = t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
+t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
 
 t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
 
@@ -420,10 +385,6 @@ t.WorksheetQueue.prototype.findItemById = function (id) {
 
 t.WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
   return _find(this.worksheets, { worksheetId })
-}
-
-t.WorksheetQueue.prototype.findItemByOperatorId = function (operatorId) {
-  return _find(this.worksheets, { operatorId })
 }
 
 t.WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
