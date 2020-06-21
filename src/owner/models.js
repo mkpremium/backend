@@ -399,22 +399,6 @@ GROUP BY t.status, building[0].address.city`
     return results && results.length && _.first(results)
   }
 
-  /**
-   *
-   * @param buildingId - the building id
-   * @param ownerStatus - owner status
-   * @returns {Promise<*>}
-   */
-  async findAllByBuildingId (buildingId, ownerStatus) {
-    const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
-      .where('t.`status` = ?', ownerStatus)
-
-    const results = await this.query(qb)
-    const ownerIds = _.map(results, 'id')
-    return this.findByIdWithIncludes(ownerIds, ['person', 'building'])
-  }
-
   async findAllVerifiedOwnersByBuildingId (buildingId) {
     const qb = this.getQueryBuilder()
       .where('t.`buildingId` = ?', buildingId)
