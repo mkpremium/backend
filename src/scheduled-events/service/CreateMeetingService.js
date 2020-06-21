@@ -2,16 +2,18 @@ import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
 
 export class CreateMeetingService {
-  constructor (scheduledEventsRepository, eventBus) {
+  constructor (scheduledEventsRepository, buildingRepository, eventBus) {
+    this.buildingRepository = buildingRepository
     this.scheduledEventsRepository = scheduledEventsRepository
     this.eventBus = eventBus
   }
 
   async createMeeting (operator, requestBody) {
-    const meetingOperatorId = requestBody.notifyTo
-    this.checkOperatorPermissions(operator, meetingOperatorId)
+    const meetingAgentId = requestBody.notifyTo
+    this.checkOperatorPermissions(operator, meetingAgentId)
 
     const createdMeeting = await this.scheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
+    await this.buildingRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
     await this.eventBus.publish(new MeetingCreated(createdMeeting.notifyTo, createdMeeting.event.buildingId))
 
     return createdMeeting

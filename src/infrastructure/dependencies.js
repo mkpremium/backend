@@ -70,6 +70,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
 
   container.createMeetingService = new CreateMeetingService(
     legacyDependenciesContainer.scheduledEventsRepository,
+    buildingRepository,
     eventBus
   )
 

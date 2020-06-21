@@ -302,6 +302,7 @@ export const Building = t.struct(
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),
     negotiationStatus: t.enums.of(buildingNegotiationStatus),
+    assignedAgentId: t.maybe(t.String),
 
     metadata: t.list(BuildingMetadataPreview),
 

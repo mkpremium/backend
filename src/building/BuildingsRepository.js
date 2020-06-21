@@ -12,6 +12,12 @@ SET negotiationStatus = $2
 WHERE _documentType = 'building' AND id = $1
 `
 
+const assignBuildingToAgentQuery = `
+UPDATE mkpremium
+SET assignedAgentId = $2
+WHERE _documentType = 'building' AND id = $1
+`
+
 export class BuildingsRepository {
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
@@ -26,6 +32,12 @@ export class BuildingsRepository {
   async setBuildingNegotiationStatus (buildingId, negotiationStatus) {
     await this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(setBuildingNegotiationStatusQuery), [ buildingId, negotiationStatus ]
+    )
+  }
+
+  async assignBuildingToAgent (buildingId, agentId) {
+    await this.couchbaseAdapter.queryAsync(
+      N1qlQuery.fromString(assignBuildingToAgentQuery), [ buildingId, agentId ]
     )
   }
 }
