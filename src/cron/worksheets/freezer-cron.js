@@ -1,5 +1,7 @@
 import { CronJob } from 'cron'
 import debug from 'debug'
+import { CouchbaseModel } from '../../db/model'
+import { createDependenciesContainer, createLegacyDependenciesContainer } from '../../infrastructure/dependencies'
 import { utc } from '../../lib/date'
 import { moveWorksheetOutOfFreezer } from '../../business/worksheets/freezer'
 import { SystemPreferencesRepository } from '../../system-preferences/models'
@@ -13,7 +15,12 @@ async function onTick () {
   const pref = await SystemPreferencesRepository.getPreferences()
   if (pref.freezer.enable) {
     cronDebug(`Executing freezer cron at ${utc().startOf('minute').toISOString()}`)
-    await moveWorksheetOutOfFreezer(false, 500)
+    const dependencies = createDependenciesContainer(
+      await CouchbaseModel.prototype._promiseBucket, {},
+      createLegacyDependenciesContainer()
+    )
+
+    await moveWorksheetOutOfFreezer(false, 500, dependencies.buildingRepository)
   } else {
     cronDebug(`Freeze cron called at ${utc().startOf('minute').toISOString()} but do nothing is disabled`)
   }

@@ -1,32 +1,30 @@
+import Promise from 'bluebird'
 import debug from 'debug'
+import _ from 'lodash'
+import fromJSON from 'tcomb/lib/fromJSON'
+import { utc } from '../../lib/date'
+import { OwnerRepository } from '../../owner/models'
+import { SystemPreferencesRepository } from '../../system-preferences/models'
+import { OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
 import { WorksheetRepository } from '../../worksheet/models/worksheet'
-import { utc } from '../../lib/date'
-import Promise from 'bluebird'
-import fromJSON from 'tcomb/lib/fromJSON'
-import { SystemPreferencesRepository } from '../../system-preferences/models'
-import { OwnerRepository } from '../../owner/models'
-import { OwnerStatus } from '../../types/enums'
-import { removeBuildingFromBusiness } from '../../firebase/lib/business'
-import { BuildingRepository } from '../../building/models'
-import { ScheduledEventsRepository } from '../../scheduled-events/models'
 
 const debugFreezer = debug('app:worksheets:freezer')
 
 let changeNothing
 let limit = 100
 
-export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100) {
+export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100, buildingRepository) {
   changeNothing = dryRun
   limit = argLimit
   const { freezer } = await SystemPreferencesRepository.getPreferences()
   debugFreezer('starting to move worksheets from freezer settings', freezer)
-  await moveNoSaleWorksheets(freezer)
-  await moveFreezerWorksheets(freezer)
+  await moveNoSaleWorksheets(freezer, buildingRepository)
+  await moveFreezerWorksheets(freezer, buildingRepository)
   debugFreezer('end of freezer process')
 }
 
-export async function moveFreezerWorksheets ({ daysInFreezer, provinces }) {
+export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
   const maxDays = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new WorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
@@ -41,10 +39,10 @@ export async function moveFreezerWorksheets ({ daysInFreezer, provinces }) {
   }
 
   const worksheets = await repository.query(queryBuilder)
-  return pullOutFreezer(worksheets)
+  return pullOutFreezer(worksheets, buildingRepository)
 }
 
-export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }) {
+export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
   const dateDaysAgo = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new WorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
@@ -58,10 +56,10 @@ export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }) {
   }
 
   const worksheets = await repository.query(queryBuilder)
-  return pullOutFreezer(worksheets)
+  return pullOutFreezer(worksheets, buildingRepository)
 }
 
-async function pullOutFreezer (worksheets) {
+async function pullOutFreezer (worksheets, buildingRepository) {
   if (!worksheets || worksheets.length === 0) {
     return
   }
@@ -89,6 +87,8 @@ async function pullOutFreezer (worksheets) {
   }
 
   await Promise.map(updatedWorksheets, saveWorksheet, { concurrency: 1 })
+  const outOfFreezerBuildingIds = _.flatMap(updatedWorksheets.map(({relatedBuildingIds}) => relatedBuildingIds))
+  await buildingRepository.pullBuildingsOutOfFreezer(outOfFreezerBuildingIds)
 }
 
 export async function moveOwnerStatus (buildingId) {
@@ -99,53 +99,11 @@ export async function moveOwnerStatus (buildingId) {
     return
   }
 
-  const businessToRemove = []
-
   const updatedOwners = owners.map(owner => {
-    const toState = owner.status === OwnerStatus.NO_SALE ? OwnerStatus.VERIFIED : owner.status
-    debugFreezer(`moving owner ${owner.id} with current status ${owner.status} to ${toState}`)
-    if (owner.business) {
-      businessToRemove.push({ businessId: owner.business.meetingWithOperatorId, buildingId: owner.buildingId })
-    }
-
     return owner.pullOutFreezer(OwnerStatus.VERIFIED)
   })
 
-  const saveOwner = owner => repository.save(owner, false)
-
-  const cleanBusiness = async ({ buildingId, businessId }) => {
-    await removeBuildingFromBusiness(buildingId, businessId)
-    try {
-      await cleanMeetings(buildingId)
-    } catch (e) {
-      debugFreezer('an error happen removing the meetings of building', buildingId, e)
-    }
-  }
-
   if (updatedOwners.length > 0) {
-    await Promise.map(updatedOwners, saveOwner, { concurrency: 3 })
+    await Promise.map(updatedOwners, owner => repository.save(owner, false), { concurrency: 3 })
   }
-
-  if (businessToRemove.length > 0) {
-    await Promise.map(businessToRemove, cleanBusiness, { concurrency: 2 })
-  }
-}
-
-async function cleanMeetings (buildingId) {
-  const worksheet = await WorksheetRepository.findByBuilding(buildingId)
-  const worksheetMeetings = await WorksheetRepository.findMeetings(worksheet.id)
-  const buildingMeetings = await BuildingRepository.findMeetings(buildingId)
-  const removed = {}
-  const options = { concurrency: 1 }
-  const repo = new ScheduledEventsRepository()
-
-  await Promise.map(worksheetMeetings.concat(buildingMeetings), async (meeting) => {
-    if (removed[meeting.id]) {
-      return
-    }
-
-    removed[meeting.id] = true
-
-    return repo.delete(meeting.id)
-  }, options)
 }

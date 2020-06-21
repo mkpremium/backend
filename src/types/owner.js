@@ -308,8 +308,7 @@ Owner.prototype.setStatus = function ($set) {
 
 Owner.prototype.pullOutFreezer = function (newStatus) {
   return t.update(this, {
-    status: { $set: newStatus },
-    business: { $set: null }
+    status: { $set: newStatus }
   })
 }
 

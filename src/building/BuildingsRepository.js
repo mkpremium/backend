@@ -18,6 +18,12 @@ SET assignedAgentId = $2
 WHERE _documentType = 'building' AND id = $1
 `
 
+const pullBuildingOutOfFreezerQuery = `
+UPDATE mkpremium
+UNSET assignedAgentId, negotiationStatus
+WHERE _documentType = 'building' AND id IN $1
+`
+
 export class BuildingsRepository {
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
@@ -38,6 +44,12 @@ export class BuildingsRepository {
   async assignBuildingToAgent (buildingId, agentId) {
     await this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(assignBuildingToAgentQuery), [ buildingId, agentId ]
+    )
+  }
+
+  async pullBuildingsOutOfFreezer (buildingIds) {
+    await this.couchbaseAdapter.queryAsync(
+      N1qlQuery.fromString(pullBuildingOutOfFreezerQuery), [ buildingIds ]
     )
   }
 }
