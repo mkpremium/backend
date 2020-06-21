@@ -51,12 +51,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     await repo.initialBusinessStatus(ownerId, scheduleEvent.notifyTo)
   }
 
-  static async firebaseMeetingById (meetingId) {
-    const repo = new ScheduledEventsRepository()
-    const meeting = await repo.findByIdOrThrow(meetingId)
-    return repo.firebaseMeeting(meeting)
-  }
-
   async validateMeeting (data) {
     if (data.type !== ScheduledEventType.MEETINGS) {
       return true

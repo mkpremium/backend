@@ -1,10 +1,10 @@
 import { wrap } from 'express-promise-wrap'
-import { OwnerBusinessStatus } from '../types/enums'
-import { BuildingProposalRepository, BuildingRepository } from './models'
 import { getPrivateUploadUrl } from '../aws'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
-import { OwnerRepository } from '../owner/models'
 import { History } from '../history/models'
+import { OwnerRepository } from '../owner/models'
+import { OwnerBusinessStatus } from '../types/enums'
+import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { BuildingProposalRepository, BuildingRepository } from './models'
 
 export function createListBuildingsController (listBuildingsService) {
   return async (req, res) => {
@@ -77,7 +77,6 @@ async function addOwnerToBuilding (req, res) {
   await worksheetRepo.addOwner(worksheet, owner)
   await History.registerCreate({ contextModel: owner, user: req.user })
   await History.registerUpdate({ contextModel: worksheet, user: req.user })
-  await worksheetRepo.syncWorksheetFirebase(worksheet)
   res.status(201).json(owner)
 }
 

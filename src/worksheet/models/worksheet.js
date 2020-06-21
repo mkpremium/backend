@@ -1,25 +1,31 @@
 import Promise from 'bluebird'
-import uuid from 'uuid/v4'
 import { N1qlQuery } from 'couchbase'
-import t from 'tcomb'
 import debug from 'debug'
 import _ from 'lodash'
-import _get from 'lodash/get'
-import _head from 'lodash/head'
-import _some from 'lodash/some'
 import _every from 'lodash/every'
 import _find from 'lodash/find'
+import _get from 'lodash/get'
+import _head from 'lodash/head'
 import _isNil from 'lodash/isNil'
+import _map from 'lodash/map'
+import _some from 'lodash/some'
+import _uniq from 'lodash/uniq'
+import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
+import uuid from 'uuid/v4'
+import { emitModelEvents } from '../../../config'
+import { BuildingRepository } from '../../building/models'
 
 import { CouchbaseModel } from '../../db/model'
-import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
 import { newHttpError } from '../../lib/http-error'
+import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
 import { OwnerRepository } from '../../owner/models'
-import { BuildingRepository } from '../../building/models'
-import _uniq from 'lodash/uniq'
 import { ownersContactViews } from '../../owner/types'
-import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
+import { ScheduledEvents } from '../../scheduled-events/models'
+import { ScheduledEventType } from '../../scheduled-events/types'
+import { OperatorStats } from '../../stats/models'
+import { OperatorActions } from '../../stats/types'
+import { OwnerBusinessStatus } from '../../types/enums'
 import {
   haveOwnerBusiness,
   isInvalid,
@@ -28,14 +34,8 @@ import {
   ownerVerified,
   publicEntity
 } from '../../types/owner'
-import { ScheduledEvents, ScheduledEventsRepository } from '../../scheduled-events/models'
-import { OperatorActions } from '../../stats/types'
-import { OperatorStats } from '../../stats/models'
-import { OwnerBusinessStatus } from '../../types/enums'
+import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
 import { WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
-import _map from 'lodash/map'
-import { emitModelEvents } from '../../../config'
-import { ScheduledEventType } from '../../scheduled-events/types'
 
 const worksheetDebug = debug('app:model:worksheet')
 
@@ -319,16 +319,6 @@ export class WorksheetRepository extends CouchbaseModel {
     const repo = new WorksheetRepository()
 
     return repo.save(worksheet, emitModelEvents)
-  }
-
-  async syncWorksheetFirebase (worksheet) {
-    const worksheetMeetings = await WorksheetRepository.findMeetings(worksheet.id)
-    const buildingMeetings = await BuildingRepository.findMeetings(worksheet.relatedBuildingIds[0])
-    const allMeetingIds = (worksheetMeetings || []).concat(buildingMeetings || []).map(({ id }) => id)
-    const meetings = _.chain(allMeetingIds).compact().uniq().value()
-    if (meetings.length > 0) {
-      return Promise.mapSeries(meetings, id => ScheduledEventsRepository.firebaseMeetingById(id))
-    }
   }
 
   async preSave (data) {
