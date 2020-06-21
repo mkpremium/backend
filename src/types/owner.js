@@ -257,7 +257,7 @@ export const Owner = t.struct(
   {
     id: t.maybe(t.String),
     type: t.OwnerType,
-    status: t.OwnerStatus,
+    status: OwnerStatusEnum,
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
     business: t.maybe(OwnerBusiness),
