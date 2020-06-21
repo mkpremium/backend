@@ -401,12 +401,6 @@ export function publicEntityNotVerify (data) {
   return owner.status === OwnerStatus.PUBLIC
 }
 
-export function isInvalidVerified (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.ERROR
-}
-
 export function isInvalid (data) {
   const owner = fromJSON(data, Owner)
   return owner.status === OwnerStatus.ERROR
@@ -422,16 +416,6 @@ export function ownerAlreadySold (data) {
   const owner = fromJSON(data, Owner)
   return owner.confirmedByOperator.value &&
     owner.status === OwnerStatus.ALREADY_SOLD
-}
-
-export function isAllowedChangeState (data) {
-  const owner = fromJSON(data, Owner)
-  return [
-    OwnerStatus.ALREADY_SOLD,
-    OwnerStatus.NO_SALE,
-    OwnerStatus.VERIFIED,
-    OwnerStatus.PUBLIC
-  ].indexOf(owner.status) !== -1
 }
 
 export function haveOwnerBusiness (owners) {
