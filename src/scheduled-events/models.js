@@ -45,12 +45,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     return scheduledEvent
   }
 
-  async firebaseMeeting (scheduleEvent) {
-    const repo = new OwnerRepository()
-    const ownerId = _get(scheduleEvent, 'event.ownerId')
-    await repo.initialBusinessStatus(ownerId, scheduleEvent.notifyTo)
-  }
-
   async validateMeeting (data) {
     if (data.type !== ScheduledEventType.MEETINGS) {
       return true
@@ -120,12 +114,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       }
     }
 
-    try {
-      await this.firebaseMeeting(scheduledEvent)
-    } catch (e) {
-      console.error(e)
-    }
-
     return scheduledEvent
   }
 
@@ -167,10 +155,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       }
     })
 
-    const updatedScheduledEvent = await this.save(updatedScheduledEventData)
-    await this.firebaseMeeting(updatedScheduledEvent)
-
-    return updatedScheduledEvent
+    return this.save(updatedScheduledEventData)
   }
 
   async delete (id) {
