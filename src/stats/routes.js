@@ -1,11 +1,12 @@
 import { Router } from 'express'
-import {
-  overAllController, overProvincesController,
-  ownerBusinessStatsController,
-  ownerStatsController,
-  performanceController, worksheetStatsController
-} from './controller'
 import { permissions } from '../middleware/jwt'
+import {
+  overAllController,
+  overProvincesController,
+  ownerStatsController,
+  performanceController,
+  worksheetStatsController
+} from './controller'
 
 const router = Router()
 
@@ -225,35 +226,5 @@ router.get('/owner', permissions.manager, ownerStatsController)
  *           $ref: "#/definitions/Error"
  */
 router.get('/worksheets', permissions.manager, worksheetStatsController)
-
-/**
- * @swagger
- * /stats/owner-business:
- *   get:
- *     tags: [Stats, Manager]
- *     summary: "Obtiene estadisticas de los owner actuales comerciales"
- *     security:
- *       - manager: []
- *       - admin: []
- *     consumes:
- *       - "application/json"
- *     produces:
- *       - "application/json"
- *     responses:
- *       200:
- *         schema:
- *           type: "array"
- *           items:
- *             $ref: "#/definitions/OperatorResults"
- *       401:
- *         description: Credenciales inválidos o cuenta deshabilitada
- *         schema:
- *           $ref: "#/definitions/Error"
- *       403:
- *         description: Permisos insuficientes
- *         schema:
- *           $ref: "#/definitions/Error"
- */
-router.get('/owner-business', permissions.manager, ownerBusinessStatsController)
 
 export default router
