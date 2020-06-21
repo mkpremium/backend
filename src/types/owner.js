@@ -115,7 +115,6 @@ export const Owner = t.struct(
     status: OwnerStatusEnum,
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
-    business: t.maybe(OwnerBusiness),
     name: t.maybe(t.String),
 
     note: t.maybe(t.String),
@@ -140,7 +139,6 @@ export const Owner = t.struct(
       _documentType: 'owner',
       _relatedTo: '',
       _migrateId: null,
-      business: null,
       _secondMigration: false,
       _verifiedMigrateId: null
     }
