@@ -14,10 +14,6 @@ export class StockSalesService {
     await this.legacyBuildingRepository.findByIdOrThrow(params.buildingId)
     const stock = await this.legacyStockRepository.findByBuildingIdOrThrow(params.buildingId)
 
-    if (stock.currentStatus !== StockStatuses.PURCHASE) {
-      throw new Error(`El stock no se encuentra en estado ${StockStatuses.PURCHASE}`)
-    }
-
     const sell = createTransaction(params, operatorId)
     const updatedStock = t.update(stock, {
       sell: { $set: sell },
