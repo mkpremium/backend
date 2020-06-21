@@ -18,7 +18,7 @@ SELECT
     stock,
 
     ARRAY {m.eventDate, "ownerId": m.event.owner.id} FOR m IN buildingMeetings END buildingMeetings,
-    ARRAY {"negotiationStatus": o.business.status, o.id, o.featuredContact, o.personId} FOR o IN verifiedOwners END verifiedOwners,
+    ARRAY {o.id, o.featuredContact, o.personId} FOR o IN verifiedOwners END verifiedOwners,
     ARRAY {p.id, p.firstName, "fullName": p.name, p.contacts} FOR p IN personOwners END personOwners
 FROM mkpremium building
 LEFT NEST mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
@@ -146,7 +146,7 @@ export class CommercialsBuildingRepository {
             longitude: location.lng ? location.lng : undefined
           } : undefined,
           cadastreReference: cadastreReference || undefined,
-          negotiationStatus: negotiationStatus || (featuredOwner ? featuredOwner.negotiationStatus : undefined),
+          negotiationStatus: negotiationStatus || undefined,
           floorArea,
           usage: use !== null ? use : undefined,
           owner: (featuredOwnerId && {
