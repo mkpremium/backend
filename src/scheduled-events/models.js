@@ -135,12 +135,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     return scheduledEvent
   }
 
-  async findAllMeetings () {
-    const qb = this.getQueryBuilder()
-      .where('type = ?', ScheduledEventType.MEETINGS)
-    return this.query(qb)
-  }
-
   async validateUniqueWorksheet (params) {
     const worksheetId = _get(params, 'event.worksheetId')
     const type = _get(params, 'type')
