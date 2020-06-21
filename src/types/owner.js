@@ -1,40 +1,16 @@
 import _ from 'lodash'
-import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { Building } from './building'
 import { TypedContactInfo } from './common'
-import { OwnerStatus, OwnerStatusEnum, OwnerType } from './enums'
+import { OwnerStatusEnum, OwnerType } from './enums'
 
 export const OwnerBusiness = t.struct({
   meetingWithOperatorId: t.String
 }, 'OwnerBusiness')
 
-/**
- * @swagger
- * definitions:
- *   OwnerBody:
- *     required:
- *       - status
- *     properties:
- *       person:
- *         $ref: "#/definitions/PersonBody"
- *       personId:
- *         type: string
- *         format: uuid/v4
- *       buildingId:
- *         type: string
- *         format: uuid/v4
- *       note:
- *         type: string
- *       type:
- *         type: string
- *       status:
- *         type: string
- *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
- */
 export const OwnerBody = t.struct(
   {
     type: t.maybe(t.OwnerType),
@@ -43,8 +19,7 @@ export const OwnerBody = t.struct(
     person: t.maybe(t.Object),
     personId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
-    note: t.maybe(t.String),
-    business: t.maybe(OwnerBusiness)
+    note: t.maybe(t.String)
   },
   {
     name: 'OwnerBody',
@@ -58,93 +33,6 @@ export const OwnerBody = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   OwnerUpdate:
- *     properties:
- *       type:
- *         type: string
- *         description: Tipo de propietario
- *       status:
- *         type: string
- *       note:
- *         type: string
- *       buildingId:
- *         type: string
- *         format: uuid/v4
- *         description: Id del edificio relacionado
- *       personId:
- *         type: string
- *         format: uuid/v4
- *         description: Id de la persona relacionada
- *       confirmed:
- *         type: boolean
- */
-t.OwnerUpdate = t.struct({
-  type: t.maybe(t.OwnerType),
-  status: t.maybe(t.OwnerStatus),
-  business: t.maybe(OwnerBusiness),
-  note: t.maybe(t.String),
-  buildingId: t.maybe(t.String),
-  person: t.maybe(t.Object),
-  confirmed: t.maybe(t.Boolean)
-}, 'OwnerUpdate')
-
-/**
- * @swagger
- * definitions:
- *   PersonBody:
- *     properties:
- *       name:
- *         type: string
- *         description: Nombre de organización
- *       firstName:
- *         type: string
- *       firstSurname:
- *         type: string
- *       secondSurname:
- *         type: string
- *       documentNumber:
- *         type: string
- *       contacts:
- *         type: array
- *         items:
- *           $ref: "#/definitions/TypedContactInfo"
- *       birthDate:
- *         type: string
- *         format: "DD-MM-YYYY"
- *
- */
-
-/**
- * @swagger
- * definitions:
- *   Person:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       name:
- *         type: string
- *         description: Nombre de organización
- *       firstName:
- *         type: string
- *       firstSurname:
- *         type: string
- *       secondSurname:
- *         type: string
- *       documentNumber:
- *         type: string
- *       contacts:
- *         type: array
- *         items:
- *           $ref: "#/definitions/TypedContactInfo"
- *       birthDate:
- *         type: string
- *         format: "DD-MM-YYYY"
- *
- */
 export const Person = t.Person = t.struct(
   {
     id: t.maybe(t.String),
@@ -200,11 +88,6 @@ t.Person.prototype.findContactById = function (id) {
   return _find(this.contacts, { id })
 }
 
-t.Person.prototype.findContactValueById = function (id) {
-  const contact = this.findContactById(id)
-  return contact ? contact.value : null
-}
-
 t.Person.prototype.fullName = function () {
   return `${this.name}`.trim()
 }
@@ -213,33 +96,6 @@ t.Person.prototype.contactValueExists = function (value) {
   return !!_find(this.contacts, { value })
 }
 
-/**
- * @swagger
- * definitions:
- *   Owner:
- *     required:
- *       - person
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       personId:
- *         type: string
- *         format: uuid/v4
- *       buildingId:
- *         type: string
- *         format: uuid/v4
- *       note:
- *         type: string
- *       type:
- *         type: string
- *       verified:
- *         type: boolean
- *         description: "Verifica la información por un operador humano"
- *       status:
- *         type: string
- *         enum: [NO_VERIFICADO, VERIFICADO, NO_SALE, ERRONEO]
- */
 t.OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
@@ -312,29 +168,6 @@ Owner.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
-/**
- * @return {Owner}
- */
-t.OwnerWithInclude.prototype.calculateOwnerValidStatus = function () {
-  if (!this.person) {
-    throw new Error(`owner ${this.id} cannot calculateOwnerStatus`)
-  }
-
-  const contacts = _get(this, 'person.contacts', [])
-  const hasNoContacts = contacts.length === 0
-
-  const isBadContact = contact =>
-    this.confirmedByOperator.value && contact.status === 'BAD'
-
-  const ownerIsInvalid = hasNoContacts || _every(contacts, isBadContact)
-
-  if (ownerIsInvalid) {
-    return t.update(this, { status: { $set: OwnerStatus.ERROR } })
-  }
-
-  return this
-}
-
 Owner.prototype.findFirstGoodContact = function () {
   if (this.person) {
     return this.person.prototype.findFirstGoodContact()
@@ -353,56 +186,12 @@ Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   })
 }
 
-Owner.prototype.isPrimaryVerified = function () {
-  return isPrimaryVerified(this)
-}
-
 export function familyOwner (data) {
   const owner = fromJSON(data, Owner)
   return [
     OwnerType.PRINCIPAL,
     OwnerType.SECONDARY
   ].indexOf(owner.type) !== -1
-}
-
-export function isPrimary (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.type === OwnerType.PRINCIPAL
-}
-
-export function isPrimaryVerified (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.confirmedByOperator.value &&
-    owner.status === OwnerStatus.VERIFIED &&
-    owner.type === OwnerType.PRINCIPAL
-}
-
-export function ownerVefifiedNoConfirmed (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.status === OwnerStatus.VERIFIED
-}
-
-export function publicEntityNotVerify (data) {
-  const owner = fromJSON(data, Owner)
-  return owner.status === OwnerStatus.PUBLIC
-}
-
-export function haveOwnerBusiness (owners) {
-  const ownerWithBusiness = owners.filter(owner => !_.isEmpty(owner.business))
-
-  switch (ownerWithBusiness.length) {
-    case 0:
-      return null
-    case 1:
-      return ownerWithBusiness[0]
-    default: // more than 1
-      return goodOwnerBusiness(ownerWithBusiness)
-  }
-}
-
-function goodOwnerBusiness (owners) {
-  const sorted = owners.sort(sortByConfirmedAt)
-  return sorted[0]
 }
 
 function sortByConfirmedAt (a, b) {
