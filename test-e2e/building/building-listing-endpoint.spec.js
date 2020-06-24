@@ -159,7 +159,11 @@ describe('Building listing endpoint', () => {
               street: building2.address.street,
               number: building2.address.number
             },
-            floorArea: building2.floorArea
+            floorArea: building2.floorArea,
+            negotiationStatus: 'PENDIENTE',
+            owner: {
+              id: 'other-owner'
+            }
           }
         ])
       })

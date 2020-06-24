@@ -15,7 +15,7 @@ SELECT
     building.ownerId,
     building.negotiationStatus,
 
-    stock,
+    stock[0] stock,
 
     ARRAY {m.eventDate, "ownerId": m.event.owner.id} FOR m IN buildingMeetings END buildingMeetings,
     ARRAY {o.id, o.featuredContact, o.personId} FOR o IN verifiedOwners END verifiedOwners,

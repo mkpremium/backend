@@ -43,7 +43,7 @@ export const createOwner = async (app) => {
   const { ownerRepository } = app.locals.legacyDependenciesContainer
 
   return ownerRepository.createOwnerAndPerson({
-    status: OwnerStatus.NON_VERIFIED,
+    status: OwnerStatus.VERIFIED,
     person: {
       name: testOwnerName,
       firstName: testOwnerFirstName,
