@@ -25,9 +25,9 @@ export class StockRepository extends CouchbaseModel {
   async findByBuildingIdOrDefault (buildingId) {
     const result = await this.findByBuildingId(buildingId)
     if (!result) {
-      console.log(`No existe un stock asociado a ${buildingId}`)
       return null
     }
+
     return result
   }
 
@@ -37,21 +37,6 @@ export class StockRepository extends CouchbaseModel {
       throw new Error(`No existe un stock asociado a ${buildingId}`)
     }
     return result
-  }
-
-  async listProfitRankings (params) {
-    const currentYear = new Date().getFullYear()
-    const profitsQuery = `
-      SELECT close.operatorId, SUM(close.gain) as total
-      FROM mkpremium
-      WHERE _documentType = 'stock'
-      AND close IS NOT NULL
-      AND DATE_PART_STR(close.transactionDate,'year') = ${currentYear}
-      GROUP BY close.operatorId
-      ORDER BY total
-      `
-
-    return this.raw(profitsQuery)
   }
 }
 
