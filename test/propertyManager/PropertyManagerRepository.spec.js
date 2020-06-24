@@ -14,6 +14,7 @@ describe('PropertyManagerRepository', () => {
     propertyManagerRepository = new PropertyManagerRepository(new CouchbaseAdapter(couchbaseBucket))
     operatorRepository = new OperatorRepository()
     await couchbaseBucket.removeAll()
+    await new Promise(resolve => setTimeout(resolve, 50))
   })
 
   describe('getActivePropertyManagers', () => {
