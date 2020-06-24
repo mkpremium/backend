@@ -80,5 +80,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     legacyDependenciesContainer.stockRepository
   )
 
+  container.couchbaseAdapter = couchbaseAdapter
+
   return container
 }
