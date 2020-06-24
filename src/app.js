@@ -55,6 +55,7 @@ dependenciesPromise.then(() => {
   user(app, dependenciesContainer)
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
+  scheduledEvents(app, dependenciesContainer)
 
   app.locals.dependenciesContainer = dependenciesContainer
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
@@ -81,7 +82,6 @@ maintenanceMode(app)
 operator(app)
 worksheet(app)
 calls(app)
-scheduledEvents(app)
 history(app)
 migration(app)
 notes(app)
