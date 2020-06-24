@@ -1,21 +1,18 @@
-import { CouchbaseAdapter } from '../../src/db/CouchbaseAdapter'
-import { PropertyManagerRepository } from '../../src/PropertyManager/PropertyManagerRepository'
 import { expect } from 'chai'
 import couchbase from '../../src/db/couchbase'
+import { CouchbaseAdapter } from '../../src/db/CouchbaseAdapter'
 import { OperatorRepository } from '../../src/operator/models'
-import { buildOperator } from '../common'
+import { PropertyManagerRepository } from '../../src/PropertyManager/PropertyManagerRepository'
 import { OperatorRoles } from '../../src/types/operator'
+import { buildOperator } from '../common'
 
 describe('PropertyManagerRepository', () => {
   let couchbaseBucket, propertyManagerRepository, operatorRepository
 
-  before(async () => {
+  beforeEach(async () => {
     couchbaseBucket = await couchbase()
     propertyManagerRepository = new PropertyManagerRepository(new CouchbaseAdapter(couchbaseBucket))
     operatorRepository = new OperatorRepository()
-  })
-
-  beforeEach(async () => {
     await couchbaseBucket.removeAll()
   })
 
