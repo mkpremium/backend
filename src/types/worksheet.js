@@ -3,7 +3,6 @@ import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { utc } from '../lib/date'
 import { newHttpError } from '../lib/http-error'
 import '../owner/types'
@@ -44,33 +43,6 @@ t.WorkSheetCall = t.struct({
   realizedAt: t.Date
 }, 'WorkSheetCall')
 
-/**
- * @swagger
- * definitions:
- *   Worksheet:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       owner:
- *         $ref: "#/definitions/Owner"
- *       queueId:
- *         type: string
- *         format: uuid/v4
- *       relatedOwners:
- *         type: array
- *         items:
- *           $ref: "#/definitions/RelatedOwner"
- *       relatedBuildings:
- *         type: array
- *         items:
- *           $ref: "#/definitions/Building"
- *       ownerContacts:
- *         type: array
- *         items:
- *           $ref: "#/definitions/OwnerCompactView"
- *
- */
 export const Worksheet = t.WorkSheet = t.struct({
   id: t.maybe(t.String),
   worksheetIndex: t.maybe(t.Number),
@@ -164,37 +136,6 @@ t.WorkSheet.prototype.setStatusChangedAt = function (newDate) {
   return t.update(this, { statusChangedAt: { $set: newDate } })
 }
 
-/**
- * @swagger
- * definitions:
- *   RelatedOwner:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       person:
- *         $ref: "#/definitions/Person"
- *       note:
- *         type: string
- *       type:
- *         type: string
- */
-
-/**
- * @swagger
- * definitions:
- *   QueueItem:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       operator:
- *         $ref: "#/definitions/Operator"
- *       worksheet:
- *         $ref: "#/definitions/Worksheet"
- *       status:
- *         type: string
- */
 t.QueueItem = t.struct(
   {
     id: t.maybe(t.String),
@@ -270,20 +211,6 @@ t.QueueItem.prototype.releaseSchedule = function (operatorId) {
   throw newHttpError(400, 'No puede liberar este item')
 }
 
-/**
- * @swagger
- * definitions:
- *   WorksheetQueueSource:
- *     properties:
- *       city:
- *         type: string
- *       province:
- *         type: string
- *       zone:
- *         type: string
- *       neighborhood:
- *         type: string
- */
 const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
   province: t.maybe(t.String),
@@ -291,19 +218,6 @@ const WorksheetQueueSource = t.struct({
   neighborhood: t.maybe(t.String)
 }, 'source')
 
-/**
- * @swagger
- * definitions:
- *   WorksheetQueueBody:
- *     required:
- *       - name
- *       - source
- *     properties:
- *       name:
- *         type: string
- *       source:
- *         $ref: "#/definitions/WorksheetQueueSource"
- */
 t.WorksheetQueueBody = t.struct(
   {
     name: t.String,
@@ -316,23 +230,6 @@ t.WorksheetQueueBody = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   WorksheetQueue:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       name:
- *         type: string
- *       source:
- *         $ref: "#/definitions/WorksheetQueueSource"
- *       worksheets:
- *         type: array
- *         items:
- *           $ref: "#/definitions/QueueItem"
- */
 t.WorksheetQueue = t.struct(
   {
     id: t.maybe(t.String),
@@ -401,8 +298,4 @@ t.WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = nu
   const currentIndex = _findIndex(this.worksheets, { id: currentItemId })
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets
   return _find(worksheets, { status: Queue.Status.AVAILABLE })
-}
-
-export function newWorksheet (data) {
-  return fromJSON(data, t.WorkSheet)
 }
