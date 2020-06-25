@@ -7,10 +7,6 @@ import { Building } from './building'
 import { TypedContactInfo } from './common'
 import { OwnerStatusEnum, OwnerType } from './enums'
 
-export const OwnerBusiness = t.struct({
-  meetingWithOperatorId: t.String
-}, 'OwnerBusiness')
-
 export const OwnerBody = t.struct(
   {
     type: t.maybe(t.OwnerType),
