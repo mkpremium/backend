@@ -3,7 +3,7 @@ import { History } from '../history/models'
 import { newHttpError } from '../lib/http-error'
 import { FeaturedContact, Owner } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
-import { OwnerRepository, PersonRepository } from './models'
+import { OwnerRepository } from './models'
 import { OwnerNotFound } from './OwnerRepository'
 import { EmptyFeaturedContact } from './SetOwnerFeaturedContactService'
 import t from './types'
@@ -37,17 +37,6 @@ async function updateOwner (req, res) {
   await repo.save(updatedOwner)
 
   await History.registerUpdate({ contextModel, user: req.user })
-
-  if (owner.status !== updatedOwner.status) {
-    const personRepository = new PersonRepository()
-    const person = personRepository.findById(updatedOwner.personId)
-    const updatedPerson = t.update(person, {
-      $set: {
-        active: owner.status === 'VERIFICADO'
-      }
-    })
-    await personRepository.save(updatedPerson)
-  }
 
   res.status(204).send()
 }
