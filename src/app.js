@@ -20,7 +20,7 @@ import history from './history'
 import notes from './notes'
 import building from './building'
 import metadata from './metadata'
-import people from './person'
+
 import stats from './stats'
 import street from './street'
 import autocomplete from './autocomplete'
@@ -84,7 +84,6 @@ calls(app)
 history(app)
 notes(app)
 metadata(app)
-people(app)
 stats(app)
 street(app)
 autocomplete(app)
