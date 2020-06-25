@@ -34,43 +34,19 @@ export const Person = t.struct(
     id: t.maybe(t.String),
     name: t.String,
     firstName: t.maybe(t.String),
-    firstSurname: t.maybe(t.String),
-    secondSurname: t.maybe(t.String),
     documentNumber: t.maybe(t.String), // Note: make unique one day
 
     contacts: t.list(TypedContactInfo),
-    addresses: t.list(t.SimpleAddress),
-    _address: t.maybe(t.SimpleAddress),
-    birthDate: t.maybe(t.Date),
-    birthYear: t.maybe(t.Number),
-    gender: t.maybe(t.Gender),
-
-    personType: t.PersonType,
     active: t.maybe(t.Boolean),
 
-    _documentType: t.String,
-
-    _migrateId: t.maybe(t.String),
-    _migrateOwnerId: t.maybe(t.String),
-    _relatedTo: t.maybe(t.String),
-    _secondMigration: t.maybe(t.Boolean),
-    _verifiedOwnerMigrateId: t.maybe(t.String)
+    _documentType: t.String
   },
   {
     name: 'Person',
     defaultProps: {
       contacts: [],
-      addresses: [],
-      gender: 'NINGUNO',
       _documentType: 'person',
-      active: true,
-      personType: 'NATURAL',
-      _secondMigration: false,
-      birthDate: null,
-      birthYear: null,
-      _migrateId: null,
-      _address: null,
-      _verifiedOwnerMigrateId: null
+      active: true
     }
   }
 )
