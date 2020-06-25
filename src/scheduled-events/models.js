@@ -73,7 +73,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const m = utc(data.eventDate)
     const start = m.clone().subtract(previousTime, 'hours').toISOString()
     const end = m.clone().add(meetingTime, 'hours').toISOString()
-    console.log('areAllowedMeetingInRange', data.eventDate, start, end)
     const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end, data.id)
     if (meetingsInRange && meetingsInRange.length > 0) {
       throw newHttpError(
