@@ -10,7 +10,7 @@ import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { TypedContactInfo } from '../types/common'
 import { OwnerStatus } from '../types/enums'
-import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
+import { Owner, OwnerBody, Person } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerListQuery } from './types'
 
@@ -110,7 +110,7 @@ export class OwnerRepository extends CouchbaseModel {
       building = await buildingRepository.findByIdOrThrow(buildingId)
     }
 
-    const person = PersonStruct(ownerBody.person)
+    const person = Person(ownerBody.person)
     body.name = person.fullName()
 
     const owner = await this.save(body)
