@@ -15,10 +15,7 @@ import { ScheduledEvents } from '../scheduled-events/models'
 import { ScheduledEventType } from '../scheduled-events/types'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { NeighborhoodRepository } from '../street/models'
-import { toGeoJSON } from '../street/views'
 import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
-import { BuildingState } from '../types/enums'
 import { BuildingMetadata } from './types'
 
 const debugBuilding = debug('app:model:building')
@@ -222,38 +219,6 @@ export class BuildingRepository extends CouchbaseModel {
     return this.save(updatedBuilding)
   }
 
-  async findWrongStateBuildingsByCity (city) {
-    const qb = this.getQueryBuilder()
-    qb.where('address.city = ?', city)
-    qb.where('state = ?', BuildingState.MALO)
-
-    const buildings = await this.query(qb)
-
-    return toGeoJSON(buildings)
-  }
-
-  async calculateStatsByCity (city) {
-    const qb = this.getQueryBuilder('count')
-    qb.where('address.city = ?', city)
-
-    qb
-      .field('state')
-      .field('address.city')
-      .field('address.neighborhood')
-      .group('state')
-      .group('address.city')
-      .group('address.neighborhood')
-
-    return this.query(qb)
-  }
-
-  async findWrongStateBuildingsStatsByCity (city) {
-    const neighborhoodRepo = new NeighborhoodRepository()
-    const neighborhoods = await neighborhoodRepo.findByCity(city)
-    const results = await this.calculateStatsByCity(city)
-    return calculeStateTotals(results, neighborhoods)
-  }
-
   async searchBuilding (query) {
     const qs = this.getSearchBuilder(query)
     qs.highlight()
@@ -268,23 +233,6 @@ export class BuildingRepository extends CouchbaseModel {
     return results && results.length && _.first(results)
   }
 
-  /**
-   *
-   * @param buildingIds
-   * @returns {Promise<*>}
-   */
-  async findBuildingsByIds (buildingIds) {
-    const ids = `[${buildingIds.map(id => `'${id}'`).join(', ')}]`
-    const qb = this.getQueryBuilder()
-      .where(`id IN ${ids}`)
-    return this.query(qb)
-  }
-
-  /**
-   *
-   * @param buildingId
-   * @returns {Promise<*>}
-   */
   async getBuildingNotesIds (buildingId) {
     const bucket = this.getBucketName()
     const documentType = 'note'
@@ -315,30 +263,6 @@ export class BuildingRepository extends CouchbaseModel {
 
     return this.raw(query)
   }
-}
-
-function calculeStateTotals (results, neighborhoods) {
-  const bad = results.filter(r => r.state === BuildingState.MALO)
-  const good = results.filter(r => r.state === BuildingState.BUENO)
-  const completeResults = []
-
-  neighborhoods.forEach(neighborhood => {
-    const rBad = bad.find(filterStateByNeighborhood(neighborhood, BuildingState.MALO))
-    const rGood = good.find(filterStateByNeighborhood(neighborhood, BuildingState.BUENO))
-
-    completeResults.push({
-      [`C-${neighborhood.name}`]: _get(rGood, 'count', 0),
-      [`D-${neighborhood.name}`]: _get(rBad, 'count', 0)
-    })
-  })
-
-  return completeResults
-}
-
-function filterStateByNeighborhood (neighborhood, state) {
-  return (rb) =>
-    rb.neighborhood === neighborhood.name &&
-    rb.state === state
 }
 
 export function calculateElements ({ commons }, entities) {

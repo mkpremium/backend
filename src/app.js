@@ -22,7 +22,6 @@ import building from './building'
 import metadata from './metadata'
 
 import stats from './stats'
-import street from './street'
 import autocomplete from './autocomplete'
 import email from './email'
 import gearman from './gearman'
@@ -85,7 +84,6 @@ history(app)
 notes(app)
 metadata(app)
 stats(app)
-street(app)
 autocomplete(app)
 email(app)
 cadastre(app)
