@@ -89,8 +89,6 @@ export class CommercialsBuildingRepository {
         ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
-        // const ownersWithPerson = verifiedOwners.map(vo => ({...vo, person: personOwners.find(p => p.id === vo.personId)}))
-        //   .filter(vo => !!vo.person)
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
         const featuredOwnerId = ownerId ||
