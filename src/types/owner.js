@@ -29,7 +29,7 @@ export const OwnerBody = t.struct(
   }
 )
 
-export const Person = t.Person = t.struct(
+export const Person = t.struct(
   {
     id: t.maybe(t.String),
     name: t.String,
@@ -75,20 +75,20 @@ export const Person = t.Person = t.struct(
   }
 )
 
-t.Person.prototype.findFirstGoodContact = function () {
+Person.prototype.findFirstGoodContact = function () {
   const contact = _find(this.contacts, { status: 'GOOD' }, {})
   return _get(contact, 'value')
 }
 
-t.Person.prototype.findContactById = function (id) {
+Person.prototype.findContactById = function (id) {
   return _find(this.contacts, { id })
 }
 
-t.Person.prototype.fullName = function () {
+Person.prototype.fullName = function () {
   return `${this.name}`.trim()
 }
 
-t.Person.prototype.contactValueExists = function (value) {
+Person.prototype.contactValueExists = function (value) {
   return !!_find(this.contacts, { value })
 }
 
@@ -143,7 +143,7 @@ export const Owner = t.struct(
 
 export const OwnerWithInclude = t.OwnerWithInclude = Owner.extend({
   building: t.maybe(Building),
-  person: t.maybe(t.Person)
+  person: t.maybe(Person)
 })
 
 Owner.prototype.fullName = function () {

@@ -1,6 +1,6 @@
 import uuid from 'uuid/v4'
 import * as t from 'tcomb'
-import { Owner } from '../../types/owner'
+import { Owner, Person } from '../../types/owner'
 import { cleanObjectKeys, removeNullValues } from './models-helper'
 import { difference, isEmpty, merge, omit } from 'lodash'
 
@@ -197,7 +197,7 @@ export default function migrateFromCsv (data) {
 
   const name = input.ragionesociale || `NO Name ${input.id_fornitore}`
 
-  const person = t.Person({
+  const person = Person({
     id: uuid(),
     name,
     firstName: input.num_3,

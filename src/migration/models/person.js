@@ -2,6 +2,7 @@ import uuid from 'uuid/v4'
 import _get from 'lodash/get'
 import _uniq from 'lodash/uniq'
 import t from 'tcomb'
+import { Person } from '../../types/owner'
 import { removeNullValues, cleanObjectKeys } from './models-helper'
 
 export const PersonInputDTO = t.struct({
@@ -109,7 +110,7 @@ export default function migrateFromCsv (data = {}, codes) {
 
   const addr = address(input, codes)
 
-  return t.Person({
+  return Person({
     id: uuid(),
     name,
     firstName: _get(input, 'nombre', ''),
