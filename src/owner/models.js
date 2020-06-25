@@ -16,20 +16,7 @@ import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerListQuery } from './types'
 
-export class Person extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = t.Person
-  }
-}
-
-export const ContactStatus = {
-  UNDEFINED: 'UNDEFINED',
-  GOOD: 'GOOD',
-  BAD: 'BAD'
-}
-
-export class PersonRepository extends Person {
+export class PersonRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = PersonStruct
