@@ -69,51 +69,7 @@ export const ContactInfoStatus = t.TypedContactInfoStatus = t.enums({
   BAD: 'BAD'
 })
 
-/**
- * @swagger
- * definitions:
- *   TypedContactInfoBody:
- *     required:
- *       - type
- *       - status
- *       - value
- *     properties:
- *       type:
- *         type: string
- *         enum: [TELEFONO, FAX, MOVIL, EMAIL, SITIO_WEB]
- *       value:
- *         type: string
- *       note:
- *         type: string
- *       status:
- *         type: string
- *         enum: [UNDEFINED, GOOD, BAD]
- */
-
-/**
- * @swagger
- * definitions:
- *   TypedContactInfo:
- *     required:
- *       - type
- *       - status
- *       - value
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       type:
- *         type: string
- *         enum: [TELEFONO, FAX, MOVIL, EMAIL, SITIO_WEB]
- *       value:
- *         type: string
- *       note:
- *         type: string
- *       status:
- *         type: string
- *         enum: [UNDEFINED, GOOD, BAD]
- */
-export const TypedContactInfo = t.TypedContactInfo = t.struct(
+export const TypedContactInfo = t.struct(
   {
     id: t.String,
     type: TypeContact,

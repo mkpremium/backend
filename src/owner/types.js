@@ -3,6 +3,7 @@ import _flatten from 'lodash/flatten'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { isTest } from '../../config'
+import { TypedContactInfo } from '../types/common'
 import { OwnerWithInclude } from '../types/owner'
 
 t.OwnerCompactView = t.struct(
@@ -16,7 +17,7 @@ t.OwnerCompactView = t.struct(
       id: t.String,
       name: t.String
     }, 'person'),
-    contact: t.TypedContactInfo
+    contact: TypedContactInfo
   },
   {
     name: 'OwnerView',

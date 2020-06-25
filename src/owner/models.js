@@ -8,6 +8,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { BuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
+import { TypedContactInfo } from '../types/common'
 import { OwnerStatus } from '../types/enums'
 import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
@@ -26,24 +27,6 @@ export class PersonRepository extends CouchbaseModel {
     }
 
     return person
-  }
-
-  async addContact (personId, body = {}) {
-    const newContact = new t.TypedContactInfo(body)
-    const person = await this.findById(personId)
-
-    if (!person) {
-      throw newHttpError(400, `La persona ${personId} asociada al propietario no pudo ser encontrada`)
-    }
-
-    if (person.contactValueExists(newContact.value)) {
-      throw newHttpError(400, `La persona ${personId} asociada al propietario ya tiene un contacto con el mismo valor`)
-    }
-
-    const updatedContacts = t.update(person.contacts, { $push: [newContact] })
-    const updatedPerson = t.update(person, { contacts: { $merge: updatedContacts } })
-
-    return this.save(updatedPerson)
   }
 }
 
@@ -124,7 +107,7 @@ export class OwnerRepository extends CouchbaseModel {
       $merge: {
         person: t.update(owner.person, {
           $merge: {
-            contacts: [ {id: contactId, ...data}, ...otherContacts ]
+            contacts: [ { id: contactId, ...data }, ...otherContacts ]
           }
         })
       }
@@ -158,10 +141,19 @@ export class OwnerRepository extends CouchbaseModel {
   }
 
   async addContact (ownerId, body) {
-    const personRepo = new PersonRepository()
     const owner = await this.findByIdOrThrow(ownerId)
-
-    return personRepo.addContact(owner.personId, body)
+    const updatedOwner = t.update(owner, {
+      $merge: {
+        person: t.update(owner.person, {
+          $merge: {
+            contacts: t.update(owner.person.contacts, {
+              $push: [new TypedContactInfo(body)]
+            })
+          }
+        })
+      }
+    })
+    return this.save(updatedOwner)
   }
 
   async getContactPhoneNumber (ownerId, contactId) {
@@ -237,7 +229,7 @@ GROUP BY t.status, building[0].address.city`
 
     const results = await this.query(qb)
     const ownerIds = _.map(results, 'id')
-    const owners = await this.findByIdWithIncludes(ownerIds, ['person', 'building'])
+    const owners = await this.findByIdWithIncludes(ownerIds, [ 'person', 'building' ])
     return this.getVerifiedOwners(owners)
   }
 

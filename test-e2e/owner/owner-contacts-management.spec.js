@@ -1,19 +1,21 @@
 import { expect } from 'chai'
 import { operatorCreateBusiness } from '../../test/common'
 import { createOwner, testPhoneContactId } from '../helper/mother-of-objects'
-import { authenticatedPut, initApplication } from '../helper/rest-api-helper'
+import { authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
 
 describe('Building owner contacts management', () => {
-  let app, businessUser
+  let app, businessUser, owner
 
   before(async () => {
     app = await initApplication()
     businessUser = await operatorCreateBusiness()
   })
 
-  it('modifies a contact', async () => {
-    const owner = await createOwner(app)
+  beforeEach(async () => {
+    owner = await createOwner(app)
+  })
 
+  it('modifies a contact', async () => {
     const contactInfoToUpdate = {
       type: 'EMAIL',
       value: 'test@example.org',
@@ -31,6 +33,24 @@ describe('Building owner contacts management', () => {
           note: null,
           ...contactInfoToUpdate
         })
+      })
+  })
+
+  it('adds a contact', async () => {
+    const contactInfoToAdd = {
+      type: 'EMAIL',
+      value: 'test@example.org',
+      status: 'GOOD'
+    }
+
+    await authenticatedPost(`/owners/${owner.id}/contacts`, businessUser, app, contactInfoToAdd)
+      .then(async (response) => {
+        expect(response.status).to.be.equal(200)
+        const { ownerRepository } = app.locals.legacyDependenciesContainer
+        const savedOwner = await ownerRepository.findById(owner.id)
+
+        expect(savedOwner.person.contacts.length).to.be.equal(2)
+        expect(savedOwner.person.contacts[ 1 ]).to.include(contactInfoToAdd)
       })
   })
 })
