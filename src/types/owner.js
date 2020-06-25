@@ -94,11 +94,7 @@ export const Owner = t.struct(
     confirmedByOperator: t.OwnerConfirmed,
     featuredContact: t.maybe(FeaturedContact),
 
-    _migrateId: t.maybe(t.Any),
-    _relatedTo: t.maybe(t.String),
-    _documentType: t.String,
-    _secondMigration: t.maybe(t.Boolean),
-    _verifiedMigrateId: t.maybe(t.String)
+    _documentType: t.String
   },
   {
     name: 'Owner',
@@ -108,11 +104,7 @@ export const Owner = t.struct(
       },
       type: 'NINGUNO',
       status: 'NO_VERIFICADO',
-      _documentType: 'owner',
-      _relatedTo: '',
-      _migrateId: null,
-      _secondMigration: false,
-      _verifiedMigrateId: null
+      _documentType: 'owner'
     }
   }
 )
