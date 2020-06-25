@@ -8,7 +8,6 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { BuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
-import { updateList } from '../lib/tcomb-utils'
 import { OwnerStatus } from '../types/enums'
 import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
@@ -27,19 +26,6 @@ export class PersonRepository extends CouchbaseModel {
     }
 
     return person
-  }
-
-  async updateContact (personId, contactId, data) {
-    const person = await this.findByIdOrThrow(personId)
-    const contact = person.findContactById(contactId)
-    if (!contact) {
-      throw newHttpError(400, `La información de contacto ${contactId} no fue encontrada y no pudo actualizarse`)
-    }
-
-    const updatedContacts = updateList(person.contacts, contact, Object.assign({}, data, { id: contactId }))
-    const updatedPerson = t.update(person, { contacts: { $merge: updatedContacts } })
-
-    return this.save(updatedPerson)
   }
 
   async addContact (personId, body = {}) {
@@ -128,8 +114,23 @@ export class OwnerRepository extends CouchbaseModel {
 
   async updateContact (ownerId, contactId, data) {
     const owner = await this.findByIdOrThrow(ownerId)
-    const personRepo = new PersonRepository()
-    return personRepo.updateContact(owner.personId, contactId, data)
+    const contact = owner.person.contacts.find(c => c.id === contactId)
+    if (!contact) {
+      throw new Error(`Contact "${contactId}" not found in owner "${ownerId}"`)
+    }
+    const otherContacts = owner.person.contacts.filter(c => c.id !== contactId)
+
+    const updatedOwner = t.update(owner, {
+      $merge: {
+        person: t.update(owner.person, {
+          $merge: {
+            contacts: [ {id: contactId, ...data}, ...otherContacts ]
+          }
+        })
+      }
+    })
+
+    return this.save(updatedOwner)
   }
 
   async createOwnerAndPerson (body) {
