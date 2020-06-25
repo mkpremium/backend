@@ -198,26 +198,13 @@ GROUP BY t.status, building[0].address.city`
 
   async list (query = {}) {
     const params = new OwnerListQuery(query)
-    let results = []
-
-    if (params.contactNumber) {
-      const personRepository = new PersonRepository()
-      const qbPerson = personRepository.getQueryBuilder('select')
-        .limit(params.limit)
-        .where('ANY v IN contacts SATISFIES `v`.`value` = ? END', params.contactNumber)
-      const personResults = await personRepository.query(qbPerson)
-      const personIds = _.uniq(_.map(personResults, 'id'))
-
-      if (personIds && personIds.length) {
-        const qbOwners = this.getQueryBuilder('let')
-          .limit(params.limit)
-          .where(`personId IN ${JSON.stringify(personIds)}`)
-
-        ownerIncludes(qbOwners, ['person'])
-        const result = await this.query(qbOwners)
-        results = result.map(mapOwnerIncludes)
-      }
+    if (!params.contactNumber) {
+      return []
     }
+
+    const qb = this.getQueryBuilder()
+      .where('ANY v IN person.contacts SATISFIES `v`.`value` = ? END', params.contactNumber)
+    const results = await this.query(qb)
 
     return fromJSON({ results }, t.OwnerLitResponse)
   }

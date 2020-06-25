@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { operatorCreateBusiness } from '../../test/common'
-import { createOwner, testPhoneContactId } from '../helper/mother-of-objects'
-import { authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
+import { createOwner, testContactPhone, testPhoneContactId } from '../helper/mother-of-objects'
+import { authenticatedGet, authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
 
 describe('Building owner contacts management', () => {
   let app, businessUser, owner
@@ -51,6 +51,18 @@ describe('Building owner contacts management', () => {
 
         expect(savedOwner.person.contacts.length).to.be.equal(2)
         expect(savedOwner.person.contacts[ 1 ]).to.include(contactInfoToAdd)
+      })
+  })
+
+  it('list owners with matching phone number', async () => {
+    await authenticatedGet(`/owners?contactNumber=${testContactPhone}`, businessUser, app)
+      .then(async (response) => {
+        expect(response.status).to.be.equal(200)
+
+        expect(response.body.results).to.have.lengthOf(1)
+        expect(response.body.results[ 0 ]).to.include({
+          id: owner.id
+        })
       })
   })
 })
