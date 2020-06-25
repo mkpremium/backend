@@ -4,7 +4,6 @@ import _head from 'lodash/head'
 import _isArray from 'lodash/isArray'
 import _isEmpty from 'lodash/isEmpty'
 import _isNil from 'lodash/isNil'
-import squel from 'squel/dist/squel'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { BuildingRepository } from '../building/models'
@@ -20,15 +19,6 @@ export class PersonRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = PersonStruct
-  }
-
-  async searchPeople (query) {
-    const params = t.PeopleSearchQuery(query)
-    const qs = this.getSearchBuilder(params.query)
-    qs.highlight()
-    qs.fields('*')
-
-    return this.search(qs)
   }
 
   async findByIdOrThrow (personId) {
@@ -69,62 +59,6 @@ export class PersonRepository extends CouchbaseModel {
     const updatedPerson = t.update(person, { contacts: { $merge: updatedContacts } })
 
     return this.save(updatedPerson)
-  }
-
-  /**
-   * Find person by dni / document number
-   * @param documentNumber
-   * @param required
-   * @returns {Promise<void>}
-   */
-  async findByDocumentNumber (documentNumber, required = true) {
-    const expr = squel.expr().and('t.documentNumber = ?', documentNumber)
-    const qb = this.getQueryBuilder()
-      .where(expr)
-    const results = await this.query(qb)
-
-    if (required && (!results || results.length === 0)) {
-      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`)
-    }
-
-    return _head(results)
-  }
-
-  /**
-   * Find person by dni / document number
-   * @param documentNumber
-   * @param required
-   * @returns {Promise<void>}
-   */
-  async findAllByDocumentNumber (documentNumber, required = true) {
-    const expr = squel.expr().and('t.documentNumber = ?', documentNumber)
-    const qb = this.getQueryBuilder()
-      .where(expr)
-    const results = await this.query(qb)
-
-    if (required && (!results || results.length === 0)) {
-      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by documentNumber: ${documentNumber}`)
-    }
-    return results
-  }
-
-  /**
-   * Find person migrateOwnerId
-   * @param migrateOwnerId
-   * @param required
-   * @returns {Promise<void>}
-   */
-  async findByMigrateOwnerId (migrateOwnerId, required = true) {
-    const expr = squel.expr().and('t._migrateOwnerId = ?', migrateOwnerId)
-    const qb = this.getQueryBuilder()
-      .where(expr)
-    const results = await this.query(qb)
-
-    if (required && (!results || results.length === 0)) {
-      throw new Error(`No records of ${this._getMeta().defaultProps._documentType} found by _migrateOwnerId: ${migrateOwnerId}`)
-    }
-
-    return _head(results)
   }
 }
 
@@ -312,12 +246,6 @@ GROUP BY t.status, building[0].address.city`
     }
 
     return fromJSON({ results }, t.OwnerLitResponse)
-  }
-
-  async findByPersonId (personId) {
-    const qb = this.getQueryBuilder().where('t.`personId` = ?', personId)
-    const results = await this.query(qb)
-    return results && results.length && _.first(results)
   }
 
   async findAllVerifiedOwnersByBuildingId (buildingId) {
