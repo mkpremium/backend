@@ -7,34 +7,12 @@ import { Building } from './building'
 import { TypedContactInfo } from './common'
 import { OwnerStatusEnum, OwnerType } from './enums'
 
-export const OwnerBody = t.struct(
-  {
-    type: t.maybe(t.OwnerType),
-    verified: t.maybe(t.Boolean),
-    status: OwnerStatusEnum,
-    person: t.maybe(t.Object),
-    personId: t.maybe(t.String),
-    buildingId: t.maybe(t.String),
-    note: t.maybe(t.String)
-  },
-  {
-    name: 'OwnerBody',
-    defaultProps: {
-      type: 'NINGUNO',
-      verified: false,
-      status: 'NO_VERIFICADO',
-      personId: '',
-      person: {}
-    }
-  }
-)
-
 export const Person = t.struct(
   {
     id: t.maybe(t.String),
     name: t.String,
     firstName: t.maybe(t.String),
-    documentNumber: t.maybe(t.String), // Note: make unique one day
+    documentNumber: t.maybe(t.String), // Note: make unique one day DELETE ME
 
     contacts: t.list(TypedContactInfo),
     active: t.maybe(t.Boolean),
@@ -47,6 +25,28 @@ export const Person = t.struct(
       contacts: [],
       _documentType: 'person',
       active: true
+    }
+  }
+)
+
+export const OwnerBody = t.struct(
+  {
+    type: t.maybe(t.OwnerType),
+    verified: t.maybe(t.Boolean),
+    status: OwnerStatusEnum,
+    person: t.maybe(Person),
+    personId: t.maybe(t.String),
+    buildingId: t.maybe(t.String),
+    note: t.maybe(t.String)
+  },
+  {
+    name: 'OwnerBody',
+    defaultProps: {
+      type: 'NINGUNO',
+      verified: false,
+      status: 'NO_VERIFICADO',
+      personId: '',
+      person: {}
     }
   }
 )
@@ -86,6 +86,9 @@ export const Owner = t.struct(
     type: t.OwnerType,
     status: OwnerStatusEnum,
     personId: t.maybe(t.String),
+
+    person: t.maybe(Person),
+
     buildingId: t.maybe(t.String),
     name: t.maybe(t.String),
 
@@ -110,8 +113,7 @@ export const Owner = t.struct(
 )
 
 export const OwnerWithInclude = Owner.extend({
-  building: t.maybe(Building),
-  person: t.maybe(Person)
+  building: t.maybe(Building)
 })
 
 Owner.prototype.fullName = function () {

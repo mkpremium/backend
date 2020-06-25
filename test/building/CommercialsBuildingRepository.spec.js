@@ -55,8 +55,18 @@ describe('CommercialsBuildingRepository', () => {
             }
           ],
           'ownerId': null,
-          'personOwners': [
+          'stock': [],
+          'use': 'Residencial',
+          'verifiedOwners': [
             {
+              'id': '169e02a9-b5a6-4f46-8fc4-b90f3076953d',
+              'personId': '953b7501-f074-4b80-9775-121f3317249f'
+            },
+            {
+              'featuredContact': null,
+              'id': '4718e69d-55bf-4c59-86d7-570e43d953a0',
+              'negotiationStatus': 'PENDIENTE',
+              'personId': '388ae2f6-69be-4b4d-a368-658411d82570',
               'contacts': [
                 {
                   'id': 'bd7677b6-5b53-4fcc-9290-398a9386f244',
@@ -74,22 +84,7 @@ describe('CommercialsBuildingRepository', () => {
                 }
               ],
               'firstName': 'PATRICIA',
-              'fullName': 'ESTEBAN SERRANO PATRICIA',
-              'id': '388ae2f6-69be-4b4d-a368-658411d82570'
-            }
-          ],
-          'stock': [],
-          'use': 'Residencial',
-          'verifiedOwners': [
-            {
-              'id': '169e02a9-b5a6-4f46-8fc4-b90f3076953d',
-              'personId': '953b7501-f074-4b80-9775-121f3317249f'
-            },
-            {
-              'featuredContact': null,
-              'id': '4718e69d-55bf-4c59-86d7-570e43d953a0',
-              'negotiationStatus': 'PENDIENTE',
-              'personId': '388ae2f6-69be-4b4d-a368-658411d82570'
+              'fullName': 'ESTEBAN SERRANO PATRICIA'
             },
             {
               'id': '1e7a0970-4b8b-4571-b24c-ebc329b20765',

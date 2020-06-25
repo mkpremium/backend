@@ -18,18 +18,15 @@ SELECT
     stock[0] stock,
 
     ARRAY {m.eventDate, "ownerId": m.event.owner.id} FOR m IN buildingMeetings END buildingMeetings,
-    ARRAY {o.id, o.featuredContact, o.personId} FOR o IN verifiedOwners END verifiedOwners,
-    ARRAY {p.id, p.firstName, "fullName": p.name, p.contacts} FOR p IN personOwners END personOwners
+    ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN verifiedOwners END verifiedOwners
 FROM mkpremium building
 LEFT NEST mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 
 LEFT NEST mkpremium verifiedOwners ON verifiedOwners.status = "VERIFICADO"
     AND verifiedOwners.buildingId = building.id
     AND verifiedOwners._documentType = 'owner'
-LEFT NEST mkpremium personOwners ON personOwners.id IN ARRAY o.personId FOR o IN verifiedOwners END
-    AND personOwners._documentType = 'person'
-    AND personOwners.active = true
-    AND ANY c in personOwners.contacts SATISFIES c.status = "GOOD" END
+    AND ANY c in verifiedOwners.person.contacts SATISFIES c.status = "GOOD" END
+
 
 LEFT NEST mkpremium buildingMeetings ON buildingMeetings.event.buildingId = building.id
     AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
@@ -89,18 +86,18 @@ export class CommercialsBuildingRepository {
     return buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
-        ownerId, buildingMeetings = [], verifiedOwners, personOwners, negotiationStatus
+        ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
-        const ownersWithPerson = verifiedOwners.map(vo => ({...vo, person: personOwners.find(p => p.id === vo.personId)}))
-          .filter(vo => !!vo.person)
+        // const ownersWithPerson = verifiedOwners.map(vo => ({...vo, person: personOwners.find(p => p.id === vo.personId)}))
+        //   .filter(vo => !!vo.person)
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
         const featuredOwnerId = ownerId ||
                                 _.get(lastMeeting, 'ownerId') ||
                                 _.get(verifiedOwners, '[0].id')
-        const featuredOwner = featuredOwnerId ? ownersWithPerson.find(o => o.id === featuredOwnerId) : undefined
-        const contacts = _.get(featuredOwner, 'person.contacts')
+        const featuredOwner = featuredOwnerId ? verifiedOwners.find(o => o.id === featuredOwnerId) : undefined
+        const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
         return ({
           id,
@@ -150,10 +147,10 @@ export class CommercialsBuildingRepository {
           usage: use !== null ? use : undefined,
           owner: (featuredOwnerId && {
             id: featuredOwnerId,
-            firstName: _.get(featuredOwner, 'person.firstName'),
-            name: _.get(featuredOwner, 'person.fullName'),
+            firstName: _.get(featuredOwner, 'firstName'),
+            name: _.get(featuredOwner, 'fullName'),
             contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
-            featuredContact: featuredOwner && featuredOwner.featuredContact ? featuredOwner.featuredContact : undefined
+            featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
           }) || undefined,
           lastMeeting: (lastMeeting && {
             dateMeeting: moment(lastMeeting.eventDate).format()

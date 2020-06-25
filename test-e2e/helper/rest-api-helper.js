@@ -8,6 +8,7 @@ export const initApplication = async () => {
   await dependenciesPromise
 
   await deleteAll()
+  await new Promise(resolve => setTimeout(resolve, 50))
 
   return globalApp
 }

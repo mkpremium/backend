@@ -2,7 +2,6 @@ import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import _head from 'lodash/head'
 import _isArray from 'lodash/isArray'
-import _isEmpty from 'lodash/isEmpty'
 import _isNil from 'lodash/isNil'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -73,17 +72,6 @@ function ownerIncludes (qb, includes) {
       .letQuery('building', letBuildingQuery)
       .field('building')
   }
-
-  if (includes.indexOf('person') !== -1) {
-    const personRepo = new PersonRepository()
-    const letPersonQuery = personRepo
-      .getQueryBuilder('use', 'p')
-      .useKey('t.`personId`')
-      .where('t.`personId` = p.`id`')
-    qb
-      .letQuery('person', letPersonQuery)
-      .field('person')
-  }
 }
 
 function mapOwnerIncludes (owner) {
@@ -146,7 +134,6 @@ export class OwnerRepository extends CouchbaseModel {
 
   async createOwnerAndPerson (body) {
     const ownerBody = OwnerBody(body)
-    const personRepo = new PersonRepository()
     const buildingRepository = new BuildingRepository()
     const buildingId = ownerBody.buildingId
     let building
@@ -155,13 +142,8 @@ export class OwnerRepository extends CouchbaseModel {
       building = await buildingRepository.findByIdOrThrow(buildingId)
     }
 
-    const person = _isEmpty(ownerBody.person)
-      ? await personRepo.findByIdOrThrow(ownerBody.personId)
-      : await personRepo.save(ownerBody.person)
-
-    body.personId = person.id
+    const person = PersonStruct(ownerBody.person)
     body.name = person.fullName()
-    delete body.person
 
     const owner = await this.save(body)
 
