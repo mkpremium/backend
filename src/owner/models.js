@@ -14,22 +14,6 @@ import { Owner, OwnerBody, Person as PersonStruct } from '../types/owner'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerListQuery } from './types'
 
-export class PersonRepository extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = PersonStruct
-  }
-
-  async findByIdOrThrow (personId) {
-    const person = await this.findById(personId)
-    if (!person) {
-      throw newHttpError(404, `La persona ${personId} no existe`)
-    }
-
-    return person
-  }
-}
-
 function ownerIncludes (qb, includes) {
   if (includes.indexOf('building') !== -1) {
     const buildingRepo = new BuildingRepository()
