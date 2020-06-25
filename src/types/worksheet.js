@@ -11,6 +11,7 @@ import { ScheduledEvent } from '../scheduled-events/types'
 import { Building } from './building'
 import { Address } from './common'
 import { Queue } from './constants'
+import { OwnerWithInclude } from './owner'
 
 const debugWorksheet = debug('app:types:worksheet')
 
@@ -80,7 +81,7 @@ export const Worksheet = t.WorkSheet = t.struct({
   relatedBuildingIds: t.list(t.String),
   relatedBuildings: t.list(Building),
   relatedOwnerIds: t.list(t.String),
-  relatedOwners: t.list(t.OwnerWithInclude),
+  relatedOwners: t.list(OwnerWithInclude),
 
   // never store this
   ownerContacts: t.list(t.OwnerCompactView),

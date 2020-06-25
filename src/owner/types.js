@@ -3,40 +3,8 @@ import _flatten from 'lodash/flatten'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { isTest } from '../../config'
+import { OwnerWithInclude } from '../types/owner'
 
-/**
- * @swagger
- * definitions:
- *   OwnerCompactViewPerson:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *         description: Id de la persona
- *       name:
- *         type: string
- *         description: Nombre de la persona
- *   OwnerCompactView:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *         description: Id del propietario
- *       person:
- *         $ref: "#/definitions/OwnerCompactViewPerson"
- *       contact:
- *         $ref: "#/definitions/TypedContactInfo"
- *       buildingId:
- *         type: string
- *         format: uuid/v4
- *       type:
- *         type: string
- *       verified:
- *         type: boolean
- *       status:
- *         type: string
- *         enum: [NO_VERIFICADO, VERIFICADO, ERRONEO]
- */
 t.OwnerCompactView = t.struct(
   {
     id: t.String,
@@ -60,21 +28,9 @@ t.OwnerCompactView = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   OwnerLitResponse:
- *     required:
- *       - results
- *     properties:
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/OwnerWithInclude"
- */
 t.OwnerLitResponse = t.struct(
   {
-    results: t.list(t.OwnerWithInclude)
+    results: t.list(OwnerWithInclude)
   },
   {
     name: 'OwnerLitResponse',
