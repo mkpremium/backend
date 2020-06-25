@@ -157,9 +157,8 @@ export class OwnerRepository extends CouchbaseModel {
   }
 
   async getContactPhoneNumber (ownerId, contactId) {
-    const personRepo = new PersonRepository()
     const owner = await this.findById(ownerId)
-    const person = await personRepo.findById(owner.personId)
+    const { person } = owner
 
     const ownerContactValue = person.findContactById(contactId)
 
