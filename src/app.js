@@ -24,7 +24,6 @@ import metadata from './metadata'
 import stats from './stats'
 import autocomplete from './autocomplete'
 import email from './email'
-import gearman from './gearman'
 import cadastre from './cadastre'
 import preferences from './system-preferences'
 import stock from './stock'
@@ -75,7 +74,6 @@ app.use(cors())
 
 swagger(app)
 webhooks(app)
-gearman(app)
 maintenanceMode(app)
 operator(app)
 worksheet(app)
