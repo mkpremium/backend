@@ -11,12 +11,11 @@ meeting.event.contactId,
 building.metadata,
 
 owner.name as contactName,
-person.contacts
+owner.person.contacts
 FROM mkpremium meeting
 LEFT JOIN mkpremium building ON building.id = meeting.event.buildingId AND building._documentType = 'building'
 
 LEFT JOIN mkpremium owner ON owner.id = meeting.event.owner.id AND owner._documentType = 'owner'
-LEFT JOIN mkpremium person ON person.id = owner.personId AND person._documentType = 'person' AND person.active = true
 
 WHERE meeting._documentType = 'scheduled-event' AND meeting.type = 'MEETINGS'
 AND meeting.notifyTo = $1
