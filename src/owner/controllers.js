@@ -31,8 +31,10 @@ async function updateOwner (req, res) {
   let updatedOwner = t.update(owner, { $merge: Object.assign({}, req.body, { id }) })
   if (typeof req.body.verified !== 'undefined') {
     const owner = Owner(updatedOwner)
-    owner.verifyOwner(req.user.id, req.body.verified)
+    updatedOwner = owner.verifyOwner(req.user.id, req.body.verified)
   }
+
+  await repo.save(updatedOwner)
 
   await History.registerUpdate({ contextModel, user: req.user })
 
