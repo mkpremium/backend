@@ -12,7 +12,6 @@ export const Person = t.struct(
     id: t.maybe(t.String),
     name: t.String,
     firstName: t.maybe(t.String),
-    documentNumber: t.maybe(t.String), // Note: make unique one day DELETE ME
 
     contacts: t.list(TypedContactInfo),
     active: t.maybe(t.Boolean),
