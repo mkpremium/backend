@@ -47,7 +47,7 @@ async function addOwnerContact (req, res) {
   const contextModel = await repo.addContact(ownerId, req.body)
   await History.registerCreate({ contextModel, user: req.user })
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
-  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building', 'person'])
+  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building'])
   res.json(updatedOwner)
 }
 

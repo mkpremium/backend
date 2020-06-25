@@ -240,7 +240,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const ownerId = _get(scheduleEvent, 'event.ownerId')
     if (ownerId) {
       const ownerRepo = new OwnerRepository()
-      const [owner] = await ownerRepo.findByIdWithIncludes(ownerId, ['person', 'building'])
+      const [owner] = await ownerRepo.findByIdWithIncludes(ownerId, ['building'])
       if (owner) {
         const updatedEvent = t.update(scheduleEvent.event, { $merge: { owner } })
         return t.update(scheduleEvent, { event: { $set: updatedEvent } })

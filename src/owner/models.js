@@ -63,7 +63,7 @@ export class OwnerRepository extends CouchbaseModel {
   }
 
   // TODO: .map() should not be used for convert owner.person in object
-  async findByIdWithIncludes (id, includes = ['person']) {
+  async findByIdWithIncludes (id, includes = []) {
     if (!id) {
       // noinspection HtmlUnknownTag
       throw new Error('id undefined, expected String or Array<String>')
@@ -199,7 +199,7 @@ GROUP BY t.status, building[0].address.city`
 
     const results = await this.query(qb)
     const ownerIds = _.map(results, 'id')
-    const owners = await this.findByIdWithIncludes(ownerIds, [ 'person', 'building' ])
+    const owners = await this.findByIdWithIncludes(ownerIds, [ 'building' ])
     return this.getVerifiedOwners(owners)
   }
 
