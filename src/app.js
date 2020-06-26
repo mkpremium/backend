@@ -11,7 +11,6 @@ import { createDependenciesContainer, createLegacyDependenciesContainer } from '
 import operator from './operator'
 import worksheet from './worksheet'
 import owner from './owner'
-import swagger from './swagger'
 import calls from './calls'
 import scheduledEvents from './scheduled-events'
 import webhooks from './webhooks'
@@ -72,7 +71,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 app.use(cors())
 
-swagger(app)
 webhooks(app)
 maintenanceMode(app)
 operator(app)

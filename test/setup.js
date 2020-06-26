@@ -1,10 +1,6 @@
 require('@babel/register')
 require('@babel/polyfill')
 
-// disable gearman winston log
-const w = require('winston')
-w.remove(w.transports.Console)
-
 const path = require('path')
 
 require('dotenv').config({
