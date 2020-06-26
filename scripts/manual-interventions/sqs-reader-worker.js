@@ -10,8 +10,6 @@ const couchbase = require('../../src/db/couchbase').default
 const t = require('tcomb')
 const { createLegacyDependenciesContainer } = require('../../src/infrastructure/dependencies')
 
-AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: 'mkjorge' })
-
 AWS.config.update({ region: 'eu-west-1' })
 const sqsClient = Promise.promisifyAll(new AWS.SQS(), { suffix: 'Promise' })
 
