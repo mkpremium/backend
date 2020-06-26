@@ -11,7 +11,7 @@ npx babel ./ \
   --out-dir ${build_folder} \
   -s \
   --copy-files \
-  --ignore node_modules,docker,test,test-e2e
+  --ignore node_modules,docker,test,test-e2e,test-bkp
 
 # Build the package.json
 BUILD_FOLDER=$build_folder scripts/package.js
