@@ -4,7 +4,7 @@ import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { Building } from './building'
-import { TypedContactInfo } from './common'
+import { SimpleAddress, TypedContactInfo } from './common'
 import { OwnerStatusEnum, OwnerType } from './enums'
 
 export const Person = t.struct(
@@ -15,6 +15,8 @@ export const Person = t.struct(
 
     contacts: t.list(TypedContactInfo),
     active: t.maybe(t.Boolean),
+    documentNumber: t.maybe(t.String),
+    addresses: t.list(SimpleAddress),
 
     _documentType: t.String
   },
@@ -23,6 +25,7 @@ export const Person = t.struct(
     defaultProps: {
       contacts: [],
       _documentType: 'person',
+      addresses: [],
       active: true
     }
   }
