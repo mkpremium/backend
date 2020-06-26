@@ -14,19 +14,14 @@ export const Person = t.struct(
     firstName: t.maybe(t.String),
 
     contacts: t.list(TypedContactInfo),
-    active: t.maybe(t.Boolean),
     documentNumber: t.maybe(t.String),
-    addresses: t.list(SimpleAddress),
-
-    _documentType: t.String
+    addresses: t.list(SimpleAddress)
   },
   {
     name: 'Person',
     defaultProps: {
       contacts: [],
-      _documentType: 'person',
-      addresses: [],
-      active: true
+      addresses: []
     }
   }
 )
