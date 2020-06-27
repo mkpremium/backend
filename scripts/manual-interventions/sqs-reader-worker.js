@@ -40,11 +40,12 @@ couchbase(app)
     async ({ cbBucket, legacyDependenciesContainer }) => {
       let nbOfProcessedMessages = 0
       while (true) {
-        await pollForMessages(Math.min(maxMessagesToProcess - nbOfProcessedMessages, 10))
+        const maxNumberOfMessages = Math.min(maxMessagesToProcess - nbOfProcessedMessages, 10)
+        await pollForMessages(maxNumberOfMessages)
         await new Promise(resolve => {
           setTimeout(resolve, 200)
         })
-        nbOfProcessedMessages += 10
+        nbOfProcessedMessages += maxNumberOfMessages
 
         if (nbOfProcessedMessages >= maxMessagesToProcess) {
           console.info(`exiting after process ${nbOfProcessedMessages}`)
