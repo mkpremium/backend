@@ -28,7 +28,9 @@ JOIN mkpremium person ON person.id = owner.personId AND person._documentType = "
 WHERE owner._documentType = "owner" AND owner.id = $1
 `
 
+const maxMessagesToProcess = process.env.MAX_MESSAGES_TO_PROCESS || 1000
 const app = { locals: {} }
+
 couchbase(app)
   .then(cbBucket => {
     const legacyDependenciesContainer = createLegacyDependenciesContainer(cbBucket)
@@ -36,15 +38,22 @@ couchbase(app)
   })
   .then(
     async ({ cbBucket, legacyDependenciesContainer }) => {
+      let nbOfProcessedMessages = 0
       while (true) {
-        await pollForMessages()
+        await pollForMessages(Math.min(maxMessagesToProcess - nbOfProcessedMessages, 10))
         await new Promise(resolve => {
           setTimeout(resolve, 200)
         })
+        nbOfProcessedMessages += 10
+
+        if (nbOfProcessedMessages >= maxMessagesToProcess) {
+          console.info(`exiting after process ${nbOfProcessedMessages}`)
+          process.exit()
+        }
       }
 
-      function pollForMessages () {
-        return sqsClient.receiveMessagePromise({ QueueUrl: queueUrl, MaxNumberOfMessages: 10, WaitTimeSeconds: 5 })
+      function pollForMessages (maxNumberOfMessages = 10) {
+        return sqsClient.receiveMessagePromise({ QueueUrl: queueUrl, MaxNumberOfMessages: maxNumberOfMessages, WaitTimeSeconds: 5 })
                         .then(result => {
                           if (!result.Messages) {
                             console.info('no messages received, exiting')
@@ -80,6 +89,10 @@ couchbase(app)
       async function embedPersonalInfoIntoOwner (ownerId) {
         const { ownerRepository } = legacyDependenciesContainer
         const owner = await ownerRepository.findById(ownerId)
+        if (owner.person) {
+          console.info('skipping owner with already embed person', {ownerId})
+          return
+        }
 
         const person = await cbBucket.queryAsync(
           N1qlQuery.fromString(personInfoQuery),
