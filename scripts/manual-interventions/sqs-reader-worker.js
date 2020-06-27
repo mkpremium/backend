@@ -109,3 +109,7 @@ couchbase(app)
       }
     }
   )
+  .catch(error => {
+    console.error('error connecting to couchbase', {error})
+    process.exit(1)
+  })
