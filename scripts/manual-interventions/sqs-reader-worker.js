@@ -29,7 +29,10 @@ WHERE owner._documentType = "owner" AND owner.id = $1
 `
 
 const maxMessagesToProcess = process.env.MAX_MESSAGES_TO_PROCESS || 1000
+const maxEmptyPolls = process.env.MAX_EMPTY_POLLS || 3
 const app = { locals: {} }
+
+const NO_MESSAGES = 'NO-MESSAGES'
 
 couchbase(app)
   .then(cbBucket => {
@@ -39,9 +42,17 @@ couchbase(app)
   .then(
     async ({ cbBucket, legacyDependenciesContainer }) => {
       let nbOfProcessedMessages = 0
+      let emptyPolls = 0
+
       while (true) {
         const maxNumberOfMessages = Math.min(maxMessagesToProcess - nbOfProcessedMessages, 10)
-        await pollForMessages(maxNumberOfMessages)
+        const result = await pollForMessages(maxNumberOfMessages)
+        emptyPolls = result === NO_MESSAGES ? emptyPolls + 1 : 0
+        if (emptyPolls >= maxEmptyPolls) {
+          console.info(`${emptyPolls} empty polls received, exiting`)
+          process.exit()
+        }
+
         await new Promise(resolve => {
           setTimeout(resolve, 200)
         })
@@ -54,11 +65,15 @@ couchbase(app)
       }
 
       function pollForMessages (maxNumberOfMessages = 10) {
-        return sqsClient.receiveMessagePromise({ QueueUrl: queueUrl, MaxNumberOfMessages: maxNumberOfMessages, WaitTimeSeconds: 5 })
+        return sqsClient.receiveMessagePromise({
+          QueueUrl: queueUrl,
+          MaxNumberOfMessages: maxNumberOfMessages,
+          WaitTimeSeconds: 20
+        })
                         .then(result => {
                           if (!result.Messages) {
                             console.info('no messages received, exiting')
-                            process.exit()
+                            return NO_MESSAGES
                           }
 
                           return Promise.all(result.Messages.map(async (msg) => {
@@ -91,7 +106,11 @@ couchbase(app)
         const { ownerRepository } = legacyDependenciesContainer
         const owner = await ownerRepository.findById(ownerId)
         if (owner.person) {
-          console.info('skipping owner with already embed person', {ownerId})
+          console.info('skipping owner with already embed person', { ownerId })
+          return
+        }
+        if (!owner.personId) {
+          console.info('skipping owner without personId', { ownerId })
           return
         }
 
@@ -111,6 +130,6 @@ couchbase(app)
     }
   )
   .catch(error => {
-    console.error('error connecting to couchbase', {error})
+    console.error('error connecting to couchbase', { error })
     process.exit(1)
   })
