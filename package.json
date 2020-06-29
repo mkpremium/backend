@@ -83,6 +83,7 @@
     "socket.io-client": "^2.1.0",
     "squel": "^5.12.1",
     "tcomb": "^3.2.25",
+    "utm-latlng": "^1.0.6",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
