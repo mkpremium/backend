@@ -37,15 +37,6 @@ export const numintec = {
 
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10)
 
-export const migrationEnabled = JSON.parse(process.env.MIGRATION_MODULE || false)
-export const uploadDir = process.env.REPORT_DIR || '/tmp'
-export const gearmanConfig = {
-  enabled: JSON.parse(process.env.GEARMAN_ENABLE || 'true'),
-  host: process.env.GEARMAN_HOST || 'localhost',
-  port: parseInt(process.env.GEARMAN_PORT || 4730),
-  recoverTime: 5000 // gearman defaults to 30000
-}
-
 export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0)
 
 export const awsConfig = {
@@ -55,10 +46,6 @@ export const awsConfig = {
   bucket: process.env.S3_BUCKET_NAME || 'mkpremium',
   prefix: process.env.S3_METADATA_PREFIX || 'dev',
   signatureVersion: 'v4'
-}
-
-export const tests = {
-  skipCalls: JSON.parse(process.env.TEST_SKIP_CALLS || 'true')
 }
 
 export const isTest = () => process.env.NODE_ENV === 'test'
@@ -119,28 +106,9 @@ export const mailer = {
 
 export const cadastrewaitTimeMS = Number(process.env.SERVICES_WAIT_TIME || 2000)
 
-export const cadastreLocation = {
-  serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccoordenadas.asmx/Consulta_CPMRC',
-  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000)
-}
-
-export const cadastreAddress = {
-  serviceUrl: 'http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCallejero.asmx?op=Consulta_DNPRC',
-  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000),
-  cachePrefix: process.env.CADASTRE_ADDRESS_CACHE_KEY || 'address_cache'
-}
-
-export const nestoriaService = {
-  serviceUrl: 'https://api.nestoria.es:443/api',
-  waitTimeMS: Number(process.env.SERVICES_WAIT_TIME || 2000),
-  cachePrefix: process.env.NESTORIA_CACHE_KEY || 'nestoria_cache'
-}
-
 export const operatorPerformance = {
   numberOfDayOffset: Number(process.env.PERFORMANCE_OFFSET_DAYS || 15)
 }
-
-export const proxyEnable = JSON.parse(process.env.PROXY_ENABLE || false)
 
 export const cronJobs = {
   freezer: process.env.CRONJOB_FREEZER || '*/5 * * * *' // every five minutes
