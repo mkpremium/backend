@@ -59,7 +59,7 @@ export class OwnerRepository extends CouchbaseModel {
       throw new Error(`Cannot find owner by ${migratedId}`)
     }
 
-    return fromJSON(owners[0], this.Struct)
+    return fromJSON(owners[ 0 ], this.Struct)
   }
 
   // TODO: .map() should not be used for convert owner.person in object
@@ -69,9 +69,9 @@ export class OwnerRepository extends CouchbaseModel {
       throw new Error('id undefined, expected String or Array<String>')
     }
 
-    const ids = _isArray(id) ? id : [id]
+    const ids = _isArray(id) ? id : [ id ]
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`
-    const qb = this.getQueryBuilder().where(`id IN ${idsText}`)
+    const qb = this.getQueryBuilder(includes.length > 0 ? 'let' : 'select').where(`id IN ${idsText}`)
 
     ownerIncludes(qb, includes)
     const result = await this.query(qb)
@@ -131,7 +131,7 @@ export class OwnerRepository extends CouchbaseModel {
         person: t.update(owner.person, {
           $merge: {
             contacts: t.update(owner.person.contacts, {
-              $push: [new TypedContactInfo(body)]
+              $push: [ new TypedContactInfo(body) ]
             })
           }
         })
@@ -174,7 +174,7 @@ GROUP BY t.status, building[0].address.city`
       _.filter(result, { status }).forEach(({ count }) => {
         total += count
       })
-      totals[status] = total
+      totals[ status ] = total
     })
 
     return totals

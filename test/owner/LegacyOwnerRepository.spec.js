@@ -18,5 +18,13 @@ describe('LegacyOwnerRepository', () => {
 
       expect(foundOwner.id).to.be.equal(owner.id)
     })
+
+    it('finds owner including empty building', async () => {
+      const owner = await createOwner(app)
+
+      const [ foundOwner ] = await legacyOwnerRepository.findByIdWithIncludes(owner.id, ['building'])
+
+      expect(foundOwner.id).to.be.equal(owner.id)
+    })
   })
 })
