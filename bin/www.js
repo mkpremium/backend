@@ -3,7 +3,7 @@
 import http from 'http'
 import { logger } from '../src/infrastructure/logger'
 
-import {port} from '../config'
+import { port } from '../config'
 import app from '../src/app'
 
 const server = http.createServer(app)
@@ -25,21 +25,5 @@ function errorHandler (error) {
     throw error
   }
 
-  const bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port
-
-  // handle specific listen errors with friendly messages
-  // noinspection FallThroughInSwitchStatementJS
-  console.error('Error received', {error})
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges')
-      process.exit(1)
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use')
-      process.exit(1)
-    default:
-      throw error
-  }
+  logger.error('Error received', { error })
 }
