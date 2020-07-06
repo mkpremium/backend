@@ -4,5 +4,5 @@ set -e
 
 ./scripts/start-couchbase-and-wait-for-it.sh
 
-eval "$(echo export $(cat .env))"
+set -a && . .env
 npm start
