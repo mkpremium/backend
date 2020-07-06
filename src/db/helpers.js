@@ -10,11 +10,11 @@ export async function getList (documentType) {
   return this.queryAsync(queryString, [ couchbase.bucket, documentType ])
 }
 
-export async function upsertToDb (pk, data) {
-  const name = _get(data, '_documentType', '')
-  logger.debug('upsertToDb', name, pk, data)
-  await this.upsertAsync(pk, data)
-  const result = await this.getAsync(pk)
+export async function upsertToDb (id, data) {
+  const documentType = _get(data, '_documentType', '')
+  logger.debug('upsertToDb', { documentType, id, data })
+  await this.upsertAsync(id, data)
+  const result = await this.getAsync(id)
 
   if (result && result.value) {
     return result.value
