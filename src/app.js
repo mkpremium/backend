@@ -67,9 +67,7 @@ app.get('/_ready', (req, res) => {
 
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-if (process.env.NODE_ENV !== 'test') {
-  app.use(morgan('dev'))
-}
+app.use(morgan('combined'))
 app.use(cors())
 
 webhooks(app)
