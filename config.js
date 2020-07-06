@@ -37,8 +37,6 @@ export const numintec = {
 
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10)
 
-export const errorVerbosity = parseInt(process.env.ERR_HANDLER_LEVEL || 0)
-
 export const awsConfig = {
   region: process.env.AWS_REGION || 'eu-west-3',
   accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
