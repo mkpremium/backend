@@ -1,20 +1,18 @@
 import _get from 'lodash/get'
 import { N1qlQuery } from 'couchbase'
-import debug from 'debug'
 import { couchbase } from '../../config'
 import promises from './promises'
-
-const debugHelper = debug('app:db:helpers')
+import { logger } from '../infrastructure/logger'
 
 export async function getList (documentType) {
   const queryString = N1qlQuery.fromString('SELECT t.* FROM $1 t WHERE t._documentType = \'$2\' LIMIT 100')
 
-  return this.queryAsync(queryString, [couchbase.bucket, documentType])
+  return this.queryAsync(queryString, [ couchbase.bucket, documentType ])
 }
 
 export async function upsertToDb (pk, data) {
   const name = _get(data, '_documentType', '')
-  debugHelper('upsertToDb', name, pk, data)
+  logger.debug('upsertToDb', name, pk, data)
   await this.upsertAsync(pk, data)
   const result = await this.getAsync(pk)
 

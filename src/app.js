@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 
 import couchbase from './db/couchbase'
+import { logger } from './infrastructure/logger'
 // app aware types
 import './types'
 import { createDependenciesContainer, createLegacyDependenciesContainer } from './infrastructure/dependencies'
@@ -55,8 +56,8 @@ dependenciesPromise.then(() => {
 
   app.locals.dependenciesContainer = dependenciesContainer
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
-}).catch(err => {
-  console.error(err)
+}).catch(errors => {
+  logger.error('error starting application', { errors })
   process.exit(1)
 })
 
@@ -65,7 +66,7 @@ app.get('/_ready', (req, res) => {
   else res.sendStatus(503)
 })
 
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(cors())
