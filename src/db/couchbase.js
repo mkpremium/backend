@@ -1,4 +1,3 @@
-import debug from 'debug'
 import Couchbase from 'couchbase'
 import { couchbase } from '../../config'
 import attachHelpers from './helpers'
@@ -8,11 +7,10 @@ import '../lib/squel/let'
 
 import { CouchbaseModel } from './model'
 import { defer } from '../lib/promise-util'
-
-const debugCouchbase = debug('app:couchbase')
+import { logger } from '../infrastructure/logger'
 
 export default (app) => {
-  debugCouchbase(`initializing couchbase connection with "${couchbase.uri}"`)
+  logger.info(`initializing couchbase connection with "${couchbase.uri}"`, couchbase)
   const cluster = new Couchbase.Cluster(couchbase.uri)
   cluster.authenticate(couchbase.user, couchbase.pass)
 
@@ -32,10 +30,10 @@ export default (app) => {
 }
 
 function checkBucket (bucket, cluster, resolve, reject, retries = couchbase.retries) {
-  debugCouchbase(`checking bucket ${bucket._name} for connection (${retries})`)
+  logger.info(`checking bucket ${bucket._name} for connection (${retries})`)
 
   if (bucket.connected) {
-    debugCouchbase(`bucket ${bucket._name} connected`)
+    logger.info(`bucket ${bucket._name} connected`)
     attachHelpers(bucket)
     attachModel(bucket, cluster)
     resolve(bucket)

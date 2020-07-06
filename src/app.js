@@ -57,6 +57,7 @@ dependenciesPromise.then(() => {
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
 }).catch(err => {
   console.error(err)
+  process.exit(1)
 })
 
 app.get('/_ready', (req, res) => {
