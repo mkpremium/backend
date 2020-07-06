@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "./scripts/lint.sh",
     "lint:fix": "./scripts/lint.sh --fix",
-    "start": "nodemon bin/www.js --exec babel-node",
+    "start": "./scripts/start-local-app.sh",
     "pretest": "npm run lint",
     "test": "./scripts/run-test.sh test",
     "test:e2e": "./scripts/run-test.sh test-e2e",

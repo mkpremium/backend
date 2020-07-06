@@ -14,14 +14,9 @@ export default (app) => {
   const cluster = new Couchbase.Cluster(couchbase.uri)
   cluster.authenticate(couchbase.user, couchbase.pass)
 
-  // http://bluebirdjs.com/docs/api/deferred-migration.html
-  const { promise, resolve, reject } = defer()
+  const { promise, bucket } = connectToBucket(cluster, couchbase.bucket)
 
-  const bucket = cluster.openBucket(couchbase.bucket)
   CouchbaseModel.prototype._promiseBucket = promise
-
-  checkBucket(bucket, cluster, resolve, reject)
-
   if (app) {
     Object.assign(app.locals, { cluster, bucket, bucketPromise: promise })
   }
@@ -29,21 +24,21 @@ export default (app) => {
   return promise
 }
 
-function checkBucket (bucket, cluster, resolve, reject, retries = couchbase.retries) {
-  logger.info(`checking bucket ${bucket._name} for connection (${retries})`)
+function connectToBucket (cluster, bucketName) {
+  // http://bluebirdjs.com/docs/api/deferred-migration.html
+  const { promise, resolve, reject } = defer()
 
-  if (bucket.connected) {
-    logger.info(`bucket ${bucket._name} connected`)
+  const bucket = cluster.openBucket(bucketName)
+  bucket.on('error', error => {
+    logger.error('couchbase connection error', { error })
+    reject(error)
+  })
+  bucket.on('connect', (...args) => {
     attachHelpers(bucket)
     attachModel(bucket, cluster)
     resolve(bucket)
-  } else {
-    if (retries <= 0) {
-      reject(new Error(`It's possible an error trying to connect bucket ${bucket._name} check your setup`))
-    } else {
-      setTimeout(() => checkBucket(bucket, cluster, resolve, reject, retries - 1), couchbase.timeout)
-    }
-  }
+  })
+  return { promise, bucket }
 }
 
 function attachModel (bucket, cluster) {

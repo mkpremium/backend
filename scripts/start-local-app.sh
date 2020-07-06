@@ -5,4 +5,4 @@ set -e
 ./scripts/start-couchbase-and-wait-for-it.sh
 
 set -a && . .env
-npm start
+npx nodemon bin/www.js --exec babel-node
