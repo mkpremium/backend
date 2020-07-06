@@ -1,9 +1,7 @@
 import '../src/types'
-import debug from 'debug'
+import { logger } from '../src/infrastructure/logger'
 import worksheetFreezerCron from '../src/cron/worksheets/freezer-cron'
 
-const cronDebug = debug('app:cron')
-
-cronDebug('bootstraping cronjobs')
+logger.info('starting cron jobs')
 
 worksheetFreezerCron.start()

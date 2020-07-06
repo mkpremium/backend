@@ -2,15 +2,13 @@
 import Promise from 'bluebird'
 import express from 'express'
 import {Server} from 'http'
-import debug from 'debug'
+import { logger } from '../src/infrastructure/logger'
 
 import '../src/types'
 
 import {socket as socketConfig} from '../config'
 import socket from '../src/socket'
 import couchbase from '../src/db/couchbase'
-
-const socketDebug = debug('app:socket')
 
 const app = express()
 const httpServer = Server(app)
@@ -32,7 +30,7 @@ function listenHandler () {
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port
-  socketDebug('Listening on ' + bind)
+  logger.info('Listening on ' + bind)
 }
 
 function errorHandler (error) {

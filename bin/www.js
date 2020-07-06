@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
 import http from 'http'
-import debug from 'debug'
+import { logger } from '../src/infrastructure/logger'
 
 import {port} from '../config'
 import app from '../src/app'
 
 const server = http.createServer(app)
-const serverDebug = debug('app:server')
 
 server.listen(port)
 server.on('error', errorHandler)
@@ -18,7 +17,7 @@ function listenHandler () {
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port
-  serverDebug('Listening on ' + bind)
+  logger.info('API listening on ' + bind)
 }
 
 function errorHandler (error) {
