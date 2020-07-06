@@ -14,4 +14,4 @@ export const logger = createLogger({
   ]
 })
 
-logger.info('logger started', { level })
+logger.info('logger started', { loggingLevel: level })
