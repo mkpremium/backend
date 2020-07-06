@@ -29,7 +29,6 @@ function ownerIncludes (qb, includes) {
 
 function mapOwnerIncludes (owner) {
   return Object.assign({}, owner, {
-    person: _head(owner.person || []),
     building: _head(owner.building || [])
   })
 }
