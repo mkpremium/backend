@@ -1,4 +1,4 @@
-import debug from 'debug'
+import { logger } from '../infrastructure/logger'
 import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
@@ -11,8 +11,6 @@ import { Building } from './building'
 import { Address } from './common'
 import { Queue } from './constants'
 import { OwnerWithInclude } from './owner'
-
-const debugWorksheet = debug('app:types:worksheet')
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -73,7 +71,7 @@ export const Worksheet = t.WorkSheet = t.struct({
 
   lastAddedMeeting: t.maybe(ScheduledEvent),
 
-  _documentType: t.enums.of(['worksheet']),
+  _documentType: t.enums.of([ 'worksheet' ]),
 
   buildingAddress: t.maybe(Address),
 
@@ -100,10 +98,10 @@ export const Worksheet = t.WorkSheet = t.struct({
 
 t.WorkSheet.prototype.setStatus = function (newStatus) {
   if (newStatus === this.status) {
-    debugWorksheet('setStatus', `${this.id} status "${this.status}" remains equals`)
+    logger.debug('WorkSheet#setStatus status remains equals', { status: this.status, id: this.id })
     return this
   } else {
-    debugWorksheet('setStatus', `${this.id} status changed to "${newStatus}"`)
+    logger.debug('WorkSheet#setStatus status changed', { oldStatus: this.status, newStatus, id: this.id })
     return t.update(this, { status: { $set: newStatus }, statusChangedAt: { $set: utc().toDate() } })
   }
 }
@@ -238,7 +236,7 @@ t.WorksheetQueue = t.struct(
     worksheets: t.list(t.QueueItem),
     worksheetIndex: t.maybe(t.Number),
 
-    _documentType: t.enums.of(['worksheet-queue'])
+    _documentType: t.enums.of([ 'worksheet-queue' ])
   },
   {
     name: 'WorksheetQueue',
@@ -264,7 +262,7 @@ t.WorksheetQueueExtraInfo = t.struct(
     source: WorksheetQueueSource,
     worksheets: t.list(t.QueueItemExtraInfo),
 
-    _documentType: t.enums.of(['worksheet-queue'])
+    _documentType: t.enums.of([ 'worksheet-queue' ])
   },
   {
     name: 'WorksheetQueue',

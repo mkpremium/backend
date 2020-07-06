@@ -1,5 +1,4 @@
 import Promise from 'bluebird'
-import debug from 'debug'
 import _ from 'lodash'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { utc } from '../../lib/date'
@@ -9,7 +8,7 @@ import { OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
 import { WorksheetRepository } from '../../worksheet/models/worksheet'
 
-const debugFreezer = debug('app:worksheets:freezer')
+import { logger } from '../../infrastructure/logger'
 
 let changeNothing
 let limit = 100
@@ -18,10 +17,10 @@ export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100,
   changeNothing = dryRun
   limit = argLimit
   const { freezer } = await SystemPreferencesRepository.getPreferences()
-  debugFreezer('starting to move worksheets from freezer settings', freezer)
+  logger.info('starting to move worksheets from freezer settings', { freezer })
   await moveNoSaleWorksheets(freezer, buildingRepository)
   await moveFreezerWorksheets(freezer, buildingRepository)
-  debugFreezer('end of freezer process')
+  logger.info('end of freezer process')
 }
 
 export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
@@ -31,7 +30,7 @@ export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, build
     .where('inFreezer = ?', true)
     .where('statusChangedAt IS NOT NULL')
     .where('statusChangedAt <= ?', maxDays)
-    .where(`status IN ${JSON.stringify([WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING])}`)
+    .where(`status IN ${JSON.stringify([ WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING ])}`)
     .limit(limit)
 
   if (provinces.length > 0) {
@@ -66,14 +65,18 @@ async function pullOutFreezer (worksheets, buildingRepository) {
 
   if (changeNothing) {
     worksheets.forEach(worksheet => {
-      debugFreezer(`[dry-run] moving out freezer worksheet '${worksheet.id}' with status ${worksheet.status}, last status changed at: '${worksheet.statusChangedAt}'`)
+      logger.info(`[dry-run] moving out freezer worksheet`, {
+        statusChangedAt: worksheet.statusChangedAt,
+        id: worksheet.id,
+        status: worksheet.status
+      })
     })
     return
   }
 
   const repository = new WorksheetRepository()
   const updatedWorksheets = worksheets.map(worksheet => {
-    debugFreezer(`moving out freezer worksheet '${worksheet.id}', last status changed at: '${worksheet.statusChangedAt}'`)
+    logger.info(`moving worksheet out freezer`, { statusChangedAt: worksheet.statusChangedAt, id: worksheet.id })
     return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.WITH_OWNER)
   })
 
@@ -83,11 +86,11 @@ async function pullOutFreezer (worksheets, buildingRepository) {
 
   const saveWorksheet = async (worksheet) => {
     await repository.save(worksheet, false)
-    await moveOwnerStatus(worksheet.relatedBuildingIds[0])
+    await moveOwnerStatus(worksheet.relatedBuildingIds[ 0 ])
   }
 
   await Promise.map(updatedWorksheets, saveWorksheet, { concurrency: 1 })
-  const outOfFreezerBuildingIds = _.flatMap(updatedWorksheets.map(({relatedBuildingIds}) => relatedBuildingIds))
+  const outOfFreezerBuildingIds = _.flatMap(updatedWorksheets.map(({ relatedBuildingIds }) => relatedBuildingIds))
   await buildingRepository.pullBuildingsOutOfFreezer(outOfFreezerBuildingIds)
 }
 
@@ -95,7 +98,7 @@ export async function moveOwnerStatus (buildingId) {
   const repository = new OwnerRepository()
   const owners = await repository.findOwnersByBuildingId(buildingId)
   if (owners.length === 0) {
-    debugFreezer('there is not owners for this worksheet to change')
+    logger.info('there is not owners for this worksheet to change', { buildingId })
     return
   }
 

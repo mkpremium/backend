@@ -1,10 +1,8 @@
-import debug from 'debug'
+import { logger } from '../infrastructure/logger'
 import { verify } from 'jsonwebtoken'
 import _get from 'lodash/get'
 import { jwt } from '../../config'
 import { OperatorRepository } from '../operator/models'
-
-const socketJwtDebug = debug('app:socket:jwt')
 
 async function verifySocketToken (socket) {
   const token = _get(socket, 'handshake.query.token', null)
@@ -26,9 +24,9 @@ function socketJwt () {
         socket.operator = operator || user.operator
         next()
       })
-      .catch(err => {
-        socketJwtDebug('error', err)
-        next(err)
+      .catch(error => {
+        logger.error('socketJwt', { error })
+        next(error)
       })
   }
 }

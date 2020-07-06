@@ -6,9 +6,7 @@ import { newHttpError } from '../lib/http-error'
 import { Calls } from './models'
 import { numintec } from '../../config'
 import { encodePlusSign } from './helper'
-import debug from 'debug'
-
-const debugService = debug('app:calls:numintec')
+import { logger } from '../infrastructure/logger'
 
 const requester = axios.create({
   baseURL: numintec.apiUrl,
@@ -19,7 +17,7 @@ const requester = axios.create({
 
 function getCallParams (from, to, serviceId) {
   const struct = t.CallService({
-    from: from.agentNumber.split('-')[1],
+    from: from.agentNumber.split('-')[ 1 ],
     to: encodePlusSign(to.value),
     service_id: parseInt(serviceId),
     return_id: true
@@ -31,14 +29,14 @@ function getCallParams (from, to, serviceId) {
 async function doCall (from, phone) {
   const params = getCallParams(from, phone, from.serviceId)
   const url = `/Call/rest/call/${params}`
-  debugService('doCall', 'requester GET', url)
+  logger.debug('calls-service#doCall', { method: 'get', url })
   try {
     const result = await requester.get(url)
-    debugService('doCall', 'requester OK', result.data)
+    logger.debug('calls-service#doCall', { result: result.data })
     return result.data
-  } catch (e) {
-    debugService('doCall', 'requester error', JSON.stringify(e))
-    return _get(e, 'response.data', { status: false })
+  } catch (error) {
+    logger.error('calls-service#doCall', { error, url })
+    return _get(error, 'response.data', { status: false })
   }
 }
 
@@ -59,14 +57,14 @@ async function call (from, phone) {
 
 async function doHangUp (activeCall) {
   const url = `/Call/rest/hangup/?options[call_id]=${activeCall.callId}`
-  debugService('doHangUp', 'requester GET', url)
+  logger.debug('calls-service#doHangUp', { url })
   try {
     const result = await requester.get(url)
-    debugService('doHangUp', 'requester OK', result.data)
+    logger.debug('calls-service#doHangUp', {result: result.data})
     return result.data
-  } catch (e) {
-    debugService('doHangUp', 'requester error', JSON.stringify(e))
-    return _get(e, 'response.data', { status: false })
+  } catch (error) {
+    logger.error('calls-service#doHangUp', { error })
+    return _get(error, 'response.data', { status: false })
   }
 }
 

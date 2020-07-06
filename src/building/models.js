@@ -1,5 +1,4 @@
 import { N1qlQuery } from 'couchbase'
-import debug from 'debug'
 import _ from 'lodash'
 import _get from 'lodash/get'
 import mime from 'mime-types'
@@ -18,7 +17,7 @@ import { OperatorActions } from '../stats/types'
 import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
 import { BuildingMetadata } from './types'
 
-const debugBuilding = debug('app:model:building')
+import { logger } from '../infrastructure/logger'
 
 export class Metadata extends CouchbaseModel {
   constructor () {
@@ -270,7 +269,7 @@ export function calculateElements ({ commons }, entities) {
   const sumSurface = entities.reduce((acc, { surface }) => acc + Number(surface), 0)
   const average = sumSurface / (number > 0 ? number : 1)
 
-  debugBuilding('calculateElements', { number, average, commons })
+  logger.debug('building#calculateElements', { number, average, commons })
 
   return {
     number,

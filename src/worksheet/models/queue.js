@@ -1,6 +1,6 @@
 import Promise from 'bluebird'
 import t from 'tcomb'
-import debug from 'debug'
+import { logger } from '../../infrastructure/logger'
 import fromJSON from 'tcomb/lib/fromJSON'
 import _ from 'lodash'
 import _map from 'lodash/map'
@@ -15,8 +15,6 @@ import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
-
-const queueDebug = debug('app:model:queue')
 
 export class WorksheetQueue extends CouchbaseModel {
   constructor () {
@@ -59,18 +57,18 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       _set(info, 'totalContacts', worksheet.relatedOwners.length)
       _set(info, 'totalBuildings', worksheet.relatedBuildings.length)
 
-      const [owner] = worksheet.relatedOwners
+      const [ owner ] = worksheet.relatedOwners
       if (owner) {
         _set(info, 'ownerName', owner.person.name)
         _set(info, 'ownerType', owner.type)
       }
 
-      const [building] = worksheet.relatedBuildings
+      const [ building ] = worksheet.relatedBuildings
       if (building) {
         _set(info, 'buildingAddress', building.address.fullAddress)
       }
 
-      const [call] = worksheet.calls
+      const [ call ] = worksheet.calls
       if (call) {
         _set(info, 'lastCall', call)
       }
@@ -101,11 +99,6 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     return fromJSON({ total, results: resultsWithCount }, t.QueueListResponse)
   }
 
-  async addWorksheetAndSave (queueId, worksheetId) {
-    const updatedQueue = await this.addWorksheet(queueId, worksheetId)
-    return this.save(updatedQueue)
-  }
-
   async addWorksheetToQueue (queue, worksheetId) {
     const itemRepo = new QueueItemRepository()
     const worksheetRepo = new WorksheetRepository()
@@ -115,22 +108,21 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
 
-    queueDebug('addWorksheet', worksheet.id, 'to queue', queue.id)
+    logger.info('WorksheetQueueRepository#addWorksheetToQueue worksheet to queue', {
+      worksheetId: worksheet.id,
+      queueId: queue.id
+    }
+    )
 
     await worksheetRepo.save(t.update(worksheet, { queueId: { $set: queue.id } }))
     const item = await itemRepo.save({ worksheetId: worksheet.id })
-    const updatedWorksheets = t.update(queue.worksheets, { $push: [item] })
+    const updatedWorksheets = t.update(queue.worksheets, { $push: [ item ] })
     const updatedQueue = t.update(queue, {
       worksheets: { $set: updatedWorksheets },
       worksheetIndex: { $set: worksheet.worksheetIndex }
     })
 
     return fromJSON(updatedQueue, t.WorksheetQueue)
-  }
-
-  async addWorksheet (queueId, worksheetId) {
-    const queue = await this.findByIdOrThrow(queueId)
-    return this.addWorksheetToQueue(queue, worksheetId)
   }
 
   async removeWorksheetInQueue (queue, worksheetId) {
@@ -141,7 +133,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
 
-    const updatedWorksheet = t.update(worksheet, { $remove: ['queueId'] })
+    const updatedWorksheet = t.update(worksheet, { $remove: [ 'queueId' ] })
     await worksheetRepo.save(updatedWorksheet)
 
     const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
@@ -177,7 +169,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
     const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
 
-    queueDebug('scheduleWorksheetInQueue', worksheet.id, 'scheduled from queue ', queue.id)
+    logger.info('WorksheetQueueRepository#scheduleWorksheetInQueue worksheet from queue', {
+      worksheetId: worksheet.id,
+      queueId: queue.id
+    })
 
     await this.save(updatedQueue)
 
@@ -215,7 +210,11 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
     const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
 
-    queueDebug('takeWorksheetInQueue', worksheet.id, worksheet.status, 'from queue', queue.id)
+    logger.info('WorksheetQueueRepository#takeWorksheetInQueue', {
+      worksheetId: worksheet.id,
+      status: worksheet.status,
+      queueId: queue.id
+    })
 
     await this.save(updatedQueue)
 
@@ -283,7 +282,10 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async releaseItemInQueueAndSave (queue, item, operatorId) {
-    queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id)
+    logger.info('WorksheetQueueRepository#releaseWorksheetInQueue from queu', {
+      worksheetId: item.worksheetId,
+      queueId: queue.id
+    })
     await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== Queue.Status.SCHEDULED) {
@@ -294,7 +296,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async releaseItemInQueue (queue, item, operatorId) {
-    queueDebug('releaseWorksheetInQueue', item.worksheetId, 'from queue', queue.id)
+    logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
     await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== Queue.Status.SCHEDULED) {
@@ -315,13 +317,12 @@ export class WorksheetQueueRepository extends WorksheetQueue {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
     const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
 
-    queueDebug('removeScheduleWorksheet', item.worksheetId, 'scheduled from queue ', queue.id)
+    logger.info('WorksheetQueueRepository#removeScheduledWorksheet', {
+      worksheetId: item.worksheetId,
+      queueId: queue.id
+    })
 
     await this.save(updatedQueue)
-  }
-
-  async getScheduledWorksheets (queue, operatorId) {
-    return queue.findScheduledItemsByOperatorId(operatorId)
   }
 
   async nextWorksheetInQueue (queue, operatorId) {
@@ -348,7 +349,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async findNextAvailableInSource (queue) {
     const worksheetRepo = new WorksheetRepository()
-    const [worksheet] = await worksheetRepo.findBySource(queue)
+    const [ worksheet ] = await worksheetRepo.findBySource(queue)
 
     if (worksheet) {
       return this.addWorksheetToQueue(queue, worksheet.id)

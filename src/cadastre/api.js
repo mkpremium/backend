@@ -1,15 +1,13 @@
 import Promise from 'bluebird'
 import _ from 'lodash'
 import camaro from 'camaro'
-import debug from 'debug'
 import axiosCadastreClient from './axios'
 import { parseCoords } from './coord-parser'
 import { keys, streetTypes, templates, urls } from './constants'
 import { cadastrewaitTimeMS } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { calculateElements } from '../building/models'
-
-const debugApi = debug('app:cadastre:api')
+import { logger } from '../infrastructure/logger'
 
 export class CadastreApi {
   constructor (fakeData = {}) {
@@ -159,7 +157,7 @@ export class CadastreApi {
     } else {
       try {
         await Promise.delay(cadastrewaitTimeMS)
-        debugApi('fetching', urls[key], { params })
+        logger.debug('CadastreApi#fetchXml', { params, url: urls[key] })
         switch (method) {
           case 'get': {
             const responseGet = await this.client.get(urls[key], { params })

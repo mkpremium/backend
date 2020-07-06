@@ -1,4 +1,4 @@
-import debug from 'debug'
+import { logger } from '../infrastructure/logger'
 import multer from 'multer'
 import { wrap } from 'express-promise-wrap'
 import { compose } from 'compose-middleware'
@@ -6,12 +6,11 @@ import { mailer, storage } from '../../config'
 import t from './types'
 import { newHttpError } from '../lib/http-error'
 
-const debugEmail = debug('app:email:controller')
 const attachment = multer({ storage }).single('attachment')
 
 async function sendMessage (message) {
   const info = await mailer.transporter.sendMail(message)
-  debugEmail('sendMessage', 'success', info, mailer.info(info))
+  logger.debug('emails-controller#sendMessage email sent sucessfully', { info, mailerInfo: mailer.info(info) })
 }
 
 function createMessage (from, data, attachment) {
@@ -41,7 +40,7 @@ function createMessage (from, data, attachment) {
     attachments
   }
 
-  debugEmail('createMessase', message)
+  logger.debug('emails-controller#createMessase', { message })
   return message
 }
 
@@ -52,4 +51,4 @@ async function createEmail (req, res) {
   res.status(201).send()
 }
 
-export const createEmailController = compose(attachment, [wrap(createEmail)])
+export const createEmailController = compose(attachment, [ wrap(createEmail) ])

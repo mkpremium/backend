@@ -1,4 +1,3 @@
-import debug from 'debug'
 import { compose } from 'compose-middleware'
 import { wrap } from 'express-promise-wrap'
 import jwtMiddleware from 'express-jwt'
@@ -7,25 +6,7 @@ import _get from 'lodash/get'
 import { jwt as jwtConfig } from '../../config'
 import { OperatorRepository } from '../operator/models'
 import { OperatorRoles } from '../types/operator'
-
-const debugJwt = debug('app:middleware:jwt')
-
-/**
- * @swagger
- * securityDefinitions:
- *   manager:
- *     name: Authorization
- *     type: apiKey
- *     in: header
- *   admin:
- *     name: Authorization
- *     type: apiKey
- *     in: header
- *   operator:
- *     name: Authorization
- *     type: apiKey
- *     in: header
- */
+import { logger } from '../infrastructure/logger'
 
 export const jwt = (getToken) => {
   const jwtInstance = jwtMiddleware(Object.assign({}, jwtConfig, { getToken }))
@@ -38,7 +19,7 @@ export const jwt = (getToken) => {
 export default () => jwt(bearerTokenExtractor)
 
 async function addUserInfo (req, res, next) {
-  debugJwt('addUserInfo', req.user.id)
+  logger.debug('jwt-middleware#addUserInfo', req.user.id)
   const id = req.user.id
   const userRepo = new OperatorRepository()
   req.user.operator = await userRepo.findById(id)

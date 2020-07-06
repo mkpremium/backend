@@ -1,4 +1,4 @@
-import debug from 'debug'
+import { logger } from '../infrastructure/logger'
 import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -18,8 +18,6 @@ import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { ScheduledEvent, ScheduledEventType } from './types'
-
-const debugModel = debug('app:model:scheduled-events')
 
 export class ScheduledEvents extends CouchbaseModel {
   constructor () {
@@ -85,7 +83,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
 
   async findMeetingInRange (notifyTo, start, end, scheduleId) {
     const qb = this.getQueryBuilder()
-    const eventDate = [start, end].join(',')
+    const eventDate = [ start, end ].join(',')
     addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate)
     qb.where('type = ?', ScheduledEventType.MEETINGS)
     qb.where('notifyTo = ?', notifyTo)
@@ -140,7 +138,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 
   async update (id, data = {}) {
-    debugModel('update', id, data)
+    logger.debug('scheduled-events-model#update', { id, data })
     const scheduledEvent = await this.findByIdOrThrow(id)
     fromJSON(data, t.UpdateScheduledEvent)
     const updatedEvent = t.update(scheduledEvent.event, {
@@ -240,7 +238,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     const ownerId = _get(scheduleEvent, 'event.ownerId')
     if (ownerId) {
       const ownerRepo = new OwnerRepository()
-      const [owner] = await ownerRepo.findByIdWithIncludes(ownerId, ['building'])
+      const [ owner ] = await ownerRepo.findByIdWithIncludes(ownerId, [ 'building' ])
       if (owner) {
         const updatedEvent = t.update(scheduleEvent.event, { $merge: { owner } })
         return t.update(scheduleEvent, { event: { $set: updatedEvent } })
@@ -254,7 +252,7 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   }
 }
 
-function areAllowedMeetingMinutes (time, allowedMinutes = [0, 30]) {
+function areAllowedMeetingMinutes (time, allowedMinutes = [ 0, 30 ]) {
   const min = time.getMinutes()
 
   return allowedMinutes.indexOf(min) !== -1

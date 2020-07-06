@@ -1,5 +1,5 @@
 import Promise from 'bluebird'
-import debug from 'debug'
+import { logger } from '../infrastructure/logger'
 import socketJwt from '../middleware/socketJwt'
 import socketIO from 'socket.io'
 import _get from 'lodash/get'
@@ -7,7 +7,6 @@ import { WorksheetQueueRepository } from '../worksheet/models/queue'
 import { Calls } from '../calls/models'
 import { OperatorRepository } from '../operator/models'
 
-const socketDebug = debug('app:socket')
 const SYSTEM_ID = 'system' // bite me :lel:
 
 export class SocketServer {
@@ -31,12 +30,13 @@ export class SocketServer {
   }
 
   onConnection (socket) {
+    const isSystem = socket.user.permissions.indexOf(SYSTEM_ID) !== -1
     const msg = `user ${socket.id} ${socket.user.id}/${socket.user.operator.name}`
-    socketDebug('welcome', msg)
+    logger.debug('SocketServer#onConnection', { msg, id: socket.id, isSystem })
     this.io.emit('welcome', msg) // TODO: send to only users with role X
 
-    if (this.io.sockets[socket.user.id]) {
-      const oldSocket = this.io.sockets[socket.user.id]
+    if (this.io.sockets[ socket.user.id ]) {
+      const oldSocket = this.io.sockets[ socket.user.id ]
       oldSocket.emit('forced-disconnect')
       Promise
         .delay(500)
@@ -45,14 +45,11 @@ export class SocketServer {
         })
     }
 
-    this.io.sockets[socket.user.id] = socket
-    const isSystem = socket.user.permissions.indexOf(SYSTEM_ID) !== -1
-
-    socketDebug('socket', socket.id, 'can broadcast events?', isSystem)
+    this.io.sockets[ socket.user.id ] = socket
 
     if (isSystem) {
       socket.on('event', (data, ack) => {
-        socketDebug('broadcasting', data.payload.type)
+        logger.debug('broadcasting', data.payload.type)
         this.io.emit(data.payload.type, data)
         if (ack) {
           ack(true)
@@ -60,14 +57,14 @@ export class SocketServer {
       })
     } else {
       OperatorRepository.setOnline(socket.user.id, true)
-        .catch(err => {
-          console.error('when online', err)
-        })
+                        .catch(error => {
+                          logger.error('SocketServer#onConnection when online', { error })
+                        })
     }
 
-    if (this.timers[socket.user.id]) {
-      clearTimeout(this.timers[socket.user.id])
-      delete this.timers[socket.user.id]
+    if (this.timers[ socket.user.id ]) {
+      clearTimeout(this.timers[ socket.user.id ])
+      delete this.timers[ socket.user.id ]
     }
 
     socket.on('disconnect', () => {
@@ -75,26 +72,26 @@ export class SocketServer {
       const operatorId = _get(socket, 'user.operator.id', null)
 
       const scheduleRelease = () => {
-        this.timers[socket.user.id] = setTimeout(() => {
+        this.timers[ socket.user.id ] = setTimeout(() => {
           releaseTakenWorksheets(operatorId, queueId)
             .then(needReschedule => {
               if (needReschedule) {
                 scheduleRelease()
               }
             })
-            .catch(err => console.error(err))
+            .catch(error => logger.error('SocketServer#onConnection disconnect', { error }))
         }, 60 * 1000)
       }
 
-      if (!isSystem && this.io.sockets[socket.user.id].id === socket.id && queueId) {
-        socketDebug('scheduling release taken worksheets for', socket.user.id)
+      if (!isSystem && this.io.sockets[ socket.user.id ].id === socket.id && queueId) {
+        logger.debug('SocketServer#onConnection scheduling release taken worksheets for', { userId: socket.user.id })
         scheduleRelease()
       }
 
       OperatorRepository
-        .setOnline(socket.user.id, this.io.sockets[socket.user.id].connected)
-        .catch(err => {
-          console.error('when online', err)
+        .setOnline(socket.user.id, this.io.sockets[ socket.user.id ].connected)
+        .catch(error => {
+          logger.error('SocketServer#onConnection when online', { error })
         })
     })
   }

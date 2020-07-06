@@ -1,4 +1,4 @@
-import debug from 'debug'
+import { logger } from '../infrastructure/logger'
 import _isNil from 'lodash/isNil'
 import _groupBy from 'lodash/groupBy'
 import _ from 'lodash'
@@ -14,8 +14,6 @@ import {
 import { queryDateFormat, utc } from '../lib/date'
 import { operatorPerformance } from '../../config'
 
-const statDebug = debug('app:model:stats')
-
 export class OperatorStats extends CouchbaseModel {
   constructor () {
     super()
@@ -23,7 +21,7 @@ export class OperatorStats extends CouchbaseModel {
   }
 
   static async registerAction (operatorId, action, filters = {}) {
-    statDebug('registerAction', action, operatorId)
+    logger.debug('OperatorStats#registerAction', { action, operatorId })
     const operatorStats = new OperatorStats()
     return operatorStats.save(Object.assign({ operatorId, action }, filters))
   }
@@ -90,33 +88,33 @@ function getDateBetweenByFixed (value, offset = 0) {
     case 'lastYear':
       return [
         queryDateFormat(lastYear.clone().subtract(offset, 'days').startOf('year')),
-        queryDateFormat(lastYear.clone().endOf('year'))].join(',')
+        queryDateFormat(lastYear.clone().endOf('year')) ].join(',')
     case 'year':
       return [
         queryDateFormat(today.clone().subtract(offset, 'days').startOf('year')),
-        queryDateFormat(today.clone().endOf('day'))].join(',')
+        queryDateFormat(today.clone().endOf('day')) ].join(',')
     case 'month':
       return [
         queryDateFormat(today.clone().subtract(offset, 'days').startOf('month')),
-        queryDateFormat(today.clone().endOf('day'))].join(',')
+        queryDateFormat(today.clone().endOf('day')) ].join(',')
     case 'lastMonth':
       return [
         queryDateFormat(lastMonth.clone().subtract(offset, 'days').startOf('month')),
-        queryDateFormat(lastMonth.clone().endOf('month'))].join(',')
+        queryDateFormat(lastMonth.clone().endOf('month')) ].join(',')
     case 'yesterday':
       return [
         queryDateFormat(yesterday.clone().subtract(offset, 'days')),
-        queryDateFormat(yesterday)].join(',')
+        queryDateFormat(yesterday) ].join(',')
     case 'today':
     default:
       return [
         queryDateFormat(today.clone().subtract(offset, 'days')),
-        queryDateFormat(today)].join(',')
+        queryDateFormat(today) ].join(',')
   }
 }
 
 function getDateRangeOffset (dateRange) {
-  const [start, end] = splitDateRange(dateRange)
+  const [ start, end ] = splitDateRange(dateRange)
   const startOffset = start.subtract(operatorPerformance.numberOfDayOffset, 'days')
   return [
     queryDateFormat(startOffset),
@@ -266,7 +264,7 @@ export class OperatorStatsRepository extends OperatorStats {
 
   async getPerformanceByDateRange (dateRange, filter) {
     const results = await this.getStatsByDateRange(getDateRangeOffset(dateRange), filter)
-    return [dateRange, results]
+    return [ dateRange, results ]
   }
 
   async getPerformanceByFixed (filter) {
@@ -276,7 +274,7 @@ export class OperatorStatsRepository extends OperatorStats {
 
   async getPerformance (params) {
     const filter = GetStatsFilter(params)
-    const [dateRange, results] = GetStatsFilterFixed.is(filter)
+    const [ dateRange, results ] = GetStatsFilterFixed.is(filter)
       ? await this.getPerformanceByFixed(filter)
       : await this.getPerformanceByDateRange(filter.dateBetween, filter)
     const groupedResults = _groupBy(filterPerformanceEvents(results), 'operatorId')
@@ -286,7 +284,7 @@ export class OperatorStatsRepository extends OperatorStats {
 
 function filterPerformanceEvents (results) {
   return results
-    .filter(result => [OperatorActions.MEETING, OperatorActions.VIEW_WORKSHEET].indexOf(result.action) !== -1)
+    .filter(result => [ OperatorActions.MEETING, OperatorActions.VIEW_WORKSHEET ].indexOf(result.action) !== -1)
 }
 
 function operatorCalculation (dateRange) {
@@ -306,12 +304,12 @@ function operatorCalculation (dateRange) {
       _.mapValues(dailyCalculations, (dailyCalculation, date) => {
         if (range.contains(utc(date))) {
           values.push(dailyCalculation)
-          valuesKeys[date] = dailyCalculation
+          valuesKeys[ date ] = dailyCalculation
         }
       })
-      ratios[dayDate] = {
+      ratios[ dayDate ] = {
         values: valuesKeys,
-        dayRatio: dailyCalculations[dayDate] || 0,
+        dayRatio: dailyCalculations[ dayDate ] || 0,
         meanRatio: _.sum(values) / Math.max(1, values.length)
       }
     })
@@ -327,7 +325,7 @@ function calculateCounters (counters) {
       total += count
     })
 
-    mappedCounters[statKey] = total
+    mappedCounters[ statKey ] = total
   })
 
   return mappedCounters
@@ -342,11 +340,11 @@ function operatorStats (operatorStats) {
 
 function dailyCalculation (dayActions) {
   const meetings = _.chain(dayActions)
-    .filter(['action', OperatorActions.MEETING])
+    .filter([ 'action', OperatorActions.MEETING ])
     .sumBy('count')
     .value()
   const views = _.chain(dayActions)
-    .filter(['action', OperatorActions.VIEW_WORKSHEET])
+    .filter([ 'action', OperatorActions.VIEW_WORKSHEET ])
     .sumBy('count')
     .value()
   return meetings / Math.max(1, views)

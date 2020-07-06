@@ -1,4 +1,3 @@
-import debug from 'debug'
 import Promise from 'bluebird'
 import aws from 'aws-sdk'
 import _pick from 'lodash/pick'
@@ -8,10 +7,10 @@ import { exec } from 'child_process'
 import fs from 'fs-extra'
 import t from './types'
 import mime from 'mime-types'
+import { logger } from '../infrastructure/logger'
 
 import { awsConfig } from '../../config'
 
-const awsDebug = debug('app:aws')
 const accountConfig = _pick(awsConfig, ['region', 'accessKeyId', 'secretAccessKey', 'signatureVersion'])
 
 aws.config.update(accountConfig)
@@ -113,7 +112,7 @@ export function resolvePublicUrl (url) {
 export async function makePreview (rawUrl) {
   const url = cleanUrl(rawUrl)
   const extension = path.extname(url)
-  awsDebug('make preview', extension, url)
+  logger.debug('aws#makePreview', { extension, url})
   switch (extension) {
     case '.pdf':
     case '.png':

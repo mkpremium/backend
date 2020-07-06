@@ -1,6 +1,5 @@
 import Promise from 'bluebird'
 import { N1qlQuery } from 'couchbase'
-import debug from 'debug'
 import _ from 'lodash'
 import _every from 'lodash/every'
 import _find from 'lodash/find'
@@ -28,8 +27,6 @@ import { OperatorActions } from '../../stats/types'
 import { OwnerBusinessStatus, OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
 import { WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
-
-const worksheetDebug = debug('app:model:worksheet')
 
 function canRegisterVerified (worksheet, newStatus, operatorId) {
   if (!operatorId) {
@@ -131,16 +128,12 @@ export class WorksheetRepository extends CouchbaseModel {
   static mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
     switch (negotiationStatus) {
       case OwnerBusinessStatus.DISCARDED:
-        worksheetDebug('Owner business status is discarded so status is _PUBLIC')
         return WorkSheetStatus.PUBLIC
       case OwnerBusinessStatus.NO_SALE:
-        worksheetDebug('Owner business status is NO_SALE so status is _NO_SALE')
         return WorkSheetStatus.NO_SALE
       case OwnerBusinessStatus.ALREADY_SOLD:
-        worksheetDebug('Owner business status is ALREADY_SOLD so status is _INVALID')
         return WorkSheetStatus.INVALID
       default:
-        worksheetDebug('Owner business status is defult so status is _MEETING')
         return WorkSheetStatus.MEETING
     }
   }
