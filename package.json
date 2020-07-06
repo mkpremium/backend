@@ -84,7 +84,8 @@
     "squel": "^5.12.1",
     "tcomb": "^3.2.25",
     "utm-latlng": "^1.0.6",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.7",
