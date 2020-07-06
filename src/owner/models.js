@@ -71,7 +71,7 @@ export class OwnerRepository extends CouchbaseModel {
 
     const ids = _isArray(id) ? id : [id]
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`
-    const qb = this.getQueryBuilder('let').where(`id IN ${idsText}`)
+    const qb = this.getQueryBuilder().where(`id IN ${idsText}`)
 
     ownerIncludes(qb, includes)
     const result = await this.query(qb)
