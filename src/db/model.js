@@ -4,15 +4,13 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import squel from 'squel'
 import { N1qlQuery, SearchQuery, ViewQuery } from 'couchbase'
-import debug from 'debug'
 import _ from 'lodash'
+import { logger } from '../infrastructure/logger'
 
 import init from './couchbase'
 import { couchbase, emitModelEvents } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { ONE_WEEK } from '../lib/constants'
-
-const debugModel = debug('app:db:model')
 
 class CouchbaseModelStruct {
   constructor () {
@@ -187,7 +185,7 @@ export class CouchbaseModel {
   }
 
   async countQuery (queryBuilder = this.getQueryBuilder('count')) {
-    const [{ count }] = await this.query(queryBuilder)
+    const [ { count } ] = await this.query(queryBuilder)
     return count
   }
 
@@ -201,7 +199,7 @@ export class CouchbaseModel {
   }
 
   async search (searchBuilder) {
-    debugModel('search', JSON.stringify(searchBuilder))
+    logger.debug('model#search', { searchBuilder })
     await this._promiseBucket
 
     return this._bucket.queryAsync(searchBuilder)
@@ -242,10 +240,15 @@ export class CouchbaseModel {
 
   async queryRaw (query) {
     await this._promiseBucket
-    debugModel('queryRaw', query)
-    const result = await this._bucket.queryAsync(query)
-    debugModel('result')
-    return result
+    try {
+      const result = await this._bucket.queryAsync(query)
+      logger.debug('model#queryRaw', { query, result })
+
+      return result
+    } catch (error) {
+      logger.error('model#queryRaw', { query, error })
+      throw error
+    }
   }
 
   getBucketName () {
@@ -256,25 +259,28 @@ export class CouchbaseModel {
     await this._promiseBucket
     const queryParam = queryBuilder.toParam()
 
-    debugModel('query', `c(${consistency})`, queryParam)
-    const n1ql = N1qlQuery.fromString(queryParam.text)
-    n1ql.consistency(consistency)
-    const result = await this._bucket.queryAsync(n1ql, queryParam.values)
-    // debugModel('query-result', `c(${consistency})`, queryParam);
-    return result
+    try {
+      const n1ql = N1qlQuery.fromString(queryParam.text)
+      n1ql.consistency(consistency)
+      const result = await this._bucket.queryAsync(n1ql, queryParam.values)
+      logger.debug('model#query', { consistency, queryParam, queryBuilder, result })
+      return result
+    } catch (error) {
+      logger.error('model#query', { consistency, queryParam, queryBuilder, error })
+    }
   }
 
   async unique (data, field) {
-    const value = data[field]
+    const value = data[ field ]
     const query = this.getQueryBuilder().where(`${field} = ?`, value).limit(1)
 
     const result = await this.query(query)
 
-    debugModel('result unique query ', result)
+    logger.debug('model#unique', { data, field, result })
 
     if (result && result.length) {
       // we can safely omit data with the same id
-      if (data.id && data.id === result[0].id) {
+      if (data.id && data.id === result[ 0 ].id) {
         return
       }
 
@@ -282,13 +288,6 @@ export class CouchbaseModel {
       e.code = 400
       throw e
     }
-  }
-
-  async findEmptyWorksheets () {
-    const qb = this.getQueryBuilder()
-      .where('ARRAY_COUNT(t.relatedBuildingIds) = 0')
-
-    return this.query(qb)
   }
 
   async findByMigratedId (migratedId, required = true) {
@@ -302,17 +301,15 @@ export class CouchbaseModel {
     return results
   }
 
-  async findOneByMigrateId (migrateId, require = true) {
-    const [result] = await this.findByMigratedId(migrateId, require)
-    return fromJSON(result, this.Struct)
-  }
-
   async findById (id) {
     if (_.isEmpty(id)) {
       throw new Error('id should be defined')
     }
     try {
-      debugModel('findById', this._getMeta().defaultProps._documentType, id)
+      logger.debug('findById', {
+        documentType: this._getMeta().defaultProps._documentType,
+        id
+      })
       await this._promiseBucket
       const result = await this._bucket.getAsync(id)
       if (result && result.value) {
@@ -339,8 +336,9 @@ export class CouchbaseModel {
   }
 
   async sendEvent (eventName, data, sendEvent = emitModelEvents) {
-    if (sendEvent && this._socketPromise) {
-      debugModel('event', eventName, data, 'will be emitted', sendEvent)
+    const shouldEmitValue = sendEvent && this._socketPromise
+    logger.debug('model.sendEvent', { eventName, data, shouldEmitValue, sendEvent })
+    if (shouldEmitValue) {
       const socket = await this._socketPromise
       return socket.sendEvent(eventName, data)
     } else {
