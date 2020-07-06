@@ -1,9 +1,15 @@
-import { errorVerbosity } from '../../config'
+import { logger } from '../infrastructure/logger'
 
-const level = {
-  NONE: 0,
-  MESSAGE: 1,
-  STACK: 2
+export function appErrorHandler (error, req, res, next) {
+  if (res.headersSent) {
+    return next(error)
+  }
+
+  prepareErrorCode(error)
+  logger.error('appErrorHandler', { error: { message: error.message, stack: error.stack } })
+
+  res.status(error.code)
+  res.json({ message: error.message })
 }
 
 function prepareErrorCode (err) {
@@ -22,48 +28,6 @@ function prepareErrorCode (err) {
 
   // for any reason not listed before
   err.code = err.code || 500
-
-  switch (errorVerbosity) {
-    case level.MESSAGE:
-      console.error(err.message)
-      break
-    case level.STACK:
-      console.error(err)
-      break
-  }
-}
-
-/**
- * @swagger
- * definitions:
- *   Error:
- *     properties:
- *       message:
- *         type: string
- */
-export function appErrorHandler (err, req, res, next) {
-  if (res.headersSent) {
-    return next(err)
-  }
-
-  prepareErrorCode(err)
-
-  res.status(err.code)
-  res.json({ message: err.message })
-}
-
-export function oldAppErrorHandler (err, req, res, next) {
-  if (res.headersSent) {
-    return next(err)
-  }
-
-  prepareErrorCode(err)
-
-  res.status(err.code)
-  res.json({
-    Error: true,
-    Message: err.message
-  })
 }
 
 export default appErrorHandler
