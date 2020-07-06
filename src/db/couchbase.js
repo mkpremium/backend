@@ -10,7 +10,7 @@ import { defer } from '../lib/promise-util'
 import { logger } from '../infrastructure/logger'
 
 export default (app) => {
-  logger.info(`initializing couchbase connection with "${couchbase.uri}"`, couchbase)
+  logger.info(`initializing couchbase connection with "${couchbase.uri}"`)
   const cluster = new Couchbase.Cluster(couchbase.uri)
   cluster.authenticate(couchbase.user, couchbase.pass)
 
