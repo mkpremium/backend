@@ -1,6 +1,6 @@
 {
   "ipcMode": null,
-  "executionRoleArn": "arn:aws:iam::173249668334:role/ecsTaskExecutionRole",
+  "executionRoleArn": "ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
@@ -89,12 +89,11 @@
   ],
   "placementConstraints": [],
   "memory": "2048",
-  "taskRoleArn": "arn:aws:iam::173249668334:role/backend-role",
+  "taskRoleArn": "backend-role",
   "compatibilities": [
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:eu-west-1:173249668334:task-definition/backend:2",
   "family": "backend",
   "requiresAttributes": [
     {
