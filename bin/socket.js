@@ -18,8 +18,9 @@ Promise.all([
   socket.initModel('bin-socket'),
   couchbase(app)
 ])
-  .catch(err => {
-    console.error(err)
+  .catch(errors => {
+    logger.error('starting socket dependencies', { errors })
+    process.exit(1)
   })
 
 server.on('error', errorHandler)
@@ -38,20 +39,5 @@ function errorHandler (error) {
     throw error
   }
 
-  const bind = typeof socketConfig.port === 'string'
-    ? 'Pipe ' + socketConfig.port
-    : 'Port ' + socketConfig.port
-
-  // handle specific listen errors with friendly messages
-  // noinspection FallThroughInSwitchStatementJS
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges')
-      process.exit(1)
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use')
-      process.exit(1)
-    default:
-      throw error
-  }
+  logger.error('Error received', { error })
 }
