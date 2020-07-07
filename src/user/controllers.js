@@ -16,3 +16,10 @@ export const createAddFavoritesController = addFavoriteBuildingService => {
     res.sendStatus(201)
   }
 }
+
+export const createDeleteFavoriteBuildingController = deleteFavoriteBuildingService => {
+  return async (req, res) => {
+    await deleteFavoriteBuildingService.deleteFavoriteBuilding(req.user.operator.id, req.params.buildingId)
+    res.sendStatus(200)
+  }
+}

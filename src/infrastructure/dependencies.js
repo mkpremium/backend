@@ -21,6 +21,7 @@ import { StockRepository } from '../stock/StockRepository'
 import { StockRepository as LegacyStockRepository } from '../stock/models'
 
 import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
+import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 
@@ -56,6 +57,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.featuredOwnerService = new FeaturedOwnerService(buildingRepository)
   container.usersRepository = usersRepository
   container.addFavoriteBuildingService = new AddFavoriteBuildingService(usersRepository)
+  container.deleteFavoriteBuildingService = new DeleteFavoriteBuildingService(usersRepository)
 
   container.addProposalService = new AddProposalService(legacyDependenciesContainer.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { operatorCreateBusiness } from '../../test/common'
-import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
+import { authenticatedDelete, authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
 describe('Property agent favourite buildings', () => {
   it('stores property agent favourite buildings', async () => {
@@ -12,13 +12,24 @@ describe('Property agent favourite buildings', () => {
       buildingId: 'building-id'
     }).then(response => expect(response.status).to.be.equal(201))
 
-    return authenticatedGet('/me', businessUser, app)
+    await authenticatedGet('/me', businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         expect(response.body).to.be.deep.contains({
           favoriteBuildings: [
             'building-id'
           ]
+        })
+      })
+
+    await authenticatedDelete('/favorites/building-id', businessUser, app)
+      .then(response => expect(response.status).to.be.equal(200))
+
+    await authenticatedGet('/me', businessUser, app)
+      .then(response => {
+        expect(response.status).to.be.equal(200)
+        expect(response.body).to.deep.contains({
+          favoriteBuildings: []
         })
       })
   })

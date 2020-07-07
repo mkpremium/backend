@@ -23,6 +23,16 @@ export const authenticatedGet = async (endpoint, user, app) => {
     .set('Authorization', authenticatedUser.authorization)
 }
 
+export const authenticatedDelete = async (endpoint, user, app) => {
+  const authenticatedUser = await operatorLogin(app,
+    {username: user.username, password: defaultPassword})
+
+  return request(app)
+    .delete(endpoint)
+    .timeout(DEFAULT_MILLISECONDS_TO_WAIT)
+    .set('Authorization', authenticatedUser.authorization)
+}
+
 export const authenticatedPost = async (endpoint, user, app, body) => {
   const authenticatedUser = await operatorLogin(app,
     {username: user.username, password: defaultPassword})
