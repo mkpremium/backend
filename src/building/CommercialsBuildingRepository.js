@@ -22,8 +22,8 @@ SELECT
 FROM mkpremium building
 LEFT NEST mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 
-LEFT NEST mkpremium verifiedOwners ON verifiedOwners.status != "ERRONEO"
-    AND verifiedOwners.buildingId = building.id
+NEST mkpremium verifiedOwners ON verifiedOwners.status != "ERRONEO"
+    AND (verifiedOwners.buildingId = building.id OR verifiedOwners.id = building.ownerId)
     AND verifiedOwners._documentType = 'owner'
     AND ANY c in verifiedOwners.person.contacts SATISFIES c.status = "GOOD" END
 
