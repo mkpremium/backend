@@ -67,7 +67,7 @@ export class CommercialsBuildingRepository {
 
   listAssignedToPropertyAgentOfId (agentId) {
     return this.allAssignedBuildingsId(agentId)
-      .then(buildingsId => this.listById(buildingsId))
+               .then(buildingsId => this.listById(buildingsId))
   }
 
   listProposalsForBuilding (buildingId) {
@@ -78,23 +78,20 @@ export class CommercialsBuildingRepository {
 
   allAssignedBuildingsId (agentId) {
     return this.couchbaseAdapter
-      .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery), [ agentId ])
-      .then(result => result.map(({ buildingId }) => buildingId))
+               .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery), [ agentId ])
+               .then(result => result.map(({ buildingId }) => buildingId))
   }
 
   static mapToPropertyAgentBuildingView (buildings) {
     return buildings.map(
       ({
-        id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
-        ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus
-      }) => {
+         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
+         ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus
+       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-        const featuredOwnerId = ownerId ||
-                                _.get(lastMeeting, 'ownerId') ||
-                                _.get(verifiedOwners, '[0].id')
-        const featuredOwner = featuredOwnerId ? verifiedOwners.find(o => o.id === featuredOwnerId) : undefined
+        const featuredOwner = this.getOwner(ownerId, lastMeeting, verifiedOwners)
         const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
         return ({
@@ -143,8 +140,8 @@ export class CommercialsBuildingRepository {
           negotiationStatus: negotiationStatus || undefined,
           floorArea,
           usage: use !== null ? use : undefined,
-          owner: (featuredOwnerId && {
-            id: featuredOwnerId,
+          owner: (featuredOwner && {
+            id: featuredOwner.id,
             firstName: _.get(featuredOwner, 'firstName'),
             name: _.get(featuredOwner, 'fullName'),
             contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
@@ -156,5 +153,19 @@ export class CommercialsBuildingRepository {
         })
       }
     )
+  }
+
+  static getOwner (featuredOwnerId, lastMeeting, verifiedOwners) {
+    if (!verifiedOwners || verifiedOwners.length === 0) {
+      return
+    }
+    const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
+
+    return this.verifiedOwnerOfId(verifiedOwners, featuredOwnerId) ||
+      this.verifiedOwnerOfId(verifiedOwners, lastMeetingOwnerId) || verifiedOwners[ 0 ]
+  }
+
+  static verifiedOwnerOfId (verifiedOwners, ownerId) {
+    return verifiedOwners.find(o => o.id === ownerId)
   }
 }
