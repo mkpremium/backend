@@ -67,7 +67,7 @@ export class CommercialsBuildingRepository {
 
   listAssignedToPropertyAgentOfId (agentId) {
     return this.allAssignedBuildingsId(agentId)
-               .then(buildingsId => this.listById(buildingsId))
+      .then(buildingsId => this.listById(buildingsId))
   }
 
   listProposalsForBuilding (buildingId) {
@@ -78,20 +78,20 @@ export class CommercialsBuildingRepository {
 
   allAssignedBuildingsId (agentId) {
     return this.couchbaseAdapter
-               .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery), [ agentId ])
-               .then(result => result.map(({ buildingId }) => buildingId))
+      .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery), [ agentId ])
+      .then(result => result.map(({ buildingId }) => buildingId))
   }
 
   static mapToPropertyAgentBuildingView (buildings) {
     return buildings.map(
       ({
-         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
-         ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus
-       }) => {
+        id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
+        ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus
+      }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-        const featuredOwner = this.getOwner(ownerId, lastMeeting, verifiedOwners)
+        const featuredOwner = CommercialsBuildingRepository.getOwner(ownerId, lastMeeting, verifiedOwners)
         const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
         return ({
@@ -162,7 +162,7 @@ export class CommercialsBuildingRepository {
     const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
 
     return this.verifiedOwnerOfId(verifiedOwners, featuredOwnerId) ||
-      this.verifiedOwnerOfId(verifiedOwners, lastMeetingOwnerId) || verifiedOwners[ 0 ]
+      CommercialsBuildingRepository.verifiedOwnerOfId(verifiedOwners, lastMeetingOwnerId) || verifiedOwners[ 0 ]
   }
 
   static verifiedOwnerOfId (verifiedOwners, ownerId) {
