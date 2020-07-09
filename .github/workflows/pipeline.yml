@@ -63,12 +63,20 @@ jobs:
         docker push $ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
+    - name: Render Amazon ECS task definition for api container
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: ecs-task-definition.json
         container-name: api
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Modify Amazon ECS task definition with websocket container
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ecs-task-definition.json
+        container-name: websocket
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
