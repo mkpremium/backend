@@ -53,6 +53,7 @@ jobs:
           service: backend
           cluster: ecs-trial
           wait-for-service-stability: true
+          wait-for-minutes: 5
 
     - name: Render Amazon ECS task definition for websocket container
       id: websocket-task-def
@@ -69,3 +70,4 @@ jobs:
           service: backend
           cluster: ecs-trial
           wait-for-service-stability: true
+          wait-for-minutes: 5
