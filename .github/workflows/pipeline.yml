@@ -47,13 +47,13 @@ jobs:
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS API task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.api-task-def.outputs.task-definition }}
-          service: backend
-          cluster: ecs-trial
-          wait-for-service-stability: true
-          wait-for-minutes: 5
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.api-task-def.outputs.task-definition }}
+        service: backend
+        cluster: ecs-trial
+        wait-for-service-stability: true
+        wait-for-minutes: 5
 
     - name: Render Amazon ECS task definition for websocket container
       id: websocket-task-def
@@ -64,10 +64,10 @@ jobs:
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS WebSocket task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.websocket-task-def.outputs.task-definition }}
-          service: backend
-          cluster: ecs-trial
-          wait-for-service-stability: true
-          wait-for-minutes: 5
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.websocket-task-def.outputs.task-definition }}
+        service: backend
+        cluster: ecs-trial
+        wait-for-service-stability: true
+        wait-for-minutes: 5
