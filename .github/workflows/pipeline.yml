@@ -64,7 +64,7 @@ jobs:
         echo "::set-output name=image::$ECR_REPOSITORY:$IMAGE_TAG"
 
     - name: Render Amazon ECS task definition for api container
-      id: task-def
+      id: api-task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: ecs-task-definition.json
@@ -72,7 +72,7 @@ jobs:
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Modify Amazon ECS task definition with websocket container
-      id: task-def
+      id: websocket-task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: ecs-task-definition.json
