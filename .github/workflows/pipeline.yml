@@ -50,7 +50,7 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.api-task-def.outputs.task-definition }}
-        service: backend
+        service: api
         cluster: ecs-trial
         wait-for-service-stability: true
         wait-for-minutes: 5
@@ -67,7 +67,7 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.websocket-task-def.outputs.task-definition }}
-        service: backend
+        service: websocket
         cluster: ecs-trial
         wait-for-service-stability: true
         wait-for-minutes: 5
