@@ -42,7 +42,7 @@
         },
         {
           "name": "FIREBASE_COMERCIALES",
-          "value": "false"
+          "value": "true"
         },
         {
           "name": "FIREBASE_INFORMADORES",
