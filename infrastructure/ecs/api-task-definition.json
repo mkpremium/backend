@@ -45,6 +45,10 @@
           "value": "true"
         },
         {
+          "name": "FIREBASE_COMERCIALES_DATABASE_URL",
+          "value": "https://mkpremiumcomerciales-bd40a.firebaseio.com"
+        },
+        {
           "name": "FIREBASE_INFORMADORES",
           "value": "false"
         },
