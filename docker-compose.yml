@@ -1,27 +1,67 @@
 version: '3'
 
 services:
-  www:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     image: mk-backend:local
 
     environment:
-      APP_PORT: "9003"
+      APP_PORT: "9001"
       COUCHBASE_URI: "couchbase://couchbase_db"
       COUCHBASE_BUCKET: "mkpremium"
       COUCHBASE_USER: "couchbase"
       COUCHBASE_PASS: "couchbase"
+      FIREBASE_COMERCIALES: "false"
       SOCKET_ENABLED: "false"
-      DEBUG: "app:*"
+      SOCKET_SERVER: "http://websocket:9002"
+      DEBUG: "ON"
+    expose:
+      - "9001"
+    volumes:
+      - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
+    links:
+      - "websocket"
+      - "couchbase_db"
+    depends_on:
+      - websocket
+      - couchbase_db
+    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "/app/bin/www.js"]
+
+  websocket:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mk-backend:local
+
+    environment:
+      SOCKET_PORT: "9002"
+      COUCHBASE_URI: "couchbase://couchbase_db"
+      COUCHBASE_BUCKET: "mkpremium"
+      COUCHBASE_USER: "couchbase"
+      COUCHBASE_PASS: "couchbase"
+      SOCKET_ENABLED: "true"
+      FIREBASE_COMERCIALES: "false"
+      SOCKET_SERVER: "http://localhost:9002"
+      DEBUG: "ON"
 
     volumes:
       - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
 
-    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "/app/build/bin/www.js"]
+    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "node", "/app/bin/socket.js"]
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./infrastructure/nginx/conf:/etc/nginx/conf.d
+      - ./infrastructure/nginx/conf/ssl:/etc/ssl
     ports:
-      - "9003:9003"
+      - "80:80"
+      - "443:443"
+    links:
+      - websocket
+      - api
 
   couchbase_db:
     build:
@@ -41,10 +81,10 @@ services:
       core: 100000000
       memlock: 100000000
 
-  localstack:
-    image: localstack/localstack
-    ports:
-      - "4567-4584:4567-4584"
-      - "8080:8080" # web UI
-    environment:
-      - SERVICES=sqs
+#  localstack:
+#    image: localstack/localstack
+#    ports:
+#      - "4567-4584:4567-4584"
+#      - "8080:8080" # web UI
+#    environment:
+#      - SERVICES=sqs
