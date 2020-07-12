@@ -53,10 +53,6 @@
           "value": "false"
         },
         {
-          "name": "MAX_MESSAGES_TO_PROCESS",
-          "value": "300000"
-        },
-        {
           "name": "SOCKET_ENABLED",
           "value": "false"
         }

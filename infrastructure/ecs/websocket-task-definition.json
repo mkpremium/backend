@@ -48,10 +48,6 @@
         {
           "name": "FIREBASE_INFORMADORES",
           "value": "false"
-        },
-        {
-          "name": "MAX_MESSAGES_TO_PROCESS",
-          "value": "300000"
         }
       ],
       "resourceRequirements": null,
