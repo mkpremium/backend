@@ -11,6 +11,12 @@ import socket from '../src/socket'
 import couchbase from '../src/db/couchbase'
 
 const app = express()
+app.set('IS_READY', false)
+app.get('/_ready', (req, res) => {
+  if (app.get('IS_READY')) res.sendStatus(200)
+  else res.sendStatus(503)
+})
+
 const httpServer = Server(app)
 const server = httpServer.listen(socketConfig.port, listenHandler)
 
@@ -18,6 +24,9 @@ Promise.all([
   socket.initModel('bin-socket'),
   couchbase(app)
 ])
+  .then(() => {
+    app.set('IS_READY', true)
+  })
   .catch(errors => {
     logger.error('starting socket dependencies', { errors })
     process.exit(1)
