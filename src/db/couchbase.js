@@ -37,6 +37,7 @@ function connectToBucket (cluster, bucketName) {
     attachHelpers(bucket)
     attachModel(bucket, cluster)
     resolve(bucket)
+    logger.info('successfully connected to Couchbase')
   })
   return { promise, bucket }
 }

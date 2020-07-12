@@ -1,7 +1,7 @@
 import winston, { createLogger } from 'winston'
 
-// const level = process.env.DEBUG ? 'debug' : 'info'
-const level = 'info'
+const level = process.env.DEBUG === 'ON' ? 'debug' : 'info'
+// const level = 'info'
 export const logger = createLogger({
   level,
   format: winston.format.json(),

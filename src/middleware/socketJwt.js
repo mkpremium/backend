@@ -25,7 +25,7 @@ function socketJwt () {
         next()
       })
       .catch(error => {
-        logger.error('socketJwt', { error })
+        logger.error('verifying socket token', { error })
         next(error)
       })
   }
