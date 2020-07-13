@@ -4,6 +4,7 @@ import t from 'tcomb'
 import {join} from 'path'
 import _ from 'lodash'
 import {N1qlQuery} from 'couchbase'
+import { logger } from './src/infrastructure/logger'
 
 export const port = parseInt(process.env.APP_PORT || '9001')
 export const emitHistoryEvents = JSON.parse(process.env.EMIT_HISTORY_EVENTS || false)
@@ -95,7 +96,7 @@ export const mailer = {
       user: process.env.MAILER_USER || 'v3hn5oczispny2x4@ethereal.email',
       pass: process.env.MAILER_PASS || 'kF5nfKm6XreTsMN8Br'
     },
-    logger: false,
+    logger: logger,
     debug: false,
     tls: {
       rejectUnauthorized: false
