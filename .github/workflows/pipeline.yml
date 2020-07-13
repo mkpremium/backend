@@ -51,7 +51,7 @@ jobs:
       with:
         task-definition: ${{ steps.api-task-def.outputs.task-definition }}
         service: api
-        cluster: ecs-trial
+        cluster: production
         wait-for-minutes: 5
 
     - name: Render Amazon ECS task definition for websocket container
@@ -67,6 +67,5 @@ jobs:
       with:
         task-definition: ${{ steps.websocket-task-def.outputs.task-definition }}
         service: websocket
-        cluster: ecs-trial
-        wait-for-service-stability: true
+        cluster: production
         wait-for-minutes: 5
