@@ -7,7 +7,7 @@ import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { BuildingProposalRepository, BuildingRepository } from './models'
 
 export function createListBuildingsController (listBuildingsService) {
-  return async (req, res) => {
+  return wrap(async (req, res) => {
     if (req.query.id) {
       res.send(await listBuildingsService.buildingsOfId(req.query.id))
     } else if (req.query.allAssignedToMe !== undefined) {
@@ -15,13 +15,13 @@ export function createListBuildingsController (listBuildingsService) {
     } else {
       res.status(400).json({ error: 'No id or allAssignedToMe provided' })
     }
-  }
+  })
 }
 
 export function createListBuildingProposalsController (listBuildingProposalsService) {
-  return async (req, res) => {
+  return wrap(async (req, res) => {
     res.send(await listBuildingProposalsService.forBuilding(req.params.buildingId))
-  }
+  })
 }
 
 export function createUpdateBuildingNegotiationStatusController (updateBuildingNegotiationStatusService) {
@@ -86,7 +86,7 @@ export const updateNegotiationProposalController = wrap(updateNegotiationProposa
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createListVerifiedOwnersController = legacyOwnerRepository => {
-  return async (req, res) => {
+  return wrap(async (req, res) => {
     const owners = await legacyOwnerRepository.findAllVerifiedOwnersByBuildingId(req.params.buildingId)
     const result = owners.map(o => ({
       id: o.id,
@@ -96,5 +96,5 @@ export const createListVerifiedOwnersController = legacyOwnerRepository => {
     }))
 
     res.json(result)
-  }
+  })
 }
