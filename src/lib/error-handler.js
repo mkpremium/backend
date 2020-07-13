@@ -32,6 +32,10 @@ function prepareErrorCode (err) {
 
   // for any reason not listed before
   err.code = err.code || 500
+  if (isNaN(err.code)) {
+    logger.error('prepareErrorCode error.code not a number', { error: err })
+    err.code = 500
+  }
 }
 
 export default appErrorHandler
