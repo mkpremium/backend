@@ -87,12 +87,12 @@
     }
   ],
   "placementConstraints": [],
-  "memory": "4096",
+  "memory": "2048",
   "taskRoleArn": "backend-role",
   "family": "websocket",
   "pidMode": null,
   "networkMode": "awsvpc",
-  "cpu": "1024",
+  "cpu": "512",
   "inferenceAccelerators": null,
   "proxyConfiguration": null,
   "volumes": []
