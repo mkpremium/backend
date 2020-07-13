@@ -77,6 +77,10 @@
           "value": "smtp@mkpremium.com"
         },
         {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
           "name": "SOCKET_ENABLED",
           "value": "false"
         },
