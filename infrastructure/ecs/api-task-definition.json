@@ -55,6 +55,14 @@
         {
           "name": "SOCKET_ENABLED",
           "value": "false"
+        },
+        {
+          "name": "SOCKET_PORT",
+          "value": "9002"
+        },
+        {
+          "name": "SOCKET_SERVER",
+          "value": "http://websocket.local"
         }
       ],
       "resourceRequirements": null,
@@ -98,7 +106,7 @@
     }
   ],
   "placementConstraints": [],
-  "memory": "4096",
+  "memory": "2048",
   "taskRoleArn": "backend-role",
   "family": "api",
   "pidMode": null,
@@ -106,7 +114,7 @@
     "FARGATE"
   ],
   "networkMode": "awsvpc",
-  "cpu": "1024",
+  "cpu": "512",
   "inferenceAccelerators": null,
   "proxyConfiguration": null,
   "volumes": []
