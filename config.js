@@ -90,6 +90,7 @@ export const mailer = {
     host: process.env.MAILER_HOST || 'smtp.ethereal.email',
     port: Number(process.env.MAILER_PORT || '587'),
     secure: JSON.parse(process.env.MAILER_SECURE || false),
+    connectionTimeout: 2000,
     auth: {
       user: process.env.MAILER_USER || 'v3hn5oczispny2x4@ethereal.email',
       pass: process.env.MAILER_PASS || 'kF5nfKm6XreTsMN8Br'
