@@ -53,6 +53,7 @@ dependenciesPromise.then(() => {
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
   scheduledEvents(app, dependenciesContainer)
+  app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
@@ -84,6 +85,5 @@ autocomplete(app)
 email(app)
 cadastre(app)
 preferences(app)
-app.use(appErrorHandler)
 
 export default app

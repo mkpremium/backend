@@ -25,11 +25,11 @@ export function createListBuildingProposalsController (listBuildingProposalsServ
 }
 
 export function createUpdateBuildingNegotiationStatusController (updateBuildingNegotiationStatusService) {
-  return async (req, res) => {
+  return wrap(async (req, res) => {
     await updateBuildingNegotiationStatusService.updateBuildingStatus(
       req.params.buildingId, req.body.status, req.user.id)
     res.sendStatus(200)
-  }
+  })
 }
 
 async function addMetadataToBuilding (req, res) {
