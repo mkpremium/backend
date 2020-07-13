@@ -48,6 +48,10 @@
         {
           "name": "FIREBASE_INFORMADORES",
           "value": "false"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
         }
       ],
       "resourceRequirements": null,
