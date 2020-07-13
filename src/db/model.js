@@ -339,6 +339,7 @@ export class CouchbaseModel {
     const shouldEmitValue = sendEvent && this._socketPromise
     logger.debug('model.sendEvent', { eventName, data, shouldEmitValue, sendEvent })
     if (shouldEmitValue) {
+      logger.info('CouchbaseModel#sendEvent', { eventName, id: (data || {}).id })
       const socket = await this._socketPromise
       return socket.sendEvent(eventName, data)
     } else {

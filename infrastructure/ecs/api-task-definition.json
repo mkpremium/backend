@@ -41,6 +41,10 @@
           "value": "backend"
         },
         {
+          "name": "EMIT_MODEL_EVENTS",
+          "value": "true"
+        },
+        {
           "name": "FIREBASE_COMERCIALES",
           "value": "true"
         },
