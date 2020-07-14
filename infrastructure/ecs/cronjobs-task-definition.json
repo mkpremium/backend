@@ -107,7 +107,7 @@
   "placementConstraints": [],
   "memory": "2048",
   "taskRoleArn": "backend-role",
-  "family": "api",
+  "family": "cronjobs",
   "pidMode": null,
   "requiresCompatibilities": [
     "FARGATE"
