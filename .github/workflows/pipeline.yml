@@ -69,3 +69,19 @@ jobs:
         service: websocket
         cluster: production
         wait-for-minutes: 5
+
+    - name: Render Amazon ECS task definition for cronjobs container
+      id: cronjobs-task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: infrastructure/ecs/cronjobs-task-definition.json
+        container-name: cronjobs
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS cronjobs task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.cronjobs-task-def.outputs.task-definition }}
+        service: cronjobs
+        cluster: production
+        wait-for-minutes: 5
