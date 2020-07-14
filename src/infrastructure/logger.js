@@ -11,6 +11,11 @@ export const logger = createLogger({
     new winston.transports.Console({
       format: winston.format.json()
     })
+  ],
+  rejectionHandlers: [
+    new winston.transports.Console({
+      format: winston.format.json()
+    })
   ]
 })
 
