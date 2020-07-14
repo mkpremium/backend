@@ -62,11 +62,11 @@
         },
         {
           "name": "MAILER_HOST",
-          "value": "172.31.10.172"
+          "value": "authsmtp.mkpremium.com"
         },
         {
           "name": "MAILER_PORT",
-          "value": "2525"
+          "value": "587"
         },
         {
           "name": "MAILER_SECURE",
