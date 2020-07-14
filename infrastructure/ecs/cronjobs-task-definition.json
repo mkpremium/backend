@@ -18,7 +18,7 @@
       "portMappings": [],
       "command": [
         "node",
-        "bin/cronjobs"
+        "bin/freezer.js"
       ],
       "linuxParameters": null,
       "cpu": 0,
