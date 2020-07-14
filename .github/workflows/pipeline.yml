@@ -77,3 +77,10 @@ jobs:
         task-definition: infrastructure/ecs/cronjobs-task-definition.json
         container-name: cronjobs
         image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS cronjobs task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.cronjobs-task-def.outputs.task-definition }}
+        cluster: production
+        wait-for-minutes: 5
