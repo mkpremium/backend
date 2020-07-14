@@ -18,7 +18,7 @@ BUILD_FOLDER=$build_folder scripts/package.js
 
 cd ${build_folder}
 # Create folder for uploads (email attachments)
-mkdir .uploads
+mkdir -p .uploads
 git rev-parse HEAD > GIT_COMMIT
 
 rm -rf .idea .circleci conf docker docs test test-e2e node_modules
