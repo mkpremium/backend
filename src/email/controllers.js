@@ -33,7 +33,7 @@ function createMessage (from, data, attachment) {
     to,
     cc,
     bcc: cco,
-    replyTo: from.email,
+    replyTo: `${from.firstName} ${from.lastName}<${from.email}>`,
     from: `${from.firstName} ${from.lastName}<${process.env.MAILER_USER}>`,
     subject,
     html,
