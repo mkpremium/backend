@@ -62,19 +62,19 @@
         },
         {
           "name": "MAILER_HOST",
-          "value": "authsmtp.mkpremium.com"
+          "value": "smtp.gmail.com"
         },
         {
           "name": "MAILER_PORT",
-          "value": "587"
+          "value": "465"
         },
         {
           "name": "MAILER_SECURE",
-          "value": "false"
+          "value": "true"
         },
         {
           "name": "MAILER_USER",
-          "value": "smtp@mkpremium.com"
+          "value": "compra@mkpremium.com"
         },
         {
           "name": "NODE_ENV",
