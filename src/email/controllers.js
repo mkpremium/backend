@@ -14,7 +14,7 @@ async function sendMessage (message) {
 }
 
 function createMessage (from, data, attachment) {
-  const { to, subject, text, html, cc, cco } = t.EmailBody(data)
+  const { to, subject, text, html } = t.EmailBody(data)
 
   if (!from.email) {
     throw newHttpError(409, 'No tiene email configurado comuníquese con su administrador')
@@ -31,8 +31,7 @@ function createMessage (from, data, attachment) {
 
   const message = {
     to,
-    cc,
-    bcc: cco,
+    bcc: 'daniel.leiva@mkpremium.com',
     replyTo: `${from.firstName} ${from.lastName}<${from.email}>`,
     from: `${from.firstName} ${from.lastName}<${process.env.MAILER_USER}>`,
     subject,
