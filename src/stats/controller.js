@@ -2,8 +2,8 @@ import { wrap } from 'express-promise-wrap'
 
 import { OperatorRepository } from '../operator/models'
 import { OwnerRepository } from '../owner/models'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OperatorStatsRepository } from './models'
+import { WorksheetRepository } from '../worksheet/models/worksheet'
 
 async function overAll (req, res) {
   const operatorRepo = new OperatorRepository()
@@ -35,8 +35,15 @@ async function worksheetStats (req, res) {
   res.json(results)
 }
 
+async function ownerBusinessStats (req, res) {
+  const repo = new OwnerRepository()
+  const results = await repo.ownerBusinessStats()
+  res.json(results)
+}
+
 export const overAllController = wrap(overAll)
 export const performanceController = wrap(performance)
 export const ownerStatsController = wrap(ownerStats)
 export const worksheetStatsController = wrap(worksheetStats)
+export const ownerBusinessStatsController = wrap(ownerBusinessStats)
 export const overProvincesController = wrap(overProvinces)

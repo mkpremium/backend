@@ -9,8 +9,9 @@ import { BuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { TypedContactInfo } from '../types/common'
-import { OwnerStatus } from '../types/enums'
 import { Owner, OwnerBody, Person } from '../types/owner'
+import { OperatorRepository } from '../operator/models'
+import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { OwnerListQuery } from './types'
 
@@ -177,6 +178,36 @@ GROUP BY t.status, building[0].address.city`
     })
 
     return totals
+  }
+
+  async ownerBusinessStats () {
+    const bucket = this.getBucketName()
+    const query = `SELECT t.business.status, t.business.meetingWithOperatorId, COUNT(*) as count
+                    FROM ${bucket} \`t\`
+                    WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
+                    GROUP BY t.business.status, t.business.meetingWithOperatorId`
+    const results = await this.queryRaw(N1qlQuery.fromString(query))
+
+    let owners = await Promise.all(results.map(async (result) => {
+      const operatorRepository = new OperatorRepository()
+      const operator = await operatorRepository.findByIdOrThrow(result.meetingWithOperatorId)
+
+      return { id: result.meetingWithOperatorId, name: operator.username, stats: {} }
+    }))
+    owners = _.uniqBy(owners, 'id')
+
+    owners.forEach(owner => {
+      Object.values(OwnerBusinessStatus).forEach(status => {
+        let total = 0
+        _.filter(results, { meetingWithOperatorId: owner.id, status }).forEach(({ count }) => {
+          total += count
+        })
+
+        owner.stats[status] = total
+      })
+    })
+
+    return owners
   }
 
   async list (query = {}) {
