@@ -181,7 +181,6 @@ GROUP BY t.status, building[0].address.city`
   }
 
   async ownerBusinessStats () {
-    const bucket = this.getBucketName()
     const query = `
 SELECT
 negotiationStatus,
