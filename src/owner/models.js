@@ -182,10 +182,18 @@ GROUP BY t.status, building[0].address.city`
 
   async ownerBusinessStats () {
     const bucket = this.getBucketName()
-    const query = `SELECT t.business.status, t.business.meetingWithOperatorId, COUNT(*) as count
-                    FROM ${bucket} \`t\`
-                    WHERE t.\`_documentType\` = 'owner' AND t.business.status IS NOT MISSING
-                    GROUP BY t.business.status, t.business.meetingWithOperatorId`
+    const query = `
+SELECT
+negotiationStatus,
+assignedAgentId,
+COUNT(*) as count
+FROM mkpremium
+WHERE
+_documentType = 'building'
+AND negotiationStatus IS NOT MISSING
+AND assignedAgentId IS NOT MISSING AND assignedAgentId IS NOT NULL
+GROUP BY negotiationStatus, assignedAgentId
+`
     const results = await this.queryRaw(N1qlQuery.fromString(query))
 
     let owners = await Promise.all(results.map(async (result) => {
