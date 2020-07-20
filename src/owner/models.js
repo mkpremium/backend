@@ -183,8 +183,8 @@ GROUP BY t.status, building[0].address.city`
   async ownerBusinessStats () {
     const query = `
 SELECT
-negotiationStatus,
-assignedAgentId,
+negotiationStatus as status,
+assignedAgentId as meetingWithOperatorId,
 COUNT(*) as count
 FROM mkpremium
 WHERE
