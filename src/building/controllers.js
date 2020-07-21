@@ -99,7 +99,7 @@ export const createListVerifiedOwnersController = legacyOwnerRepository => {
  */
 export const createAllAgentsStockStatsController = adminBuildingRepository => {
   return wrap(async (req, res) => {
-    req.json(await adminBuildingRepository.allAgentsStockStats())
+    res.json(await adminBuildingRepository.allAgentsStockStats())
   })
 }
 
