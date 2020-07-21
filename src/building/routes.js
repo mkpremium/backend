@@ -2,7 +2,8 @@ import { Router } from 'express'
 import {
   addMetadataToBuildingController,
   addOwnerToBuildingController,
-  createAddNegotiationProposalController, createAllAgentsStockStatsController,
+  createAddNegotiationProposalController,
+  createAllAgentsStockStatsController,
   createListBuildingProposalsController,
   createListBuildingsController,
   createListVerifiedOwnersController,

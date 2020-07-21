@@ -14,31 +14,32 @@ WHERE building._documentType = 'building'
 `
 
 export class AdminBuildingRepository {
-  constructor (couchbaseAdapter) {
+  constructor(couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
   }
 
-  allAgentsStockStats () {
-    return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(ALL_AGENTS_STOCK_STATS_QUERY)
-    ).then(({buildingId, agentName, agentId, stock}) => ({
-      buildingId,
-      agentName,
-      agentId,
-      stock: {
-        purchase: stock.purchase ? {
-          reservationAmount: stock.purchase.reservationAmount,
-          reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
-          transactionAmount: stock.purchase.transactionAmount,
-          transactionDate: moment(stock.purchase.transactionDate).format()
-        } : undefined,
-        sell: stock && stock.sell ? {
-          reservationAmount: stock.sell.reservationAmount,
-          reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
-          transactionAmount: stock.sell.transactionAmount,
-          transactionDate: moment(stock.sell.transactionDate).format()
-        } : undefined
-      }
-    }))
+  allAgentsStockStats() {
+    return this.couchbaseAdapter
+      .queryAsync(N1qlQuery.fromString(ALL_AGENTS_STOCK_STATS_QUERY))
+      .then(result =>
+        result.map(({buildingId, agentName, agentId, stock}) => ({
+          buildingId,
+          agentName,
+          agentId,
+          stock: {
+            purchase: stock.purchase ? {
+              reservationAmount: stock.purchase.reservationAmount,
+              reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
+              transactionAmount: stock.purchase.transactionAmount,
+              transactionDate: moment(stock.purchase.transactionDate).format()
+            } : undefined,
+            sell: stock && stock.sell ? {
+              reservationAmount: stock.sell.reservationAmount,
+              reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
+              transactionAmount: stock.sell.transactionAmount,
+              transactionDate: moment(stock.sell.transactionDate).format()
+            } : undefined
+          }
+        })))
   }
 }
