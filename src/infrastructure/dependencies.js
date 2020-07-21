@@ -24,6 +24,7 @@ import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
 import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
+import {AdminBuildingRepository} from "../building/repository/AdminBuildingRepository";
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -63,6 +64,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
+  container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
   const eventBus = {
     publish: (event) => {

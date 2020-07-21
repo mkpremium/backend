@@ -80,11 +80,6 @@ async function addOwnerToBuilding (req, res) {
   res.status(201).json(owner)
 }
 
-export const addMetadataToBuildingController = wrap(addMetadataToBuilding)
-export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
-export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
-export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
-
 export const createListVerifiedOwnersController = legacyOwnerRepository => {
   return wrap(async (req, res) => {
     const owners = await legacyOwnerRepository.findAllVerifiedOwnersByBuildingId(req.params.buildingId)
@@ -98,3 +93,17 @@ export const createListVerifiedOwnersController = legacyOwnerRepository => {
     res.json(result)
   })
 }
+
+/**
+ * @param adminBuildingRepository AdminBuildingRepository
+ */
+export const createAllAgentsStockStatsController = adminBuildingRepository => {
+  return wrap(async (req, res) => {
+    req.json(await adminBuildingRepository.allAgentsStockStats())
+  })
+}
+
+export const addMetadataToBuildingController = wrap(addMetadataToBuilding)
+export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
+export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
+export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
