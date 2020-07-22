@@ -79,7 +79,12 @@ describe('Building listing endpoint', () => {
       propertyAgentId: businessUser.id
     })).close
 
-    const building2 = await createBuilding(app, { ...owner, id: 'other-owner' }, { id: 'test-building2' })
+    const owner2 = await createOwner(app)
+    const building2 = await createBuilding(app, { ...owner, id: owner2.id }, { id: 'test-building2' })
+    await associateBuildingWithOwner(app, owner2, building2.id)
+    // await new Promise(resolve => {
+    //   setTimeout(resolve, 500)
+    // })
 
     await authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
       .then(response => {
@@ -162,7 +167,17 @@ describe('Building listing endpoint', () => {
             floorArea: building2.floorArea,
             negotiationStatus: 'PENDIENTE',
             owner: {
-              id: 'other-owner'
+              contacts: [
+                {
+                  id: 'test-contact-id',
+                  status: 'GOOD',
+                  type: 'TELEFONO',
+                  value: '666666666'
+                }
+              ],
+              firstName: 'Owner First Name',
+              id: owner2.id,
+              name: 'Owner Name'
             }
           }
         ])
