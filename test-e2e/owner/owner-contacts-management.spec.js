@@ -6,12 +6,9 @@ import { authenticatedGet, authenticatedPost, authenticatedPut, initApplication 
 describe('Building owner contacts management', () => {
   let app, businessUser, owner
 
-  before(async () => {
+  beforeEach(async () => {
     app = await initApplication()
     businessUser = await operatorCreateBusiness()
-  })
-
-  beforeEach(async () => {
     owner = await createOwner(app)
   })
 
