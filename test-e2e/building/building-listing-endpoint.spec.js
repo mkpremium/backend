@@ -2,12 +2,14 @@ import { expect } from 'chai'
 import moment from 'moment'
 import { operatorCreateBusiness } from '../../test/common'
 import {
-  associateBuildingWithOwner,
   closeBuildingStock,
-  createBuilding, createMeeting,
-  createOwner, createProposalForBuilding, createWorksheetForBuilding,
+  createBuilding,
+  createMeeting,
+  createProposalForBuilding,
+  createWorksheetForBuilding,
   purchaseBuilding,
-  sellBuilding, testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
+  sellBuilding,
+  testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 
