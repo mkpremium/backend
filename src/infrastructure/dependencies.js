@@ -24,7 +24,7 @@ import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
 import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
-import {AdminBuildingRepository} from "../building/repository/AdminBuildingRepository";
+import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}

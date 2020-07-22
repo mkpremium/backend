@@ -112,7 +112,7 @@ export function resolvePublicUrl (url) {
 export async function makePreview (rawUrl) {
   const url = cleanUrl(rawUrl)
   const extension = path.extname(url)
-  logger.debug('aws#makePreview', { extension, url})
+  logger.debug('aws#makePreview', { extension, url })
   switch (extension) {
     case '.pdf':
     case '.png':

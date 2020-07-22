@@ -57,9 +57,9 @@ export class SocketServer {
       })
     } else {
       OperatorRepository.setOnline(socket.user.id, true)
-                        .catch(error => {
-                          logger.error('SocketServer#onConnection when online', { error })
-                        })
+        .catch(error => {
+          logger.error('SocketServer#onConnection when online', { error })
+        })
     }
 
     if (this.timers[ socket.user.id ]) {

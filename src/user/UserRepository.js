@@ -31,7 +31,7 @@ export class UserRepository {
     return this.couchbaseAdapter.save(updatedUser, Operator)
   }
 
-  async removeFavoriteBuildingToUserOfId(userId, buildingId) {
+  async removeFavoriteBuildingToUserOfId (userId, buildingId) {
     const user = await this.getUserOfId(userId)
     if (!user) {
       throw new UserNotFound(userId)
