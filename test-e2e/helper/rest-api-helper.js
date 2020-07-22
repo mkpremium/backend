@@ -39,7 +39,7 @@ export const authenticatedPost = async (endpoint, user, app, body) => {
 
   return request(app)
     .post(endpoint)
-    // .timeout(DEFAULT_MILLISECONDS_TO_WAIT)
+    .timeout(DEFAULT_MILLISECONDS_TO_WAIT)
     .send(body)
     .set('Content-Type', 'application/json')
     .set('Authorization', authenticatedUser.authorization)
