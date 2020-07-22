@@ -97,11 +97,6 @@ export class WorksheetRepository extends CouchbaseModel {
     return meetingRepo.query(qb)
   }
 
-  static async findMeetings (worksheetId) {
-    const repo = new WorksheetRepository()
-    return repo.findMeetings(worksheetId)
-  }
-
   async findWorksheetByBuilding (buildingId) {
     const qb = this.getQueryBuilder()
       .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId)
@@ -431,53 +426,6 @@ export class WorksheetRepository extends CouchbaseModel {
       results = await Promise.map(worksheetIds, (worksheetId) => this.findByIdWIthIncludes(worksheetId))
     }
     return fromJSON({ results }, WorksheetSearchResponse)
-  }
-
-  /**
-   * Attaches related owners objects to a worksheet
-   * @param worksheet
-   * @returns {Promise<*>}
-   */
-  static async worksheetWithRelatedOwners (worksheet) {
-    let updatedWorksheet = worksheet
-
-    if (worksheet.relatedOwnerIds.length > 0) {
-      const ownerRepository = new OwnerRepository()
-      const relatedOwners = await ownerRepository.findByIdWithIncludes(worksheet.relatedOwnerIds)
-      updatedWorksheet = t.update(worksheet, {
-        relatedOwners: { $set: relatedOwners },
-        ownerContacts: { $set: ownersContactViews(relatedOwners, worksheet) }
-      })
-    }
-
-    return updatedWorksheet
-  }
-
-  /**
-   * Finds all worksheets with the owners.
-   * @returns {Promise<*>}
-   */
-  async findAllWorksheetsWithOwners (limit, offset) {
-    const qb = this.getQueryBuilder()
-      .limit(limit || 10)
-      .offset(offset || 0)
-      .order('worksheetIndex')
-    const results = await this.query(qb)
-
-    return Promise.map(results, (worksheet) => WorksheetRepository.worksheetWithRelatedOwners(worksheet))
-  }
-
-  /**
-   * Find all worksheets with a particular status.
-   * @param status
-   * @returns {Promise<Array<Worksheet>>}
-   */
-  async findWorksheetsByStatus (status) {
-    const qb = this
-      .getQueryBuilder()
-      .where('status = ?', status)
-
-    return this.query(qb)
   }
 
   /**

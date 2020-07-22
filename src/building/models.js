@@ -1,8 +1,6 @@
-import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import _get from 'lodash/get'
 import mime from 'mime-types'
-import squel from 'squel'
 import t from 'tcomb'
 import { emitModelEvents } from '../../config'
 import { cleanUrl, makePreview, uploadPreview } from '../aws'
@@ -10,8 +8,6 @@ import { CouchbaseModel } from '../db/model'
 import '../firebase'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
-import { ScheduledEvents } from '../scheduled-events/models'
-import { ScheduledEventType } from '../scheduled-events/types'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
@@ -76,25 +72,6 @@ export class BuildingRepository extends CouchbaseModel {
     return building
   }
 
-  async findBuildingByMetadataMigration (lookupData) {
-    const expr = squel.expr()
-      .or('t._migrateId = ?', lookupData)
-      .or('t.cadastre.reference = ?', lookupData)
-    const qb = this.getQueryBuilder()
-      .where('t._migrateId IS NOT MISSING')
-      .where(expr)
-    const [result] = await this.query(qb)
-    return result
-  }
-
-  static async findMeetings (buildingId) {
-    const meetingRepo = new ScheduledEvents()
-    const qb = meetingRepo.getQueryBuilder()
-    qb.where('event.buildingId = ?', buildingId)
-    qb.where('type = ?', ScheduledEventType.MEETINGS)
-    return meetingRepo.query(qb)
-  }
-
   static async findByCadastreReference (cadastreReference) {
     const repo = new BuildingRepository()
     const qb = repo.getQueryBuilder()
@@ -102,25 +79,6 @@ export class BuildingRepository extends CouchbaseModel {
       .where('cadastre.reference = ?', cadastreReference)
       .limit(1)
     const [building] = await repo.query(qb)
-    return building
-  }
-
-  /**
-   * Find building by cadastre reference / catastro
-   * @param cadastre
-   * @param required
-   * @returns {Promise<*>}
-   */
-  async findByCatastro (cadastre, required = true) {
-    const qb = this.getQueryBuilder()
-      .where('cadastre IS NOT MISSING')
-      .where('cadastre.reference = ?', cadastre.reference)
-      .limit(1)
-    const [building] = await this.query(qb)
-
-    if (required && !building) {
-      throw new Error(`No records buildings found by cadastreReference ${cadastre.reference}`)
-    }
     return building
   }
 
@@ -144,14 +102,6 @@ export class BuildingRepository extends CouchbaseModel {
     const building = Building(updatedJson)
     const repo = new BuildingRepository()
     return repo.save(building, emitModelEvents)
-  }
-
-  async removeMetadataFromBuilding (building, metadata) {
-    const updatedMetadata = building.metadata.filter(m => m.id !== metadata.id)
-    const updatedBuilding = t.update(building, { metadata: { $set: updatedMetadata } })
-
-    await this.save(updatedBuilding)
-    return metadata
   }
 
   async addMetadataToBuilding (building, params) {
@@ -230,37 +180,6 @@ export class BuildingRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder().where('t.`id` = ?', id)
     const results = await this.query(qb)
     return results && results.length && _.first(results)
-  }
-
-  async getBuildingNotesIds (buildingId) {
-    const bucket = this.getBucketName()
-    const documentType = 'note'
-    const query = `SELECT RAW id FROM ${bucket} t WHERE t._documentType = ${JSON.stringify(documentType)} AND t.context.buildingId = ${JSON.stringify(buildingId)}`
-
-    return this.queryRaw(N1qlQuery.fromString(query))
-  }
-
-  /**
-   *
-   * @returns {Promise<*>}
-   */
-  async getBuildingIds () {
-    const bucket = this.getBucketName()
-    const query = `SELECT RAW id  FROM ${bucket} t
-                   WHERE t._documentType = 'building'
-                   ORDER BY id`
-
-    return this.raw(query)
-  }
-
-  async getBuildingIdsByCity (city) {
-    const bucket = this.getBucketName()
-    const query = `SELECT RAW id  FROM ${bucket} t
-                   WHERE t._documentType = 'building'
-                   AND t.address.city = '${city}'
-                   ORDER BY id`
-
-    return this.raw(query)
   }
 }
 

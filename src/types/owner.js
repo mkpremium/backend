@@ -61,10 +61,6 @@ Person.prototype.fullName = function () {
   return `${this.name}`.trim()
 }
 
-Person.prototype.contactValueExists = function (value) {
-  return !!_find(this.contacts, { value })
-}
-
 t.OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
