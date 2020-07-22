@@ -30,7 +30,7 @@ describe('Users Meetings', () => {
 
   it(`retrieves users's meetings`, async () => {
     const owner = await createOwner(app)
-    const building = await createBuilding(app, owner)
+    const building = await createBuilding(app)
     await associateBuildingWithOwner(app, owner, building.id)
     const buildingProposal = await createProposalForBuilding(app, {propertyAgentId: businessUser.id, buildingId: building.id})
 

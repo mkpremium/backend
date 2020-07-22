@@ -9,7 +9,7 @@ describe('Building featured owner', () => {
 
     const businessUser = await operatorCreateBusiness()
     const ownerId = 'owner-id'
-    const building = await createBuilding(app, { id: ownerId })
+    const building = await createBuilding(app)
 
     await authenticatedPost(`/buildings/${building.id}/set-featured-owner`, businessUser, app, {
       ownerId

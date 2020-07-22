@@ -12,7 +12,7 @@ describe('negotiation status change', () => {
   })
 
   it('changes building negotiation status', async () => {
-    const building = await createBuilding(app, { id: 'owner-id' }, {})
+    const building = await createBuilding(app, {})
 
     await authenticatedPut(
       `/buildings/${building.id}/negotiation-status`, businessUser, app, { status: 'COMPRADO' })

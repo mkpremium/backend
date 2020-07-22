@@ -20,16 +20,15 @@ describe('Building listing endpoint', () => {
   })
 
   it('returns list of given building IDs', async () => {
-    const owner = await createOwner(app)
     const testMetadataId = 'test-metadata-1'
-    const building1 = await createBuilding(app, owner, {
+    const building1 = await createBuilding(app, {
       id: 'test-building1',
-      metadata: [ {
+      metadata: [{
         id: testMetadataId,
         name: '5325108TG3452E0001YT.jpg',
         mimeType: 'image/jpeg',
         previewUrl: 'https://mkpremium-files.s3.eu-west-2.amazonaws.com/preview/ffe6fa34-28bf-4da8-9695-53b7bf421648.jpg'
-      } ],
+      }],
       cadastre: {
         address: '',
         reference: 'test-building1-cadastre-reference'
@@ -60,13 +59,12 @@ describe('Building listing endpoint', () => {
       propertyAgentId: businessUser.id,
       buildingId: building1.id
     })
-    await associateBuildingWithOwner(app, owner, building1.id)
 
     const building1LastMeeting = await createMeeting(app, {
       propertyAgentId: businessUser.id,
       contactId: testPhoneContactId,
       buildingId: building1.id,
-      ownerId: owner.id
+      ownerId: building1.ownerId
     })
     await createWorksheetForBuilding(app, building1)
     const building1Sale = (await sellBuilding(app, {
@@ -79,12 +77,7 @@ describe('Building listing endpoint', () => {
       propertyAgentId: businessUser.id
     })).close
 
-    const owner2 = await createOwner(app)
-    const building2 = await createBuilding(app, { ...owner, id: owner2.id }, { id: 'test-building2' })
-    await associateBuildingWithOwner(app, owner2, building2.id)
-    // await new Promise(resolve => {
-    //   setTimeout(resolve, 500)
-    // })
+    const building2 = await createBuilding(app, {id: 'test-building2'})
 
     await authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
       .then(response => {
@@ -139,7 +132,7 @@ describe('Building listing endpoint', () => {
             usage: building1.use,
             floorArea: building1.floorArea,
             owner: {
-              id: owner.id,
+              id: building1.ownerId,
               firstName: testOwnerFirstName,
               name: testOwnerName,
               contacts: [
@@ -176,7 +169,7 @@ describe('Building listing endpoint', () => {
                 }
               ],
               firstName: 'Owner First Name',
-              id: owner2.id,
+              id: building2.ownerId,
               name: 'Owner Name'
             }
           }

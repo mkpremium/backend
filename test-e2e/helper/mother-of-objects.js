@@ -11,7 +11,8 @@ export const testContactPhone = '666666666'
 export const testOwnerName = 'Owner Name'
 export const testOwnerFirstName = 'Owner First Name'
 
-export const createBuilding = async (app, owner, options) => {
+export const createBuilding = async (app, buildingProperties) => {
+  const owner = await createOwner(app)
   const { buildingRepository } = app.locals.legacyDependenciesContainer
   const building = {
     ...{
@@ -29,10 +30,12 @@ export const createBuilding = async (app, owner, options) => {
       },
       location: {}
     },
-    ...options
+    ...buildingProperties
   }
+  const savedBuilding = await buildingRepository.save(building)
+  await associateBuildingWithOwner(app, owner, savedBuilding.id)
 
-  return buildingRepository.save(building)
+  return savedBuilding
 }
 
 export const createWorksheetForBuilding = async (app, building) => {
