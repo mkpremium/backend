@@ -1,5 +1,5 @@
 import { StockStatuses, Transaction, TransactionParams } from './types'
-import { StockFirebaseRepository, StockRepository } from './models'
+import { StockRepository } from './models'
 import { BuildingRepository } from '../building/models'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -35,18 +35,11 @@ export async function createPurchaseStock (params = {}, operatorId) {
     purchase
   }
 
-  const result = await stockRepository.save(stock)
-
-  const stockFirebaseRepository = new StockFirebaseRepository()
-  await stockFirebaseRepository.savePurchaseStock(stock)
-
-  return result
+  return stockRepository.save(stock)
 }
 
 export async function updatePurchaseStock (params = {}, operatorId) {
   const purchase = createTransaction(params, operatorId)
-
-  const stockFirebaseRepository = new StockFirebaseRepository()
 
   const stockRepository = new StockRepository()
 
@@ -60,17 +53,11 @@ export async function updatePurchaseStock (params = {}, operatorId) {
     purchase: { $set: purchase }
   })
 
-  const result = await stockRepository.save(stock)
-
-  await stockFirebaseRepository.savePurchaseStock(stock)
-
-  return result
+  return stockRepository.save(stock)
 }
 
 export async function updateSellStock (params = {}, operatorId) {
   const buildingRepository = new BuildingRepository()
-
-  const stockFirebaseRepository = new StockFirebaseRepository()
 
   await buildingRepository.findByIdOrThrow(params.buildingId)
 
@@ -88,11 +75,7 @@ export async function updateSellStock (params = {}, operatorId) {
     currentStatus: { $set: StockStatuses.SELL }
   })
 
-  const result = await stockRepository.save(stock)
-
-  await stockFirebaseRepository.saveSellStock(stock)
-
-  return result
+  return stockRepository.save(stock)
 }
 
 export async function cancelSellStock (params) {
@@ -109,12 +92,7 @@ export async function cancelSellStock (params) {
     currentStatus: { $set: StockStatuses.PURCHASE }
   })
 
-  const result = await stockRepository.save(stock)
-
-  const stockFirebaseRepository = new StockFirebaseRepository()
-  await stockFirebaseRepository.deleteSellStock(stock)
-
-  return result
+  return stockRepository.save(stock)
 }
 
 export async function closeSellStock (params, operatorId) {
@@ -145,10 +123,5 @@ export async function closeSellStock (params, operatorId) {
     transactionDate: new Date()
   }
   const updatedStock = t.update(stock, { close: { $set: close }, currentStatus: { $set: StockStatuses.CLOSE } })
-  const result = stockRepository.save(updatedStock)
-
-  const stockFirebaseRepository = new StockFirebaseRepository()
-  await stockFirebaseRepository.saveCloseStock(updatedStock)
-
-  return result
+  return stockRepository.save(updatedStock)
 }
