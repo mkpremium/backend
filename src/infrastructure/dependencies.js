@@ -25,6 +25,7 @@ import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingSer
 import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
+import { PurchaseBuildingService } from '../stock/service/PurchaseBuildingService'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -85,6 +86,11 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   )
 
   container.couchbaseAdapter = couchbaseAdapter
+
+  container.createPurchaseStockService = new PurchaseBuildingService(
+    legacyDependenciesContainer.stockRepository,
+    container.updateBuildingNegotiationStatusService
+  )
 
   return container
 }

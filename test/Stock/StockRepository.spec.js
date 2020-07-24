@@ -2,17 +2,18 @@ import { initApplication } from '../../test-e2e/helper/rest-api-helper'
 import { operatorCreateBusiness } from '../common'
 import moment from 'moment-timezone'
 import { expect } from 'chai'
-import { closeSellStock, createPurchaseStock } from '../../src/stock/application'
+import { closeSellStock } from '../../src/stock/application'
 import { BuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 
 describe('StockRepository', () => {
-  let app, stockRepository
+  let app, stockRepository, createPurchaseStockService
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
 
   beforeEach(async () => {
     app = await initApplication()
+    createPurchaseStockService = app.locals.dependenciesContainer.createPurchaseStockService
     stockRepository = app.locals.dependenciesContainer.stockRepository
   })
 
@@ -23,7 +24,7 @@ describe('StockRepository', () => {
       const testBuilding = await BuildingRepository.createNewBuilding(buildingData)
       const buildingPurchaseAmount = 1000
       const buildingSellingAmount = 1200
-      await purchaseBuildingBySalesAgent(testBuilding, propertyManager, buildingPurchaseAmount)
+      await purchaseBuildingBySalesAgent(createPurchaseStockService, testBuilding, propertyManager, buildingPurchaseAmount)
       await sellBuilding(app, testBuilding, propertyManager, buildingSellingAmount)
 
       await closeSellStock({buildingId: testBuilding.id}, propertyManager.id)
@@ -38,7 +39,7 @@ describe('StockRepository', () => {
   })
 })
 
-function purchaseBuildingBySalesAgent (building, agent, transactionAmount) {
+function purchaseBuildingBySalesAgent (createPurchaseStockService, building, agent, transactionAmount) {
   const params = {
     buildingId: building.id,
     reservationAmount: 1110.00,
@@ -46,7 +47,7 @@ function purchaseBuildingBySalesAgent (building, agent, transactionAmount) {
     transactionAmount: transactionAmount,
     transactionDate: '2019-07-11T13:00:00.000Z'
   }
-  return createPurchaseStock(params, agent.id)
+  return createPurchaseStockService.purchaseBuilding(params, agent.id)
 }
 
 function sellBuilding (app, building, agent, transactionAmount) {

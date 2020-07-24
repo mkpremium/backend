@@ -16,28 +16,6 @@ export function createTransaction (params = {}, operatorId) {
   })
 }
 
-export async function createPurchaseStock (params = {}, operatorId) {
-  const createStockParams = fromJSON(params, TransactionParams)
-
-  const purchase = createTransaction(params, operatorId)
-
-  const stockRepository = new StockRepository()
-
-  const stockExist = await stockRepository.findByBuildingIdOrDefault(params.buildingId)
-
-  if (stockExist) {
-    throw new Error(`There is an stock related to the building with ID ${params.buildingId}`)
-  }
-
-  const stock = {
-    buildingId: createStockParams.buildingId,
-    currentStatus: StockStatuses.PURCHASE,
-    purchase
-  }
-
-  return stockRepository.save(stock)
-}
-
 export async function updatePurchaseStock (params = {}, operatorId) {
   const purchase = createTransaction(params, operatorId)
 

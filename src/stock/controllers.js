@@ -2,7 +2,6 @@ import { wrap } from 'express-promise-wrap'
 import {
   cancelSellStock,
   closeSellStock,
-  createPurchaseStock,
   updatePurchaseStock,
   updateSellStock
 } from './application'
@@ -12,11 +11,6 @@ export const getRankingController = (propertyManagerRankingService) => {
     const ranking = await propertyManagerRankingService.ranking()
     res.status(201).json(ranking)
   })
-}
-
-async function createPurchaseStockFromRequest (req, res) {
-  const stock = await createPurchaseStock(req.body, req.user.id)
-  res.status(201).json(stock)
 }
 
 async function updatePurchaseStockFromRequest (req, res) {
@@ -46,7 +40,15 @@ async function closeSellStockFromRequest (req, res) {
   res.status(201).json(stock)
 }
 
-export const createPurchaseStockController = wrap(createPurchaseStockFromRequest)
+/**
+ * @param purchaseBuildingService PurchaseBuildingService
+ */
+export const createPurchaseStockController = purchaseBuildingService => {
+  return wrap(async function (req, res) {
+    const stock = await purchaseBuildingService.purchaseBuilding(req.body, req.user.id)
+    res.status(201).json(stock)
+  })
+}
 export const updatePurchaseStockController = wrap(updatePurchaseStockFromRequest)
 export const updateSellStockController = wrap(updateSellStockFromRequest)
 export const closeSellStockController = wrap(closeSellStockFromRequest)

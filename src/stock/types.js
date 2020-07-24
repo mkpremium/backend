@@ -34,7 +34,7 @@ export const Stock = t.struct({
   }
 })
 
-export const TransactionParams = t.TransactionParams = t.struct({
+export const TransactionParams = t.struct({
   buildingId: t.String,
   reservationAmount: t.Number,
   reservationDate: t.Date,
