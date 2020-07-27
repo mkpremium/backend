@@ -5,12 +5,12 @@ import jwt from '../middleware/jwt'
 export default (app, {
   propertyManagerRankingService,
   stockSalesService,
-  createPurchaseStockService
+  stockService
 }) => {
   const secured = jwt()
   app.use('/stock', secured, addStockRoutes(
     propertyManagerRankingService,
     stockSalesService,
-    createPurchaseStockService
+    stockService
   ))
 }

@@ -5,13 +5,14 @@ import {
   createPurchaseStockController,
   updatePurchaseStockController,
   updateSellStockController,
-  getRankingController, createSellPurchasedStockController
+  getRankingController,
+  createSellPurchasedStockController
 } from './controllers'
 
-export const addStockRoutes = (propertyManagerRankingService, stockSalesService, createPurchaseStockService) => {
+export const addStockRoutes = (propertyManagerRankingService, stockSalesService, stockService) => {
   const router = Router()
 
-  router.post('/purchase', createPurchaseStockController(createPurchaseStockService))
+  router.post('/purchase', createPurchaseStockController(stockService))
   router.put('/purchase', updatePurchaseStockController)
 
   router.post('/sell', createSellPurchasedStockController(stockSalesService))

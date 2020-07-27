@@ -41,11 +41,11 @@ async function closeSellStockFromRequest (req, res) {
 }
 
 /**
- * @param purchaseBuildingService PurchaseBuildingService
+ * @param stockService StockService
  */
-export const createPurchaseStockController = purchaseBuildingService => {
+export const createPurchaseStockController = stockService => {
   return wrap(async function (req, res) {
-    const stock = await purchaseBuildingService.purchaseBuilding(req.body, req.user.id)
+    const stock = await stockService.purchaseBuilding(req.body, req.user.id)
     res.status(201).json(stock)
   })
 }

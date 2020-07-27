@@ -84,8 +84,8 @@ const testSaleReservationAmount = 50001
 const testSaleAmount = 100001
 
 export const purchaseBuilding = async (app, { buildingId, propertyAgentId }) => {
-  const { createPurchaseStockService } = app.locals.dependenciesContainer
-  return createPurchaseStockService.purchaseBuilding({
+  const { stockService } = app.locals.dependenciesContainer
+  return stockService.purchaseBuilding({
     buildingId,
     reservationAmount: testPurchaseReservationAmount,
     reservationDate: new Date(),

@@ -7,13 +7,13 @@ import { BuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 
 describe('StockRepository', () => {
-  let app, stockRepository, createPurchaseStockService
+  let app, stockRepository, stockService
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
 
   beforeEach(async () => {
     app = await initApplication()
-    createPurchaseStockService = app.locals.dependenciesContainer.createPurchaseStockService
+    stockService = app.locals.dependenciesContainer.stockService
     stockRepository = app.locals.dependenciesContainer.stockRepository
   })
 
@@ -24,7 +24,7 @@ describe('StockRepository', () => {
       const testBuilding = await BuildingRepository.createNewBuilding(buildingData)
       const buildingPurchaseAmount = 1000
       const buildingSellingAmount = 1200
-      await purchaseBuildingBySalesAgent(createPurchaseStockService, testBuilding, propertyManager, buildingPurchaseAmount)
+      await purchaseBuildingBySalesAgent(stockService, testBuilding, propertyManager, buildingPurchaseAmount)
       await sellBuilding(app, testBuilding, propertyManager, buildingSellingAmount)
 
       await closeSellStock({buildingId: testBuilding.id}, propertyManager.id)

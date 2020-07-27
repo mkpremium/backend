@@ -2,7 +2,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { StockStatuses, TransactionParams } from '../types'
 import { createTransaction } from '../application'
 
-export class PurchaseBuildingService {
+export class StockService {
   /**
    * @param legacyStockRepository StockRepository
    * @param updateBuildingNegotiationStatusService UpdateBuildingNegotiationStatusService
