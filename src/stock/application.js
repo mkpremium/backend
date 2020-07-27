@@ -1,8 +1,7 @@
-import { StockStatuses, Transaction, TransactionParams } from './types'
+import { StockStatuses, Transaction } from './types'
 import { StockRepository } from './models'
 import { BuildingRepository } from '../building/models'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { OperatorRepository } from '../operator/models'
 import { SuperSellAward } from '../operator/Awards/SuperSellAward'
 
@@ -51,23 +50,6 @@ export async function updateSellStock (params = {}, operatorId) {
   stock = t.update(stock, {
     sell: { $set: sell },
     currentStatus: { $set: StockStatuses.SELL }
-  })
-
-  return stockRepository.save(stock)
-}
-
-export async function cancelSellStock (params) {
-  const stockRepository = new StockRepository()
-
-  let stock = await stockRepository.findByBuildingIdOrThrow(params.buildingId)
-
-  if (stock.currentStatus !== StockStatuses.SELL) {
-    throw new Error(`El stock no se encuentra en estado ${StockStatuses.SELL}`)
-  }
-
-  stock = t.update(stock, {
-    sell: { $set: null },
-    currentStatus: { $set: StockStatuses.PURCHASE }
   })
 
   return stockRepository.save(stock)

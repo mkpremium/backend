@@ -1,6 +1,7 @@
 import fromJSON from 'tcomb/lib/fromJSON'
 import { StockStatuses, TransactionParams } from '../types'
 import { createTransaction } from '../application'
+import t from 'tcomb'
 
 export class StockService {
   /**
@@ -33,5 +34,24 @@ export class StockService {
     }
 
     return this.legacyStockRepository.save(stock)
+  }
+
+  async cancelSale (buildingId) {
+    let stock = await this.legacyStockRepository.findByBuildingIdOrThrow(buildingId)
+
+    if (stock.currentStatus !== StockStatuses.SELL) {
+      throw new Error(`El stock no se encuentra en estado ${StockStatuses.SELL}`)
+    }
+
+    stock = t.update(stock, {
+      sell: { $set: null },
+      currentStatus: { $set: StockStatuses.PURCHASE }
+    })
+
+    const updatedStock = await this.legacyStockRepository.save(stock)
+
+    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, 'COMPRADO')
+
+    return updatedStock
   }
 }

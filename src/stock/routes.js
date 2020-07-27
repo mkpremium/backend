@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import {
-  cancelSellStockController,
+  createCancelSaleController,
   closeSellStockController,
   createPurchaseStockController,
   updatePurchaseStockController,
@@ -17,7 +17,7 @@ export const addStockRoutes = (propertyManagerRankingService, stockSalesService,
 
   router.post('/sell', createSellPurchasedStockController(stockSalesService))
   router.put('/sell', updateSellStockController)
-  router.post('/sell/cancel', cancelSellStockController)
+  router.post('/sell/cancel', createCancelSaleController(stockService))
 
   router.post('/close', closeSellStockController)
 
