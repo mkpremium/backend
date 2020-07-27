@@ -18,11 +18,6 @@ export class NoteRepository extends Note {
     return this.save(t.update(noteBody, { $merge: { createdBy } }))
   }
 
-  createNoteMigration (params = {}) {
-    const noteBody = fromJSON(params, TNote)
-    return this.save(noteBody)
-  }
-
   async listNotes (query = {}) {
     const params = fromJSON(query, t.NoteListQuery)
     const qb = this.getQueryBuilder()
@@ -52,6 +47,7 @@ export class NoteRepository extends Note {
     }
 
     const total = await this.countQuery(qbCount)
+    qb.order('createdAt', false)
     const results = await this.query(qb)
 
     return fromJSON({ total, results }, t.NoteListResponse)
