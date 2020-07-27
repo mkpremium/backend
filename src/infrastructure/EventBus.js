@@ -18,7 +18,13 @@ export class EventBus {
       .addListener(eventName, (event) => {
         subscriber(event)
           .catch(error => {
-            logger.crit('error processing event', { event, error: error.message ? error.message : error })
+            logger.crit('error processing event', {
+              event,
+              error: {
+                message: error.message ? error.message : error.toString(),
+                stack: error.stack ? error.stack : undefined
+              }
+            })
           })
       })
   }

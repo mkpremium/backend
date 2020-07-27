@@ -14,7 +14,6 @@ t.OwnerCompactView = t.struct(
     buildingId: isTest() ? t.maybe(t.String) : t.String,
     confirmedByOperator: t.OwnerConfirmed,
     person: t.struct({
-      id: t.String,
       name: t.String
     }, 'person'),
     contact: TypedContactInfo
