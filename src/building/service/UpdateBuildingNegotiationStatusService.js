@@ -6,20 +6,21 @@ export class UpdateBuildingNegotiationStatusService {
     this.eventBus = eventBus
   }
 
-  async updateBuildingStatus (buildingId, negotiationStatus) {
+  async updateBuildingStatus (buildingId, negotiationStatus, operatorId) {
     if (buildingNegotiationStatus.indexOf(negotiationStatus) === -1) {
       throw new InvalidBuildingNegotiationStatus(buildingId, negotiationStatus)
     }
 
     await this.buildingRepository.setBuildingNegotiationStatus(buildingId, negotiationStatus)
-    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, negotiationStatus))
+    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, operatorId))
   }
 }
 
 export class BuildingNegotiationStatusChanged {
-  constructor (buildingId, newNegotiationStatus) {
+  constructor (buildingId, operatorId) {
+    this.operatorId = operatorId
+    this.name = 'BUILDING_NEGOTIATION_STATUS_CHANGED'
     this.buildingId = buildingId
-    this.newNegotiationStatus = newNegotiationStatus
   }
 }
 

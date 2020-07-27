@@ -26,6 +26,8 @@ import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
 import { StockService } from '../stock/service/StockService'
+import { EventBus } from './EventBus'
+import { WorksheetRepository } from '../worksheet/models/worksheet'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -34,6 +36,7 @@ export const createLegacyDependenciesContainer = () => {
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
   container.scheduledEventsRepository = new ScheduledEventsRepository()
+  container.worksheetRepository = new WorksheetRepository()
 
   return container
 }
@@ -67,10 +70,8 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
-  const eventBus = {
-    publish: (event) => {
-    }
-  }
+  const eventBus = new EventBus()
+  container.eventBus = eventBus
   container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
 
   container.createMeetingService = new CreateMeetingService(

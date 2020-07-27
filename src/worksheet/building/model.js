@@ -16,7 +16,7 @@ export async function createBuildingWithWorksheet (data = {}) {
     : await createBuildingByAddress(data)
   const worksheet = created
     ? await WorksheetRepository.createNewForBuilding(building)
-    : await WorksheetRepository.findByBuilding(building.id)
+    : await (new WorksheetRepository().findByBuilding(building.id))
 
   return { created, worksheet }
 }

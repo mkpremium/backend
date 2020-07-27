@@ -286,7 +286,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       worksheetId: item.worksheetId,
       queueId: queue.id
     })
-    await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
+    await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== Queue.Status.SCHEDULED) {
       return this.removeWorksheetAndSave(queue.id, item.worksheetId)
@@ -297,7 +297,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
 
   async releaseItemInQueue (queue, item, operatorId) {
     logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
-    await WorksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
+    await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== Queue.Status.SCHEDULED) {
       return this.removeWorksheetInQueue(queue, item.worksheetId)

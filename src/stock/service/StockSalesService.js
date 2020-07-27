@@ -21,7 +21,12 @@ export class StockSalesService {
     })
 
     const result = await this.legacyStockRepository.save(updatedStock)
-    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(params.buildingId, OwnerBusinessStatus.ALREADY_SOLD)
+    await this.updateBuildingNegotiationStatusService
+      .updateBuildingStatus(
+        params.buildingId,
+        OwnerBusinessStatus.ALREADY_SOLD,
+        operatorId
+      )
 
     return result
   }

@@ -4,6 +4,7 @@ const level = process.env.DEBUG === 'ON' ? 'debug' : 'info'
 // const level = 'info'
 export const logger = createLogger({
   level,
+  levels: winston.config.syslog.levels,
   format: winston.format.json(),
   transports: [
     // new winston.transports.File({ filename: 'error.log', level: 'error' }),
@@ -18,5 +19,4 @@ export const logger = createLogger({
     })
   ]
 })
-
 logger.info('logger started', { loggingLevel: level })

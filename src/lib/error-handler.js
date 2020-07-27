@@ -9,7 +9,7 @@ export function appErrorHandler (error, req, res, next) {
   if (error.code >= 500) {
     logger.error('appErrorHandler', { error: { ...error, stack: error.stack } })
   } else {
-    logger.warn('appErrorHandler', { error })
+    logger.warning('appErrorHandler', { error })
   }
 
   res.status(error.code)

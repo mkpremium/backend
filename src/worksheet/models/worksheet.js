@@ -106,7 +106,7 @@ export class WorksheetRepository extends CouchbaseModel {
     return fromJSON(_head(results), t.WorkSheet)
   }
 
-  static async findByBuilding (buildingId) {
+  findByBuilding (buildingId) {
     const repo = new WorksheetRepository()
     return repo.findWorksheetByBuilding(buildingId)
   }
@@ -251,7 +251,7 @@ export class WorksheetRepository extends CouchbaseModel {
     await worksheetRepo.sendWorksheetEvent(worksheetId)
   }
 
-  static async updateWorkSheetStatus (worksheetId, operatorId) {
+  async updateWorkSheetStatus (worksheetId, operatorId) {
     const worksheetRepo = new WorksheetRepository()
     return worksheetRepo.updateStatus(worksheetId, operatorId)
   }

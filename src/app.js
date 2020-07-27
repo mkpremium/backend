@@ -53,6 +53,7 @@ dependenciesPromise.then(() => {
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
   scheduledEvents(app, dependenciesContainer)
+  worksheet(app, dependenciesContainer, legacyDependenciesContainer)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
@@ -75,7 +76,6 @@ app.use(cors())
 webhooks(app)
 maintenanceMode(app)
 operator(app)
-worksheet(app)
 calls(app)
 history(app)
 notes(app)
