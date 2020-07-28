@@ -23,5 +23,10 @@ SystemPreferencesRepository
     }
   })
   .catch(error => {
-    logger.error('starting freezer', { error })
+    logger.error('starting freezer', {
+      error: {
+        message: error.message ? error.message : error.toString(),
+        stack: error.stack ? error.stack : undefined
+      }
+    })
   })
