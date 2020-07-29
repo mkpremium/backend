@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import couchbase from '../../src/db/couchbase'
 import { CouchbaseAdapter } from '../../src/db/CouchbaseAdapter'
 import { OperatorRepository } from '../../src/operator/models'
-import { PropertyManagerRepository } from '../../src/PropertyManager/PropertyManagerRepository'
+import { PropertyManagerRepository } from '../../src/property-manager/PropertyManagerRepository'
 import { OperatorRoles } from '../../src/types/operator'
 import { buildOperator } from '../common'
 
