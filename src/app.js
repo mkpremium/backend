@@ -20,6 +20,7 @@ import history from './history'
 import notes from './notes'
 import building from './building'
 import metadata from './metadata'
+import { init as initPropertyManager } from './property-manager'
 
 import stats from './stats'
 import autocomplete from './autocomplete'
@@ -54,6 +55,7 @@ dependenciesPromise.then(() => {
   owner(app, dependenciesContainer)
   scheduledEvents(app, dependenciesContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer)
+  initPropertyManager(app, dependenciesContainer)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
