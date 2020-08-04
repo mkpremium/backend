@@ -155,6 +155,7 @@ export const Building = t.struct(
     recentProposal: t.maybe(BuildingProposal),
     negotiationStatus: t.enums.of(buildingNegotiationStatus),
     assignedAgentId: t.maybe(t.String),
+    salePrice: t.maybe(t.Number),
 
     metadata: t.list(BuildingMetadataPreview),
 

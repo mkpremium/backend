@@ -107,3 +107,13 @@ export const addMetadataToBuildingController = wrap(addMetadataToBuilding)
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
 export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
+
+export const createSetBuildingSalePriceController = setBuildingSalePriceService => {
+  return wrap(async (req, res) => {
+    await setBuildingSalePriceService.setBuildingSalePrice({
+      buildingId: req.params.buildingId,
+      salePrice: req.body.salePrice
+    })
+    res.send()
+  })
+}

@@ -28,6 +28,7 @@ import { AdminBuildingRepository } from '../building/repository/AdminBuildingRep
 import { StockService } from '../stock/service/StockService'
 import { EventBus } from './EventBus'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService';
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -85,6 +86,8 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     legacyDependenciesContainer.buildingRepository,
     legacyDependenciesContainer.stockRepository
   )
+
+  container.setBuildingSalePriceService = new SetBuildingSalePriceService(buildingRepository)
 
   container.couchbaseAdapter = couchbaseAdapter
 

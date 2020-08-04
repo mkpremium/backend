@@ -7,7 +7,7 @@ import {
   createListBuildingProposalsController,
   createListBuildingsController,
   createListVerifiedOwnersController,
-  createMetadataUploadUrlController,
+  createMetadataUploadUrlController, createSetBuildingSalePriceController,
   createUpdateBuildingNegotiationStatusController,
   updateNegotiationProposalController
 } from './controllers'
@@ -18,7 +18,8 @@ export const createBuildingRoutes = (
   legacyOwnerRepository,
   updateBuildingNegotiationStatusService,
   legacyBuildingRepository,
-  adminBuildingRepository
+  adminBuildingRepository,
+  setBuildingSalePriceService
 ) => {
   const router = Router()
 
@@ -43,6 +44,11 @@ export const createBuildingRoutes = (
   router.put(
     '/:buildingId/negotiation-status',
     createUpdateBuildingNegotiationStatusController(updateBuildingNegotiationStatusService)
+  )
+
+  router.put(
+    '/:buildingId/sale-price',
+    createSetBuildingSalePriceController(setBuildingSalePriceService)
   )
 
   router.get('/stock-stats', createAllAgentsStockStatsController(adminBuildingRepository))

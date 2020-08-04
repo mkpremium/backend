@@ -1,4 +1,5 @@
 import { N1qlQuery } from 'couchbase'
+import { Building } from '../types/building';
 
 const setBuildingFeaturedOwner = `
 UPDATE mkpremium
@@ -51,5 +52,13 @@ export class BuildingsRepository {
     await this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(pullBuildingOutOfFreezerQuery), [ buildingIds ]
     )
+  }
+
+  get (buildingId) {
+    return this.couchbaseAdapter.getEntity(Building, buildingId)
+  }
+
+  save (building) {
+    return this.couchbaseAdapter.save(building, Building)
   }
 }
