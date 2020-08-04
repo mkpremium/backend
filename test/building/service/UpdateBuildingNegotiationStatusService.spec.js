@@ -48,6 +48,6 @@ describe('UpdateBuildingNegotiationStatusService', () => {
   it('publishes negotiation status changed event', async () => {
     await service.updateBuildingStatus('building-id', 'COMPRADO', 'operator-id')
 
-    expect(eventBus.publish).to.have.been.deep.calledWith(new BuildingNegotiationStatusChanged('building-id'))
+    expect(eventBus.publish).to.have.been.deep.calledWith(new BuildingNegotiationStatusChanged('building-id', 'operator-id'))
   })
 })

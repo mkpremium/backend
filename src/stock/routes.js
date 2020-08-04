@@ -21,7 +21,6 @@ export const addStockRoutes = (propertyManagerRankingService, stockSalesService,
 
   router.post('/close', closeSellStockController)
 
-
   router.get('/ranking', getRankingController(propertyManagerRankingService))
 
   return router
