@@ -20,6 +20,6 @@ export class SetBuildingSalePriceService {
       }
     })
 
-    await this.buildingRepository.save(updatedBuilding)
+    return this.buildingRepository.save(updatedBuilding)
   }
 }

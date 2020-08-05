@@ -110,10 +110,10 @@ export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createSetBuildingSalePriceController = setBuildingSalePriceService => {
   return wrap(async (req, res) => {
-    await setBuildingSalePriceService.setBuildingSalePrice({
+    const updatedBuilding = await setBuildingSalePriceService.setBuildingSalePrice({
       buildingId: req.params.buildingId,
       salePrice: req.body.salePrice
     })
-    res.send()
+    res.send(updatedBuilding)
   })
 }

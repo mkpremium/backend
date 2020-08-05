@@ -18,6 +18,7 @@ describe('set building sale price', () => {
     await authenticatedPut(`/buildings/${building.id}/sale-price`, businessUser, app, { salePrice })
       .then(response => {
         expect(response.status).to.be.equal(200)
+        expect(response.body.salePrice).to.be.equal(salePrice)
       })
 
     await authenticatedGet(`/buildings?id=${building.id}`, businessUser, app)
