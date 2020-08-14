@@ -28,7 +28,7 @@ export function createUpdateBuildingNegotiationStatusController (updateBuildingN
   return wrap(async (req, res) => {
     await updateBuildingNegotiationStatusService.updateBuildingStatus(
       req.params.buildingId, req.body.status, req.user.id)
-    res.sendStatus(200)
+    res.json()
   })
 }
 
