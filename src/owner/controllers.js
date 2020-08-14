@@ -68,7 +68,7 @@ export const createSetFeaturedContactController = setOwnerFeaturedContactService
       const featuredContact = FeaturedContact(req.body)
       await setOwnerFeaturedContactService.setFeaturedContact(req.params.ownerId, featuredContact)
 
-      res.sendStatus(200)
+      res.json()
     } catch (e) {
       if (e instanceof EmptyFeaturedContact) {
         throw newHttpError(400, `Invalid featured contact request.`)
