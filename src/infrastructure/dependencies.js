@@ -28,7 +28,7 @@ import { AdminBuildingRepository } from '../building/repository/AdminBuildingRep
 import { StockService } from '../stock/service/StockService'
 import { EventBus } from './EventBus'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
-import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService';
+import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}

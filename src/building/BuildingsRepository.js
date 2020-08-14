@@ -1,5 +1,5 @@
 import { N1qlQuery } from 'couchbase'
-import { Building } from '../types/building';
+import { Building } from '../types/building'
 
 const setBuildingFeaturedOwner = `
 UPDATE mkpremium

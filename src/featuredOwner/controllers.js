@@ -3,5 +3,5 @@ export const createSetFeaturedOwnerController = (featuredOwnerService) => async 
     req.params.buildingId,
     req.body.ownerId
   )
-  res.sendStatus(200)
+  res.json()
 }
