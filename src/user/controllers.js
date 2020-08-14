@@ -13,7 +13,7 @@ export const createMeController = usersRepository => {
 export const createAddFavoritesController = addFavoriteBuildingService => {
   return async (req, res) => {
     await addFavoriteBuildingService.addFavoriteBuilding(req.user.operator.id, req.body.buildingId)
-    res.sendStatus(201).json()
+    res.status(201).json()
   }
 }
 
