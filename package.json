@@ -12,7 +12,7 @@
     "deploy:uat": "scripts/deployment.sh mkpremium-uat",
     "deploy:prod": "scripts/deployment.sh mkpremium-prod",
     "socket": "nodemon bin/socket.js --exec babel-node",
-    "cronjobs": "nodemon bin/cronjobs.js --exec babel-node"
+    "cronjobs": "nodemon bin/freezer.js --exec babel-node"
   },
   "dependencies": {
     "@babel/polyfill": "^7.7.0",

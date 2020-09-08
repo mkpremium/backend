@@ -21,6 +21,7 @@ SystemPreferencesRepository
     } else {
       logger.info(`Freeze called, nothing to do`)
     }
+    process.exit(0)
   })
   .catch(error => {
     logger.error('starting freezer', {
@@ -29,4 +30,5 @@ SystemPreferencesRepository
         stack: error.stack ? error.stack : undefined
       }
     })
+    process.exit(1)
   })
