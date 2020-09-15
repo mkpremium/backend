@@ -38,13 +38,9 @@ export const numintec = {
 
 export const saltFactor = parseInt(process.env.SALT_FACTOR || 10)
 
-export const awsConfig = {
-  region: process.env.AWS_REGION || 'eu-west-3',
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
-  bucket: process.env.S3_BUCKET_NAME || 'mkpremium',
-  prefix: process.env.S3_METADATA_PREFIX || 'dev',
-  signatureVersion: 'v4'
+export const metadataS3Config = {
+  region: process.env.METADATA_S3_REGION || 'eu-west-2',
+  bucket: process.env.METADATA_S3_BUCKET || 'mkpremium-files'
 }
 
 export const isTest = () => process.env.NODE_ENV === 'test'

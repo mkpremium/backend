@@ -9,11 +9,7 @@ import t from './types'
 import mime from 'mime-types'
 import { logger } from '../infrastructure/logger'
 
-import { awsConfig } from '../../config'
-
-const accountConfig = _pick(awsConfig, ['region', 'accessKeyId', 'secretAccessKey', 'signatureVersion'])
-
-aws.config.update(accountConfig)
+import { metadataS3Config } from '../../config'
 
 export function getPrivateUploadUrl (prefix, config) {
   const { fileName, fileType } = t.SignedUrlRequest(config)
@@ -22,7 +18,8 @@ export function getPrivateUploadUrl (prefix, config) {
   const Key = keyName(prefix, fileName)
 
   const params = {
-    Bucket: awsConfig.bucket,
+    Bucket: metadataS3Config.bucket,
+    Region: metadataS3Config.region,
     Key,
     Expires: 900,
     ACL: 'private',
@@ -43,7 +40,7 @@ export async function uploadFile (prefix, params, filepath) {
   const Key = keyName(prefix, fileName)
 
   const s3params = {
-    Bucket: awsConfig.bucket,
+    Bucket: metadataS3Config.bucket,
     Key,
     Expires: 900,
     ACL: 'private',
@@ -73,7 +70,7 @@ export async function uploadPreview (prefix, filepath) {
   const s3 = new aws.S3()
   const data = await fs.readFile(filepath)
   const params = {
-    Bucket: awsConfig.bucket,
+    Bucket: metadataS3Config.bucket,
     ACL: 'public-read',
     Key: keyName(prefix, filepath),
     Body: data,
@@ -99,10 +96,10 @@ export function resolvePublicUrl (url) {
     return url
   }
 
-  const Key = url.replace(`https://${awsConfig.bucket}.s3.${awsConfig.region}.amazonaws.com/`, '')
+  const Key = url.replace(`https://${metadataS3Config.bucket}.s3.${metadataS3Config.region}.amazonaws.com/`, '')
   const s3 = new aws.S3()
   const params = {
-    Bucket: awsConfig.bucket,
+    Bucket: metadataS3Config.bucket,
     Key
   }
 
