@@ -1,7 +1,7 @@
 import Promise from 'bluebird'
 import aws from 'aws-sdk'
-import _pick from 'lodash/pick'
 import path from 'path'
+import url from 'url'
 import uuid from 'uuid/v4'
 import { exec } from 'child_process'
 import fs from 'fs-extra'
@@ -91,16 +91,15 @@ export function cleanUrl (url) {
   return url.split('?')[0]
 }
 
-export function resolvePublicUrl (url) {
-  if (!/amazonaws.com/.test(url)) {
-    return url
+export function resolvePublicUrl (privateUrl) {
+  if (!/amazonaws.com/.test(privateUrl)) {
+    return privateUrl
   }
 
-  const Key = url.replace(`https://${metadataS3Config.bucket}.s3.${metadataS3Config.region}.amazonaws.com/`, '')
   const s3 = new aws.S3()
   const params = {
     Bucket: metadataS3Config.bucket,
-    Key
+    Key: url.parse(privateUrl).path
   }
 
   return s3.getSignedUrl('getObject', params)
