@@ -104,7 +104,6 @@ export function resolvePublicUrl (privateUrl) {
   })
   const params = {
     Bucket: metadataS3Config.bucket,
-    Region: metadataS3Config.region,
     Key: url.parse(privateUrl).path
   }
 
