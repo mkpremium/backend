@@ -108,9 +108,8 @@ export function resolvePublicUrl (privateUrl) {
     Key: url.parse(privateUrl).path
   }
 
-  const signedUrl = s3.getSignedUrl('getObject', params)
-  logger.info('signing metadata URL', { params, signedUrl })
-  return signedUrl
+  logger.info('signing metadata URL', { params })
+  return s3.getSignedUrlPromise('getObject', params)
 }
 
 export async function makePreview (rawUrl) {
