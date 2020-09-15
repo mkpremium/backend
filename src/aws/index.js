@@ -98,7 +98,10 @@ export function resolvePublicUrl (privateUrl) {
     return privateUrl
   }
 
-  const s3 = new aws.S3()
+  const s3 = new aws.S3({
+    signatureVersion: 'v4',
+    region: metadataS3Config.region
+  })
   const params = {
     Bucket: metadataS3Config.bucket,
     Region: metadataS3Config.region,
