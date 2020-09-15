@@ -59,6 +59,7 @@ export async function uploadFile (prefix, params, filepath) {
     })
   })
 }
+
 function keyName (prefix, fileName) {
   return `${prefix}/${uuid()}${path.extname(fileName)}`
 }
@@ -104,7 +105,9 @@ export function resolvePublicUrl (privateUrl) {
     Key: url.parse(privateUrl).path
   }
 
-  return s3.getSignedUrl('getObject', params)
+  const signedUrl = s3.getSignedUrl('getObject', params)
+  logger.info('signing metadata URL', { params, signedUrl })
+  return signedUrl
 }
 
 export async function makePreview (rawUrl) {
