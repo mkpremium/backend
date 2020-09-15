@@ -41,6 +41,7 @@ export async function uploadFile (prefix, params, filepath) {
 
   const s3params = {
     Bucket: metadataS3Config.bucket,
+    Region: metadataS3Config.region,
     Key,
     Expires: 900,
     ACL: 'private',
@@ -99,6 +100,7 @@ export function resolvePublicUrl (privateUrl) {
   const s3 = new aws.S3()
   const params = {
     Bucket: metadataS3Config.bucket,
+    Region: metadataS3Config.region,
     Key: url.parse(privateUrl).path
   }
 
