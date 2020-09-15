@@ -104,7 +104,7 @@ export function resolvePublicUrl (privateUrl) {
   })
   const params = {
     Bucket: metadataS3Config.bucket,
-    Key: url.parse(privateUrl).path
+    Key: url.parse(privateUrl).path.substr(1) // path without first slash
   }
 
   logger.info('signing metadata URL', { params })
