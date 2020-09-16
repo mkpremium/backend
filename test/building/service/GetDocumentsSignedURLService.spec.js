@@ -45,6 +45,7 @@ describe('GetDocumentsSignedURLService', () => {
 
     expect(signedURLs).to.deep.equal([ {
       url: testSignedURL,
+      mimeType: undefined,
       documentId: testDocumentId
     } ])
   })

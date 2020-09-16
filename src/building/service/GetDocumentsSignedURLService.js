@@ -10,7 +10,7 @@ export class GetDocumentsSignedURLService {
   async getDocumentsSignedURL (buildingId) {
     const buildingDocuments = await this.buildingDocumentsRepository.documentsOfBuilding(buildingId)
     return Promise.all(
-      buildingDocuments.map(({ documentId, privateUrl }) => {
+      buildingDocuments.map(({ documentId, privateUrl, mimeType }) => {
         return this.s3Client
           .getSignedUrlPromise('getObject', {
             Bucket: this.documentBucket,
@@ -18,6 +18,7 @@ export class GetDocumentsSignedURLService {
           }).then(signedUrl => {
             return {
               documentId,
+              mimeType: mimeType,
               url: signedUrl
             }
           })
