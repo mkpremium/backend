@@ -59,6 +59,13 @@ export function createAddNegotiationProposalController (legacyBuildingRepository
   }
 }
 
+export const createSignDocumentsUrlController = getDocumentsSignedURLService => {
+  return wrap(async (req, res) => {
+    const signedUrls = await getDocumentsSignedURLService.getDocumentsSignedURL(req.params.buildingId)
+    res.json(signedUrls)
+  })
+}
+
 async function updateNegotiationProposal (req, res) {
   const proposalRepo = new BuildingProposalRepository()
   const buildingRepo = new BuildingRepository()

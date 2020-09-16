@@ -7,7 +7,7 @@ import {
   createListBuildingProposalsController,
   createListBuildingsController,
   createListVerifiedOwnersController,
-  createMetadataUploadUrlController, createSetBuildingSalePriceController,
+  createMetadataUploadUrlController, createSetBuildingSalePriceController, createSignDocumentsUrlController,
   createUpdateBuildingNegotiationStatusController,
   updateNegotiationProposalController
 } from './controllers'
@@ -19,13 +19,16 @@ export const createBuildingRoutes = (
   updateBuildingNegotiationStatusService,
   legacyBuildingRepository,
   adminBuildingRepository,
-  setBuildingSalePriceService
+  setBuildingSalePriceService,
+  getDocumentsSignedURLService
 ) => {
   const router = Router()
 
   router.post('/create-url', createMetadataUploadUrlController)
 
   router.post('/:id/metadata', addMetadataToBuildingController)
+
+  router.post('/:buildingId/documents-signed-urls', createSignDocumentsUrlController(getDocumentsSignedURLService))
 
   router.post('/:id/negotiation', createAddNegotiationProposalController(legacyBuildingRepository, updateBuildingNegotiationStatusService))
 

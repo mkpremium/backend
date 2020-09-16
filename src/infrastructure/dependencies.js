@@ -30,6 +30,9 @@ import { EventBus } from './EventBus'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
 import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository';
+import aws from 'aws-sdk';
+import { metadataS3Config } from '../../config';
+import { GetDocumentsSignedURLService } from '../building/service/GetDocumentsSignedURLService';
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -99,6 +102,15 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   )
 
   container.buildingDocumentsRepository = new BuildingDocumentsRepository(couchbaseAdapter)
+  const buildingDocumentsS3Client = new aws.S3({
+    signatureVersion: 'v4',
+    region: metadataS3Config.region
+  })
+  container.getDocumentsSignedURLService = new GetDocumentsSignedURLService(
+    container.buildingDocumentsRepository,
+    buildingDocumentsS3Client,
+    metadataS3Config.bucket
+  )
 
   return container
 }

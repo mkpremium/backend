@@ -7,7 +7,8 @@ export default (app, {
   listBuildingProposalsService,
   updateBuildingNegotiationStatusService,
   adminBuildingRepository,
-  setBuildingSalePriceService
+  setBuildingSalePriceService,
+  getDocumentsSignedURLService
 },
 {
   ownerRepository, buildingRepository
@@ -20,6 +21,7 @@ export default (app, {
     updateBuildingNegotiationStatusService,
     buildingRepository,
     adminBuildingRepository,
-    setBuildingSalePriceService
+    setBuildingSalePriceService,
+    getDocumentsSignedURLService
   ))
 }
