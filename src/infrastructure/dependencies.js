@@ -2,7 +2,7 @@ import { AddProposalService } from '../building/AddProposalService'
 import { CommercialsBuildingRepository } from '../building/CommercialsBuildingRepository'
 import { ListBuildingProposalsService } from '../building/ListBuildingProposalsService'
 import { ListBuildingsService } from '../building/ListBuildingsService'
-import { BuildingRepository as LegacyBuildingRepository } from '../building/models'
+import { BuildingRepository as LegacyBuildingRepository, MetadataRepository } from '../building/models'
 import { BuildingsRepository } from '../building/BuildingsRepository'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/UpdateBuildingNegotiationStatusService'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
@@ -29,6 +29,7 @@ import { StockService } from '../stock/service/StockService'
 import { EventBus } from './EventBus'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
+import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository';
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -38,6 +39,7 @@ export const createLegacyDependenciesContainer = () => {
   container.stockRepository = new LegacyStockRepository()
   container.scheduledEventsRepository = new ScheduledEventsRepository()
   container.worksheetRepository = new WorksheetRepository()
+  container.metadataRepository = new MetadataRepository()
 
   return container
 }
@@ -95,6 +97,8 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     legacyDependenciesContainer.stockRepository,
     container.updateBuildingNegotiationStatusService
   )
+
+  container.buildingDocumentsRepository = new BuildingDocumentsRepository(couchbaseAdapter)
 
   return container
 }
