@@ -22,6 +22,7 @@ describe('BuildingDocumentsRepository', () => {
       buildingId: testBuildingId,
       url: testDocumentPath,
       createdAt: new Date(),
+      mimeType: 'image/jpg',
       createdBy: 'test'
     })
 
@@ -30,7 +31,8 @@ describe('BuildingDocumentsRepository', () => {
     const buildingDocuments = await buildingDocumentsRepository.documentsOfBuilding(testBuildingId)
     expect(buildingDocuments).to.deep.equal([ {
       documentId: testBuildingDocumentId,
-      privateUrl: testDocumentPath
+      privateUrl: testDocumentPath,
+      mimeType: 'image/jpg'
     } ])
   })
 })
