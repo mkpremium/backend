@@ -26,7 +26,44 @@ import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { OwnerBusinessStatus, OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
-import { WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
+import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
+
+const QueueRequestParamsBase = t.struct(
+  {
+    action: t.maybe(t.QueueRequestAction)
+  },
+  {
+    name: 'QueueRequest',
+    defaultProps: {
+      action: QueueRequestAction.TAKE
+    }
+  }
+)
+
+export const QueueRequestParams = t.union([
+  QueueRequestParamsBase,
+  QueueRequestParamsBase.extend({ queueItemId: t.String }),
+  QueueRequestParamsBase.extend({ worksheetId: t.String })
+])
+
+QueueRequestParams.dispatch = function (x) {
+  switch (x.action) {
+    case QueueRequestAction.NEXT:
+      return QueueRequestParamsBase
+    case QueueRequestAction.RELEASE:
+      return QueueRequestParamsBase.extend(
+        {
+          worksheetId: t.String
+        }
+      )
+    default:
+      return QueueRequestParamsBase.extend(
+        {
+          queueItemId: t.String
+        }
+      )
+  }
+}
 
 function canRegisterVerified (worksheet, newStatus, operatorId) {
   if (!operatorId) {

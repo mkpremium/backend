@@ -88,7 +88,7 @@ async function queueList (req, res) {
 async function actionsOnWorksheetQueue (req, res) {
   const repo = new WorksheetQueueRepository()
   const queueId = req.params.id
-  const params = t.QueueRequestParams(req.body)
+  const params = QueueRequestParams(req.body)
   const queue = await repo.findByIdOrThrow(queueId)
   canOperatorHandleQueue(req.user.operator, queueId)
 
