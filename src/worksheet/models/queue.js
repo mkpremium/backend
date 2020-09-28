@@ -13,7 +13,8 @@ import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
-import { OperatorActions, WorksheetQueue as WorksheetQueueStruct } from '../../stats/types'
+import { WorksheetQueue as WorksheetQueueStruct } from '../../types/worksheet'
+import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 
 export class WorksheetQueue extends CouchbaseModel {
