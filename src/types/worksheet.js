@@ -216,7 +216,7 @@ const WorksheetQueueSource = t.struct({
   neighborhood: t.maybe(t.String)
 }, 'source')
 
-t.WorksheetQueueBody = t.struct(
+export const WorksheetQueueBody = t.struct(
   {
     name: t.String,
     source: WorksheetQueueSource

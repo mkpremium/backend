@@ -2,13 +2,14 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import _get from 'lodash/get'
 import { wrap } from 'express-promise-wrap'
-import { WorksheetRepository } from './models/worksheet'
+import { QueueRequestParams, WorksheetRepository } from './models/worksheet'
 import { WorksheetQueueRepository } from './models/queue'
 import { QueueRequestAction } from './types'
 import { OperatorRoles } from '../types/operator'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
 import { canOperatorHandleQueue } from '../lib/role-operators'
+import { WorksheetQueueBody } from '../types/worksheet';
 
 async function worksheetList (req, res) {
   const repo = new WorksheetRepository()
@@ -28,7 +29,7 @@ function bool (value) {
 }
 
 async function createQueue (req, res) {
-  const params = fromJSON(req.body, t.WorksheetQueueBody)
+  const params = fromJSON(req.body, WorksheetQueueBody)
   const repo = new WorksheetQueueRepository()
   const queue = await repo.save(params)
   await History.registerCreate({

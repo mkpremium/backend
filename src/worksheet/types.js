@@ -9,57 +9,6 @@ export const QueueRequestAction = {
 
 t.QueueRequestAction = t.enums(QueueRequestAction)
 
-/**
- * @swagger
- * definitions:
- *   QueueRequestParams:
- *     properties:
- *       queueItemId:
- *         description: Id del item de la cola *
- *         type: string
- *         format: uuid/v4
- *       action:
- *         description: Acción a realizar en el item
- *         type: string
- *         default: TAKE
- */
-
-const QueueRequestParams = t.struct(
-  {
-    action: t.maybe(t.QueueRequestAction)
-  },
-  {
-    name: 'QueueRequest',
-    defaultProps: {
-      action: QueueRequestAction.TAKE
-    }
-  }
-)
-
-const QueueRequestItemParams = QueueRequestParams.extend(
-  {
-    queueItemId: t.String
-  }
-)
-
-const QueueRequestWorksheetParams = QueueRequestParams.extend(
-  {
-    worksheetId: t.String
-  }
-)
-
-t.QueueRequestParams = t.union([QueueRequestParams, QueueRequestItemParams, QueueRequestWorksheetParams])
-t.QueueRequestParams.dispatch = function (x) {
-  switch (x.action) {
-    case QueueRequestAction.NEXT:
-      return QueueRequestParams
-    case QueueRequestAction.RELEASE:
-      return QueueRequestWorksheetParams
-    default:
-      return QueueRequestItemParams
-  }
-}
-
 export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
   {
     status: t.maybe(t.WorkSheetStatus),
@@ -82,21 +31,6 @@ t.WorksheeQueueListQuery = t.ListQuery.extend({
   dateRange: t.list(t.String)
 })
 
-/**
- * @swagger
- * definitions:
- *   WorkSheetLitResponse:
- *     required:
- *       - total
- *       - results
- *     properties:
- *       total:
- *         type: number
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/Worksheet"
- */
 t.WorkSheetLitResponse = t.struct(
   {
     total: t.Number,
@@ -111,21 +45,6 @@ t.WorkSheetLitResponse = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   QueueListResponse:
- *     required:
- *       - total
- *       - results
- *     properties:
- *       total:
- *         type: number
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/WorksheetQueue"
- */
 t.QueueListResponse = t.struct(
   {
     total: t.Number,
@@ -153,18 +72,6 @@ export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   WorksheetSearchResponse:
- *     required:
- *       - results
- *     properties:
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/Worksheet"
- */
 export const WorksheetSearchResponse = t.struct(
   {
     results: t.list(Worksheet)

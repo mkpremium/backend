@@ -13,7 +13,7 @@ import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
-import { WorksheetQueue as WorksheetQueueStruct } from '../../types/worksheet'
+import { WorksheetQueue as WorksheetQueueStruct, WorksheetQueueBody } from '../../types/worksheet'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 
@@ -229,7 +229,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async update (queue, params) {
-    const $merge = fromJSON(params, t.WorksheetQueueBody)
+    const $merge = fromJSON(params, WorksheetQueueBody)
     const updatedQueue = t.update(queue, { $merge })
     return this.save(updatedQueue)
   }
