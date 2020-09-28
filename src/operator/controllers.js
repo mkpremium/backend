@@ -65,12 +65,13 @@ async function limitedListOperator (req, res) {
 }
 
 async function selfCallCenterWorkInProgress (req, res) {
-  const model = new Calls()
-  const repoWorksheetQueue = new WorksheetQueueRepository()
-
   const queueId = _get(req, 'user.operator.profile.queueId', null)
   const operatorId = _get(req, 'user.operator.id', null)
+
+  const repoWorksheetQueue = new WorksheetQueueRepository()
   const queueItem = await repoWorksheetQueue.findItemByOperator(queueId, operatorId)
+
+  const model = new Calls()
   const activeCall = await model.findActiveCallByOperatorId(req.user.id)
   res.json(Object.assign({}, req.user.operator, { activeCall, queueItem }))
 }
