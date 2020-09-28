@@ -47,7 +47,7 @@ function canRegisterVerified (worksheet, newStatus, operatorId) {
 export class WorksheetRepository extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.WorkSheet
+    this.Struct = Worksheet
   }
 
   async findBySource ({ source, worksheetIndex }) {
@@ -103,7 +103,7 @@ export class WorksheetRepository extends CouchbaseModel {
 
     const results = await this.query(qb)
 
-    return fromJSON(_head(results), t.WorkSheet)
+    return fromJSON(_head(results), Worksheet)
   }
 
   findByBuilding (buildingId) {
@@ -172,7 +172,7 @@ export class WorksheetRepository extends CouchbaseModel {
 
   async updateStatus (worksheetId, operatorId) {
     const worksheetData = await this.findByIdWIthIncludes(worksheetId)
-    const worksheet = fromJSON(worksheetData, t.WorkSheet)
+    const worksheet = fromJSON(worksheetData, Worksheet)
     const newStatus = await this.calculateFixedStatus(worksheet)
     const updatedWorksheet = worksheet.setStatus(newStatus)
     if (canRegisterVerified(worksheet, newStatus, operatorId)) {

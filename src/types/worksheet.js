@@ -41,7 +41,7 @@ t.WorkSheetCall = t.struct({
   realizedAt: t.Date
 }, 'WorkSheetCall')
 
-export const Worksheet = t.WorkSheet = t.struct({
+export const Worksheet = t.struct({
   id: t.maybe(t.String),
   worksheetIndex: t.maybe(t.Number),
   calls: t.list(t.WorkSheetCall),
@@ -96,7 +96,7 @@ export const Worksheet = t.WorkSheet = t.struct({
   }
 })
 
-t.WorkSheet.prototype.setStatus = function (newStatus) {
+Worksheet.prototype.setStatus = function (newStatus) {
   if (newStatus === this.status) {
     logger.debug('WorkSheet#setStatus status remains equals', { status: this.status, id: this.id })
     return this
@@ -106,11 +106,11 @@ t.WorkSheet.prototype.setStatus = function (newStatus) {
   }
 }
 
-t.WorkSheet.prototype.fixStatus = function (newStatus) {
+Worksheet.prototype.fixStatus = function (newStatus) {
   return t.update(this, { status: { $set: newStatus } })
 }
 
-t.WorkSheet.prototype.pullOutFreezer = function (newStatus) {
+Worksheet.prototype.pullOutFreezer = function (newStatus) {
   const updated = this.setStatus(newStatus)
 
   return t.update(updated, {
@@ -119,18 +119,18 @@ t.WorkSheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
-t.WorkSheet.prototype.cleanMeetings = function () {
+Worksheet.prototype.cleanMeetings = function () {
   return t.update(this, {
     lastAddedMeeting: { $set: null }
   })
 }
 
-t.WorkSheet.prototype.putOnFreezer = function () {
+Worksheet.prototype.putOnFreezer = function () {
   const $set = worksheetStatusCanBeInsideFreezer(this.status)
   return t.update(this, { inFreezer: { $set } })
 }
 
-t.WorkSheet.prototype.setStatusChangedAt = function (newDate) {
+Worksheet.prototype.setStatusChangedAt = function (newDate) {
   return t.update(this, { statusChangedAt: { $set: newDate } })
 }
 
