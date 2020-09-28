@@ -13,13 +13,13 @@ import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
-import { OperatorActions } from '../../stats/types'
+import { OperatorActions, WorksheetQueue as WorksheetQueueStruct } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 
 export class WorksheetQueue extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.WorksheetQueue
+    this.Struct = WorksheetQueueStruct
   }
 }
 
@@ -41,7 +41,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       throw newHttpError(404, `La cola ${queueId} no existe`)
     }
 
-    return fromJSON(queue, t.WorksheetQueue)
+    return fromJSON(queue, WorksheetQueueStruct)
   }
 
   async getExtraInfo (queue) {
@@ -122,7 +122,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       worksheetIndex: { $set: worksheet.worksheetIndex }
     })
 
-    return fromJSON(updatedQueue, t.WorksheetQueue)
+    return fromJSON(updatedQueue, WorksheetQueueStruct)
   }
 
   async removeWorksheetInQueue (queue, worksheetId) {
@@ -180,7 +180,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async takeWorksheetInQueue (data, itemId, operatorId) {
-    const queue = fromJSON(data, t.WorksheetQueue)
+    const queue = fromJSON(data, WorksheetQueueStruct)
     const item = queue.findItemById(itemId)
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)

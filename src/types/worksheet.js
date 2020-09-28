@@ -228,7 +228,7 @@ t.WorksheetQueueBody = t.struct(
   }
 )
 
-t.WorksheetQueue = t.struct(
+export const WorksheetQueue = t.struct(
   {
     id: t.maybe(t.String),
     name: t.String,
@@ -248,7 +248,7 @@ t.WorksheetQueue = t.struct(
   }
 )
 
-export const WorksheetQueueCount = t.WorksheetQueue.extend(
+export const WorksheetQueueCount = WorksheetQueue.extend(
   {
     possibleNumberOfWorksheets: t.Number
   }
@@ -275,23 +275,23 @@ t.WorksheetQueueExtraInfo = t.struct(
   }
 )
 
-t.WorksheetQueue.prototype.findItemById = function (id) {
+WorksheetQueue.prototype.findItemById = function (id) {
   return _find(this.worksheets, { id })
 }
 
-t.WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
+WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
   return _find(this.worksheets, { worksheetId })
 }
 
-t.WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
+WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
   return _find(this.worksheets, { operatorId, status: Queue.Status.OPENED })
 }
 
-t.WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
+WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
   return _filter(this.worksheets, { operatorId, status: Queue.Status.SCHEDULED })
 }
 
-t.WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null) {
+WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null) {
   const currentItemId = currentItem ? currentItem.id : -1
   const currentIndex = _findIndex(this.worksheets, { id: currentItemId })
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets
