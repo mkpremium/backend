@@ -52,6 +52,10 @@
         {
           "name": "NODE_ENV",
           "value": "production"
+        },
+        {
+          "name": "DEBUG",
+          "value": "ON"
         }
       ],
       "resourceRequirements": null,
