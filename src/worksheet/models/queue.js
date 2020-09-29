@@ -390,26 +390,6 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   /**
-   * Liberates worksheets that have a queue id but are not in such queue.
-   * Use in command.
-   * @param queueId - the queue id
-   * @returns {Promise<void>}
-   */
-  async freeNotInQueueWorksheets (queueId) {
-    if (!queueId) {
-      return null
-    }
-
-    const worksheetRepo = new WorksheetRepository()
-    const queue = await this.findByIdOrThrow(queueId)
-    const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue)
-
-    if (worksheetsToBeLiberated.length) {
-      await worksheetRepo.updateQueueId(worksheetsToBeLiberated)
-    }
-  }
-
-  /**
    * Gets all worksheets queues.
    * @returns {Promise<Array<Worksheet>>}
    */
@@ -417,21 +397,5 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder()
 
     return this.query(qb)
-  }
-
-  /**
-   *
-   * @returns {Promise<void>}
-   */
-  async cleanAllWorksheetsNotInQueue () {
-    const worksheetRepo = new WorksheetRepository()
-    const queues = await this.findAll()
-
-    await Promise.all(queues.map(async (queue) => {
-      const worksheetsToBeLiberated = await WorksheetQueueRepository.getWorkSheetsToBeLiberatedByQueue(queue)
-      if (worksheetsToBeLiberated.length) {
-        await worksheetRepo.updateQueueId(worksheetsToBeLiberated)
-      }
-    }))
   }
 }
