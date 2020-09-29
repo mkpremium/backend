@@ -134,7 +134,7 @@ Worksheet.prototype.setStatusChangedAt = function (newDate) {
   return t.update(this, { statusChangedAt: { $set: newDate } })
 }
 
-t.QueueItem = t.struct(
+export const QueueItem = t.struct(
   {
     id: t.maybe(t.String),
     worksheetId: t.String,
@@ -154,7 +154,7 @@ t.QueueItem = t.struct(
   }
 )
 
-t.QueueItemExtraInfo = t.QueueItem.extend({
+t.QueueItemExtraInfo = QueueItem.extend({
   totalContacts: t.Number,
   totalBuildings: t.Number,
   ownerName: t.maybe(t.String),
@@ -164,14 +164,14 @@ t.QueueItemExtraInfo = t.QueueItem.extend({
   lastCall: t.maybe(t.WorkSheetCall)
 })
 
-t.QueueItem.prototype.canBeOpened = function (operatorId) {
+QueueItem.prototype.canBeOpened = function (operatorId) {
   if (operatorId && this.operatorId) {
     return operatorId === this.operatorId
   }
   return Queue.StatusAvailable.indexOf(this.status) !== -1
 }
 
-t.QueueItem.prototype.canBeReleased = function (operatorId) {
+QueueItem.prototype.canBeReleased = function (operatorId) {
   if (operatorId && this.operatorId) {
     return operatorId === this.operatorId
   }
@@ -179,14 +179,14 @@ t.QueueItem.prototype.canBeReleased = function (operatorId) {
   return false
 }
 
-t.QueueItem.prototype.take = function (operatorId = null) {
+QueueItem.prototype.take = function (operatorId = null) {
   return t.update(this, {
     status: { $set: Queue.Status.OPENED },
     operatorId: { $set: operatorId }
   })
 }
 
-t.QueueItem.prototype.release = function () {
+QueueItem.prototype.release = function () {
   return t.update(this, {
     status: { $set: Queue.Status.AVAILABLE },
     operatorId: { $set: null },
@@ -194,7 +194,7 @@ t.QueueItem.prototype.release = function () {
   })
 }
 
-t.QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
+QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   return t.update(this, {
     status: { $set: Queue.Status.SCHEDULED },
     operatorId: { $set: operatorId },
@@ -202,7 +202,7 @@ t.QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   })
 }
 
-t.QueueItem.prototype.releaseSchedule = function (operatorId) {
+QueueItem.prototype.releaseSchedule = function (operatorId) {
   if (this.status === Queue.Status.SCHEDULED && this.operatorId === operatorId) {
     return this.release()
   }
@@ -233,7 +233,7 @@ export const WorksheetQueue = t.struct(
     id: t.maybe(t.String),
     name: t.String,
     source: WorksheetQueueSource,
-    worksheets: t.list(t.QueueItem),
+    worksheets: t.list(QueueItem),
     worksheetIndex: t.maybe(t.Number),
 
     _documentType: t.enums.of([ 'worksheet-queue' ])

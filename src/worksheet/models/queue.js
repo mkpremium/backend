@@ -13,36 +13,34 @@ import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
-import { WorksheetQueue as WorksheetQueueStruct, WorksheetQueueBody } from '../../types/worksheet'
+import {
+  WorksheetQueue,
+  QueueItem,
+  WorksheetQueueBody
+} from '../../types/worksheet'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 
-export class WorksheetQueue extends CouchbaseModel {
+export class QueueItemRepository extends EmbeddedModel {
   constructor () {
     super()
-    this.Struct = WorksheetQueueStruct
+    this.Struct = QueueItem
   }
 }
 
-export class QueueItem extends EmbeddedModel {
+export class WorksheetQueueRepository extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.QueueItem
+    this.Struct = WorksheetQueue
   }
-}
 
-export class QueueItemRepository extends QueueItem {
-
-}
-
-export class WorksheetQueueRepository extends WorksheetQueue {
   async findByIdOrThrow (queueId) {
     const queue = await this.findById(queueId)
     if (!queue) {
       throw newHttpError(404, `La cola ${queueId} no existe`)
     }
 
-    return fromJSON(queue, WorksheetQueueStruct)
+    return fromJSON(queue, WorksheetQueue)
   }
 
   async getExtraInfo (queue) {
@@ -123,7 +121,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
       worksheetIndex: { $set: worksheet.worksheetIndex }
     })
 
-    return fromJSON(updatedQueue, WorksheetQueueStruct)
+    return fromJSON(updatedQueue, WorksheetQueue)
   }
 
   async removeWorksheetInQueue (queue, worksheetId) {
@@ -181,7 +179,7 @@ export class WorksheetQueueRepository extends WorksheetQueue {
   }
 
   async takeWorksheetInQueue (data, itemId, operatorId) {
-    const queue = fromJSON(data, WorksheetQueueStruct)
+    const queue = fromJSON(data, WorksheetQueue)
     const item = queue.findItemById(itemId)
     if (!item) {
       throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
