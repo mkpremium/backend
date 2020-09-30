@@ -32,7 +32,7 @@ export const worksheetStatusCanBeInsideFreezer = function (status) {
   }
 }
 
-t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
+export const WorkSheetStatusEnum = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
 
 export const WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
 
@@ -56,7 +56,7 @@ export const Worksheet = t.struct({
   // never store this
   ownerContacts: t.list(t.OwnerCompactView),
 
-  status: t.WorkSheetStatus,
+  status: WorkSheetStatusEnum,
 
   price: t.struct({
     maximumToPay: t.Number,

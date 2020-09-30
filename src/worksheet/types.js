@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { Worksheet, WorksheetQueueCount, WorkSheetQueueStatus } from '../types/worksheet'
+import { Worksheet, WorksheetQueueCount, WorkSheetQueueStatus, WorkSheetStatusEnum } from '../types/worksheet'
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
@@ -11,7 +11,7 @@ t.QueueRequestAction = t.enums(QueueRequestAction)
 
 export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
   {
-    status: t.maybe(t.WorkSheetStatus),
+    status: t.maybe(WorkSheetStatusEnum),
     viewedAt: t.maybe(t.String),
     viewedBetween: t.maybe(t.StringSplitList),
     ownerName: t.maybe(t.String)
