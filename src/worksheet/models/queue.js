@@ -373,14 +373,4 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId)
     }
   }
-
-  /**
-   * Gets all worksheets queues.
-   * @returns {Promise<Array<Worksheet>>}
-   */
-  async findAll () {
-    const qb = this.getQueryBuilder()
-
-    return this.query(qb)
-  }
 }
