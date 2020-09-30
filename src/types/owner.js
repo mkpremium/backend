@@ -5,7 +5,7 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { Building } from './building'
 import { SimpleAddress, TypedContactInfo } from './common'
-import { OwnerStatusEnum, OwnerType } from './enums'
+import { OwnerStatusEnum, OwnerType, OwnerTypeEnum } from './enums'
 
 export const Person = t.struct(
   {
@@ -28,7 +28,7 @@ export const Person = t.struct(
 
 export const OwnerBody = t.struct(
   {
-    type: t.maybe(t.OwnerType),
+    type: t.maybe(OwnerTypeEnum),
     verified: t.maybe(t.Boolean),
     status: OwnerStatusEnum,
     person: t.maybe(Person),
@@ -76,7 +76,7 @@ export const FeaturedContact = t.struct(
 export const Owner = t.struct(
   {
     id: t.maybe(t.String),
-    type: t.OwnerType,
+    type: OwnerTypeEnum,
     status: OwnerStatusEnum,
     personId: t.maybe(t.String),
 

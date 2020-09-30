@@ -52,7 +52,7 @@ export const OwnerBusinessStatus = {
   DISCARDED: 'DESCARTADO'
 }
 
-t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType')
+export const OwnerTypeEnum = t.enums.of(Object.values(OwnerType), 'OwnerType')
 export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
 t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus')
 
