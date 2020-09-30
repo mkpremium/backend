@@ -20,16 +20,6 @@ export const WorkSheetStatus = {
   PUBLIC: 'ENTE_PUBLICO'
 }
 
-export const worksheetStatusCanBeInsideFreezer = function (status) {
-  switch (status) {
-    case WorkSheetStatus.PUBLIC:
-    case WorkSheetStatus.INVALID:
-      return false
-    default:
-      return true
-  }
-}
-
 export const WorkSheetStatusEnum = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
 
 export const QueueStatus = {
