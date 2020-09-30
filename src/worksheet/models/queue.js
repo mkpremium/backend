@@ -6,18 +6,13 @@ import _ from 'lodash'
 import _map from 'lodash/map'
 import _set from 'lodash/set'
 import _get from 'lodash/get'
-import _difference from 'lodash/difference'
 import { CouchbaseModel, EmbeddedModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
-import {
-  WorksheetQueue,
-  QueueItem,
-  WorksheetQueueBody
-} from '../../types/worksheet'
+import { QueueItem, WorksheetQueue, WorksheetQueueBody } from '../../types/worksheet'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 
