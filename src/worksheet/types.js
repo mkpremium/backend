@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { Worksheet, WorksheetQueueCount } from '../types/worksheet'
+import { Worksheet, WorksheetQueueCount, WorkSheetQueueStatus } from '../types/worksheet'
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
@@ -25,7 +25,7 @@ export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
 )
 
 t.WorksheeQueueListQuery = t.ListQuery.extend({
-  status: t.maybe(t.WorkSheetQueueStatus),
+  status: t.maybe(WorkSheetQueueStatus),
   operatorId: t.maybe(t.String),
   date: t.maybe(t.String),
   dateRange: t.list(t.String)

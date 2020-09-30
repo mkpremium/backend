@@ -34,7 +34,7 @@ export const worksheetStatusCanBeInsideFreezer = function (status) {
 
 t.WorkSheetStatus = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
 
-t.WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
+export const WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
 
 t.WorkSheetCall = t.struct({
   ownerId: t.String,
@@ -139,7 +139,7 @@ export const QueueItem = t.struct(
     id: t.maybe(t.String),
     worksheetId: t.String,
     operatorId: t.maybe(t.String),
-    status: t.WorkSheetQueueStatus,
+    status: WorkSheetQueueStatus,
     addedAt: t.Date,
     event: t.maybe(t.Any)
   },
