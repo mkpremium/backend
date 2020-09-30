@@ -375,21 +375,6 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   /**
-   * Makes a difference between the worksheet queue array of worksheets
-   * and the worksheets that have said queue id set.
-   * @param queue - model.
-   * @returns array of worksheets ids.
-   */
-  static async getWorkSheetsToBeLiberatedByQueue (queue) {
-    const worksheetRepo = new WorksheetRepository()
-    const worksheetsIdsInQueueArray = _map(queue.worksheets, 'worksheetId')
-    const worksheetsWithQueueId = await worksheetRepo.findWorksheetsByQueueId(queue.id)
-    const worksheetsIdsWithQueueId = _map(worksheetsWithQueueId, 'id')
-
-    return _difference(worksheetsIdsWithQueueId, worksheetsIdsInQueueArray)
-  }
-
-  /**
    * Gets all worksheets queues.
    * @returns {Promise<Array<Worksheet>>}
    */
