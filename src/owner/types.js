@@ -5,12 +5,13 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { isTest } from '../../config'
 import { TypedContactInfo } from '../types/common'
 import { OwnerWithInclude } from '../types/owner'
+import { OwnerStatusEnum } from '../types/enums';
 
 t.OwnerCompactView = t.struct(
   {
     id: t.String,
     type: t.OwnerType,
-    status: t.OwnerStatus,
+    status: OwnerStatusEnum,
     buildingId: isTest() ? t.maybe(t.String) : t.String,
     confirmedByOperator: t.OwnerConfirmed,
     person: t.struct({

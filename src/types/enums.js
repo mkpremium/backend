@@ -53,7 +53,7 @@ export const OwnerBusinessStatus = {
 }
 
 t.OwnerType = t.enums.of(Object.values(OwnerType), 'OwnerType')
-export const OwnerStatusEnum = t.OwnerStatus = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
+export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
 t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus')
 
 t.Gender = t.enums({
