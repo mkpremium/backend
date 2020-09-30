@@ -12,10 +12,126 @@ import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
 import { Queue } from '../../types/constants'
-import { QueueItem, WorksheetQueue, WorksheetQueueBody } from '../../types/worksheet'
+import {
+  WorkSheetCall,
+  WorksheetQueue,
+  WorksheetQueueBody, WorksheetQueueCount,
+  WorksheetQueueSource,
+  WorkSheetQueueStatus
+} from '../../types/worksheet'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 import uuid from 'uuid/v4'
+
+const QueueItem = t.struct(
+  {
+    id: t.maybe(t.String),
+    worksheetId: t.String,
+    operatorId: t.maybe(t.String),
+    status: WorkSheetQueueStatus,
+    addedAt: t.Date,
+    event: t.maybe(t.Any)
+  },
+  {
+    name: 'QueueItem',
+    defaultProps: {
+      status: Queue.Status.AVAILABLE,
+      get addedAt () {
+        return new Date()
+      }
+    }
+  }
+)
+
+QueueItem.prototype.canBeOpened = function (operatorId) {
+  if (operatorId && this.operatorId) {
+    return operatorId === this.operatorId
+  }
+  return Queue.StatusAvailable.indexOf(this.status) !== -1
+}
+
+QueueItem.prototype.canBeReleased = function (operatorId) {
+  if (operatorId && this.operatorId) {
+    return operatorId === this.operatorId
+  }
+
+  return false
+}
+
+QueueItem.prototype.take = function (operatorId = null) {
+  return t.update(this, {
+    status: { $set: Queue.Status.OPENED },
+    operatorId: { $set: operatorId }
+  })
+}
+
+QueueItem.prototype.release = function () {
+  return t.update(this, {
+    status: { $set: Queue.Status.AVAILABLE },
+    operatorId: { $set: null },
+    event: { $set: null }
+  })
+}
+
+QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
+  return t.update(this, {
+    status: { $set: Queue.Status.SCHEDULED },
+    operatorId: { $set: operatorId },
+    event: { $set: scheduledEvent }
+  })
+}
+
+QueueItem.prototype.releaseSchedule = function (operatorId) {
+  if (this.status === Queue.Status.SCHEDULED && this.operatorId === operatorId) {
+    return this.release()
+  }
+  throw newHttpError(400, 'No puede liberar este item')
+}
+
+const QueueItemExtraInfo = QueueItem.extend({
+  totalContacts: t.Number,
+  totalBuildings: t.Number,
+  ownerName: t.maybe(t.String),
+  ownerType: t.maybe(t.String),
+  buildingAddress: t.maybe(t.String),
+  note: t.maybe(t.String),
+  lastCall: t.maybe(WorkSheetCall)
+})
+
+const WorksheetQueueExtraInfo = t.struct(
+  {
+    id: t.maybe(t.String),
+    name: t.String,
+    size: t.Number,
+    source: WorksheetQueueSource,
+    worksheets: t.list(QueueItemExtraInfo),
+
+    _documentType: t.enums.of([ 'worksheet-queue' ])
+  },
+  {
+    name: 'WorksheetQueue',
+    defaultProps: {
+      worksheets: [],
+      source: {},
+      size: 100,
+      _documentType: 'worksheet-queue'
+    }
+  }
+)
+
+const QueueListResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(WorksheetQueueCount)
+  },
+  {
+    name: 'QueueListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
+    }
+  }
+)
 
 export class QueueItemRepository {
   async save (data) {
@@ -76,7 +192,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     const worksheets = await this.getExtraInfo(queue)
     const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), { worksheets })
 
-    return fromJSON(queueExtraInfo, t.WorksheetQueueExtraInfo)
+    return fromJSON(queueExtraInfo, WorksheetQueueExtraInfo)
   }
 
   async list (query = {}) {
@@ -91,7 +207,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       const count = await wsRepo.countWorksheetsInSource(queue.source)
       return Object.assign(JSON.parse(JSON.stringify(queue)), { possibleNumberOfWorksheets: count })
     })
-    return fromJSON({ total, results: resultsWithCount }, t.QueueListResponse)
+    return fromJSON({ total, results: resultsWithCount }, QueueListResponse)
   }
 
   async addWorksheetToQueue (queue, worksheetId) {

@@ -4,7 +4,6 @@ import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
 import t from 'tcomb'
 import { utc } from '../lib/date'
-import { newHttpError } from '../lib/http-error'
 import '../owner/types'
 import { ScheduledEvent } from '../scheduled-events/types'
 import { Building } from './building'
@@ -36,7 +35,7 @@ export const WorkSheetStatusEnum = t.enums.of(Object.values(WorkSheetStatus), 'W
 
 export const WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
 
-t.WorkSheetCall = t.struct({
+export const WorkSheetCall = t.struct({
   ownerId: t.String,
   realizedAt: t.Date
 }, 'WorkSheetCall')
@@ -44,7 +43,7 @@ t.WorkSheetCall = t.struct({
 export const Worksheet = t.struct({
   id: t.maybe(t.String),
   worksheetIndex: t.maybe(t.Number),
-  calls: t.list(t.WorkSheetCall),
+  calls: t.list(WorkSheetCall),
 
   queueId: t.maybe(t.String),
 
@@ -154,62 +153,7 @@ export const QueueItem = t.struct(
   }
 )
 
-t.QueueItemExtraInfo = QueueItem.extend({
-  totalContacts: t.Number,
-  totalBuildings: t.Number,
-  ownerName: t.maybe(t.String),
-  ownerType: t.maybe(t.String),
-  buildingAddress: t.maybe(t.String),
-  note: t.maybe(t.String),
-  lastCall: t.maybe(t.WorkSheetCall)
-})
-
-QueueItem.prototype.canBeOpened = function (operatorId) {
-  if (operatorId && this.operatorId) {
-    return operatorId === this.operatorId
-  }
-  return Queue.StatusAvailable.indexOf(this.status) !== -1
-}
-
-QueueItem.prototype.canBeReleased = function (operatorId) {
-  if (operatorId && this.operatorId) {
-    return operatorId === this.operatorId
-  }
-
-  return false
-}
-
-QueueItem.prototype.take = function (operatorId = null) {
-  return t.update(this, {
-    status: { $set: Queue.Status.OPENED },
-    operatorId: { $set: operatorId }
-  })
-}
-
-QueueItem.prototype.release = function () {
-  return t.update(this, {
-    status: { $set: Queue.Status.AVAILABLE },
-    operatorId: { $set: null },
-    event: { $set: null }
-  })
-}
-
-QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
-  return t.update(this, {
-    status: { $set: Queue.Status.SCHEDULED },
-    operatorId: { $set: operatorId },
-    event: { $set: scheduledEvent }
-  })
-}
-
-QueueItem.prototype.releaseSchedule = function (operatorId) {
-  if (this.status === Queue.Status.SCHEDULED && this.operatorId === operatorId) {
-    return this.release()
-  }
-  throw newHttpError(400, 'No puede liberar este item')
-}
-
-const WorksheetQueueSource = t.struct({
+export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
   province: t.maybe(t.String),
   zone: t.maybe(t.String),
@@ -251,27 +195,6 @@ export const WorksheetQueue = t.struct(
 export const WorksheetQueueCount = WorksheetQueue.extend(
   {
     possibleNumberOfWorksheets: t.Number
-  }
-)
-
-t.WorksheetQueueExtraInfo = t.struct(
-  {
-    id: t.maybe(t.String),
-    name: t.String,
-    size: t.Number,
-    source: WorksheetQueueSource,
-    worksheets: t.list(t.QueueItemExtraInfo),
-
-    _documentType: t.enums.of([ 'worksheet-queue' ])
-  },
-  {
-    name: 'WorksheetQueue',
-    defaultProps: {
-      worksheets: [],
-      source: {},
-      size: 100,
-      _documentType: 'worksheet-queue'
-    }
   }
 )
 

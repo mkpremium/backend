@@ -45,20 +45,6 @@ t.WorkSheetLitResponse = t.struct(
   }
 )
 
-t.QueueListResponse = t.struct(
-  {
-    total: t.Number,
-    results: t.list(WorksheetQueueCount)
-  },
-  {
-    name: 'QueueListResponse',
-    defaultProps: {
-      total: 0,
-      results: []
-    }
-  }
-)
-
 export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
   {
     query: t.String,
