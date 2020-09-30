@@ -8,7 +8,6 @@ import '../owner/types'
 import { ScheduledEvent } from '../scheduled-events/types'
 import { Building } from './building'
 import { Address } from './common'
-import { Queue } from './constants'
 import { OwnerWithInclude } from './owner'
 
 export const WorkSheetStatus = {
@@ -33,7 +32,14 @@ export const worksheetStatusCanBeInsideFreezer = function (status) {
 
 export const WorkSheetStatusEnum = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
 
-export const WorkSheetQueueStatus = t.enums(Queue.Status, 'WorkSheetQueueStatus')
+export const QueueStatus = {
+  AVAILABLE: 'AVAILABLE',
+  OPENED: 'OPENED',
+  SCHEDULED: 'SCHEDULED',
+  CLOSED: 'CLOSED'
+}
+
+export const WorkSheetQueueStatus = t.enums(QueueStatus, 'WorkSheetQueueStatus')
 
 export const WorkSheetCall = t.struct({
   ownerId: t.String,
@@ -105,10 +111,6 @@ Worksheet.prototype.setStatus = function (newStatus) {
   }
 }
 
-Worksheet.prototype.fixStatus = function (newStatus) {
-  return t.update(this, { status: { $set: newStatus } })
-}
-
 Worksheet.prototype.pullOutFreezer = function (newStatus) {
   const updated = this.setStatus(newStatus)
 
@@ -116,21 +118,6 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
     inFreezer: { $set: false },
     lastAddedMeeting: { $set: null }
   })
-}
-
-Worksheet.prototype.cleanMeetings = function () {
-  return t.update(this, {
-    lastAddedMeeting: { $set: null }
-  })
-}
-
-Worksheet.prototype.putOnFreezer = function () {
-  const $set = worksheetStatusCanBeInsideFreezer(this.status)
-  return t.update(this, { inFreezer: { $set } })
-}
-
-Worksheet.prototype.setStatusChangedAt = function (newDate) {
-  return t.update(this, { statusChangedAt: { $set: newDate } })
 }
 
 export const QueueItem = t.struct(
@@ -145,7 +132,7 @@ export const QueueItem = t.struct(
   {
     name: 'QueueItem',
     defaultProps: {
-      status: Queue.Status.AVAILABLE,
+      status: QueueStatus.AVAILABLE,
       get addedAt () {
         return new Date()
       }
@@ -207,16 +194,16 @@ WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
 }
 
 WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
-  return _find(this.worksheets, { operatorId, status: Queue.Status.OPENED })
+  return _find(this.worksheets, { operatorId, status: QueueStatus.OPENED })
 }
 
 WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
-  return _filter(this.worksheets, { operatorId, status: Queue.Status.SCHEDULED })
+  return _filter(this.worksheets, { operatorId, status: QueueStatus.SCHEDULED })
 }
 
 WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null) {
   const currentItemId = currentItem ? currentItem.id : -1
   const currentIndex = _findIndex(this.worksheets, { id: currentItemId })
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets
-  return _find(worksheets, { status: Queue.Status.AVAILABLE })
+  return _find(worksheets, { status: QueueStatus.AVAILABLE })
 }

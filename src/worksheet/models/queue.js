@@ -11,11 +11,12 @@ import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
 import { utc } from '../../lib/date'
-import { Queue } from '../../types/constants'
 import {
+  QueueStatus,
   WorkSheetCall,
   WorksheetQueue,
-  WorksheetQueueBody, WorksheetQueueCount,
+  WorksheetQueueBody,
+  WorksheetQueueCount,
   WorksheetQueueSource,
   WorkSheetQueueStatus
 } from '../../types/worksheet'
@@ -35,7 +36,7 @@ const QueueItem = t.struct(
   {
     name: 'QueueItem',
     defaultProps: {
-      status: Queue.Status.AVAILABLE,
+      status: QueueStatus.AVAILABLE,
       get addedAt () {
         return new Date()
       }
@@ -47,7 +48,10 @@ QueueItem.prototype.canBeOpened = function (operatorId) {
   if (operatorId && this.operatorId) {
     return operatorId === this.operatorId
   }
-  return Queue.StatusAvailable.indexOf(this.status) !== -1
+  return [
+    QueueStatus.AVAILABLE,
+    QueueStatus.SCHEDULED
+  ]
 }
 
 QueueItem.prototype.canBeReleased = function (operatorId) {
@@ -60,14 +64,14 @@ QueueItem.prototype.canBeReleased = function (operatorId) {
 
 QueueItem.prototype.take = function (operatorId = null) {
   return t.update(this, {
-    status: { $set: Queue.Status.OPENED },
+    status: { $set: QueueStatus.OPENED },
     operatorId: { $set: operatorId }
   })
 }
 
 QueueItem.prototype.release = function () {
   return t.update(this, {
-    status: { $set: Queue.Status.AVAILABLE },
+    status: { $set: QueueStatus.AVAILABLE },
     operatorId: { $set: null },
     event: { $set: null }
   })
@@ -75,14 +79,14 @@ QueueItem.prototype.release = function () {
 
 QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   return t.update(this, {
-    status: { $set: Queue.Status.SCHEDULED },
+    status: { $set: QueueStatus.SCHEDULED },
     operatorId: { $set: operatorId },
     event: { $set: scheduledEvent }
   })
 }
 
 QueueItem.prototype.releaseSchedule = function (operatorId) {
-  if (this.status === Queue.Status.SCHEDULED && this.operatorId === operatorId) {
+  if (this.status === QueueStatus.SCHEDULED && this.operatorId === operatorId) {
     return this.release()
   }
   throw newHttpError(400, 'No puede liberar este item')
@@ -398,7 +402,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     })
     await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
 
-    if (item.status !== Queue.Status.SCHEDULED) {
+    if (item.status !== QueueStatus.SCHEDULED) {
       return this.removeWorksheetAndSave(queue.id, item.worksheetId)
     }
 
@@ -409,7 +413,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
     await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
 
-    if (item.status !== Queue.Status.SCHEDULED) {
+    if (item.status !== QueueStatus.SCHEDULED) {
       return this.removeWorksheetInQueue(queue, item.worksheetId)
     }
 
