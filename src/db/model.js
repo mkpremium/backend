@@ -18,36 +18,6 @@ class CouchbaseModelStruct {
   }
 }
 
-export class EmbeddedModel {
-  constructor () {
-    this.Struct = CouchbaseModelStruct
-  }
-
-  getQueryBuilder () {
-    throw new Error('getQueryBuilder undefined for embedded models')
-  }
-
-  async query () {
-    throw new Error('query undefined for embedded models')
-  }
-
-  async preSave (data) {
-    // no pre-save operations on base model
-    return data
-  }
-
-  async save (data) {
-    const struct = new this.Struct(data)
-    const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })
-    const dataPreSaved = await this.preSave(dataWithId)
-    if (!dataPreSaved) {
-      throw new Error('it seems you forgot return the data on the preSave(data) method')
-    }
-
-    return dataPreSaved
-  }
-}
-
 export class CouchbaseCounter {
   constructor (bucket, options) {
     this.options = options

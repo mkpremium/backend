@@ -6,7 +6,7 @@ import _ from 'lodash'
 import _map from 'lodash/map'
 import _set from 'lodash/set'
 import _get from 'lodash/get'
-import { CouchbaseModel, EmbeddedModel } from '../../db/model'
+import { CouchbaseModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { WorksheetRepository } from './worksheet'
@@ -15,11 +15,12 @@ import { Queue } from '../../types/constants'
 import { QueueItem, WorksheetQueue, WorksheetQueueBody } from '../../types/worksheet'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
+import uuid from 'uuid/v4'
 
-export class QueueItemRepository extends EmbeddedModel {
-  constructor () {
-    super()
-    this.Struct = QueueItem
+export class QueueItemRepository {
+  async save (data) {
+    const queueItem = QueueItem(data)
+    return t.update(queueItem, { id: { $set: data.id || uuid() } })
   }
 }
 
@@ -94,14 +95,11 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   async addWorksheetToQueue (queue, worksheetId) {
-    const itemRepo = new QueueItemRepository()
     const worksheetRepo = new WorksheetRepository()
     const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId)
-
     if (worksheet.queueId) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
-
     logger.info('WorksheetQueueRepository#addWorksheetToQueue worksheet to queue', {
       worksheetId: worksheet.id,
       queueId: queue.id
@@ -109,6 +107,8 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     )
 
     await worksheetRepo.save(t.update(worksheet, { queueId: { $set: queue.id } }))
+
+    const itemRepo = new QueueItemRepository()
     const item = await itemRepo.save({ worksheetId: worksheet.id })
     const updatedWorksheets = t.update(queue.worksheets, { $push: [ item ] })
     const updatedQueue = t.update(queue, {
