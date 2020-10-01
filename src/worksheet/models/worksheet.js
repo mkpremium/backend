@@ -74,7 +74,7 @@ function canRegisterVerified (worksheet, newStatus, operatorId) {
     return false
   }
 
-  if (newStatus !== WorkSheetStatus.WITH_OWNER) {
+  if (newStatus !== WorkSheetStatus.AVAILABLE) {
     return false
   }
 
@@ -196,7 +196,7 @@ export class WorksheetRepository extends CouchbaseModel {
         return WorkSheetStatus.INVALID
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
-        return WorkSheetStatus.WITH_OWNER
+        return WorkSheetStatus.AVAILABLE
       default:
         const meetings = await this.findMeetings(worksheet.id)
         if (meetings.length > 0) {

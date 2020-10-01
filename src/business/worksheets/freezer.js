@@ -77,7 +77,7 @@ async function pullOutFreezer (worksheets, buildingRepository) {
   const repository = new WorksheetRepository()
   const updatedWorksheets = worksheets.map(worksheet => {
     logger.info(`moving worksheet out freezer`, { statusChangedAt: worksheet.statusChangedAt, id: worksheet.id })
-    return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.WITH_OWNER)
+    return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.AVAILABLE)
   })
 
   if (updatedWorksheets.length === 0) {

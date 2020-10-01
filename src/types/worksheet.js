@@ -12,7 +12,7 @@ import { OwnerWithInclude } from './owner'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
-  WITH_OWNER: 'LOOKING_MEETING',
+  AVAILABLE: 'LOOKING_MEETING',
   INVALID: 'INVALID',
   NO_SALE: 'NO_SALE',
   ALREADY_SOLD: 'YA_VENDIO',
