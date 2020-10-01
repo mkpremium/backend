@@ -9,6 +9,7 @@ import { ScheduledEvent } from '../scheduled-events/types'
 import { Building } from './building'
 import { Address } from './common'
 import { OwnerWithInclude } from './owner'
+import { QueueItem, QueueStatus } from '../worksheet/models/queue-item'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -21,15 +22,6 @@ export const WorkSheetStatus = {
 }
 
 export const WorkSheetStatusEnum = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
-
-export const QueueStatus = {
-  AVAILABLE: 'AVAILABLE',
-  OPENED: 'OPENED',
-  SCHEDULED: 'SCHEDULED',
-  CLOSED: 'CLOSED'
-}
-
-export const WorkSheetQueueStatus = t.enums(QueueStatus, 'WorkSheetQueueStatus')
 
 export const WorkSheetCall = t.struct({
   ownerId: t.String,
@@ -109,26 +101,6 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
     lastAddedMeeting: { $set: null }
   })
 }
-
-export const QueueItem = t.struct(
-  {
-    id: t.maybe(t.String),
-    worksheetId: t.String,
-    operatorId: t.maybe(t.String),
-    status: WorkSheetQueueStatus,
-    addedAt: t.Date,
-    event: t.maybe(t.Any)
-  },
-  {
-    name: 'QueueItem',
-    defaultProps: {
-      status: QueueStatus.AVAILABLE,
-      get addedAt () {
-        return new Date()
-      }
-    }
-  }
-)
 
 export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),

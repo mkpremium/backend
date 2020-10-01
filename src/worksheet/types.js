@@ -1,5 +1,6 @@
 import t from 'tcomb'
-import { Worksheet, WorksheetQueueCount, WorkSheetQueueStatus, WorkSheetStatusEnum } from '../types/worksheet'
+import { Worksheet, WorksheetQueueCount, WorkSheetStatusEnum } from '../types/worksheet'
+import { WorkSheetQueueStatus } from './models/queue-item';
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
