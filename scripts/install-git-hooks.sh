@@ -1,3 +1,5 @@
 #!/usr/bin/env sh
 
-ln -s ./scripts/git-hooks/* .git/hooks/
+for hook in scripts/git-hooks/*; do
+  ln -fs "${PWD}/$hook" "${PWD}/.git/hooks/${hook##*/}"
+done
