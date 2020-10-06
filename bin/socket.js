@@ -21,7 +21,6 @@ const httpServer = Server(app)
 const server = httpServer.listen(socketConfig.port, listenHandler)
 
 Promise.all([
-  socket.initModel('bin-socket'),
   couchbase(app)
 ])
   .then(() => {

@@ -15,7 +15,6 @@ import owner from './owner'
 import calls from './calls'
 import scheduledEvents from './scheduled-events'
 import webhooks from './webhooks'
-import socket from './socket'
 import history from './history'
 import notes from './notes'
 import building from './building'
@@ -37,8 +36,7 @@ import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 const app = express()
 app.set('IS_READY', false)
 export const dependenciesPromise = Promise.all([
-  couchbase(app),
-  socket.initModel()
+  couchbase(app)
 ])
 
 dependenciesPromise.then(() => {
