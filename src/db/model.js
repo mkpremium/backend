@@ -8,7 +8,7 @@ import _ from 'lodash'
 import { logger } from '../infrastructure/logger'
 
 import init from './couchbase'
-import { couchbase, emitModelEvents } from '../../config'
+import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { ONE_WEEK } from '../lib/constants'
 
@@ -305,22 +305,9 @@ export class CouchbaseModel {
     // no post-save events operations on base model
   }
 
-  async sendEvent (eventName, data, sendEvent = emitModelEvents) {
-    const shouldEmitValue = sendEvent && this._socketPromise
-    logger.debug('model.sendEvent', { eventName, data, shouldEmitValue, sendEvent })
-    if (shouldEmitValue) {
-      logger.info('CouchbaseModel#sendEvent', { eventName, id: (data || {}).id })
-      const socket = await this._socketPromise
-      return socket.sendEvent(eventName, data)
-    } else {
-      return Promise.resolve()
-    }
-  }
-
   async save (data, sendEvent, opts = {}) {
     // noinspection JSCheckFunctionSignatures
     const struct = fromJSON(data, this.Struct)
-    const isNewData = !data.id
     const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })
     const dataPreSaved = await this.preSave(dataWithId)
 
@@ -334,8 +321,6 @@ export class CouchbaseModel {
     const model = fromJSON(result, this.Struct)
 
     if (result) {
-      const eventType = isNewData ? 'new' : data.id
-      await this.sendEvent(eventType, dataPreSaved, sendEvent)
       await this.postSave(model)
     }
 

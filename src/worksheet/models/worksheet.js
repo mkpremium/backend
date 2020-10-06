@@ -219,13 +219,6 @@ export class WorksheetRepository extends CouchbaseModel {
     return this.save(updatedWorksheet)
   }
 
-  async sendWorksheetEvent (worksheetId) {
-    const worksheet = await this.findById(worksheetId)
-    if (worksheet) {
-      return this.sendEvent(`${worksheet.id}`, worksheet)
-    }
-  }
-
   async addOwner (worksheet, owner) {
     const updatedWorksheet = t.update(worksheet, {
       relatedBuildingIds: {
@@ -283,22 +276,12 @@ export class WorksheetRepository extends CouchbaseModel {
     return _get(results, '0.count', 0)
   }
 
-  static async notifyWorkSheetChange (worksheetId) {
-    const worksheetRepo = new WorksheetRepository()
-    await worksheetRepo.sendWorksheetEvent(worksheetId)
-  }
-
   async updateWorkSheetStatus (worksheetId, operatorId) {
     const worksheetRepo = new WorksheetRepository()
     return worksheetRepo.updateStatus(worksheetId, operatorId)
   }
 
   static async notifyWorkSheetChangeByOwner (ownerId) {
-    const worksheetRepo = new WorksheetRepository()
-    const worksheet = await worksheetRepo.findWorksheetByOwner(ownerId)
-    if (worksheet) {
-      await WorksheetRepository.notifyWorkSheetChange(worksheet.id)
-    }
   }
 
   static async createNewForBuilding (building) {

@@ -158,7 +158,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
   async delete (id) {
     const scheduledEvent = await this.findByIdOrThrow(id)
     const qb = this.getQueryBuilder('delete').where('id = ?', id)
-    await this.sendWeekEvent(scheduledEvent)
     await this.query(qb)
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new WorksheetRepository()
@@ -226,11 +225,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     } else {
       return results
     }
-  }
-
-  async sendWeekEvent (scheduleEvent) {
-    const week = meetingWeekFormat(scheduleEvent.eventDate)
-    return this.sendEvent(week, scheduleEvent)
   }
 
   async preSave (scheduleEvent) {
