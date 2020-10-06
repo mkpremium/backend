@@ -3,7 +3,7 @@ import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../db/model'
-import { buildRangeFromWeek, meetingWeekFormat, utc } from '../lib/date'
+import { buildRangeFromWeek, utc } from '../lib/date'
 import { buildDistanceCalculator } from '../lib/geo'
 import { newHttpError } from '../lib/http-error'
 import {

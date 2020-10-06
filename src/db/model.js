@@ -1,5 +1,4 @@
 import t from 'tcomb'
-import Promise from 'bluebird'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import squel from 'squel'

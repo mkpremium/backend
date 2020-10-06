@@ -29,10 +29,10 @@ import { StockService } from '../stock/service/StockService'
 import { EventBus } from './EventBus'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
 import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
-import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository';
-import aws from 'aws-sdk';
-import { metadataS3Config } from '../../config';
-import { GetDocumentsSignedURLService } from '../building/service/GetDocumentsSignedURLService';
+import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository'
+import aws from 'aws-sdk'
+import { metadataS3Config } from '../../config'
+import { GetDocumentsSignedURLService } from '../building/service/GetDocumentsSignedURLService'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
