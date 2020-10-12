@@ -2,7 +2,6 @@ import _ from 'lodash'
 import _get from 'lodash/get'
 import mime from 'mime-types'
 import t from 'tcomb'
-import { emitModelEvents } from '../../config'
 import { cleanUrl, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
 import '../firebase'
@@ -97,11 +96,9 @@ export class BuildingRepository extends CouchbaseModel {
 
   static async createNewBuilding (data) {
     const json = toJSON(data)
-    const _migrateId = lookUpMigrateId(data)
-    const updatedJson = Object.assign({}, json, { _migrateId })
-    const building = Building(updatedJson)
+    const building = Building(json)
     const repo = new BuildingRepository()
-    return repo.save(building, emitModelEvents)
+    return repo.save(building)
   }
 
   async addMetadataToBuilding (building, params) {
@@ -195,12 +192,4 @@ export function calculateElements ({ commons }, entities) {
     average,
     commons
   }
-}
-
-function lookUpMigrateId (data) {
-  const migrateId = _get('data', '_migrateId')
-  const reference = _.get(data, 'cadastre.reference')
-  const fullAddress = _.get(data, 'address.fullAddress')
-
-  return migrateId || reference || fullAddress
 }
