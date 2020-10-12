@@ -28,31 +28,6 @@ export const OperatorRole = t.enums.of(Object.values(OperatorRoles))
 export const OperatorFirebaseStatesEnum = t.enums.of(Object.values(OperatorFirebaseStates))
 export const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
-/**
- * @swagger
- * definitions:
- *   OperatorProfile:
- *     properties:
- *       firstName:
- *         type: string
- *       lastName:
- *         type: string
- *       city:
- *         type: array
- *         items:
- *           type: string
- *       neighborhood:
- *         type: string
- *       state:
- *         type: string
- *         description: Estado en Firebase [A P B]
- *       queueId:
- *         type: string
- *         description: Id de la cola al cual ha sido asignado el operador
- *     required:
- *       - firstName
- *       - lastName
- */
 export const OperatorProfile = t.OperatorProfile = t.struct(
   {
     firstName: t.String,
@@ -114,52 +89,6 @@ const OperatorSignatures = t.struct({
   city: Signature
 })
 
-/**
- * @swagger
- * definitions:
- *  Operator:
- *    required:
- *      - username
- *      - password
- *      - agentNumber
- *      - roles
- *    properties:
- *      id:
- *        type: string
- *        format: uuid/v4
- *      username:
- *        type: string
- *      email:
- *        type: string
- *        description: Email para uso en firebase
- *      password:
- *        type: string
- *      agentNumber:
- *        type: string
- *        description: "Numero de Agente en Firebase, código y extension en call center"
- *      level:
- *        type: number
- *        description: Nivel en Firebase
- *      enable:
- *        type: boolean
- *      profile:
- *        $ref: "#/definitions/OperatorProfile"
- *      roles:
- *        type: array
- *        items:
- *          type: string
- *      restringedHours:
- *        $ref: "#/definitions/RestringedHours"
- *      features:
- *        type: array
- *        items:
- *          type: string
- *        description: "Funciones o Permisos en Firebase"
- *      createdAt:
- *        type: string
- *      disabledAt:
- *        type: string
- */
 export const Operator = t.struct(
   {
     id: t.maybe(t.String),
