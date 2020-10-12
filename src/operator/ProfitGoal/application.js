@@ -1,6 +1,5 @@
 import { OperatorRepository } from '../models'
 import t from 'tcomb'
-import { ProfitGoalFirebaseRepository } from './models'
 import fromJSON from 'tcomb/lib/fromJSON'
 
 import { ProfitGoalRequest } from './types'
@@ -21,9 +20,6 @@ export async function setProfitGoalToOperator (data, now = () => new Date()) {
   const updatedOperator = t.update(operator, { profitGoal: { $set: profitGoal } })
 
   const result = await operatorRepository.save(updatedOperator)
-
-  const profitGoalFirebaseRepository = new ProfitGoalFirebaseRepository()
-  await profitGoalFirebaseRepository.saveProfitGoalToFirebaseUser(profitGoal, operator.id)
 
   return result
 }
