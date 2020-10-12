@@ -17,10 +17,6 @@ t.AuthenticatedResponse = t.struct({
     name: t.String,
     username: t.String
   }, 'Operator'),
-  firebase: t.maybe(t.struct({
-    token: t.String,
-    databaseURL: t.String
-  }, 'firebase')),
   roles: t.list(t.String)
 }, 'AuthenticatedResponse')
 

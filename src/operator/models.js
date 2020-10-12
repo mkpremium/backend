@@ -6,7 +6,6 @@ import fromJSON from 'tcomb/lib/fromJSON'
 
 import { jwt, saltFactor } from '../../config'
 import { CouchbaseModel } from '../db/model'
-import { firebaseSetup } from '../firebase'
 import { newHttpError } from '../lib/http-error'
 import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
@@ -108,7 +107,6 @@ class Operator extends CouchbaseModel {
 
     const { refreshToken } = await OperatorRefreshTokenRepository.createToken(operator)
     const token = await OperatorRepository.createToken(tokenPayload)
-    const firebase = await firebaseSetup(operator.id)
 
     return t.AuthenticatedResponse({
       refreshToken,
@@ -116,8 +114,7 @@ class Operator extends CouchbaseModel {
       access_token: token,
       token_type: 'bearer',
       roles: operator.roles,
-      operator: tokenPayload.operator,
-      firebase
+      operator: tokenPayload.operator
     })
   }
 }
