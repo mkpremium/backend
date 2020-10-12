@@ -7,17 +7,15 @@ const BuildingLocation = t.struct({
   lng: t.Number
 }, 'BuildingLocation')
 
-const BaseBuilding = t.struct({
+const BuildingByAddress = t.struct({
   location: BuildingLocation,
   address: Address
 })
 
-export const BuildingByCadastre = BaseBuilding
+export const BuildingByCadastre = BuildingByAddress
   .extend({
     cadastre: t.maybe(BuildingCadastre)
   }, 'BuildingByCadastre')
-
-export const BuildingByAddress = BaseBuilding.extend({}, 'BuildingByAddress')
 
 export const CreateBuildingInput = t.union([BuildingCadastre, BuildingByAddress])
 CreateBuildingInput.dispatch = function (input) {
