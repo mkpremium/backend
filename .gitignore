@@ -3,6 +3,8 @@
 logs
 *.log
 node_modules
+node_modules-*
+built
 
 # Files used by tools like istanbul, mocha
 test-results.xml
