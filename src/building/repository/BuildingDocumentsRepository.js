@@ -13,7 +13,7 @@ export class BuildingDocumentsRepository {
 
   documentsOfBuilding (buildingId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(buildingDocumentsQuery), [ buildingId ]
+      N1qlQuery.fromString(buildingDocumentsQuery).consistency(N1qlQuery.Consistency.REQUEST_PLUS), [ buildingId ]
     ).then(docs => docs.map(({ id, url, mimeType }) => ({ documentId: id, privateUrl: url, mimeType })))
   }
 }
