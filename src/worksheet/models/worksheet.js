@@ -140,6 +140,15 @@ export class WorksheetRepository extends CouchbaseModel {
 
     const results = await this.query(qb)
 
+    if (results.length === 0) {
+      throw new (class extends Error {
+        constructor () {
+          super('No Worksheet found for building')
+          this.buildingId = buildingId
+        }
+      })()
+    }
+
     return fromJSON(_head(results), Worksheet)
   }
 
