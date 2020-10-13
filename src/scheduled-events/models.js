@@ -240,10 +240,6 @@ export class ScheduledEventsRepository extends ScheduledEvents {
     }
     return scheduleEvent
   }
-
-  async postSave (scheduleEvent) {
-    return this.sendWeekEvent(scheduleEvent)
-  }
 }
 
 function areAllowedMeetingMinutes (time, allowedMinutes = [ 0, 30 ]) {
