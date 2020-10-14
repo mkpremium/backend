@@ -143,14 +143,14 @@ export const Building = t.struct(
     landArea: t.union([t.Number, t.String]),
     roofArea: t.union([t.Number, t.String]),
     coefficient: t.union([t.Number, t.String]),
-    use: t.maybe(t.String), // FIXME: define this as a t.enums
-    propertyType: t.maybe(t.String), // FIXME: define this as a t.enums
+    use: t.maybe(t.String),
+    propertyType: t.maybe(t.String),
     buildingDate: t.union([t.Number, t.String]),
     location: BuildingLocation,
     elements: t.maybe(t.Elements),
     entities: t.list(t.BuildingEntity),
     ownerId: t.maybe(t.String),
-    owner: t.maybe(BuildingOwner), // TODO: move to owners collection
+    owner: t.maybe(BuildingOwner),
     state: BuildingStateEnum,
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),

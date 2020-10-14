@@ -1,15 +1,15 @@
-import { logger } from '../infrastructure/logger'
 import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
 import t from 'tcomb'
+import { logger } from '../infrastructure/logger'
 import { utc } from '../lib/date'
-import '../owner/types'
 import { OwnerWithInclude } from '../owner/owner'
+import '../owner/types'
 import { ScheduledEvent } from '../scheduled-events/types'
+import { QueueItem, QueueStatus } from '../worksheet/models/queue-item'
 import { Building } from './building'
 import { Address } from './common'
-import { QueueItem, QueueStatus } from '../worksheet/models/queue-item'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',

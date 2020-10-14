@@ -24,7 +24,7 @@ import { ScheduledEvents } from '../../scheduled-events/models'
 import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
-import { OwnerBusinessStatus, OwnerStatus } from '../../types/enums'
+import { OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
 import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 
@@ -168,11 +168,13 @@ export class WorksheetRepository extends CouchbaseModel {
 
   static mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
     switch (negotiationStatus) {
-      case OwnerBusinessStatus.DISCARDED:
+      case 'DESCARTADO':
         return WorkSheetStatus.PUBLIC
-      case OwnerBusinessStatus.NO_SALE:
+      case 'NO VENDE':
         return WorkSheetStatus.NO_SALE
-      case OwnerBusinessStatus.ALREADY_SOLD:
+      case 'YA VENDIO':
+        return WorkSheetStatus.ALREADY_SOLD
+      case 'VENDIDO':
         return WorkSheetStatus.INVALID
       default:
         return WorkSheetStatus.MEETING
@@ -180,8 +182,9 @@ export class WorksheetRepository extends CouchbaseModel {
   }
 
   async calculateFixedStatus (worksheet) {
-    if (worksheet.relatedBuildings && worksheet.relatedBuildings.length > 0) {
-      return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(worksheet.relatedBuildings[ 0 ].negotiationStatus)
+    const relatedBuilding = worksheet.relatedBuildings[ 0 ]
+    if (relatedBuilding.negotiationStatus) {
+      return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(relatedBuilding.negotiationStatus)
     }
 
     const ownersStatus = worksheet.relatedOwners
@@ -195,13 +198,7 @@ export class WorksheetRepository extends CouchbaseModel {
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.PUBLIC):
         return WorkSheetStatus.PUBLIC
-      case _some(ownersStatus,
-        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.NO_SALE):
-        return WorkSheetStatus.NO_SALE
-      case _some(ownersStatus,
-        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.ALREADY_SOLD):
-        return WorkSheetStatus.ALREADY_SOLD
-      case _every(ownersStatus, ({ status }) => status === OwnerStatus.ERROR):
+      case _every(ownersStatus, ({ status }) => !![ OwnerStatus.ERROR, OwnerStatus.WITHOUT_CONTACT ].find(status)):
         return WorkSheetStatus.INVALID
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
