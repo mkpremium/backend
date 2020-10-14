@@ -63,7 +63,7 @@ export const SimplePhoneNumber = t.SimplePhoneNumber = t.struct(
   }
 )
 
-export const ContactInfoStatus = t.TypedContactInfoStatus = t.enums({
+export const ContactInfoStatus = t.enums({
   UNDEFINED: 'UNDEFINED',
   GOOD: 'GOOD',
   BAD: 'BAD'
@@ -75,7 +75,7 @@ export const TypedContactInfo = t.struct(
     type: TypeContact,
     value: t.String,
     note: t.maybe(t.String),
-    status: t.TypedContactInfoStatus
+    status: ContactInfoStatus
   },
   {
     name: 'TypedContactInfo',
@@ -111,7 +111,7 @@ t.TypedContactInfoUpdate = t.struct(
     type: t.maybe(TypeContact),
     value: t.maybe(t.String),
     note: t.maybe(t.String),
-    status: t.maybe(t.TypedContactInfoStatus)
+    status: t.maybe(ContactInfoStatus)
   },
   {
     name: 'TypedContactInfoUpdate'
