@@ -1,5 +1,5 @@
 # Build container
-FROM node:9
+FROM node:12
 
 RUN ["npm", "install", "-g", "npm"]
 
@@ -20,7 +20,7 @@ WORKDIR /app/build
 RUN ["npm", "install", "--production"]
 
 # Run container
-FROM node:9
+FROM node:12
 
 RUN ["mkdir", "/app"]
 WORKDIR /app
