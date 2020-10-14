@@ -12,9 +12,8 @@ describe('Building owner contacts management', () => {
     owner = await createOwner(app)
   })
 
-  it('modifies a contact', async () => {
-    const contactInfoToUpdate = { status: 'BAD' }
-    await authenticatedPut(`/owners/${owner.id}/contacts/${testPhoneContactId}`, businessUser, app, contactInfoToUpdate)
+  it('updates contact status', async () => {
+    await authenticatedPut(`/owners/${owner.id}/contacts/${testPhoneContactId}/status`, businessUser, app, { status: 'BAD' })
       .then(async (response) => {
         expect(response.status).to.be.equal(204)
         const { ownerRepository } = app.locals.legacyDependenciesContainer
