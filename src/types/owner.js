@@ -54,7 +54,7 @@ Person.prototype.fullName = function () {
   return `${this.name}`.trim()
 }
 
-t.OwnerConfirmed = t.struct({
+export const OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
   confirmedAt: t.maybe(t.Date)
@@ -80,7 +80,7 @@ export const Owner = t.struct(
 
     note: t.maybe(t.String),
 
-    confirmedByOperator: t.OwnerConfirmed,
+    confirmedByOperator: OwnerConfirmed,
     featuredContact: t.maybe(FeaturedContact),
 
     _documentType: t.String
