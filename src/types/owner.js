@@ -1,5 +1,4 @@
 import _find from 'lodash/find'
-import _get from 'lodash/get'
 import t from 'tcomb'
 import { Building } from './building'
 import { SimpleAddress, TypedContactInfo } from './common'
@@ -45,11 +44,6 @@ export const OwnerBody = t.struct(
     }
   }
 )
-
-Person.prototype.findFirstGoodContact = function () {
-  const contact = _find(this.contacts, { status: 'GOOD' }, {})
-  return _get(contact, 'value')
-}
 
 Person.prototype.findContactById = function (id) {
   return _find(this.contacts, { id })
@@ -121,12 +115,6 @@ Owner.prototype.pullOutFreezer = function (newStatus) {
   return t.update(this, {
     status: { $set: newStatus }
   })
-}
-
-Owner.prototype.findFirstGoodContact = function () {
-  if (this.person) {
-    return this.person.prototype.findFirstGoodContact()
-  }
 }
 
 Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
