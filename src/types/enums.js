@@ -37,7 +37,8 @@ export const OwnerStatus = {
   NO_SALE: 'NO_VENDE',
   ALREADY_SOLD: 'YA_VENDIO',
   ERROR: 'ERRONEO',
-  PUBLIC: 'ENTE_PUBLICO'
+  PUBLIC: 'ENTE_PUBLICO',
+  WITHOUT_CONTACT: 'WITHOUT_CONTACT'
 }
 
 export const OwnerBusinessStatus = {

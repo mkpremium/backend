@@ -42,11 +42,11 @@ export const createWorksheetForBuilding = async (app, building) => {
   await WorksheetRepository.createNewForBuilding(building)
 }
 
-export const createOwner = async (app) => {
+export const createOwner = async (app, { status } = { status: OwnerStatus.VERIFIED }) => {
   const { ownerRepository } = app.locals.legacyDependenciesContainer
 
   return ownerRepository.createOwnerAndPerson({
-    status: OwnerStatus.VERIFIED,
+    status,
     person: {
       name: testOwnerName,
       firstName: testOwnerFirstName,

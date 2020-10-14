@@ -1,8 +1,9 @@
+import _ from 'lodash'
 import _find from 'lodash/find'
 import t from 'tcomb'
 import { Building } from './building'
 import { SimpleAddress, TypedContactInfo } from './common'
-import { OwnerStatusEnum, OwnerTypeEnum } from './enums'
+import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from './enums'
 
 export const Person = t.struct(
   {
@@ -126,5 +127,26 @@ Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
         confirmedAt: new Date()
       }
     })
+  })
+}
+
+Owner.prototype.updateContact = function (contactId, data) {
+  const contact = this.person.contacts.find(c => c.id === contactId)
+  if (!contact) {
+    throw new Error(`Contact "${contactId}" not found in owner "${this.id}"`)
+  }
+  const otherContacts = this.person.contacts.filter(c => c.id !== contactId)
+
+  const contacts = [ { ...contact, ...data, id: contactId }, ...otherContacts ]
+  const updatedStatus = _.some(contacts, c => c.status === 'GOOD') ? OwnerStatus.VERIFIED
+    : (_.every(contacts, c => c.status === 'BAD') ? OwnerStatus.WITHOUT_CONTACT : this.status)
+
+  return t.update(this, {
+    $merge: {
+      status: updatedStatus,
+      person: t.update(this.person, {
+        $merge: { contacts }
+      })
+    }
   })
 }

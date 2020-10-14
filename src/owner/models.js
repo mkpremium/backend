@@ -81,21 +81,7 @@ export class OwnerRepository extends CouchbaseModel {
 
   async patchContact (ownerId, contactId, data) {
     const owner = await this.findByIdOrThrow(ownerId)
-    const contact = owner.person.contacts.find(c => c.id === contactId)
-    if (!contact) {
-      throw new Error(`Contact "${contactId}" not found in owner "${ownerId}"`)
-    }
-    const otherContacts = owner.person.contacts.filter(c => c.id !== contactId)
-
-    const updatedOwner = t.update(owner, {
-      $merge: {
-        person: t.update(owner.person, {
-          $merge: {
-            contacts: [ { ...contact, ...data, id: contactId }, ...otherContacts ]
-          }
-        })
-      }
-    })
+    const updatedOwner = owner.updateContact(contactId, data)
 
     return this.save(updatedOwner)
   }
