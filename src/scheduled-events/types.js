@@ -1,8 +1,8 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { isMaybeTesting } from '../../config'
+import { OwnerWithInclude } from '../owner/owner'
 import { Building } from '../types/building'
-import { OwnerWithInclude } from '../types/owner'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',

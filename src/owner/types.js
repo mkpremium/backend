@@ -4,8 +4,8 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { isTest } from '../../config'
 import { TypedContactInfo } from '../types/common'
-import { OwnerConfirmed, OwnerWithInclude } from '../types/owner'
 import { OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
+import { OwnerConfirmed, OwnerWithInclude } from './owner'
 
 t.OwnerCompactView = t.struct(
   {

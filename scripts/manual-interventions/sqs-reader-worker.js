@@ -1,4 +1,4 @@
-const { Person } = require('../../src/types/owner')
+const { Person } = require('../../src/owner/owner')
 
 const { config } = require('dotenv')
 config()

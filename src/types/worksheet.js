@@ -5,10 +5,10 @@ import _findIndex from 'lodash/findIndex'
 import t from 'tcomb'
 import { utc } from '../lib/date'
 import '../owner/types'
+import { OwnerWithInclude } from '../owner/owner'
 import { ScheduledEvent } from '../scheduled-events/types'
 import { Building } from './building'
 import { Address } from './common'
-import { OwnerWithInclude } from './owner'
 import { QueueItem, QueueStatus } from '../worksheet/models/queue-item'
 
 export const WorkSheetStatus = {

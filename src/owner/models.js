@@ -9,10 +9,10 @@ import { BuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { TypedContactInfo } from '../types/common'
-import { Owner, OwnerBody, Person } from '../types/owner'
 import { OperatorRepository } from '../operator/models'
 import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
 import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { Owner, OwnerBody, Person } from './owner'
 import { OwnerListQuery } from './types'
 
 function ownerIncludes (qb, includes) {

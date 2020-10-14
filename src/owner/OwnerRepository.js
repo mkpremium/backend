@@ -1,5 +1,5 @@
-import { Owner } from '../types/owner'
 import t from 'tcomb'
+import { Owner } from './owner'
 
 export class OwnerRepository {
   constructor (couchbaseAdapter) {
