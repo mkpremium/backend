@@ -2,10 +2,9 @@ import _ from 'lodash'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { Building } from './building'
 import { SimpleAddress, TypedContactInfo } from './common'
-import { OwnerStatusEnum, OwnerType, OwnerTypeEnum } from './enums'
+import { OwnerStatusEnum, OwnerTypeEnum } from './enums'
 
 export const Person = t.struct(
   {
@@ -141,14 +140,6 @@ Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
       }
     })
   })
-}
-
-export function familyOwner (data) {
-  const owner = fromJSON(data, Owner)
-  return [
-    OwnerType.PRINCIPAL,
-    OwnerType.SECONDARY
-  ].indexOf(owner.type) !== -1
 }
 
 function sortByConfirmedAt (a, b) {
