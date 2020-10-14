@@ -129,7 +129,8 @@ export const buildingNegotiationStatus = [
   'COMPRADO',
   'VENDIDO',
   'NO VENDE',
-  'DESCARTADO'
+  'DESCARTADO',
+  'YA VENDIO'
 ]
 
 export const Building = t.struct(
