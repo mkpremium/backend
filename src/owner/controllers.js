@@ -14,8 +14,7 @@ async function updateOwnerContact (req, res) {
   const contextModel = { _documentType: 'owner-contact', contactId }
 
   const repo = new OwnerRepository()
-  await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
-  await repo.updateContact(ownerId, contactId, req.body)
+  await repo.patchContact(ownerId, contactId, req.body)
   await History.registerUpdate({ contextModel, user: req.user })
 
   res.status(204).send()

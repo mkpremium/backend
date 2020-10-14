@@ -79,7 +79,7 @@ export class OwnerRepository extends CouchbaseModel {
     return result.map(mapOwnerIncludes)
   }
 
-  async updateContact (ownerId, contactId, data) {
+  async patchContact (ownerId, contactId, data) {
     const owner = await this.findByIdOrThrow(ownerId)
     const contact = owner.person.contacts.find(c => c.id === contactId)
     if (!contact) {
@@ -91,7 +91,7 @@ export class OwnerRepository extends CouchbaseModel {
       $merge: {
         person: t.update(owner.person, {
           $merge: {
-            contacts: [ { id: contactId, ...data }, ...otherContacts ]
+            contacts: [ { ...contact, ...data, id: contactId }, ...otherContacts ]
           }
         })
       }

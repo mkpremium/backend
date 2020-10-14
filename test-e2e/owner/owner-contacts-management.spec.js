@@ -13,11 +13,7 @@ describe('Building owner contacts management', () => {
   })
 
   it('modifies a contact', async () => {
-    const contactInfoToUpdate = {
-      type: 'EMAIL',
-      value: 'test@example.org',
-      status: 'GOOD'
-    }
+    const contactInfoToUpdate = { status: 'BAD' }
     await authenticatedPut(`/owners/${owner.id}/contacts/${testPhoneContactId}`, businessUser, app, contactInfoToUpdate)
       .then(async (response) => {
         expect(response.status).to.be.equal(204)
@@ -25,10 +21,12 @@ describe('Building owner contacts management', () => {
         const savedOwner = await ownerRepository.findById(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(1)
-        expect(savedOwner.person.contacts[ 0 ]).to.be.deep.equal({
+        expect(savedOwner.person.contacts[0]).to.be.deep.equal({
           id: testPhoneContactId,
           note: null,
-          ...contactInfoToUpdate
+          type: 'TELEFONO',
+          status: 'BAD',
+          value: testContactPhone
         })
       })
   })
@@ -47,7 +45,7 @@ describe('Building owner contacts management', () => {
         const savedOwner = await ownerRepository.findById(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(2)
-        expect(savedOwner.person.contacts[ 1 ]).to.include(contactInfoToAdd)
+        expect(savedOwner.person.contacts[1]).to.include(contactInfoToAdd)
       })
   })
 
@@ -57,7 +55,7 @@ describe('Building owner contacts management', () => {
         expect(response.status).to.be.equal(200)
 
         expect(response.body.results).to.have.lengthOf(1)
-        expect(response.body.results[ 0 ]).to.include({
+        expect(response.body.results[0]).to.include({
           id: owner.id
         })
       })
