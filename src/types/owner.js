@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import t from 'tcomb'
@@ -140,42 +139,4 @@ Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
       }
     })
   })
-}
-
-function sortByConfirmedAt (a, b) {
-  const valueA = _.get(a, 'confirmedByOperator.confirmedAt', null)
-  const valueB = _.get(b, 'confirmedByOperator.confirmedAt', null)
-
-  if (valueB === null) {
-    return -1
-  }
-
-  if (valueA === null) {
-    return 1
-  }
-
-  if (valueA < valueB) {
-    return 1
-  }
-
-  if (valueB > valueA) {
-    return -1
-  }
-
-  return 0
-}
-
-if (require.main === module) {
-  const original = [
-    { confirmedByOperator: { confirmedAt: '2019-03-08T16:36:33.390Z' } },
-    { confirmedByOperator: null },
-    { confirmedByOperator: { confirmedAt: '2019-03-11T13:38:01.453Z' } },
-    { confirmedByOperator: null },
-    { confirmedByOperator: null }
-  ]
-
-  console.log('ORIGINAL', original)
-
-  const sorted = original.sort(sortByConfirmedAt)
-  console.log('SORTED  ', sorted)
 }
