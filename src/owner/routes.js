@@ -12,6 +12,7 @@ const router = Router()
 router.put('/:id', updateOwnerController)
 
 router.put('/:id/contacts/:contactId', updateOwnerContactController)
+router.put('/:id/contacts/:contactId/status', updateOwnerContactController)
 
 router.post('/:id/contacts', addOwnerContactController)
 
