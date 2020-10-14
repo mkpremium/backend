@@ -79,9 +79,9 @@ export class OwnerRepository extends CouchbaseModel {
     return result.map(mapOwnerIncludes)
   }
 
-  async patchContact (ownerId, contactId, data) {
+  async changeContactStatus (ownerId, contactId, newStatus) {
     const owner = await this.findByIdOrThrow(ownerId)
-    const updatedOwner = owner.updateContact(contactId, data)
+    const updatedOwner = owner.changeContactStatus(contactId, newStatus)
 
     return this.save(updatedOwner)
   }

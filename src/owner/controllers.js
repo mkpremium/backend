@@ -8,13 +8,14 @@ import { OwnerNotFound } from './OwnerRepository'
 import { EmptyFeaturedContact } from './SetOwnerFeaturedContactService'
 import t from './types'
 
-async function updateOwnerContact (req, res) {
+async function updateOwnerContactStatus (req, res) {
   const ownerId = req.params.id
   const contactId = req.params.contactId
   const contextModel = { _documentType: 'owner-contact', contactId }
 
+  const { status } = req.body
   const repo = new OwnerRepository()
-  await repo.patchContact(ownerId, contactId, req.body)
+  await repo.changeContactStatus(ownerId, contactId, status)
   await History.registerUpdate({ contextModel, user: req.user })
 
   res.status(204).send()
@@ -46,7 +47,7 @@ async function addOwnerContact (req, res) {
   const contextModel = await repo.addContact(ownerId, req.body)
   await History.registerCreate({ contextModel, user: req.user })
   await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
-  const [updatedOwner] = await repo.findByIdWithIncludes(ownerId, ['building'])
+  const [ updatedOwner ] = await repo.findByIdWithIncludes(ownerId, [ 'building' ])
   res.json(updatedOwner)
 }
 
@@ -56,7 +57,7 @@ async function ownerList (req, res) {
   res.json(owners)
 }
 
-export const updateOwnerContactController = wrap(updateOwnerContact)
+export const updateOwnerContactController = wrap(updateOwnerContactStatus)
 export const updateOwnerController = wrap(updateOwner)
 export const addOwnerContactController = wrap(addOwnerContact)
 export const listOwnerController = wrap(ownerList)

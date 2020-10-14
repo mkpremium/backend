@@ -26,18 +26,18 @@ describe('LegacyOwnerRepository', () => {
     })
   })
 
-  describe('patchContact', () => {
+  describe('changeContactStatus', () => {
     it('marks owner as VERIFIED when at least one at least one contact is GOOD', async () => {
       expect(owner.status).to.be.equal(OwnerStatus.NON_VERIFIED)
 
-      const updatedOwner = await legacyOwnerRepository.patchContact(owner.id, testPhoneContactId, { status: 'GOOD' })
+      const updatedOwner = await legacyOwnerRepository.changeContactStatus(owner.id, testPhoneContactId, 'GOOD')
       expect(updatedOwner.status).to.be.equal(OwnerStatus.VERIFIED)
     })
 
     it('marks owner as WITHOUT_CONTACT when all contacts are BAD', async () => {
       expect(owner.status).to.be.equal(OwnerStatus.NON_VERIFIED)
 
-      const updatedOwner = await legacyOwnerRepository.patchContact(owner.id, testPhoneContactId, { status: 'BAD' })
+      const updatedOwner = await legacyOwnerRepository.changeContactStatus(owner.id, testPhoneContactId, 'BAD')
       expect(updatedOwner.status).to.be.equal(OwnerStatus.WITHOUT_CONTACT)
     })
   })

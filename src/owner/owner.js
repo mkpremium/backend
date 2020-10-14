@@ -126,14 +126,14 @@ Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   })
 }
 
-Owner.prototype.updateContact = function (contactId, data) {
+Owner.prototype.changeContactStatus = function (contactId, newStatus) {
   const contact = this.person.contacts.find(c => c.id === contactId)
   if (!contact) {
     throw new Error(`Contact "${contactId}" not found in owner "${this.id}"`)
   }
   const otherContacts = this.person.contacts.filter(c => c.id !== contactId)
 
-  const contacts = [ { ...contact, ...data, id: contactId }, ...otherContacts ]
+  const contacts = [ { ...contact, status: newStatus, id: contactId }, ...otherContacts ]
   const updatedStatus = _.some(contacts, c => c.status === 'GOOD') ? OwnerStatus.VERIFIED
     : (_.every(contacts, c => c.status === 'BAD') ? OwnerStatus.WITHOUT_CONTACT : this.status)
 
