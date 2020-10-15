@@ -158,6 +158,7 @@ export const Building = t.struct(
     negotiationStatus: NegotiationStatus,
     assignedAgentId: t.maybe(t.String),
     salePrice: t.maybe(t.Number),
+    isTest: t.maybe(t.Boolean),
 
     metadata: t.list(BuildingMetadataPreview),
 

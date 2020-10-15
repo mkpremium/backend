@@ -34,7 +34,8 @@ export const createBuildingFactory = (buildingRepository, createOwner, createBui
         number: '08820',
         verified: false
       },
-      city: 'TEST_PORTO'
+      city: 'TEST_PORTO',
+      isTest: true
     },
     location: {}
   }
