@@ -16,6 +16,7 @@ export const createBuildingWorksheetFactory = worksheetRepository => req => {
     id: uuid(),
     relatedBuildingIds: [ building.id ],
     buildingId: building.id,
+    buildingAddress: building.address,
     relatedOwnersId: [ ownerId ],
     status: status || WorkSheetStatus.AVAILABLE
   }))

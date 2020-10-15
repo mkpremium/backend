@@ -36,6 +36,7 @@ export const Worksheet = t.struct({
   queueId: t.maybe(t.String),
 
   relatedBuildingIds: t.list(t.String),
+  // buildingId: t.String,
   relatedBuildings: t.list(Building),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.list(OwnerWithInclude),

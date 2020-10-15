@@ -21,9 +21,7 @@ export function createTestHarness (app, dependenciesContainer) {
     wrap(
       async (req, res) => {
         const createBuildingReq = CreateBuildingRequest(req.body)
-        const building = await createBuilding(createBuildingReq)
-
-        res.status(204).json(building)
+        res.json(await createBuilding(createBuildingReq))
       }
     )
   )
