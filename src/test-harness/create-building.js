@@ -42,9 +42,9 @@ export const createBuildingFactory = (buildingRepository, createOwner, createBui
         number: '08820',
         verified: false
       },
-      city: 'TEST_PORTO',
-      isTest: true
+      city: 'TEST_PORTO'
     },
+    isTest: true,
     location: {}
   }
   const building = await buildingRepository.save({ ...buildingPrototype, ...req.building })
