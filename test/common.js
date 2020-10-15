@@ -118,19 +118,3 @@ export async function operatorCreateManager (queueId) {
     }
   })
 }
-
-export async function operatorCreateStreetManager () {
-  return createFullOperator({
-    username: 'street_manager',
-    password: 'Passw0rd',
-    agentNumber: 'street_manager',
-    roles: [
-      'STREET_MANAGER'
-    ],
-    profile: {
-      firstName: 'street_manager',
-      lastName: 'operator',
-      city: 'barcelona'
-    }
-  })
-}
