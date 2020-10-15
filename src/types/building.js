@@ -133,6 +133,7 @@ export const buildingNegotiationStatus = [
   'YA VENDIO'
 ]
 
+export const NegotiationStatus = t.enums.of(buildingNegotiationStatus)
 export const Building = t.struct(
   {
     id: t.String,
@@ -154,7 +155,7 @@ export const Building = t.struct(
     state: BuildingStateEnum,
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),
-    negotiationStatus: t.enums.of(buildingNegotiationStatus),
+    negotiationStatus: NegotiationStatus,
     assignedAgentId: t.maybe(t.String),
     salePrice: t.maybe(t.Number),
 

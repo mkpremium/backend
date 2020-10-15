@@ -10,6 +10,7 @@ import './types'
 import { createDependenciesContainer, createLegacyDependenciesContainer } from './infrastructure/dependencies'
 // modules
 import operator from './operator'
+import { createTestHarness } from './test-harness/routes'
 import worksheet from './worksheet'
 import owner from './owner'
 import calls from './calls'
@@ -53,6 +54,7 @@ dependenciesPromise.then(() => {
   owner(app, dependenciesContainer)
   scheduledEvents(app, dependenciesContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer)
+  createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)
   app.use(appErrorHandler)
 

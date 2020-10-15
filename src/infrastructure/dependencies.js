@@ -26,8 +26,9 @@ import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
 import { StockService } from '../stock/service/StockService'
+import { WorksheetRepository } from '../worksheet/worksheet-repository'
 import { EventBus } from './EventBus'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet'
 import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
 import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository'
 import aws from 'aws-sdk'
@@ -41,7 +42,7 @@ export const createLegacyDependenciesContainer = () => {
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
   container.scheduledEventsRepository = new ScheduledEventsRepository()
-  container.worksheetRepository = new WorksheetRepository()
+  container.worksheetRepository = new LegacyWorksheetRepository()
   container.metadataRepository = new MetadataRepository()
 
   return container
@@ -65,6 +66,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.setOwnerFeaturedContactService = new SetOwnerFeaturedContactService(container.ownerRepository)
 
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
+  container.buildingRepository = buildingRepository
   container.featuredOwnerService = new FeaturedOwnerService(buildingRepository)
   container.usersRepository = usersRepository
   container.addFavoriteBuildingService = new AddFavoriteBuildingService(usersRepository)
@@ -75,6 +77,8 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
+
+  container.worksheetRepository = new WorksheetRepository(couchbaseAdapter)
 
   const eventBus = new EventBus()
   container.eventBus = eventBus

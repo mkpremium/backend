@@ -1,0 +1,47 @@
+import uuid from 'uuid/v4'
+import { Owner } from '../owner/owner'
+import { TypedContactInfo } from '../types/common'
+import { OwnerStatus, OwnerStatusEnum, OwnerType } from '../types/enums'
+import t from 'tcomb'
+
+export const CreateOwnerCmd = t.struct({
+  name: t.maybe(t.String),
+  firstName: t.maybe(t.String),
+  contacts: t.maybe(t.list(TypedContactInfo)),
+  status: t.maybe(OwnerStatusEnum),
+  buildingId: t.maybe(t.String),
+  type: t.maybe(t.enums(OwnerType))
+}, {
+  defaultProps: {
+    name: 'Owner Full Name',
+    person: {
+      name: 'Owner Full Name',
+      firstName: 'Owner First Name',
+      contacts: []
+    },
+    status: OwnerStatus.NON_VERIFIED,
+    type: 'PRINCIPAL'
+  }
+})
+
+CreateOwnerCmd.prototype.toOwner = function (id) {
+  return {
+    id,
+    name: this.name,
+    buildingId: this.buildingId,
+    status: this.status,
+    type: this.type,
+    person: {
+      name: this.name,
+      firstName: this.firstName,
+      contacts: this.contacts
+    }
+  }
+}
+
+export const createOwnerFactory = ownerRepository => cmd => {
+  t.assert(CreateOwnerCmd.is(cmd))
+  const owner = Owner(cmd.toOwner(uuid()))
+
+  return ownerRepository.save(owner)
+}

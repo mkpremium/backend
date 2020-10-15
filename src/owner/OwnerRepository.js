@@ -16,7 +16,11 @@ export class OwnerRepository {
       featuredContact: { $set: featuredContact }
     })
 
-    return this.couchbaseAdapter.save(updatedOwner, Owner)
+    return this.save(updatedOwner)
+  }
+
+  save (owner) {
+    return this.couchbaseAdapter.save(owner, Owner)
   }
 }
 
