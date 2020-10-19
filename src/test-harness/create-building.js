@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { createBuildingReq } from '../../bin/fake-data-generator'
+import { createBuildingReq } from './fake-data-generator'
 import { TypedContactInfo } from '../types/common'
 import { OwnerStatus } from '../types/enums'
 import { CreateOwnerCmd } from './create-owner'
