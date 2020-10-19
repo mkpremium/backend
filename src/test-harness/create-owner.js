@@ -2,7 +2,7 @@ import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { Owner } from '../owner/owner'
 import { TypedContactInfo } from '../types/common'
-import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
+import { OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 
 export const CreateOwnerCmd = t.struct({
   name: t.maybe(t.String),
@@ -11,17 +11,6 @@ export const CreateOwnerCmd = t.struct({
   status: t.maybe(OwnerStatusEnum),
   buildingId: t.maybe(t.String),
   type: t.maybe(OwnerTypeEnum)
-}, {
-  defaultProps: {
-    name: 'Owner Full Name',
-    person: {
-      name: 'Owner Full Name',
-      firstName: 'Owner First Name',
-      contacts: []
-    },
-    status: OwnerStatus.NON_VERIFIED,
-    type: 'PRINCIPAL'
-  }
 })
 
 CreateOwnerCmd.prototype.toOwner = function (id) {

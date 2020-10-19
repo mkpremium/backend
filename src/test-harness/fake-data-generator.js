@@ -16,7 +16,7 @@ export const createOwnerCmd = buildingId => {
       {
         id: uuid(),
         type: 'TELEFONO',
-        value: faker.phone.phoneNumber(),
+        value: faker.phone.phoneNumber('9########'),
         status: faker.helpers.shuffle([ 'UNDEFINED', 'GOOD' ])[ 0 ]
       }
     ]
