@@ -1,6 +1,5 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { logger } from '../infrastructure/logger'
 import { Owner } from '../owner/owner'
 import { TypedContactInfo } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
@@ -44,6 +43,5 @@ export const createOwnerFactory = ownerRepository => cmd => {
   t.assert(CreateOwnerCmd.is(cmd))
   const owner = Owner(cmd.toOwner(uuid()))
 
-  logger.error(`saving owner`, { owner })
   return ownerRepository.save(owner)
 }

@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { Building } from '../types/building'
 import { createBuildingReq } from './fake-data-generator'
 import { TypedContactInfo } from '../types/common'
 import { OwnerStatus } from '../types/enums'
@@ -28,15 +29,19 @@ export const CreateBuildingRequest = t.struct({
 
 export const createBuildingFactory = (buildingRepository, createOwner, createBuildingWorksheet) => async (req) => {
   t.assert(CreateBuildingRequest.is(req))
-  const fakedRequest = createBuildingReq()
   const buildingId = uuid()
+  const fakedRequest = createBuildingReq(buildingId)
   const createOwnerCmd = CreateOwnerCmd(
-    t.update(req.owner, { $merge: { ...fakedRequest.owner, buildingId } })
+    t.update(CreateOwnerCmd({ ...fakedRequest.owner }), { $merge: req.owner })
   )
+
   const owner = await createOwner(createOwnerCmd)
-  const savedBuilding = await buildingRepository.save(t.update(req.building,
-    { $merge: { ...fakedRequest.building, id: buildingId, ownerId: owner.id } }
-  ))
+  const savedBuilding = await buildingRepository.save(
+    t.update(
+      Building({ ...fakedRequest.building, isTest: true, ownerId: owner.id }),
+      { $merge: req.owner }
+    )
+  )
 
   const worksheet = await createBuildingWorksheet(CreateWorksheetRequest({
     building: savedBuilding,
