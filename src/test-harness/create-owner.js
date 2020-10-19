@@ -1,8 +1,9 @@
+import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { logger } from '../infrastructure/logger'
 import { Owner } from '../owner/owner'
 import { TypedContactInfo } from '../types/common'
-import { OwnerStatus, OwnerStatusEnum, OwnerType } from '../types/enums'
-import t from 'tcomb'
+import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 
 export const CreateOwnerCmd = t.struct({
   name: t.maybe(t.String),
@@ -10,7 +11,7 @@ export const CreateOwnerCmd = t.struct({
   contacts: t.maybe(t.list(TypedContactInfo)),
   status: t.maybe(OwnerStatusEnum),
   buildingId: t.maybe(t.String),
-  type: t.maybe(t.enums(OwnerType))
+  type: t.maybe(OwnerTypeEnum)
 }, {
   defaultProps: {
     name: 'Owner Full Name',
@@ -43,5 +44,6 @@ export const createOwnerFactory = ownerRepository => cmd => {
   t.assert(CreateOwnerCmd.is(cmd))
   const owner = Owner(cmd.toOwner(uuid()))
 
+  logger.error(`saving owner`, { owner })
   return ownerRepository.save(owner)
 }
