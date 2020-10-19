@@ -1,6 +1,6 @@
 import faker from 'faker/locale/es'
 import uuid from 'uuid/v4'
-import { OwnerStatus, OwnerType } from '../types/enums'
+import { OwnerType } from '../types/enums'
 
 const streetNumber = faker.random.number().toString()
 const ownerFirstName = faker.name.firstName()
@@ -21,14 +21,14 @@ export const createBuildingReq = () => ({
   owner: {
     name: `${ownerFirstName} ${ownerLastName}`,
     firstName: ownerFirstName,
-    status: faker.helpers.shuffle(Object.values(OwnerStatus))[ 0 ],
+    status: faker.helpers.shuffle([ 'VERIFICADO', 'NO_VERIFICADO' ])[ 0 ],
     type: faker.helpers.shuffle(Object.values(OwnerType))[ 0 ],
     contacts: [
       {
         id: uuid(),
         type: 'TELEFONO',
         value: faker.phone.phoneNumber(),
-        status: faker.helpers.shuffle([ 'UNDEFINED', 'GOOD', 'BAD' ])[ 0 ]
+        status: faker.helpers.shuffle([ 'UNDEFINED', 'GOOD' ])[ 0 ]
       }
     ]
   }
