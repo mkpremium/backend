@@ -31,9 +31,8 @@ export const createBuildingFactory = (buildingRepository, createOwner, createBui
   const fakedRequest = createBuildingReq()
   const buildingId = uuid()
   const createOwnerCmd = CreateOwnerCmd(
-    t.update(req.owner, { $merge: fakedRequest.owner })
+    t.update(req.owner, { $merge: { ...fakedRequest.owner, buildingId } })
   )
-  console.log(createOwnerCmd)
   const owner = await createOwner(createOwnerCmd)
   const savedBuilding = await buildingRepository.save(t.update(req.building,
     { $merge: { ...fakedRequest.building, id: buildingId, ownerId: owner.id } }
