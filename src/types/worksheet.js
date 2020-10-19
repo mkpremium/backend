@@ -5,7 +5,8 @@ import t from 'tcomb'
 import { logger } from '../infrastructure/logger'
 import { utc } from '../lib/date'
 import { OwnerWithInclude } from '../owner/owner'
-import '../owner/types'
+import { OwnerCompactView } from '../owner/types'
+
 import { ScheduledEvent } from '../scheduled-events/types'
 import { QueueItem, QueueStatus } from '../worksheet/models/queue-item'
 import { Building } from './building'
@@ -42,7 +43,7 @@ export const Worksheet = t.struct({
   relatedOwners: t.list(OwnerWithInclude),
 
   // never store this
-  ownerContacts: t.list(t.OwnerCompactView),
+  ownerContacts: t.list(OwnerCompactView),
 
   status: WorkSheetStatusEnum,
 

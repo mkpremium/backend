@@ -7,7 +7,7 @@ import { TypedContactInfo } from '../types/common'
 import { OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { OwnerConfirmed, OwnerWithInclude } from './owner'
 
-t.OwnerCompactView = t.struct(
+export const OwnerCompactView = t.struct(
   {
     id: t.String,
     type: OwnerTypeEnum,
@@ -65,7 +65,7 @@ export function ownerContactsView (owner, building) {
     .map((contact) => fromJSON(Object.assign({}, owner, {
       person: owner.person,
       contact
-    }), t.OwnerCompactView))
+    }), OwnerCompactView))
 }
 
 export default t
