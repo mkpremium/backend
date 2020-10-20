@@ -183,7 +183,7 @@ export class WorksheetRepository extends CouchbaseModel {
 
   async calculateFixedStatus (worksheet) {
     const relatedBuilding = worksheet.relatedBuildings[ 0 ]
-    if (relatedBuilding.negotiationStatus) {
+    if (relatedBuilding.negotiationStatus && relatedBuilding.assignedAgentId) {
       return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(relatedBuilding.negotiationStatus)
     }
 
