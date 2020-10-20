@@ -104,7 +104,7 @@ async function releaseTakenWorksheets (operatorId, queueId) {
   if (activeCall) {
     return true
   } else {
-    await queueRepo.releaseTakenWorksheetInQueue(queueId, operatorId)
+    await queueRepo.releaseWorksheetTakenByOperatorOfId(queueId, operatorId)
     return false
   }
 }

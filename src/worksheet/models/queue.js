@@ -89,7 +89,12 @@ export class WorksheetQueueRepository extends CouchbaseModel {
 
     await this.worksheetRepository.save(t.update(worksheet, { queueId: { $set: queue.id } }))
 
-    const updatedWorksheets = t.update(queue.worksheets, { $push: [ QueueItem({ worksheetId: worksheet.id, id: uuid() }) ] })
+    const updatedWorksheets = t.update(queue.worksheets, {
+      $push: [ QueueItem({
+        worksheetId: worksheet.id,
+        id: uuid()
+      }) ]
+    })
     const updatedQueue = t.update(queue, {
       worksheets: { $set: updatedWorksheets },
       worksheetIndex: { $set: worksheet.worksheetIndex }
@@ -140,6 +145,12 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return updatedItem
   }
 
+  /**
+   * @public
+   * @param {WorksheetQueue} queue
+   * @param {string} operatorId
+   * @returns {Promise<Worksheet>}
+   */
   async nextWorksheetInQueue (queue, operatorId) {
     const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
     let nextAvailableItem = queue.findNextAvailableInQueue(operatorItem)
@@ -162,11 +173,18 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return this.takeWorksheetInQueue(releasedUpdatedQueue, nextAvailableItem.id, operatorId)
   }
 
+  /**
+   * @public
+   * @param {WorksheetQueue} queue
+   * @param {string} worksheetId
+   * @param {string} operatorId
+   * @returns {Promise<WorksheetQueue>}
+   */
   async releaseWorksheetByIdInQueue (queue, worksheetId, operatorId) {
     const item = queue.findItemByWorksheetId(worksheetId)
 
     if (!item) {
-      throw newHttpError(400, `La worksheet ${worksheetId} no fue encontrada en la cola`)
+      return queue
     }
 
     if (!item.canBeReleased(operatorId)) {
@@ -176,6 +194,45 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return this.releaseItemInQueueAndSave(queue, item, operatorId)
   }
 
+  /**
+   * @public
+   * @param queueId
+   * @param operatorId
+   * @returns {Promise<void>}
+   */
+  async releaseWorksheetTakenByOperatorOfId (queueId, operatorId) {
+    const queue = await this.findByIdOrThrow(queueId)
+    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
+
+    if (operatorItem) {
+      await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId)
+    }
+  }
+
+  /**
+   * @private
+   */
+  async releaseWorksheetInQueueAndSave (queue, itemId, operatorId) {
+    const item = queue.findItemById(itemId)
+
+    if (!item) {
+      return queue
+    }
+
+    if (!item.canBeReleased(operatorId)) {
+      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`)
+    }
+
+    return this.releaseItemInQueueAndSave(queue, item, operatorId)
+  }
+
+  /**
+   * @private
+   * @param {WorksheetQueue} queue
+   * @param {QueueItem} item
+   * @param {string} operatorId
+   * @returns {Promise<unknown>}
+   */
   async releaseItemInQueueAndSave (queue, item, operatorId) {
     logger.info('WorksheetQueueRepository#releaseWorksheetInQueue from queu', {
       worksheetId: item.worksheetId,
@@ -191,20 +248,9 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return queue
   }
 
-  async releaseWorksheetInQueueAndSave (queue, itemId, operatorId) {
-    const item = queue.findItemById(itemId)
-
-    if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
-    }
-
-    if (!item.canBeReleased(operatorId)) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`)
-    }
-
-    return this.releaseItemInQueueAndSave(queue, item, operatorId)
-  }
-
+  /**
+   * @private
+   */
   async releaseWorksheetInQueue (queue, itemId, operatorId) {
     const item = queue.findItemById(itemId)
 
@@ -219,6 +265,13 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return this.releaseItemInQueue(queue, item, operatorId)
   }
 
+  /**
+   * @private
+   * @param queue
+   * @param item
+   * @param operatorId
+   * @returns {Promise<Object|*>}
+   */
   async releaseItemInQueue (queue, item, operatorId) {
     logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
     await this.worksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
@@ -228,15 +281,6 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     }
 
     return queue
-  }
-
-  async releaseTakenWorksheetInQueue (queueId, operatorId) {
-    const queue = await this.findByIdOrThrow(queueId)
-    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
-
-    if (operatorItem) {
-      await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId)
-    }
   }
 
   async takeWorksheetInQueue (data, itemId, operatorId) {
