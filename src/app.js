@@ -41,8 +41,6 @@ export const dependenciesPromise = Promise.all([
 ])
 
 dependenciesPromise.then(() => {
-  app.set('IS_READY', true)
-
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer)
 
@@ -60,9 +58,11 @@ dependenciesPromise.then(() => {
 
   app.locals.dependenciesContainer = dependenciesContainer
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
-}).catch(errors => {
-  logger.error('error starting application', { errors })
-  process.exit(1)
+
+  app.set('IS_READY', true)
+}).catch(error => {
+  logger.error('error starting application', { error })
+  throw error
 })
 
 app.get('/_ready', (req, res) => {

@@ -26,6 +26,7 @@ import { UserRepository } from '../user/UserRepository'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
 import { StockService } from '../stock/service/StockService'
+import { QueueItemRepository, WorksheetQueueRepository } from '../worksheet/models/queue'
 import { WorksheetRepository } from '../worksheet/worksheet-repository'
 import { EventBus } from './EventBus'
 import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet'
@@ -44,6 +45,10 @@ export const createLegacyDependenciesContainer = () => {
   container.scheduledEventsRepository = new ScheduledEventsRepository()
   container.worksheetRepository = new LegacyWorksheetRepository()
   container.metadataRepository = new MetadataRepository()
+  container.worksheetQueueRepository = new WorksheetQueueRepository(
+    container.worksheetRepository,
+    new QueueItemRepository()
+  )
 
   return container
 }

@@ -14,32 +14,34 @@ import {
 } from './controllers'
 import { permissions } from '../middleware/jwt'
 
-const router = Router()
+export function worksheetRoutes (worksheetQueueRepository) {
+  const router = Router()
 
-router.get('/', worksheetListController)
+  router.get('/', worksheetListController)
 
-router.get('/queues', permissions.manager, queueListController)
+  router.get('/queues', permissions.manager, queueListController)
 
-router.post('/queues', permissions.manager, createQueueController)
+  router.post('/queues', permissions.manager, createQueueController)
 
-router.get('/queues/:id', getQueueController)
+  router.get('/queues/:id', getQueueController)
 
-router.get('/queues/:id/taken', queueTakenFindByOperatorController)
+  router.get('/queues/:id/taken', queueTakenFindByOperatorController)
 
-router.post('/queues/:id', actionsOnWorksheetQueueController)
+  router.post('/queues/:id', actionsOnWorksheetQueueController(worksheetQueueRepository))
 
-router.put('/queues/:id', permissions.manager, updateQueueController)
+  router.put('/queues/:id', permissions.manager, updateQueueController)
 
-router.delete('/queues/:id', permissions.manager, deleteQueueController)
+  router.delete('/queues/:id', permissions.manager, deleteQueueController)
 
-router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController)
+  router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController)
 
-router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController)
+  router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController)
 
-router.get('/search', searchWorksheetController)
+  router.get('/search', searchWorksheetController)
 
-router.get('/:id', worksheetFindByIdController)
+  router.get('/:id', worksheetFindByIdController)
 
-router.post('/:id/owners', addOwnerToWorksheetController)
+  router.post('/:id/owners', addOwnerToWorksheetController)
 
-export default router
+  return router
+}

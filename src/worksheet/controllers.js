@@ -1,14 +1,14 @@
-import fromJSON from 'tcomb/lib/fromJSON'
-import _get from 'lodash/get'
 import { wrap } from 'express-promise-wrap'
-import { newHttpError } from '../lib/http-error'
-import { QueueRequestParams, WorksheetRepository } from './models/worksheet'
-import { WorksheetQueueRepository } from './models/queue'
-import { QueueRequestAction } from './types'
-import { OperatorRoles } from '../types/operator'
+import _get from 'lodash/get'
+import fromJSON from 'tcomb/lib/fromJSON'
 import { History } from '../history/models'
-import { OwnerRepository } from '../owner/models'
+import { newHttpError } from '../lib/http-error'
 import { canOperatorHandleQueue } from '../lib/role-operators'
+import { OwnerRepository } from '../owner/models'
+import { OperatorRoles } from '../types/operator'
+import { WorksheetQueueRepository } from './models/queue'
+import { QueueRequestParams, WorksheetRepository } from './models/worksheet'
+import { QueueRequestAction } from './types'
 import { WorksheetQueueBody } from './worksheet'
 
 async function worksheetList (req, res) {
@@ -85,23 +85,22 @@ async function queueList (req, res) {
   res.json(queues)
 }
 
-async function actionsOnWorksheetQueue (req, res) {
-  const repo = new WorksheetQueueRepository()
+const actionsOnWorksheetQueue = worksheetQueueRepository => async (req, res) => {
   const queueId = req.params.id
   const params = QueueRequestParams(req.body)
-  const queue = await repo.findByIdOrThrow(queueId)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   canOperatorHandleQueue(req.user.operator, queueId)
 
   switch (params.action) {
     case QueueRequestAction.NEXT: {
-      const nextWorksheet = await repo.nextWorksheetInQueue(queue, req.user.id)
+      const nextWorksheet = await worksheetQueueRepository.nextWorksheetInQueue(queue, req.user.id)
       if (nextWorksheet === undefined) {
         throw newHttpError(422, 'No hay items disponibles en la lista')
       }
       return res.json(nextWorksheet)
     }
     case QueueRequestAction.TAKE: {
-      const worksheet = await repo.takeWorksheetInQueue(queue, params.queueItemId, req.user.id)
+      const worksheet = await worksheetQueueRepository.takeWorksheetInQueue(queue, params.queueItemId, req.user.id)
       await History.registerTake({
         contextModel: worksheet,
         user: req.user
@@ -109,7 +108,7 @@ async function actionsOnWorksheetQueue (req, res) {
       return res.json(worksheet)
     }
     case QueueRequestAction.RELEASE: {
-      const releasedWorksheet = await repo.releaseWorksheetByIdInQueue(queue, params.worksheetId, req.user.id)
+      const releasedWorksheet = await worksheetQueueRepository.releaseWorksheetByIdInQueue(queue, params.worksheetId, req.user.id)
       await History.registerRelease({
         contextModel: releasedWorksheet,
         user: req.user
@@ -190,7 +189,9 @@ export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
 export const getQueueController = wrap(getQueue)
 export const queueListController = wrap(queueList)
-export const actionsOnWorksheetQueueController = wrap(actionsOnWorksheetQueue)
+export const actionsOnWorksheetQueueController = (worksheetQueueRepository) => wrap(
+  actionsOnWorksheetQueue(worksheetQueueRepository)
+)
 export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator)
 export const createQueueController = wrap(createQueue)
 export const updateQueueController = wrap(updateQueue)

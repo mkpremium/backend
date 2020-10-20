@@ -1,11 +1,11 @@
-import routes from './routes'
+import { worksheetRoutes } from './routes'
 import buildingRoutes from './building/routes'
 
 import './types'
 import jwt from '../middleware/jwt'
 import { logger } from '../infrastructure/logger'
 
-export default (app, { eventBus }, { worksheetRepository }) => {
+export default (app, { eventBus }, { worksheetRepository, worksheetQueueRepository }) => {
   const secured = jwt()
 
   eventBus
@@ -15,6 +15,6 @@ export default (app, { eventBus }, { worksheetRepository }) => {
       await worksheetRepository.updateWorkSheetStatus(worksheet.id, operatorId)
     })
 
-  app.use('/worksheets', secured, routes)
+  app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository))
   app.use('/worksheets/buildings', secured, buildingRoutes)
 }
