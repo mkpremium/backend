@@ -205,25 +205,8 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
 
     if (operatorItem) {
-      await this.releaseWorksheetInQueueAndSave(queue, operatorItem.id, operatorId)
+      await this.releaseItemInQueueAndSave(queue, operatorItem, operatorId)
     }
-  }
-
-  /**
-   * @private
-   */
-  async releaseWorksheetInQueueAndSave (queue, itemId, operatorId) {
-    const item = queue.findItemById(itemId)
-
-    if (!item) {
-      return queue
-    }
-
-    if (!item.canBeReleased(operatorId)) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`)
-    }
-
-    return this.releaseItemInQueueAndSave(queue, item, operatorId)
   }
 
   /**
@@ -234,7 +217,10 @@ export class WorksheetQueueRepository extends CouchbaseModel {
    * @returns {Promise<unknown>}
    */
   async releaseItemInQueueAndSave (queue, item, operatorId) {
-    logger.info('WorksheetQueueRepository#releaseWorksheetInQueue from queu', {
+    if (!item.canBeReleased(operatorId)) {
+      throw newHttpError(409, `El ${item.id} (${item.status}) no puede ser liberado`)
+    }
+    logger.info('WorksheetQueueRepository#releaseWorksheetInQueue from queue', {
       worksheetId: item.worksheetId,
       queueId: queue.id
     })
