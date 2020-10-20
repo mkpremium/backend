@@ -31,7 +31,7 @@ export function worksheetRoutes (worksheetQueueRepository) {
 
   router.put('/queues/:id', permissions.manager, updateQueueController)
 
-  router.delete('/queues/:id', permissions.manager, deleteQueueController)
+  router.delete('/queues/:id', permissions.manager, deleteQueueController(worksheetQueueRepository))
 
   router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController)
 

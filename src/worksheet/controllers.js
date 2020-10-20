@@ -50,11 +50,10 @@ async function updateQueue (req, res) {
   res.json(updatedQueue)
 }
 
-async function deleteQueue (req, res) {
-  const repo = new WorksheetQueueRepository()
+const deleteQueue = worksheetQueueRepository => async (req, res) => {
   const queueId = req.params.id
-  const queue = await repo.findByIdOrThrow(queueId)
-  await repo.deleteQueue(queue)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
+  await worksheetQueueRepository.deleteQueue(queue)
   await History.registerDelete({
     contextModel: queue,
     user: req.user
@@ -192,7 +191,7 @@ export const actionsOnWorksheetQueueController = worksheetQueueRepository => wra
 export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator)
 export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
 export const updateQueueController = wrap(updateQueue)
-export const deleteQueueController = wrap(deleteQueue)
+export const deleteQueueController = worksheetQueueRepository => wrap(deleteQueue(worksheetQueueRepository))
 export const getScheduledWorksheetsController = wrap(getScheduledWorksheets)
 export const removeScheduledWorksheetController = wrap(removeScheduledWorksheet)
 export const searchWorksheetController = wrap(searchWorksheets)
