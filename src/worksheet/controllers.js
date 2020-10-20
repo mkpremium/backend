@@ -1,6 +1,7 @@
 import fromJSON from 'tcomb/lib/fromJSON'
 import _get from 'lodash/get'
 import { wrap } from 'express-promise-wrap'
+import { newHttpError } from '../lib/http-error'
 import { QueueRequestParams, WorksheetRepository } from './models/worksheet'
 import { WorksheetQueueRepository } from './models/queue'
 import { QueueRequestAction } from './types'
@@ -94,6 +95,9 @@ async function actionsOnWorksheetQueue (req, res) {
   switch (params.action) {
     case QueueRequestAction.NEXT: {
       const nextWorksheet = await repo.nextWorksheetInQueue(queue, req.user.id)
+      if (nextWorksheet === undefined) {
+        throw newHttpError(422, 'No hay items disponibles en la lista')
+      }
       return res.json(nextWorksheet)
     }
     case QueueRequestAction.TAKE: {

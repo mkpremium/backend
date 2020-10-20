@@ -306,7 +306,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     const item = queue.findItemById(itemId)
 
     if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
+      return queue
     }
 
     if (!item.canBeReleased(operatorId)) {
@@ -373,7 +373,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     }
 
     if (!nextAvailableItem) {
-      throw newHttpError(422, 'No hay items disponibles en la lista')
+      return
     }
 
     const releasedUpdatedQueue = operatorItem
