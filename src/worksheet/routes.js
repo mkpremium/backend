@@ -19,23 +19,23 @@ export function worksheetRoutes (worksheetQueueRepository) {
 
   router.get('/', worksheetListController)
 
-  router.get('/queues', permissions.manager, queueListController)
+  router.get('/queues', permissions.manager, queueListController(worksheetQueueRepository))
 
   router.post('/queues', permissions.manager, createQueueController(worksheetQueueRepository))
 
-  router.get('/queues/:id', getQueueController)
+  router.get('/queues/:id', getQueueController(worksheetQueueRepository))
 
-  router.get('/queues/:id/taken', queueTakenFindByOperatorController)
+  router.get('/queues/:id/taken', queueTakenFindByOperatorController(worksheetQueueRepository))
 
   router.post('/queues/:id', actionsOnWorksheetQueueController(worksheetQueueRepository))
 
-  router.put('/queues/:id', permissions.manager, updateQueueController)
+  router.put('/queues/:id', permissions.manager, updateQueueController(worksheetQueueRepository))
 
   router.delete('/queues/:id', permissions.manager, deleteQueueController(worksheetQueueRepository))
 
-  router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController)
+  router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController(worksheetQueueRepository))
 
-  router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController)
+  router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController(worksheetQueueRepository))
 
   router.get('/search', searchWorksheetController)
 

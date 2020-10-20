@@ -6,7 +6,6 @@ import { newHttpError } from '../lib/http-error'
 import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { OperatorRoles } from '../types/operator'
-import { WorksheetQueueRepository } from './models/queue'
 import { QueueRequestParams, WorksheetRepository } from './models/worksheet'
 import { QueueRequestAction } from './types'
 import { WorksheetQueueBody } from './worksheet'
@@ -38,11 +37,10 @@ const createQueue = worksheetQueueRepository => async (req, res) => {
   res.status(201).json(queue)
 }
 
-async function updateQueue (req, res) {
-  const repo = new WorksheetQueueRepository()
+const updateQueue = worksheetQueueRepository => async (req, res) => {
   const queueId = req.params.id
-  const queue = await repo.findByIdOrThrow(queueId)
-  const updatedQueue = await repo.update(queue, req.body)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
+  const updatedQueue = await worksheetQueueRepository.update(queue, req.body)
   await History.registerUpdate({
     contextModel: updatedQueue,
     user: req.user
@@ -61,25 +59,23 @@ const deleteQueue = worksheetQueueRepository => async (req, res) => {
   res.status(204).send()
 }
 
-async function getQueue (req, res) {
-  const repo = new WorksheetQueueRepository()
+const getQueue = worksheetQueueRepository => async (req, res) => {
   const extra = bool(_get(req.query, 'extra', false))
   const queueId = req.params.id
 
-  const queue = await repo.findByIdOrThrow(queueId)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   canOperatorHandleQueue(req.user.operator, queueId)
 
   if (extra) {
-    const queueWithExtraInfo = await repo.findWithExtra(queue)
+    const queueWithExtraInfo = await worksheetQueueRepository.findWithExtra(queue)
     res.json(queueWithExtraInfo)
   } else {
     res.json(queue)
   }
 }
 
-async function queueList (req, res) {
-  const repo = new WorksheetQueueRepository()
-  const queues = await repo.list(req.query)
+const queueList = worksheetQueueRepository => async (req, res) => {
+  const queues = await worksheetQueueRepository.list(req.query)
   res.json(queues)
 }
 
@@ -123,11 +119,10 @@ function operatorIdByPermissions (req) {
     : req.user.id
 }
 
-async function queueTakenFindByOperator (req, res) {
+const queueTakenFindByOperator = worksheetQueueRepository => async (req, res) => {
   const operatorId = operatorIdByPermissions(req)
   const queueId = req.params.id
-  const repo = new WorksheetQueueRepository()
-  const queue = await repo.findByIdOrThrow(queueId)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   canOperatorHandleQueue(req.user.operator, queueId)
 
   const queueItem = queue.findOpenedItemByOperatorId(operatorId)
@@ -149,23 +144,21 @@ async function addOwnerToWorksheet (req, res) {
   res.status(201).json(owner)
 }
 
-async function getScheduledWorksheets (req, res) {
-  const repo = new WorksheetQueueRepository()
+const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
   const queueId = req.params.id
   const operatorId = req.user.id
-  const queue = await repo.findByIdOrThrow(queueId)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   const items = queue.findScheduledItemsByOperatorId(operatorId)
   res.json(items)
 }
 
-async function removeScheduledWorksheet (req, res) {
-  const repo = new WorksheetQueueRepository()
+const removeScheduledWorksheet = worksheetQueueRepository => async (req, res) => {
   const queueId = req.params.id
   const operatorId = req.user.id
   const itemId = req.body.itemId
 
-  const queue = await repo.findByIdOrThrow(queueId)
-  await repo.removeScheduledWorksheet(queue, itemId, operatorId)
+  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
+  await worksheetQueueRepository.removeScheduledWorksheet(queue, itemId, operatorId)
 
   res.status(204).send()
 }
@@ -185,13 +178,13 @@ async function searchWorksheets (request, response) {
 export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet)
 export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
-export const getQueueController = wrap(getQueue)
-export const queueListController = wrap(queueList)
+export const getQueueController = worksheetQueueRepository => wrap(getQueue(worksheetQueueRepository))
+export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
 export const actionsOnWorksheetQueueController = worksheetQueueRepository => wrap(actionsOnWorksheetQueue(worksheetQueueRepository))
-export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator)
+export const queueTakenFindByOperatorController = worksheetQueueRepository => wrap(queueTakenFindByOperator(worksheetQueueRepository))
 export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
-export const updateQueueController = wrap(updateQueue)
+export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))
 export const deleteQueueController = worksheetQueueRepository => wrap(deleteQueue(worksheetQueueRepository))
-export const getScheduledWorksheetsController = wrap(getScheduledWorksheets)
-export const removeScheduledWorksheetController = wrap(removeScheduledWorksheet)
+export const getScheduledWorksheetsController = worksheetQueueRepository => wrap(getScheduledWorksheets(worksheetQueueRepository))
+export const removeScheduledWorksheetController = worksheetQueueRepository => wrap(removeScheduledWorksheet(worksheetQueueRepository))
 export const searchWorksheetController = wrap(searchWorksheets)
