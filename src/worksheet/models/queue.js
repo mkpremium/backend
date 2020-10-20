@@ -170,7 +170,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return fromJSON(updatedQueue, WorksheetQueue)
   }
 
-  async removeWorksheetInQueue (queue, worksheetId) {
+  async removeWorksheetFromQueue (queue, worksheetId) {
     const worksheetRepo = new WorksheetRepository()
     const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId)
     const haveEmptyQueueId = _.isNil(worksheet.queueId) || _.isEmpty(worksheet.queueId)
@@ -183,16 +183,6 @@ export class WorksheetQueueRepository extends CouchbaseModel {
 
     const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
     return t.update(queue, { worksheets: { $set: updatedWorksheetItems } })
-  }
-
-  async removeWorksheet (queueId, worksheetId) {
-    const queue = await this.findByIdOrThrow(queueId)
-    return this.removeWorksheetInQueue(queue, worksheetId)
-  }
-
-  async removeWorksheetAndSave (queueId, worksheetId) {
-    const updatedQueue = await this.removeWorksheet(queueId, worksheetId)
-    return this.save(updatedQueue)
   }
 
   async scheduleWorksheetInQueue (queue, scheduledEvent) {
@@ -326,6 +316,17 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return this.releaseItemInQueue(queue, item, operatorId)
   }
 
+  async releaseItemInQueue (queue, item, operatorId) {
+    logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
+    await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
+
+    if (item.status !== QueueStatus.SCHEDULED) {
+      return this.removeWorksheetFromQueue(queue, item.worksheetId)
+    }
+
+    return queue
+  }
+
   async releaseItemInQueueAndSave (queue, item, operatorId) {
     logger.info('WorksheetQueueRepository#releaseWorksheetInQueue from queu', {
       worksheetId: item.worksheetId,
@@ -334,18 +335,8 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== QueueStatus.SCHEDULED) {
-      return this.removeWorksheetAndSave(queue.id, item.worksheetId)
-    }
-
-    return queue
-  }
-
-  async releaseItemInQueue (queue, item, operatorId) {
-    logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
-    await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
-
-    if (item.status !== QueueStatus.SCHEDULED) {
-      return this.removeWorksheetInQueue(queue, item.worksheetId)
+      const updatedQueue = this.removeWorksheetFromQueue(queue, item.worksheetId)
+      return this.save(updatedQueue)
     }
 
     return queue
