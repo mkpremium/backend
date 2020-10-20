@@ -68,22 +68,13 @@ const QueueListResponse = t.struct(
   }
 )
 
-export class QueueItemRepository {
-  async save (data) {
-    const queueItem = QueueItem(data)
-    return t.update(queueItem, { id: { $set: data.id || uuid() } })
-  }
-}
-
 export class WorksheetQueueRepository extends CouchbaseModel {
   constructor (
-    worksheetRepository = new WorksheetRepository(),
-    queueItemRepository = new QueueItemRepository()
+    worksheetRepository = new WorksheetRepository()
   ) {
     super()
     this.Struct = WorksheetQueue
     this.worksheetRepository = worksheetRepository
-    this.queueItemRepository = queueItemRepository
   }
 
   async addWorksheetToQueue (queue, worksheetId) {
@@ -94,13 +85,11 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     logger.info('WorksheetQueueRepository#addWorksheetToQueue worksheet to queue', {
       worksheetId: worksheet.id,
       queueId: queue.id
-    }
-    )
+    })
 
     await this.worksheetRepository.save(t.update(worksheet, { queueId: { $set: queue.id } }))
 
-    const item = await this.queueItemRepository.save({ worksheetId: worksheet.id })
-    const updatedWorksheets = t.update(queue.worksheets, { $push: [ item ] })
+    const updatedWorksheets = t.update(queue.worksheets, { $push: [ QueueItem({ worksheetId: worksheet.id, id: uuid() }) ] })
     const updatedQueue = t.update(queue, {
       worksheets: { $set: updatedWorksheets },
       worksheetIndex: { $set: worksheet.worksheetIndex }

@@ -1,12 +1,19 @@
+import aws from 'aws-sdk'
+import { metadataS3Config } from '../../config'
 import { AddProposalService } from '../building/AddProposalService'
+import { BuildingsRepository } from '../building/BuildingsRepository'
 import { CommercialsBuildingRepository } from '../building/CommercialsBuildingRepository'
 import { ListBuildingProposalsService } from '../building/ListBuildingProposalsService'
 import { ListBuildingsService } from '../building/ListBuildingsService'
 import { BuildingRepository as LegacyBuildingRepository, MetadataRepository } from '../building/models'
-import { BuildingsRepository } from '../building/BuildingsRepository'
+import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
+import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository'
+import { GetDocumentsSignedURLService } from '../building/service/GetDocumentsSignedURLService'
+import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/UpdateBuildingNegotiationStatusService'
 import { CouchbaseAdapter } from '../db/CouchbaseAdapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
+import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
 import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
 import { OwnerRepository } from '../owner/OwnerRepository'
@@ -15,26 +22,19 @@ import { PropertyManagerRankingService } from '../property-manager/PropertyManag
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
 import { ScheduledEventsRepository } from '../scheduled-events/models'
 import { CreateMeetingService } from '../scheduled-events/service/CreateMeetingService'
+import { StockRepository as LegacyStockRepository } from '../stock/models'
 
 import { StockSalesService } from '../stock/service/StockSalesService'
+import { StockService } from '../stock/service/StockService'
 import { StockRepository } from '../stock/StockRepository'
-import { StockRepository as LegacyStockRepository } from '../stock/models'
 
 import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
 import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
-import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
-import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
-import { StockService } from '../stock/service/StockService'
-import { QueueItemRepository, WorksheetQueueRepository } from '../worksheet/models/queue'
+import { WorksheetQueueRepository } from '../worksheet/models/queue'
+import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet'
 import { WorksheetRepository } from '../worksheet/worksheet-repository'
 import { EventBus } from './EventBus'
-import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet'
-import { SetBuildingSalePriceService } from '../building/service/SetBuildingSalePriceService'
-import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository'
-import aws from 'aws-sdk'
-import { metadataS3Config } from '../../config'
-import { GetDocumentsSignedURLService } from '../building/service/GetDocumentsSignedURLService'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -46,8 +46,7 @@ export const createLegacyDependenciesContainer = () => {
   container.worksheetRepository = new LegacyWorksheetRepository()
   container.metadataRepository = new MetadataRepository()
   container.worksheetQueueRepository = new WorksheetQueueRepository(
-    container.worksheetRepository,
-    new QueueItemRepository()
+    container.worksheetRepository
   )
 
   return container
