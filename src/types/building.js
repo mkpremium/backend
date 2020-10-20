@@ -16,12 +16,12 @@ export const BuildingCadastre = t.struct({
   address: t.String
 }, 'Cadastre')
 
-export const BuildingLocation = t.Location = t.struct({
+export const BuildingLocation = t.struct({
   lat: t.maybe(t.Number),
   lng: t.maybe(t.Number)
 }, 'Location')
 
-t.Elements = t.struct({
+const Elements = t.struct({
   number: t.Number,
   average: t.Number,
   commons: t.Number
@@ -47,8 +47,6 @@ const BuildingProposalStatus = {
   PENDING: 'pendiente'
 }
 
-t.BuildingProposalStatus = t.enums.of(Object.values(BuildingProposalStatus))
-
 export const BuildingProposal = t.struct(
   {
     id: t.String,
@@ -62,9 +60,9 @@ export const BuildingProposal = t.struct(
 
     aspiration: t.maybe(t.Number),
     proposal: t.maybe(t.Number),
-    state: t.BuildingProposalStatus,
+    state: t.enums.of(Object.values(BuildingProposalStatus)),
 
-    _documentType: t.enums.of(['building-proposal'])
+    _documentType: t.enums.of([ 'building-proposal' ])
   },
   {
     name: 'BuildingProposal',
@@ -82,12 +80,10 @@ export const BuildingProposal = t.struct(
   }
 )
 
-t.BuildingEntityStatus = t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus))
-
-t.BuildingEntity = t.struct(
+const BuildingEntity = t.struct(
   {
     id: t.String,
-    status: t.BuildingEntityStatus,
+    status: t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus)),
     name: t.maybe(t.String),
     type: t.maybe(t.String),
     surface: t.Number,
@@ -140,16 +136,16 @@ export const Building = t.struct(
     address: Address,
     buildingType: t.BuildingType,
     cadastre: t.maybe(BuildingCadastre),
-    floorArea: t.union([t.Number, t.String]),
-    landArea: t.union([t.Number, t.String]),
-    roofArea: t.union([t.Number, t.String]),
-    coefficient: t.union([t.Number, t.String]),
+    floorArea: t.union([ t.Number, t.String ]),
+    landArea: t.union([ t.Number, t.String ]),
+    roofArea: t.union([ t.Number, t.String ]),
+    coefficient: t.union([ t.Number, t.String ]),
     use: t.maybe(t.String),
     propertyType: t.maybe(t.String),
-    buildingDate: t.union([t.Number, t.String]),
+    buildingDate: t.union([ t.Number, t.String ]),
     location: BuildingLocation,
-    elements: t.maybe(t.Elements),
-    entities: t.list(t.BuildingEntity),
+    elements: t.maybe(Elements),
+    entities: t.list(BuildingEntity),
     ownerId: t.maybe(t.String),
     owner: t.maybe(BuildingOwner),
     state: BuildingStateEnum,
