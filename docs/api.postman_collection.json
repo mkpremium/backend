@@ -1,0 +1,235 @@
+{
+	"info": {
+		"_postman_id": "172f4b3a-d6e4-4791-97aa-93687f9a21b4",
+		"name": "MKPremium",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "test-harness",
+			"item": [
+				{
+					"name": "Create Building",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/test-harness/create-building",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"test-harness",
+								"create-building"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create test Owner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"buildingId\": \"4bae3ae9-319c-4dd7-a993-8bdc6b54650c\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/test-harness/create-owner",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"test-harness",
+								"create-owner"
+							]
+						},
+						"description": "Create owner associated with buildingId"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Take Next Queue Worksheet",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"action\":\"NEXT\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/worksheets/queues/{{queueId}}",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"worksheets",
+						"queues",
+						"{{queueId}}"
+					]
+				},
+				"description": "Fetch next available worksheet in queue."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Queue",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test-queue\",\n\t\"source\": {\n\t\t\"city\": \"TEST_PORTO\"\n\t}\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/worksheets/queues",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"worksheets",
+						"queues"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"business\",\n\t\"password\": \"Passw0rd\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/operators/login",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"operators",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU4MDA0ODRlLTNiNmUtNGFjOC1hMmY2LTQ4ZDY5N2MxYWY0ZSIsInBlcm1pc3Npb25zIjpbIkJVU0lORVNTIl0sIm9wZXJhdG9yIjp7ImlkIjoiNTgwMDQ4NGUtM2I2ZS00YWM4LWEyZjYtNDhkNjk3YzFhZjRlIiwibmFtZSI6Im9wZXJhdG9yIG9wZXJhdG9yIiwidXNlcm5hbWUiOiJidXNpbmVzcyIsImNpdHkiOiJiYXJjZWxvbmEiLCJxdWV1ZUlkIjoicXVldWVJZCIsImVtYWlsIjoib3BlcmF0b3JAZXhhbXBsZS5jb20iLCJsYW5ndWFnZSI6ImVzIn0sImlhdCI6MTYwMzE5MTQ4NCwiZXhwIjoxNjAzNDUwNjg0fQ.qqwz4CwHy67biGqEFP_w1BGOqc-26w3rumAFIZ1kVhM",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "fc30bd3d-247b-4e17-af40-620779e09e74",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "6bb5b32e-f6bc-4b3c-97f7-378c19df5b07",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "7e8b827e-7073-4eb7-8390-22f0c69187bb",
+			"key": "apiUrl",
+			"value": "https://api.mkpremium.net",
+			"type": "string"
+		},
+		{
+			"id": "5a46bd4e-01ae-4e2f-91f7-4df4dbc3288c",
+			"key": "queueId",
+			"value": "f365e947-4c0e-4beb-ba18-25db1773587f",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
