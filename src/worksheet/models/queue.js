@@ -1,16 +1,18 @@
 import Promise from 'bluebird'
-import t from 'tcomb'
-import { logger } from '../../infrastructure/logger'
-import fromJSON from 'tcomb/lib/fromJSON'
 import _ from 'lodash'
+import _get from 'lodash/get'
 import _map from 'lodash/map'
 import _set from 'lodash/set'
-import _get from 'lodash/get'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
+import uuid from 'uuid/v4'
 import { CouchbaseModel } from '../../db/model'
+import { logger } from '../../infrastructure/logger'
+import { utc } from '../../lib/date'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
-import { WorksheetRepository } from './worksheet'
-import { utc } from '../../lib/date'
+import { OperatorStats } from '../../stats/models'
+import { OperatorActions } from '../../stats/types'
 import {
   WorkSheetCall,
   WorksheetQueue,
@@ -18,10 +20,8 @@ import {
   WorksheetQueueCount,
   WorksheetQueueSource
 } from '../worksheet'
-import { OperatorActions } from '../../stats/types'
-import { OperatorStats } from '../../stats/models'
-import uuid from 'uuid/v4'
 import { QueueItem, QueueStatus } from './queue-item'
+import { WorksheetRepository } from './worksheet'
 
 const QueueItemExtraInfo = QueueItem.extend({
   totalContacts: t.Number,
@@ -76,14 +76,18 @@ export class QueueItemRepository {
 }
 
 export class WorksheetQueueRepository extends CouchbaseModel {
-  constructor () {
+  constructor (
+    worksheetRepository = new WorksheetRepository(),
+    queueItemRepository = new QueueItemRepository()
+  ) {
     super()
     this.Struct = WorksheetQueue
+    this.worksheetRepository = worksheetRepository
+    this.queueItemRepository = queueItemRepository
   }
 
   async addWorksheetToQueue (queue, worksheetId) {
-    const worksheetRepo = new WorksheetRepository()
-    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId)
+    const worksheet = await this.worksheetRepository.findByIdOrThrow(worksheetId)
     if (worksheet.queueId) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
@@ -93,10 +97,9 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     }
     )
 
-    await worksheetRepo.save(t.update(worksheet, { queueId: { $set: queue.id } }))
+    await this.worksheetRepository.save(t.update(worksheet, { queueId: { $set: queue.id } }))
 
-    const itemRepo = new QueueItemRepository()
-    const item = await itemRepo.save({ worksheetId: worksheet.id })
+    const item = await this.queueItemRepository.save({ worksheetId: worksheet.id })
     const updatedWorksheets = t.update(queue.worksheets, { $push: [ item ] })
     const updatedQueue = t.update(queue, {
       worksheets: { $set: updatedWorksheets },
@@ -107,15 +110,14 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   async removeWorksheetFromQueue (queue, worksheetId) {
-    const worksheetRepo = new WorksheetRepository()
-    const worksheet = await worksheetRepo.findByIdOrThrow(worksheetId)
+    const worksheet = await this.worksheetRepository.findByIdOrThrow(worksheetId)
     const haveEmptyQueueId = _.isNil(worksheet.queueId) || _.isEmpty(worksheet.queueId)
     if (!haveEmptyQueueId && worksheet.queueId !== queue.id) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
 
     const updatedWorksheet = t.update(worksheet, { $remove: [ 'queueId' ] })
-    await worksheetRepo.save(updatedWorksheet)
+    await this.worksheetRepository.save(updatedWorksheet)
 
     const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
     return t.update(queue, { worksheets: { $set: updatedWorksheetItems } })
@@ -129,8 +131,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       throw newHttpError(400, `La Worksheet ${worksheetId} no fue encontrada en la cola`)
     }
 
-    const worksheetRepo = new WorksheetRepository()
-    const worksheet = await worksheetRepo.findById(item.worksheetId)
+    const worksheet = await this.worksheetRepository.findById(item.worksheetId)
 
     if (!worksheet) {
       throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`)
@@ -191,7 +192,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       worksheetId: item.worksheetId,
       queueId: queue.id
     })
-    await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
+    await this.worksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== QueueStatus.SCHEDULED) {
       const updatedQueue = this.removeWorksheetFromQueue(queue, item.worksheetId)
@@ -231,7 +232,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
 
   async releaseItemInQueue (queue, item, operatorId) {
     logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
-    await new WorksheetRepository().updateWorkSheetStatus(item.worksheetId, operatorId)
+    await this.worksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
 
     if (item.status !== QueueStatus.SCHEDULED) {
       return this.removeWorksheetFromQueue(queue, item.worksheetId)
@@ -266,15 +267,14 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente ${operatorItem.id}`)
     }
 
-    const worksheetRepo = new WorksheetRepository()
-    const worksheet = await worksheetRepo.findByIdWIthIncludes(item.worksheetId)
+    const worksheet = await this.worksheetRepository.findByIdWIthIncludes(item.worksheetId)
 
     if (!worksheet) {
       throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`)
     }
 
     const updatedWorksheet = t.update(worksheet, { viewedAt: { $set: utc().toDate() } })
-    await worksheetRepo.save(updatedWorksheet)
+    await this.worksheetRepository.save(updatedWorksheet)
 
     const updatedItem = item.take(operatorId)
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
@@ -294,7 +294,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, { city, province })
     }
 
-    return worksheetRepo.findByIdWIthIncludes(updatedItem.worksheetId)
+    return this.worksheetRepository.findByIdWIthIncludes(updatedItem.worksheetId)
   }
 
   async removeScheduledWorksheet (queue, itemId, operatorId) {
@@ -317,8 +317,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   async findNextAvailableInSource (queue) {
-    const worksheetRepo = new WorksheetRepository()
-    const [ worksheet ] = await worksheetRepo.findBySource(queue)
+    const [ worksheet ] = await this.worksheetRepository.findBySource(queue)
 
     if (worksheet) {
       return this.addWorksheetToQueue(queue, worksheet.id)
@@ -353,9 +352,8 @@ export class WorksheetQueueRepository extends CouchbaseModel {
 
   async getExtraInfo (queue) {
     const worksheetIds = _map(queue.worksheets, 'worksheetId')
-    const worksheetRepo = new WorksheetRepository()
     const worksheets = await Promise
-      .map(worksheetIds, (worksheetId) => worksheetRepo.findByIdWIthIncludes(worksheetId))
+      .map(worksheetIds, (worksheetId) => this.worksheetRepository.findByIdWIthIncludes(worksheetId))
 
     return worksheets.map(worksheet => {
       const info = {}
@@ -385,7 +383,6 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   async list (query = {}) {
-    const wsRepo = new WorksheetRepository()
     const params = t.ListQuery(query)
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
@@ -393,7 +390,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     const total = await this.countQuery()
     const results = await this.query(qb)
     const resultsWithCount = await Promise.map(results, async (queue) => {
-      const count = await wsRepo.countWorksheetsInSource(queue.source)
+      const count = await this.worksheetRepository.countWorksheetsInSource(queue.source)
       return Object.assign(JSON.parse(JSON.stringify(queue)), { possibleNumberOfWorksheets: count })
     })
     return fromJSON({ total, results: resultsWithCount }, QueueListResponse)
