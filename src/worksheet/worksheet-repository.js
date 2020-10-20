@@ -1,4 +1,4 @@
-import { Worksheet } from '../types/worksheet'
+import { Worksheet } from './worksheet'
 
 export class WorksheetRepository {
   constructor (couchbaseAdapter) {

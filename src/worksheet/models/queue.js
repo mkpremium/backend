@@ -17,7 +17,7 @@ import {
   WorksheetQueueBody,
   WorksheetQueueCount,
   WorksheetQueueSource
-} from '../../types/worksheet'
+} from '../worksheet'
 import { OperatorActions } from '../../stats/types'
 import { OperatorStats } from '../../stats/models'
 import uuid from 'uuid/v4'

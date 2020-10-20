@@ -8,9 +8,9 @@ import { OwnerWithInclude } from '../owner/owner'
 import { OwnerCompactView } from '../owner/types'
 
 import { ScheduledEvent } from '../scheduled-events/types'
-import { QueueItem, QueueStatus } from '../worksheet/models/queue-item'
-import { Building } from './building'
-import { Address } from './common'
+import { QueueItem, QueueStatus } from './models/queue-item'
+import { Building } from '../types/building'
+import { Address } from '../types/common'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',

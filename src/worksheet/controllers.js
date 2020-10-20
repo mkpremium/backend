@@ -8,7 +8,7 @@ import { OperatorRoles } from '../types/operator'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
 import { canOperatorHandleQueue } from '../lib/role-operators'
-import { WorksheetQueueBody } from '../types/worksheet'
+import { WorksheetQueueBody } from './worksheet'
 
 async function worksheetList (req, res) {
   const repo = new WorksheetRepository()

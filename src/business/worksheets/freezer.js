@@ -5,7 +5,7 @@ import { utc } from '../../lib/date'
 import { OwnerRepository } from '../../owner/models'
 import { SystemPreferencesRepository } from '../../system-preferences/models'
 import { OwnerStatus } from '../../types/enums'
-import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
+import { Worksheet, WorkSheetStatus } from '../../worksheet/worksheet'
 import { WorksheetRepository } from '../../worksheet/models/worksheet'
 
 import { logger } from '../../infrastructure/logger'

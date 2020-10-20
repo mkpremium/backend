@@ -25,7 +25,7 @@ import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { OwnerStatus } from '../../types/enums'
-import { Worksheet, WorkSheetStatus } from '../../types/worksheet'
+import { Worksheet, WorkSheetStatus } from '../worksheet'
 import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 
 const QueueRequestParamsBase = t.struct(
