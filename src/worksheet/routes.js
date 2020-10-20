@@ -21,7 +21,7 @@ export function worksheetRoutes (worksheetQueueRepository) {
 
   router.get('/queues', permissions.manager, queueListController)
 
-  router.post('/queues', permissions.manager, createQueueController)
+  router.post('/queues', permissions.manager, createQueueController(worksheetQueueRepository))
 
   router.get('/queues/:id', getQueueController)
 

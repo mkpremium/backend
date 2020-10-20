@@ -28,10 +28,9 @@ function bool (value) {
   return value === 'true'
 }
 
-async function createQueue (req, res) {
+const createQueue = worksheetQueueRepository => async (req, res) => {
   const params = fromJSON(req.body, WorksheetQueueBody)
-  const repo = new WorksheetQueueRepository()
-  const queue = await repo.save(params)
+  const queue = await worksheetQueueRepository.save(params)
   await History.registerCreate({
     contextModel: queue,
     user: req.user
@@ -189,11 +188,9 @@ export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
 export const getQueueController = wrap(getQueue)
 export const queueListController = wrap(queueList)
-export const actionsOnWorksheetQueueController = (worksheetQueueRepository) => wrap(
-  actionsOnWorksheetQueue(worksheetQueueRepository)
-)
+export const actionsOnWorksheetQueueController = worksheetQueueRepository => wrap(actionsOnWorksheetQueue(worksheetQueueRepository))
 export const queueTakenFindByOperatorController = wrap(queueTakenFindByOperator)
-export const createQueueController = wrap(createQueue)
+export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
 export const updateQueueController = wrap(updateQueue)
 export const deleteQueueController = wrap(deleteQueue)
 export const getScheduledWorksheetsController = wrap(getScheduledWorksheets)
