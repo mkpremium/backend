@@ -198,7 +198,7 @@ export class WorksheetRepository extends CouchbaseModel {
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.PUBLIC):
         return WorkSheetStatus.PUBLIC
-      case _every(ownersStatus, ({ status }) => !![ OwnerStatus.ERROR, OwnerStatus.WITHOUT_CONTACT ].find(status)):
+      case _every(ownersStatus, ({ status }) => [ OwnerStatus.ERROR, OwnerStatus.WITHOUT_CONTACT ].indexOf(status) !== -1):
         return WorkSheetStatus.INVALID
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
