@@ -14,6 +14,7 @@ import { updateList } from '../../lib/tcomb-utils'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import {
+  Worksheet,
   WorkSheetCall,
   WorksheetQueue,
   WorksheetQueueBody,
@@ -77,8 +78,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     this.worksheetRepository = worksheetRepository
   }
 
-  async addWorksheetToQueue (queue, worksheetId) {
-    const worksheet = await this.worksheetRepository.findByIdOrThrow(worksheetId)
+  async addWorksheetToQueue (queue, worksheet) {
     if (worksheet.queueId) {
       throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
@@ -306,10 +306,10 @@ export class WorksheetQueueRepository extends CouchbaseModel {
   }
 
   async findNextAvailableInSource (queue) {
-    const [ worksheet ] = await this.worksheetRepository.findBySource(queue)
+    const [ rawWorksheet ] = await this.worksheetRepository.findBySource(queue)
 
-    if (worksheet) {
-      return this.addWorksheetToQueue(queue, worksheet.id)
+    if (rawWorksheet) {
+      return this.addWorksheetToQueue(queue, fromJSON(rawWorksheet, Worksheet))
     }
 
     return queue
