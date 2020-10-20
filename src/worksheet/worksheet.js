@@ -9,7 +9,7 @@ import { OwnerCompactView } from '../owner/types'
 
 import { ScheduledEvent } from '../scheduled-events/types'
 import { QueueItem, QueueStatus } from './models/queue-item'
-import { Building } from '../types/building'
+import { Building } from '../building/building'
 import { Address } from '../types/common'
 
 export const WorkSheetStatus = {

@@ -8,7 +8,7 @@ const appMod = require('../../../src/app')
 const app = appMod.default
 const { dependenciesPromise } = appMod
 
-const { Building } = require('../../../src/types/building')
+const { Building } = require('../../../src/building/building')
 const buildings = require('/tmp/building_to_couchbase.json')
 
 const _ = require('lodash')

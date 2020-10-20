@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { Address, SimpleAddress, SimplePhoneNumber } from './common'
-import { BuildingStateEnum } from './enums'
+import { Address, SimpleAddress, SimplePhoneNumber } from '../types/common'
+import { BuildingStateEnum } from '../types/enums'
 
 const buildingEntitiesDefaultStatus = 'SIN DATOS'
 const buildingEntitiesStatus = {

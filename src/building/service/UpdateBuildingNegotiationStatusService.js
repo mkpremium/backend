@@ -1,4 +1,4 @@
-import { buildingNegotiationStatus } from '../../types/building'
+import { buildingNegotiationStatus } from '../building'
 
 export class UpdateBuildingNegotiationStatusService {
   constructor (buildingRepository, eventBus) {

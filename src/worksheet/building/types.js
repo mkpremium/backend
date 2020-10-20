@@ -1,5 +1,5 @@
 import * as t from 'tcomb'
-import { BuildingCadastre } from '../../types/building'
+import { BuildingCadastre } from '../../building/building'
 import { Address } from '../../types/common'
 
 const BuildingLocation = t.struct({

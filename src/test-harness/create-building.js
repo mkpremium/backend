@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { Building } from '../types/building'
+import { Building } from '../building/building'
 import { createBuildingReq } from './fake-data-generator'
 import { TypedContactInfo } from '../types/common'
 import { OwnerStatus } from '../types/enums'

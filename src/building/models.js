@@ -8,7 +8,7 @@ import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from '../types/building'
+import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from './building'
 import { BuildingMetadata } from './types'
 
 import { logger } from '../infrastructure/logger'

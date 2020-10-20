@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import _find from 'lodash/find'
 import t from 'tcomb'
-import { Building } from '../types/building'
+import { Building } from '../building/building'
 import { SimpleAddress, TypedContactInfo } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 
