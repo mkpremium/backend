@@ -7,7 +7,9 @@ import {
   createListBuildingProposalsController,
   createListBuildingsController,
   createListVerifiedOwnersController,
-  createMetadataUploadUrlController, createSetBuildingSalePriceController, createSignDocumentsUrlController,
+  createMetadataUploadUrlController,
+  createSetBuildingSalePriceController,
+  createSignDocumentsUrlController,
   createUpdateBuildingNegotiationStatusController,
   updateNegotiationProposalController
 } from './controllers'

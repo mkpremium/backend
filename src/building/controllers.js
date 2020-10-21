@@ -24,6 +24,10 @@ export function createListBuildingProposalsController (listBuildingProposalsServ
   })
 }
 
+/**
+ * @param {UpdateBuildingNegotiationStatusService} updateBuildingNegotiationStatusService
+ * @returns { | }
+ */
 export function createUpdateBuildingNegotiationStatusController (updateBuildingNegotiationStatusService) {
   return wrap(async (req, res) => {
     await updateBuildingNegotiationStatusService.updateBuildingStatus(
