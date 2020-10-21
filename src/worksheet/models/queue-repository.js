@@ -78,45 +78,12 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     this.worksheetRepository = worksheetRepository
   }
 
-  async addWorksheetToQueue (queue, worksheet) {
-    if (worksheet.queueId) {
-      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
-    }
-    logger.info('WorksheetQueueRepository#addWorksheetToQueue worksheet to queue', {
-      worksheetId: worksheet.id,
-      queueId: queue.id
-    })
-
-    await this.worksheetRepository.save(t.update(worksheet, { queueId: { $set: queue.id } }))
-
-    const updatedWorksheets = t.update(queue.worksheets, {
-      $push: [ QueueItem({
-        worksheetId: worksheet.id,
-        id: uuid()
-      }) ]
-    })
-    const updatedQueue = t.update(queue, {
-      worksheets: { $set: updatedWorksheets },
-      worksheetIndex: { $set: worksheet.worksheetIndex }
-    })
-
-    return fromJSON(updatedQueue, WorksheetQueue)
-  }
-
-  async removeWorksheetFromQueue (queue, worksheetId) {
-    const worksheet = await this.worksheetRepository.findByIdOrThrow(worksheetId)
-    const haveEmptyQueueId = _.isNil(worksheet.queueId) || _.isEmpty(worksheet.queueId)
-    if (!haveEmptyQueueId && worksheet.queueId !== queue.id) {
-      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
-    }
-
-    const updatedWorksheet = t.update(worksheet, { $remove: [ 'queueId' ] })
-    await this.worksheetRepository.save(updatedWorksheet)
-
-    const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
-    return t.update(queue, { worksheets: { $set: updatedWorksheetItems } })
-  }
-
+  /**
+   * @public
+   * @param {WorksheetQueue} queue
+   * @param {ScheduledEvent} scheduledEvent
+   * @returns {Promise<QueueItem>}
+   */
   async scheduleWorksheetInQueue (queue, scheduledEvent) {
     const worksheetId = scheduledEvent.event.worksheetId
     const operatorId = scheduledEvent.notifyTo
@@ -187,10 +154,6 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       return queue
     }
 
-    if (!item.canBeReleased(operatorId)) {
-      throw newHttpError(409, `El ${item.id} (${item.status}) no puede ser liberado`)
-    }
-
     return this.releaseItemInQueueAndSave(queue, item, operatorId)
   }
 
@@ -207,6 +170,168 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     if (operatorItem) {
       await this.releaseItemInQueueAndSave(queue, operatorItem, operatorId)
     }
+  }
+
+  /**
+   * @public
+   * @param {WorksheetQueue} queue
+   * @param itemId
+   * @param operatorId
+   * @returns {Promise<WorksheetQueue>}
+   */
+  async removeScheduledWorksheet (queue, itemId, operatorId) {
+    const item = queue.findItemById(itemId)
+
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
+    }
+
+    const updatedItem = item.releaseSchedule(operatorId)
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
+    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
+
+    logger.info('WorksheetQueueRepository#removeScheduledWorksheet', {
+      worksheetId: item.worksheetId,
+      queueId: queue.id
+    })
+
+    await this.save(updatedQueue)
+  }
+
+  /**
+   * @public
+   * @param data
+   * @param itemId
+   * @param operatorId
+   * @returns {Promise<Worksheet>}
+   */
+  async takeWorksheetInQueue (data, itemId, operatorId) {
+    const queue = fromJSON(data, WorksheetQueue)
+    const item = queue.findItemById(itemId)
+    if (!item) {
+      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
+    }
+
+    if (!item.canBeOpened(operatorId)) {
+      throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`)
+    }
+
+    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
+
+    if (operatorItem && operatorItem.id !== item.id) {
+      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente ${operatorItem.id}`)
+    }
+
+    const worksheet = await this.worksheetRepository.findByIdWIthIncludes(item.worksheetId)
+
+    if (!worksheet) {
+      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`)
+    }
+
+    const updatedWorksheet = t.update(worksheet, { viewedAt: { $set: utc().toDate() } })
+    await this.worksheetRepository.save(updatedWorksheet)
+
+    const updatedItem = item.take(operatorId)
+    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
+    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
+
+    logger.info('WorksheetQueueRepository#takeWorksheetInQueue', {
+      worksheetId: worksheet.id,
+      status: worksheet.status,
+      queueId: queue.id
+    })
+
+    await this.save(updatedQueue)
+
+    if (!operatorItem) {
+      const city = _get(worksheet, 'relatedBuildings.0.address.city')
+      const province = _get(worksheet, 'relatedBuildings.0.address.province')
+      await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, { city, province })
+    }
+
+    return this.worksheetRepository.findByIdWIthIncludes(updatedItem.worksheetId)
+  }
+
+  /**
+   * @public
+   * @param queueId
+   * @param operatorId
+   * @returns {Promise<null|*>}
+   */
+  async findItemByOperator (queueId, operatorId) {
+    if (!queueId) {
+      return null
+    }
+    const queue = await this.findByIdOrThrow(queueId)
+    return queue.findOpenedItemByOperatorId(operatorId)
+  }
+
+  /**
+   * @public
+   * @param queueId
+   * @returns {Promise<WorksheetQueue>}
+   */
+  async findByIdOrThrow (queueId) {
+    const queue = await this.findById(queueId)
+    if (!queue) {
+      throw newHttpError(404, `La cola ${queueId} no existe`)
+    }
+
+    return fromJSON(queue, WorksheetQueue)
+  }
+
+  /**
+   * @public
+   * @param queue
+   * @returns {Promise<unknown>}
+   */
+  async findWithExtra (queue) {
+    const worksheets = await this.getQueueWorksheets(queue)
+    const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), { worksheets })
+
+    return fromJSON(queueExtraInfo, WorksheetQueueExtraInfo)
+  }
+
+  /**
+   * @public
+   * @param query
+   * @returns {Promise<unknown>}
+   */
+  async list (query = {}) {
+    const params = t.ListQuery(query)
+    const qb = this.getQueryBuilder('select')
+      .limit(params.limit)
+      .offset(params.offset)
+    const total = await this.countQuery()
+    const results = await this.query(qb)
+    const resultsWithCount = await Promise.map(results, async (queue) => {
+      const count = await this.worksheetRepository.countWorksheetsInSource(queue.source)
+      return Object.assign(JSON.parse(JSON.stringify(queue)), { possibleNumberOfWorksheets: count })
+    })
+    return fromJSON({ total, results: resultsWithCount }, QueueListResponse)
+  }
+
+  /**
+   * @public
+   * @param {WorksheetQueue} queue
+   * @param params
+   * @returns {Promise<unknown>}
+   */
+  async update (queue, params) {
+    const $merge = fromJSON(params, WorksheetQueueBody)
+    const updatedQueue = t.update(queue, { $merge })
+    return this.save(updatedQueue)
+  }
+
+  /**
+   * @public
+   * @param {WorksheetQueue} queue
+   * @returns {Promise<undefined>}
+   */
+  async deleteQueue (queue) {
+    const qb = this.getQueryBuilder('delete')
+    qb.where('id = ?', queue.id)
+    await this.deleteQuery(qb)
   }
 
   /**
@@ -269,72 +394,62 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return queue
   }
 
-  async takeWorksheetInQueue (data, itemId, operatorId) {
-    const queue = fromJSON(data, WorksheetQueue)
-    const item = queue.findItemById(itemId)
-    if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
+  /**
+   * @private
+   * @param {WorksheetQueue} queue
+   * @param worksheet
+   * @returns {Promise<WorksheetQueue>}
+   */
+  async addWorksheetToQueue (queue, worksheet) {
+    if (worksheet.queueId) {
+      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
+    }
+    logger.info('WorksheetQueueRepository#addWorksheetToQueue worksheet to queue', {
+      worksheetId: worksheet.id,
+      queueId: queue.id
+    })
+
+    await this.worksheetRepository.save(t.update(worksheet, { queueId: { $set: queue.id } }))
+
+    const updatedWorksheets = t.update(queue.worksheets, {
+      $push: [ QueueItem({
+        worksheetId: worksheet.id,
+        id: uuid()
+      }) ]
+    })
+    const updatedQueue = t.update(queue, {
+      worksheets: { $set: updatedWorksheets },
+      worksheetIndex: { $set: worksheet.worksheetIndex }
+    })
+
+    return fromJSON(updatedQueue, WorksheetQueue)
+  }
+
+  /**
+   * @private
+   * @param queue
+   * @param worksheetId
+   * @returns {Promise<Object>}
+   */
+  async removeWorksheetFromQueue (queue, worksheetId) {
+    const worksheet = await this.worksheetRepository.findByIdOrThrow(worksheetId)
+    const haveEmptyQueueId = _.isNil(worksheet.queueId) || _.isEmpty(worksheet.queueId)
+    if (!haveEmptyQueueId && worksheet.queueId !== queue.id) {
+      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
     }
 
-    if (!item.canBeOpened(operatorId)) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`)
-    }
-
-    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
-
-    if (operatorItem && operatorItem.id !== item.id) {
-      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente ${operatorItem.id}`)
-    }
-
-    const worksheet = await this.worksheetRepository.findByIdWIthIncludes(item.worksheetId)
-
-    if (!worksheet) {
-      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`)
-    }
-
-    const updatedWorksheet = t.update(worksheet, { viewedAt: { $set: utc().toDate() } })
+    const updatedWorksheet = t.update(worksheet, { $remove: [ 'queueId' ] })
     await this.worksheetRepository.save(updatedWorksheet)
 
-    const updatedItem = item.take(operatorId)
-    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
-    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
-
-    logger.info('WorksheetQueueRepository#takeWorksheetInQueue', {
-      worksheetId: worksheet.id,
-      status: worksheet.status,
-      queueId: queue.id
-    })
-
-    await this.save(updatedQueue)
-
-    if (!operatorItem) {
-      const city = _get(worksheet, 'relatedBuildings.0.address.city')
-      const province = _get(worksheet, 'relatedBuildings.0.address.province')
-      await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, { city, province })
-    }
-
-    return this.worksheetRepository.findByIdWIthIncludes(updatedItem.worksheetId)
+    const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
+    return t.update(queue, { worksheets: { $set: updatedWorksheetItems } })
   }
 
-  async removeScheduledWorksheet (queue, itemId, operatorId) {
-    const item = queue.findItemById(itemId)
-
-    if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
-    }
-
-    const updatedItem = item.releaseSchedule(operatorId)
-    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
-    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
-
-    logger.info('WorksheetQueueRepository#removeScheduledWorksheet', {
-      worksheetId: item.worksheetId,
-      queueId: queue.id
-    })
-
-    await this.save(updatedQueue)
-  }
-
+  /**
+   * @private
+   * @param {WorksheetQueue} queue
+   * @returns {Promise<WorksheetQueue|*>}
+   */
   async findNextAvailableInSource (queue) {
     const [ rawWorksheet ] = await this.worksheetRepository.findBySource(queue)
 
@@ -345,31 +460,12 @@ export class WorksheetQueueRepository extends CouchbaseModel {
     return queue
   }
 
-  async findItemByOperator (queueId, operatorId) {
-    if (!queueId) {
-      return null
-    }
-    const queue = await this.findByIdOrThrow(queueId)
-    return queue.findOpenedItemByOperatorId(operatorId)
-  }
-
-  async findByIdOrThrow (queueId) {
-    const queue = await this.findById(queueId)
-    if (!queue) {
-      throw newHttpError(404, `La cola ${queueId} no existe`)
-    }
-
-    return fromJSON(queue, WorksheetQueue)
-  }
-
-  async findWithExtra (queue) {
-    const worksheets = await this.getExtraInfo(queue)
-    const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), { worksheets })
-
-    return fromJSON(queueExtraInfo, WorksheetQueueExtraInfo)
-  }
-
-  async getExtraInfo (queue) {
+  /**
+   * @private
+   * @param queue
+   * @returns {Promise<Worksheet[]>}
+   */
+  async getQueueWorksheets (queue) {
     const worksheetIds = _map(queue.worksheets, 'worksheetId')
     const worksheets = await Promise
       .map(worksheetIds, (worksheetId) => this.worksheetRepository.findByIdWIthIncludes(worksheetId))
@@ -399,31 +495,5 @@ export class WorksheetQueueRepository extends CouchbaseModel {
 
       return Object.assign({}, JSON.parse(JSON.stringify(item)), info)
     })
-  }
-
-  async list (query = {}) {
-    const params = t.ListQuery(query)
-    const qb = this.getQueryBuilder('select')
-      .limit(params.limit)
-      .offset(params.offset)
-    const total = await this.countQuery()
-    const results = await this.query(qb)
-    const resultsWithCount = await Promise.map(results, async (queue) => {
-      const count = await this.worksheetRepository.countWorksheetsInSource(queue.source)
-      return Object.assign(JSON.parse(JSON.stringify(queue)), { possibleNumberOfWorksheets: count })
-    })
-    return fromJSON({ total, results: resultsWithCount }, QueueListResponse)
-  }
-
-  async update (queue, params) {
-    const $merge = fromJSON(params, WorksheetQueueBody)
-    const updatedQueue = t.update(queue, { $merge })
-    return this.save(updatedQueue)
-  }
-
-  async deleteQueue (queue) {
-    const qb = this.getQueryBuilder('delete')
-    qb.where('id = ?', queue.id)
-    return this.deleteQuery(qb)
   }
 }

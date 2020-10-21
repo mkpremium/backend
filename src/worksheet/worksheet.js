@@ -2,15 +2,15 @@ import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
 import t from 'tcomb'
+import { Building } from '../building/building'
 import { logger } from '../infrastructure/logger'
 import { utc } from '../lib/date'
 import { OwnerWithInclude } from '../owner/owner'
 import { OwnerCompactView } from '../owner/types'
 
 import { ScheduledEvent } from '../scheduled-events/types'
-import { QueueItem, QueueStatus } from './models/queue-item'
-import { Building } from '../building/building'
 import { Address } from '../types/common'
+import { QueueItem, QueueStatus } from './models/queue-item'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -149,6 +149,10 @@ export const WorksheetQueueCount = WorksheetQueue.extend(
   }
 )
 
+/**
+ * @param id
+ * @returns {QueueItem}
+ */
 WorksheetQueue.prototype.findItemById = function (id) {
   return _find(this.worksheets, { id })
 }

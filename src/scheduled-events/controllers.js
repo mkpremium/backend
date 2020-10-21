@@ -2,7 +2,7 @@ import { wrap } from 'express-promise-wrap'
 import { ScheduledEventsRepository } from './models'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { WorksheetQueueRepository } from '../worksheet/models/queue'
+import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { canScheduleCall } from '../lib/role-operators'
 
 async function listScheduledEvent (req, res) {

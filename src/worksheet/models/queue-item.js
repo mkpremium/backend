@@ -53,6 +53,9 @@ QueueItem.prototype.take = function (operatorId = null) {
   })
 }
 
+/**
+ * @returns {QueueItem}
+ */
 QueueItem.prototype.release = function () {
   return t.update(this, {
     status: { $set: QueueStatus.AVAILABLE },
@@ -69,6 +72,10 @@ QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   })
 }
 
+/**
+ * @param operatorId
+ * @returns {QueueItem}
+ */
 QueueItem.prototype.releaseSchedule = function (operatorId) {
   if (this.status === QueueStatus.SCHEDULED && this.operatorId === operatorId) {
     return this.release()

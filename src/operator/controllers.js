@@ -3,7 +3,7 @@ import { OperatorRefreshTokenRepository, OperatorRepository } from './models'
 import { History } from '../history/models'
 import { canManageOperator } from '../lib/role-operators'
 import { Calls } from '../calls/models'
-import { WorksheetQueueRepository } from '../worksheet/models/queue'
+import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import _get from 'lodash/get'
 
 async function login (req, res) {
