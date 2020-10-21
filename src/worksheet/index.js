@@ -11,8 +11,12 @@ export default (app, { eventBus }, { worksheetRepository, worksheetQueueReposito
   eventBus
     .on('BUILDING_NEGOTIATION_STATUS_CHANGED', async ({ buildingId, operatorId }) => {
       logger.info('updating worksheet because building negotiation status changed', { buildingId, operatorId })
-      const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
-      await worksheetRepository.updateWorkSheetStatus(worksheet.id, operatorId)
+      try {
+        const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
+        await worksheetRepository.updateWorkSheetStatus(worksheet.id, operatorId)
+      } catch (error) {
+        logger.crit('could not update worksheet on building status change', { error })
+      }
     })
 
   app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository))
