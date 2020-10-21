@@ -166,6 +166,10 @@ export class WorksheetRepository extends CouchbaseModel {
     return _head(results)
   }
 
+  /**
+   * @param {NegotiationStatus} negotiationStatus
+   * @returns {string}
+   */
   static mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
     switch (negotiationStatus) {
       case 'DESCARTADO':
