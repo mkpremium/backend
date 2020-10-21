@@ -2,9 +2,7 @@ import Promise from 'bluebird'
 import _ from 'lodash'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { utc } from '../../lib/date'
-import { OwnerRepository } from '../../owner/models'
 import { SystemPreferencesRepository } from '../../system-preferences/models'
-import { OwnerStatus } from '../../types/enums'
 import { Worksheet, WorkSheetStatus } from '../../worksheet/worksheet'
 import { WorksheetRepository } from '../../worksheet/models/worksheet-repository'
 
@@ -86,27 +84,9 @@ async function pullOutFreezer (worksheets, buildingRepository) {
 
   const saveWorksheet = async (worksheet) => {
     await repository.save(worksheet, false)
-    await moveOwnerStatus(worksheet.relatedBuildingIds[ 0 ])
   }
 
   await Promise.map(updatedWorksheets, saveWorksheet, { concurrency: 1 })
   const outOfFreezerBuildingIds = _.flatMap(updatedWorksheets.map(({ relatedBuildingIds }) => relatedBuildingIds))
   await buildingRepository.pullBuildingsOutOfFreezer(outOfFreezerBuildingIds)
-}
-
-export async function moveOwnerStatus (buildingId) {
-  const repository = new OwnerRepository()
-  const owners = await repository.findOwnersByBuildingId(buildingId)
-  if (owners.length === 0) {
-    logger.info('there is not owners for this worksheet to change', { buildingId })
-    return
-  }
-
-  const updatedOwners = owners.map(owner => {
-    return owner.pullOutFreezer(OwnerStatus.VERIFIED)
-  })
-
-  if (updatedOwners.length > 0) {
-    await Promise.map(updatedOwners, owner => repository.save(owner, false), { concurrency: 3 })
-  }
 }
