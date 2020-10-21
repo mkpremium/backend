@@ -1,7 +1,7 @@
 import { wrap } from 'express-promise-wrap'
 import { History } from '../history/models'
 import { newHttpError } from '../lib/http-error'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { OwnerRepository } from './models'
 import { FeaturedContact, Owner } from './owner'
 import { OwnerNotFound } from './OwnerRepository'

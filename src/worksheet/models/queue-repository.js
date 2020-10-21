@@ -22,7 +22,7 @@ import {
   WorksheetQueueSource
 } from '../worksheet'
 import { QueueItem, QueueStatus } from './queue-item'
-import { WorksheetRepository } from './worksheet'
+import { WorksheetRepository } from './worksheet-repository'
 
 const QueueItemExtraInfo = QueueItem.extend({
   totalContacts: t.Number,

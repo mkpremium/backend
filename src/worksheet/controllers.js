@@ -6,7 +6,7 @@ import { newHttpError } from '../lib/http-error'
 import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { OperatorRoles } from '../types/operator'
-import { QueueRequestParams, WorksheetRepository } from './models/worksheet'
+import { QueueRequestParams, WorksheetRepository } from './models/worksheet-repository'
 import { QueueRequestAction } from './types'
 import { WorksheetQueueBody } from './worksheet'
 

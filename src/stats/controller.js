@@ -3,7 +3,7 @@ import { wrap } from 'express-promise-wrap'
 import { OperatorRepository } from '../operator/models'
 import { OwnerRepository } from '../owner/models'
 import { OperatorStatsRepository } from './models'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 
 async function overAll (req, res) {
   const operatorRepo = new OperatorRepository()

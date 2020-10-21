@@ -11,7 +11,7 @@ import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
 import { TypedContactInfo } from '../types/common'
 import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { Owner, OwnerBody, Person } from './owner'
 import { OwnerListQuery } from './types'
 

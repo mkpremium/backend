@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { BuildingByCadastre, CreateBuildingInput } from './types'
 import { BuildingRepository } from '../../building/models'
-import { WorksheetRepository } from '../models/worksheet'
+import { WorksheetRepository } from '../models/worksheet-repository'
 
 /**
  *

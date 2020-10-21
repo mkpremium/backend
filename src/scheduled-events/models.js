@@ -16,7 +16,7 @@ import { OwnerRepository } from '../owner/models'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { ScheduledEvent, ScheduledEventType } from './types'
 
 export class ScheduledEvents extends CouchbaseModel {

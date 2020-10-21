@@ -3,7 +3,7 @@ import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
 import { OwnerBusinessStatus } from '../types/enums'
-import { WorksheetRepository } from '../worksheet/models/worksheet'
+import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { BuildingProposalRepository, BuildingRepository } from './models'
 
 export function createListBuildingsController (listBuildingsService) {
