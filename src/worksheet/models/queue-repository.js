@@ -69,6 +69,9 @@ const QueueListResponse = t.struct(
   }
 )
 
+/**
+ * @field {WorksheetRepository} worksheetRepository
+ */
 export class WorksheetQueueRepository extends CouchbaseModel {
   constructor (
     worksheetRepository = new WorksheetRepository()
@@ -349,7 +352,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
       worksheetId: item.worksheetId,
       queueId: queue.id
     })
-    await this.worksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
+    await this.worksheetRepository.updateStatus(item.worksheetId, operatorId)
 
     if (item.status !== QueueStatus.SCHEDULED) {
       const updatedQueue = this.removeWorksheetFromQueue(queue, item.worksheetId)
@@ -385,7 +388,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
    */
   async releaseItemInQueue (queue, item, operatorId) {
     logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
-    await this.worksheetRepository.updateWorkSheetStatus(item.worksheetId, operatorId)
+    await this.worksheetRepository.updateStatus(item.worksheetId, operatorId)
 
     if (item.status !== QueueStatus.SCHEDULED) {
       return this.removeWorksheetFromQueue(queue, item.worksheetId)

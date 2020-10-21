@@ -282,11 +282,6 @@ export class WorksheetRepository extends CouchbaseModel {
     return _get(results, '0.count', 0)
   }
 
-  async updateWorkSheetStatus (worksheetId, operatorId) {
-    const worksheetRepo = new WorksheetRepository()
-    return worksheetRepo.updateStatus(worksheetId, operatorId)
-  }
-
   static async notifyWorkSheetChangeByOwner (ownerId) {
   }
 

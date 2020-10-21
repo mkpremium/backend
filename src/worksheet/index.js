@@ -5,6 +5,12 @@ import './types'
 import jwt from '../middleware/jwt'
 import { logger } from '../infrastructure/logger'
 
+/**
+ * @param app
+ * @param eventBus
+ * @param {WorksheetRepository} worksheetRepository
+ * @param worksheetQueueRepository
+ */
 export default (app, { eventBus }, { worksheetRepository, worksheetQueueRepository }) => {
   const secured = jwt()
 
@@ -13,7 +19,7 @@ export default (app, { eventBus }, { worksheetRepository, worksheetQueueReposito
       logger.info('updating worksheet because building negotiation status changed', { buildingId, operatorId })
       try {
         const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
-        await worksheetRepository.updateWorkSheetStatus(worksheet.id, operatorId)
+        await worksheetRepository.updateStatus(worksheet.id, operatorId)
       } catch (error) {
         logger.crit('could not update worksheet on building status change', { error })
       }
