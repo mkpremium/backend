@@ -13,7 +13,6 @@ services:
       COUCHBASE_BUCKET: "mkpremium"
       COUCHBASE_USER: "couchbase"
       COUCHBASE_PASS: "couchbase"
-      FIREBASE_COMERCIALES: "false"
       SOCKET_ENABLED: "false"
       SOCKET_SERVER: "http://websocket:9002"
       DEBUG: "ON"
@@ -42,7 +41,6 @@ services:
       COUCHBASE_USER: "couchbase"
       COUCHBASE_PASS: "couchbase"
       SOCKET_ENABLED: "true"
-      FIREBASE_COMERCIALES: "false"
       SOCKET_SERVER: "http://localhost:9002"
       DEBUG: "ON"
 

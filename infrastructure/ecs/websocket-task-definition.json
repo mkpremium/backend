@@ -42,14 +42,6 @@
           "value": "backend"
         },
         {
-          "name": "FIREBASE_COMERCIALES",
-          "value": "false"
-        },
-        {
-          "name": "FIREBASE_INFORMADORES",
-          "value": "false"
-        },
-        {
           "name": "NODE_ENV",
           "value": "production"
         },

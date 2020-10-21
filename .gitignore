@@ -12,7 +12,6 @@ coverage
 
 # Environment values
 /.env
-firebase*.json
 *-pm2.json
 
 # Deployment builds

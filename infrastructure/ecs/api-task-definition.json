@@ -23,7 +23,8 @@
         }
       ],
       "command": [
-        "scripts/read-creds-and-start.sh"
+        "node",
+        "bin/www.js"
       ],
       "linuxParameters": null,
       "cpu": 0,
@@ -43,18 +44,6 @@
         {
           "name": "EMIT_MODEL_EVENTS",
           "value": "true"
-        },
-        {
-          "name": "FIREBASE_COMERCIALES",
-          "value": "true"
-        },
-        {
-          "name": "FIREBASE_COMERCIALES_DATABASE_URL",
-          "value": "https://mkpremiumcomerciales-bd40a.firebaseio.com"
-        },
-        {
-          "name": "FIREBASE_INFORMADORES",
-          "value": "false"
         },
         {
           "name": "JWT_EXPIRES",
@@ -102,10 +91,6 @@
         {
           "valueFrom": "backend.couchbase_pass",
           "name": "COUCHBASE_PASS"
-        },
-        {
-          "valueFrom": "backend.firebase.credentials",
-          "name": "FIREBASE_CREDENTIALS"
         },
         {
           "valueFrom": "backend.mailer.pass",

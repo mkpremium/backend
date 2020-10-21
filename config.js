@@ -1,9 +1,8 @@
+import { N1qlQuery } from 'couchbase'
 import multer from 'multer'
 import nodemailer from 'nodemailer'
+import { join } from 'path'
 import t from 'tcomb'
-import {join} from 'path'
-import _ from 'lodash'
-import {N1qlQuery} from 'couchbase'
 import { logger } from './src/infrastructure/logger'
 
 export const port = parseInt(process.env.APP_PORT || '9001')
@@ -46,25 +45,6 @@ export const metadataS3Config = {
 export const isTest = () => process.env.NODE_ENV === 'test'
 export const isMaybeTesting = v => isTest() ? t.maybe(v) : v
 
-const defaultFirebaseServiceAccount = join(__dirname, 'firebaseComerciales.json')
-
-function isEnabled (value) {
-  if (_.isEmpty(value)) {
-    return !isTest()
-  }
-  return JSON.parse(value)
-}
-
-const isFirebaseComercialesEnabled = isEnabled(process.env.FIREBASE_COMERCIALES || 'true')
-export const firebaseComerciales = {
-  enabled: isFirebaseComercialesEnabled,
-  serviceAccount: isFirebaseComercialesEnabled
-    ? (process.env.FIREBASE_COMERCIALES_SERVICE_ACCOUNT_KEY || defaultFirebaseServiceAccount)
-    : null,
-  databaseURL: process.env.FIREBASE_COMERCIALES_DATABASE_URL || '',
-  prefixURL: process.env.FIREBASE_COMERCIALES_PREFIX_URL || ''
-}
-
 const defaultUploadDir = join(__dirname, '.uploads')
 
 export const storage = multer.diskStorage({
@@ -104,8 +84,4 @@ export const cadastrewaitTimeMS = Number(process.env.SERVICES_WAIT_TIME || 2000)
 
 export const operatorPerformance = {
   numberOfDayOffset: Number(process.env.PERFORMANCE_OFFSET_DAYS || 15)
-}
-
-export const cronJobs = {
-  freezer: process.env.CRONJOB_FREEZER || '*/5 * * * *' // every five minutes
 }
