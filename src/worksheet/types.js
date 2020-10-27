@@ -1,4 +1,5 @@
 import t from 'tcomb'
+import { ListQuery } from '../types/params'
 import { Worksheet, WorkSheetStatusEnum } from './worksheet'
 import { WorkSheetQueueStatus } from './models/queue-item'
 
@@ -10,7 +11,7 @@ export const QueueRequestAction = {
 
 t.QueueRequestAction = t.enums(QueueRequestAction)
 
-export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
+export const WorksheetListQuery = t.WorksheetListQuery = ListQuery.extend(
   {
     status: t.maybe(WorkSheetStatusEnum),
     viewedAt: t.maybe(t.String),
@@ -25,7 +26,7 @@ export const WorksheetListQuery = t.WorksheetListQuery = t.ListQuery.extend(
   }
 )
 
-t.WorksheeQueueListQuery = t.ListQuery.extend({
+t.WorksheeQueueListQuery = ListQuery.extend({
   status: t.maybe(WorkSheetQueueStatus),
   operatorId: t.maybe(t.String),
   date: t.maybe(t.String),

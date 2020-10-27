@@ -1,27 +1,13 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { ListQuery } from '../types/params'
 
-/**
- * @swagger
- * definitions:
- *   NoteBody:
- *     required:
- *       - note
- *       - context
- *     properties:
- *       note:
- *         type: string
- *         description: texto de la nota
- *       context:
- *         type: object
- *         description: Contexto de la nota, necesario para su posterior consulta
- */
 t.NoteBody = t.struct({
   note: t.String,
   context: t.Object
 }, 'NoteBody')
 
-t.NoteListQuery = t.ListQuery.extend(
+t.NoteListQuery = ListQuery.extend(
   {
     createdBy: t.maybe(t.String),
     createdAt: t.maybe(t.Date),
@@ -36,29 +22,6 @@ t.NoteListQuery = t.ListQuery.extend(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   Note:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *       note:
- *         type: string
- *         description: texto de la nota
- *       context:
- *         type: object
- *         description: Contexto de la nota, necesario para su posterior consulta
- *       createdBy:
- *         type: string
- *         format: uuid/v4
- *         description: Id del operador que crea la nota
- *       createdAt:
- *         type: string
- *         format: YYYY-MM-DDTHH:mm:ss.sssZ
- *         description: Fecha de creación de la nota
- */
 export const TNote = t.Note = t.struct(
   {
     id: t.String,
@@ -82,21 +45,6 @@ export const TNote = t.Note = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   NoteListResponse:
- *     required:
- *       - total
- *       - results
- *     properties:
- *       total:
- *         type: number
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/Note"
- */
 t.NoteListResponse = t.struct(
   {
     total: t.Number,

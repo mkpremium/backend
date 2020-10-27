@@ -16,6 +16,7 @@ import { OwnerRepository } from '../owner/models'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
+import { ListQuery } from '../types/params'
 import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../worksheet/worksheet'
 import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from './types'
@@ -40,7 +41,7 @@ const UpdateScheduledEvent = t.struct({
   event: t.maybe(Event)
 }, 'UpdateScheduledEvent')
 
-const ScheduledEventListQuery = t.ListQuery.extend( // TODO remove global t.ListQuery
+const ScheduledEventListQuery = ListQuery.extend(
   {
     createdBy: t.maybe(t.String),
     notifyAt: t.maybe(t.String),

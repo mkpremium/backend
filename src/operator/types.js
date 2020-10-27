@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import { Operator, OperatorProfile, OperatorRole } from '../types/operator'
+import { ListQuery } from '../types/params'
 import { RestringedHourObject } from './restringed-hours/types'
 
 t.Credentials = t.struct({
@@ -20,12 +21,12 @@ t.AuthenticatedResponse = t.struct({
   roles: t.list(t.String)
 }, 'AuthenticatedResponse')
 
-t.OperatorListQuery = t.ListQuery.extend({
+t.OperatorListQuery = ListQuery.extend({
   enable: t.maybe(t.Boolean),
   role: t.maybe(t.String)
 })
 
-t.OperatorLimitedListQuery = t.ListQuery.extend(
+t.OperatorLimitedListQuery = ListQuery.extend(
   {
     role: t.String,
     enable: t.maybe(t.Boolean)

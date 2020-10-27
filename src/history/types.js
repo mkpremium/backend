@@ -1,4 +1,5 @@
 import t from 'tcomb'
+import { ListQuery } from '../types/params'
 
 /**
  * @swagger
@@ -68,7 +69,7 @@ t.HistoryListResponse = t.struct(
   }
 )
 
-t.HistoryListQuery = t.ListQuery.extend(
+t.HistoryListQuery = ListQuery.extend(
   {
     actionType: t.maybe(t.RecordAction),
     modelName: t.maybe(t.String),

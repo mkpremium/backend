@@ -1,6 +1,6 @@
 import t from 'tcomb'
 
-t.ListQuery = t.struct(
+export const ListQuery = t.struct(
   {
     limit: t.Positive,
     offset: t.Positive

@@ -5,6 +5,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { isTest } from '../../config'
 import { TypedContactInfo } from '../types/common'
 import { OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
+import { ListQuery } from '../types/params'
 import { OwnerConfirmed, OwnerWithInclude } from './owner'
 
 export const OwnerCompactView = t.struct(
@@ -41,7 +42,7 @@ t.OwnerLitResponse = t.struct(
   }
 )
 
-export const OwnerListQuery = t.OwnerListQuery = t.ListQuery.extend(
+export const OwnerListQuery = ListQuery.extend(
   {
     contactNumber: t.maybe(t.String)
   },

@@ -13,6 +13,7 @@ import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
+import { ListQuery } from '../../types/params'
 import {
   Worksheet,
   WorkSheetCall,
@@ -301,7 +302,7 @@ export class WorksheetQueueRepository extends CouchbaseModel {
    * @returns {Promise<unknown>}
    */
   async list (query = {}) {
-    const params = t.ListQuery(query)
+    const params = ListQuery(query)
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset)
