@@ -18,7 +18,48 @@ import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
 import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../worksheet/worksheet'
-import { ScheduledEvent, ScheduledEventType } from './types'
+import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from './types'
+
+const ScheduleEventsListResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(ScheduledEvent)
+  },
+  {
+    name: 'ScheduleEventsListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
+    }
+  }
+)
+
+const UpdateScheduledEvent = t.struct({
+  notifyAt: t.maybe(t.Date),
+  eventDate: t.maybe(t.Date),
+  event: t.maybe(Event)
+}, 'UpdateScheduledEvent')
+
+const ScheduledEventListQuery = t.ListQuery.extend( // TODO remove global t.ListQuery
+  {
+    createdBy: t.maybe(t.String),
+    notifyAt: t.maybe(t.String),
+    type: t.maybe(ScheduledEventTypeEnum),
+    createdAt: t.maybe(t.String),
+    eventDate: t.maybe(t.String),
+    eventDateBetween: t.maybe(t.String),
+    createdBetween: t.maybe(t.StringSplitList), // TODO remove global t.StringSplitList
+    notifyBetween: t.maybe(t.StringSplitList)
+  },
+  {
+    name: 'ScheduledEventListQuery',
+    defaultProps: {
+      createdBetween: ',',
+      notifyBetween: ',',
+      eventDateBetween: ','
+    }
+  }
+)
 
 export class ScheduledEventsRepository extends CouchbaseModel {
   constructor () {
@@ -135,7 +176,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
   async update (id, data = {}) {
     logger.debug('scheduled-events-model#update', { id, data })
     const scheduledEvent = await this.findByIdOrThrow(id)
-    fromJSON(data, t.UpdateScheduledEvent)
+    fromJSON(data, UpdateScheduledEvent)
     const updatedEvent = t.update(scheduledEvent.event, {
       $merge: data.event
     })
@@ -163,7 +204,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
   }
 
   async list (query = {}) {
-    const params = t.ScheduledEventListQuery(query)
+    const params = ScheduledEventListQuery(query)
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset)
@@ -201,7 +242,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     const total = await this.countQuery(qbCount)
     const results = await this.query(qb)
 
-    return fromJSON({ total, results }, t.ScheduleEventsListResponse)
+    return fromJSON({ total, results }, ScheduleEventsListResponse)
   }
 
   async weekScheduleEventMeetings (week, year, location) {
