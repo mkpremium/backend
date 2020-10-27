@@ -1,8 +1,8 @@
-import { logger } from '../infrastructure/logger'
 import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../db/model'
+import { logger } from '../infrastructure/logger'
 import { buildRangeFromWeek, utc } from '../lib/date'
 import { buildDistanceCalculator } from '../lib/geo'
 import { newHttpError } from '../lib/http-error'
@@ -20,14 +20,12 @@ import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../worksheet/worksheet'
 import { ScheduledEvent, ScheduledEventType } from './types'
 
-export class ScheduledEvents extends CouchbaseModel {
+export class ScheduledEventsRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = ScheduledEvent
   }
-}
 
-export class ScheduledEventsRepository extends ScheduledEvents {
   async findByIdOrThrow (id) {
     const scheduledEvent = await this.findById(id)
     if (!scheduledEvent) {

@@ -20,13 +20,13 @@ import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
 import { OwnerRepository } from '../../owner/models'
 import { ownersContactViews } from '../../owner/types'
-import { ScheduledEvents } from '../../scheduled-events/models'
+import { ScheduledEventsRepository } from '../../scheduled-events/models'
 import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { OwnerStatus } from '../../types/enums'
-import { Worksheet, WorkSheetStatus } from '../worksheet'
 import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
+import { Worksheet, WorkSheetStatus } from '../worksheet'
 
 const QueueRequestParamsBase = t.struct(
   {
@@ -127,7 +127,7 @@ export class WorksheetRepository extends CouchbaseModel {
   }
 
   async findMeetings (worksheetId) {
-    const meetingRepo = new ScheduledEvents()
+    const meetingRepo = new ScheduledEventsRepository()
     const qb = meetingRepo.getQueryBuilder()
     qb.where('type = ?', ScheduledEventType.MEETINGS)
     qb.where('event.worksheetId = ?', worksheetId)
