@@ -17,6 +17,7 @@ import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
 import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
+import { WorkSheetStatus } from '../worksheet/worksheet'
 import { ScheduledEvent, ScheduledEventType } from './types'
 
 export class ScheduledEvents extends CouchbaseModel {
@@ -102,7 +103,10 @@ export class ScheduledEventsRepository extends ScheduledEvents {
       const worksheetRepo = new WorksheetRepository()
       const worksheet = await worksheetRepo.findByIdWIthIncludes(_get(scheduledEvent, 'event.worksheetId'))
       const { city, province } = _get(worksheet, 'relatedBuildings.0.address', {})
-      const updatedWorksheet = t.update(worksheet, { lastAddedMeeting: { $set: scheduledEvent } })
+      const updatedWorksheet = t.update(worksheet, {
+        lastAddedMeeting: { $set: scheduledEvent },
+        status: { $set: WorkSheetStatus.MEETING }
+      })
       await worksheetRepo.save(updatedWorksheet, false)
       if (worksheet.lastAddedMeeting === null) {
         const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING
