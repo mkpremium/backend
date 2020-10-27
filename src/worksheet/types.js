@@ -12,7 +12,7 @@ export const QueueRequestAction = {
 
 t.QueueRequestAction = t.enums(QueueRequestAction)
 
-export const WorksheetListQuery = t.WorksheetListQuery = ListQuery.extend(
+export const WorksheetListQuery = ListQuery.extend(
   {
     status: t.maybe(WorkSheetStatusEnum),
     viewedAt: t.maybe(t.String),
