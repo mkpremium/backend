@@ -63,8 +63,8 @@ export const updateScheduledEventController = wrap(updateScheduledEvent)
 export const deleteScheduledEventController = wrap(deleteScheduledEvent)
 
 export const createAddScheduledMeetingEventController = (createMeetingService) => {
-  return async (req, res) => {
+  return wrap(async (req, res) => {
     const scheduledEvent = await createMeetingService.createMeeting(req.user.operator, req.body)
     res.status(201).json(scheduledEvent)
-  }
+  })
 }
