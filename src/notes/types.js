@@ -1,6 +1,7 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { ListQuery } from '../types/params'
+import { StringSplitList } from '../types/refinement'
 
 t.NoteBody = t.struct({
   note: t.String,
@@ -11,7 +12,7 @@ t.NoteListQuery = ListQuery.extend(
   {
     createdBy: t.maybe(t.String),
     createdAt: t.maybe(t.Date),
-    createdBetween: t.maybe(t.StringSplitList),
+    createdBetween: t.maybe(StringSplitList),
     context: t.maybe(t.String)
   },
   {

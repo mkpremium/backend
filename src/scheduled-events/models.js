@@ -17,6 +17,7 @@ import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { SystemPreferencesRepository } from '../system-preferences/models'
 import { ListQuery } from '../types/params'
+import { StringSplitList } from '../types/refinement'
 import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../worksheet/worksheet'
 import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from './types'
@@ -49,8 +50,8 @@ const ScheduledEventListQuery = ListQuery.extend(
     createdAt: t.maybe(t.String),
     eventDate: t.maybe(t.String),
     eventDateBetween: t.maybe(t.String),
-    createdBetween: t.maybe(t.StringSplitList), // TODO remove global t.StringSplitList
-    notifyBetween: t.maybe(t.StringSplitList)
+    createdBetween: t.maybe(StringSplitList),
+    notifyBetween: t.maybe(StringSplitList)
   },
   {
     name: 'ScheduledEventListQuery',
