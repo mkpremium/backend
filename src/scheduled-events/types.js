@@ -1,8 +1,7 @@
 import t from 'tcomb'
-import uuid from 'uuid/v4'
 import { isMaybeTesting } from '../../config'
-import { OwnerWithInclude } from '../owner/owner'
 import { Building } from '../building/building'
+import { OwnerWithInclude } from '../owner/owner'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -39,28 +38,6 @@ export const ScheduleTaskType = {
 }
 
 t.ScheduleTaskType = t.enums.of(Object.values(ScheduleTaskType))
-t.ScheduledTask = t.struct(
-  {
-    id: t.String,
-    type: t.ScheduleTaskType,
-    context: t.Object,
-    executeAt: t.Date,
-    createdAt: t.Date,
-    _documentType: t.enums.of(['scheduled-task'])
-  },
-  {
-    name: 'ScheduledTask',
-    defaultProps: {
-      get id () {
-        return uuid()
-      },
-      get createdAt () {
-        return new Date()
-      },
-      _documentType: 'scheduled-task'
-    }
-  }
-)
 
 export const ScheduledEvent = t.struct(
   {
