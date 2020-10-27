@@ -11,86 +11,6 @@ export const ScheduledEventType = {
 
 t.ScheduledEventType = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType')
 
-/**
- * @swagger
- * definitions:
- *   ScheduledCallEventBody:
- *     properties:
- *       notifyTo:
- *        type: string
- *        format: uuid/v4
- *        description: Id del operador a notificar
- *       event:
- *         type: object
- *         $ref: "#/definitions/ScheduledCallEvent"
- *         description: Contexto de la llamada
- *       notifyAt:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *         description: Fecha de envío de la notificación
- *       eventDate:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *         description: Fecha de la cita
- */
-
-/**
- * @swagger
- * definitions:
- *   ScheduledMeetingEventBody:
- *     properties:
- *       createdBy:
- *        type: string
- *        format: uuid/v4
- *        description: Id del operador que crea la cita
- *       notifyTo:
- *        type: string
- *        format: uuid/v4
- *        description: Id del operador a notificar
- *       event:
- *         type: object
- *         $ref: "#/definitions/ScheduledMeetingEvent"
- *         description: Contexto de la cita
- *       notifyAt:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *         description: Fecha de envío de la notificación
- *       eventDate:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *         description: Fecha de la cita
- */
-
-/**
- * @swagger
- * definitions:
- *   ScheduledEvent:
- *     properties:
- *       id:
- *        type: string
- *        format: uuid/v4
- *       createdBy:
- *        type: string
- *        format: uuid/v4
- *       notifyTo:
- *        type: string
- *        format: uuid/v4
- *       event:
- *        type: object
- *        description: Puede contener ScheduledCallEvent o ScheduledMeetingEvent
- *       type:
- *         type: string
- *         enum: [CALLS, MEETINGS]
- *       notifyAt:
- *         type: string
- *         description: YYYY-MM-DDTHH:MM:SSZ
- *       eventDate:
- *         type: string
- *         description: YYYY-MM-DDTHH:MM:SSZ
- *       createdAt:
- *         type: string
- *         description: YYYY-MM-DD
- */
 const Event = t.struct(
   {
     owner: t.maybe(OwnerWithInclude),
@@ -166,78 +86,6 @@ export const ScheduledEvent = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   ScheduledCallEvent:
- *     properties:
- *       queueId:
- *         type: string
- *         format: uuid/v4
- *       itemId:
- *         type: string
- *         format: uuid/v4
- *         description: Item de la llamada programada
- *       contactId:
- *         type: string
- *         format: uuid/v4
- *       ownerId:
- *         type: string
- *         format: uuid/v4
- *       worksheetId:
- *         type: string
- *         format: uuid/v4
- */
-
-/**
- * @swagger
- * definitions:
- *   ScheduledMeetingEventLocation:
- *     properties:
- *       lat:
- *         type: number
- *       long:
- *         type: number
- *   ScheduledMeetingEvent:
- *     properties:
- *       contactId:
- *         type: string
- *         format: uuid/v4
- *       ownerId:
- *         type: string
- *         format: uuid/v4
- *       buildingId:
- *         type: string
- *         format: uuid/v4
- *       worksheetId:
- *         type: string
- *         format: uuid/v4
- *       eventAddress:
- *         type: string
- *       eventLocation:
- *         type: object
- *         $ref: "#/definitions/ScheduledMeetingEventLocation"
- *       inPerson:
- *         type: boolean
- *         description: Indica si la cita es presencial. cuando los es, esta cita no envía eventos de recordatorio
- *         default: true
- */
-
-/**
- * @swagger
- * definitions:
- *   ScheduleEventsListResponse:
- *     required:
- *       - total
- *       - results
- *     properties:
- *       total:
- *         type: number
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/ScheduledEvent"
- */
 t.ScheduleEventsListResponse = t.struct(
   {
     total: t.Number,
@@ -252,24 +100,6 @@ t.ScheduleEventsListResponse = t.struct(
   }
 )
 
-/**
- * @swagger
- * definitions:
- *   UpdateScheduledEvent:
- *     properties:
- *       event:
- *         type: object
- *         $ref: "#/definitions/ScheduledMeetingEvent"
- *         description: Contexto de la cita
- *       notifyAt:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *         description: Fecha de envío de la notificación
- *       eventDate:
- *         type: string
- *         format: YYYY-MM-DDTHH:MM:SSZ
- *         description: Fecha de la cita
- */
 t.UpdateScheduledEvent = t.struct({
   notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date),
