@@ -11,6 +11,7 @@ import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { Operator as OperatorType, OperatorProfile, OperatorRole, OperatorRoles } from '../types/operator'
+import { StringNotEmpty } from '../types/refinement'
 import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
@@ -327,7 +328,7 @@ export class OperatorRefreshTokenRepository extends CouchbaseModel {
 
 const OperatorRequest = t.struct(
   {
-    username: t.StringNotEmpty,
+    username: StringNotEmpty,
     password: t.Password,
     email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),

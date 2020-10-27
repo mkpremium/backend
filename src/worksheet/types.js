@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import { ListQuery } from '../types/params'
-import { StringSplitList } from '../types/refinement'
+import { Positive, StringSplitList } from '../types/refinement'
 import { WorkSheetQueueStatus } from './models/queue-item'
 import { Worksheet, WorkSheetStatusEnum } from './worksheet'
 
@@ -48,10 +48,10 @@ t.WorkSheetLitResponse = t.struct(
   }
 )
 
-export const WorksheetSearchQuery = t.WorksheetSearchQuery = t.struct(
+export const WorksheetSearchQuery = t.struct(
   {
     query: t.String,
-    limit: t.Positive
+    limit: Positive
   },
   {
     name: 'WorksheetSearchQuery',
