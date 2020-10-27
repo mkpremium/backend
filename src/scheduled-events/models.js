@@ -27,13 +27,6 @@ export class ScheduledEvents extends CouchbaseModel {
   }
 }
 
-export class ScheduledTask extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = t.ScheduledTask
-  }
-}
-
 export class ScheduledEventsRepository extends ScheduledEvents {
   async findByIdOrThrow (id) {
     const scheduledEvent = await this.findById(id)
