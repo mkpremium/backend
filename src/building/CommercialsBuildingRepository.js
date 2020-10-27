@@ -62,7 +62,8 @@ export class CommercialsBuildingRepository {
 
   listById (ids) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(listBuildingsByIdQuery), [ ids ]
+      N1qlQuery.fromString(listBuildingsByIdQuery).consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
+      [ ids ]
     ).then(CommercialsBuildingRepository.mapToPropertyAgentBuildingView)
   }
 
