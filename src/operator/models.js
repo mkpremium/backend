@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
+import _isNil from 'lodash/isNil'
 import _omit from 'lodash/omit'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -11,7 +12,6 @@ import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { Operator as OperatorType, OperatorProfile, OperatorRole, OperatorRoles } from '../types/operator'
-import { StringNotEmpty } from '../types/refinement'
 import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
@@ -326,10 +326,13 @@ export class OperatorRefreshTokenRepository extends CouchbaseModel {
   }
 }
 
+const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
+const Password = t.refinement(t.String, n => passwordRegex.test(n), 'Password')
+const NotEmptyString = t.refinement(t.String, n => !_isNil(n), 'NotEmptyString')
 const OperatorRequest = t.struct(
   {
-    username: StringNotEmpty,
-    password: t.Password,
+    username: NotEmptyString,
+    password: Password,
     email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
