@@ -1,5 +1,9 @@
 import { buildingNegotiationStatus } from '../building'
 
+/**
+ * @property {BuildingsRepository} buildingRepository
+ * @property {EventBus} eventBus
+ */
 export class UpdateBuildingNegotiationStatusService {
   constructor (buildingRepository, eventBus) {
     this.buildingRepository = buildingRepository
