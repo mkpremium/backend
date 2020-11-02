@@ -2,6 +2,11 @@ import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
 
 export class CreateMeetingService {
+  /**
+   * @param {ScheduledEventsRepository} scheduledEventsRepository
+   * @param {BuildingsRepository} buildingRepository
+   * @param {EventBus} eventBus
+   */
   constructor (scheduledEventsRepository, buildingRepository, eventBus) {
     this.buildingRepository = buildingRepository
     this.scheduledEventsRepository = scheduledEventsRepository

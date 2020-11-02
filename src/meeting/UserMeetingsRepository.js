@@ -28,7 +28,7 @@ export class UserMeetingsRepository {
 
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY), [ userId ]
+      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY).consistency(N1qlQuery.Consistency.STATEMENT_PLUS), [ userId ]
     ).then(meetings =>
       meetings.map(
         ({ id, meetingAddress, meetingAt, buildingId, inPerson, proposalValue, contactId, contacts, contactName, metadata = [] }) => {

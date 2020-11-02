@@ -62,6 +62,9 @@ export const addScheduledCallEventController = wrap(addScheduledCallEvent)
 export const updateScheduledEventController = wrap(updateScheduledEvent)
 export const deleteScheduledEventController = wrap(deleteScheduledEvent)
 
+/**
+ * @param {CreateMeetingService} createMeetingService
+ */
 export const createAddScheduledMeetingEventController = (createMeetingService) => {
   return wrap(async (req, res) => {
     const scheduledEvent = await createMeetingService.createMeeting(req.user.operator, req.body)
