@@ -29,29 +29,31 @@ export class UserMeetingsRepository {
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(GET_USER_MEETINGS_QUERY).consistency(N1qlQuery.Consistency.STATEMENT_PLUS), [ userId ]
-    ).then(meetings =>
-      meetings.map(
-        ({ id, meetingAddress, meetingAt, buildingId, inPerson, proposalValue, contactId, contacts, contactName, metadata = [] }) => {
-          const thumbnails = metadata.filter(m => m.mimeType === 'image/jpeg').map(({ id, mimeType, previewUrl }) => ({
-            id,
-            mimeType,
-            thumbnailUrl: previewUrl
-          }))
-          const phoneContact = contacts ? contacts.find(c => ['TELEFONO', 'MOVIL'].indexOf(c.type) !== -1 && (!contactId || c.id === contactId)) : undefined
-          const emailContact = contacts ? contacts.find(c => c.type === 'EMAIL' && (!contactId || c.id === contactId)) : undefined
-          return {
-            id,
-            meetingAddress,
-            meetingAt,
-            buildingId,
-            inPerson,
-            proposalValue,
-            contactName,
-            phoneNumber: phoneContact ? phoneContact.value : undefined,
-            email: emailContact ? emailContact.value : undefined,
-            thumbnail: thumbnails.length > 0 ? thumbnails[ 0 ] : undefined
-          }
-        })
-    )
+    ).then(scheduledEventToMeeting)
   }
+}
+
+function scheduledEventToMeeting (meetings) {
+  return meetings.map(
+    ({ id, meetingAddress, meetingAt, buildingId, inPerson, proposalValue, contactId, contacts, contactName, metadata = [] }) => {
+      const thumbnails = metadata.filter(m => m.mimeType === 'image/jpeg').map(({ id, mimeType, previewUrl }) => ({
+        id,
+        mimeType,
+        thumbnailUrl: previewUrl
+      }))
+      const phoneContact = contacts ? contacts.find(c => [ 'TELEFONO', 'MOVIL' ].indexOf(c.type) !== -1 && (!contactId || c.id === contactId)) : undefined
+      const emailContact = contacts ? contacts.find(c => c.type === 'EMAIL' && (!contactId || c.id === contactId)) : undefined
+      return {
+        id,
+        meetingAddress,
+        meetingAt,
+        buildingId,
+        inPerson,
+        proposalValue,
+        contactName,
+        phoneNumber: phoneContact ? phoneContact.value : undefined,
+        email: emailContact ? emailContact.value : undefined,
+        thumbnail: thumbnails.length > 0 ? thumbnails[ 0 ] : undefined
+      }
+    })
 }
