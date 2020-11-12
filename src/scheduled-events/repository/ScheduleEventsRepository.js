@@ -134,7 +134,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
    */
   async addScheduledMeetingEvent (data = {}, createdBy) {
     const params = { ...data, createdBy, type: 'MEETINGS' }
-    await this.validateUniqueWorksheet(params)
     const scheduledEvent = await this.save(params)
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
@@ -154,24 +153,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     }
 
     return scheduledEvent
-  }
-
-  async validateUniqueWorksheet (params) {
-    const worksheetId = _get(params, 'event.worksheetId')
-    const type = _get(params, 'type')
-
-    if (!worksheetId) {
-      return
-    }
-
-    const qb = this.getQueryBuilder()
-      .where('event.worksheetId = ?', worksheetId)
-      .where('type = ?', type)
-    const result = await this.query(qb)
-
-    if (result && result.length > 0) {
-      throw newHttpError(400, 'No se pueden crear multiples citas para una misma worksheet')
-    }
   }
 
   async addScheduleCallEvent (data = {}, createdBy) {
