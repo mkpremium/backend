@@ -1,7 +1,6 @@
 import crypto from 'crypto'
 import { CouchbaseModel } from '../db/model'
 import { CadastreAddressInput, CadastreCache } from './types'
-import { ONE_MONTH } from '../lib/constants'
 import { CadastreApi } from './api'
 
 function cacheHash (value) {
@@ -106,6 +105,7 @@ export class CadastreRepository extends CouchbaseModel {
    * @return {Promise<*>}
    */
   async saveToExpire (id, data) {
+    const ONE_MONTH = 60 * 60 * 24 * 29
     const options = {
       expiry: ONE_MONTH
     }
