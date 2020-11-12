@@ -5,7 +5,9 @@ import { expect } from 'chai'
 import { closeSellStock } from '../../src/stock/application'
 import { BuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
+import Promise from 'bluebird'
 
+const CONSISTENCY_THREDHOLD = 1000
 describe('StockRepository', () => {
   let app, stockRepository, stockService
   const now = moment()

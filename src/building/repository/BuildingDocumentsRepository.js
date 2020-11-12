@@ -1,9 +1,12 @@
 import { N1qlQuery } from 'couchbase'
 
-const buildingDocumentsQuery = `
-  SELECT id, url, mimeType
-  FROM $2 metadata
-  WHERE _documentType = 'metadata' AND buildingId = $1
+const buildingDocumentsQuery = bucketName => `
+  SELECT
+    metadata.id,
+    metadata.url,
+    metadata.mimeType
+  FROM ${bucketName} metadata
+  WHERE metadata._documentType = 'metadata' AND metadata.buildingId = $1
 `
 
 export class BuildingDocumentsRepository {
@@ -16,8 +19,8 @@ export class BuildingDocumentsRepository {
 
   documentsOfBuilding (buildingId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(buildingDocumentsQuery).consistency(N1qlQuery.Consistency.REQUEST_PLUS),
-      [ buildingId, this.couchbaseAdapter.bucketName ]
+      N1qlQuery.fromString(buildingDocumentsQuery(this.couchbaseAdapter.bucketName)).consistency(N1qlQuery.Consistency.REQUEST_PLUS),
+      [ buildingId ]
     ).then(docs => docs.map(({ id, url, mimeType }) => ({ documentId: id, privateUrl: url, mimeType })))
   }
 }

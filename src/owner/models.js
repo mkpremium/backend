@@ -172,7 +172,7 @@ SELECT
 negotiationStatus as status,
 assignedAgentId as meetingWithOperatorId,
 COUNT(*) as count
-FROM ${this._bucket.name || 'mkpremium'}
+FROM ${this.getBucketName()}
 WHERE
 _documentType = 'building'
 AND negotiationStatus IS NOT MISSING
