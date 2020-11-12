@@ -128,8 +128,12 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return this.query(qb)
   }
 
+  /**
+   * @param {ScheduledEvent} data
+   * @param {string} createdBy
+   */
   async addScheduledMeetingEvent (data = {}, createdBy) {
-    const params = Object.assign({}, data, { createdBy, type: 'MEETINGS' })
+    const params = { ...data, createdBy, type: 'MEETINGS' }
     await this.validateUniqueWorksheet(params)
     const scheduledEvent = await this.save(params)
 
