@@ -1,6 +1,6 @@
 import moment from 'moment'
 import t from 'tcomb'
-import { ScheduledEventsRepository } from '../../src/scheduled-events/models'
+import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/ScheduleEventsRepository'
 import { closeSellStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
 import { WorksheetRepository } from '../../src/worksheet/models/worksheet-repository'

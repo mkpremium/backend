@@ -20,7 +20,7 @@ import { OwnerRepository } from '../owner/OwnerRepository'
 import { SetOwnerFeaturedContactService } from '../owner/SetOwnerFeaturedContactService'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
-import { ScheduledEventsRepository } from '../scheduled-events/models'
+import { ScheduledEventsRepository } from '../scheduled-events/repository/ScheduleEventsRepository'
 import { CreateMeetingService } from '../scheduled-events/service/CreateMeetingService'
 import { StockRepository as LegacyStockRepository } from '../stock/models'
 
