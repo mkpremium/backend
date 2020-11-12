@@ -5,7 +5,7 @@ import { BuildingsRepository } from '../building/BuildingsRepository'
 import { CommercialsBuildingRepository } from '../building/CommercialsBuildingRepository'
 import { ListBuildingProposalsService } from '../building/ListBuildingProposalsService'
 import { ListBuildingsService } from '../building/ListBuildingsService'
-import { BuildingRepository as LegacyBuildingRepository, MetadataRepository } from '../building/models'
+import { BuildingRepository as LegacyBuildingRepository} from '../building/models'
 import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
 import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository'
 import { GetDocumentsSignedURLService } from '../building/service/GetDocumentsSignedURLService'
@@ -35,6 +35,7 @@ import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorksheetRepository } from '../worksheet/worksheet-repository'
 import { EventBus } from './EventBus'
+import { MetadataRepository } from '../building/repository/MetadataRepository'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
