@@ -12,23 +12,27 @@ building.metadata,
 
 owner.name as contactName,
 owner.person.contacts
-FROM mkpremium meeting
-LEFT JOIN mkpremium building ON building.id = meeting.event.buildingId AND building._documentType = 'building'
+FROM $2 meeting
+LEFT JOIN $2 building ON building.id = meeting.event.buildingId AND building._documentType = 'building'
 
-LEFT JOIN mkpremium owner ON owner.id = meeting.event.owner.id AND owner._documentType = 'owner'
+LEFT JOIN $2 owner ON owner.id = meeting.event.owner.id AND owner._documentType = 'owner'
 
 WHERE meeting._documentType = 'scheduled-event' AND meeting.type = 'MEETINGS'
 AND meeting.notifyTo = $1
 `
 
 export class UserMeetingsRepository {
+  /**
+   * @param {CouchbaseAdapter} couchbaseAdapter
+   */
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
   }
 
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY).consistency(N1qlQuery.Consistency.STATEMENT_PLUS), [ userId ]
+      N1qlQuery.fromString(GET_USER_MEETINGS_QUERY).consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
+      [ userId, this.couchbaseAdapter.bucketName ]
     ).then(meetings =>
       meetings.map(
         ({ id, meetingAddress, meetingAt, buildingId, inPerson, proposalValue, contactId, contacts, contactName, metadata = [] }) => {

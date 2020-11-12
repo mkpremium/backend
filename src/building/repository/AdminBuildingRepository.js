@@ -10,20 +10,23 @@ SELECT
     building.address.fullAddress as buildingAddress,
     agent.id AS agentId,
     {'sell': stock.sell, 'purchase': stock.purchase} as stock
-FROM mkpremium building
-INNER JOIN mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock' AND (stock.close IS MISSING OR stock.close IS NULL)
-INNER JOIN mkpremium agent ON agent._documentType = 'operator' AND building.assignedAgentId = agent.id
+FROM $1 building
+INNER JOIN $1 stock ON stock.buildingId = building.id AND stock._documentType = 'stock' AND (stock.close IS MISSING OR stock.close IS NULL)
+INNER JOIN $1 agent ON agent._documentType = 'operator' AND building.assignedAgentId = agent.id
 WHERE building._documentType = 'building'
 `
 
 export class AdminBuildingRepository {
+  /**
+   * @param {CouchbaseAdapter} couchbaseAdapter
+   */
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
   }
 
   allAgentsStockStats () {
     return this.couchbaseAdapter
-      .queryAsync(N1qlQuery.fromString(ALL_AGENTS_STOCK_STATS_QUERY))
+      .queryAsync(N1qlQuery.fromString(ALL_AGENTS_STOCK_STATS_QUERY), [this.couchbaseAdapter.bucketName])
       .then(result =>
         result.map(({
           buildingId, use, landArea, buildingAddress, stock, agentName, agentId
