@@ -2,4 +2,5 @@
 
 set -e
 
+npm run lint
 ./scripts/test-ci.sh
