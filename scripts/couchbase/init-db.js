@@ -7,38 +7,72 @@ const config = {
   password: process.env.COUCHBASE_PASS || 'couchbase',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
 }
-const cluster = new couchbase.Cluster(config.connString)
-cluster.authenticate(config.username, config.password);
-
 const BUCKET_MIN_REQUIRED_MB = 100
+
 const bucketName = config.bucketName
 
-let bucket
-let bucketManager
+const cluster = Promise.promisifyAll(new couchbase.Cluster(config.connString))
 
+cluster.authenticate(config.username, config.password)
 const clusterManager = Promise.promisifyAll(cluster.manager())
-clusterManager.createBucketAsync(bucketName, {flushEnabled: 1, ramQuotaMB: BUCKET_MIN_REQUIRED_MB})
-  .then(() => Promise.delay(2000))
-  .catch(() => undefined)
-  .finally(() => {
-    bucket = cluster.openBucket(bucketName)
-    bucketManager = Promise.promisifyAll(bucket.manager())
-  })
-  .then(() => bucketManager.flushAsync())
-  .then(() => bucketManager.createPrimaryIndexAsync({name: `${bucketName}_primary`, ignoreIfExists: true}))
-  .then(() => {
-    return bucketManager.createIndexAsync(
-      `${bucketName}document-type`,
-      ['_documentType'],
-      {
-        ignoreIfExists: true, deferred: false
-      }
-    )
-  })
-  .then(() => process.exit())
+const createBucket = () => clusterManager.createBucketAsync(bucketName, {
+  flushEnabled: 1,
+  ramQuotaMB: BUCKET_MIN_REQUIRED_MB
+})
+
+const CONNECTION_TIMEOUT = 10000
+const BUCKET_CREATION_TIMEOUT = 2000
+const EXISTING_BUCKET = 'EXISTING_BUCKET'
+const NEW_BUCKET = 'NEW_BUCKET'
+
+console.info(`Initializating bucket with name ${bucketName}`)
+createBucket()
   .catch(error => {
-    console.error({error, stack: error.stack})
-    process.exit(1);
+    if ([ 'ECONNREFUSED', 'ECONNRESET' ].indexOf(error.code) !== -1) {
+      console.info('Connection error, waiting 10 seconds before retrying', { code: error.code })
+      return Promise.delay(CONNECTION_TIMEOUT).then(createBucket).delay(BUCKET_CREATION_TIMEOUT)
+    } else if (error.statusCode === 400) {
+      return EXISTING_BUCKET
+    }
+    console.error('Bucket creation failed', { error })
+    throw error
+  })
+  .then(() => {
+    console.info('Bucket created')
+    return Promise.delay(BUCKET_CREATION_TIMEOUT).then(NEW_BUCKET)
+  })
+  .then((bucketSource) => {
+    const bucket = cluster.openBucket(bucketName)
+    const bucketManager = Promise.promisifyAll(bucket.manager())
+
+    if (bucketSource === NEW_BUCKET) {
+      console.info('Initializing new bucket')
+      console.info('Creating primary index')
+      return bucketManager
+        .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
+        .catch(console.error)
+        .then(() => {
+          console.info('Creating application indexes')
+          return bucketManager.createIndexAsync(
+            `${bucketName}document-type`,
+            [ '_documentType' ],
+            {
+              ignoreIfExists: true, deferred: false
+            }
+          )
+        })
+    } else {
+      console.info('Flushing existing bucket')
+      return bucketManager.flushAsync()
+    }
+  })
+  .then(() => {
+    console.info('Done!')
+    return process.exit()
+  })
+  .catch(error => {
+    console.error({ error, stack: error.stack })
+    process.exit(1)
   })
 
 
