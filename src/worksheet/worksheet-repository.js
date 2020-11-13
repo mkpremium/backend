@@ -1,6 +1,9 @@
 import { Worksheet } from './worksheet'
 
 export class WorksheetRepository {
+  /**
+   * @param {CouchbaseAdapter} couchbaseAdapter
+   */
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
   }
