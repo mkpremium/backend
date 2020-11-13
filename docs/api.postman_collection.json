@@ -81,74 +81,97 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Take Next Queue Worksheet",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"action\":\"NEXT\"}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Worksheets",
+			"item": [
+				{
+					"name": "Create Queue",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"test-queue\",\n\t\"source\": {\n\t\t\"city\": \"TEST_PORTO\"\n\t}\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{apiUrl}}/worksheets/queues/{{queueId}}",
-					"host": [
-						"{{apiUrl}}"
-					],
-					"path": [
-						"worksheets",
-						"queues",
-						"{{queueId}}"
-					]
-				},
-				"description": "Fetch next available worksheet in queue."
-			},
-			"response": []
+				{
+					"name": "Take Next Queue Worksheet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"action\":\"NEXT\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues/{{queueId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues",
+								"{{queueId}}"
+							]
+						},
+						"description": "Fetch next available worksheet in queue."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Create Queue",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"name\": \"test-queue\",\n\t\"source\": {\n\t\t\"city\": \"TEST_PORTO\"\n\t}\n}\n",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Scheduled Events",
+			"item": [
+				{
+					"name": "Get Scheduled Calls",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
 						}
-					}
-				},
-				"url": {
-					"raw": "{{apiUrl}}/worksheets/queues",
-					"host": [
-						"{{apiUrl}}"
-					],
-					"path": [
-						"worksheets",
-						"queues"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Login",
@@ -183,6 +206,33 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Update user (permissions)",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"roles\": [\n        \"OPERATOR\",\n        \"BUSINESS\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/operators/{{test-user-id}}",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"operators",
+						"{{test-user-id}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -190,7 +240,12 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU4MDA0ODRlLTNiNmUtNGFjOC1hMmY2LTQ4ZDY5N2MxYWY0ZSIsInBlcm1pc3Npb25zIjpbIkJVU0lORVNTIl0sIm9wZXJhdG9yIjp7ImlkIjoiNTgwMDQ4NGUtM2I2ZS00YWM4LWEyZjYtNDhkNjk3YzFhZjRlIiwibmFtZSI6Im9wZXJhdG9yIG9wZXJhdG9yIiwidXNlcm5hbWUiOiJidXNpbmVzcyIsImNpdHkiOiJiYXJjZWxvbmEiLCJxdWV1ZUlkIjoicXVldWVJZCIsImVtYWlsIjoib3BlcmF0b3JAZXhhbXBsZS5jb20iLCJsYW5ndWFnZSI6ImVzIn0sImlhdCI6MTYwMzE5MTQ4NCwiZXhwIjoxNjAzNDUwNjg0fQ.qqwz4CwHy67biGqEFP_w1BGOqc-26w3rumAFIZ1kVhM",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNWYyODRjLTUwZjctNDA5YS1hOWQ5LTdhNzMyYTk4ZjJjNiIsInBlcm1pc3Npb25zIjpbIkJVU0lORVNTIiwiT1BFUkFUT1IiLCJBRE1JTiJdLCJvcGVyYXRvciI6eyJpZCI6ImFhNWYyODRjLTUwZjctNDA5YS1hOWQ5LTdhNzMyYTk4ZjJjNiIsIm5hbWUiOiJvcGVyYXRvciBvcGVyYXRvciIsInVzZXJuYW1lIjoiYnVzaW5lc3MiLCJjaXR5IjoiYmFyY2Vsb25hIiwicXVldWVJZCI6IjQyODI4MDYxLWI3MGEtNDE5Ny05NTk3LThmYjRkOTEzNTU1MyIsImVtYWlsIjoib3BlcmF0b3JAZXhhbXBsZS5jb20iLCJsYW5ndWFnZSI6ImVzIn0sImlhdCI6MTYwNDU5Njg3MiwiZXhwIjoxNjA0ODU2MDcyfQ.-bRazmEVW2YxGIrSaUXwQYiyoC_2VWbUypFWlw7pylQ",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "{{ACCESS_TOKEN}}",
 				"type": "string"
 			}
 		]
@@ -219,16 +274,19 @@
 	],
 	"variable": [
 		{
-			"id": "7e8b827e-7073-4eb7-8390-22f0c69187bb",
+			"id": "d677528c-8428-44b6-a430-5761699f97cf",
 			"key": "apiUrl",
-			"value": "https://api.mkpremium.net",
-			"type": "string"
+			"value": "https://api.mkpremium.net"
 		},
 		{
-			"id": "5a46bd4e-01ae-4e2f-91f7-4df4dbc3288c",
+			"id": "9646d716-740d-4166-8235-c5e93ede68f9",
 			"key": "queueId",
-			"value": "f365e947-4c0e-4beb-ba18-25db1773587f",
-			"type": "string"
+			"value": "f365e947-4c0e-4beb-ba18-25db1773587f"
+		},
+		{
+			"id": "4a6b52d9-3e10-4ea1-8fca-7fce0f66866b",
+			"key": "test-user-id",
+			"value": "test-user-id"
 		}
 	],
 	"protocolProfileBehavior": {}
