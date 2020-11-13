@@ -20,7 +20,7 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   ramQuotaMB: BUCKET_MIN_REQUIRED_MB
 })
 
-const CONNECTION_TIMEOUT = 10000
+const CONNECTION_TIMEOUT = 30000
 const BUCKET_CREATION_TIMEOUT = 10000
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
