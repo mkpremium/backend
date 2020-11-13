@@ -21,36 +21,41 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
 })
 
 const CONNECTION_TIMEOUT = 10000
-const BUCKET_CREATION_TIMEOUT = 2000
+const BUCKET_CREATION_TIMEOUT = 10000
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
 
 console.info(`Initializating bucket with name ${bucketName}`)
 createBucket()
+  .then(() => {
+    console.info('Bucket created')
+    return Promise.delay(BUCKET_CREATION_TIMEOUT).then(NEW_BUCKET)
+  })
   .catch(error => {
     if ([ 'ECONNREFUSED', 'ECONNRESET' ].indexOf(error.code) !== -1) {
       console.info('Connection error, waiting 10 seconds before retrying', { code: error.code })
-      return Promise.delay(CONNECTION_TIMEOUT).then(createBucket).delay(BUCKET_CREATION_TIMEOUT)
+      return Promise.delay(CONNECTION_TIMEOUT).then(createBucket).delay(BUCKET_CREATION_TIMEOUT).then(() => NEW_BUCKET)
     } else if (error.statusCode === 400) {
+      console.warn('Guessing error means that bucket already exists', { error })
       return EXISTING_BUCKET
     }
     console.error('Bucket creation failed', { error })
     throw error
   })
-  .then(() => {
-    console.info('Bucket created')
-    return Promise.delay(BUCKET_CREATION_TIMEOUT).then(NEW_BUCKET)
-  })
   .then((bucketSource) => {
     const bucket = cluster.openBucket(bucketName)
     const bucketManager = Promise.promisifyAll(bucket.manager())
 
+    console.info({ bucketSource });
     if (bucketSource === NEW_BUCKET) {
       console.info('Initializing new bucket')
       console.info('Creating primary index')
       return bucketManager
         .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
-        .catch(console.error)
+        .catch(error => {
+          console.error('Primary index creation failed', { error })
+          throw error
+        })
         .then(() => {
           console.info('Creating application indexes')
           return bucketManager.createIndexAsync(
