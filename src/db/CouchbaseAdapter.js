@@ -7,6 +7,10 @@ export class CouchbaseAdapter {
     this.couchbaseBucket = couchbaseBucket
   }
 
+  get bucketName () {
+    return this.couchbaseBucket.name
+  }
+
   async save (data, structType) {
     const struct = fromJSON(data, structType)
     const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })

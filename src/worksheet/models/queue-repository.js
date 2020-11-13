@@ -90,16 +90,16 @@ export class WorksheetQueueRepository extends CouchbaseModel {
    */
   async scheduleWorksheetInQueue (queue, scheduledEvent) {
     const worksheetId = scheduledEvent.event.worksheetId
-    const operatorId = scheduledEvent.notifyTo
-    const item = queue.findItemByWorksheetId(worksheetId)
-    if (!item) {
-      throw newHttpError(400, `La Worksheet ${worksheetId} no fue encontrada en la cola`)
+    const worksheet = await this.worksheetRepository.findById(worksheetId)
+    if (!worksheet) {
+      throw newHttpError(409, `La hoja de trabajo ${worksheetId} no puede abrirse, comuníquese con su administrador`)
     }
 
-    const worksheet = await this.worksheetRepository.findById(item.worksheetId)
-
-    if (!worksheet) {
-      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`)
+    const operatorId = scheduledEvent.notifyTo
+    let item = queue.findItemByWorksheetId(worksheetId)
+    if (!item) {
+      queue = queue.addWorksheet(worksheet)
+      item = _.find(queue.worksheets, i => i.worksheetId === worksheetId)
     }
 
     const updatedItem = item.schedule(operatorId, scheduledEvent)

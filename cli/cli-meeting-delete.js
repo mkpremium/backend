@@ -5,7 +5,7 @@ import Promise from 'bluebird'
 import {actionWrapper} from './lib'
 import {WorksheetRepository} from '../src/worksheet/models/worksheet'
 import {BuildingRepository} from '../src/building/models'
-import {ScheduledEventsRepository} from '../src/scheduled-events/models'
+import {ScheduledEventsRepository} from '../src/scheduled-events/repository/ScheduleEventsRepository'
 
 if (require.main === module) {
   program

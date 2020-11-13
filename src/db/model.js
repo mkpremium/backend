@@ -9,7 +9,6 @@ import { logger } from '../infrastructure/logger'
 import init from './couchbase'
 import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
-import { ONE_WEEK } from '../lib/constants'
 
 class CouchbaseModelStruct {
   constructor () {
@@ -27,36 +26,6 @@ export class CouchbaseCounter {
     const counterKey = `counter:${key}`
     const { value } = await this.bucket.counterAsync(counterKey, delta, this.options)
     return value
-  }
-}
-
-export class CouchbaseSimpleCache {
-  constructor (bucket, options) {
-    this.bucket = bucket
-    this.options = options
-  }
-
-  async getValue (key) {
-    const cacheKey = `cache:${key}`
-    let result = null
-    if (!this.bucket) {
-      return null
-    }
-    try {
-      result = await this.bucket.getAsync(cacheKey)
-    } catch (e) {
-      console.error(e)
-    }
-
-    return result && result.value
-  }
-
-  async setValue (key, value) {
-    if (!this.bucket) {
-      return null
-    }
-    const cacheKey = `cache:${key}`
-    return this.bucket.upsertToDb(cacheKey, value, this.options)
   }
 }
 
@@ -176,10 +145,6 @@ export class CouchbaseModel {
 
   getCounter (options = { initial: 1 }) {
     return new CouchbaseCounter(this._bucket, options)
-  }
-
-  getCache (options = { expiry: ONE_WEEK }) {
-    return new CouchbaseSimpleCache(this._bucket, options)
   }
 
   async raw (query, consistency = couchbase.consistency) {

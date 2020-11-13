@@ -1,5 +1,5 @@
 import { wrap } from 'express-promise-wrap'
-import { ScheduledEventsRepository } from './models'
+import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'

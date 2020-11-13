@@ -172,7 +172,7 @@ SELECT
 negotiationStatus as status,
 assignedAgentId as meetingWithOperatorId,
 COUNT(*) as count
-FROM mkpremium
+FROM ${this.getBucketName()}
 WHERE
 _documentType = 'building'
 AND negotiationStatus IS NOT MISSING
@@ -196,7 +196,7 @@ GROUP BY negotiationStatus, assignedAgentId
           total += count
         })
 
-        owner.stats[status] = total
+        owner.stats[ status ] = total
       })
     })
 

@@ -1,21 +1,28 @@
 import { N1qlQuery } from 'couchbase'
 
-const ACTIVE_PROPERTY_MANAGERS_QUERY = `
-    SELECT id, profile.city, username as userName, profitGoal.amount as profitGoal
-    FROM mkpremium as propertyManager
-    WHERE propertyManager._documentType = 'operator'
+const activePropertyManagersQuery = bucketName => `
+    SELECT
+      id,
+      profile.city,
+      username as userName,
+      profitGoal.amount as profitGoal
+    FROM ${bucketName}
+    WHERE _documentType = 'operator'
     AND enable = true
-    AND (ANY V IN roles SATISFIES V = 'BUSINESS' END)
+    AND (ANY r IN roles SATISFIES r = 'BUSINESS' END)
 `
 
 export class PropertyManagerRepository {
+  /**
+   * @param {CouchbaseAdapter} couchbaseAdapter
+   */
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
   }
 
   getActivePropertyManagers () {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(ACTIVE_PROPERTY_MANAGERS_QUERY)
+      N1qlQuery.fromString(activePropertyManagersQuery(this.couchbaseAdapter.bucketName))
         .consistency(N1qlQuery.Consistency.STATEMENT_PLUS)
     )
   }

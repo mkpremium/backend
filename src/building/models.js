@@ -9,25 +9,9 @@ import { toJSON } from '../lib/tcomb'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from './building'
-import { BuildingMetadata } from './types'
 
 import { logger } from '../infrastructure/logger'
-
-export class Metadata extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = BuildingMetadata
-  }
-
-  async findByIdOrThrow (metadataId) {
-    const metadata = await this.findById(metadataId)
-    if (!metadata) {
-      throw newHttpError(404, `El archivo de meta datos ${metadataId} no existe`)
-    }
-
-    return metadata
-  }
-}
+import { MetadataRepository } from './repository/MetadataRepository'
 
 export class BuildingProposal extends CouchbaseModel {
   constructor () {
@@ -51,10 +35,6 @@ export class BuildingProposalRepository extends BuildingProposal {
   }
 }
 
-export class MetadataRepository extends Metadata {
-
-}
-
 export class BuildingRepository extends CouchbaseModel {
   constructor () {
     super()
@@ -76,7 +56,7 @@ export class BuildingRepository extends CouchbaseModel {
       .where('cadastre IS NOT MISSING')
       .where('cadastre.reference = ?', cadastreReference)
       .limit(1)
-    const [building] = await repo.query(qb)
+    const [ building ] = await repo.query(qb)
     return building
   }
 
@@ -89,7 +69,7 @@ export class BuildingRepository extends CouchbaseModel {
       .where('cadastre IS NOT MISSING')
       .where('address.fullAddress = ?', fullAddress)
       .limit(1)
-    const [building] = await repo.query(qb)
+    const [ building ] = await repo.query(qb)
     return building
   }
 
@@ -113,7 +93,7 @@ export class BuildingRepository extends CouchbaseModel {
       url: cleanUrl(params.url)
     })
     const metadata = await metaRepo.save(body)
-    const updatedMetadata = t.update(building.metadata, { $push: [BuildingMetadataPreview(metadata)] })
+    const updatedMetadata = t.update(building.metadata, { $push: [ BuildingMetadataPreview(metadata) ] })
     const updatedBuilding = t.update(building, { metadata: { $merge: updatedMetadata } })
 
     await this.save(updatedBuilding)
@@ -127,7 +107,7 @@ export class BuildingRepository extends CouchbaseModel {
     })
     const proposalRepo = new BuildingProposalRepository()
     const proposal = await proposalRepo.save(paramsWithOperator)
-    const updateProposals = t.update(building.proposals || [], { $push: [proposal.id] })
+    const updateProposals = t.update(building.proposals || [], { $push: [ proposal.id ] })
     const updatedBuilding = t.update(building, {
       proposals: { $set: updateProposals },
       recentProposal: { $set: proposal }

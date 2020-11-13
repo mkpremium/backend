@@ -1,26 +1,26 @@
 import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { CouchbaseModel } from '../db/model'
-import { logger } from '../infrastructure/logger'
-import { buildRangeFromWeek, utc } from '../lib/date'
-import { buildDistanceCalculator } from '../lib/geo'
-import { newHttpError } from '../lib/http-error'
+import { CouchbaseModel } from '../../db/model'
+import { logger } from '../../infrastructure/logger'
+import { buildRangeFromWeek, utc } from '../../lib/date'
+import { buildDistanceCalculator } from '../../lib/geo'
+import { newHttpError } from '../../lib/http-error'
 import {
   addBetweenQueryToBuilder,
   addDateQueryToBuilder,
   addMinuteBetweenQueryToBuilder,
   addMinuteDateQueryToBuilder
-} from '../lib/query/helpers'
-import { OwnerRepository } from '../owner/models'
-import { OperatorStats } from '../stats/models'
-import { OperatorActions } from '../stats/types'
-import { SystemPreferencesRepository } from '../system-preferences/models'
-import { ListQuery } from '../types/params'
-import { StringSplitList } from '../types/refinement'
-import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
-import { WorkSheetStatus } from '../worksheet/worksheet'
-import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from './types'
+} from '../../lib/query/helpers'
+import { OwnerRepository } from '../../owner/models'
+import { OperatorStats } from '../../stats/models'
+import { OperatorActions } from '../../stats/types'
+import { SystemPreferencesRepository } from '../../system-preferences/models'
+import { ListQuery } from '../../types/params'
+import { StringSplitList } from '../../types/refinement'
+import { WorksheetRepository } from '../../worksheet/models/worksheet-repository'
+import { WorkSheetStatus } from '../../worksheet/worksheet'
+import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from '../types'
 
 const ScheduleEventsListResponse = t.struct(
   {
@@ -94,7 +94,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
       return true
     }
 
-    if (!areAllowedMeetingMinutes(data.eventDate, pref.meetingRestrictions.allowedStartMinutes)) {
+    if (!areMeetingMinutesAllowed(data.eventDate, pref.meetingRestrictions.allowedStartMinutes)) {
       throw newHttpError(
         400,
         `Las reuniones solo puede empezar a los 00 minutos o 30 minutos UTC: ${data.eventDate}|${data.eventDate.toISOString()}`
@@ -128,9 +128,12 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return this.query(qb)
   }
 
+  /**
+   * @param {ScheduledEvent} data
+   * @param {string} createdBy
+   */
   async addScheduledMeetingEvent (data = {}, createdBy) {
-    const params = Object.assign({}, data, { createdBy, type: 'MEETINGS' })
-    await this.validateUniqueWorksheet(params)
+    const params = { ...data, createdBy, type: 'MEETINGS' }
     const scheduledEvent = await this.save(params)
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
@@ -150,24 +153,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     }
 
     return scheduledEvent
-  }
-
-  async validateUniqueWorksheet (params) {
-    const worksheetId = _get(params, 'event.worksheetId')
-    const type = _get(params, 'type')
-
-    if (!worksheetId) {
-      return
-    }
-
-    const qb = this.getQueryBuilder()
-      .where('event.worksheetId = ?', worksheetId)
-      .where('type = ?', type)
-    const result = await this.query(qb)
-
-    if (result && result.length > 0) {
-      throw newHttpError(400, 'No se pueden crear multiples citas para una misma worksheet')
-    }
   }
 
   async addScheduleCallEvent (data = {}, createdBy) {
@@ -280,7 +265,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
   }
 }
 
-function areAllowedMeetingMinutes (time, allowedMinutes = [ 0, 30 ]) {
+function areMeetingMinutesAllowed (time, allowedMinutes = [ 0, 30 ]) {
   const min = time.getMinutes()
 
   return allowedMinutes.indexOf(min) !== -1

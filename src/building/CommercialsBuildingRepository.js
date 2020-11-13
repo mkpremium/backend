@@ -2,7 +2,7 @@ import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import moment from 'moment'
 
-const listBuildingsByIdQuery = `
+const listBuildingsByIdQuery = bucketName => `
 SELECT
     building.id,
     building.metadata,
@@ -20,49 +20,52 @@ SELECT
 
     ARRAY {m.eventDate, "ownerId": m.event.owner.id} FOR m IN buildingMeetings END buildingMeetings,
     ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN verifiedOwners END verifiedOwners
-FROM mkpremium building
-LEFT NEST mkpremium stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
+FROM ${bucketName} building
+LEFT NEST ${bucketName} stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 
-NEST mkpremium verifiedOwners ON verifiedOwners.status != "ERRONEO"
+NEST ${bucketName} verifiedOwners ON verifiedOwners.status != "ERRONEO"
     AND verifiedOwners.buildingId = building.id
     AND verifiedOwners._documentType = 'owner'
     AND ANY c in verifiedOwners.person.contacts SATISFIES c.status = "GOOD" END
 
 
-LEFT NEST mkpremium buildingMeetings ON buildingMeetings.event.buildingId = building.id
+LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = building.id
     AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
 WHERE building._documentType = 'building'
 AND building.id IN $1
 `
 
-const listProposalsForBuildingIdQuery = `
+const listProposalsForBuildingIdQuery = bucketName => `
 SELECT
 id,
 proposal,
 createdAt,
 updatedAt,
 aspiration
-FROM mkpremium
+FROM ${bucketName}
 WHERE _documentType = 'building-proposal'
 AND buildingId = $1
 `
 
-const assignedBuildingsIdForAgentQuery = `
+const assignedBuildingsIdForAgentQuery = bucketName => `
 SELECT
-    building.id buildingId
-FROM mkpremium building
-WHERE building._documentType = 'building'
-    AND building.assignedAgentId = $1
+    id buildingId
+FROM ${bucketName}
+WHERE _documentType = 'building'
+    AND assignedAgentId = $1
 `
 
 export class CommercialsBuildingRepository {
+  /**
+   * @param {CouchbaseAdapter} couchbaseAdapter
+   */
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter
   }
 
   listById (ids) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(listBuildingsByIdQuery).consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
+      N1qlQuery.fromString(listBuildingsByIdQuery(this.couchbaseAdapter.bucketName)).consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
       [ ids ]
     ).then(CommercialsBuildingRepository.mapToPropertyAgentBuildingView)
   }
@@ -74,13 +77,13 @@ export class CommercialsBuildingRepository {
 
   listProposalsForBuilding (buildingId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(listProposalsForBuildingIdQuery), [ buildingId ]
+      N1qlQuery.fromString(listProposalsForBuildingIdQuery(this.couchbaseAdapter.bucketName)), [ buildingId ]
     )
   }
 
   allAssignedBuildingsId (agentId) {
     return this.couchbaseAdapter
-      .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery), [ agentId ])
+      .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery(this.couchbaseAdapter.bucketName)), [ agentId ])
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 
