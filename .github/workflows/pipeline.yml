@@ -12,7 +12,9 @@ jobs:
 
     services:
       couchbase_db:
-        image: couchbase:community-6.0.0
+        build:
+          context: ./docker/couchbase
+          dockerfile: Dockerfile
 
     steps:
       - name: Checkout
