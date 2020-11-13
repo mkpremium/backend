@@ -12,9 +12,12 @@ jobs:
 
     services:
       couchbase_db:
-        build:
-          context: ./docker/couchbase
-          dockerfile: Dockerfile
+        image: "priyacouch/couchbase-dev"
+        environment:
+          COUCHBASE_ADMINISTRATOR_USERNAME: couchbase
+          COUCHBASE_ADMINISTRATOR_PASSWORD: couchbase
+          COUCHBASE_BUCKET: mkpremium
+
 
     steps:
       - name: Checkout
