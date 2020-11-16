@@ -29,7 +29,7 @@ console.info(`Initializating bucket with name ${bucketName}`)
 createBucket()
   .then(() => {
     console.info('Bucket created')
-    return Promise.delay(BUCKET_CREATION_WAIT_TIME).then(NEW_BUCKET)
+    return Promise.delay(BUCKET_CREATION_WAIT_TIME).then(() => NEW_BUCKET)
   })
   .catch(error => {
     if ([ 'ECONNREFUSED', 'ECONNRESET' ].indexOf(error.code) !== -1) {
