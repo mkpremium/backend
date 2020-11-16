@@ -19,14 +19,14 @@ SELECT
     stock[0] stock,
 
     ARRAY {m.eventDate, "ownerId": m.event.owner.id} FOR m IN buildingMeetings END buildingMeetings,
-    ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN verifiedOwners END verifiedOwners
+    ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN owners END owners
 FROM ${bucketName} building
 LEFT NEST ${bucketName} stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
 
-NEST ${bucketName} verifiedOwners ON verifiedOwners.status != "ERRONEO"
-    AND verifiedOwners.buildingId = building.id
-    AND verifiedOwners._documentType = 'owner'
-    AND ANY c in verifiedOwners.person.contacts SATISFIES c.status = "GOOD" END
+NEST ${bucketName} owners ON owners.status != "ERRONEO"
+    AND owners.buildingId = building.id
+    AND owners._documentType = 'owner'
+    AND ANY c in owners.person.contacts SATISFIES c.status = "GOOD" END
 
 
 LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = building.id
@@ -91,12 +91,12 @@ export class CommercialsBuildingRepository {
     return buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
-        ownerId, buildingMeetings = [], verifiedOwners, negotiationStatus, salePrice
+        ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-        const featuredOwner = CommercialsBuildingRepository.getOwner(ownerId, lastMeeting, verifiedOwners)
+        const featuredOwner = CommercialsBuildingRepository.getOwner(ownerId, lastMeeting, owners)
         const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
         return ({
@@ -161,17 +161,17 @@ export class CommercialsBuildingRepository {
     )
   }
 
-  static getOwner (featuredOwnerId, lastMeeting, verifiedOwners) {
-    if (!verifiedOwners || verifiedOwners.length === 0) {
+  static getOwner (featuredOwnerId, lastMeeting, owners) {
+    if (!owners || owners.length === 0) {
       return
     }
     const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
 
-    return this.verifiedOwnerOfId(verifiedOwners, featuredOwnerId) ||
-      CommercialsBuildingRepository.verifiedOwnerOfId(verifiedOwners, lastMeetingOwnerId) || verifiedOwners[ 0 ]
+    return this.ownerOfId(owners, featuredOwnerId) ||
+      CommercialsBuildingRepository.ownerOfId(owners, lastMeetingOwnerId) || owners[ 0 ]
   }
 
-  static verifiedOwnerOfId (verifiedOwners, ownerId) {
-    return verifiedOwners.find(o => o.id === ownerId)
+  static ownerOfId (owners, ownerId) {
+    return owners.find(o => o.id === ownerId)
   }
 }

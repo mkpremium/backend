@@ -57,7 +57,7 @@ describe('CommercialsBuildingRepository', () => {
           'ownerId': null,
           'stock': [],
           'use': 'Residencial',
-          'verifiedOwners': [
+          'owners': [
             {
               'id': '169e02a9-b5a6-4f46-8fc4-b90f3076953d',
               'personId': '953b7501-f074-4b80-9775-121f3317249f'
@@ -165,7 +165,7 @@ describe('CommercialsBuildingRepository', () => {
         ],
         'ownerId': 'a3d94192-ec4f-4bd9-b839-c1be9ff562da',
         'use': 'Residencial',
-        'verifiedOwners': [
+        'owners': [
           {
             'contacts': [
               {
