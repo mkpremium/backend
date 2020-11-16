@@ -33,7 +33,7 @@ createBucket()
   })
   .catch(error => {
     if ([ 'ECONNREFUSED', 'ECONNRESET' ].indexOf(error.code) !== -1) {
-      console.info(`Connection error, waiting ${CONNECTION_WAIT_TIME/1000} seconds before retrying`, { code: error.code })
+      console.info(`Connection error, waiting ${CONNECTION_WAIT_TIME / 1000} seconds before retrying`, { code: error.code })
       return Promise.delay(CONNECTION_WAIT_TIME).then(createBucket).delay(BUCKET_CREATION_WAIT_TIME).then(() => NEW_BUCKET)
     } else if (error.statusCode === 400) {
       console.warn('Guessing error means that bucket already exists', { error })
@@ -46,12 +46,16 @@ createBucket()
     const bucket = cluster.openBucket(bucketName)
     const bucketManager = Promise.promisifyAll(bucket.manager())
 
-    console.info({ bucketSource });
+    console.info({ bucketSource })
     if (bucketSource === NEW_BUCKET) {
       console.info('Initializing new bucket')
       console.info('Creating primary index')
       return bucketManager
         .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
+        .catch(error => {
+          console.warn('Primary creation failed on first attempt, retrying', { error })
+          return Promise.delay(3000).then(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }))
+        })
         .catch(error => {
           console.error('Primary index creation failed', { error })
           throw error
@@ -59,7 +63,7 @@ createBucket()
         .then(() => {
           console.info('Creating application indexes')
           return bucketManager.createIndexAsync(
-            `${bucketName}document-type`,
+            `${bucketName}_document-type`,
             [ '_documentType' ],
             {
               ignoreIfExists: true, deferred: false
