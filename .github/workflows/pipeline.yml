@@ -13,6 +13,8 @@ jobs:
     services:
       couchbase_db:
         image: "jvelasco/couchbase-dev"
+        ports:
+          - "8091-8094":"8091-8094"
 
 
     steps:
