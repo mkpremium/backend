@@ -62,10 +62,7 @@ services:
       - api
 
   couchbase_db:
-    build:
-      context: ./docker/couchbase
-      dockerfile: Dockerfile
-    image: "mkpremium:couchbase-local"
+    image: "jvelasco/couchbase-dev"
 
     ports:
       - "8091:8091" # REST/HTTP including Web UI
