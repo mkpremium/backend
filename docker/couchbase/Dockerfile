@@ -1,6 +1,9 @@
 FROM couchbase:community-6.0.0
 
-RUN ["apt-get", "update"]
-RUN ["apt-get", "install", "-y", "less", "vim"]
+ENV CLUSTER_NAME default
+ENV COUCHBASE_USERNAME couchbase
+ENV COUCHBASE_PASSWORD couchbase
+COPY init-cluster.sh /opt/couchbase
 
-COPY init-couchbase /etc/service/init-couchbase
+CMD ["/opt/couchbase/init-cluster.sh"]
+
