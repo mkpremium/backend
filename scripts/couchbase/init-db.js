@@ -20,7 +20,7 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   ramQuotaMB: BUCKET_MIN_REQUIRED_MB
 })
 
-const CONNECTION_TIMEOUT = 30000
+const CONNECTION_WAIT_TIME = 60000
 const BUCKET_CREATION_WAIT_TIME = 10000
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
@@ -33,8 +33,8 @@ createBucket()
   })
   .catch(error => {
     if ([ 'ECONNREFUSED', 'ECONNRESET' ].indexOf(error.code) !== -1) {
-      console.info(`Connection error, waiting ${BUCKET_CREATION_WAIT_TIME/1000} seconds before retrying`, { code: error.code })
-      return Promise.delay(CONNECTION_TIMEOUT).then(createBucket).delay(BUCKET_CREATION_WAIT_TIME).then(() => NEW_BUCKET)
+      console.info(`Connection error, waiting ${CONNECTION_WAIT_TIME/1000} seconds before retrying`, { code: error.code })
+      return Promise.delay(CONNECTION_WAIT_TIME).then(createBucket).delay(BUCKET_CREATION_WAIT_TIME).then(() => NEW_BUCKET)
     } else if (error.statusCode === 400) {
       console.warn('Guessing error means that bucket already exists', { error })
       return EXISTING_BUCKET
