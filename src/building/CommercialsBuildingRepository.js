@@ -26,7 +26,6 @@ LEFT NEST ${bucketName} stock ON stock.buildingId = building.id AND stock._docum
 NEST ${bucketName} owners ON owners.status != "ERRONEO"
     AND owners.buildingId = building.id
     AND owners._documentType = 'owner'
-    AND ANY c in owners.person.contacts SATISFIES c.status = "GOOD" END
 
 
 LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = building.id
