@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { Building } from '../building/building'
-import { Worksheet, WorkSheetStatus } from '../worksheet/worksheet'
+import { Worksheet, WorkSheetStatus } from '../worksheet/domain/worksheet'
 
 export const CreateWorksheetRequest = t.struct({
   building: Building,

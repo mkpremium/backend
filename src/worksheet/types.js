@@ -2,7 +2,7 @@ import t from 'tcomb'
 import { ListQuery } from '../types/params'
 import { Positive, StringSplitList } from '../types/refinement'
 import { WorkSheetQueueStatus } from './models/queue-item'
-import { Worksheet, WorkSheetStatusEnum } from './worksheet'
+import { Worksheet, WorkSheetStatusEnum } from './domain/worksheet'
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',

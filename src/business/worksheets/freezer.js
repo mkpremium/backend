@@ -3,7 +3,7 @@ import _ from 'lodash'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { utc } from '../../lib/date'
 import { SystemPreferencesRepository } from '../../system-preferences/models'
-import { Worksheet, WorkSheetStatus } from '../../worksheet/worksheet'
+import { Worksheet, WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { WorksheetRepository } from '../../worksheet/models/worksheet-repository'
 
 import { logger } from '../../infrastructure/logger'

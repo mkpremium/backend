@@ -26,7 +26,7 @@ import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { OwnerStatus } from '../../types/enums'
 import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
-import { Worksheet, WorkSheetStatus } from '../worksheet'
+import { Worksheet, WorkSheetStatus } from '../domain/worksheet'
 
 const QueueRequestParamsBase = t.struct(
   {

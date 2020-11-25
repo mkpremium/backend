@@ -1,6 +1,6 @@
 import { WorksheetQueueActionsService } from '../../../src/worksheet/service/worksheet-queue-actions-service'
 import { stub } from 'sinon'
-import { Worksheet, WorksheetQueue } from '../../../src/worksheet/worksheet'
+import { Worksheet, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
 import spy from 'sinon/lib/sinon/spy'
 import { expect } from 'chai'
 import { utc } from '../../../src/lib/date'

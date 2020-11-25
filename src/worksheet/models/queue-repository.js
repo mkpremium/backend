@@ -21,7 +21,7 @@ import {
   WorksheetQueueBody,
   WorksheetQueueCount,
   WorksheetQueueSource
-} from '../worksheet'
+} from '../domain/worksheet'
 import { QueueItem, QueueStatus } from './queue-item'
 import { WorksheetRepository } from './worksheet-repository'
 

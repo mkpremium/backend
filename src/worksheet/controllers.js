@@ -8,7 +8,7 @@ import { OwnerRepository } from '../owner/models'
 import { OperatorRoles } from '../types/operator'
 import { QueueRequestParams, WorksheetRepository } from './models/worksheet-repository'
 import { QueueRequestAction } from './types'
-import { WorksheetQueueBody } from './worksheet'
+import { WorksheetQueueBody } from './domain/worksheet'
 
 async function worksheetList (req, res) {
   const repo = new WorksheetRepository()

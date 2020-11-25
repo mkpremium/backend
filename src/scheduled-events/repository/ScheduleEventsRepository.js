@@ -19,7 +19,7 @@ import { SystemPreferencesRepository } from '../../system-preferences/models'
 import { ListQuery } from '../../types/params'
 import { StringSplitList } from '../../types/refinement'
 import { WorksheetRepository } from '../../worksheet/models/worksheet-repository'
-import { WorkSheetStatus } from '../../worksheet/worksheet'
+import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from '../types'
 
 const ScheduleEventsListResponse = t.struct(

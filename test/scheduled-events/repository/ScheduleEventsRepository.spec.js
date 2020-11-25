@@ -1,6 +1,6 @@
 import { initApplication } from '../../../test-e2e/helper/rest-api-helper'
 import { expect } from 'chai'
-import { WorkSheetStatus } from '../../../src/worksheet/worksheet'
+import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
 
 describe('ScheduleEventsRepository', () => {
   let app
