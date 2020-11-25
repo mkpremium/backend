@@ -194,9 +194,18 @@ WorksheetQueue.prototype.addWorksheet = function (worksheet) {
   })
 }
 
-// TODO check if worksheet already in queue
-// TODO check if worksheet already is in a different queue?
 WorksheetQueue.prototype.takeWorksheet = function (worksheet, byUserOfId) {
+  const worksheetQueueItem = this.worksheets.find(w => w.worksheetId === worksheet.id)
+  if (worksheetQueueItem) {
+    return [
+      this,
+      t.update(worksheet, {
+        queueId: { $set: this.id },
+        viewedAt: { $set: utc().toDate() }
+      })
+    ]
+  }
+
   return [
     t.update(this, {
       worksheets: {
