@@ -180,14 +180,15 @@ WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null
  * @param {Worksheet} worksheet
  * @return {WorksheetQueue}
  */
-WorksheetQueue.prototype.addWorksheet = function (worksheet) {
+WorksheetQueue.prototype.addWorksheet = function (worksheet, operatorId = undefined, status = QueueStatus.AVAILABLE) {
   return t.update(this, {
     worksheets: {
       $push: [
         QueueItem({
           worksheetId: worksheet.id,
-          status: 'AVAILABLE',
-          addedAt: new Date()
+          status: status,
+          addedAt: new Date(),
+          operatorId
         })
       ]
     }
