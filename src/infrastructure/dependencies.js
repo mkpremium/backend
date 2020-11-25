@@ -33,7 +33,7 @@ import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingSer
 import { UserRepository } from '../user/UserRepository'
 import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
-import { WorksheetRepository } from '../worksheet/worksheet-repository'
+import { WorksheetRepository } from '../worksheet/repository/worksheet.repository'
 import { EventBus } from './EventBus'
 import { MetadataRepository } from '../building/repository/MetadataRepository'
 

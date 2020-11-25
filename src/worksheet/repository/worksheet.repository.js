@@ -1,4 +1,4 @@
-import { Worksheet } from './domain/worksheet'
+import { Worksheet } from '../domain/worksheet'
 
 export class WorksheetRepository {
   /**
