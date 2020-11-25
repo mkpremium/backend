@@ -12,6 +12,7 @@ export class WorksheetQueueActionsService {
 
     const queueWithWorksheet = queue.addWorksheet(worksheet, userId, QueueStatus.OPENED)
 
+    await this.worksheetRepository.save(worksheet.addToQueue(queueId))
     await this.queueRepository.save(queueWithWorksheet)
 
     return this.worksheetRepository.getForCallcenterView(worksheetId)

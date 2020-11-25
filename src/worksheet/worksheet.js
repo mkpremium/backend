@@ -104,6 +104,13 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
+Worksheet.prototype.addToQueue = function (queueId) {
+  return t.update(this, {
+    queueId: { $set: queueId },
+    viewedAt: { $set: utc().toDate() }
+  })
+}
+
 export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
   province: t.maybe(t.String),
