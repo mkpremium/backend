@@ -104,13 +104,6 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
-Worksheet.prototype.addToQueue = function (queueId) {
-  return t.update(this, {
-    queueId: { $set: queueId },
-    viewedAt: { $set: utc().toDate() }
-  })
-}
-
 export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
   province: t.maybe(t.String),
@@ -187,17 +180,39 @@ WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null
  * @param {Worksheet} worksheet
  * @return {WorksheetQueue}
  */
-WorksheetQueue.prototype.addWorksheet = function (worksheet, operatorId = undefined, status = QueueStatus.AVAILABLE) {
+WorksheetQueue.prototype.addWorksheet = function (worksheet) {
   return t.update(this, {
     worksheets: {
       $push: [
         QueueItem({
           worksheetId: worksheet.id,
-          status: status,
-          addedAt: new Date(),
-          operatorId
+          status: QueueStatus.AVAILABLE,
+          addedAt: new Date()
         })
       ]
     }
   })
+}
+
+// TODO check if worksheet already in queue
+// TODO check if worksheet already is in a different queue?
+WorksheetQueue.prototype.takeWorksheet = function (worksheet, byUserOfId) {
+  return [
+    t.update(this, {
+      worksheets: {
+        $push: [
+          QueueItem({
+            worksheetId: worksheet.id,
+            status: QueueStatus.OPENED,
+            addedAt: new Date(),
+            operatorId: byUserOfId
+          })
+        ]
+      }
+    }),
+    t.update(worksheet, {
+      queueId: { $set: this.id },
+      viewedAt: { $set: utc().toDate() }
+    })
+  ]
 }

@@ -1,5 +1,3 @@
-import { QueueStatus } from '../models/queue-item'
-
 export class WorksheetQueueActionsService {
   constructor (queueRepository, worksheetRepository) {
     this.queueRepository = queueRepository
@@ -10,9 +8,9 @@ export class WorksheetQueueActionsService {
     const queue = await this.queueRepository.get(queueId)
     const worksheet = await this.worksheetRepository.get(worksheetId)
 
-    const queueWithWorksheet = queue.addWorksheet(worksheet, userId, QueueStatus.OPENED)
+    const [ queueWithWorksheet, worksheetInQueue ] = queue.takeWorksheet(worksheet, userId)
 
-    await this.worksheetRepository.save(worksheet.addToQueue(queueId))
+    await this.worksheetRepository.save(worksheetInQueue)
     await this.queueRepository.save(queueWithWorksheet)
 
     return this.worksheetRepository.getForCallcenterView(worksheetId)
