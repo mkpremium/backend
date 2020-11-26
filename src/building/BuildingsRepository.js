@@ -1,5 +1,6 @@
 import { N1qlQuery } from 'couchbase'
 import { Building } from './building'
+import { CouchbaseRepository } from '../db/couchbase.repository'
 
 const setBuildingFeaturedOwner = bucketName => `
 UPDATE ${bucketName} building
@@ -25,14 +26,7 @@ UNSET building.assignedAgentId, building.negotiationStatus
 WHERE building._documentType = 'building' AND building.id IN $1
 `
 
-export class BuildingsRepository {
-  /**
-   * @param {CouchbaseAdapter} couchbaseAdapter
-   */
-  constructor (couchbaseAdapter) {
-    this.couchbaseAdapter = couchbaseAdapter
-  }
-
+export class BuildingsRepository extends CouchbaseRepository {
   async setBuildingFeaturedOwner (buildingId, ownerId) {
     await this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(setBuildingFeaturedOwner(this.couchbaseAdapter.bucketName)),
@@ -59,11 +53,7 @@ export class BuildingsRepository {
     )
   }
 
-  get (buildingId) {
-    return this.couchbaseAdapter.getEntity(Building, buildingId)
-  }
-
-  save (building) {
-    return this.couchbaseAdapter.save(building, Building)
+  struct () {
+    return Building
   }
 }

@@ -1,8 +1,14 @@
 import { logger } from '../infrastructure/logger'
+import { EntityNotFound } from '../db/errors'
 
 export function appErrorHandler (error, req, res, next) {
   if (res.headersSent) {
     return next(error)
+  }
+
+  if (error instanceof EntityNotFound) {
+    res.status(404).send()
+    return
   }
 
   prepareErrorCode(error)

@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { wrap } from 'express-promise-wrap'
 import {
   worksheetFindByIdController,
   worksheetListController,
@@ -13,8 +14,9 @@ import {
   getScheduledWorksheetsController, removeScheduledWorksheetController, searchWorksheetController
 } from './controllers'
 import { permissions } from '../middleware/jwt'
+import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
 
-export function worksheetRoutes (worksheetQueueRepository) {
+export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActionsService) {
   const router = Router()
 
   router.get('/', worksheetListController)
@@ -28,6 +30,10 @@ export function worksheetRoutes (worksheetQueueRepository) {
   router.get('/queues/:id/taken', queueTakenFindByOperatorController(worksheetQueueRepository))
 
   router.post('/queues/:id', actionsOnWorksheetQueueController(worksheetQueueRepository))
+
+  router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
+    createTakeWorksheetIntoQueueController(worksheetQueueActionsService)
+  ))
 
   router.put('/queues/:id', permissions.manager, updateQueueController(worksheetQueueRepository))
 

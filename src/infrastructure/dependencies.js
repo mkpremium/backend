@@ -31,11 +31,13 @@ import { StockRepository } from '../stock/StockRepository'
 import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
 import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingService'
 import { UserRepository } from '../user/UserRepository'
-import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
+import { WorksheetQueueRepository as LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { WorksheetRepository as LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorksheetRepository } from '../worksheet/repository/worksheet.repository'
 import { EventBus } from './EventBus'
 import { MetadataRepository } from '../building/repository/MetadataRepository'
+import { WorksheetQueueActionsService } from '../worksheet/service/worksheet-queue-actions-service'
+import { WorksheetQueueRepository } from '../worksheet/repository/worksheet-queue.repository'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -46,9 +48,7 @@ export const createLegacyDependenciesContainer = () => {
   container.scheduledEventsRepository = new ScheduledEventsRepository()
   container.worksheetRepository = new LegacyWorksheetRepository()
   container.metadataRepository = new MetadataRepository()
-  container.worksheetQueueRepository = new WorksheetQueueRepository(
-    container.worksheetRepository
-  )
+  container.worksheetQueueRepository = new LegacyWorksheetQueueRepository(container.worksheetRepository)
 
   return container
 }
@@ -119,6 +119,11 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     container.buildingDocumentsRepository,
     buildingDocumentsS3Client,
     metadataS3Config.bucket
+  )
+  container.worksheetQueueRepository = new WorksheetQueueRepository(couchbaseAdapter)
+  container.worksheetQueueActionsService = new WorksheetQueueActionsService(
+    container.worksheetQueueRepository,
+    container.worksheetRepository
   )
 
   return container

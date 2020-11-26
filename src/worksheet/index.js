@@ -11,7 +11,10 @@ import { logger } from '../infrastructure/logger'
  * @param {WorksheetRepository} worksheetRepository
  * @param worksheetQueueRepository
  */
-export default (app, { eventBus }, { worksheetRepository, worksheetQueueRepository }) => {
+export default (app,
+  { eventBus, worksheetQueueActionsService },
+  { worksheetRepository, worksheetQueueRepository }
+) => {
   const secured = jwt()
 
   eventBus
@@ -25,6 +28,6 @@ export default (app, { eventBus }, { worksheetRepository, worksheetQueueReposito
       }
     })
 
-  app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository))
+  app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository, worksheetQueueActionsService))
   app.use('/worksheets/buildings', secured, buildingRoutes)
 }

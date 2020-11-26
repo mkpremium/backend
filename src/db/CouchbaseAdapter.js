@@ -1,6 +1,8 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
+import { errors } from 'couchbase'
+import { EntityNotFound } from './errors'
 
 export class CouchbaseAdapter {
   constructor (couchbaseBucket) {
@@ -20,13 +22,15 @@ export class CouchbaseAdapter {
     return fromJSON(result, structType)
   }
 
-  async getEntity (structType, entityId) {
-    const result = await this.couchbaseBucket.getAsync(entityId)
-    if (!(result && result.value)) {
-      return null
-    }
-
-    return fromJSON(result.value, structType)
+  getEntity (structType, entityId) {
+    return this.couchbaseBucket.getAsync(entityId)
+      .catch(error => {
+        if (error.code === errors.keyNotFound) {
+          throw new EntityNotFound(entityId, structType)
+        }
+        throw error
+      })
+      .then(result => fromJSON(result.value, structType))
   }
 
   queryAsync (...args) {
