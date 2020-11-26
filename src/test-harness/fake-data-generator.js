@@ -31,7 +31,7 @@ export const createBuildingReq = (buildingId) => {
       id: buildingId,
       buildingType: faker.helpers.shuffle([ 'VERTICAL', 'HORIZONTAL' ])[ 0 ],
       address: {
-        street: `${faker.address.streetName()}, ${streetNumber}`,
+        street: `${faker.address.streetName()}`,
         number: streetNumber,
         postalCode: {
           number: faker.address.zipCode()
