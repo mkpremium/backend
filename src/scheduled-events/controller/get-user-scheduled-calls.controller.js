@@ -5,5 +5,5 @@ export const createGetUserScheduledCallsController = scheduledCallsService => wr
 
   const scheduledCalls = await scheduledCallsService.scheduledCallsFor(userId)
 
-  res.json({ userId, scheduledCalls })
+  res.json(scheduledCalls)
 })
