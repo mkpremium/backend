@@ -3,8 +3,8 @@ import { createScheduleEventsRoutes } from './routes'
 import './types'
 import jwt from '../middleware/jwt'
 
-export default (app, { createMeetingService }) => {
+export default (app, { createMeetingService, scheduledCallsService }) => {
   const secured = jwt()
 
-  app.use('/scheduled-events', secured, createScheduleEventsRoutes(createMeetingService))
+  app.use('/scheduled-events', secured, createScheduleEventsRoutes(createMeetingService, scheduledCallsService))
 }

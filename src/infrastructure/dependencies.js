@@ -38,6 +38,7 @@ import { EventBus } from './EventBus'
 import { MetadataRepository } from '../building/repository/MetadataRepository'
 import { WorksheetQueueActionsService } from '../worksheet/service/worksheet-queue-actions-service'
 import { WorksheetQueueRepository } from '../worksheet/repository/worksheet-queue.repository'
+import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -125,6 +126,8 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     container.worksheetQueueRepository,
     container.worksheetRepository
   )
+
+  container.scheduledCallsService = new ScheduledCallsService(couchbaseAdapter)
 
   return container
 }

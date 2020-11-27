@@ -10,12 +10,11 @@ import {
 
   createAddScheduledMeetingEventController
 } from './controllers'
+import { createGetUserScheduledCallsController } from './controller/get-user-scheduled-calls.controller'
 
 const router = Router()
 
 router.get('/week', weekScheduleEventMeetingsController)
-
-router.get('/:id', findScheduledEventController)
 
 router.get('/', listScheduledEventController)
 
@@ -25,8 +24,12 @@ router.put('/:id', updateScheduledEventController)
 
 router.delete('/:id', deleteScheduledEventController)
 
-export const createScheduleEventsRoutes = (createMeetingService) => {
+export const createScheduleEventsRoutes = (createMeetingService, scheduledCallsService) => {
   router.post('/meeting', createAddScheduledMeetingEventController(createMeetingService))
+
+  router.get('/calls', createGetUserScheduledCallsController(scheduledCallsService))
+
+  router.get('/:id', findScheduledEventController)
 
   return router
 }
