@@ -16,14 +16,13 @@ export class ScheduledCallsService {
       [ userId ]
     ).then(rows => {
       return rows.map(
-        ({ event, eventDate, building, owner }) => {
+        ({ event, eventDate, building, owner, eventId }) => {
           const shapedRow = {
+            id: eventId,
+            eventDate,
             event: {
-              eventDate,
-              event: {
-                ...event,
-                owner: { ...owner, building }
-              }
+              ...event,
+              owner: { ...owner, building }
             }
           }
           try {
@@ -40,6 +39,7 @@ export class ScheduledCallsService {
 
 const scheduledCallsForQuery = bucketName => `
 select
+se.id eventId,
 {se.event.contactId,se.event.worksheetId} event,
 se.eventDate,
 {
@@ -65,55 +65,54 @@ AND se.notifyTo = $1
 `
 
 const ScheduledCallsView = t.struct({
+  id: t.String,
+  eventDate: t.String,
   event: t.struct({
-    event: t.struct({
-      owner: t.struct({
+    owner: t.struct({
+      id: t.String,
+      building: t.struct({
         id: t.String,
-        building: t.struct({
-          id: t.String,
-          address: t.struct({
-            city: t.String,
-            neighborhood: t.String,
-            type: t.maybe(t.String),
-            street: t.String,
-            number: t.union([ t.String, t.Number ]),
-            postalCode: t.maybe(t.struct({
-              number: t.union([ t.String, t.Number ])
-            }))
-          }),
-          negotiationStatus: NegotiationStatus,
-          floorArea: t.Number,
-
-          location: t.maybe(t.struct({
-            lat: t.maybe(t.Number),
-            lng: t.maybe(t.Number)
-          })),
-          recentProposal: t.maybe(t.struct({
-            proposal: t.Number,
-            createdAt: t.String
-          })),
-          use: t.maybe(t.String),
-          metadata: t.maybe(t.list(t.struct({
-            id: t.String,
-            mimeType: t.String,
-            previewUrl: t.String
-          }))),
-          cadastre: t.maybe(t.struct({
-            reference: t.String
+        address: t.struct({
+          city: t.String,
+          neighborhood: t.String,
+          type: t.maybe(t.String),
+          street: t.String,
+          number: t.union([ t.String, t.Number ]),
+          postalCode: t.maybe(t.struct({
+            number: t.union([ t.String, t.Number ])
           }))
         }),
-        featuredContact: t.maybe(t.struct({
-          phoneId: t.maybe(t.String),
-          emailId: t.maybe(t.String)
+        negotiationStatus: NegotiationStatus,
+        floorArea: t.Number,
+
+        location: t.maybe(t.struct({
+          lat: t.maybe(t.Number),
+          lng: t.maybe(t.Number)
         })),
-        person: t.struct({
-          name: t.String,
-          contacts: t.list(TypedContactInfo)
-        })
+        recentProposal: t.maybe(t.struct({
+          proposal: t.Number,
+          createdAt: t.String
+        })),
+        use: t.maybe(t.String),
+        metadata: t.maybe(t.list(t.struct({
+          id: t.String,
+          mimeType: t.String,
+          previewUrl: t.String
+        }))),
+        cadastre: t.maybe(t.struct({
+          reference: t.String
+        }))
       }),
-      contactId: t.String,
-      worksheetId: t.String
+      featuredContact: t.maybe(t.struct({
+        phoneId: t.maybe(t.String),
+        emailId: t.maybe(t.String)
+      })),
+      person: t.struct({
+        name: t.String,
+        contacts: t.list(TypedContactInfo)
+      })
     }),
-    eventDate: t.String
+    contactId: t.String,
+    worksheetId: t.String
   })
 })
