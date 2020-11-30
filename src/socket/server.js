@@ -33,7 +33,7 @@ export class SocketServer {
     const isSystem = socket.user.permissions.indexOf(SYSTEM_ID) !== -1
     const msg = `user ${socket.id} ${socket.user.id}/${socket.user.operator.name}`
     logger.debug('SocketServer#onConnection', { msg, id: socket.id, isSystem })
-    this.io.emit('welcome', msg) // TODO: send to only users with role X
+    this.io.emit('welcome', msg)
 
     if (this.io.sockets[ socket.user.id ]) {
       const oldSocket = this.io.sockets[ socket.user.id ]

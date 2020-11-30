@@ -62,7 +62,6 @@ export class OwnerRepository extends CouchbaseModel {
     return fromJSON(owners[ 0 ], this.Struct)
   }
 
-  // TODO: .map() should not be used for convert owner.person in object
   async findByIdWithIncludes (id, includes = []) {
     if (!id) {
       // noinspection HtmlUnknownTag

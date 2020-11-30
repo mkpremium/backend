@@ -57,7 +57,6 @@ export class CouchbaseModel {
     return ViewQuery.from('operator', viewName)
   }
 
-  // TODO: refactor to CouchbaseQuery
   getQueryBuilder (method = 'select', prefix = 't', props = this._getMeta().props) {
     let qb
 
