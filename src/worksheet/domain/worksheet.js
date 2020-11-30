@@ -197,6 +197,10 @@ WorksheetQueue.prototype.addWorksheet = function (worksheet) {
 WorksheetQueue.prototype.takeWorksheet = function (worksheet, byUserOfId) {
   const worksheetQueueItem = this.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
+    if (worksheetQueueItem.operatorId !== byUserOfId) {
+      throw new WorksheetAlreadyTaken(worksheet.id, worksheetQueueItem.operatorId, byUserOfId)
+    }
+
     return [
       this,
       t.update(worksheet, {
@@ -224,4 +228,13 @@ WorksheetQueue.prototype.takeWorksheet = function (worksheet, byUserOfId) {
       viewedAt: { $set: utc().toDate() }
     })
   ]
+}
+
+export class WorksheetAlreadyTaken extends Error {
+  constructor (worksheetId, assignedUserId, newUserId) {
+    super('Worksheet already taken by a different user')
+    this.worksheetId = worksheetId
+    this.assignedUserId = assignedUserId
+    this.newUserId = newUserId
+  }
 }

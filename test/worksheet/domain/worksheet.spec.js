@@ -1,4 +1,4 @@
-import { Worksheet, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
+import { Worksheet, WorksheetAlreadyTaken, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
 import { QueueItem } from '../../../src/worksheet/models/queue-item'
 
@@ -19,12 +19,30 @@ describe('WorksheetQueue', () => {
       const testWorksheet = Worksheet({ id: 'test-worksheet-id' })
       const testQueue = WorksheetQueue({
         name: 'test queue',
-        worksheets: [ QueueItem({ worksheetId: testWorksheet.id }) ]
+        worksheets: [ QueueItem({
+          worksheetId: testWorksheet.id,
+          operatorId: 'test-user-id'
+        }) ]
       })
 
       const [ queueWithWorksheet ] = testQueue.takeWorksheet(testWorksheet, 'test-user-id')
 
       expect(queueWithWorksheet.worksheets).to.have.lengthOf(1)
+    })
+
+    it('does not allow to take a worksheet taken by a different user', () => {
+      const testWorksheet = Worksheet({ id: 'test-worksheet-id' })
+      const testQueue = WorksheetQueue({
+        name: 'test queue',
+        worksheets: [ QueueItem({
+          worksheetId: testWorksheet.id,
+          operatorId: 'other-user-id'
+        }) ]
+      })
+
+      expect(
+        () => testQueue.takeWorksheet(testWorksheet, 'test-user-id')
+      ).to.throw(WorksheetAlreadyTaken)
     })
   })
 })
