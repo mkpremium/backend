@@ -48,10 +48,20 @@ async function updateScheduledEvent (req, res) {
   res.status(204).send()
 }
 
-async function deleteScheduledEvent (req, res) {
+export const SCHEDULED_EVENT_DELETED = 'SCHEDULED_EVENT_DELETED'
+
+class ScheduledEventDeleted {
+  constructor (id) {
+    this.id = id
+    this.name = SCHEDULED_EVENT_DELETED
+  }
+}
+
+const deleteScheduledEvent = eventBus => async (req, res) => {
   const id = req.params.id
   const repo = new ScheduledEventsRepository()
   await repo.delete(id)
+  eventBus.publish(new ScheduledEventDeleted(id))
   res.status(204).send()
 }
 
@@ -60,7 +70,7 @@ export const weekScheduleEventMeetingsController = wrap(weekScheduleEventMeeting
 export const findScheduledEventController = wrap(findByIdScheduledEvent)
 export const addScheduledCallEventController = wrap(addScheduledCallEvent)
 export const updateScheduledEventController = wrap(updateScheduledEvent)
-export const deleteScheduledEventController = wrap(deleteScheduledEvent)
+export const createDeleteScheduledEventController = eventBus => wrap(deleteScheduledEvent(eventBus))
 
 /**
  * @param {CreateMeetingService} createMeetingService

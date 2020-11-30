@@ -20,10 +20,11 @@ export class UpdateBuildingNegotiationStatusService {
   }
 }
 
+export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'BUILDING_NEGOTIATION_STATUS_CHANGED'
 export class BuildingNegotiationStatusChanged {
   constructor (buildingId, operatorId) {
     this.operatorId = operatorId
-    this.name = 'BUILDING_NEGOTIATION_STATUS_CHANGED'
+    this.name = BUILDING_NEGOTIATION_STATUS_CHANGED
     this.buildingId = buildingId
   }
 }

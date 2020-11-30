@@ -4,6 +4,8 @@ import buildingRoutes from './building/routes'
 import './types'
 import jwt from '../middleware/jwt'
 import { logger } from '../infrastructure/logger'
+import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
+import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/UpdateBuildingNegotiationStatusService'
 
 /**
  * @param app
@@ -18,7 +20,7 @@ export default (app,
   const secured = jwt()
 
   eventBus
-    .on('BUILDING_NEGOTIATION_STATUS_CHANGED', async ({ buildingId, operatorId }) => {
+    .on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({ buildingId, operatorId }) => {
       logger.info('updating worksheet because building negotiation status changed', { buildingId, operatorId })
       try {
         const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
@@ -26,6 +28,12 @@ export default (app,
       } catch (error) {
         logger.crit('could not update worksheet on building status change', { error })
       }
+    })
+
+  eventBus
+    .on(SCHEDULED_EVENT_DELETED, async ({ id }) => {
+      // TODO update queue if scheduled event is for a queue
+      console.log(`scheduled event deleted`, { id })
     })
 
   app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository, worksheetQueueActionsService))

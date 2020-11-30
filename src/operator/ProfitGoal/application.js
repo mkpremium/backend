@@ -4,7 +4,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 
 import { ProfitGoalRequest } from './types'
 
-// TODO Should validate that operator has BUSINESS role
+// TODO Should validate that operator has ADMIN role
 export async function setProfitGoalToOperator (data, now = () => new Date()) {
   const { operatorId, profitAmount } = fromJSON(data, ProfitGoalRequest)
 

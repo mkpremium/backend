@@ -16,16 +16,25 @@ export class EventBus {
   on (eventName, subscriber) {
     this.emitter
       .addListener(eventName, (event) => {
-        subscriber(event)
-          .catch(error => {
-            logger.crit('error processing event', {
-              event,
-              error: {
-                message: error.message ? error.message : error.toString(),
-                stack: error.stack ? error.stack : undefined
-              }
+        try {
+          subscriber(event)
+            .catch(error => {
+              logSubscriberError(event, eventName, error)
             })
-          })
+        } catch (error) {
+          logSubscriberError(event, eventName, error)
+        }
       })
   }
+}
+
+function logSubscriberError (event, eventName, error) {
+  logger.crit('error processing event', {
+    event,
+    eventName,
+    error: {
+      message: error.message ? error.message : error.toString(),
+      stack: error.stack ? error.stack : undefined
+    }
+  })
 }
