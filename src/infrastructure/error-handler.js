@@ -1,5 +1,6 @@
 import { logger } from './logger'
 import { EntityNotFound } from '../db/errors'
+import { HttpError } from '../lib/http-error'
 
 export function appErrorHandler (error, req, res, next) {
   if (res.headersSent) {
@@ -11,36 +12,28 @@ export function appErrorHandler (error, req, res, next) {
     return
   }
 
-  prepareErrorCode(error)
-  if (error.code >= 500) {
-    logger.error('appErrorHandler', { error: { ...error, stack: error.stack } })
-  } else {
-    logger.warning('appErrorHandler', { error })
-  }
+  const statusCode = inferStatusCode(error)
 
-  res.status(error.code)
+  if (statusCode >= 500) {
+    logger.error('appErrorHandler', { error: { ...error, stack: error.stack, message: error.message } })
+  } else {
+    logger.warning('appErrorHandler', { message: error.message })
+  }
+  res.status(statusCode)
+
   res.json({ message: error.message })
 }
 
-function prepareErrorCode (err) {
-  if (/^\[tcomb/.test(err.message)) {
-    err.code = err.code || 400
-    err.message = err.message.replace('[tcomb] ', '')
-  }
-
-  // some errors code is an string (jwt)
-  err.code = err.status || err.code
-
-  // error from couchbase are outside HTTP range
-  if (!err.code || err.code < 400 || err.code > 599) {
-    err.code = 500
-  }
-
-  // for any reason not listed before
-  err.code = err.code || 500
-  if (isNaN(err.code)) {
-    logger.error('prepareErrorCode error.code not a number', { error: err })
-    err.code = 500
+export function inferStatusCode (error) {
+  switch (true) {
+    case error.message.substring(0, 7) === '[tcomb]':
+      return 400
+    case error instanceof HttpError:
+      return error.statusCode
+    case !!error.status:
+      return error.status
+    default:
+      return 500
   }
 }
 

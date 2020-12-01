@@ -1,6 +1,11 @@
 
 export function newHttpError (code, message) {
-  const e = new Error(message)
-  e.code = code
-  return e
+  return new HttpError(code, message)
+}
+
+export class HttpError extends Error {
+  constructor (statusCode, message) {
+    super(message)
+    this.statusCode = statusCode
+  }
 }
