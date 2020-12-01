@@ -73,6 +73,8 @@ QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
 }
 
 QueueItem.prototype.removeScheduledCall = function () {
+  t.assert(this.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
+
   return t.update(this, {
     status: { $set: this.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
     event: { $set: undefined }

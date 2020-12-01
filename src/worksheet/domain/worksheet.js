@@ -178,7 +178,6 @@ WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null
 }
 
 WorksheetQueue.prototype.removeScheduledCall = function (scheduledCallId) {
-  // TODO validate that there is a scheduled call
   const updatedWorksheets = this.worksheets.map(
     w => _get(w, 'event.id') === scheduledCallId ? w.removeScheduledCall() : w
   )
