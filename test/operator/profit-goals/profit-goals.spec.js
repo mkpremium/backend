@@ -43,7 +43,7 @@ describe('profit goals', () => {
 
       expect(error).to.not.be.null
       expect(error.message).to.equal('El operator fakeId no existe')
-      expect(error.code).to.equal(404)
+      expect(error.statusCode).to.equal(404)
     })
   })
 
