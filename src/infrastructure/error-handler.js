@@ -14,13 +14,9 @@ export function appErrorHandler (error, req, res, next) {
 
   const statusCode = inferStatusCode(error)
 
-  if (statusCode >= 500) {
-    logger.error('appErrorHandler', { error: { ...error, stack: error.stack, message: error.message } })
-  } else {
-    logger.warning('appErrorHandler', { message: error.message })
-  }
-  res.status(statusCode)
+  logError(statusCode, error)
 
+  res.status(statusCode)
   res.json({ message: error.message })
 }
 
@@ -34,6 +30,14 @@ export function inferStatusCode (error) {
       return error.status
     default:
       return 500
+  }
+}
+
+function logError (statusCode, error) {
+  if (statusCode >= 500) {
+    logger.error('server error', { error: { ...error, stack: error.stack, message: error.message } })
+  } else {
+    logger.warning('client error', { message: error.message })
   }
 }
 
