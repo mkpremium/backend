@@ -1,4 +1,4 @@
-import { logger } from '../infrastructure/logger'
+import { logger } from './logger'
 import { EntityNotFound } from '../db/errors'
 
 export function appErrorHandler (error, req, res, next) {

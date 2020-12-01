@@ -31,7 +31,7 @@ import stock from './stock'
 import featuredOwner from './featuredOwner'
 import meeting from './meeting'
 import user from './user'
-import appErrorHandler from './lib/error-handler'
+import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 
 const app = express()
