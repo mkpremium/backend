@@ -36,8 +36,6 @@ export function inferStatusCode (error) {
 function logError (statusCode, error) {
   if (statusCode >= 500) {
     logger.error('server error', { error: { ...error, stack: error.stack, message: error.message } })
-  } else {
-    logger.warning('client error', { message: error.message })
   }
 }
 
