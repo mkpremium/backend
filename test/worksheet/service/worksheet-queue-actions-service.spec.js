@@ -100,9 +100,9 @@ describe('WorksheetQueueActionsService', () => {
 
       await service.removeScheduledCallFromWorksheets(testScheduledCallId)
 
-      expect(worksheetRepositoryMock.save).to.have.been.calledOnce
-      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].event).to.be.undefined
-      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].status).to.be.equal(QueueStatus.AVAILABLE)
+      expect(queueRepositoryMock.save).to.have.been.calledOnce
+      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].event).to.be.undefined
+      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].status).to.be.equal(QueueStatus.AVAILABLE)
     })
   })
 })

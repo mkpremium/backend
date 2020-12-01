@@ -21,13 +21,13 @@ export class WorksheetQueueActionsService {
   }
 
   async removeScheduledCallFromWorksheets (scheduledCallId) {
-    const queue = await this.queueRepository.findQueueWithScheduledCallOfId(scheduledCallId)
-    if (!queue) {
-      return
-    }
+    return this.queueRepository.findQueueWithScheduledCallOfId(scheduledCallId)
+      .then(queue => {
+        if (!queue) {
+          return
+        }
 
-    const queueWithoutScheduledCall = queue.removeScheduledCall(scheduledCallId)
-
-    return this.worksheetRepository.save(queueWithoutScheduledCall)
+        return this.queueRepository.save(queue.removeScheduledCall(scheduledCallId))
+      })
   }
 }
