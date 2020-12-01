@@ -10,6 +10,7 @@ import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/UpdateB
 /**
  * @param app
  * @param eventBus
+ * @param {WorksheetQueueActionsService} worksheetQueueActionsService
  * @param {WorksheetRepository} worksheetRepository
  * @param worksheetQueueRepository
  */
@@ -32,8 +33,13 @@ export default (app,
 
   eventBus
     .on(SCHEDULED_EVENT_DELETED, async ({ id }) => {
-      // TODO update queue if scheduled event is for a queue
-      console.log(`scheduled event deleted`, { id })
+      worksheetQueueActionsService.removeScheduledCallFromWorksheets(id)
+        .then(() => {
+          logger.info('scheduled call removed from worksheet successfully')
+        })
+        .catch(error => {
+          logger.crit('error removing scheduled call from worksheets', { scheduledCallId: id, error })
+        })
     })
 
   app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository, worksheetQueueActionsService))

@@ -5,4 +5,11 @@ export class WorksheetQueueRepository extends CouchbaseRepository {
   struct () {
     return WorksheetQueue
   }
+
+  /**
+   * @param scheduledCallId
+   * @return {Promise<WorksheetQueue>}
+   */
+  async findQueueWithScheduledCallOfId (scheduledCallId) {
+  }
 }

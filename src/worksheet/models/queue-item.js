@@ -72,6 +72,13 @@ QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   })
 }
 
+QueueItem.prototype.removeScheduledCall = function () {
+  return t.update(this, {
+    status: { $set: this.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
+    event: { $set: undefined }
+  })
+}
+
 /**
  * @param operatorId
  * @returns {QueueItem}

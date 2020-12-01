@@ -1,4 +1,8 @@
 export class WorksheetQueueActionsService {
+  /**
+   * @param {WorksheetQueueRepository} queueRepository
+   * @param {WorksheetRepository} worksheetRepository
+   */
   constructor (queueRepository, worksheetRepository) {
     this.queueRepository = queueRepository
     this.worksheetRepository = worksheetRepository
@@ -14,5 +18,16 @@ export class WorksheetQueueActionsService {
     await this.queueRepository.save(queueWithWorksheet)
 
     return this.worksheetRepository.getForCallcenterView(worksheetId)
+  }
+
+  async removeScheduledCallFromWorksheets (scheduledCallId) {
+    const queue = await this.queueRepository.findQueueWithScheduledCallOfId(scheduledCallId)
+    if (!queue) {
+      return
+    }
+
+    const queueWithoutScheduledCall = queue.removeScheduledCall(scheduledCallId)
+
+    return this.worksheetRepository.save(queueWithoutScheduledCall)
   }
 }

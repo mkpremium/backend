@@ -1,6 +1,7 @@
 import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
+import _get from 'lodash/get'
 import t from 'tcomb'
 import { Building } from '../../building/building'
 import { logger } from '../../infrastructure/logger'
@@ -174,6 +175,18 @@ WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null
   const currentIndex = _findIndex(this.worksheets, { id: currentItemId })
   const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets
   return _find(worksheets, { status: QueueStatus.AVAILABLE })
+}
+
+WorksheetQueue.prototype.removeScheduledCall = function (scheduledCallId) {
+  // TODO validate that there is a scheduled call
+  const updatedWorksheets = this.worksheets.map(
+    w => _get(w, 'event.id') === scheduledCallId ? w.removeScheduledCall() : w
+  )
+  return t.update(this, {
+    worksheets: {
+      $set: updatedWorksheets
+    }
+  })
 }
 
 /**
