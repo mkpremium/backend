@@ -79,7 +79,11 @@ const queueList = worksheetQueueRepository => async (req, res) => {
   res.json(queues)
 }
 
-const actionsOnWorksheetQueue = worksheetQueueRepository => async (req, res) => {
+/**
+ * @param {LegacyWorksheetQueueRepository} worksheetQueueRepository
+ * @param {TakeNextWorksheetService} takeNextWorksheetService
+ */
+const actionsOnWorksheetQueue = (worksheetQueueRepository, takeNextWorksheetService) => async (req, res) => {
   const queueId = req.params.id
   const params = QueueRequestParams(req.body)
   const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
@@ -87,7 +91,7 @@ const actionsOnWorksheetQueue = worksheetQueueRepository => async (req, res) => 
 
   switch (params.action) {
     case QueueRequestAction.NEXT: {
-      const nextWorksheet = await worksheetQueueRepository.nextWorksheetInQueue(queue, req.user.id)
+      const nextWorksheet = await takeNextWorksheetService.nextWorksheetInQueue(queue, req.user.id)
       if (nextWorksheet === undefined) {
         throw newHttpError(422, 'No hay items disponibles en la lista')
       }
@@ -180,7 +184,7 @@ export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
 export const getQueueController = worksheetQueueRepository => wrap(getQueue(worksheetQueueRepository))
 export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
-export const actionsOnWorksheetQueueController = worksheetQueueRepository => wrap(actionsOnWorksheetQueue(worksheetQueueRepository))
+export const actionsOnWorksheetQueueController = (worksheetQueueRepository, takeNextWorksheetService) => wrap(actionsOnWorksheetQueue(worksheetQueueRepository, takeNextWorksheetService))
 export const queueTakenFindByOperatorController = worksheetQueueRepository => wrap(queueTakenFindByOperator(worksheetQueueRepository))
 export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
 export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))

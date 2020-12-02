@@ -16,7 +16,7 @@ import {
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
 
-export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActionsService) {
+export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService) {
   const router = Router()
 
   router.get('/', worksheetListController)
@@ -29,7 +29,7 @@ export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActions
 
   router.get('/queues/:id/taken', queueTakenFindByOperatorController(worksheetQueueRepository))
 
-  router.post('/queues/:id', actionsOnWorksheetQueueController(worksheetQueueRepository))
+  router.post('/queues/:id', actionsOnWorksheetQueueController(worksheetQueueRepository, takeNextWorksheetService))
 
   router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
     createTakeWorksheetIntoQueueController(worksheetQueueActionsService)

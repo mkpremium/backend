@@ -15,7 +15,7 @@ import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/UpdateB
  * @param worksheetQueueRepository
  */
 export default (app,
-  { eventBus, worksheetQueueActionsService },
+  { eventBus, worksheetQueueActionsService, takeNextWorksheetService },
   { worksheetRepository, worksheetQueueRepository }
 ) => {
   const secured = jwt()
@@ -42,6 +42,6 @@ export default (app,
         })
     })
 
-  app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository, worksheetQueueActionsService))
+  app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService))
   app.use('/worksheets/buildings', secured, buildingRoutes)
 }
