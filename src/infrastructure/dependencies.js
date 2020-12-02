@@ -39,6 +39,7 @@ import { MetadataRepository } from '../building/repository/MetadataRepository'
 import { WorksheetQueueActionsService } from '../worksheet/service/worksheet-queue-actions-service'
 import { WorksheetQueueRepository } from '../worksheet/repository/worksheet-queue.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
+import { TakeNextWorksheetService } from '../worksheet/service/take-next-worksheet.service'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -124,6 +125,10 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.worksheetQueueRepository = new WorksheetQueueRepository(couchbaseAdapter)
   container.worksheetQueueActionsService = new WorksheetQueueActionsService(
     container.worksheetQueueRepository,
+    container.worksheetRepository
+  )
+  container.takeNextWorksheetService = new TakeNextWorksheetService(
+    container.worksheetQueueActionsService,
     container.worksheetRepository
   )
 
