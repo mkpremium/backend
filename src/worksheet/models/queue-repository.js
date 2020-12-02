@@ -73,7 +73,7 @@ const QueueListResponse = t.struct(
 /**
  * @field {WorksheetRepository} worksheetRepository
  */
-export class WorksheetQueueRepository extends CouchbaseModel {
+export class LegacyWorksheetQueueRepository extends CouchbaseModel {
   constructor (
     worksheetRepository = new WorksheetRepository()
   ) {

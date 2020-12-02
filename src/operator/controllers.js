@@ -3,7 +3,7 @@ import { OperatorRefreshTokenRepository, OperatorRepository } from './models'
 import { History } from '../history/models'
 import { canManageOperator } from '../lib/role-operators'
 import { Calls } from '../calls/models'
-import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
+import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import _get from 'lodash/get'
 
 async function login (req, res) {
@@ -68,7 +68,7 @@ async function selfCallCenterWorkInProgress (req, res) {
   const queueId = _get(req, 'user.operator.profile.queueId', null)
   const operatorId = _get(req, 'user.operator.id', null)
 
-  const repoWorksheetQueue = new WorksheetQueueRepository()
+  const repoWorksheetQueue = new LegacyWorksheetQueueRepository()
   const queueItem = await repoWorksheetQueue.findItemByOperator(queueId, operatorId)
 
   const model = new Calls()

@@ -2,7 +2,7 @@ import { wrap } from 'express-promise-wrap'
 import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
+import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { canScheduleCall } from '../lib/role-operators'
 
 async function listScheduledEvent (req, res) {
@@ -28,7 +28,7 @@ async function findByIdScheduledEvent (req, res) {
 
 async function addScheduledCallEvent (req, res) {
   const repo = new ScheduledEventsRepository()
-  const queueRepo = new WorksheetQueueRepository()
+  const queueRepo = new LegacyWorksheetQueueRepository()
 
   canScheduleCall(req.user.operator, req.body.notifyTo)
 

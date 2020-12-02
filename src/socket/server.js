@@ -3,7 +3,7 @@ import { logger } from '../infrastructure/logger'
 import socketJwt from '../middleware/socketJwt'
 import socketIO from 'socket.io'
 import _get from 'lodash/get'
-import { WorksheetQueueRepository } from '../worksheet/models/queue-repository'
+import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { Calls } from '../calls/models'
 import { OperatorRepository } from '../operator/models'
 
@@ -99,7 +99,7 @@ export class SocketServer {
 
 async function releaseTakenWorksheets (operatorId, queueId) {
   const modelCall = new Calls()
-  const queueRepo = new WorksheetQueueRepository()
+  const queueRepo = new LegacyWorksheetQueueRepository()
   const activeCall = await modelCall.findActiveCallByOperatorId(operatorId)
   if (activeCall) {
     return true
