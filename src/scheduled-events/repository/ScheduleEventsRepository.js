@@ -18,7 +18,7 @@ import { OperatorActions } from '../../stats/types'
 import { SystemPreferencesRepository } from '../../system-preferences/models'
 import { ListQuery } from '../../types/params'
 import { StringSplitList } from '../../types/refinement'
-import { WorksheetRepository } from '../../worksheet/models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from '../types'
 
@@ -137,7 +137,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     const scheduledEvent = await this.save(params)
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
-      const worksheetRepo = new WorksheetRepository()
+      const worksheetRepo = new LegacyWorksheetRepository()
       const worksheet = await worksheetRepo.findByIdWIthIncludes(_get(scheduledEvent, 'event.worksheetId'))
       const { city, province } = _get(worksheet, 'relatedBuildings.0.address', {})
       const updatedWorksheet = t.update(worksheet, {
@@ -183,7 +183,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder('delete').where('id = ?', id)
     await this.query(qb)
     if (_get(scheduledEvent, 'event.worksheetId')) {
-      const worksheetRepo = new WorksheetRepository()
+      const worksheetRepo = new LegacyWorksheetRepository()
       const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'))
       const updatedWorksheet = t.update(worksheet, { lastAddedMeeting: { $set: null } })
       await worksheetRepo.save(updatedWorksheet, false)

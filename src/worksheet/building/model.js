@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { BuildingByCadastre, CreateBuildingInput } from './types'
 import { BuildingRepository } from '../../building/models'
-import { WorksheetRepository } from '../models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../models/worksheet-repository'
 
 /**
  *
@@ -15,8 +15,8 @@ export async function createBuildingWithWorksheet (data = {}) {
     ? await createBuildingByCadastre(data)
     : await createBuildingByAddress(data)
   const worksheet = created
-    ? await WorksheetRepository.createNewForBuilding(building)
-    : await (new WorksheetRepository().findByBuilding(building.id))
+    ? await LegacyWorksheetRepository.createNewForBuilding(building)
+    : await (new LegacyWorksheetRepository().findByBuilding(building.id))
 
   return { created, worksheet }
 }

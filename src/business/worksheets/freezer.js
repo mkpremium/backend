@@ -4,7 +4,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { utc } from '../../lib/date'
 import { SystemPreferencesRepository } from '../../system-preferences/models'
 import { Worksheet, WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import { WorksheetRepository } from '../../worksheet/models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 
 import { logger } from '../../infrastructure/logger'
 
@@ -23,7 +23,7 @@ export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100,
 
 export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
   const maxDays = utc().subtract(daysInFreezer, 'days').toDate()
-  const repository = new WorksheetRepository()
+  const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
     .where('inFreezer = ?', true)
     .where('statusChangedAt IS NOT NULL')
@@ -41,7 +41,7 @@ export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, build
 
 export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
   const dateDaysAgo = utc().subtract(daysInFreezer, 'days').toDate()
-  const repository = new WorksheetRepository()
+  const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
     .where('status = ?', WorkSheetStatus.NO_SALE)
     .where('statusChangedAt IS NOT NULL')
@@ -72,7 +72,7 @@ async function pullOutFreezer (worksheets, buildingRepository) {
     return
   }
 
-  const repository = new WorksheetRepository()
+  const repository = new LegacyWorksheetRepository()
   const updatedWorksheets = worksheets.map(worksheet => {
     logger.info(`moving worksheet out freezer`, { statusChangedAt: worksheet.statusChangedAt, id: worksheet.id })
     return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.AVAILABLE)

@@ -11,7 +11,7 @@ import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
 import { TypedContactInfo } from '../types/common'
 import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
-import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { Owner, OwnerBody, Person } from './owner'
 import { OwnerListQuery } from './types'
 
@@ -101,7 +101,7 @@ export class OwnerRepository extends CouchbaseModel {
     const owner = await this.save(body)
 
     if (building) {
-      const worksheetRepository = new WorksheetRepository()
+      const worksheetRepository = new LegacyWorksheetRepository()
       const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
       await worksheetRepository.addOnlyOwner(worksheet, owner)
     }

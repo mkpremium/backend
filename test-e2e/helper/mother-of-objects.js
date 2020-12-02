@@ -3,7 +3,7 @@ import t from 'tcomb'
 import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/ScheduleEventsRepository'
 import { closeSellStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
-import { WorksheetRepository } from '../../src/worksheet/models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../../src/worksheet/models/worksheet-repository'
 
 const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
@@ -39,7 +39,7 @@ export const createBuilding = async (app, buildingProperties) => {
 }
 
 export const createWorksheetForBuilding = async (app, building) => {
-  await WorksheetRepository.createNewForBuilding(building)
+  await LegacyWorksheetRepository.createNewForBuilding(building)
 }
 
 export const createOwner = async (app, { status } = { status: OwnerStatus.VERIFIED }) => {

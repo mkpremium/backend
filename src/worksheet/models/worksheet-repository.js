@@ -81,7 +81,7 @@ function canRegisterVerified (worksheet, newStatus, operatorId) {
   return true
 }
 
-export class WorksheetRepository extends CouchbaseModel {
+export class LegacyWorksheetRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = Worksheet
@@ -153,7 +153,7 @@ export class WorksheetRepository extends CouchbaseModel {
   }
 
   findByBuilding (buildingId) {
-    const repo = new WorksheetRepository()
+    const repo = new LegacyWorksheetRepository()
     return repo.findWorksheetByBuilding(buildingId)
   }
 
@@ -188,7 +188,7 @@ export class WorksheetRepository extends CouchbaseModel {
   async calculateFixedStatus (worksheet) {
     const relatedBuilding = worksheet.relatedBuildings[ 0 ]
     if (relatedBuilding.negotiationStatus && relatedBuilding.assignedAgentId) {
-      return WorksheetRepository.mapNegotiationStatusToWorksheetStatus(relatedBuilding.negotiationStatus)
+      return LegacyWorksheetRepository.mapNegotiationStatusToWorksheetStatus(relatedBuilding.negotiationStatus)
     }
 
     const ownersStatus = worksheet.relatedOwners
@@ -299,7 +299,7 @@ export class WorksheetRepository extends CouchbaseModel {
       status: WorkSheetStatus.INVALID,
       queueId: null
     })
-    const repo = new WorksheetRepository()
+    const repo = new LegacyWorksheetRepository()
 
     return repo.save(worksheet, emitModelEvents)
   }

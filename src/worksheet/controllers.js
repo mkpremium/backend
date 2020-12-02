@@ -6,19 +6,19 @@ import { newHttpError } from '../lib/http-error'
 import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { OperatorRoles } from '../types/operator'
-import { QueueRequestParams, WorksheetRepository } from './models/worksheet-repository'
+import { QueueRequestParams, LegacyWorksheetRepository } from './models/worksheet-repository'
 import { QueueRequestAction } from './types'
 import { WorksheetQueueBody } from './domain/worksheet'
 
 async function worksheetList (req, res) {
-  const repo = new WorksheetRepository()
+  const repo = new LegacyWorksheetRepository()
   const worksheets = await repo.list(req.query)
   res.json(worksheets)
 }
 
 async function findById (req, res) {
   const id = req.params.id
-  const repo = new WorksheetRepository()
+  const repo = new LegacyWorksheetRepository()
   const worksheet = await repo.findByIdWIthIncludes(id)
   res.json(worksheet)
 }
@@ -134,7 +134,7 @@ const queueTakenFindByOperator = worksheetQueueRepository => async (req, res) =>
 }
 
 async function addOwnerToWorksheet (req, res) {
-  const worksheetRepo = new WorksheetRepository()
+  const worksheetRepo = new LegacyWorksheetRepository()
   const ownerRepo = new OwnerRepository()
   const worksheet = await worksheetRepo.findByIdOrThrow(req.params.id)
   const owner = await ownerRepo.createOwnerAndPerson(req.body)
@@ -170,7 +170,7 @@ const removeScheduledWorksheet = worksheetQueueRepository => async (req, res) =>
  * @returns {Promise<void>}
  */
 async function searchWorksheets (request, response) {
-  const repo = new WorksheetRepository()
+  const repo = new LegacyWorksheetRepository()
   const worksheets = await repo.searchWorksheets(request.query)
   response.json(worksheets)
 }

@@ -23,7 +23,7 @@ import {
   WorksheetQueueSource
 } from '../domain/worksheet'
 import { QueueItem, QueueStatus } from './queue-item'
-import { WorksheetRepository } from './worksheet-repository'
+import { LegacyWorksheetRepository } from './worksheet-repository'
 
 const QueueItemExtraInfo = QueueItem.extend({
   totalContacts: t.Number,
@@ -75,7 +75,7 @@ const QueueListResponse = t.struct(
  */
 export class LegacyWorksheetQueueRepository extends CouchbaseModel {
   constructor (
-    worksheetRepository = new WorksheetRepository()
+    worksheetRepository = new LegacyWorksheetRepository()
   ) {
     super()
     this.Struct = WorksheetQueue

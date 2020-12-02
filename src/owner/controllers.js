@@ -1,7 +1,7 @@
 import { wrap } from 'express-promise-wrap'
 import { History } from '../history/models'
 import { newHttpError } from '../lib/http-error'
-import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { OwnerRepository } from './models'
 import { FeaturedContact, Owner } from './owner'
 import { OwnerNotFound } from './OwnerRepository'
@@ -25,7 +25,7 @@ async function updateOwner (req, res) {
   const id = req.params.id
   const contextModel = { _documentType: 'owner', id }
   const repo = new OwnerRepository()
-  await WorksheetRepository.notifyWorkSheetChangeByOwner(id)
+  await LegacyWorksheetRepository.notifyWorkSheetChangeByOwner(id)
 
   const owner = await repo.findByIdOrThrow(id)
   let updatedOwner = t.update(owner, { $merge: Object.assign({}, req.body, { id }) })
@@ -46,7 +46,7 @@ async function addOwnerContact (req, res) {
   const repo = new OwnerRepository()
   const contextModel = await repo.addContact(ownerId, req.body)
   await History.registerCreate({ contextModel, user: req.user })
-  await WorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
+  await LegacyWorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
   const [ updatedOwner ] = await repo.findByIdWithIncludes(ownerId, [ 'building' ])
   res.json(updatedOwner)
 }

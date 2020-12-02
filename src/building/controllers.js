@@ -3,7 +3,7 @@ import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
 import { OwnerBusinessStatus } from '../types/enums'
-import { WorksheetRepository } from '../worksheet/models/worksheet-repository'
+import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { BuildingProposalRepository, BuildingRepository } from './models'
 
 export function createListBuildingsController (listBuildingsService) {
@@ -81,7 +81,7 @@ async function updateNegotiationProposal (req, res) {
 }
 
 async function addOwnerToBuilding (req, res) {
-  const worksheetRepo = new WorksheetRepository()
+  const worksheetRepo = new LegacyWorksheetRepository()
   const ownerRepo = new OwnerRepository()
   const worksheet = await worksheetRepo.findWorksheetByBuilding(req.params.id)
   const owner = await ownerRepo.createOwnerAndPerson(req.body)
