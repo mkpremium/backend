@@ -6,30 +6,42 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 
-const worksheetForCallcenterViewQuery = bucketName => `
+const worksheetForCallcenterViewQuery = (bucketName, conditions) => `
 SELECT
-worksheet.id id,
-worksheet.status status,
-worksheet.queueId queueId,
-[{
-    building.id,
-    building.address,
-    building.metadata,
-    building.\`use\`,
-    building.location,
-    building.recentProposal,
-    building.cadastre,
-    building.floorArea
-}] relatedBuildings,
-ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
+  worksheet.id id,
+  worksheet.status status,
+  worksheet.queueId queueId,
+  [{
+      building.id,
+      building.address,
+      building.metadata,
+      building.\`use\`,
+      building.location,
+      building.recentProposal,
+      building.cadastre,
+      building.floorArea
+  }] relatedBuildings,
+  ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
 
 FROM ${bucketName} worksheet
 JOIN ${bucketName} building ON building._documentType = 'building' AND
 building.id = worksheet.relatedBuildingIds[0]
 NEST ${bucketName} owners ON owners._documentType = 'owner' AND owners.buildingId = building.id
 
-WHERE worksheet._documentType = 'worksheet' AND worksheet.id = $1
+WHERE worksheet._documentType = 'worksheet' AND ${conditions.join(' AND ')}
 `
+
+const worksheetByIdQuery = bucketName => worksheetForCallcenterViewQuery(bucketName, [ 'worksheet.id = $1' ])
+
+const nextWorksheetAvailableInSourceQuery = (bucketName, source) => {
+  const sourceMatchCondition = Object.keys(source).filter(k => !!source[ k ])
+    .map(k => `worksheet.buildingAddress.${k} = "${source[ k ]}"`)
+
+  const worksheetQuery = worksheetForCallcenterViewQuery(bucketName,
+    [ 'worksheet.queueId IS NULL', `worksheet.status IN ['OPEN', 'LOOKING_MEETING']`, ...sourceMatchCondition ])
+
+  return `${worksheetQuery} ORDER BY worksheet.viewedAt LIMIT 1`
+}
 
 class WorksheetNotFound extends Error {
   constructor (worksheetId) {
@@ -41,7 +53,7 @@ class WorksheetNotFound extends Error {
 export class WorksheetRepository extends CouchbaseRepository {
   getForCallcenterView (worksheetId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(worksheetForCallcenterViewQuery(this.bucketName)),
+      N1qlQuery.fromString(worksheetByIdQuery(this.bucketName)),
       [ worksheetId ]
     ).then(rows => {
       if (rows.length === 0) {
@@ -51,8 +63,26 @@ export class WorksheetRepository extends CouchbaseRepository {
       try {
         return fromJSON(rows[ 0 ], CallcenterView)
       } catch (error) {
-        logger.error('parsing worksheet with CallcenterView', { worksheetId })
+        logger.error('parsing worksheet with CallcenterView', { worksheetId, error })
         return rows[ 0 ]
+      }
+    })
+  }
+
+  nextAvailableWorksheetInSource (source) {
+    const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source)
+    return this.couchbaseAdapter.queryAsync(
+      N1qlQuery.fromString(q)
+    ).then(result => {
+      if (result.length === 0) {
+        return
+      }
+
+      try {
+        return fromJSON(result[ 0 ], CallcenterView)
+      } catch (error) {
+        logger.error('parsing worksheet with CallcenterView', { worksheetId: result[ 0 ].id, error })
+        return result[ 0 ]
       }
     })
   }
