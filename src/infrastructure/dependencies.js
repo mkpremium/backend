@@ -36,10 +36,7 @@ import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-reposit
 import { WorksheetRepository } from '../worksheet/repository/worksheet.repository'
 import { EventBus } from './event-bus'
 import { MetadataRepository } from '../building/repository/MetadataRepository'
-import { WorksheetQueueActionsService } from '../worksheet/service/worksheet-queue-actions-service'
-import { WorksheetQueueRepository } from '../worksheet/repository/worksheet-queue.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
-import { TakeNextWorksheetService } from '../worksheet/service/take-next-worksheet.service'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -85,7 +82,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
-  container.worksheetRepository = new WorksheetRepository(couchbaseAdapter)
+  container.worksheetRepository = new WorksheetRepository(couchbaseAdapter) // used by test-harness
 
   const eventBus = new EventBus()
   container.eventBus = eventBus
@@ -121,15 +118,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     container.buildingDocumentsRepository,
     buildingDocumentsS3Client,
     metadataS3Config.bucket
-  )
-  container.worksheetQueueRepository = new WorksheetQueueRepository(couchbaseAdapter)
-  container.worksheetQueueActionsService = new WorksheetQueueActionsService(
-    container.worksheetQueueRepository,
-    container.worksheetRepository
-  )
-  container.takeNextWorksheetService = new TakeNextWorksheetService(
-    container.worksheetQueueActionsService,
-    container.worksheetRepository
   )
 
   container.scheduledCallsService = new ScheduledCallsService(couchbaseAdapter)

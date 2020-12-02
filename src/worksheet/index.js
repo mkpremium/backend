@@ -6,26 +6,36 @@ import jwt from '../middleware/jwt'
 import { logger } from '../infrastructure/logger'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/UpdateBuildingNegotiationStatusService'
+import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
+import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
+import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 
 /**
  * @param app
  * @param eventBus
  * @param {WorksheetQueueActionsService} worksheetQueueActionsService
  * @param {WorksheetRepository} worksheetRepository
- * @param worksheetQueueRepository
  */
 export default (app,
-  { eventBus, worksheetQueueActionsService, takeNextWorksheetService },
-  { worksheetRepository, worksheetQueueRepository }
+  { eventBus, couchbaseAdapter, worksheetRepository },
+  { worksheetRepository: legacyWorksheetRepository, worksheetQueueRepository: legacyWorksheetQueueRepository }
 ) => {
   const secured = jwt()
+
+  const worksheetQueueRepository = new WorksheetQueueRepository(couchbaseAdapter)
+  const worksheetQueueActionsService = new WorksheetQueueActionsService(
+    worksheetQueueRepository,
+    worksheetRepository,
+    eventBus
+  )
+  const takeNextWorksheetService = new TakeNextWorksheetService(worksheetQueueActionsService, worksheetRepository)
 
   eventBus
     .on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({ buildingId, operatorId }) => {
       logger.info('updating worksheet because building negotiation status changed', { buildingId, operatorId })
       try {
-        const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
-        await worksheetRepository.updateStatus(worksheet.id, operatorId)
+        const worksheet = await legacyWorksheetRepository.findWorksheetByBuilding(buildingId)
+        await legacyWorksheetRepository.updateStatus(worksheet.id, operatorId)
       } catch (error) {
         logger.crit('could not update worksheet on building status change', { error })
       }
@@ -42,6 +52,7 @@ export default (app,
         })
     })
 
-  app.use('/worksheets', secured, worksheetRoutes(worksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService))
+  app.use('/worksheets', secured,
+    worksheetRoutes(legacyWorksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService))
   app.use('/worksheets/buildings', secured, buildingRoutes)
 }
