@@ -14,6 +14,7 @@ describe('WorksheetQueueActionsService', () => {
   let service
   let queueRepositoryMock
   let worksheetRepositoryMock
+  let eventBusMock
 
   beforeEach(() => {
     queueRepositoryMock = {
@@ -26,10 +27,14 @@ describe('WorksheetQueueActionsService', () => {
       save: spy(),
       getForCallcenterView: stub()
     }
+    eventBusMock = {
+      publish: spy()
+    }
 
     service = new WorksheetQueueActionsService(
       queueRepositoryMock,
-      worksheetRepositoryMock
+      worksheetRepositoryMock,
+      eventBusMock
     )
   })
 
@@ -72,6 +77,15 @@ describe('WorksheetQueueActionsService', () => {
 
     it('returns updated worksheet', () => {
       expect(takenWorksheet).to.equal(testWorksheetForCallcenterView)
+    })
+
+    it('publishes WorksheetTaken event', () => {
+      expect(eventBusMock.publish).to.have.been.calledWith({
+        name: 'worksheet.taken',
+        worksheetId: testWorksheetId,
+        queueId: testQueueId,
+        by: testUserId
+      })
     })
   })
 
