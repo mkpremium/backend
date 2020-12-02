@@ -8,11 +8,11 @@ export class WorksheetQueueActionsService {
     this.worksheetRepository = worksheetRepository
   }
 
-  async takeWorksheetInQueue (queueId, worksheetId, userId) {
+  async takeWorksheetInQueue (queueId, worksheetId, byUserOfId) {
     const queue = await this.queueRepository.get(queueId)
     const worksheet = await this.worksheetRepository.get(worksheetId)
 
-    const [ queueWithWorksheet, worksheetInQueue ] = queue.takeWorksheet(worksheet, userId)
+    const [ queueWithWorksheet, worksheetInQueue ] = queue.takeWorksheet(worksheet, byUserOfId)
 
     await this.worksheetRepository.save(worksheetInQueue)
     await this.queueRepository.save(queueWithWorksheet)
