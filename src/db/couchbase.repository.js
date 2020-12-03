@@ -11,6 +11,13 @@ export class CouchbaseRepository {
     return this.couchbaseAdapter.getEntity(this.struct(), entityId)
   }
 
+  async patch (entityId, patch) {
+    const entity = await this.get(entityId)
+    const patchedEntity = this.struct().update(entity, patch)
+
+    return this.save(patchedEntity)
+  }
+
   save (entityData) {
     return this.couchbaseAdapter.save(entityData, this.struct())
   }

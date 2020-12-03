@@ -28,7 +28,11 @@ export default (app,
     eventBus
   )
   const takeNextWorksheetService = new TakeNextWorksheetService(worksheetQueueActionsService, worksheetRepository)
-  const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService()
+  const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService(
+    worksheetQueueRepository,
+    worksheetRepository,
+    2
+  )
 
   setupEventListeners(eventBus, {
     legacyWorksheetRepository,

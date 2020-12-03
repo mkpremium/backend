@@ -62,7 +62,7 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
 
     expect(worksheetRepositoryMock.patch).to.have.been
       .calledWithMatch('3-hours-ago-worksheet',
-        patch => patch.status === WorkSheetStatus.AVAILABLE && patch.queueId === null && new Date().valueOf() - patch.statusChangedAt.valueOf() < 100
+        patch => patch.status.$set === WorkSheetStatus.AVAILABLE && patch.queueId.$set === null && new Date().valueOf() - patch.statusChangedAt.$set.valueOf() < 100
       )
   })
 })
