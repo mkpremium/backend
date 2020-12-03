@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "172f4b3a-d6e4-4791-97aa-93687f9a21b4",
+		"_postman_id": "d1d3a626-e856-4b29-8d66-9f1b08efa861",
 		"name": "MKPremium",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -118,20 +118,34 @@
 					"response": []
 				},
 				{
-					"name": "Take Next Queue Worksheet",
+					"name": "Take worksheet (new)",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues/queue-id/worksheets/worksheet-id",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues",
+								"queue-id",
+								"worksheets",
+								"worksheet-id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Take next worksheet in queue",
+					"request": {
+						"method": "POST",
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"action\":\"NEXT\"}",
+							"raw": "{\"action\": \"NEXT\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -139,17 +153,34 @@
 							}
 						},
 						"url": {
-							"raw": "{{apiUrl}}/worksheets/queues/{{queueId}}",
+							"raw": "{{apiUrl}}/worksheets/queues/queue-id",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"worksheets",
 								"queues",
-								"{{queueId}}"
+								"queue-id"
 							]
-						},
-						"description": "Fetch next available worksheet in queue."
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List queues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues"
+							]
+						}
 					},
 					"response": []
 				}
@@ -165,7 +196,111 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{apiUrl}}/scheduled-events/calls",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"calls"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete scheduled event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/id",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"id"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Buildings",
+			"item": [
+				{
+					"name": "Get buildings by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/buildings?id=building-id",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"buildings"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "building-id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Update user (permissions)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roles\": [\n        \"OPERATOR\",\n        \"ADMIN\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/operators/f75a1005-36d1-4688-a48c-141824241d85",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"operators",
+								"f75a1005-36d1-4688-a48c-141824241d85"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/operators",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"operators"
+							]
 						}
 					},
 					"response": []
@@ -175,6 +310,26 @@
 		},
 		{
 			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e8addef2-30b2-4456-ba50-56f99111c1a7",
+						"exec": [
+							"pm.test(\"ValidResponse\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody(\"token\");",
+							"})",
+							"",
+							"const responseData = pm.response.json();",
+							"",
+							"pm.collectionVariables.set(\"accessToken\", responseData.token);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -187,7 +342,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"business\",\n\t\"password\": \"Passw0rd\"\n}",
+					"raw": "{\n    \"username\": \"test\",\n    \"password\": \"testtest\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -206,33 +361,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "Update user (permissions)",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"roles\": [\n        \"OPERATOR\",\n        \"BUSINESS\"\n    ]\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{apiUrl}}/operators/{{test-user-id}}",
-					"host": [
-						"{{apiUrl}}"
-					],
-					"path": [
-						"operators",
-						"{{test-user-id}}"
-					]
-				}
-			},
-			"response": []
 		}
 	],
 	"auth": {
@@ -240,12 +368,12 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNWYyODRjLTUwZjctNDA5YS1hOWQ5LTdhNzMyYTk4ZjJjNiIsInBlcm1pc3Npb25zIjpbIkJVU0lORVNTIiwiT1BFUkFUT1IiLCJBRE1JTiJdLCJvcGVyYXRvciI6eyJpZCI6ImFhNWYyODRjLTUwZjctNDA5YS1hOWQ5LTdhNzMyYTk4ZjJjNiIsIm5hbWUiOiJvcGVyYXRvciBvcGVyYXRvciIsInVzZXJuYW1lIjoiYnVzaW5lc3MiLCJjaXR5IjoiYmFyY2Vsb25hIiwicXVldWVJZCI6IjQyODI4MDYxLWI3MGEtNDE5Ny05NTk3LThmYjRkOTEzNTU1MyIsImVtYWlsIjoib3BlcmF0b3JAZXhhbXBsZS5jb20iLCJsYW5ndWFnZSI6ImVzIn0sImlhdCI6MTYwNDU5Njg3MiwiZXhwIjoxNjA0ODU2MDcyfQ.-bRazmEVW2YxGIrSaUXwQYiyoC_2VWbUypFWlw7pylQ",
+				"value": "{{accessToken}}",
 				"type": "string"
 			},
 			{
 				"key": "password",
-				"value": "{{ACCESS_TOKEN}}",
+				"value": "{{accessToken}}",
 				"type": "string"
 			}
 		]
@@ -254,7 +382,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "fc30bd3d-247b-4e17-af40-620779e09e74",
+				"id": "3afd0ac1-3255-4eba-a05a-4f18e618dc28",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -264,7 +392,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "6bb5b32e-f6bc-4b3c-97f7-378c19df5b07",
+				"id": "b748d338-2c14-403b-8653-4ad0750e0b14",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -274,19 +402,24 @@
 	],
 	"variable": [
 		{
-			"id": "d677528c-8428-44b6-a430-5761699f97cf",
+			"id": "06265bc1-2bac-4d48-a174-13991e77415e",
 			"key": "apiUrl",
 			"value": "https://api.mkpremium.net"
 		},
 		{
-			"id": "9646d716-740d-4166-8235-c5e93ede68f9",
+			"id": "a4e481e7-26c5-4726-b232-b889af18132e",
 			"key": "queueId",
 			"value": "f365e947-4c0e-4beb-ba18-25db1773587f"
 		},
 		{
-			"id": "4a6b52d9-3e10-4ea1-8fca-7fce0f66866b",
+			"id": "3b31dcf8-f932-4173-947c-d4ea5ea5575a",
 			"key": "test-user-id",
 			"value": "test-user-id"
+		},
+		{
+			"id": "571e570d-8cfe-47b7-9c75-1fbfb890625f",
+			"key": "accessToken",
+			"value": ""
 		}
 	],
 	"protocolProfileBehavior": {}
