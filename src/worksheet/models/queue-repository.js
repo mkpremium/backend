@@ -148,32 +148,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
 
   /**
    * @public
-   * @param {WorksheetQueue} queue
-   * @param itemId
-   * @param operatorId
-   * @returns {Promise<WorksheetQueue>}
-   */
-  async removeScheduledWorksheet (queue, itemId, operatorId) {
-    const item = queue.findItemById(itemId)
-
-    if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
-    }
-
-    const updatedItem = item.releaseSchedule(operatorId)
-    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
-    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
-
-    logger.info('WorksheetQueueRepository#removeScheduledWorksheet', {
-      worksheetId: item.worksheetId,
-      queueId: queue.id
-    })
-
-    await this.save(updatedQueue)
-  }
-
-  /**
-   * @public
    * @param data
    * @param itemId
    * @param operatorId

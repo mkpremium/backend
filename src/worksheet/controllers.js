@@ -156,17 +156,6 @@ const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
   res.json(items)
 }
 
-const removeScheduledWorksheet = worksheetQueueRepository => async (req, res) => {
-  const queueId = req.params.id
-  const operatorId = req.user.id
-  const itemId = req.body.itemId
-
-  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
-  await worksheetQueueRepository.removeScheduledWorksheet(queue, itemId, operatorId)
-
-  res.status(204).send()
-}
-
 /**
  * Searches worksheets by keyword.
  * @param request
@@ -190,5 +179,4 @@ export const createQueueController = worksheetQueueRepository => wrap(createQueu
 export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))
 export const deleteQueueController = worksheetQueueRepository => wrap(deleteQueue(worksheetQueueRepository))
 export const getScheduledWorksheetsController = worksheetQueueRepository => wrap(getScheduledWorksheets(worksheetQueueRepository))
-export const removeScheduledWorksheetController = worksheetQueueRepository => wrap(removeScheduledWorksheet(worksheetQueueRepository))
 export const searchWorksheetController = wrap(searchWorksheets)

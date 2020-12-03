@@ -11,7 +11,8 @@ import {
   createQueueController,
   updateQueueController,
   deleteQueueController,
-  getScheduledWorksheetsController, removeScheduledWorksheetController, searchWorksheetController
+  getScheduledWorksheetsController,
+  searchWorksheetController
 } from './controllers'
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
@@ -40,8 +41,6 @@ export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActions
   router.delete('/queues/:id', permissions.manager, deleteQueueController(worksheetQueueRepository))
 
   router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController(worksheetQueueRepository))
-
-  router.delete('/queues/:id/scheduled', permissions.operator, removeScheduledWorksheetController(worksheetQueueRepository))
 
   router.get('/search', searchWorksheetController)
 
