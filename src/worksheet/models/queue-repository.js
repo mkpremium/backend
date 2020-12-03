@@ -5,7 +5,6 @@ import _map from 'lodash/map'
 import _set from 'lodash/set'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import uuid from 'uuid/v4'
 import { CouchbaseModel } from '../../db/model'
 import { logger } from '../../infrastructure/logger'
 import { utc } from '../../lib/date'
@@ -15,7 +14,6 @@ import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { ListQuery } from '../../types/params'
 import {
-  Worksheet,
   WorkSheetCall,
   WorksheetQueue,
   WorksheetQueueBody,
@@ -114,34 +112,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
     await this.save(updatedQueue)
 
     return updatedItem
-  }
-
-  /**
-   * @public
-   * @param {WorksheetQueue} queue
-   * @param {string} operatorId
-   * @returns {Promise<Worksheet>}
-   */
-  async nextWorksheetInQueue (queue, operatorId) {
-    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
-    let nextAvailableItem = queue.findNextAvailableInQueue(operatorItem)
-    let updatedQueue = queue
-
-    // add worksheet only if the bag it's empty
-    if (!nextAvailableItem) {
-      updatedQueue = await this.findNextAvailableInSource(queue)
-      nextAvailableItem = updatedQueue.findNextAvailableInQueue(operatorItem)
-    }
-
-    if (!nextAvailableItem) {
-      return
-    }
-
-    const releasedUpdatedQueue = operatorItem
-      ? await this.releaseWorksheetInQueue(updatedQueue, operatorItem.id, operatorId)
-      : updatedQueue
-
-    return this.takeWorksheetInQueue(releasedUpdatedQueue, nextAvailableItem.id, operatorId)
   }
 
   /**
@@ -365,72 +335,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
 
   /**
    * @private
-   */
-  async releaseWorksheetInQueue (queue, itemId, operatorId) {
-    const item = queue.findItemById(itemId)
-
-    if (!item) {
-      return queue
-    }
-
-    if (!item.canBeReleased(operatorId)) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) no puede ser liberado`)
-    }
-
-    return this.releaseItemInQueue(queue, item, operatorId)
-  }
-
-  /**
-   * @private
-   * @param queue
-   * @param item
-   * @param operatorId
-   * @returns {Promise<Object|*>}
-   */
-  async releaseItemInQueue (queue, item, operatorId) {
-    logger.info('WorksheetQueueRepository#releaseItemInQueue', { worksheetId: item.worksheetId, queueId: queue.id })
-    await this.worksheetRepository.updateStatus(item.worksheetId, operatorId)
-
-    if (item.status !== QueueStatus.SCHEDULED) {
-      return this.removeWorksheetFromQueue(queue, item.worksheetId)
-    }
-
-    return queue
-  }
-
-  /**
-   * @private
-   * @param {WorksheetQueue} queue
-   * @param worksheet
-   * @returns {Promise<WorksheetQueue>}
-   */
-  async addWorksheetToQueue (queue, worksheet) {
-    if (worksheet.queueId) {
-      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
-    }
-    logger.info('WorksheetQueueRepository#addWorksheetToQueue worksheet to queue', {
-      worksheetId: worksheet.id,
-      queueId: queue.id
-    })
-
-    await this.worksheetRepository.save(t.update(worksheet, { queueId: { $set: queue.id } }))
-
-    const updatedWorksheets = t.update(queue.worksheets, {
-      $push: [ QueueItem({
-        worksheetId: worksheet.id,
-        id: uuid()
-      }) ]
-    })
-    const updatedQueue = t.update(queue, {
-      worksheets: { $set: updatedWorksheets },
-      worksheetIndex: { $set: worksheet.worksheetIndex }
-    })
-
-    return fromJSON(updatedQueue, WorksheetQueue)
-  }
-
-  /**
-   * @private
    * @param queue
    * @param worksheetId
    * @returns {Promise<Object>}
@@ -447,21 +351,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
 
     const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
     return t.update(queue, { worksheets: { $set: updatedWorksheetItems } })
-  }
-
-  /**
-   * @private
-   * @param {WorksheetQueue} queue
-   * @returns {Promise<WorksheetQueue|*>}
-   */
-  async findNextAvailableInSource (queue) {
-    const [ rawWorksheet ] = await this.worksheetRepository.findBySource(queue)
-
-    if (rawWorksheet) {
-      return this.addWorksheetToQueue(queue, fromJSON(rawWorksheet, Worksheet))
-    }
-
-    return queue
   }
 
   /**
