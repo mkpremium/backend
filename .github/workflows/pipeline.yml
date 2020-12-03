@@ -43,6 +43,7 @@ jobs:
         with:
           max_attempts: 3
           retry_on: error
+          timeout_minutes: 10
           command: ./scripts/test-ci.sh
 
   deploy:
