@@ -7,7 +7,7 @@ import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-
 import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
 import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import { setupEventListeners } from './event-listeners'
-import { ReleaseUserOtherActiveWorksheetsInQueueService } from './service/release-user-other-active-worksheets-in-queue.service'
+import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
 
 /**
  * @param app
@@ -28,7 +28,7 @@ export default (app,
     eventBus
   )
   const takeNextWorksheetService = new TakeNextWorksheetService(worksheetQueueActionsService, worksheetRepository)
-  const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserOtherActiveWorksheetsInQueueService()
+  const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService()
 
   setupEventListeners(eventBus, {
     legacyWorksheetRepository,

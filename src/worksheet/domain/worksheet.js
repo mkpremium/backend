@@ -2,6 +2,7 @@ import _filter from 'lodash/filter'
 import _find from 'lodash/find'
 import _findIndex from 'lodash/findIndex'
 import _get from 'lodash/get'
+import _ from 'lodash'
 import t from 'tcomb'
 import { Building } from '../../building/building'
 import { logger } from '../../infrastructure/logger'
@@ -184,6 +185,20 @@ WorksheetQueue.prototype.removeScheduledCall = function (scheduledCallId) {
   return t.update(this, {
     worksheets: {
       $set: updatedWorksheets
+    }
+  })
+}
+
+WorksheetQueue.prototype.keepOnlyUserNewestOpenedWorksheets = function (userId, n) {
+  const userOpenedWorksheets = this.worksheets
+    .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
+
+  userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
+  const worksheetIdToDrop = _.map(_.drop(userOpenedWorksheets, n), 'worksheetId')
+
+  return t.update(this, {
+    worksheets: {
+      $set: this.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
     }
   })
 }
