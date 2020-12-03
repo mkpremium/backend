@@ -1,5 +1,12 @@
+import { WorkSheetStatus } from '../domain/worksheet'
+
 export class ReleaseUserExtraOpenedWorksheetsInQueueService {
-  constructor (worksheetQueueRepository, maxOpenedWorksheetPerQueueAndUser) {
+  constructor (
+    worksheetQueueRepository,
+    worksheetRepository,
+    maxOpenedWorksheetPerQueueAndUser
+  ) {
+    this.worksheetRepository = worksheetRepository
     this.worksheetQueueRepository = worksheetQueueRepository
     this.maxOpenedWorksheetPerQueueAndUser = maxOpenedWorksheetPerQueueAndUser
   }
@@ -10,11 +17,17 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
       return
     }
 
-    const queueWithMaxWorkseetForUser = queue.keepOnlyUserNewestOpenedWorksheets(
+    const [ queueWithMaxWorksheetForUser, releasedWorksheetIds ] = queue.keepOnlyUserNewestOpenedWorksheets(
       userId, this.maxOpenedWorksheetPerQueueAndUser
     )
 
-    await this.worksheetQueueRepository.save(queueWithMaxWorkseetForUser)
-    // TODO save worksheets
+    await this.worksheetQueueRepository.save(queueWithMaxWorksheetForUser)
+    await Promise.all(releasedWorksheetIds.map(
+      worksheetId => this.worksheetRepository.patch(worksheetId, {
+        status: WorkSheetStatus.AVAILABLE,
+        queueId: null,
+        statusChangedAt: new Date()
+      })
+    ))
   }
 }

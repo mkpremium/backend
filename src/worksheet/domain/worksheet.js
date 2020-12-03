@@ -196,11 +196,14 @@ WorksheetQueue.prototype.keepOnlyUserNewestOpenedWorksheets = function (userId, 
   userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
   const worksheetIdToDrop = _.map(_.drop(userOpenedWorksheets, n), 'worksheetId')
 
-  return t.update(this, {
-    worksheets: {
-      $set: this.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
-    }
-  })
+  return [
+    t.update(this, {
+      worksheets: {
+        $set: this.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
+      }
+    }),
+    worksheetIdToDrop
+  ]
 }
 
 /**
