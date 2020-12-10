@@ -42,10 +42,6 @@
           "value": "backend"
         },
         {
-          "name": "EMIT_MODEL_EVENTS",
-          "value": "true"
-        },
-        {
           "name": "JWT_EXPIRES",
           "value": "7 days"
         },

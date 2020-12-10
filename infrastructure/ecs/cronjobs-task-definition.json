@@ -36,10 +36,6 @@
           "value": "backend"
         },
         {
-          "name": "EMIT_MODEL_EVENTS",
-          "value": "true"
-        },
-        {
           "name": "NODE_ENV",
           "value": "production"
         },

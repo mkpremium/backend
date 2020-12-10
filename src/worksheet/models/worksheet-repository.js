@@ -12,7 +12,6 @@ import _uniq from 'lodash/uniq'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
-import { emitModelEvents } from '../../../config'
 import { BuildingRepository } from '../../building/models'
 
 import { CouchbaseModel } from '../../db/model'
@@ -301,7 +300,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     })
     const repo = new LegacyWorksheetRepository()
 
-    return repo.save(worksheet, emitModelEvents)
+    return repo.save(worksheet)
   }
 
   async preSave (data) {

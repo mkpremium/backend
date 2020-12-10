@@ -6,7 +6,6 @@ import t from 'tcomb'
 import { logger } from './src/infrastructure/logger'
 
 export const port = parseInt(process.env.APP_PORT || '9001')
-export const emitModelEvents = JSON.parse(process.env.EMIT_MODEL_EVENTS || false)
 export const socket = {
   enabled: JSON.parse(process.env.SOCKET_ENABLED || 'true'),
   port: parseInt(process.env.SOCKET_PORT || '9002'),
