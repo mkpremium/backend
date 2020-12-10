@@ -2,7 +2,6 @@ import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
 import { getHistoryStruct } from './helper'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { emitHistoryEvents } from '../../config'
 import { addDateQueryToBuilder, addBetweenQueryToBuilder } from '../lib/query/helpers'
 
 import './types'
@@ -13,57 +12,56 @@ export class History extends CouchbaseModel {
     this.Struct = t.History
   }
 
-  async register (eventData, sendEvent) {
-    const emitEvent = sendEvent || emitHistoryEvents
-    return this.save(getHistoryStruct(eventData), emitEvent)
+  async register (eventData) {
+    return this.save(getHistoryStruct(eventData))
   }
 
-  static async registerCreate (eventData, sendEvent = false) {
+  static async registerCreate (eventData) {
     const history = new History()
     eventData.type = 'CREATE'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerGet (eventData, sendEvent = false) {
+  static async registerGet (eventData) {
     const history = new History()
     eventData.type = 'GET'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerUpdate (eventData, sendEvent = false) {
+  static async registerUpdate (eventData) {
     const history = new History()
     eventData.type = 'UPDATE'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerDelete (eventData, sendEvent = false) {
+  static async registerDelete (eventData) {
     const history = new History()
     eventData.type = 'DELETE'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerOpen (eventData, sendEvent = false) {
+  static async registerOpen (eventData) {
     const history = new History()
     eventData.type = 'OPEN'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerList (eventData, sendEvent = false) {
+  static async registerList (eventData) {
     const history = new History()
     eventData.type = 'LIST'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerTake (eventData, sendEvent = false) {
+  static async registerTake (eventData) {
     const history = new History()
     eventData.type = 'TAKE'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 
-  static async registerRelease (eventData, sendEvent = false) {
+  static async registerRelease (eventData) {
     const history = new History()
     eventData.type = 'RELEASE'
-    return history.register(eventData, sendEvent)
+    return history.register(eventData)
   }
 }
 
