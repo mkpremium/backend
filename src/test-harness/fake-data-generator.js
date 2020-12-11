@@ -36,7 +36,8 @@ export const createBuildingReq = (buildingId) => {
         postalCode: {
           number: faker.address.zipCode()
         },
-        city: 'TEST_PORTO'
+        city: 'TEST_PORTO',
+        province: 'TEST_PORTO'
       },
       location: {}
     },
