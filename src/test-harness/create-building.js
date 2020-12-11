@@ -32,22 +32,20 @@ export const createBuildingFactory = (buildingRepository, createOwner, createBui
   t.assert(CreateBuildingRequest.is(req))
   const buildingId = uuid()
   const fakedRequest = createBuildingReq(buildingId)
-  const createOwnerCmd = CreateOwnerCmd(
-    t.update(CreateOwnerCmd({ ...fakedRequest.owner }), { $merge: req.owner })
-  )
+  const createOwnerCommands = fakedRequest.owners.map(o => CreateOwnerCmd(o))
 
-  const owner = await createOwner(createOwnerCmd)
+  const owners = await Promise.all(createOwnerCommands.map(cmd => createOwner(cmd)))
   const savedBuilding = await buildingRepository.save(
     t.update(
-      Building({ ...fakedRequest.building, isTest: true, ownerId: owner.id }),
+      Building({ ...fakedRequest.building, isTest: true, ownerId: owners[ 0 ].id }),
       { $merge: req.owner }
     )
   )
 
   const worksheet = await createBuildingWorksheet(CreateWorksheetRequest({
     building: savedBuilding,
-    ownerId: owner.id
+    ownersId: owners.map(({ id }) => id)
   }))
 
-  return { building: savedBuilding, owner, worksheet }
+  return { building: savedBuilding, owners, worksheet }
 }

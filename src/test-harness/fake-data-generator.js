@@ -1,6 +1,7 @@
 import faker from 'faker/locale/es'
 import uuid from 'uuid/v4'
 import { OwnerType } from '../types/enums'
+import _ from 'lodash'
 
 export const createOwnerCmd = buildingId => {
   const ownerFirstName = faker.name.firstName()
@@ -25,6 +26,7 @@ export const createOwnerCmd = buildingId => {
 
 export const createBuildingReq = (buildingId) => {
   const streetNumber = faker.random.number().toString()
+  const nbOfOwners = 1 + ((Math.random() * 10) % 2) // [1, 3]
 
   return ({
     building: {
@@ -41,6 +43,6 @@ export const createBuildingReq = (buildingId) => {
       },
       location: {}
     },
-    owner: createOwnerCmd(buildingId)
+    owners: _.times(nbOfOwners, () => createOwnerCmd(buildingId))
   })
 }
