@@ -106,6 +106,16 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
+Worksheet.prototype.makeAvailable = function () {
+  return t.update(
+    this.setStatus(WorkSheetStatus.AVAILABLE),
+    {
+      inFreezer: { $set: false },
+      queueId: { $set: null }
+    }
+  )
+}
+
 export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
   province: t.maybe(t.String),

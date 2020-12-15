@@ -16,8 +16,12 @@ import {
 } from './controllers'
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
+import { createMakeAlreadySoldWorksheetAvailable } from './controller/make-already-sold-worksheets-available'
 
-export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService) {
+export function worksheetRoutes (
+  worksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService, worksheetRepository,
+  eventBus
+) {
   const router = Router()
 
   router.get('/', worksheetListController)
@@ -47,6 +51,9 @@ export function worksheetRoutes (worksheetQueueRepository, worksheetQueueActions
   router.get('/:id', worksheetFindByIdController)
 
   router.post('/:id/owners', addOwnerToWorksheetController)
+
+  router.post('/republish-already-sold', permissions.admin,
+    createMakeAlreadySoldWorksheetAvailable(worksheetRepository, eventBus))
 
   return router
 }

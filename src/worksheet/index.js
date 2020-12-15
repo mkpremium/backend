@@ -41,6 +41,7 @@ export default (app,
   })
 
   app.use('/worksheets', secured,
-    worksheetRoutes(legacyWorksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService))
+    worksheetRoutes(legacyWorksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService,
+      worksheetRepository, eventBus))
   app.use('/worksheets/buildings', secured, buildingRoutes)
 }

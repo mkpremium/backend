@@ -23,13 +23,15 @@ t.NoteListQuery = ListQuery.extend(
   }
 )
 
-export const TNote = t.Note = t.struct(
+export const TNote = t.struct(
   {
     id: t.String,
     note: t.String,
     createdAt: t.Date,
     createdBy: t.String,
-    context: t.Object,
+    context: t.struct({
+      buildingId: t.String
+    }),
     _documentType: t.enums.of(['note'])
   },
   {
@@ -49,7 +51,7 @@ export const TNote = t.Note = t.struct(
 t.NoteListResponse = t.struct(
   {
     total: t.Number,
-    results: t.list(t.Note)
+    results: t.list(TNote)
   },
   {
     name: 'NoteListResponse',

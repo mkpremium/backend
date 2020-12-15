@@ -43,6 +43,13 @@ const nextWorksheetAvailableInSourceQuery = (bucketName, source) => {
   return `${worksheetQuery} ORDER BY worksheet.viewedAt LIMIT 1`
 }
 
+const alreadySoldBuildingWorksheetId = bucketName => `
+SELECT id
+FROM ${bucketName}
+LET buildingIds = ARRAY b.id FOR b IN (SELECT building.id FROM mkpremium building WHERE building._documentType = 'building' AND building.negotiationStatus = 'YA VENDIO') END
+WHERE _documentType = 'worksheet' AND relatedBuildingIds[0] IN buildingIds
+`
+
 class WorksheetNotFound extends Error {
   constructor (worksheetId) {
     super('Worksheet not found')
@@ -85,6 +92,12 @@ export class WorksheetRepository extends CouchbaseRepository {
         return result[ 0 ]
       }
     })
+  }
+
+  getAllWorksheetIdForAlreadySoldBuildings () {
+    return this.couchbaseAdapter.queryAsync(
+      N1qlQuery.fromString(alreadySoldBuildingWorksheetId(this.bucketName))
+    ).then(result => result.map(({ id }) => id))
   }
 
   struct () {
