@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import {
   addOwnerContactController,
-  createSetFeaturedContactController,
   listOwnerController,
   updateOwnerContactController,
   updateOwnerController
 } from './controllers'
+import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
 
 const router = Router()
 
