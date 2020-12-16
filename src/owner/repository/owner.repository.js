@@ -1,5 +1,12 @@
+import { Owner } from '../owner'
 import t from 'tcomb'
-import { Owner } from './owner'
+
+export class OwnerNotFound extends Error {
+  constructor (ownerId) {
+    super()
+    this.message = `Owner with id ${ownerId} not found`
+  }
+}
 
 export class OwnerRepository {
   constructor (couchbaseAdapter) {
@@ -21,12 +28,5 @@ export class OwnerRepository {
 
   save (owner) {
     return this.couchbaseAdapter.save(owner, Owner)
-  }
-}
-
-export class OwnerNotFound extends Error {
-  constructor (ownerId) {
-    super()
-    this.message = `Owner with id ${ownerId} not found`
   }
 }
