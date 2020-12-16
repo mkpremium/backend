@@ -26,7 +26,8 @@ const FoundOwner = t.struct({
   contacts: t.list(t.struct({
     id: t.String,
     value: t.String,
-    type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ])
+    type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
+    status: t.enums.of(['UNDEFINED', 'GOOD', 'BAD'])
   })),
   buildingAddress: t.struct({
     neighborhood: t.maybe(t.String),
