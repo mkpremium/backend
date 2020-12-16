@@ -9,9 +9,11 @@ SELECT
 owner.id,
 owner.buildingId,
 owner.person.contacts,
-building.address buildingAddress
+building.address buildingAddress,
+worksheet.id worksheetId
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
+JOIN mkpremium worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
 WHERE owner._documentType = 'owner'
 AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 END
 `
@@ -19,12 +21,13 @@ AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 END
 const FoundOwner = t.struct({
   id: t.String,
   buildingId: t.String,
+  worksheetId: t.String,
+  matchingContactId: t.String,
   contacts: t.list(t.struct({
     id: t.String,
     value: t.String,
     type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ])
   })),
-  matchingContactId: t.String,
   buildingAddress: t.struct({
     neighborhood: t.maybe(t.String),
     type: t.maybe(t.String),
