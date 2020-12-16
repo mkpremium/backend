@@ -10,7 +10,8 @@ owner.id,
 owner.buildingId,
 owner.person.contacts,
 building.address buildingAddress,
-worksheet.id worksheetId
+worksheet.id worksheetId,
+owner.name
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
 JOIN mkpremium worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
@@ -23,6 +24,7 @@ const FoundOwner = t.struct({
   buildingId: t.String,
   worksheetId: t.String,
   matchingContactId: t.String,
+  name: t.String,
   contacts: t.list(t.struct({
     id: t.String,
     value: t.String,
