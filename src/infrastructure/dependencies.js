@@ -16,7 +16,6 @@ import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
 import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
-import { SetOwnerFeaturedContactService } from '../owner/SetOwnerFeaturedContactService'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
 import { ScheduledEventsRepository } from '../scheduled-events/repository/ScheduleEventsRepository'
@@ -37,6 +36,7 @@ import { EventBus } from './event-bus'
 import { MetadataRepository } from '../building/repository/MetadataRepository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { OwnerRepository } from '../owner/repository/owner.repository'
+import { SetOwnerFeaturedContactService } from '../owner/service/set-featured-contact.service'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}

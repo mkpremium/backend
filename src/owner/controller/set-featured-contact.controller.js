@@ -1,7 +1,7 @@
 import { FeaturedContact } from '../owner'
-import { EmptyFeaturedContact } from '../SetOwnerFeaturedContactService'
 import { newHttpError } from '../../lib/http-error'
 import { OwnerNotFound } from '../repository/owner.repository'
+import { EmptyFeaturedContact } from '../service/set-featured-contact.service'
 
 export const createSetFeaturedContactController = setOwnerFeaturedContactService => {
   return async (req, res) => {

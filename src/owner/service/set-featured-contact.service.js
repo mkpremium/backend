@@ -1,5 +1,8 @@
 import _ from 'lodash'
 
+export class EmptyFeaturedContact extends Error {
+}
+
 export class SetOwnerFeaturedContactService {
   constructor (ownerRepository) {
     this.ownerRepository = ownerRepository
@@ -12,7 +15,4 @@ export class SetOwnerFeaturedContactService {
 
     await this.ownerRepository.setOwnerFeaturedContact(ownerId, featuredContact)
   }
-}
-
-export class EmptyFeaturedContact extends Error {
 }
