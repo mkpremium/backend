@@ -6,20 +6,24 @@ import {
   updateOwnerController
 } from './controllers'
 import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
+import { createSearchOwnersController } from './controller/search-owners.controller'
+import { wrap } from 'express-promise-wrap'
 
-const router = Router()
+export default (setOwnerFeaturedContactService, ownerRepository) => {
+  const router = Router()
 
-router.put('/:id', updateOwnerController)
+  router.put('/:id', updateOwnerController)
 
-router.put('/:id/contacts/:contactId', updateOwnerContactController)
-router.put('/:id/contacts/:contactId/status', updateOwnerContactController)
+  router.put('/:id/contacts/:contactId', updateOwnerContactController)
+  router.put('/:id/contacts/:contactId/status', updateOwnerContactController)
 
-router.post('/:id/contacts', addOwnerContactController)
+  router.post('/:id/contacts', addOwnerContactController)
 
-router.get('/', listOwnerController)
-
-export default (setOwnerFeaturedContactService) => {
   router.put('/:ownerId/featured-contact', createSetFeaturedContactController(setOwnerFeaturedContactService))
+
+  router.get('/', listOwnerController)
+
+  router.post('/search', wrap(createSearchOwnersController(ownerRepository)))
 
   return router
 }
