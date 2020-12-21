@@ -16,15 +16,16 @@ export class UpdateBuildingNegotiationStatusService {
     }
 
     await this.buildingRepository.setBuildingNegotiationStatus(buildingId, negotiationStatus)
-    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, operatorId))
+    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, operatorId, negotiationStatus))
   }
 }
 
 export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'BUILDING_NEGOTIATION_STATUS_CHANGED'
 export class BuildingNegotiationStatusChanged {
-  constructor (buildingId, operatorId) {
-    this.operatorId = operatorId
+  constructor (buildingId, operatorId, negotiationStatus) {
     this.name = BUILDING_NEGOTIATION_STATUS_CHANGED
+    this.operatorId = operatorId
+    this.negotiationStatus = negotiationStatus
     this.buildingId = buildingId
   }
 }
