@@ -26,14 +26,17 @@ describe('scheduled-events.setupEventListeners', () => {
     eventBus.publish({
       name: BUILDING_NEGOTIATION_STATUS_CHANGED,
       buildingId: 'test-building-id',
-      negotiationStatus: 'COMPRADO'
+      negotiationStatus: 'NO VENDE'
     })
-    expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).not.to.have.been.called
 
+    expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).to.have.been.calledWith('test-building-id')
+  })
+
+  it('deletes scheduled calls when building is discarded', () => {
     eventBus.publish({
       name: BUILDING_NEGOTIATION_STATUS_CHANGED,
       buildingId: 'test-building-id',
-      negotiationStatus: 'NO VENDE'
+      negotiationStatus: 'DESCARTADO'
     })
 
     expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).to.have.been.calledWith('test-building-id')
