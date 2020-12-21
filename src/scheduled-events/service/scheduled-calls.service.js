@@ -19,6 +19,7 @@ export class ScheduledCallsService {
         ({ event, eventDate, building, owner, eventId }) => {
           const shapedRow = {
             id: eventId,
+            buildingId: building.id,
             eventDate,
             event: {
               ...event,
@@ -66,6 +67,7 @@ AND se.notifyTo = $1
 
 const ScheduledCallsView = t.struct({
   id: t.String,
+  buildingId: t.String,
   eventDate: t.String,
   event: t.struct({
     owner: t.struct({
