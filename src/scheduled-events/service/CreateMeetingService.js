@@ -19,7 +19,11 @@ export class CreateMeetingService {
 
     const createdMeeting = await this.scheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
     await this.buildingRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
-    await this.eventBus.publish(new MeetingCreated(createdMeeting.notifyTo, createdMeeting.event.buildingId))
+    await this.eventBus.publish({
+      name: 'meeting.created',
+      userId: createdMeeting.notifyTo,
+      buildingId: createdMeeting.event.buildingId
+    })
 
     return createdMeeting
   }
@@ -28,12 +32,5 @@ export class CreateMeetingService {
     if (isBusiness(operator.roles) && operator.id !== meetingOperatorId) {
       throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
     }
-  }
-}
-
-export class MeetingCreated {
-  constructor (operatorId, buildingId) {
-    this.operatorId = operatorId
-    this.buildingId = buildingId
   }
 }
