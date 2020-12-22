@@ -179,15 +179,8 @@ export class ScheduledEventsRepository extends CouchbaseModel {
   }
 
   async delete (id) {
-    const scheduledEvent = await this.findByIdOrThrow(id)
     const qb = this.getQueryBuilder('delete').where('id = ?', id)
     await this.query(qb)
-    if (_get(scheduledEvent, 'event.worksheetId')) {
-      const worksheetRepo = new LegacyWorksheetRepository()
-      const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'))
-      const updatedWorksheet = t.update(worksheet, { lastAddedMeeting: { $set: null } })
-      await worksheetRepo.save(updatedWorksheet, false)
-    }
   }
 
   async list (query = {}) {
