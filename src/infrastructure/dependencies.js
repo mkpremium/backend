@@ -18,7 +18,7 @@ import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
 import { ScheduledEventsRepository } from '../scheduled-events/repository/ScheduleEventsRepository'
-import { CreateMeetingService } from '../scheduled-events/service/CreateMeetingService'
+import { CreateMeetingService } from '../scheduled-events/service/create-meeting.service'
 import { StockRepository as LegacyStockRepository } from '../stock/models'
 
 import { StockSalesService } from '../stock/service/StockSalesService'
