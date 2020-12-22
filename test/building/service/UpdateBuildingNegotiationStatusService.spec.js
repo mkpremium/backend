@@ -4,7 +4,7 @@ import {
   BuildingNegotiationStatusChanged,
   InvalidBuildingNegotiationStatus,
   UpdateBuildingNegotiationStatusService
-} from '../../../src/building/service/UpdateBuildingNegotiationStatusService'
+} from '../../../src/building/service/update-building-negotiation-status.service'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
   let buildingRepository, service, eventBus

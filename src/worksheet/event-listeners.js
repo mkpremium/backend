@@ -1,4 +1,4 @@
-import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/UpdateBuildingNegotiationStatusService'
+import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/update-building-negotiation-status.service'
 import { logger } from '../infrastructure/logger'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 

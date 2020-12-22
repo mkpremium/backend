@@ -2,7 +2,7 @@ import { setupEventListeners } from '../../src/scheduled-events/event-listeners'
 import { InMemorySyncEventBus } from '../../src/infrastructure/event-bus/in-memory-sync-event-bus'
 import { spy } from 'sinon'
 import { expect } from 'chai'
-import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../../src/building/service/UpdateBuildingNegotiationStatusService'
+import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../../src/building/service/update-building-negotiation-status.service'
 
 describe('scheduled-events.setupEventListeners', () => {
   let eventBus

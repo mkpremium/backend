@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { GetDocumentsSignedURLService } from '../../../src/building/service/GetDocumentsSignedURLService'
+import { GetDocumentsSignedURLService } from '../../../src/building/service/get-documents-signed-URL.service'
 import { stub } from 'sinon'
 
 describe('GetDocumentsSignedURLService', () => {
