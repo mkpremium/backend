@@ -1,10 +1,9 @@
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
-import { AddProposalService } from '../building/AddProposalService'
+import { AddProposalService } from '../building/service/add-proposal.service'
 import { BuildingsRepository } from '../building/BuildingsRepository'
 import { CommercialsBuildingRepository } from '../building/CommercialsBuildingRepository'
-import { ListBuildingProposalsService } from '../building/ListBuildingProposalsService'
-import { ListBuildingsService } from '../building/ListBuildingsService'
+import { ListBuildingsService } from '../building/service/list-buildings.service'
 import { BuildingRepository as LegacyBuildingRepository } from '../building/models'
 import { AdminBuildingRepository } from '../building/repository/AdminBuildingRepository'
 import { BuildingDocumentsRepository } from '../building/repository/BuildingDocumentsRepository'
@@ -37,6 +36,7 @@ import { MetadataRepository } from '../building/repository/MetadataRepository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { OwnerRepository } from '../owner/repository/owner.repository'
 import { SetOwnerFeaturedContactService } from '../owner/service/set-featured-contact.service'
+import { ListBuildingProposalsService } from '../building/service/list-building-proposals.service'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
