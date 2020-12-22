@@ -1,6 +1,6 @@
 import { N1qlQuery } from 'couchbase'
-import { Building } from './building'
-import { CouchbaseRepository } from '../db/couchbase.repository'
+import { Building } from '../building'
+import { CouchbaseRepository } from '../../db/couchbase.repository'
 
 const setBuildingFeaturedOwner = bucketName => `
 UPDATE ${bucketName} building

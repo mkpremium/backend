@@ -11,7 +11,7 @@ import { OperatorActions } from '../stats/types'
 import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from './building'
 
 import { logger } from '../infrastructure/logger'
-import { MetadataRepository } from './repository/MetadataRepository'
+import { MetadataRepository } from './repository/metadata.repository'
 
 export class BuildingProposal extends CouchbaseModel {
   constructor () {

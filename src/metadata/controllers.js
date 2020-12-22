@@ -1,6 +1,6 @@
 import { resolvePublicUrl } from '../aws'
 import { wrap } from 'express-promise-wrap/dist/index'
-import { MetadataRepository } from '../building/repository/MetadataRepository'
+import { MetadataRepository } from '../building/repository/metadata.repository'
 
 async function downloadMetadataFile (req, res) {
   const repo = new MetadataRepository()
