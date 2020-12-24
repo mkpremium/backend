@@ -3,6 +3,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import { errors } from 'couchbase'
 import { EntityNotFound } from './errors'
+import { CouchbaseRecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 
 export class CouchbaseAdapter {
   constructor (couchbaseBucket) {
@@ -30,7 +31,14 @@ export class CouchbaseAdapter {
         }
         throw error
       })
-      .then(result => fromJSON(result.value, structType))
+      .then(result => {
+        const parsedRecord = fromJSON(result.value, structType)
+        if (CouchbaseRecordToDomain.is(parsedRecord)) {
+          return parsedRecord.couchbaseToDomain()
+        }
+
+        return parsedRecord
+      })
   }
 
   queryAsync (...args) {

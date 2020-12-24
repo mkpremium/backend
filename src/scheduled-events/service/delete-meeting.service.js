@@ -1,4 +1,8 @@
 export class DeleteMeetingService {
+  /**
+   * @param {MeetingsRepository} meetingRepository
+   * @param {EventBus} eventBus
+   */
   constructor (meetingRepository, eventBus) {
     this.meetingRepository = meetingRepository
     this.eventBus = eventBus

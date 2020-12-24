@@ -1,3 +1,6 @@
+/**
+ * @property {CouchbaseAdapter} couchbaseAdapter
+ */
 export class CouchbaseRepository {
   constructor (couchbaseAdapter) {
     this.couchbaseAdapter = couchbaseAdapter

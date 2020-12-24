@@ -19,7 +19,7 @@ import { ListQuery } from '../../types/params'
 import { StringSplitList } from '../../types/refinement'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import { ScheduledEvent, ScheduledEventType, Event, ScheduledEventTypeEnum } from '../types'
+import { Event, ScheduledEvent, ScheduledEventType, ScheduledEventTypeEnum } from '../types'
 
 const ScheduleEventsListResponse = t.struct(
   {
