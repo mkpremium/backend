@@ -34,7 +34,6 @@
     "express-promise-wrap": "^0.2.2",
     "faker": "^5.1.0",
     "fs-extra": "^5.0.0",
-    "geolib": "^2.0.24",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.15",
     "mime-types": "^2.1.19",
