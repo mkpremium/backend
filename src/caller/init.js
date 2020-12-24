@@ -1,21 +1,26 @@
 import jwt from '../middleware/jwt'
 import { Router } from 'express'
+import { createGetNextCallerWorksheetController } from './controller/get-next-worksheet.controller'
+import { asFunction } from 'awilix'
+import { wrap } from 'express-promise-wrap'
 
-export const initCallerModule = (app) => {
+export const initCallerModule = (app, awilixContainer) => {
   const secured = jwt()
 
   app.use('/caller',
     secured,
-    createRouter()
+    createRouter(awilixContainer)
   )
 }
 
-const createRouter = () => {
+const createRouter = (awilixContainer) => {
   const router = new Router()
 
-  router.post('/next-worksheet', (req, res) => {
-    res.sendStatus(501)
+  awilixContainer.register({
+    getNextCallerWorksheetController: asFunction(createGetNextCallerWorksheetController)
   })
+
+  router.post('/next-worksheet', wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
 
   return router
 }

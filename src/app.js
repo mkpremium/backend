@@ -34,6 +34,7 @@ import user from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { initCallerModule } from './caller/init'
+import { createContainer } from 'awilix'
 
 const app = express()
 app.set('IS_READY', false)
@@ -45,6 +46,8 @@ dependenciesPromise.then(() => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer)
 
+  const awilixContainer = createContainer()
+
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
@@ -52,10 +55,10 @@ dependenciesPromise.then(() => {
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
   scheduledEvents(app, dependenciesContainer)
-  worksheet(app, dependenciesContainer, legacyDependenciesContainer)
+  worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
   createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)
-  initCallerModule(app)
+  initCallerModule(app, awilixContainer)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer

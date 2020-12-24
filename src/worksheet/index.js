@@ -8,6 +8,7 @@ import { WorksheetQueueRepository } from './repository/worksheet-queue.repositor
 import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import { setupEventListeners } from './event-listeners'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
+import * as awilix from 'awilix'
 
 /**
  * @param app
@@ -17,7 +18,8 @@ import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/releas
  */
 export default (app,
   { eventBus, couchbaseAdapter, worksheetRepository },
-  { worksheetRepository: legacyWorksheetRepository, worksheetQueueRepository: legacyWorksheetQueueRepository }
+  { worksheetRepository: legacyWorksheetRepository, worksheetQueueRepository: legacyWorksheetQueueRepository },
+  awilixContainer
 ) => {
   const secured = jwt()
 
@@ -28,6 +30,7 @@ export default (app,
     eventBus
   )
   const takeNextWorksheetService = new TakeNextWorksheetService(worksheetQueueActionsService, worksheetRepository)
+  awilixContainer.register({ takeNextWorksheetInQueueService: awilix.asValue(takeNextWorksheetService) })
   const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService(
     worksheetQueueRepository,
     worksheetRepository,

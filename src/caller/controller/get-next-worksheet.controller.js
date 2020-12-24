@@ -1,15 +1,12 @@
-import { wrap } from 'express-promise-wrap'
-
 /**
- * * @param {TakeNextWorksheetService} getNextWorksheetInQueueService
+ * * @param {TakeNextWorksheetService} takeNextWorksheetInQueueService
  */
-export const createGetNextCallerWorksheetController = (getNextWorksheetInQueueService) => wrap((req, res) => {
+export const createGetNextCallerWorksheetController = ({ takeNextWorksheetInQueueService }) => (req, res) => {
   const callerId = req.user.id
   const callerAssignedQueueId = req.user.operator.profile.queueId
 
-  return getNextWorksheetInQueueService.nextWorksheetInQueue(callerAssignedQueueId, callerId)
+  return takeNextWorksheetInQueueService.nextWorksheetInQueue(callerAssignedQueueId, callerId)
     .then((nextWorksheet) => {
       res.json(nextWorksheet)
     })
 }
-)
