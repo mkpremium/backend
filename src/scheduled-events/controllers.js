@@ -15,7 +15,7 @@ async function listScheduledEvent (req, res) {
 async function weekScheduleEventMeetings (req, res) {
   const repo = new ScheduledEventsRepository()
   const { week, year } = req.query
-  const scheduledEventMeetings = await repo.weekScheduleEventMeetings(week, year, req.query)
+  const scheduledEventMeetings = await repo.weekScheduleEventMeetings(week, year)
   res.json(scheduledEventMeetings)
 }
 

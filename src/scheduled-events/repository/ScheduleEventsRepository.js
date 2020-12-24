@@ -4,7 +4,6 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
 import { logger } from '../../infrastructure/logger'
 import { buildRangeFromWeek, utc } from '../../lib/date'
-import { buildDistanceCalculator } from '../../lib/geo'
 import { newHttpError } from '../../lib/http-error'
 import {
   addBetweenQueryToBuilder,
@@ -225,7 +224,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return fromJSON({ total, results }, ScheduleEventsListResponse)
   }
 
-  async weekScheduleEventMeetings (week, year, location) {
+  async weekScheduleEventMeetings (week, year) {
     const now = utc()
     const y = year || now.year()
     const w = week || now.week()
@@ -235,12 +234,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     addBetweenQueryToBuilder(qb, 'eventDate', rangeWeek)
     qb.where('type = ?', 'MEETINGS')
 
-    const results = await this.query(qb)
-    if (location) {
-      return results.map(buildDistanceCalculator(location, 'event.eventLocation'))
-    } else {
-      return results
-    }
+    return this.query(qb)
   }
 
   async preSave (scheduleEvent) {
