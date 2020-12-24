@@ -33,6 +33,7 @@ import meeting from './meeting'
 import user from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
+import { initCallerModule } from './caller/init'
 
 const app = express()
 app.set('IS_READY', false)
@@ -54,6 +55,7 @@ dependenciesPromise.then(() => {
   worksheet(app, dependenciesContainer, legacyDependenciesContainer)
   createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)
+  initCallerModule(app)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
