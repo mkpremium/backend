@@ -5,6 +5,7 @@ import { asFunction } from 'awilix'
 import { wrap } from 'express-promise-wrap'
 import { createTakeWorksheetInQueueController } from './controller/take-worksheet-in-queue.controller'
 import { createAssignFlipperToCallerController } from './controller/assign-flipper-to-caller.controller'
+import { AssignFlipperToCallerService } from './service/assign-flipper-to-caller.service'
 
 export const initCallerModule = (app, awilixContainer) => {
   const secured = jwt()
@@ -22,6 +23,7 @@ const createRouter = (awilixContainer) => {
     getNextCallerWorksheetController: asFunction(createGetNextCallerWorksheetController),
     takeWorksheetInQueueController: asFunction(createTakeWorksheetInQueueController),
     assignFlipperToCallerController: asFunction(createAssignFlipperToCallerController)
+      .inject(({ scheduledCallsService }) => ({ assignFlipperToCallerService: new AssignFlipperToCallerService(scheduledCallsService) }))
   })
 
   router.post('/next-worksheet', wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
