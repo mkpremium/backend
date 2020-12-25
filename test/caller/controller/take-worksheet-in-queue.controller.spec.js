@@ -1,0 +1,47 @@
+import stub from 'sinon/lib/sinon/stub'
+import { spy } from 'sinon'
+import { expect } from 'chai'
+import { createTakeWorksheetInQueueController } from '../../../src/caller/controller/take-worksheet-in-queue.controller'
+
+describe('Take Worksheet In Queue Controller', () => {
+  it('take worksheet in caller assigned queue', async () => {
+    const testCallerId = 'test-caller-id'
+    const testCallerAssignedQueueId = 'test-caller-assigned-queue-id'
+    const testWorksheetId = 'test-worksheet-id'
+    const worksheetQueueActionsServiceMock = {
+      takeWorksheetInQueue: stub()
+    }
+
+    const controller = createTakeWorksheetInQueueController({
+      worksheetQueueActionsService: worksheetQueueActionsServiceMock
+    })
+
+    const testRequest = {
+      user: {
+        id: testCallerId,
+        operator: {
+          profile: {
+            queueId: testCallerAssignedQueueId
+          }
+        }
+      },
+      params: {
+        worksheetId: testWorksheetId
+      }
+    }
+    const responseSpy = {
+      json: spy()
+    }
+
+    const takenWorksheet = {id: 'taken-worksheet'}
+    worksheetQueueActionsServiceMock.takeWorksheetInQueue.withArgs(
+      testCallerAssignedQueueId,
+      testWorksheetId,
+      testCallerId
+    ).resolves(takenWorksheet)
+
+    return controller(testRequest, responseSpy).then(() => {
+      expect(responseSpy.json).to.have.been.calledWith(takenWorksheet)
+    })
+  })
+})
