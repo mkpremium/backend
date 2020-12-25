@@ -1,4 +1,4 @@
-import jwt from '../middleware/jwt'
+import jwt, { permissions } from '../middleware/jwt'
 import { Router } from 'express'
 import { createGetNextCallerWorksheetController } from './controller/get-next-worksheet.controller'
 import { asFunction } from 'awilix'
@@ -26,7 +26,7 @@ const createRouter = (awilixContainer) => {
 
   router.post('/next-worksheet', wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
   router.post('/assigned-queue/:worksheetId', wrap(awilixContainer.resolve('takeWorksheetInQueueController')))
-  router.put('/:callerId/flippers/:flipperId', wrap(awilixContainer.resolve('assignFlipperToCallerController')))
+  router.put('/:callerId/flippers/:flipperId', permissions.admin, wrap(awilixContainer.resolve('assignFlipperToCallerController')))
 
   return router
 }
