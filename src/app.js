@@ -34,7 +34,7 @@ import user from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { initCallerModule } from './caller/init'
-import { createContainer } from 'awilix'
+import { asValue, createContainer } from 'awilix'
 
 const app = express()
 app.set('IS_READY', false)
@@ -47,6 +47,9 @@ dependenciesPromise.then(() => {
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer)
 
   const awilixContainer = createContainer()
+  awilixContainer.register({
+    couchbaseAdapter: asValue(dependenciesContainer.couchbaseAdapter)
+  })
 
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
@@ -54,7 +57,7 @@ dependenciesPromise.then(() => {
   user(app, dependenciesContainer)
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
-  scheduledEvents(app, dependenciesContainer)
+  scheduledEvents(app, dependenciesContainer, awilixContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
   createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)
