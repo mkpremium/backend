@@ -9,12 +9,16 @@ describe('Get Next Caller Worksheet Controller', () => {
     const testCallerAssignedQueueId = 'test-caller-assigned-queue-id'
     const nextWorksheetInCallerAssignedQueue = {}
     const getNextWorksheetInQueueServiceMock = {
-      nextWorksheetInQueue: stub()
+      nextWorksheetInQueueOfId: stub()
     }
 
-    getNextWorksheetInQueueServiceMock.nextWorksheetInQueue.withArgs(testCallerAssignedQueueId, testCallerId).resolves(nextWorksheetInCallerAssignedQueue)
+    getNextWorksheetInQueueServiceMock.nextWorksheetInQueueOfId.withArgs(testCallerAssignedQueueId, testCallerId)
+      .resolves(nextWorksheetInCallerAssignedQueue)
 
-    const controller = createGetNextCallerWorksheetController(getNextWorksheetInQueueServiceMock)
+    const controller = createGetNextCallerWorksheetController({
+      takeNextWorksheetInQueueService: getNextWorksheetInQueueServiceMock
+    })
+
     const testRequest = {
       user: {
         id: testCallerId,

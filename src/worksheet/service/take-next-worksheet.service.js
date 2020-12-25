@@ -8,6 +8,10 @@ export class TakeNextWorksheetService {
     this.worksheetRepository = worksheetRepository
   }
 
+  nextWorksheetInQueueOfId (queueId, byUserOfId) {
+    return this.worksheetRepository.get(queueId).then(queue => this.nextWorksheetInQueue(queue, byUserOfId))
+  }
+
   async nextWorksheetInQueue (queue, byUserOfId) {
     const worksheetFromSource = await this.worksheetRepository.nextAvailableWorksheetInSource(queue.source)
 
