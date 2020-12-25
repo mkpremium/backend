@@ -8,7 +8,7 @@ import { WorksheetQueueRepository } from './repository/worksheet-queue.repositor
 import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import { setupEventListeners } from './event-listeners'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
-import * as awilix from 'awilix'
+import {asValue} from 'awilix'
 
 /**
  * @param app
@@ -38,7 +38,10 @@ export default (app,
     worksheetQueueRepository
   )
 
-  awilixContainer.register({ takeNextWorksheetInQueueService: awilix.asValue(takeNextWorksheetService) })
+  awilixContainer.register({
+    takeNextWorksheetInQueueService: asValue(takeNextWorksheetService),
+    worksheetQueueActionsService: asValue(worksheetQueueActionsService)
+  })
   const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService(
     worksheetQueueRepository,
     worksheetRepository,
