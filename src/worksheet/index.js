@@ -15,6 +15,9 @@ import * as awilix from 'awilix'
  * @param eventBus
  * @param {WorksheetQueueActionsService} worksheetQueueActionsService
  * @param {WorksheetRepository} worksheetRepository
+ * @param {LegacyWorksheetRepository} legacyWorksheetRepository
+ * @param {LegacyWorksheetQueueRepository} legacyWorksheetQueueRepository
+ * @param {AwilixContainer} awilixContainer
  */
 export default (app,
   { eventBus, couchbaseAdapter, worksheetRepository },
@@ -29,7 +32,12 @@ export default (app,
     worksheetRepository,
     eventBus
   )
-  const takeNextWorksheetService = new TakeNextWorksheetService(worksheetQueueActionsService, worksheetRepository)
+  const takeNextWorksheetService = new TakeNextWorksheetService(
+    worksheetQueueActionsService,
+    worksheetRepository,
+    worksheetQueueRepository
+  )
+
   awilixContainer.register({ takeNextWorksheetInQueueService: awilix.asValue(takeNextWorksheetService) })
   const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService(
     worksheetQueueRepository,
