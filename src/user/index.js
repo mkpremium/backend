@@ -5,11 +5,7 @@ import { UserRepository } from './UserRepository'
 import { AddFavoriteBuildingService } from './AddFavoriteBuildingService'
 import { DeleteFavoriteBuildingService } from './DeleteFavoriteBuildingService'
 
-export default (
-  app,
-  { usersRepository, addFavoriteBuildingService, deleteFavoriteBuildingService },
-  awilixContainer
-) => {
+export default (app, awilixContainer) => {
   const secured = jwt()
   awilixContainer.register({
     usersRepository: asClass(UserRepository).classic(),

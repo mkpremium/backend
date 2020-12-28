@@ -54,7 +54,7 @@ dependenciesPromise.then(() => {
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
-  user(app, dependenciesContainer, awilixContainer)
+  user(app, awilixContainer)
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
   scheduledEvents(app, dependenciesContainer, awilixContainer)
