@@ -12,3 +12,12 @@ export class QueryTimeout extends Error {
     this.query = query
   }
 }
+
+export class QueryError extends Error {
+  constructor (query, code, name) {
+    super('Query error')
+    this.code = code
+    this.name = name
+    this.query = query
+  }
+}
