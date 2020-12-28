@@ -19,4 +19,10 @@ describe('AssignFlipperToCallerService', () => {
 
     return expect(service.assign(testCallerId, 'test-flipper-id')).to.be.rejectedWith('scheduled calls')
   })
+
+  it('does not assign caller working on a queue different that flipper', () => {
+    scheduledCallsServiceStub.scheduledCallsFor.withArgs(testCallerId).resolves([])
+
+    return expect(service.assign(testCallerId, 'test-flipper-id')).to.be.rejectedWith('queue mismatch')
+  })
 })

@@ -51,13 +51,18 @@ dependenciesPromise.then(() => {
     couchbaseAdapter: asValue(dependenciesContainer.couchbaseAdapter)
   })
 
+  awilixContainer.register({
+    buildingRepository: asValue(dependenciesContainer.buildingRepository),
+    eventBus: asValue(dependenciesContainer.eventBus)
+  })
+
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   user(app, awilixContainer)
   building(app, dependenciesContainer, legacyDependenciesContainer)
   owner(app, dependenciesContainer)
-  scheduledEvents(app, dependenciesContainer, awilixContainer)
+  scheduledEvents(app, awilixContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
   createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)

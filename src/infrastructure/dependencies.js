@@ -33,6 +33,7 @@ import { ScheduledCallsService } from '../scheduled-events/service/scheduled-cal
 import { OwnerRepository } from '../owner/repository/owner.repository'
 import { SetOwnerFeaturedContactService } from '../owner/service/set-featured-contact.service'
 import { ListBuildingProposalsService } from '../building/service/list-building-proposals.service'
+import { asValue, createContainer } from 'awilix'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -115,4 +116,15 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.scheduledCallsService = new ScheduledCallsService(couchbaseAdapter)
 
   return container
+}
+
+export const createAwilixContainer = couchbaseBucket => {
+  const awilixContainer = createContainer()
+
+  awilixContainer.register({
+    couchbaseBucket: asValue(couchbaseBucket),
+    couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket))
+  })
+
+  return awilixContainer
 }
