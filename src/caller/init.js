@@ -23,7 +23,13 @@ const createRouter = (awilixContainer) => {
     getNextCallerWorksheetController: asFunction(createGetNextCallerWorksheetController),
     takeWorksheetInQueueController: asFunction(createTakeWorksheetInQueueController),
     assignFlipperToCallerController: asFunction(createAssignFlipperToCallerController)
-      .inject(({ scheduledCallsService }) => ({ assignFlipperToCallerService: new AssignFlipperToCallerService(scheduledCallsService) }))
+      .inject((container) => {
+        return ({
+          assignFlipperToCallerService: new AssignFlipperToCallerService(
+            awilixContainer.resolve('scheduledCallsService'), awilixContainer.resolve('usersRepository')
+          )
+        })
+      })
   })
 
   router.post('/next-worksheet', wrap(awilixContainer.resolve('getNextCallerWorksheetController')))

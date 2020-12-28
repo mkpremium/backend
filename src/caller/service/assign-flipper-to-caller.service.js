@@ -1,8 +1,9 @@
 import { CallerToFlipperAssignationRejected } from './caller-to-flipper-assignation-rejected.error'
 
 export class AssignFlipperToCallerService {
-  constructor (scheduledCallsService) {
+  constructor (scheduledCallsService, usersRepository) {
     this.scheduledCallsService = scheduledCallsService
+    this.usersRepository = usersRepository
   }
 
   assign (callerId, flipperId) {
