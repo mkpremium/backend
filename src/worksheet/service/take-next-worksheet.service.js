@@ -3,6 +3,8 @@
  * @property {WorksheetRepository}  worksheetRepository
  * @property {WorksheetQueueRepository}  worksheetQueueRepository
  */
+import { logger } from '../../infrastructure/logger'
+
 export class TakeNextWorksheetService {
   constructor (takeWorksheetService, worksheetRepository, worksheetQueueRepository) {
     this.takeWorksheetService = takeWorksheetService
@@ -17,6 +19,11 @@ export class TakeNextWorksheetService {
   async nextWorksheetInQueue (queue, byUserOfId) {
     const worksheetFromSource = await this.worksheetRepository.nextAvailableWorksheetInSource(queue.source)
       .catch(error => {
+        logger.error('taking next available worksheet in queue', {
+          queueId: queue.id,
+          userId: byUserOfId,
+          error
+        })
         error.queueId = queue.id
         error.byUserOfId = byUserOfId
         throw error
