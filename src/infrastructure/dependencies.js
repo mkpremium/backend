@@ -24,10 +24,6 @@ import { StockRepository as LegacyStockRepository } from '../stock/models'
 import { StockSalesService } from '../stock/service/StockSalesService'
 import { StockService } from '../stock/service/StockService'
 import { StockRepository } from '../stock/StockRepository'
-
-import { AddFavoriteBuildingService } from '../user/AddFavoriteBuildingService'
-import { DeleteFavoriteBuildingService } from '../user/DeleteFavoriteBuildingService'
-import { UserRepository } from '../user/UserRepository'
 import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { WorksheetRepository } from '../worksheet/repository/worksheet.repository'
@@ -57,7 +53,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
 
   const propertyManagersRepository = new PropertyManagerRepository(couchbaseAdapter)
   const stockRepository = new StockRepository(couchbaseAdapter)
-  const usersRepository = new UserRepository(couchbaseAdapter)
 
   const container = {}
   container.propertyManagerRankingService = new PropertyManagerRankingService(
@@ -72,9 +67,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
   container.buildingRepository = buildingRepository
   container.featuredOwnerService = new FeaturedOwnerService(buildingRepository)
-  container.usersRepository = usersRepository
-  container.addFavoriteBuildingService = new AddFavoriteBuildingService(usersRepository)
-  container.deleteFavoriteBuildingService = new DeleteFavoriteBuildingService(usersRepository)
 
   container.addProposalService = new AddProposalService(legacyDependenciesContainer.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
