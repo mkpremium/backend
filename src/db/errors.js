@@ -5,3 +5,10 @@ export class EntityNotFound extends Error {
     this.structType = structType.name
   }
 }
+
+export class QueryTimeout extends Error {
+  constructor (query) {
+    super('Couchbase query timeout')
+    this.query = query
+  }
+}

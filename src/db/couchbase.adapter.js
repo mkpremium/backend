@@ -2,7 +2,7 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import { errors } from 'couchbase'
-import { EntityNotFound } from './errors'
+import { EntityNotFound, QueryTimeout } from './errors'
 import { CouchbaseRecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 
 export class CouchbaseAdapter {
@@ -41,7 +41,13 @@ export class CouchbaseAdapter {
       })
   }
 
-  queryAsync (...args) {
-    return this.couchbaseBucket.queryAsync(...args)
+  queryAsync (query, params) {
+    return this.couchbaseBucket.queryAsync(query, params)
+      .catch(error => {
+        if (error.responseBody === '') {
+          throw new QueryTimeout(query)
+        }
+        throw error
+      })
   }
 }
