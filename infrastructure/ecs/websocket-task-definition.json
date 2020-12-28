@@ -47,7 +47,7 @@
         },
         {
           "name": "DEBUG",
-          "value": "ON"
+          "value": "OFF"
         }
       ],
       "resourceRequirements": null,
