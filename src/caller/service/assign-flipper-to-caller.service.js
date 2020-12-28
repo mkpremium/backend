@@ -6,6 +6,13 @@ export class AssignFlipperToCallerService {
   }
 
   assign (callerId, flipperId) {
-    return Promise.reject(new CallerToFlipperAssignationRejected('NOT_IMPLEMENTED'))
+    return this.scheduledCallsService.scheduledCallsFor(callerId)
+      .then(callerScheduledCalls => {
+        if (callerScheduledCalls.length > 0) {
+          throw new CallerToFlipperAssignationRejected(
+            'Caller with scheduled calls cannot change flipper'
+          )
+        }
+      })
   }
 }
