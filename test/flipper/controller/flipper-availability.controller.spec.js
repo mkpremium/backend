@@ -11,7 +11,7 @@ describe('Flipper Availability Controller', () => {
     const controller = createFlipperAvailabilityController({
       flipperAvailabilityService: flipperAvailabilityServiceStub })
 
-    const testRequest = { user: { flipperId: 'test-flipper-id' } }
+    const testRequest = { params: { flipperId: 'test-flipper-id' } }
     const testResponse = { json: spy() }
     return controller(testRequest, testResponse).then(() => {
       expect(testResponse.json).to.have.been.calledWith(flipperAvailability)
