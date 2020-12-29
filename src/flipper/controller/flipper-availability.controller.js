@@ -1,4 +1,9 @@
-export const createFlipperAvailabilityController = () => (req, res) => {
-  res.sendStatus(501)
-  return Promise.resolve()
+/**
+ * @param {FlipperAvailabilityService} flipperAvailabilityService
+ */
+export const createFlipperAvailabilityController = ({ flipperAvailabilityService }) => (req, res) => {
+  return flipperAvailabilityService.unavailabilityForFlipper(req.user.flipperId)
+    .then(flipperAvailability => {
+      res.json(flipperAvailability)
+    })
 }
