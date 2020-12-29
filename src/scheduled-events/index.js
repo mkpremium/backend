@@ -8,6 +8,7 @@ import { asClass } from 'awilix'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
+import { MeetingsService } from './service/meetings.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -19,7 +20,8 @@ export default (app, awilixContainer) => {
     createMeetingService: asClass(CreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
-    scheduledEventsRepository: asClass(ScheduledEventsRepository)
+    scheduledEventsRepository: asClass(ScheduledEventsRepository),
+    meetingsService: asClass(MeetingsService)
   })
 
   app.use('/scheduled-events', secured, createScheduleEventsRoutes(

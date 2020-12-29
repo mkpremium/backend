@@ -1,5 +1,9 @@
 export class FlipperAvailabilityService {
+  constructor ({ meetingsService }) {
+    this.meetingsService = meetingsService
+  }
+
   unavailabilityForFlipper (flipperId) {
-    return Promise.resolve([])
+    return this.meetingsService.futureMeetingsFor(flipperId)
   }
 }
