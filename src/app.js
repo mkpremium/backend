@@ -35,6 +35,7 @@ import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { initCallerModule } from './caller/init'
 import { asValue, createContainer } from 'awilix'
+import { initFlipperModule } from './flipper/init'
 
 const app = express()
 app.set('IS_READY', false)
@@ -67,6 +68,7 @@ dependenciesPromise.then(() => {
   createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)
   initCallerModule(app, awilixContainer)
+  initFlipperModule(app, awilixContainer)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
