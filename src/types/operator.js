@@ -105,6 +105,7 @@ export const Operator = t.struct(
 
     profile: OperatorProfile,
     restringedHours: t.maybe(RestringedHourObject),
+    flipperId: t.maybe(t.String),
 
     profitGoal: t.maybe(ProfitGoal),
     featuredOwners: t.maybe(t.list(t.struct({

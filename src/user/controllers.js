@@ -6,7 +6,7 @@ export const createMeController = usersRepository => {
       restringedHours,
       signatures,
       profile
-    } = await usersRepository.getUserOfId(req.user.operator.id)
+    } = await usersRepository.get(req.user.operator.id)
     res.json({
       featuredOwners,
       favoriteBuildings,

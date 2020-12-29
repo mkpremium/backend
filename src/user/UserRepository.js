@@ -1,20 +1,14 @@
 import { Operator } from '../types/operator'
 import t from 'tcomb'
+import { CouchbaseRepository } from '../db/couchbase.repository'
 
-export class UserRepository {
-  constructor (couchbaseAdapter) {
-    this.couchbaseAdapter = couchbaseAdapter
-  }
-
-  getUserOfId (id) {
-    return this.couchbaseAdapter.getEntity(Operator, id)
+export class UserRepository extends CouchbaseRepository {
+  struct () {
+    return Operator
   }
 
   async addFavoriteBuildingToUserOfId (userId, buildingId) {
-    const user = await this.getUserOfId(userId)
-    if (!user) {
-      throw new UserNotFound(userId)
-    }
+    const user = await this.get(userId)
 
     const favoriteBuildings = user.favoriteBuildings
 
@@ -24,7 +18,7 @@ export class UserRepository {
 
     const updatedUser = t.update(user, {
       favoriteBuildings: {
-        $set: [...favoriteBuildings, buildingId]
+        $set: [ ...favoriteBuildings, buildingId ]
       }
     })
 
@@ -32,7 +26,7 @@ export class UserRepository {
   }
 
   async removeFavoriteBuildingToUserOfId (userId, buildingId) {
-    const user = await this.getUserOfId(userId)
+    const user = await this.get(userId)
     if (!user) {
       throw new UserNotFound(userId)
     }
