@@ -9,6 +9,7 @@ import { ScheduledCallsService } from './service/scheduled-calls.service'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
 import { MeetingsService } from './service/meetings.service'
+import { MeetingsRepository } from './repository/meetings.repository'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -17,6 +18,7 @@ export default (app, awilixContainer) => {
   const secured = jwt()
 
   awilixContainer.register({
+    meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
