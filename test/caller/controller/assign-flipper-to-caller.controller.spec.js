@@ -8,10 +8,8 @@ describe('Assign Flipper To Caller Controller', () => {
   const testFlipperId = 'test-flipper-id'
   const testRequest = {
     params: {
-      flipperId: testFlipperId
-    },
-    user: {
-      id: testCallerId
+      flipperId: testFlipperId,
+      callerId: testCallerId
     }
   }
 
