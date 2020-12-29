@@ -21,7 +21,7 @@ export const initFlipperModule = (app, awilixContainer) => {
 
 const createRouter = awilixContainer => {
   const router = new Router()
-  router.get('/:flipperId/availability', wrap(awilixContainer.resolve('flipperAvailabilityController')))
+  router.get('/:flipperId/blocked-availability', wrap(awilixContainer.resolve('flipperAvailabilityController')))
 
   return router
 }
