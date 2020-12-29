@@ -17,7 +17,7 @@ describe('MeetingsRepository', () => {
 
   it('gets meeting saved by scheduled events repository', async () => {
     const now = moment()
-    await scheduledEventsRepository.save({
+    const testScheduledEvent = {
       id: 'test-meeting-id',
       type: 'MEETINGS',
       notifyTo: 'test-agent-id',
@@ -27,11 +27,18 @@ describe('MeetingsRepository', () => {
         inPerson: false,
         buildingId: 'test-building-id'
       }
-    })
+    }
+    await scheduledEventsRepository.save(testScheduledEvent)
 
     const fetchedMeeting = await repository.get('test-meeting-id')
 
     expect(fetchedMeeting).not.to.be.undefined
     expect(Meeting.is(fetchedMeeting)).to.be.true
+    expect(fetchedMeeting).to.be.eql({
+      id: testScheduledEvent.id,
+      buildingId: testScheduledEvent.event.buildingId,
+      withAgentOfId: testScheduledEvent.notifyTo,
+      meetingAt: moment(testScheduledEvent.eventDate)
+    })
   })
 })
