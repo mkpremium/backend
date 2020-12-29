@@ -1,7 +1,8 @@
 {
 	"info": {
-		"_postman_id": "d1d3a626-e856-4b29-8d66-9f1b08efa861",
-		"name": "MKPremium",
+		"_postman_id": "b8ccd879-177d-4d7f-b927-0e41257da0f1",
+		"name": "MKPremium API",
+		"description": "# Introduction\nSupports all MKPremium's applications (main app, websocket, old callcenter, and old admin).\n\n# Authentication\nAll requests, except that of the login, must include a bearer token in the authorization header (e.g., `Authorization: Bearer ACCESS_TOKEN`). For convinience this collection includes this header after a successful login.\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -9,7 +10,7 @@
 			"name": "test-harness",
 			"item": [
 				{
-					"name": "Create Building",
+					"name": "Create Test Building",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -172,13 +173,37 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/worksheets/queues",
+							"raw": "{{apiUrl}}/worksheets/queues?limit=100",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"worksheets",
 								"queues"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Make already sold buildings available in callcenter.",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/republish-already-sold",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"republish-already-sold"
 							]
 						}
 					},
@@ -221,6 +246,34 @@
 							"path": [
 								"scheduled-events",
 								"id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Scheduled Events for a Week",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/week?week=52&year=2020",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"week"
+							],
+							"query": [
+								{
+									"key": "week",
+									"value": "52"
+								},
+								{
+									"key": "year",
+									"value": "2020"
+								}
 							]
 						}
 					},
@@ -309,12 +362,171 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Owners",
+			"item": [
+				{
+					"name": "Search by phone number",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phoneNumber\": \"969174517\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/owners/search",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"owners",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by phone number (old)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/owners?contactNumber=969174517",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"owners"
+							],
+							"query": [
+								{
+									"key": "contactNumber",
+									"value": "969174517"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Caller",
+			"item": [
+				{
+					"name": "Get Caller Next Worksheet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/caller/next-worksheet",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"caller",
+								"next-worksheet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Take worksheet in assigned queue",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/caller/assigned-queue/:worksheetId",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"caller",
+								"assigned-queue",
+								":worksheetId"
+							],
+							"variable": [
+								{
+									"id": "fad238ce-d923-4582-b443-041285a31729",
+									"key": "worksheetId",
+									"value": "worksheet-id",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign caller to flipper",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/caller/:callerId/flippers/:flipperId",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"caller",
+								":callerId",
+								"flippers",
+								":flipperId"
+							],
+							"variable": [
+								{
+									"id": "b65e537f-a37f-409b-b605-83d70ff6be7f",
+									"key": "callerId",
+									"value": "123",
+									"type": "string"
+								},
+								{
+									"id": "2b59a17a-be70-483e-a603-59494560eed2",
+									"key": "flipperId",
+									"value": "3456",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "Login",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "e8addef2-30b2-4456-ba50-56f99111c1a7",
+						"id": "29fcfd72-adc3-444f-8e1e-e975ccc4e006",
 						"exec": [
 							"pm.test(\"ValidResponse\", function() {",
 							"    pm.response.to.have.status(200);",
@@ -382,7 +594,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "3afd0ac1-3255-4eba-a05a-4f18e618dc28",
+				"id": "e39a310c-b71d-4760-bcb8-3dfc8f4c67a3",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -392,7 +604,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "b748d338-2c14-403b-8653-4ad0750e0b14",
+				"id": "c2a4eb53-f563-4b3a-b27d-d5c7e01a6c8e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -402,22 +614,22 @@
 	],
 	"variable": [
 		{
-			"id": "06265bc1-2bac-4d48-a174-13991e77415e",
+			"id": "87fab197-fb0e-4d73-b621-0e316e5538dd",
 			"key": "apiUrl",
 			"value": "https://api.mkpremium.net"
 		},
 		{
-			"id": "a4e481e7-26c5-4726-b232-b889af18132e",
+			"id": "7ce7b415-36a5-45c6-bd0c-9d17539fd4a4",
 			"key": "queueId",
 			"value": "f365e947-4c0e-4beb-ba18-25db1773587f"
 		},
 		{
-			"id": "3b31dcf8-f932-4173-947c-d4ea5ea5575a",
+			"id": "2b5fb5d0-f7a3-475a-9230-b0431db88b80",
 			"key": "test-user-id",
-			"value": "test-user-id"
+			"value": "7f3a99b5-6e4b-4ac1-8f6e-a63ebcd9a988"
 		},
 		{
-			"id": "571e570d-8cfe-47b7-9c75-1fbfb890625f",
+			"id": "4b78af95-0ad4-4cf5-b393-219b0910dadd",
 			"key": "accessToken",
 			"value": ""
 		}
