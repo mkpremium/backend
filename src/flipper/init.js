@@ -2,7 +2,7 @@ import jwt from '../middleware/jwt'
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 import { asClass, asFunction } from 'awilix'
-import { createFlipperAvailabilityController } from './controller/flipper-availability.controller'
+import { createFlipperBlockedAvailabilityController } from './controller/flipper-availability.controller'
 import { FlipperAvailabilityService } from './service/flipper-availability.service'
 
 export const initFlipperModule = (app, awilixContainer) => {
@@ -10,7 +10,7 @@ export const initFlipperModule = (app, awilixContainer) => {
 
   awilixContainer.register({
     flipperAvailabilityService: asClass(FlipperAvailabilityService),
-    flipperAvailabilityController: asFunction(createFlipperAvailabilityController)
+    flipperBlockedAvailabilityController: asFunction(createFlipperBlockedAvailabilityController)
   })
   app.use('/flipper',
     secured,
@@ -20,7 +20,7 @@ export const initFlipperModule = (app, awilixContainer) => {
 
 const createRouter = awilixContainer => {
   const router = new Router()
-  router.get('/:flipperId/blocked-availability', wrap(awilixContainer.resolve('flipperAvailabilityController')))
+  router.get('/:flipperId/blocked-availability', wrap(awilixContainer.resolve('flipperBlockedAvailabilityController')))
 
   return router
 }

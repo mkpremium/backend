@@ -6,7 +6,7 @@ export class FlipperAvailabilityService {
     this.meetingsService = meetingsService
   }
 
-  unavailabilityForFlipper (flipperId) {
+  blockedAvailabilityForFlipper (flipperId) {
     return this.meetingsService
       .futureMeetingsFor(flipperId)
       .then(flipperMeetings => flipperMeetings.map(({ meetingAt }) => ({

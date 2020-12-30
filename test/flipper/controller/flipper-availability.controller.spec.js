@@ -1,14 +1,14 @@
-import { createFlipperAvailabilityController } from '../../../src/flipper/controller/flipper-availability.controller'
+import { createFlipperBlockedAvailabilityController } from '../../../src/flipper/controller/flipper-availability.controller'
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 
 describe('Flipper Availability Controller', () => {
   it('returns flipper availability from service', () => {
     const flipperAvailability = []
-    const flipperAvailabilityServiceStub = { unavailabilityForFlipper: stub() }
-    flipperAvailabilityServiceStub.unavailabilityForFlipper.withArgs('test-flipper-id').resolves(flipperAvailability)
+    const flipperAvailabilityServiceStub = { blockedAvailabilityForFlipper: stub() }
+    flipperAvailabilityServiceStub.blockedAvailabilityForFlipper.withArgs('test-flipper-id').resolves(flipperAvailability)
 
-    const controller = createFlipperAvailabilityController({
+    const controller = createFlipperBlockedAvailabilityController({
       flipperAvailabilityService: flipperAvailabilityServiceStub })
 
     const testRequest = { params: { flipperId: 'test-flipper-id' } }

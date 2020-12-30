@@ -6,6 +6,7 @@ import moment from 'moment'
 const { FlipperAvailabilityService } = require('../../../src/flipper/service/flipper-availability.service')
 
 describe('FlipperAvailabilityService', () => {
+  /** @var {FlipperAvailabilityService} service **/
   let service
   let meetingsServiceStub
 
@@ -25,7 +26,7 @@ describe('FlipperAvailabilityService', () => {
     })
     meetingsServiceStub.futureMeetingsFor.withArgs('test-flipper-id').resolves([ testMeeting ])
 
-    return service.unavailabilityForFlipper('test-flipper-id')
+    return service.blockedAvailabilityForFlipper('test-flipper-id')
       .then(blockedAvailability => {
         expect(blockedAvailability).to.have.length(1)
         expect(blockedAvailability[0].startsAt).to.be.equal(testMeeting.meetingAt)

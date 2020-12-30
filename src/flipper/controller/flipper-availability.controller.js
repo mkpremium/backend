@@ -1,8 +1,8 @@
 /**
  * @param {FlipperAvailabilityService} flipperAvailabilityService
  */
-export const createFlipperAvailabilityController = ({ flipperAvailabilityService }) => (req, res) => {
-  return flipperAvailabilityService.unavailabilityForFlipper(req.params.flipperId)
+export const createFlipperBlockedAvailabilityController = ({ flipperAvailabilityService }) => (req, res) => {
+  return flipperAvailabilityService.blockedAvailabilityForFlipper(req.params.flipperId)
     .then(flipperAvailability => {
       res.json(flipperAvailability)
     })
