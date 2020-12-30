@@ -54,7 +54,7 @@ createBucket()
         .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
         .catch(error => {
           console.warn('Primary index creation failed on first attempt, retrying', { error })
-          return Promise.delay(5000).then(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }))
+          return Promise.delay(10000).then(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }))
         })
         .catch(error => {
           console.error('Primary index creation failed', { error })
