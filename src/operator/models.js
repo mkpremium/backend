@@ -87,14 +87,14 @@ class Operator extends CouchbaseModel {
       profile: { $set: updatedProfile }
     })
 
-    const updatedOperator = await this.save(updateOperator)
-    return updatedOperator
+    return this.save(updateOperator)
   }
 
   async createAuthenticatedResponse (operator) {
     const tokenPayload = {
       id: operator.id,
       permissions: operator.roles,
+      flipperId: operator.flipperId,
       operator: {
         id: operator.id,
         name: operator.profile.fullName(),
