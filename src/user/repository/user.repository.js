@@ -1,6 +1,6 @@
-import { Operator } from '../types/operator'
+import { Operator } from '../../types/operator'
 import t from 'tcomb'
-import { CouchbaseRepository } from '../db/couchbase.repository'
+import { CouchbaseRepository } from '../../db/couchbase.repository'
 
 export class UserRepository extends CouchbaseRepository {
   struct () {

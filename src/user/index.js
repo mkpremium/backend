@@ -1,9 +1,9 @@
 import jwt from '../middleware/jwt'
 import { userRoutes } from './routes'
 import { asClass } from 'awilix'
-import { UserRepository } from './UserRepository'
-import { AddFavoriteBuildingService } from './AddFavoriteBuildingService'
-import { DeleteFavoriteBuildingService } from './DeleteFavoriteBuildingService'
+import { UserRepository } from './repository/user.repository'
+import { AddFavoriteBuildingService } from './service/add-favorite-building.service'
+import { DeleteFavoriteBuildingService } from './service/delete-favorite-building.service'
 
 export default (app, awilixContainer) => {
   const secured = jwt()
