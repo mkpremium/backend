@@ -9,7 +9,9 @@ export const initFlipperModule = (app, awilixContainer) => {
   const secured = jwt()
 
   awilixContainer.register({
-    flipperAvailabilityService: asClass(FlipperAvailabilityService),
+    flipperAvailabilityService: asClass(FlipperAvailabilityService).inject(() => ({
+      userBlockedAvailabilityService: { blockedAvailabilityForUser: () => Promise.resolve([]) }
+    })),
     flipperBlockedAvailabilityController: asFunction(createFlipperBlockedAvailabilityController)
   })
   app.use('/flipper',
