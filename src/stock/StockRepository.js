@@ -12,17 +12,16 @@ const statsByPropertyManagerInPeriodQuery = bucketName => `
 `
 
 const propertyManagerProfitInPeriodQuery = bucketName => `
-    SELECT
-      MAX(agent.profitGoal.amount) as profitGoal,
-      MAX(agent.profile.city) as agentCity,
-      SUM(stock.sell.transactionAmount - stock.purchase.transactionAmount) as profitAmount
-    FROM ${bucketName} stock
-    JOIN ${bucketName} agent ON agent.id = stock.close.operatorId AND
-        agent._documentType = 'operator'
-    WHERE stock._documentType = 'stock'
-      AND stock.close IS NOT NULL
-      AND stock.close.operatorId = $1
-      AND stock.close.transactionDate BETWEEN $2 AND $3
+SELECT
+  agent.profitGoal.amount as profitGoal,
+  agent.profile.city as agentCity,
+  ARRAY_SUM(ARRAY (s.sell.transactionAmount - s.purchase.transactionAmount) FOR s IN stock END)  as profitAmount
+FROM ${bucketName} agent
+LEFT NEST ${bucketName} stock ON stock._documentType = 'stock'
+    AND stock.close IS NOT NULL
+    AND stock.close.operatorId = agent.id
+    AND stock.close.transactionDate BETWEEN $2 AND $3
+WHERE agent._documentType = 'operator' AND agent.id = $1
 `
 
 const cityGoal = city => city === 'Lisboa' ? 700000 : 500000
