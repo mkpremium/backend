@@ -15,11 +15,11 @@ describe('FlipperAvailabilityService', () => {
     meetingsServiceStub = {
       futureMeetingsFor: stub()
     }
-    meetingsServiceStub.futureMeetingsFor.withArgs('test-flipper-id').resolves([ ])
+    meetingsServiceStub.futureMeetingsFor.withArgs('test-flipper-id').resolves([])
     userBlockedAvailabilityServiceStub = {
       blockedAvailabilityForUser: stub()
     }
-    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([ ])
+    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([])
 
     service = new FlipperAvailabilityService({
       meetingsService: meetingsServiceStub,
@@ -39,6 +39,7 @@ describe('FlipperAvailabilityService', () => {
     return service.blockedAvailabilityForFlipper('test-flipper-id')
       .then(blockedAvailability => {
         expect(blockedAvailability).to.have.length(1)
+        expect(blockedAvailability[ 0 ].type).to.be.equal('MEETING')
         expect(blockedAvailability[ 0 ].startsAt).to.be.equal(testMeeting.meetingAt)
         expect(blockedAvailability[ 0 ].endsAt).to.satisfies(m => testMeeting.meetingAt.add(1, 'hour').isSame(m, 'minute'))
       })
@@ -55,6 +56,7 @@ describe('FlipperAvailabilityService', () => {
     return service.blockedAvailabilityForFlipper('test-flipper-id')
       .then(blockedAvailability => {
         expect(blockedAvailability).to.have.length(1)
+        expect(blockedAvailability[ 0 ].type).to.be.equal('BLOCKED-AVAILABILITY')
         expect(blockedAvailability[ 0 ].startsAt).to.be.equal(testUserBlockedAvailability.startsAt)
         expect(blockedAvailability[ 0 ].endsAt).to.be.equal(testUserBlockedAvailability.endsAt)
       })

@@ -13,9 +13,10 @@ export class FlipperAvailabilityService {
       this.userBlockedAvailabilityService.blockedAvailabilityForUser(flipperId)
     ]).then(([flipperMeetings, flipperBlockedAvailability]) => {
       return flipperMeetings.map(({ meetingAt }) => ({
+        type: 'MEETING',
         startsAt: meetingAt,
         endsAt: meetingAt.clone().add(1, 'hour')
-      })).concat(flipperBlockedAvailability)
+      })).concat(flipperBlockedAvailability.map(ba => ({ ...ba, type: 'BLOCKED-AVAILABILITY' })))
     })
   }
 }
