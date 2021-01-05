@@ -40,6 +40,8 @@ describe('FlipperAvailabilityService', () => {
       .then(blockedAvailability => {
         expect(blockedAvailability).to.have.length(1)
         expect(blockedAvailability[ 0 ].type).to.be.equal('MEETING')
+        expect(blockedAvailability[ 0 ].meetingId).to.be.equal(testMeeting.id)
+        expect(blockedAvailability[ 0 ].buildingId).to.be.equal(testMeeting.buildingId)
         expect(blockedAvailability[ 0 ].startsAt).to.be.equal(testMeeting.meetingAt)
         expect(blockedAvailability[ 0 ].endsAt).to.satisfies(m => testMeeting.meetingAt.add(1, 'hour').isSame(m, 'minute'))
       })
