@@ -41,7 +41,7 @@ export class ScheduledCallsService {
 const scheduledCallsForQuery = bucketName => `
 select
 se.id eventId,
-{se.event.contactId,se.event.worksheetId} event,
+{se.event.contactId,se.event.worksheetId, "buildingId": building.id} event,
 se.eventDate,
 {
     building.id,
@@ -67,9 +67,10 @@ AND se.notifyTo = $1
 
 const ScheduledCallsView = t.struct({
   id: t.String,
-  buildingId: t.String,
+  buildingId: t.maybe(t.String), // Remove when all clients are using event's property.
   eventDate: t.String,
   event: t.struct({
+    buildingId: t.String,
     owner: t.struct({
       id: t.String,
       building: t.struct({
