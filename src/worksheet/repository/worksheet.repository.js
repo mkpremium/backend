@@ -71,7 +71,7 @@ export class WorksheetRepository extends CouchbaseRepository {
       try {
         return fromJSON(rows[ 0 ], CallcenterView)
       } catch (error) {
-        logger.error('parsing worksheet with CallcenterView', { worksheetId, error })
+        logger.error('parsing worksheet with CallcenterView', { worksheetId, errorMessage: error.message })
         return rows[ 0 ]
       }
     })
@@ -89,7 +89,7 @@ export class WorksheetRepository extends CouchbaseRepository {
       try {
         return fromJSON(result[ 0 ], CallcenterView)
       } catch (error) {
-        logger.error('parsing worksheet with CallcenterView', { worksheetId: result[ 0 ].id, error })
+        logger.error('parsing worksheet with CallcenterView', { worksheetId: result[ 0 ].id, errorMessage: error.message })
         return result[ 0 ]
       }
     })
