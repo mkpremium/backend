@@ -1,6 +1,7 @@
 import { logger } from './logger'
 import { EntityNotFound } from '../db/errors'
 import { HttpError } from '../lib/http-error'
+import { ClientError } from './http'
 
 export function appErrorHandler (error, req, res, next) {
   if (res.headersSent) {
@@ -9,6 +10,11 @@ export function appErrorHandler (error, req, res, next) {
 
   if (error instanceof EntityNotFound) {
     res.status(404).send()
+    return
+  }
+
+  if (error instanceof ClientError) {
+    res.status(error.statusCode).send(error.message)
     return
   }
 
