@@ -32,7 +32,7 @@ const createRouter = (awilixContainer) => {
       })
   })
 
-  router.post('/next-worksheet', wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
+  router.post('/next-worksheet', permissions.operator, wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
   router.post('/assigned-queue/:worksheetId', wrap(awilixContainer.resolve('takeWorksheetInQueueController')))
   router.put('/:callerId/flippers/:flipperId', permissions.admin, wrap(awilixContainer.resolve('assignFlipperToCallerController')))
 
