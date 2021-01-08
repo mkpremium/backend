@@ -6,6 +6,7 @@ import { wrap } from 'express-promise-wrap'
 import { createTakeWorksheetInQueueController } from './controller/take-worksheet-in-queue.controller'
 import { createAssignFlipperToCallerController } from './controller/assign-flipper-to-caller.controller'
 import { AssignFlipperToCallerService } from './service/assign-flipper-to-caller.service'
+import { createAssignedFlipperBlockedAvailabilityController } from './controller/assigned-flipper-blocked-availability.controller'
 
 export const initCallerModule = (app, awilixContainer) => {
   const secured = jwt()
@@ -22,6 +23,7 @@ const createRouter = (awilixContainer) => {
   awilixContainer.register({
     getNextCallerWorksheetController: asFunction(createGetNextCallerWorksheetController),
     takeWorksheetInQueueController: asFunction(createTakeWorksheetInQueueController),
+    assignedFlipperBlockedAvailabilityController: asFunction(createAssignedFlipperBlockedAvailabilityController),
     assignFlipperToCallerController: asFunction(createAssignFlipperToCallerController)
       .inject((container) => {
         return ({
@@ -35,6 +37,7 @@ const createRouter = (awilixContainer) => {
   router.post('/next-worksheet', permissions.operator, wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
   router.post('/assigned-queue/:worksheetId', wrap(awilixContainer.resolve('takeWorksheetInQueueController')))
   router.put('/:callerId/flippers/:flipperId', permissions.admin, wrap(awilixContainer.resolve('assignFlipperToCallerController')))
+  router.get('/assigned-flipper/blocked-availability', wrap(awilixContainer.resolve('assignedFlipperBlockedAvailabilityController')))
 
   return router
 }

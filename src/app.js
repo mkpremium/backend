@@ -67,8 +67,8 @@ dependenciesPromise.then(() => {
   worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
   createTestHarness(app, dependenciesContainer)
   initPropertyManager(app, dependenciesContainer)
-  initCallerModule(app, awilixContainer)
   initFlipperModule(app, awilixContainer)
+  initCallerModule(app, awilixContainer)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
