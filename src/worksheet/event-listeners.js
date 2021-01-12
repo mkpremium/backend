@@ -13,7 +13,7 @@ export function setupEventListeners (
         const worksheet = await legacyWorksheetRepository.findWorksheetByBuilding(buildingId)
         await legacyWorksheetRepository.updateStatus(worksheet.id, operatorId)
       } catch (error) {
-        logger.crit('could not update worksheet on building status change', { error })
+        logger.crit('could not update worksheet on building status change', { error, errorMessage: error.message })
       }
     })
 
