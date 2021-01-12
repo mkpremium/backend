@@ -63,4 +63,18 @@ describe('FlipperAvailabilityService', () => {
         expect(blockedAvailability[ 0 ].endsAt).to.be.equal(testUserBlockedAvailability.endsAt)
       })
   })
+
+  it('doesnt return passed restrictions as blocked availability', () => {
+    const startsAt = moment().add(-1, 'day')
+    const testUserBlockedAvailability = {
+      startsAt: startsAt,
+      endsAt: startsAt.clone().add(1, 'hour')
+    }
+    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([ testUserBlockedAvailability ])
+
+    return service.blockedAvailabilityForFlipper('test-flipper-id')
+      .then(blockedAvailability => {
+        expect(blockedAvailability).to.have.length(0)
+      })
+  })
 })

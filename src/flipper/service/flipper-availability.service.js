@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 /**
  * @property {MeetingsService} meetingsService
  */
@@ -12,13 +14,17 @@ export class FlipperAvailabilityService {
       this.meetingsService.futureMeetingsFor(flipperId),
       this.userBlockedAvailabilityService.blockedAvailabilityForUser(flipperId)
     ]).then(([ flipperMeetings, flipperBlockedAvailability ]) => {
+      const now = moment()
       return flipperMeetings.map(({ id: meetingId, buildingId, meetingAt }) => ({
         type: 'MEETING',
         meetingId,
         buildingId,
         startsAt: meetingAt,
         endsAt: meetingAt.clone().add(1, 'hour')
-      })).concat(flipperBlockedAvailability.map(ba => ({ ...ba, type: 'BLOCKED-AVAILABILITY' })))
+      })).concat(
+        flipperBlockedAvailability.filter(({ startsAt }) => startsAt.isSameOrAfter(now, 'day'))
+          .map(ba => ({ ...ba, type: 'BLOCKED-AVAILABILITY' }))
+      )
     })
   }
 }
