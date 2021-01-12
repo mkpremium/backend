@@ -6,6 +6,62 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 
+export const CallcenterView = t.struct({
+  id: t.String,
+  status: WorkSheetStatusEnum,
+  queueId: t.String,
+  relatedBuildings: t.list(t.struct({
+    id: t.String,
+    address: t.struct({
+      number: t.union([ t.String, t.Number ]),
+      city: t.String,
+      street: t.String,
+      postalCode: t.struct({
+        number: t.union([ t.String, t.Number ])
+      }),
+      neighborhood: t.String,
+      type: t.maybe(t.String)
+    }),
+
+    metadata: t.list(t.struct({
+      previewUrl: t.String,
+      id: t.String,
+      mimeType: t.String
+    })),
+    use: t.maybe(t.String),
+    location: t.struct({
+      lng: t.maybe(t.Number),
+      lat: t.maybe(t.Number)
+    }),
+    recentProposal: t.maybe(t.struct({
+      createdAt: t.String,
+      proposal: t.Number
+    })),
+    cadastre: t.maybe(t.struct({
+      reference: t.String
+    })),
+    floorArea: t.Number
+  })),
+  relatedOwners: t.list(t.struct({
+    id: t.String,
+    name: t.String,
+    person: t.struct({
+      contacts: t.list(t.struct({
+        id: t.String,
+        status: t.enums.of([ 'GOOD', 'BAD', 'UNDEFINED' ]),
+        type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
+        value: t.String
+      }))
+    }),
+    featuredContact: t.maybe(t.struct({
+      phoneId: t.maybe(t.String),
+      emailId: t.maybe(t.String)
+    })),
+    type: OwnerTypeEnum,
+    status: OwnerStatusEnum
+  }))
+})
+
 const worksheetForCallcenterViewQuery = (bucketName, conditions) => `
 SELECT
   worksheet.id id,
@@ -105,59 +161,3 @@ export class WorksheetRepository extends CouchbaseRepository {
     return Worksheet
   }
 }
-
-export const CallcenterView = t.struct({
-  id: t.String,
-  status: WorkSheetStatusEnum,
-  queueId: t.String,
-  relatedBuildings: t.list(t.struct({
-    id: t.String,
-    address: t.struct({
-      number: t.union([ t.String, t.Number ]),
-      city: t.String,
-      street: t.String,
-      postalCode: t.struct({
-        number: t.union([ t.String, t.Number ])
-      }),
-      neighborhood: t.String,
-      type: t.maybe(t.String)
-    }),
-
-    metadata: t.list(t.struct({
-      previewUrl: t.String,
-      id: t.String,
-      mimeType: t.String
-    })),
-    use: t.maybe(t.String),
-    location: t.struct({
-      lng: t.maybe(t.Number),
-      lat: t.maybe(t.Number)
-    }),
-    recentProposal: t.maybe(t.struct({
-      createdAt: t.String,
-      proposal: t.Number
-    })),
-    cadastre: t.maybe(t.struct({
-      reference: t.String
-    })),
-    floorArea: t.Number
-  })),
-  relatedOwners: t.list(t.struct({
-    id: t.String,
-    name: t.String,
-    person: t.struct({
-      contacts: t.list(t.struct({
-        id: t.String,
-        status: t.enums.of([ 'GOOD', 'BAD', 'UNDEFINED' ]),
-        type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
-        value: t.String
-      }))
-    }),
-    featuredContact: t.maybe(t.struct({
-      phoneId: t.maybe(t.String),
-      emailId: t.maybe(t.String)
-    })),
-    type: OwnerTypeEnum,
-    status: OwnerStatusEnum
-  }))
-})
