@@ -40,7 +40,8 @@ export const CallcenterView = t.struct({
     cadastre: t.maybe(t.struct({
       reference: t.String
     })),
-    floorArea: t.Number
+    floorArea: t.Number,
+    featuredOwnerId: t.maybe(t.String)
   })),
   relatedOwners: t.list(t.struct({
     id: t.String,
@@ -75,7 +76,8 @@ SELECT
       building.location,
       building.recentProposal,
       building.cadastre,
-      building.floorArea
+      building.floorArea,
+      "featuredOwnerId": building.ownerId
   }] relatedBuildings,
   ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
 
@@ -145,7 +147,10 @@ export class WorksheetRepository extends CouchbaseRepository {
       try {
         return fromJSON(result[ 0 ], CallcenterView)
       } catch (error) {
-        logger.error('parsing worksheet with CallcenterView', { worksheetId: result[ 0 ].id, errorMessage: error.message })
+        logger.error('parsing worksheet with CallcenterView', {
+          worksheetId: result[ 0 ].id,
+          errorMessage: error.message
+        })
         return result[ 0 ]
       }
     })
