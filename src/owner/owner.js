@@ -12,6 +12,8 @@ export const Person = t.struct(
     firstName: t.maybe(t.String),
     firstSurname: t.maybe(t.String),
     secondSurname: t.maybe(t.String),
+    personType: t.maybe(t.String),
+    gender: t.maybe(t.String),
 
     contacts: t.list(TypedContactInfo),
     documentNumber: t.maybe(t.String),
