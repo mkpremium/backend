@@ -14,7 +14,6 @@ import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
-import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
 import { ScheduledEventsRepository } from '../scheduled-events/repository/ScheduleEventsRepository'
@@ -38,7 +37,6 @@ import { asValue, createContainer } from 'awilix'
 export const createLegacyDependenciesContainer = () => {
   const container = {}
 
-  container.ownerRepository = new LegacyOwnerRepository()
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
   container.scheduledEventsRepository = new ScheduledEventsRepository()

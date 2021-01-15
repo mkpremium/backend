@@ -43,7 +43,7 @@ export const createWorksheetForBuilding = async (app, building) => {
 }
 
 export const createOwner = async (app, { status } = { status: OwnerStatus.VERIFIED }) => {
-  const { ownerRepository } = app.locals.legacyDependenciesContainer
+  const ownerRepository = app.locals.diContainer.resolve('legacyOwnersRepository')
 
   return ownerRepository.createOwnerAndPerson({
     status,

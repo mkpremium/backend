@@ -18,7 +18,7 @@ import scheduledEvents from './scheduled-events'
 import webhooks from './webhooks'
 import history from './history'
 import notes from './notes'
-import building from './building'
+import { oldInit, setupDependencies } from './building'
 import metadata from './metadata'
 import { init as initPropertyManager } from './property-manager'
 
@@ -56,12 +56,14 @@ dependenciesPromise.then(() => {
     buildingRepository: asValue(dependenciesContainer.buildingRepository),
     eventBus: asValue(dependenciesContainer.eventBus)
   })
+  setupDependencies(awilixContainer)
 
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   user(app, awilixContainer)
-  building(app, dependenciesContainer, legacyDependenciesContainer)
+
+  oldInit(app, awilixContainer, dependenciesContainer)
   owner(app, dependenciesContainer)
   scheduledEvents(app, awilixContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
@@ -73,6 +75,7 @@ dependenciesPromise.then(() => {
 
   app.locals.dependenciesContainer = dependenciesContainer
   app.locals.legacyDependenciesContainer = legacyDependenciesContainer
+  app.locals.diContainer = awilixContainer
 
   app.set('IS_READY', true)
 }).catch(error => {

@@ -3,8 +3,23 @@ import { createBuildingRoutes } from './routes'
 import jwt from '../middleware/jwt'
 import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { TNote } from '../notes/types'
+import { asClass, asFunction } from 'awilix'
+import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
+import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
+import { BuildingRepository as LegacyBuildingRepository } from './models'
 
-export default (app, {
+/**
+ * @param {AwilixContainer} awilixContainer
+ */
+export const setupDependencies = awilixContainer => {
+  awilixContainer.register({
+    legacyOwnersRepository: asClass(LegacyOwnerRepository),
+    legacyBuildingsRepository: asClass(LegacyBuildingRepository),
+    listBuildingOwnersController: asFunction(createListBuildingOwnersController)
+  })
+}
+
+export const oldInit = (app, awilixContainer, {
   listBuildingsService,
   listBuildingProposalsService,
   updateBuildingNegotiationStatusService,
@@ -13,9 +28,6 @@ export default (app, {
   getDocumentsSignedURLService,
   eventBus,
   couchbaseAdapter
-},
-{
-  ownerRepository, buildingRepository
 }) => {
   const buildingNotesRepository = new BuildingNotesRepository(couchbaseAdapter)
   eventBus.on('worksheet.made_available', async ({ buildingId }) => {
@@ -31,11 +43,12 @@ export default (app, {
   app.use('/buildings', secured, createBuildingRoutes(
     listBuildingsService,
     listBuildingProposalsService,
-    ownerRepository,
+    awilixContainer.resolve('legacyOwnersRepository'),
     updateBuildingNegotiationStatusService,
-    buildingRepository,
+    awilixContainer.resolve('legacyBuildingsRepository'),
     adminBuildingRepository,
     setBuildingSalePriceService,
-    getDocumentsSignedURLService
+    getDocumentsSignedURLService,
+    awilixContainer.resolve('listBuildingOwnersController')
   ))
 }

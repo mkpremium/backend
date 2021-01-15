@@ -9,7 +9,7 @@ describe('LegacyOwnerRepository', () => {
   beforeEach(async () => {
     app = await initApplication()
     owner = await createOwner(app, { status: undefined })
-    legacyOwnerRepository = app.locals.legacyDependenciesContainer.ownerRepository
+    legacyOwnerRepository = app.locals.diContainer.resolve('legacyOwnersRepository')
   })
 
   describe('findByIdWithIncludes', () => {

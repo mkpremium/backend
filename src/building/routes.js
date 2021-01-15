@@ -13,6 +13,7 @@ import {
   createUpdateBuildingNegotiationStatusController,
   updateNegotiationProposalController
 } from './controllers'
+import { wrap } from 'express-promise-wrap'
 
 export const createBuildingRoutes = (
   listBuildingsService,
@@ -22,7 +23,8 @@ export const createBuildingRoutes = (
   legacyBuildingRepository,
   adminBuildingRepository,
   setBuildingSalePriceService,
-  getDocumentsSignedURLService
+  getDocumentsSignedURLService,
+  listBuildingOwnersController
 ) => {
   const router = Router()
 
@@ -40,7 +42,7 @@ export const createBuildingRoutes = (
 
   router.post('/:id/owners', addOwnerToBuildingController)
 
-  router.get('/:buildingId/owners', createListVerifiedOwnersController(legacyOwnerRepository))
+  router.get('/:buildingId/owners', wrap(listBuildingOwnersController))
 
   router.get('/:buildingId/verified-owners', createListVerifiedOwnersController(legacyOwnerRepository))
 
