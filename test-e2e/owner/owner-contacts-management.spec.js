@@ -40,7 +40,7 @@ describe('Building owner contacts management', () => {
     await authenticatedPost(`/owners/${owner.id}/contacts`, businessUser, app, contactInfoToAdd)
       .then(async (response) => {
         expect(response.status).to.be.equal(200)
-        const { ownerRepository } = app.locals.legacyDependenciesContainer
+        const { ownerRepository } = app.locals.awilixContainer.resolve('legacyOwnersRepository')
         const savedOwner = await ownerRepository.findById(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(2)
