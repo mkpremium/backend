@@ -4,8 +4,8 @@ export class EmptyFeaturedContact extends Error {
 }
 
 export class SetOwnerFeaturedContactService {
-  constructor (ownerRepository) {
-    this.ownerRepository = ownerRepository
+  constructor (ownersRepository) {
+    this.ownersRepository = ownersRepository
   }
 
   async setFeaturedContact (ownerId, featuredContact) {
@@ -13,6 +13,6 @@ export class SetOwnerFeaturedContactService {
       throw new EmptyFeaturedContact()
     }
 
-    await this.ownerRepository.setOwnerFeaturedContact(ownerId, featuredContact)
+    await this.ownersRepository.setOwnerFeaturedContact(ownerId, featuredContact)
   }
 }

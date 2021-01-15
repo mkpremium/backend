@@ -12,13 +12,13 @@ import { createDependenciesContainer, createLegacyDependenciesContainer } from '
 import operator from './operator'
 import { createTestHarness } from './test-harness/routes'
 import worksheet from './worksheet'
-import owner from './owner'
+import {setupOwnerDependencies, setupOwnersRoutes} from './owner'
 import calls from './calls'
 import scheduledEvents from './scheduled-events'
 import webhooks from './webhooks'
 import history from './history'
 import notes from './notes'
-import { oldInit, setupDependencies } from './building'
+import { oldInit, setupDependencies as setupBuildingDependencies } from './building'
 import metadata from './metadata'
 import { init as initPropertyManager } from './property-manager'
 
@@ -56,7 +56,8 @@ dependenciesPromise.then(() => {
     buildingRepository: asValue(dependenciesContainer.buildingRepository),
     eventBus: asValue(dependenciesContainer.eventBus)
   })
-  setupDependencies(awilixContainer)
+  setupBuildingDependencies(awilixContainer)
+  setupOwnerDependencies(awilixContainer)
 
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
@@ -64,7 +65,7 @@ dependenciesPromise.then(() => {
   user(app, awilixContainer)
 
   oldInit(app, awilixContainer, dependenciesContainer)
-  owner(app, dependenciesContainer)
+  setupOwnersRoutes(app, awilixContainer)
   scheduledEvents(app, awilixContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
   createTestHarness(app, dependenciesContainer)
