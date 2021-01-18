@@ -129,7 +129,7 @@ export class WorksheetRepository extends CouchbaseRepository {
       try {
         return fromJSON(rows[ 0 ], CallcenterView)
       } catch (error) {
-        logger.error('parsing worksheet with CallcenterView', { worksheetId, errorMessage: error.message })
+        this.logWorksheetParsingError(worksheetId, error)
         return rows[ 0 ]
       }
     })
@@ -147,10 +147,8 @@ export class WorksheetRepository extends CouchbaseRepository {
       try {
         return fromJSON(result[ 0 ], CallcenterView)
       } catch (error) {
-        logger.error('parsing worksheet with CallcenterView', {
-          worksheetId: result[ 0 ].id,
-          errorMessage: error.message
-        })
+        this.logWorksheetParsingError(result[ 0 ].id, error)
+
         return result[ 0 ]
       }
     })
@@ -160,6 +158,14 @@ export class WorksheetRepository extends CouchbaseRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(alreadySoldBuildingWorksheetId(this.bucketName))
     ).then(result => result.map(({ id }) => id))
+  }
+
+  logWorksheetParsingError (worksheetId, error) {
+    logger.error('parsing worksheet with CallcenterView', {
+      worksheetId,
+      errorMessage: error.message,
+      stack: error.stack
+    })
   }
 
   struct () {
