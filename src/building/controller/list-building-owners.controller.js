@@ -2,7 +2,8 @@
  * @param {OwnerRepository} legacyOwnerRepository
  * @return {function(*, *)}
  */
-export const createListBuildingOwnersController = ({ legacyOwnersRepository }) => (req, res) => {
-  res.sendStatus(501)
+export const createListBuildingOwnersController = ({ ownersRepository }) => async (req, res) => {
+  const owners = await ownersRepository.buildingOwners(req.params.buildingId)
+  res.json(owners)
   return Promise.resolve()
 }

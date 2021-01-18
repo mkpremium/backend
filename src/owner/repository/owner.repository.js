@@ -19,6 +19,16 @@ WHERE owner._documentType = 'owner'
 AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 END
 `
 
+const buildingOwnersQuery = bucketName => `
+SELECT
+id,
+name,
+person.contacts,
+featuredContact
+FROM ${bucketName} owner
+WHERE _documentType = 'owner' and buildingId = $1
+`
+
 const FoundOwner = t.struct({
   id: t.String,
   buildingId: t.String,
@@ -29,7 +39,7 @@ const FoundOwner = t.struct({
     id: t.String,
     value: t.String,
     type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
-    status: t.enums.of(['UNDEFINED', 'GOOD', 'BAD'])
+    status: t.enums.of([ 'UNDEFINED', 'GOOD', 'BAD' ])
   })),
   buildingAddress: t.struct({
     neighborhood: t.maybe(t.String),
@@ -41,6 +51,17 @@ const FoundOwner = t.struct({
     })),
     city: t.maybe(t.String)
   })
+})
+
+const BuildingOwner = t.struct({
+  id: t.String,
+  name: t.String,
+  contacts: t.list(t.struct({
+    id: t.String,
+    status: t.String,
+    type: t.String,
+    value: t.String
+  }))
 })
 
 export class OwnerRepository extends CouchbaseRepository {
@@ -65,6 +86,13 @@ export class OwnerRepository extends CouchbaseRepository {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
       return { ...rec, matchingContactId: rec.contacts[ matchingContactIdx ].id }
     }), t.list(FoundOwner)))
+  }
+
+  async buildingOwners (buildingId) {
+    return this.couchbaseAdapter.queryAsync(
+      N1qlQuery.fromString(buildingOwnersQuery(this.bucketName)),
+      [ buildingId ]
+    ).then(rawOwners => rawOwners.map(o => fromJSON(o, BuildingOwner)))
   }
 
   struct () {
