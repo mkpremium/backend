@@ -5,17 +5,18 @@ import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { TNote } from '../notes/types'
 import { asClass, asFunction } from 'awilix'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
-import { OwnerRepository as LegacyOwnerRepository } from '../owner/models'
 import { BuildingRepository as LegacyBuildingRepository } from './models'
+import { BuildingsRepository } from './repository/buildings.repository'
 
 /**
  * @param {AwilixContainer} awilixContainer
  */
 export const setupDependencies = awilixContainer => {
   awilixContainer.register({
-    legacyOwnersRepository: asClass(LegacyOwnerRepository),
-    legacyBuildingsRepository: asClass(LegacyBuildingRepository),
-    listBuildingOwnersController: asFunction(createListBuildingOwnersController)
+    buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
+
+    legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
+    listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton()
   })
 }
 

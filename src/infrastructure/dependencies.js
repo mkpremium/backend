@@ -29,7 +29,6 @@ import { WorksheetRepository } from '../worksheet/repository/worksheet.repositor
 import { EventBus } from './event-bus'
 import { MetadataRepository } from '../building/repository/metadata.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
-import { OwnerRepository } from '../owner/repository/owner.repository'
 import { ListBuildingProposalsService } from '../building/service/list-building-proposals.service'
 import { asValue, createContainer } from 'awilix'
 
@@ -58,8 +57,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     stockRepository
   )
   container.stockRepository = stockRepository
-
-  container.ownerRepository = new OwnerRepository(couchbaseAdapter)
 
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
   container.buildingRepository = buildingRepository

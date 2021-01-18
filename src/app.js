@@ -68,7 +68,8 @@ dependenciesPromise.then(() => {
   setupOwnersRoutes(app, awilixContainer)
   scheduledEvents(app, awilixContainer)
   worksheet(app, dependenciesContainer, legacyDependenciesContainer, awilixContainer)
-  createTestHarness(app, dependenciesContainer)
+
+  createTestHarness(app, awilixContainer)
   initPropertyManager(app, dependenciesContainer)
   initFlipperModule(app, awilixContainer)
   initCallerModule(app, awilixContainer)

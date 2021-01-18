@@ -5,12 +5,12 @@ import { CreateOwnerCmd, createOwnerFactory } from './create-owner'
 import { createBuildingWorksheetFactory } from './create-worksheet'
 import { createOwnerCmd } from './fake-data-generator'
 
-export function createTestHarness (app, dependenciesContainer) {
+export function createTestHarness (app, awilixContainer) {
   const secured = jwt()
-  const createOwner = createOwnerFactory(dependenciesContainer.ownerRepository)
-  const createWorksheet = createBuildingWorksheetFactory(dependenciesContainer.worksheetRepository)
+  const createOwner = createOwnerFactory(awilixContainer.resolve('ownersRepository'))
+  const createWorksheet = createBuildingWorksheetFactory(awilixContainer.resolve('worksheetRepository'))
   const createBuilding = createBuildingFactory(
-    dependenciesContainer.buildingRepository,
+    awilixContainer.resolve('buildingsRepository'),
     createOwner,
     createWorksheet
   )

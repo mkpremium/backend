@@ -5,11 +5,14 @@ import jwt from '../middleware/jwt'
 import { OwnerRepository } from './repository/owner.repository'
 import { SetOwnerFeaturedContactService } from './service/set-featured-contact.service'
 import { asClass } from 'awilix'
+import { OwnerRepository as LegacyOwnerRepository } from './models'
 
 export const setupOwnerDependencies = awilixContainer => {
   awilixContainer.register({
-    ownersRepository: asClass(OwnerRepository).classic(),
-    setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).classic()
+    ownersRepository: asClass(OwnerRepository).singleton().classic(),
+    setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
+
+    legacyOwnersRepository: asClass(LegacyOwnerRepository).singleton()
   })
 }
 
