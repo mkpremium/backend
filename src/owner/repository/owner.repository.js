@@ -3,6 +3,7 @@ import t from 'tcomb'
 import { N1qlQuery } from 'couchbase'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { logger } from '../../infrastructure/logger'
 
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
@@ -58,8 +59,8 @@ const BuildingOwner = t.struct({
   name: t.String,
   contacts: t.list(t.struct({
     id: t.String,
-    status: t.String,
-    type: t.String,
+    status: t.enums.of(['GOOD', 'BAD', 'UNDEFINED']),
+    type: t.enums.of(['TELEFONO', 'MOVIL', 'EMAIL']),
     value: t.String
   }))
 })
@@ -92,7 +93,19 @@ export class OwnerRepository extends CouchbaseRepository {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(buildingOwnersQuery(this.bucketName)),
       [ buildingId ]
-    ).then(rawOwners => rawOwners.map(o => fromJSON(o, BuildingOwner)))
+    ).then(rawOwners => rawOwners.map(o => {
+      try {
+        return fromJSON(o, BuildingOwner)
+      } catch (error) {
+        logger.error('parsing building owner', {
+          buildingId,
+          ownerId: o.id,
+          errorMessage: error.message,
+          stack: error.stack
+        })
+        return o
+      }
+    }))
   }
 
   struct () {
