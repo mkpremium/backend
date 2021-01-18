@@ -64,7 +64,7 @@ export const createOwner = async (app, { status } = { status: OwnerStatus.VERIFI
 
 export const associateBuildingWithOwner = (app, owner, buildingId) => {
   const updatedOwner = t.update(owner, { buildingId: { $set: buildingId } })
-  const { ownerRepository } = app.locals.legacyDependenciesContainer
+  const ownerRepository = app.locals.diContainer.resolve('legacyOwnersRepository')
 
   return ownerRepository.save(updatedOwner)
 }
