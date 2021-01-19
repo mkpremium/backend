@@ -2,12 +2,14 @@
  * @property {WorksheetQueueActionsService} takeWorksheetService
  * @property {WorksheetRepository}  worksheetRepository
  * @property {WorksheetQueueRepository}  worksheetQueueRepository
+ * @property {EventBus} eventBus
  */
 export class TakeNextWorksheetService {
-  constructor (takeWorksheetService, worksheetRepository, worksheetQueueRepository) {
+  constructor (takeWorksheetService, worksheetRepository, worksheetQueueRepository, eventBus) {
     this.takeWorksheetService = takeWorksheetService
     this.worksheetRepository = worksheetRepository
     this.worksheetQueueRepository = worksheetQueueRepository
+    this.eventBus = eventBus
   }
 
   nextWorksheetInQueueOfId (queueId, byUserOfId) {
@@ -27,6 +29,9 @@ export class TakeNextWorksheetService {
       return
     }
 
-    return this.takeWorksheetService.takeWorksheetInQueue(queue.id, worksheetFromSource.id, byUserOfId)
+    const nextWorksheet = await this.takeWorksheetService.takeWorksheetInQueue(queue.id, worksheetFromSource.id, byUserOfId)
+    this.eventBus.publish({ name: 'worksheet.next_in_queue_taken', by: byUserOfId })
+
+    return nextWorksheet
   }
 }

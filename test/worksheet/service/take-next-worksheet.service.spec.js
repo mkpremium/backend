@@ -16,13 +16,20 @@ describe('TakeNextWorksheetService', () => {
   let takeWorksheetServiceMock
   let worksheetsRepositoryMock
   let worksheetsQueueRepositoryMock
+  let eventBusSpy
 
   beforeEach(() => {
     takeWorksheetServiceMock = { takeWorksheetInQueue: spy() }
     worksheetsRepositoryMock = { nextAvailableWorksheetInSource: stub() }
     worksheetsQueueRepositoryMock = { get: stub() }
+    eventBusSpy = { publish: spy() }
 
-    service = new TakeNextWorksheetService(takeWorksheetServiceMock, worksheetsRepositoryMock, worksheetsQueueRepositoryMock)
+    service = new TakeNextWorksheetService(
+      takeWorksheetServiceMock,
+      worksheetsRepositoryMock,
+      worksheetsQueueRepositoryMock,
+      eventBusSpy
+    )
   })
 
   it('takes next worksheet from source', async () => {
@@ -43,5 +50,14 @@ describe('TakeNextWorksheetService', () => {
     await service.nextWorksheetInQueueOfId(testQueue.id, testUserId)
 
     expect(worksheetsRepositoryMock.nextAvailableWorksheetInSource).to.have.been.calledWith(testQueue.source)
+  })
+
+  it('publishes event', async () => {
+    const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
+    worksheetsRepositoryMock.nextAvailableWorksheetInSource.resolves(testNextWorksheet)
+
+    await service.nextWorksheetInQueue(testQueue, testUserId)
+
+    expect(eventBusSpy.publish).to.have.been.calledWith({ name: 'worksheet.next_in_queue_taken', by: testUserId })
   })
 })
