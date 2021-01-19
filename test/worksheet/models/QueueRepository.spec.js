@@ -8,7 +8,7 @@ describe('WorksheetQueueRepository', () => {
 
   beforeEach(async () => {
     app = await initApplication()
-    repository = app.locals.diContainer.resolve('worksheetQueueRepository')
+    repository = app.locals.diContainer.resolve('legacyWorksheetQueueRepository')
     worksheetRepository = app.locals.diContainer.resolve('worksheetRepository')
   })
 

@@ -73,11 +73,11 @@ const QueueListResponse = t.struct(
  */
 export class LegacyWorksheetQueueRepository extends CouchbaseModel {
   constructor (
-    worksheetRepository = new LegacyWorksheetRepository()
+    legacyWorksheetRepository = new LegacyWorksheetRepository()
   ) {
     super()
     this.Struct = WorksheetQueue
-    this.worksheetRepository = worksheetRepository
+    this.worksheetRepository = legacyWorksheetRepository
   }
 
   /**
