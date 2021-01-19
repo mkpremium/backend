@@ -23,9 +23,6 @@ import { StockRepository as LegacyStockRepository } from '../stock/models'
 import { StockSalesService } from '../stock/service/StockSalesService'
 import { StockService } from '../stock/service/StockService'
 import { StockRepository } from '../stock/StockRepository'
-import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
-import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
-import { WorksheetRepository } from '../worksheet/repository/worksheet.repository'
 import { EventBus } from './event-bus'
 import { MetadataRepository } from '../building/repository/metadata.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
@@ -38,9 +35,7 @@ export const createLegacyDependenciesContainer = () => {
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
   container.scheduledEventsRepository = new ScheduledEventsRepository()
-  container.worksheetRepository = new LegacyWorksheetRepository()
   container.metadataRepository = new MetadataRepository()
-  container.worksheetQueueRepository = new LegacyWorksheetQueueRepository(container.worksheetRepository)
 
   return container
 }
@@ -67,8 +62,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
-
-  container.worksheetRepository = new WorksheetRepository(couchbaseAdapter) // used by test-harness
 
   const eventBus = new EventBus()
   container.eventBus = eventBus

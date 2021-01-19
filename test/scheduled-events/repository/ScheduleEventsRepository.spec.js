@@ -10,7 +10,7 @@ describe('ScheduleEventsRepository', () => {
   beforeEach(async () => {
     app = await initApplication()
     repository = app.locals.legacyDependenciesContainer.scheduledEventsRepository
-    worksheetRepository = app.locals.legacyDependenciesContainer.worksheetRepository
+    worksheetRepository = app.locals.diContainer.resolve('legacyWorksheetRepository')
   })
 
   describe('addScheduledMeetingEvent', () => {
