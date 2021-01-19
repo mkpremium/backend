@@ -62,6 +62,10 @@ const BuildingOwner = t.struct({
     status: t.enums.of(['GOOD', 'BAD', 'UNDEFINED']),
     type: t.enums.of(['TELEFONO', 'MOVIL', 'EMAIL']),
     value: t.String
+  })),
+  featuredContact: t.maybe(t.struct({
+    phoneId: t.maybe(t.String),
+    emailId: t.maybe(t.String)
   }))
 })
 
