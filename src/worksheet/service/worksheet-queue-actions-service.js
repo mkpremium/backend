@@ -1,13 +1,13 @@
 export class WorksheetQueueActionsService {
   /**
-   * @param {WorksheetQueueRepository} queueRepository
+   * @param {WorksheetQueueRepository} worksheetQueueRepository
    * @param {WorksheetRepository} worksheetRepository
-   * @param {EventBus} eventbus
+   * @param {EventBus} eventBus
    */
-  constructor (queueRepository, worksheetRepository, eventbus) {
-    this.queueRepository = queueRepository
+  constructor (worksheetQueueRepository, worksheetRepository, eventBus) {
+    this.queueRepository = worksheetQueueRepository
     this.worksheetRepository = worksheetRepository
-    this.eventbus = eventbus
+    this.eventBus = eventBus
   }
 
   async takeWorksheetInQueue (queueId, worksheetId, userId) {
@@ -18,7 +18,7 @@ export class WorksheetQueueActionsService {
 
     await this.worksheetRepository.save(worksheetInQueue)
     await this.queueRepository.save(queueWithWorksheet)
-    this.eventbus.publish({ name: 'worksheet.taken', worksheetId, queueId, by: userId })
+    this.eventBus.publish({ name: 'worksheet.taken', worksheetId, queueId, by: userId })
 
     return this.worksheetRepository.getForCallcenterView(worksheetId)
   }
