@@ -18,33 +18,31 @@ import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
 import { createMakeAlreadySoldWorksheetAvailable } from './controller/make-already-sold-worksheets-available'
 
-export function worksheetRoutes (
-  worksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService, worksheetRepository,
-  eventBus
-) {
+export function worksheetRoutes (awilixContainer) {
   const router = Router()
 
   router.get('/', worksheetListController)
 
-  router.get('/queues', permissions.manager, queueListController(worksheetQueueRepository))
+  const legacyWorksheetQueueRepository = awilixContainer.resolve('legacyWorksheetQueueRepository')
+  router.get('/queues', permissions.manager, queueListController(legacyWorksheetQueueRepository))
 
-  router.post('/queues', permissions.manager, createQueueController(worksheetQueueRepository))
+  router.post('/queues', permissions.manager, createQueueController(legacyWorksheetQueueRepository))
 
-  router.get('/queues/:id', getQueueController(worksheetQueueRepository))
+  router.get('/queues/:id', getQueueController(legacyWorksheetQueueRepository))
 
-  router.get('/queues/:id/taken', queueTakenFindByOperatorController(worksheetQueueRepository))
+  router.get('/queues/:id/taken', queueTakenFindByOperatorController(legacyWorksheetQueueRepository))
 
-  router.post('/queues/:id', actionsOnWorksheetQueueController(worksheetQueueRepository, takeNextWorksheetService))
+  router.post('/queues/:id', actionsOnWorksheetQueueController(legacyWorksheetQueueRepository, awilixContainer.resolve('takeNextWorksheetService')))
 
   router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
-    createTakeWorksheetIntoQueueController(worksheetQueueActionsService)
+    createTakeWorksheetIntoQueueController(awilixContainer.resolve('worksheetQueueActionsService'))
   ))
 
-  router.put('/queues/:id', permissions.manager, updateQueueController(worksheetQueueRepository))
+  router.put('/queues/:id', permissions.manager, updateQueueController(legacyWorksheetQueueRepository))
 
-  router.delete('/queues/:id', permissions.manager, deleteQueueController(worksheetQueueRepository))
+  router.delete('/queues/:id', permissions.manager, deleteQueueController(legacyWorksheetQueueRepository))
 
-  router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController(worksheetQueueRepository))
+  router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController(legacyWorksheetQueueRepository))
 
   router.get('/search', searchWorksheetController)
 
@@ -53,7 +51,10 @@ export function worksheetRoutes (
   router.post('/:id/owners', addOwnerToWorksheetController)
 
   router.post('/republish-already-sold', permissions.admin,
-    createMakeAlreadySoldWorksheetAvailable(worksheetRepository, eventBus))
+    createMakeAlreadySoldWorksheetAvailable(
+      awilixContainer.resolve('worksheetRepository'),
+      awilixContainer.resolve('eventBus')
+    ))
 
   return router
 }

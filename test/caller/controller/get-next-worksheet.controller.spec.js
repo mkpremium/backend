@@ -16,7 +16,7 @@ describe('Get Next Caller Worksheet Controller', () => {
       .resolves(nextWorksheetInCallerAssignedQueue)
 
     const controller = createGetNextCallerWorksheetController({
-      takeNextWorksheetInQueueService: getNextWorksheetInQueueServiceMock
+      takeNextWorksheetService: getNextWorksheetInQueueServiceMock
     })
 
     const testRequest = {

@@ -8,57 +8,37 @@ import { WorksheetQueueRepository } from './repository/worksheet-queue.repositor
 import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import { setupEventListeners } from './event-listeners'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
-import { asClass, asValue } from 'awilix'
+import { asClass } from 'awilix'
+import { LegacyWorksheetQueueRepository } from './models/queue-repository'
+import { LegacyWorksheetRepository } from './models/worksheet-repository'
+import { WorksheetRepository } from './repository/worksheet.repository'
 
 /**
  * @param app
- * @param eventBus
- * @param {WorksheetQueueActionsService} worksheetQueueActionsService
- * @param {WorksheetRepository} worksheetRepository
- * @param {LegacyWorksheetRepository} legacyWorksheetRepository
- * @param {LegacyWorksheetQueueRepository} legacyWorksheetQueueRepository
  * @param {AwilixContainer} awilixContainer
  */
-export default (app,
-  { eventBus, couchbaseAdapter, worksheetRepository },
-  { worksheetRepository: legacyWorksheetRepository, worksheetQueueRepository: legacyWorksheetQueueRepository },
-  awilixContainer
-) => {
+export default (app, awilixContainer) => {
   const secured = jwt()
-
-  const worksheetQueueRepository = new WorksheetQueueRepository(couchbaseAdapter)
-  const worksheetQueueActionsService = new WorksheetQueueActionsService(
-    worksheetQueueRepository,
-    worksheetRepository,
-    eventBus
-  )
-  const takeNextWorksheetService = new TakeNextWorksheetService(
-    worksheetQueueActionsService,
-    worksheetRepository,
-    worksheetQueueRepository
-  )
 
   awilixContainer.register({
     takeWorksheetService: asClass(WorksheetQueueActionsService).classic().singleton(),
-    takeNextWorksheetInQueueService: asClass(TakeNextWorksheetService).singleton().classic(),
-    worksheetQueueActionsService: asValue(worksheetQueueActionsService),
-    worksheetRepository: asValue(worksheetRepository),
-    worksheetQueueRepository: asClass(WorksheetQueueRepository).classic().singleton()
-  })
-  const releaseUserOtherActiveWorksheetsInQueueService = new ReleaseUserExtraOpenedWorksheetsInQueueService(
-    worksheetQueueRepository,
-    worksheetRepository,
-    2
-  )
+    takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),
+    worksheetQueueActionsService: asClass(TakeNextWorksheetService).classic().singleton(),
+    releaseUserOtherActiveWorksheetsInQueueService: asClass(ReleaseUserExtraOpenedWorksheetsInQueueService).classic().singleton()
+      .inject(() => ({ maxOpenedWorksheetPerQueueAndUser: 2 })),
 
-  setupEventListeners(eventBus, {
-    legacyWorksheetRepository,
-    worksheetQueueActionsService,
-    releaseUserOtherActiveWorksheetsInQueueService
+    worksheetRepository: asClass(WorksheetRepository).classic().singleton(),
+    worksheetQueueRepository: asClass(WorksheetQueueRepository).classic().singleton(),
+    legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
+    legacyWorksheetQueueRepository: asClass(LegacyWorksheetQueueRepository).classic().singleton()
   })
 
-  app.use('/worksheets', secured,
-    worksheetRoutes(legacyWorksheetQueueRepository, worksheetQueueActionsService, takeNextWorksheetService,
-      worksheetRepository, eventBus))
+  setupEventListeners(awilixContainer.resolve('eventBus'), {
+    legacyWorksheetRepository: awilixContainer.resolve('legacyWorksheetRepository'),
+    worksheetQueueActionsService: awilixContainer.resolve('worksheetQueueActionsService'),
+    releaseUserOtherActiveWorksheetsInQueueService: awilixContainer.resolve('releaseUserOtherActiveWorksheetsInQueueService')
+  })
+
+  app.use('/worksheets', secured, worksheetRoutes(awilixContainer))
   app.use('/worksheets/buildings', secured, buildingRoutes)
 }
