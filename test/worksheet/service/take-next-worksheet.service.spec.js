@@ -58,6 +58,10 @@ describe('TakeNextWorksheetService', () => {
 
     await service.nextWorksheetInQueue(testQueue, testUserId)
 
-    expect(eventBusSpy.publish).to.have.been.calledWith({ name: 'worksheet.next_in_queue_taken', by: testUserId })
+    expect(eventBusSpy.publish).to.have.been.calledWith({
+      name: 'worksheet.next_in_queue_taken',
+      by: testUserId,
+      source: testQueue.source
+    })
   })
 })

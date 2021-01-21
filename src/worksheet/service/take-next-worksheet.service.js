@@ -30,7 +30,11 @@ export class TakeNextWorksheetService {
     }
 
     const nextWorksheet = await this.takeWorksheetService.takeWorksheetInQueue(queue.id, worksheetFromSource.id, byUserOfId)
-    this.eventBus.publish({ name: 'worksheet.next_in_queue_taken', by: byUserOfId })
+    this.eventBus.publish({
+      name: 'worksheet.next_in_queue_taken',
+      by: byUserOfId,
+      source: queue.source
+    })
 
     return nextWorksheet
   }
