@@ -78,8 +78,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Worksheets",
@@ -209,8 +208,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Scheduled Events",
@@ -278,9 +276,35 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create meeting",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"createdBy\": \"caller-id\",\n    \"notifyTo\": \"flipper-id\",\n    \"event\": {\n        \"buildingId\": \"\",\n        \"inPerson\": true,\n        \"contactId\": \"\",\n        \"eventAddress\": \"\",\n        \"ownerId\": null,\n        \"worksheetId\": null\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/meeting",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"meeting"
+							]
+						}
+					},
+					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Buildings",
@@ -307,9 +331,19 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "List all owners of a building",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Users",
@@ -321,7 +355,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"roles\": [\n        \"OPERATOR\",\n        \"ADMIN\"\n    ]\n}",
+							"raw": "{\n    \"profile\": {\n        \"queueId\": \"d76e72bd-c27b-43b0-98c2-fa23e891fab9\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -329,13 +363,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{apiUrl}}/operators/f75a1005-36d1-4688-a48c-141824241d85",
+							"raw": "{{apiUrl}}/operators/:userId",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"operators",
-								"f75a1005-36d1-4688-a48c-141824241d85"
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "cdb5df5f-e5ab-4101-8d7f-ee83f80c598f"
+								}
 							]
 						}
 					},
@@ -358,8 +398,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Owners",
@@ -414,8 +453,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Caller",
@@ -464,7 +502,6 @@
 							],
 							"variable": [
 								{
-									"id": "fad238ce-d923-4582-b443-041285a31729",
 									"key": "worksheetId",
 									"value": "worksheet-id",
 									"type": "string"
@@ -501,24 +538,82 @@
 							],
 							"variable": [
 								{
-									"id": "b65e537f-a37f-409b-b605-83d70ff6be7f",
 									"key": "callerId",
-									"value": "123",
+									"value": "f75a1005-36d1-4688-a48c-141824241d85",
 									"type": "string"
 								},
 								{
-									"id": "2b59a17a-be70-483e-a603-59494560eed2",
 									"key": "flipperId",
-									"value": "3456",
+									"value": "f75a1005-36d1-4688-a48c-141824241d85",
 									"type": "string"
 								}
 							]
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Assigned Flipper's Blocked Availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "It returns the assigned flipper's blocked availability (meetings and restrictions)."
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule Meeting For Assigned Flipper",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/caller/assigned-flipper/meetings",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"caller",
+								"assigned-flipper",
+								"meetings"
+							]
+						}
+					},
+					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
+		},
+		{
+			"name": "Flipper",
+			"item": [
+				{
+					"name": "Get Flipper Availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/flipper/:flipperId/blocked-availability",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"flipper",
+								":flipperId",
+								"blocked-availability"
+							],
+							"variable": [
+								{
+									"key": "flipperId",
+									"value": "f75a1005-36d1-4688-a48c-141824241d85"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "Login",
@@ -526,7 +621,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "29fcfd72-adc3-444f-8e1e-e975ccc4e006",
 						"exec": [
 							"pm.test(\"ValidResponse\", function() {",
 							"    pm.response.to.have.status(200);",
@@ -594,7 +688,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "e39a310c-b71d-4760-bcb8-3dfc8f4c67a3",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -604,7 +697,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "c2a4eb53-f563-4b3a-b27d-d5c7e01a6c8e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -614,25 +706,20 @@
 	],
 	"variable": [
 		{
-			"id": "87fab197-fb0e-4d73-b621-0e316e5538dd",
 			"key": "apiUrl",
 			"value": "https://api.mkpremium.net"
 		},
 		{
-			"id": "7ce7b415-36a5-45c6-bd0c-9d17539fd4a4",
 			"key": "queueId",
 			"value": "f365e947-4c0e-4beb-ba18-25db1773587f"
 		},
 		{
-			"id": "2b5fb5d0-f7a3-475a-9230-b0431db88b80",
 			"key": "test-user-id",
 			"value": "7f3a99b5-6e4b-4ac1-8f6e-a63ebcd9a988"
 		},
 		{
-			"id": "4b78af95-0ad4-4cf5-b393-219b0910dadd",
 			"key": "accessToken",
 			"value": ""
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
