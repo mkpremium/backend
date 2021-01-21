@@ -6,7 +6,6 @@ import { CouchbaseModel } from '../db/model'
 import t, { OperatorActions } from './types'
 import {
   addBetweenQueryToBuilder,
-  addDateQueryToBuilder,
   rangeStartEnd,
   dateRangeArray,
   splitDateRange
@@ -123,19 +122,6 @@ function getDateRangeOffset (dateRange) {
 }
 
 export class OperatorStatsRepository extends OperatorStats {
-  async getOverAll (date = new Date()) {
-    const qb = this.getQueryBuilder('count')
-    addDateQueryToBuilder(qb, 'createdAt', date)
-
-    qb
-      .field('operatorId')
-      .field('action')
-      .group('operatorId')
-      .group('action')
-
-    return this.query(qb)
-  }
-
   async getStats (params) {
     const filter = GetStatsFilter(params)
     const results = GetStatsFilterFixed.is(filter)
