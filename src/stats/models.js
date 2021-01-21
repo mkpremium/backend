@@ -12,6 +12,7 @@ import {
 } from '../lib/query/helpers'
 import { queryDateFormat, utc } from '../lib/date'
 import { operatorPerformance } from '../../config'
+import moment from 'moment'
 
 export class OperatorStats extends CouchbaseModel {
   constructor () {
@@ -283,7 +284,7 @@ function operatorCalculation (dateRange) {
       const values = []
       const valuesKeys = {}
       _.mapValues(dailyCalculations, (dailyCalculation, date) => {
-        if (range.contains(utc(date))) {
+        if (range.contains(moment.utc(date))) {
           values.push(dailyCalculation)
           valuesKeys[ date ] = dailyCalculation
         }
