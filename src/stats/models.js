@@ -41,44 +41,39 @@ const GetStatsFilterBase = t.struct(
   }
 )
 
-const GetStatsFilterRange = GetStatsFilterBase.extend(
-  {
-    dateBetween: t.String
+const GetStatsFilterRange = GetStatsFilterBase.extend({ dateBetween: t.String })
+
+export const GetStatsFilterFixed = GetStatsFilterBase.extend({
+  range: t.enums.of([
+    'lastYear',
+    'lastMonth',
+    'yesterday',
+    'today',
+    'month',
+    'year'
+  ])
+},
+{
+  defaultProps: {
+    range: 'today'
   }
+}
 )
 
-const GetStatsFilterFixed = GetStatsFilterBase.extend(
-  {
-    range: t.enums.of([
-      'lastYear',
-      'lastMonth',
-      'yesterday',
-      'today',
-      'month',
-      'year'
-    ])
-  },
-  {
-    defaultProps: {
-      range: 'today'
-    }
-  }
-)
-
-const GetStatsFilter = t.union([
+export const GetStatsFilter = t.union([
   GetStatsFilterRange,
   GetStatsFilterFixed
 ])
 
 GetStatsFilter.dispatch = function (x) {
-  if (typeof x.dateBetween !== 'undefined') {
+  if (x !== undefined && typeof x.dateBetween !== 'undefined') {
     return GetStatsFilterRange
   }
 
   return GetStatsFilterFixed
 }
 
-function getDateBetweenByFixed (value, offset = 0) {
+export function getDateBetweenByFixed (value, offset = 0) {
   const today = utc()
   const yesterday = today.clone().subtract(1, 'days')
   const lastMonth = today.clone().subtract(1, 'months')

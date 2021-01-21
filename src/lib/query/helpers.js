@@ -1,10 +1,11 @@
 import { utc } from '../date'
 import m from 'moment-timezone'
 import { extendMoment } from 'moment-range'
+import moment from 'moment'
 
 const mr = extendMoment(m)
 
-export const splitDateRange = value => value.split(',').map(d => d ? utc(d) : d)
+export const splitDateRange = value => value.split(',').map(d => d ? moment.utc(d) : d)
 
 export const addDateQueryToBuilder = (queryBuilder, fieldName, value) => {
   const m = utc(value)
