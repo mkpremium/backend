@@ -161,16 +161,17 @@ export class CommercialsBuildingRepository {
   }
 
   static getOwner (featuredOwnerId, lastMeeting, owners) {
-    if (!owners || owners.length === 0) {
+    const validatedOwners = (owners || []).filter(({contacts}) => contacts.find(({status}) => status === 'GOOD'))
+    if (!validatedOwners || validatedOwners.length === 0) {
       return
     }
     const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
 
-    return this.ownerOfId(owners, featuredOwnerId) ||
-      CommercialsBuildingRepository.ownerOfId(owners, lastMeetingOwnerId) || owners[ 0 ]
+    return this.ownerOfId(validatedOwners, featuredOwnerId) ||
+      CommercialsBuildingRepository.ownerOfId(validatedOwners, lastMeetingOwnerId) || validatedOwners[ 0 ]
   }
 
-  static ownerOfId (owners, ownerId) {
-    return owners.find(o => o.id === ownerId)
+  static ownerOfId (validatedOwners, ownerId) {
+    return validatedOwners.find(o => o.id === ownerId)
   }
 }
