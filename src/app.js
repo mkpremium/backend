@@ -73,6 +73,7 @@ dependenciesPromise.then(() => {
   initPropertyManager(app, dependenciesContainer)
   initFlipperModule(app, awilixContainer)
   initCallerModule(app, awilixContainer)
+  stats(app, awilixContainer)
   app.use(appErrorHandler)
 
   app.locals.dependenciesContainer = dependenciesContainer
@@ -102,7 +103,6 @@ calls(app)
 history(app)
 notes(app)
 metadata(app)
-stats(app)
 autocomplete(app)
 email(app)
 cadastre(app)
