@@ -3,7 +3,6 @@ import { createAwilixContainer } from '../src/infrastructure/dependencies'
 import { logger } from '../src/infrastructure/logger'
 import { SystemPreferencesRepository } from '../src/system-preferences/models'
 import '../src/types'
-import { setupDependencies as setupBuildingDependencies } from '../src/building'
 
 logger.info('starting freezer')
 
@@ -13,7 +12,6 @@ SystemPreferencesRepository
     if (pref.freezer.enable) {
       logger.info(`Executing freezer cron`)
       const awilixContainer = createAwilixContainer()
-      setupBuildingDependencies(awilixContainer)
 
       await moveWorksheetOutOfFreezer(false, 500, awilixContainer.resolve('buildingsRepository'))
     } else {

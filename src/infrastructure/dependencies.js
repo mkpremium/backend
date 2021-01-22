@@ -27,6 +27,8 @@ import { MetadataRepository } from '../building/repository/metadata.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { ListBuildingProposalsService } from '../building/service/list-building-proposals.service'
 import { asClass, asValue, createContainer } from 'awilix'
+import { setupDependencies as setupBuildingDependencies } from '../building'
+import { setupOwnerDependencies } from '../owner'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -109,6 +111,9 @@ export const createAwilixContainer = couchbaseBucket => {
     couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket)),
     eventBus: asClass(EventBus).singleton()
   })
+
+  setupBuildingDependencies(awilixContainer)
+  setupOwnerDependencies(awilixContainer)
 
   return awilixContainer
 }

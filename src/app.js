@@ -16,13 +16,13 @@ import {
 import operator from './operator'
 import { createTestHarness } from './test-harness/routes'
 import worksheet from './worksheet'
-import { setupOwnerDependencies, setupOwnersRoutes } from './owner'
+import { setupOwnersRoutes } from './owner'
 import calls from './calls'
 import scheduledEvents from './scheduled-events'
 import webhooks from './webhooks'
 import history from './history'
 import notes from './notes'
-import { oldInit, setupDependencies as setupBuildingDependencies } from './building'
+import { oldInit } from './building'
 import metadata from './metadata'
 import { init as initPropertyManager } from './property-manager'
 
@@ -50,9 +50,6 @@ dependenciesPromise.then(() => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
   const awilixContainer = createAwilixContainer()
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
-
-  setupBuildingDependencies(awilixContainer)
-  setupOwnerDependencies(awilixContainer)
 
   stock(app, dependenciesContainer)
   featuredOwner(app, dependenciesContainer)
