@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { BuildingByCadastre, CreateBuildingInput } from './types'
-import { BuildingRepository } from '../../building/models'
+import { LegacyBuildingRepository } from '../../building/models'
 import { LegacyWorksheetRepository } from '../models/worksheet-repository'
 
 /**
@@ -27,7 +27,7 @@ export async function createBuildingWithWorksheet (data = {}) {
  * @return {Promise<*>}
  */
 async function createBuildingByAddress (input) {
-  const building = await BuildingRepository.findByAddress(_.get(input, 'address.fullAddress', ''))
+  const building = await LegacyBuildingRepository.findByAddress(_.get(input, 'address.fullAddress', ''))
   if (building) {
     return {
       created: false,
@@ -36,7 +36,7 @@ async function createBuildingByAddress (input) {
   } else {
     return {
       created: true,
-      building: await BuildingRepository.createNewBuilding(input)
+      building: await LegacyBuildingRepository.createNewBuilding(input)
     }
   }
 }
@@ -47,7 +47,7 @@ async function createBuildingByAddress (input) {
  * @return {Promise<*>}
  */
 export async function createBuildingByCadastre (input) {
-  const building = await BuildingRepository.findByCadastreReference(input.cadastre)
+  const building = await LegacyBuildingRepository.findByCadastreReference(input.cadastre)
   if (building) {
     return {
       created: false,
@@ -56,7 +56,7 @@ export async function createBuildingByCadastre (input) {
   } else {
     return {
       created: true,
-      building: await BuildingRepository.createNewBuilding(input)
+      building: await LegacyBuildingRepository.createNewBuilding(input)
     }
   }
 }

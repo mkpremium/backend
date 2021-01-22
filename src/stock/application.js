@@ -1,6 +1,6 @@
 import { StockStatuses, Transaction } from './types'
 import { StockRepository } from './models'
-import { BuildingRepository } from '../building/models'
+import { LegacyBuildingRepository } from '../building/models'
 import t from 'tcomb'
 import { OperatorRepository } from '../operator/models'
 import { SuperSellAward } from '../operator/Awards/SuperSellAward'
@@ -34,9 +34,9 @@ export async function updatePurchaseStock (params = {}, operatorId) {
 }
 
 export async function updateSellStock (params = {}, operatorId) {
-  const buildingRepository = new BuildingRepository()
+  const legacyBuildingRepository = new LegacyBuildingRepository()
 
-  await buildingRepository.findByIdOrThrow(params.buildingId)
+  await legacyBuildingRepository.findByIdOrThrow(params.buildingId)
 
   const sell = createTransaction(params, operatorId)
 
@@ -56,9 +56,9 @@ export async function updateSellStock (params = {}, operatorId) {
 }
 
 export async function closeSellStock (params, operatorId) {
-  const buildingRepository = new BuildingRepository()
+  const legacyBuildingRepository = new LegacyBuildingRepository()
 
-  await buildingRepository.findByIdOrThrow(params.buildingId)
+  await legacyBuildingRepository.findByIdOrThrow(params.buildingId)
 
   const stockRepository = new StockRepository()
 

@@ -12,7 +12,7 @@ import _uniq from 'lodash/uniq'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
-import { BuildingRepository } from '../../building/models'
+import { LegacyBuildingRepository } from '../../building/models'
 
 import { CouchbaseModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
@@ -106,10 +106,10 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
   async findByIdWIthIncludes (id, includes = [ 'relatedOwners', 'relatedBuildings' ]) {
     let worksheet = await this.findByIdOrThrow(id)
     if (includes.indexOf('relatedBuildings') !== -1 && worksheet.relatedBuildingIds.length > 0) {
-      const buildingRepo = new BuildingRepository()
+      const legacyBuildingRepository = new LegacyBuildingRepository()
       const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`
-      const rbQb = await buildingRepo.getQueryBuilder().where(`id IN ${idsText}`)
-      const relatedBuildings = await buildingRepo.query(rbQb)
+      const rbQb = await legacyBuildingRepository.getQueryBuilder().where(`id IN ${idsText}`)
+      const relatedBuildings = await legacyBuildingRepository.query(rbQb)
       worksheet = t.update(worksheet, { relatedBuildings: { $set: relatedBuildings } })
     }
 
@@ -362,10 +362,10 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
   async worksheetWithRelatedBuildings (worksheet) {
     let updatedWorksheet = worksheet
     if (worksheet.relatedBuildingIds.length > 0) {
-      const buildingRepo = new BuildingRepository()
+      const legacyBuildingRepository = new LegacyBuildingRepository()
       const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`
-      const rbQb = await buildingRepo.getQueryBuilder().where(`id IN ${idsText}`)
-      const relatedBuildings = await buildingRepo.query(rbQb)
+      const rbQb = await legacyBuildingRepository.getQueryBuilder().where(`id IN ${idsText}`)
+      const relatedBuildings = await legacyBuildingRepository.query(rbQb)
       updatedWorksheet = t.update(worksheet, { relatedBuildings: { $set: relatedBuildings } })
     }
 

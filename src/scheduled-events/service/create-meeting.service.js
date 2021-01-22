@@ -4,11 +4,11 @@ import { isBusiness } from '../../lib/role-operators'
 export class CreateMeetingService {
   /**
    * @param {ScheduledEventsRepository} scheduledEventsRepository
-   * @param {BuildingsRepository} buildingRepository
+   * @param {BuildingsRepository} buildingsRepository
    * @param {EventBus} eventBus
    */
-  constructor (scheduledEventsRepository, buildingRepository, eventBus) {
-    this.buildingRepository = buildingRepository
+  constructor (scheduledEventsRepository, buildingsRepository, eventBus) {
+    this.buildingsRepository = buildingsRepository
     this.scheduledEventsRepository = scheduledEventsRepository
     this.eventBus = eventBus
   }
@@ -18,7 +18,7 @@ export class CreateMeetingService {
     this.checkOperatorPermissions(operator, meetingAgentId)
 
     const createdMeeting = await this.scheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
-    await this.buildingRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
+    await this.buildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
     await this.eventBus.publish({
       name: 'meeting.created',
       userId: createdMeeting.notifyTo,

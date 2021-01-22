@@ -3,7 +3,7 @@ import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/applic
 import { expect } from 'chai'
 import { OperatorRepository } from '../../../src/operator/models'
 import { StockRepository } from '../../../src/stock/models'
-import { BuildingRepository } from '../../../src/building/models'
+import { LegacyBuildingRepository } from '../../../src/building/models'
 import app from '../../../src/app'
 import request from 'supertest'
 
@@ -11,12 +11,12 @@ describe('profit goals', () => {
   let salesAgent
 
   const salesAgentProfitGoal = 1500
-  const buildingRepository = new BuildingRepository()
+  const legacyBuildingRepository = new LegacyBuildingRepository()
   const stockRepository = new StockRepository()
   const operatorRepository = new OperatorRepository()
 
   beforeEach(async () => {
-    await buildingRepository.deleteQuery()
+    await legacyBuildingRepository.deleteQuery()
     await stockRepository.deleteQuery()
     await operatorRepository.deleteQuery()
 

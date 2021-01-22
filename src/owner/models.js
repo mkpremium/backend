@@ -5,7 +5,7 @@ import _isArray from 'lodash/isArray'
 import _isNil from 'lodash/isNil'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { BuildingRepository } from '../building/models'
+import { LegacyBuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
@@ -17,8 +17,8 @@ import { OwnerListQuery } from './types'
 
 function ownerIncludes (qb, includes) {
   if (includes.indexOf('building') !== -1) {
-    const buildingRepo = new BuildingRepository()
-    const letBuildingQuery = buildingRepo
+    const legacyBuildingRepository = new LegacyBuildingRepository()
+    const letBuildingQuery = legacyBuildingRepository
       .getQueryBuilder('use', 'b')
       .useKey('t.`buildingId`')
       .where('t.`buildingId` = b.`id`')
@@ -87,12 +87,12 @@ export class OwnerRepository extends CouchbaseModel {
 
   async createOwnerAndPerson (body) {
     const ownerBody = OwnerBody(body)
-    const buildingRepository = new BuildingRepository()
+    const legacyBuildingRepository = new LegacyBuildingRepository()
     const buildingId = ownerBody.buildingId
     let building
 
     if (buildingId) {
-      building = await buildingRepository.findByIdOrThrow(buildingId)
+      building = await legacyBuildingRepository.findByIdOrThrow(buildingId)
     }
 
     const person = Person(ownerBody.person)

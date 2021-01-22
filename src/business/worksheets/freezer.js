@@ -11,17 +11,17 @@ import { logger } from '../../infrastructure/logger'
 let changeNothing
 let limit = 100
 
-export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100, buildingRepository) {
+export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100, buildingsRepository) {
   changeNothing = dryRun
   limit = argLimit
   const { freezer } = await SystemPreferencesRepository.getPreferences()
   logger.info('starting to move worksheets from freezer settings', { freezer })
-  await moveNoSaleWorksheets(freezer, buildingRepository)
-  await moveFreezerWorksheets(freezer, buildingRepository)
+  await moveNoSaleWorksheets(freezer, buildingsRepository)
+  await moveFreezerWorksheets(freezer, buildingsRepository)
   logger.info('end of freezer process')
 }
 
-export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
+export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, buildingsRepository) {
   const maxDays = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
@@ -36,10 +36,10 @@ export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, build
   }
 
   const worksheets = await repository.query(queryBuilder)
-  return pullOutFreezer(worksheets, buildingRepository)
+  return pullOutFreezer(worksheets, buildingsRepository)
 }
 
-export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildingRepository) {
+export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildingsRepository) {
   const dateDaysAgo = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
@@ -53,10 +53,10 @@ export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildi
   }
 
   const worksheets = await repository.query(queryBuilder)
-  return pullOutFreezer(worksheets, buildingRepository)
+  return pullOutFreezer(worksheets, buildingsRepository)
 }
 
-async function pullOutFreezer (worksheets, buildingRepository) {
+async function pullOutFreezer (worksheets, buildingsRepository) {
   if (!worksheets || worksheets.length === 0) {
     return
   }
@@ -88,5 +88,5 @@ async function pullOutFreezer (worksheets, buildingRepository) {
 
   await Promise.map(updatedWorksheets, saveWorksheet, { concurrency: 1 })
   const outOfFreezerBuildingIds = _.flatMap(updatedWorksheets.map(({ relatedBuildingIds }) => relatedBuildingIds))
-  await buildingRepository.pullBuildingsOutOfFreezer(outOfFreezerBuildingIds)
+  await buildingsRepository.pullBuildingsOutOfFreezer(outOfFreezerBuildingIds)
 }

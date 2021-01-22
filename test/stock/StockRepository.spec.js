@@ -3,7 +3,7 @@ import { operatorCreateBusiness } from '../common'
 import moment from 'moment-timezone'
 import { expect } from 'chai'
 import { closeSellStock } from '../../src/stock/application'
-import { BuildingRepository } from '../../src/building/models'
+import { LegacyBuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 
 describe('StockRepository', () => {
@@ -21,7 +21,7 @@ describe('StockRepository', () => {
     it('returns total profit made by property owners', async () => {
       const propertyManager = await operatorCreateBusiness()
 
-      const testBuilding = await BuildingRepository.createNewBuilding(buildingData)
+      const testBuilding = await LegacyBuildingRepository.createNewBuilding(buildingData)
       const buildingPurchaseAmount = 1000
       const buildingSellingAmount = 1200
       await purchaseBuildingBySalesAgent(stockService, testBuilding, propertyManager, buildingPurchaseAmount)

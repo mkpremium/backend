@@ -4,7 +4,7 @@ import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
 import { OwnerBusinessStatus } from '../types/enums'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
-import { BuildingProposalRepository, BuildingRepository } from './models'
+import { BuildingProposalRepository, LegacyBuildingRepository } from './models'
 
 export function createListBuildingsController (listBuildingsService) {
   return wrap(async (req, res) => {
@@ -37,13 +37,13 @@ export function createUpdateBuildingNegotiationStatusController (updateBuildingN
 }
 
 async function addMetadataToBuilding (req, res) {
-  const buildingRepo = new BuildingRepository()
+  const legacyBuildingRepository = new LegacyBuildingRepository()
   const buildingId = req.params.id
-  const building = await buildingRepo.findByIdOrThrow(buildingId)
+  const building = await legacyBuildingRepository.findByIdOrThrow(buildingId)
   const bodyWithAuthor = Object.assign({}, req.body, {
     createdBy: req.user.id
   })
-  const metadata = await buildingRepo.addMetadataToBuilding(building, bodyWithAuthor)
+  const metadata = await legacyBuildingRepository.addMetadataToBuilding(building, bodyWithAuthor)
   res.status(201).json(metadata)
 }
 
@@ -72,11 +72,11 @@ export const createSignDocumentsUrlController = getDocumentsSignedURLService => 
 
 async function updateNegotiationProposal (req, res) {
   const proposalRepo = new BuildingProposalRepository()
-  const buildingRepo = new BuildingRepository()
+  const legacyBuildingRepository = new LegacyBuildingRepository()
   const proposalId = req.params.id
   const proposal = await proposalRepo.findByIdOrThrow(proposalId)
 
-  const updatedProposal = await buildingRepo.updateNegotiationProposal(proposal, req.user.id, req.body)
+  const updatedProposal = await legacyBuildingRepository.updateNegotiationProposal(proposal, req.user.id, req.body)
   res.status(200).json(updatedProposal)
 }
 

@@ -1,12 +1,12 @@
 import { buildingNegotiationStatus } from '../building'
 
 /**
- * @property {BuildingsRepository} buildingRepository
+ * @property {BuildingsRepository} buildingsRepository
  * @property {EventBus} eventBus
  */
 export class UpdateBuildingNegotiationStatusService {
-  constructor (buildingRepository, eventBus) {
-    this.buildingRepository = buildingRepository
+  constructor (buildingsRepository, eventBus) {
+    this.buildingsRepository = buildingsRepository
     this.eventBus = eventBus
   }
 
@@ -15,7 +15,7 @@ export class UpdateBuildingNegotiationStatusService {
       throw new InvalidBuildingNegotiationStatus(buildingId, negotiationStatus)
     }
 
-    await this.buildingRepository.setBuildingNegotiationStatus(buildingId, negotiationStatus)
+    await this.buildingsRepository.setBuildingNegotiationStatus(buildingId, negotiationStatus)
     await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, operatorId, negotiationStatus))
   }
 }

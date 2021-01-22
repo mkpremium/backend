@@ -4,7 +4,7 @@ import { AddProposalService } from '../building/service/add-proposal.service'
 import { BuildingsRepository } from '../building/repository/buildings.repository'
 import { CommercialsBuildingRepository } from '../building/repository/commercials-building.repository'
 import { ListBuildingsService } from '../building/service/list-buildings.service'
-import { BuildingRepository as LegacyBuildingRepository } from '../building/models'
+import { LegacyBuildingRepository } from '../building/models'
 import { AdminBuildingRepository } from '../building/repository/admin-building.repository'
 import { BuildingDocumentsRepository } from '../building/repository/building-documents.repository'
 import { GetDocumentsSignedURLService } from '../building/service/get-documents-signed-URL.service'
@@ -60,8 +60,9 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
 
   container.addProposalService = new AddProposalService(legacyDependenciesContainer.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
-  container.listBuildingsService = new ListBuildingsService(new CommercialsBuildingRepository(couchbaseAdapter))
-  container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
+  const commercialsBuildingRepository = new CommercialsBuildingRepository(couchbaseAdapter)
+  container.listBuildingsService = new ListBuildingsService(commercialsBuildingRepository)
+  container.listBuildingProposalsService = new ListBuildingProposalsService(commercialsBuildingRepository) // TODO move to awilix container
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
   const eventBus = awilixContainer.resolve('eventBus')

@@ -5,7 +5,7 @@ import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { TNote } from '../notes/types'
 import { aliasTo, asClass, asFunction } from 'awilix'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
-import { BuildingRepository as LegacyBuildingRepository } from './models'
+import { LegacyBuildingRepository } from './models'
 import { BuildingsRepository } from './repository/buildings.repository'
 import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
 

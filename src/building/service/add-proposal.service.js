@@ -1,11 +1,14 @@
-export class AddProposalService {
-  constructor (buildingRepository) {
-    this.buildingRepository = buildingRepository
+/**
+ * @field {LegacyBuildingRepository} legacyBuildingRepository
+ */
+export class AddProposalService { // TODO move to container
+  constructor (legacyBuildingRepository) {
+    this.legacyBuildingRepository = legacyBuildingRepository
   }
 
   async addProposal (buildingId, propertyAgentId, proposal) {
-    const building = await this.buildingRepository.findByIdOrThrow(buildingId)
+    const building = await this.legacyBuildingRepository.findByIdOrThrow(buildingId)
 
-    return this.buildingRepository.addNegotiationProposal(building, propertyAgentId, proposal)
+    return this.legacyBuildingRepository.addNegotiationProposal(building, propertyAgentId, proposal)
   }
 }

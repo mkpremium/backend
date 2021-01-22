@@ -35,7 +35,7 @@ export class BuildingProposalRepository extends BuildingProposal {
   }
 }
 
-export class BuildingRepository extends CouchbaseModel {
+export class LegacyBuildingRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = Building
@@ -51,12 +51,12 @@ export class BuildingRepository extends CouchbaseModel {
   }
 
   static async findByCadastreReference (cadastreReference) {
-    const repo = new BuildingRepository()
-    const qb = repo.getQueryBuilder()
+    const legacyBuildingRepository = new LegacyBuildingRepository()
+    const qb = legacyBuildingRepository.getQueryBuilder()
       .where('cadastre IS NOT MISSING')
       .where('cadastre.reference = ?', cadastreReference)
       .limit(1)
-    const [ building ] = await repo.query(qb)
+    const [ building ] = await legacyBuildingRepository.query(qb)
     return building
   }
 
@@ -64,20 +64,20 @@ export class BuildingRepository extends CouchbaseModel {
     if (_.isEmpty(fullAddress)) {
       throw newHttpError(400, 'fullAddress no puede estar vacia')
     }
-    const repo = new BuildingRepository()
-    const qb = repo.getQueryBuilder()
+    const legacyBuildingRepository = new LegacyBuildingRepository()
+    const qb = legacyBuildingRepository.getQueryBuilder()
       .where('cadastre IS NOT MISSING')
       .where('address.fullAddress = ?', fullAddress)
       .limit(1)
-    const [ building ] = await repo.query(qb)
+    const [ building ] = await legacyBuildingRepository.query(qb)
     return building
   }
 
   static async createNewBuilding (data) {
     const json = toJSON(data)
     const building = Building(json)
-    const repo = new BuildingRepository()
-    return repo.save(building)
+    const legacyBuildingRepository = new LegacyBuildingRepository()
+    return legacyBuildingRepository.save(building)
   }
 
   async addMetadataToBuilding (building, params) {

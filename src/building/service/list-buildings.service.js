@@ -1,13 +1,13 @@
 export class ListBuildingsService {
-  constructor (buildingRepository) {
-    this.buildingRepository = buildingRepository
+  constructor (commercialsBuildingRepository) {
+    this.commercialsBuildingRepository = commercialsBuildingRepository
   }
 
   buildingsOfId (ids) {
-    return this.buildingRepository.listById(typeof ids === 'string' ? [ids] : ids)
+    return this.commercialsBuildingRepository.listById(typeof ids === 'string' ? [ids] : ids)
   }
 
   buildingsAssignedTo (propertyAgentId) {
-    return this.buildingRepository.listAssignedToPropertyAgentOfId(propertyAgentId)
+    return this.commercialsBuildingRepository.listAssignedToPropertyAgentOfId(propertyAgentId)
   }
 }

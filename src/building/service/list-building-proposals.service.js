@@ -1,9 +1,9 @@
 export class ListBuildingProposalsService {
-  constructor (buildingRepository) {
-    this.buildingRepository = buildingRepository
+  constructor (commercialsBuildingRepository) {
+    this.commercialsBuildingRepository = commercialsBuildingRepository
   }
 
   forBuilding (buildingId) {
-    return this.buildingRepository.listProposalsForBuilding(buildingId)
+    return this.commercialsBuildingRepository.listProposalsForBuilding(buildingId)
   }
 }

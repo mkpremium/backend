@@ -7,16 +7,16 @@ import {
 } from '../../../src/building/service/update-building-negotiation-status.service'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
-  let buildingRepository, service, eventBus
+  let buildingsRepository, service, eventBus
 
   beforeEach(() => {
-    buildingRepository = {
+    buildingsRepository = {
       setBuildingNegotiationStatus: spy()
     }
     eventBus = {
       publish: spy()
     }
-    service = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
+    service = new UpdateBuildingNegotiationStatusService(buildingsRepository, eventBus)
   })
 
   const validNegotiationStatuses = [
@@ -32,7 +32,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     it(`accepts "${status}" as a valid negotiation status`, async () => {
       await service.updateBuildingStatus('building-id', status, 'operator-id')
 
-      expect(buildingRepository.setBuildingNegotiationStatus).to.have.been.calledWith('building-id', status)
+      expect(buildingsRepository.setBuildingNegotiationStatus).to.have.been.calledWith('building-id', status)
     })
   })
 
