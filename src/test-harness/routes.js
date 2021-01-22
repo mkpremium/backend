@@ -10,7 +10,7 @@ export function createTestHarness (app, awilixContainer) {
   const createOwner = createOwnerFactory(awilixContainer.resolve('ownersRepository'))
   const createWorksheet = createBuildingWorksheetFactory(awilixContainer.resolve('worksheetRepository'))
   const createBuilding = createBuildingFactory(
-    awilixContainer.resolve('buildingsRepository'),
+    awilixContainer.resolve('legacyBuildingsRepository'),
     createOwner,
     createWorksheet
   )

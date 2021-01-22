@@ -3,18 +3,21 @@ import { createBuildingRoutes } from './routes'
 import jwt from '../middleware/jwt'
 import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { TNote } from '../notes/types'
-import { asClass, asFunction } from 'awilix'
+import { aliasTo, asClass, asFunction } from 'awilix'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
 import { BuildingRepository as LegacyBuildingRepository } from './models'
 import { BuildingsRepository } from './repository/buildings.repository'
+import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
  */
 export const setupDependencies = awilixContainer => {
   awilixContainer.register({
-    buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
+    setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(), // private
 
+    buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
+    buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton()
   })
@@ -25,7 +28,6 @@ export const oldInit = (app, awilixContainer, {
   listBuildingProposalsService,
   updateBuildingNegotiationStatusService,
   adminBuildingRepository,
-  setBuildingSalePriceService,
   getDocumentsSignedURLService,
   eventBus,
   couchbaseAdapter
@@ -48,7 +50,7 @@ export const oldInit = (app, awilixContainer, {
     updateBuildingNegotiationStatusService,
     awilixContainer.resolve('legacyBuildingsRepository'),
     adminBuildingRepository,
-    setBuildingSalePriceService,
+    awilixContainer.resolve('setBuildingSalePriceService'),
     getDocumentsSignedURLService,
     awilixContainer.resolve('listBuildingOwnersController')
   ))

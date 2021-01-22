@@ -8,7 +8,6 @@ import { BuildingRepository as LegacyBuildingRepository } from '../building/mode
 import { AdminBuildingRepository } from '../building/repository/admin-building.repository'
 import { BuildingDocumentsRepository } from '../building/repository/building-documents.repository'
 import { GetDocumentsSignedURLService } from '../building/service/get-documents-signed-URL.service'
-import { SetBuildingSalePriceService } from '../building/service/set-building-sale-price.service'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/update-building-negotiation-status.service'
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
@@ -78,8 +77,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     legacyDependenciesContainer.buildingRepository,
     legacyDependenciesContainer.stockRepository
   )
-
-  container.setBuildingSalePriceService = new SetBuildingSalePriceService(buildingRepository)
 
   container.couchbaseAdapter = couchbaseAdapter
 

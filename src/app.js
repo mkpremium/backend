@@ -53,7 +53,6 @@ dependenciesPromise.then(() => {
   })
 
   awilixContainer.register({
-    buildingRepository: asValue(dependenciesContainer.buildingRepository),
     eventBus: asValue(dependenciesContainer.eventBus)
   })
   setupBuildingDependencies(awilixContainer)

@@ -6,20 +6,20 @@ const setBuildingSalePriceCommand = t.struct({
 })
 
 export class SetBuildingSalePriceService {
-  constructor (buildingRepository) {
-    this.buildingRepository = buildingRepository
+  constructor ({ legacyBuildingsRepository }) {
+    this.legacyBuildingsRepository = legacyBuildingsRepository
   }
 
   async setBuildingSalePrice (cmd) {
     const { buildingId, salePrice } = setBuildingSalePriceCommand(cmd)
 
-    const building = await this.buildingRepository.get(buildingId)
+    const building = await this.legacyBuildingsRepository.findById(buildingId)
     const updatedBuilding = t.update(building, {
       salePrice: {
         $set: salePrice
       }
     })
 
-    return this.buildingRepository.save(updatedBuilding)
+    return this.legacyBuildingsRepository.save(updatedBuilding)
   }
 }

@@ -13,7 +13,7 @@ export const testOwnerFirstName = 'Owner First Name'
 
 export const createBuilding = async (app, buildingProperties) => {
   const owner = await createOwner(app)
-  const { buildingRepository } = app.locals.legacyDependenciesContainer
+  const buildingsRepository = app.locals.diContainer.resolve('buildingsRepository')
   const building = {
     ...{
       id: testBuildingId,
@@ -32,7 +32,7 @@ export const createBuilding = async (app, buildingProperties) => {
     },
     ...buildingProperties
   }
-  const savedBuilding = await buildingRepository.save(building)
+  const savedBuilding = await buildingsRepository.save(building)
   await associateBuildingWithOwner(app, owner, savedBuilding.id)
 
   return savedBuilding
