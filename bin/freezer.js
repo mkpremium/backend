@@ -3,6 +3,7 @@ import { createAwilixContainer } from '../src/infrastructure/dependencies'
 import { logger } from '../src/infrastructure/logger'
 import { SystemPreferencesRepository } from '../src/system-preferences/models'
 import '../src/types'
+import { CouchbaseModel } from '../src/db/model'
 
 logger.info('starting freezer')
 
@@ -11,9 +12,11 @@ SystemPreferencesRepository
   .then(async (pref) => {
     if (pref.freezer.enable) {
       logger.info(`Executing freezer cron`)
-      const awilixContainer = createAwilixContainer()
 
-      await moveWorksheetOutOfFreezer(false, 500, awilixContainer.resolve('buildingsRepository'))
+      CouchbaseModel.prototype._promiseBucket.then(async (couchbaseBucket) => {
+        const awilixContainer = createAwilixContainer(couchbaseBucket)
+        await moveWorksheetOutOfFreezer(false, 500, awilixContainer.resolve('buildingsRepository'))
+      })
     } else {
       logger.info(`Freeze called, nothing to do`)
     }

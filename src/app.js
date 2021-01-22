@@ -48,7 +48,7 @@ export const dependenciesPromise = Promise.all([
 
 dependenciesPromise.then(() => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
-  const awilixContainer = createAwilixContainer()
+  const awilixContainer = createAwilixContainer(app.locals.bucket)
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
   stock(app, dependenciesContainer)
