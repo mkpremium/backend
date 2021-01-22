@@ -10,7 +10,6 @@ import { BuildingDocumentsRepository } from '../building/repository/building-doc
 import { GetDocumentsSignedURLService } from '../building/service/get-documents-signed-URL.service'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/update-building-negotiation-status.service'
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
-import { FeaturedOwnerService } from '../featuredOwner/FeaturedOwnerService'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
@@ -56,7 +55,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
 
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
   container.buildingRepository = buildingRepository
-  container.featuredOwnerService = new FeaturedOwnerService(buildingRepository)
 
   container.addProposalService = new AddProposalService(legacyDependenciesContainer.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))

@@ -32,7 +32,6 @@ import email from './email'
 import cadastre from './cadastre'
 import preferences from './system-preferences'
 import stock from './stock'
-import featuredOwner from './featuredOwner'
 import meeting from './meeting'
 import user from './user'
 import appErrorHandler from './infrastructure/error-handler'
@@ -50,7 +49,6 @@ dependenciesPromise.then(couchbaseBucket => {
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
   stock(app, dependenciesContainer)
-  featuredOwner(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   user(app, awilixContainer)
 

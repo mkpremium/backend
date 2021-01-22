@@ -8,18 +8,23 @@ import { createListBuildingOwnersController } from './controller/list-building-o
 import { LegacyBuildingRepository } from './models'
 import { BuildingsRepository } from './repository/buildings.repository'
 import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
+import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
+import { FeaturedOwnerService } from './service/featured-owner.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
  */
 export const setupDependencies = awilixContainer => {
   awilixContainer.register({
-    setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(), // private
+    setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
+    featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
-    listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton()
+
+    listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
+    setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton()
   })
 }
 
@@ -52,6 +57,7 @@ export const oldInit = (app, awilixContainer, {
     adminBuildingRepository,
     awilixContainer.resolve('setBuildingSalePriceService'),
     getDocumentsSignedURLService,
-    awilixContainer.resolve('listBuildingOwnersController')
+    awilixContainer.resolve('listBuildingOwnersController'),
+    awilixContainer
   ))
 }

@@ -24,7 +24,8 @@ export const createBuildingRoutes = (
   adminBuildingRepository,
   setBuildingSalePriceService,
   getDocumentsSignedURLService,
-  listBuildingOwnersController
+  listBuildingOwnersController,
+  awilixContainer
 ) => {
   const router = Router()
 
@@ -41,6 +42,7 @@ export const createBuildingRoutes = (
   router.put('/:building_id/negotiation/:id', updateNegotiationProposalController)
 
   router.post('/:id/owners', addOwnerToBuildingController)
+  router.post('/:buildingId/set-featured-owner', awilixContainer.resolve('setFeaturedOwnerController'))
 
   router.get('/:buildingId/owners', wrap(listBuildingOwnersController))
 
