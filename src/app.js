@@ -42,13 +42,11 @@ import { initFlipperModule } from './flipper/init'
 
 const app = express()
 app.set('IS_READY', false)
-export const dependenciesPromise = Promise.all([
-  couchbase(app)
-])
+export const dependenciesPromise = couchbase(app)
 
-dependenciesPromise.then(() => {
+dependenciesPromise.then(couchbaseBucket => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
-  const awilixContainer = createAwilixContainer(app.locals.bucket)
+  const awilixContainer = createAwilixContainer(couchbaseBucket)
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
   stock(app, dependenciesContainer)
@@ -79,8 +77,11 @@ dependenciesPromise.then(() => {
 })
 
 app.get('/_ready', (req, res) => {
-  if (app.get('IS_READY')) res.sendStatus(200)
-  else res.sendStatus(503)
+  if (app.get('IS_READY')) {
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(503)
+  }
 })
 
 app.use(bodyParser.urlencoded({ extended: false }))
