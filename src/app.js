@@ -7,12 +7,16 @@ import couchbase from './db/couchbase'
 import { logger } from './infrastructure/logger'
 // app aware types
 import './types'
-import { createDependenciesContainer, createLegacyDependenciesContainer } from './infrastructure/dependencies'
+import {
+  createAwilixContainer,
+  createDependenciesContainer,
+  createLegacyDependenciesContainer
+} from './infrastructure/dependencies'
 // modules
 import operator from './operator'
 import { createTestHarness } from './test-harness/routes'
 import worksheet from './worksheet'
-import {setupOwnerDependencies, setupOwnersRoutes} from './owner'
+import { setupOwnerDependencies, setupOwnersRoutes } from './owner'
 import calls from './calls'
 import scheduledEvents from './scheduled-events'
 import webhooks from './webhooks'
@@ -34,7 +38,6 @@ import user from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { initCallerModule } from './caller/init'
-import { asValue, createContainer } from 'awilix'
 import { initFlipperModule } from './flipper/init'
 
 const app = express()
@@ -45,16 +48,9 @@ export const dependenciesPromise = Promise.all([
 
 dependenciesPromise.then(() => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
-  const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer)
+  const awilixContainer = createAwilixContainer()
+  const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
-  const awilixContainer = createContainer()
-  awilixContainer.register({
-    couchbaseAdapter: asValue(dependenciesContainer.couchbaseAdapter)
-  })
-
-  awilixContainer.register({
-    eventBus: asValue(dependenciesContainer.eventBus)
-  })
   setupBuildingDependencies(awilixContainer)
   setupOwnerDependencies(awilixContainer)
 

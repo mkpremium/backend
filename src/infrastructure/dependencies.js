@@ -26,7 +26,7 @@ import { EventBus } from './event-bus'
 import { MetadataRepository } from '../building/repository/metadata.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { ListBuildingProposalsService } from '../building/service/list-building-proposals.service'
-import { asValue, createContainer } from 'awilix'
+import { asClass, asValue, createContainer } from 'awilix'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -39,7 +39,7 @@ export const createLegacyDependenciesContainer = () => {
   return container
 }
 
-export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesContainer) => {
+export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesContainer, awilixContainer) => {
   const couchbaseAdapter = new CouchbaseAdapter(couchbaseBucket)
 
   const propertyManagersRepository = new PropertyManagerRepository(couchbaseAdapter)
@@ -62,7 +62,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.listBuildingProposalsService = new ListBuildingProposalsService(new CommercialsBuildingRepository(couchbaseAdapter))
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
-  const eventBus = new EventBus()
+  const eventBus = awilixContainer.resolve('eventBus')
   container.eventBus = eventBus
   container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
 
@@ -106,7 +106,8 @@ export const createAwilixContainer = couchbaseBucket => {
 
   awilixContainer.register({
     couchbaseBucket: asValue(couchbaseBucket),
-    couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket))
+    couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket)),
+    eventBus: asClass(EventBus).singleton()
   })
 
   return awilixContainer
