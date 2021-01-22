@@ -161,7 +161,7 @@ export class CommercialsBuildingRepository {
   }
 
   static getOwner (featuredOwnerId, lastMeeting, owners) {
-    const validatedOwners = (owners || []).filter(({contacts}) => contacts.find(({status}) => status === 'GOOD'))
+    const validatedOwners = (owners || []).filter(({contacts}) => (contacts || []).find(({status}) => status === 'GOOD'))
     if (!validatedOwners || validatedOwners.length === 0) {
       return
     }
