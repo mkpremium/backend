@@ -21,7 +21,7 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
 })
 
 const CONNECTION_WAIT_TIME = 60000
-const BUCKET_CREATION_WAIT_TIME = 20000
+const BUCKET_CREATION_WAIT_TIME = 60000
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
 
