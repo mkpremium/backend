@@ -1,7 +1,7 @@
 import { initApplication } from '../../../test-e2e/helper/rest-api-helper'
 import { expect } from 'chai'
 
-describe('WorksheetQueueRepository', () => {
+describe('LegacyWorksheetQueueRepository', () => {
   let app
   let repository
   let worksheetRepository
