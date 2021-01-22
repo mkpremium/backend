@@ -42,7 +42,7 @@ export const createLegacyDependenciesContainer = () => {
 }
 
 export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesContainer, awilixContainer) => {
-  const couchbaseAdapter = new CouchbaseAdapter(couchbaseBucket)
+  const couchbaseAdapter = awilixContainer.resolve('couchbaseAdapter')
 
   const propertyManagersRepository = new PropertyManagerRepository(couchbaseAdapter)
   const stockRepository = new StockRepository(couchbaseAdapter)
