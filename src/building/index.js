@@ -10,6 +10,7 @@ import { BuildingsRepository } from './repository/buildings.repository'
 import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
 import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
 import { FeaturedOwnerService } from './service/featured-owner.service'
+import { AddProposalService } from './service/add-proposal.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -18,6 +19,7 @@ export const setupDependencies = awilixContainer => {
   awilixContainer.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
+    addProposalService: asClass(AddProposalService).singleton(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),

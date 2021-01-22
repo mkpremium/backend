@@ -70,7 +70,7 @@ export const associateBuildingWithOwner = (app, owner, buildingId) => {
 }
 
 export const createProposalForBuilding = (app, { propertyAgentId, buildingId }) => {
-  const { addProposalService } = app.locals.dependenciesContainer
+  const addProposalService = app.locals.diContainer.resolve('addProposalService')
 
   return addProposalService.addProposal(buildingId, propertyAgentId, {
     aspiration: -1,

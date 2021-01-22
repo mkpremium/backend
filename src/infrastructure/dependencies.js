@@ -1,6 +1,5 @@
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
-import { AddProposalService } from '../building/service/add-proposal.service'
 import { BuildingsRepository } from '../building/repository/buildings.repository'
 import { CommercialsBuildingRepository } from '../building/repository/commercials-building.repository'
 import { ListBuildingsService } from '../building/service/list-buildings.service'
@@ -56,7 +55,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
   container.buildingRepository = buildingRepository
 
-  container.addProposalService = new AddProposalService(legacyDependenciesContainer.buildingRepository)
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
   const commercialsBuildingRepository = new CommercialsBuildingRepository(couchbaseAdapter)
   container.listBuildingsService = new ListBuildingsService(commercialsBuildingRepository)

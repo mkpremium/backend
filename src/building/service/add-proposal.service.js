@@ -1,14 +1,14 @@
 /**
- * @field {LegacyBuildingRepository} legacyBuildingRepository
+ * @field {LegacyBuildingRepository} legacyBuildingsRepository
  */
-export class AddProposalService { // TODO move to container
-  constructor (legacyBuildingRepository) {
-    this.legacyBuildingRepository = legacyBuildingRepository
+export class AddProposalService {
+  constructor ({ legacyBuildingsRepository }) {
+    this.legacyBuildingsRepository = legacyBuildingsRepository
   }
 
   async addProposal (buildingId, propertyAgentId, proposal) {
-    const building = await this.legacyBuildingRepository.findByIdOrThrow(buildingId)
+    const building = await this.legacyBuildingsRepository.findByIdOrThrow(buildingId)
 
-    return this.legacyBuildingRepository.addNegotiationProposal(building, propertyAgentId, proposal)
+    return this.legacyBuildingsRepository.addNegotiationProposal(building, propertyAgentId, proposal)
   }
 }
