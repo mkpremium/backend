@@ -1,11 +1,23 @@
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import { UpdateBuildingNegotiationStatusService } from '../../../src/building/service/update-building-negotiation-status.service'
-import { BuildingV2 } from '../../../src/building/domain/building'
+import { Building } from '../../../src/building/building'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
   let buildingsRepository, service, eventBus
-  const testBuilding = BuildingV2({ id: 'test-building-id', negotiationStatus: 'PENDIENTE', files: [] })
+  const testBuilding = Building({
+    id: 'test-building-id',
+    buildingType: 'VERTICAL',
+    address: {
+      street: 'street, address',
+      number: '2a',
+      postalCode: {
+        verified: false
+      },
+      city: 'BARCELONA'
+    },
+    location: {}
+  })
 
   beforeEach(() => {
     buildingsRepository = {
@@ -33,7 +45,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
       await service.updateBuildingStatus('test-building-id', { status, userId: 'operator-id' })
 
       expect(buildingsRepository.save).to.have.been
-        .calledWithMatch(b => BuildingV2.is(b) && b.id === 'test-building-id' && b.negotiationStatus === status)
+        .calledWithMatch(b => Building.is(b) && b.id === 'test-building-id' && b.negotiationStatus === status)
     })
   })
 

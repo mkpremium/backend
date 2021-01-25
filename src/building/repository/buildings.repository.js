@@ -1,6 +1,6 @@
 import { N1qlQuery } from 'couchbase'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { BuildingV2 } from '../domain/building'
+import { Building } from '../building'
 
 const setBuildingFeaturedOwner = bucketName => `
 UPDATE ${bucketName} building
@@ -41,6 +41,6 @@ export class BuildingsRepository extends CouchbaseRepository {
   }
 
   struct () {
-    return BuildingV2
+    return Building
   }
 }

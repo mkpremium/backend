@@ -186,3 +186,11 @@ export const Building = t.struct(
     }
   }
 )
+
+Building.prototype.changeNegotiationStatus = function (newStatus) {
+  return Building.update(this, {
+    negotiationStatus: {
+      $set: newStatus
+    }
+  })
+}

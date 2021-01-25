@@ -1,8 +1,6 @@
 import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import moment from 'moment'
-import fromJSON from 'tcomb/lib/fromJSON'
-import { BuildingV2 } from '../domain/building'
 
 const listBuildingsByIdQuery = bucketName => `
 SELECT
@@ -177,25 +175,3 @@ export class CommercialsBuildingRepository {
     return validatedOwners.find(o => o.id === ownerId)
   }
 }
-
-export const mapToBuildingV2 = buildings => buildings.map(
-  b => {
-    const { buildingMeetings, ownerId, owners, floorArea } = b
-    buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
-
-    const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-    const owner = CommercialsBuildingRepository.getOwner(ownerId, lastMeeting, owners)
-
-    const v2Building = {
-      ...b,
-      floorArea: floorArea ? parseInt(floorArea) : undefined,
-      owner
-    }
-    try {
-      return fromJSON(v2Building, BuildingV2)
-    } catch (error) {
-      error.message = `[building:${b.id}] ${error.message}`
-      throw error
-    }
-  }
-)

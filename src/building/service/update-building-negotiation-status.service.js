@@ -8,9 +8,12 @@ export class UpdateBuildingNegotiationStatusService {
     this.eventBus = eventBus
   }
 
-  async updateBuildingStatus (buildingId, { status, userId }) {
+  async updateBuildingStatus (buildingId, { status, userId, sourceOwnerId }) {
     const building = await this.buildingsRepository.get(buildingId)
-    const updatedBuilding = building.changeNegotiationStatus(status)
+    let updatedBuilding = building.changeNegotiationStatus(status)
+    if (sourceOwnerId) {
+      updatedBuilding = updatedBuilding.withFeaturedOwner(sourceOwnerId)
+    }
 
     await this.buildingsRepository.save(updatedBuilding)
     await this.eventBus.publish({
