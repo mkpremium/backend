@@ -199,6 +199,7 @@ export class CouchbaseModel {
       return result
     } catch (error) {
       logger.error('model#query', { consistency, queryParam, queryBuilder, error })
+      throw error
     }
   }
 
