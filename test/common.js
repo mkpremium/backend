@@ -59,40 +59,6 @@ export const buildOperator = (operator = {}, prototype = defaultOperatorPrototyp
   }
 }
 
-export async function operatorCreateAdmin (queueId) {
-  return createFullOperator({
-    username: 'admin',
-    password: 'Passw0rd',
-    agentNumber: 'admin',
-    roles: [
-      'ADMIN'
-    ],
-    profile: {
-      queueId,
-      firstName: 'admin',
-      lastName: 'operator',
-      city: 'barcelona'
-    }
-  })
-}
-
-export async function operatorCreateStreet () {
-  return createFullOperator({
-    username: 'street',
-    password: 'Passw0rd',
-    agentNumber: 'street',
-    roles: [
-      'STREET'
-    ],
-    profile: {
-      firstName: 'street',
-      lastName: 'operator',
-      city: 'barcelona',
-      neighborhood: 'VALLCARCA I ELS PENITENTS'
-    }
-  })
-}
-
 export async function operatorCreateBusiness () {
   return createFullOperator(buildOperator({
     username: 'business',
@@ -100,21 +66,4 @@ export async function operatorCreateBusiness () {
       'BUSINESS'
     ]
   }))
-}
-
-export async function operatorCreateManager (queueId) {
-  return createFullOperator({
-    username: 'manager',
-    password: 'Passw0rd',
-    agentNumber: 'manager',
-    roles: [
-      'MANAGER'
-    ],
-    profile: {
-      queueId,
-      firstName: 'manager',
-      lastName: 'operator',
-      city: 'barcelona'
-    }
-  })
 }
