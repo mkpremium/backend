@@ -48,7 +48,10 @@ export function createAddNegotiationProposalController ({
     const buildingId = req.params.id
     const building = await legacyBuildingsRepository.findByIdOrThrow(buildingId)
     const proposal = await legacyBuildingsRepository.addNegotiationProposal(building, req.user.id, req.body)
-    await updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, OwnerBusinessStatus.PROPOSAL_SENT, req.user.id)
+    await updateBuildingNegotiationStatusService.updateBuildingStatus(
+      buildingId,
+      { status: OwnerBusinessStatus.PROPOSAL_SENT, userId: req.user.id, sourceOwnerId: building.ownerId }
+    )
 
     res.status(201).json(proposal)
   }
