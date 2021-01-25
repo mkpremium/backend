@@ -1,18 +1,21 @@
-import { spy } from 'sinon'
+import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import {
   BuildingNegotiationStatusChanged,
-  InvalidBuildingNegotiationStatus,
   UpdateBuildingNegotiationStatusService
 } from '../../../src/building/service/update-building-negotiation-status.service'
+import { BuildingV2 } from '../../../src/building/domain/building'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
   let buildingsRepository, service, eventBus
+  const testBuilding = BuildingV2({ id: 'test-building-id', negotiationStatus: 'PENDIENTE', files: [] })
 
   beforeEach(() => {
     buildingsRepository = {
-      setBuildingNegotiationStatus: spy()
+      get: stub(),
+      save: spy()
     }
+    buildingsRepository.get.withArgs('test-building-id').resolves(testBuilding)
     eventBus = {
       publish: spy()
     }
@@ -29,23 +32,24 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     'DESCARTADO'
   ]
   validNegotiationStatuses.forEach((status) => {
-    it(`accepts "${status}" as a valid negotiation status`, async () => {
-      await service.updateBuildingStatus('building-id', { status, userId: 'operator-id' })
+    it(`[${status}] saves building with new negotiation status`, async () => {
+      await service.updateBuildingStatus('test-building-id', { status, userId: 'operator-id' })
 
-      expect(buildingsRepository.setBuildingNegotiationStatus).to.have.been.calledWith('building-id', status)
+      expect(buildingsRepository.save).to.have.been
+        .calledWithMatch(b => BuildingV2.is(b) && b.id === 'test-building-id' && b.negotiationStatus === status)
     })
   })
 
-  it('rejects invalid negotiation statuses', async () => {
-    expect(service.updateBuildingStatus('building-id', { status: 'UNKNOWN STATUS', userId: 'operator-id' }))
-      .to.be.rejectedWith(InvalidBuildingNegotiationStatus)
+  it('rejects invalid negotiation statuses', () => {
+    return expect(service.updateBuildingStatus('test-building-id', { status: 'UNKNOWN STATUS', userId: 'operator-id' }))
+      .to.be.rejected
   })
 
   it('publishes negotiation status changed event', async () => {
-    await service.updateBuildingStatus('building-id', { status: 'COMPRADO', userId: 'operator-id' })
+    await service.updateBuildingStatus('test-building-id', { status: 'COMPRADO', userId: 'operator-id' })
 
     expect(eventBus.publish).to.have.been.deep.calledWith(new BuildingNegotiationStatusChanged(
-      'building-id',
+      'test-building-id',
       'operator-id',
       'COMPRADO'
     ))

@@ -1,5 +1,3 @@
-import { buildingNegotiationStatus } from '../building'
-
 /**
  * @property {BuildingsRepository} buildingsRepository
  * @property {EventBus} eventBus
@@ -11,11 +9,10 @@ export class UpdateBuildingNegotiationStatusService {
   }
 
   async updateBuildingStatus (buildingId, { status, userId }) {
-    if (buildingNegotiationStatus.indexOf(status) === -1) {
-      throw new InvalidBuildingNegotiationStatus(buildingId, status)
-    }
+    const building = await this.buildingsRepository.get(buildingId)
+    const updatedBuilding = building.changeNegotiationStatus(status)
 
-    await this.buildingsRepository.setBuildingNegotiationStatus(buildingId, status)
+    await this.buildingsRepository.save(updatedBuilding)
     await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, userId, status))
   }
 }
@@ -28,13 +25,5 @@ export class BuildingNegotiationStatusChanged {
     this.operatorId = operatorId
     this.negotiationStatus = negotiationStatus
     this.buildingId = buildingId
-  }
-}
-
-export class InvalidBuildingNegotiationStatus extends Error {
-  constructor (buildingId, negotiationStatus) {
-    super(`Invalid negotiation status ${negotiationStatus} for building ${buildingId}`)
-    this.buildingId = buildingId
-    this.negotiationStatus = negotiationStatus
   }
 }

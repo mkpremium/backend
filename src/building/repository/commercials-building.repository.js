@@ -2,7 +2,7 @@ import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import moment from 'moment'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { BuildingV2 } from './buildings.repository'
+import { BuildingV2 } from '../domain/building'
 
 const listBuildingsByIdQuery = bucketName => `
 SELECT
