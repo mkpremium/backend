@@ -16,7 +16,7 @@ import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 describe('Building listing endpoint', () => {
   let app, businessUser
 
-  before(async () => {
+  beforeEach(async () => {
     app = await initApplication()
     businessUser = await operatorCreateBusiness()
   })
@@ -25,12 +25,12 @@ describe('Building listing endpoint', () => {
     const testMetadataId = 'test-metadata-1'
     const building1 = await createBuilding(app, {
       id: 'test-building1',
-      metadata: [{
+      metadata: [ {
         id: testMetadataId,
         name: '5325108TG3452E0001YT.jpg',
         mimeType: 'image/jpeg',
         previewUrl: 'https://mkpremium-files.s3.eu-west-2.amazonaws.com/preview/ffe6fa34-28bf-4da8-9695-53b7bf421648.jpg'
-      }],
+      } ],
       cadastre: {
         address: '',
         reference: 'test-building1-cadastre-reference'
@@ -79,9 +79,9 @@ describe('Building listing endpoint', () => {
       propertyAgentId: businessUser.id
     })).close
 
-    const building2 = await createBuilding(app, {id: 'test-building2'})
+    const building2 = await createBuilding(app, { id: 'test-building2' })
 
-    await authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
+    return authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         expect(response.body).to.be.deep.equal([

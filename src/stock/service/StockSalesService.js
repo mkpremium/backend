@@ -24,8 +24,7 @@ export class StockSalesService {
     await this.updateBuildingNegotiationStatusService
       .updateBuildingStatus(
         params.buildingId,
-        OwnerBusinessStatus.ALREADY_SOLD,
-        operatorId
+        { status: OwnerBusinessStatus.ALREADY_SOLD, userId: operatorId }
       )
 
     return result
