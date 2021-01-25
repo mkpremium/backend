@@ -17,7 +17,7 @@ export class UpdateBuildingNegotiationStatusService {
   }
 }
 
-export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'BUILDING_NEGOTIATION_STATUS_CHANGED'
+export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'building.negotiation-status-changed'
 
 export class BuildingNegotiationStatusChanged {
   constructor (buildingId, operatorId, negotiationStatus) {
