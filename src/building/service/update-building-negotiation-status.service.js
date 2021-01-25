@@ -10,17 +10,18 @@ export class UpdateBuildingNegotiationStatusService {
     this.eventBus = eventBus
   }
 
-  async updateBuildingStatus (buildingId, negotiationStatus, operatorId) {
-    if (buildingNegotiationStatus.indexOf(negotiationStatus) === -1) {
-      throw new InvalidBuildingNegotiationStatus(buildingId, negotiationStatus)
+  async updateBuildingStatus (buildingId, { status, userId }) {
+    if (buildingNegotiationStatus.indexOf(status) === -1) {
+      throw new InvalidBuildingNegotiationStatus(buildingId, status)
     }
 
-    await this.buildingsRepository.setBuildingNegotiationStatus(buildingId, negotiationStatus)
-    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, operatorId, negotiationStatus))
+    await this.buildingsRepository.setBuildingNegotiationStatus(buildingId, status)
+    await this.eventBus.publish(new BuildingNegotiationStatusChanged(buildingId, userId, status))
   }
 }
 
 export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'BUILDING_NEGOTIATION_STATUS_CHANGED'
+
 export class BuildingNegotiationStatusChanged {
   constructor (buildingId, operatorId, negotiationStatus) {
     this.name = BUILDING_NEGOTIATION_STATUS_CHANGED

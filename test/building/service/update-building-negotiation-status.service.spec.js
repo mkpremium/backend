@@ -30,23 +30,19 @@ describe('UpdateBuildingNegotiationStatusService', () => {
   ]
   validNegotiationStatuses.forEach((status) => {
     it(`accepts "${status}" as a valid negotiation status`, async () => {
-      await service.updateBuildingStatus('building-id', status, 'operator-id')
+      await service.updateBuildingStatus('building-id', { status, userId: 'operator-id' })
 
       expect(buildingsRepository.setBuildingNegotiationStatus).to.have.been.calledWith('building-id', status)
     })
   })
 
   it('rejects invalid negotiation statuses', async () => {
-    try {
-      await service.updateBuildingStatus('building-id', 'UNKNOWN STATUS', 'operator-id')
-      expect.fail()
-    } catch (e) {
-      expect(e).to.be.an.instanceof(InvalidBuildingNegotiationStatus)
-    }
+    expect(service.updateBuildingStatus('building-id', { status: 'UNKNOWN STATUS', userId: 'operator-id' }))
+      .to.be.rejectedWith(InvalidBuildingNegotiationStatus)
   })
 
   it('publishes negotiation status changed event', async () => {
-    await service.updateBuildingStatus('building-id', 'COMPRADO', 'operator-id')
+    await service.updateBuildingStatus('building-id', { status: 'COMPRADO', userId: 'operator-id' })
 
     expect(eventBus.publish).to.have.been.deep.calledWith(new BuildingNegotiationStatusChanged(
       'building-id',
