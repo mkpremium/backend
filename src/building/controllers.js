@@ -24,18 +24,6 @@ export function createListBuildingProposalsController (listBuildingProposalsServ
   })
 }
 
-/**
- * @param {UpdateBuildingNegotiationStatusService} updateBuildingNegotiationStatusService
- * @returns { | }
- */
-export function createUpdateBuildingNegotiationStatusController (updateBuildingNegotiationStatusService) {
-  return wrap(async (req, res) => {
-    await updateBuildingNegotiationStatusService.updateBuildingStatus(
-      req.params.buildingId, req.body.status, req.user.id)
-    res.json()
-  })
-}
-
 async function addMetadataToBuilding (req, res) {
   const legacyBuildingRepository = new LegacyBuildingRepository()
   const buildingId = req.params.id
@@ -52,11 +40,14 @@ async function createMetadataUploadUrl (req, res) {
   res.json({ url })
 }
 
-export function createAddNegotiationProposalController (legacyBuildingRepository, updateBuildingNegotiationStatusService) {
+export function createAddNegotiationProposalController ({
+  legacyBuildingsRepository,
+  updateBuildingNegotiationStatusService
+}) {
   return async (req, res) => {
     const buildingId = req.params.id
-    const building = await legacyBuildingRepository.findByIdOrThrow(buildingId)
-    const proposal = await legacyBuildingRepository.addNegotiationProposal(building, req.user.id, req.body)
+    const building = await legacyBuildingsRepository.findByIdOrThrow(buildingId)
+    const proposal = await legacyBuildingsRepository.addNegotiationProposal(building, req.user.id, req.body)
     await updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, OwnerBusinessStatus.PROPOSAL_SENT, req.user.id)
 
     res.status(201).json(proposal)

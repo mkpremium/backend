@@ -2,7 +2,6 @@ import { Router } from 'express'
 import {
   addMetadataToBuildingController,
   addOwnerToBuildingController,
-  createAddNegotiationProposalController,
   createAllAgentsStockStatsController,
   createListBuildingProposalsController,
   createListBuildingsController,
@@ -10,7 +9,6 @@ import {
   createMetadataUploadUrlController,
   createSetBuildingSalePriceController,
   createSignDocumentsUrlController,
-  createUpdateBuildingNegotiationStatusController,
   updateNegotiationProposalController
 } from './controllers'
 import { wrap } from 'express-promise-wrap'
@@ -19,7 +17,6 @@ export const createBuildingRoutes = (
   listBuildingsService,
   listBuildingProposalsService,
   legacyOwnerRepository,
-  updateBuildingNegotiationStatusService,
   legacyBuildingRepository,
   adminBuildingRepository,
   setBuildingSalePriceService,
@@ -35,7 +32,7 @@ export const createBuildingRoutes = (
 
   router.post('/:buildingId/documents-signed-urls', createSignDocumentsUrlController(getDocumentsSignedURLService))
 
-  router.post('/:id/negotiation', createAddNegotiationProposalController(legacyBuildingRepository, updateBuildingNegotiationStatusService))
+  router.post('/:id/negotiation', wrap(awilixContainer.resolve('addNegotiationProposalController')))
 
   router.get('/:buildingId/proposals', createListBuildingProposalsController(listBuildingProposalsService))
 
@@ -52,7 +49,7 @@ export const createBuildingRoutes = (
 
   router.put(
     '/:buildingId/negotiation-status',
-    createUpdateBuildingNegotiationStatusController(updateBuildingNegotiationStatusService)
+    awilixContainer.resolve('updateBuildingNegotiationStatusController')
   )
 
   router.put(

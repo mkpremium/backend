@@ -11,6 +11,9 @@ import { SetBuildingSalePriceService } from './service/set-building-sale-price.s
 import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
 import { FeaturedOwnerService } from './service/featured-owner.service'
 import { AddProposalService } from './service/add-proposal.service'
+import { createUpdateBuildingNegotiationStatusController } from './controller/update-building-negotiation-status.controller'
+import { UpdateBuildingNegotiationStatusService } from './service/update-building-negotiation-status.service'
+import { createAddNegotiationProposalController } from './controllers'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -19,21 +22,23 @@ export const setupDependencies = awilixContainer => {
   awilixContainer.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
-    addProposalService: asClass(AddProposalService).singleton(),
+    addProposalService: asClass(AddProposalService).singleton().classic(),
+    updateBuildingNegotiationStatusService: asClass(UpdateBuildingNegotiationStatusService).singleton().classic(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
 
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
-    setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton()
+    setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
+    updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
+    addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton()
   })
 }
 
 export const oldInit = (app, awilixContainer, {
   listBuildingsService,
   listBuildingProposalsService,
-  updateBuildingNegotiationStatusService,
   adminBuildingRepository,
   getDocumentsSignedURLService,
   eventBus,
@@ -50,16 +55,5 @@ export const oldInit = (app, awilixContainer, {
   })
 
   const secured = jwt()
-  app.use('/buildings', secured, createBuildingRoutes(
-    listBuildingsService,
-    listBuildingProposalsService,
-    awilixContainer.resolve('legacyOwnersRepository'),
-    updateBuildingNegotiationStatusService,
-    awilixContainer.resolve('legacyBuildingsRepository'),
-    adminBuildingRepository,
-    awilixContainer.resolve('setBuildingSalePriceService'),
-    getDocumentsSignedURLService,
-    awilixContainer.resolve('listBuildingOwnersController'),
-    awilixContainer
-  ))
+  app.use('/buildings', secured, createBuildingRoutes(listBuildingsService, listBuildingProposalsService, awilixContainer.resolve('legacyOwnersRepository'), awilixContainer.resolve('legacyBuildingsRepository'), adminBuildingRepository, awilixContainer.resolve('setBuildingSalePriceService'), getDocumentsSignedURLService, awilixContainer.resolve('listBuildingOwnersController'), awilixContainer))
 }
