@@ -194,3 +194,11 @@ Building.prototype.changeNegotiationStatus = function (newStatus) {
     }
   })
 }
+
+Building.prototype.withFeaturedOwner = function (ownerId) {
+  return Building.update(this, {
+    ownerId: {
+      $set: ownerId
+    }
+  })
+}

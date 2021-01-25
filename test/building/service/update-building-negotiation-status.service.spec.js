@@ -64,4 +64,14 @@ describe('UpdateBuildingNegotiationStatusService', () => {
       status: 'COMPRADO'
     })
   })
+
+  it('saves source owner as featured owner', async () => {
+    await service.updateBuildingStatus('test-building-id', {
+      status: 'COMPRADO',
+      userId: 'operator-id',
+      sourceOwnerId: 'test-source-owner-id'
+    })
+
+    expect(buildingsRepository.save).to.have.been.calledWithMatch(b => b.ownerId === 'test-source-owner-id')
+  })
 })
