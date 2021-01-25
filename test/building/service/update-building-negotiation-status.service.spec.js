@@ -1,9 +1,6 @@
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
-import {
-  BuildingNegotiationStatusChanged,
-  UpdateBuildingNegotiationStatusService
-} from '../../../src/building/service/update-building-negotiation-status.service'
+import { UpdateBuildingNegotiationStatusService } from '../../../src/building/service/update-building-negotiation-status.service'
 import { BuildingV2 } from '../../../src/building/domain/building'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
@@ -48,10 +45,11 @@ describe('UpdateBuildingNegotiationStatusService', () => {
   it('publishes negotiation status changed event', async () => {
     await service.updateBuildingStatus('test-building-id', { status: 'COMPRADO', userId: 'operator-id' })
 
-    expect(eventBus.publish).to.have.been.deep.calledWith(new BuildingNegotiationStatusChanged(
-      'test-building-id',
-      'operator-id',
-      'COMPRADO'
-    ))
+    expect(eventBus.publish).to.have.been.deep.calledWith({
+      name: 'building.negotiation-status-changed',
+      buildingId: 'test-building-id',
+      userId: 'operator-id',
+      status: 'COMPRADO'
+    })
   })
 })
