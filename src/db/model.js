@@ -193,8 +193,7 @@ export class CouchbaseModel {
     const queryParam = queryBuilder.toParam()
 
     try {
-      const n1ql = N1qlQuery.fromString(queryParam.text)
-      n1ql.consistency(consistency)
+      const n1ql = N1qlQuery.fromString(queryParam.text).consistency(consistency)
       const result = await this._bucket.queryAsync(n1ql, queryParam.values)
       logger.debug('model#query', { consistency, queryParam, queryBuilder, result })
       return result
