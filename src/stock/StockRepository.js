@@ -3,7 +3,8 @@ import { N1qlQuery } from 'couchbase'
 const statsByPropertyManagerInPeriodQuery = bucketName => `
     SELECT
         stock.close.operatorId as propertyManagerId,
-        SUM(stock.sell.transactionAmount - stock.purchase.transactionAmount) - SUM(building.totalExpensesAmount) as profitAmount
+        SUM(stock.sell.transactionAmount - stock.purchase.transactionAmount)
+        - SUM(IFNULL(building.totalExpensesAmount, 0)) as profitAmount
     FROM ${bucketName} stock
     LEFT JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = stock.buildingId
     WHERE stock._documentType = 'stock'
