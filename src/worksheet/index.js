@@ -13,13 +13,7 @@ import { LegacyWorksheetQueueRepository } from './models/queue-repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { WorksheetRepository } from './repository/worksheet.repository'
 
-/**
- * @param app
- * @param {AwilixContainer} awilixContainer
- */
-export default (app, awilixContainer) => {
-  const secured = jwt()
-
+export const setupWorksheetDependencies = awilixContainer => {
   awilixContainer.register({
     takeWorksheetService: asClass(WorksheetQueueActionsService).classic().singleton(),
     takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),
@@ -32,6 +26,14 @@ export default (app, awilixContainer) => {
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
     legacyWorksheetQueueRepository: asClass(LegacyWorksheetQueueRepository).classic().singleton()
   })
+}
+
+/**
+ * @param app
+ * @param {AwilixContainer} awilixContainer
+ */
+export const setupWorksheetRoutesAndEventListeners = (app, awilixContainer) => {
+  const secured = jwt()
 
   setupEventListeners(awilixContainer.resolve('eventBus'), {
     legacyWorksheetRepository: awilixContainer.resolve('legacyWorksheetRepository'),
