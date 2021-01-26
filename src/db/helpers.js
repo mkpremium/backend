@@ -27,7 +27,7 @@ export async function removeAll () {
   const queryString = N1qlQuery
     .fromString(`DELETE FROM ${couchbase.bucket}`)
     .consistency(N1qlQuery.Consistency.STATEMENT_PLUS)
-  await this.query(queryString)
+  await this.queryAsync(queryString)
 }
 
 function attach (bucket) {
