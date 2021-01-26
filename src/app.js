@@ -18,7 +18,7 @@ import { createTestHarness } from './test-harness/routes'
 import worksheet from './worksheet'
 import { setupOwnersRoutes } from './owner'
 import calls from './calls'
-import scheduledEvents from './scheduled-events'
+import { setupScheduledEventsRoutes } from './scheduled-events'
 import webhooks from './webhooks'
 import history from './history'
 import notes from './notes'
@@ -54,7 +54,7 @@ dependenciesPromise.then(couchbaseBucket => {
 
   oldInit(app, awilixContainer, dependenciesContainer)
   setupOwnersRoutes(app, awilixContainer)
-  scheduledEvents(app, awilixContainer)
+  setupScheduledEventsRoutes(app, awilixContainer)
   worksheet(app, awilixContainer)
 
   createTestHarness(app, awilixContainer)

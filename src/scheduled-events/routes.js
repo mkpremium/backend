@@ -1,27 +1,24 @@
 import { Router } from 'express'
 
 import {
-  addScheduledCallEventController,
   findScheduledEventController,
   listScheduledEventController,
   updateScheduledEventController,
-  weekScheduleEventMeetingsController,
-
-  createAddScheduledMeetingEventController,
-  createDeleteScheduledEventController
+  weekScheduleEventMeetingsController
 } from './controllers'
-import { createGetUserScheduledCallsController } from './controller/get-user-scheduled-calls.controller'
+import { wrap } from 'express-promise-wrap'
 
-export const createScheduleEventsRoutes = (createMeetingService, scheduledCallsService, eventBus) => {
+export const createScheduleEventsRoutes = awilixContainer => {
   const router = Router()
 
   router.get('/week', weekScheduleEventMeetingsController)
   router.get('/', listScheduledEventController)
-  router.post('/call', addScheduledCallEventController)
-  router.post('/meeting', createAddScheduledMeetingEventController(createMeetingService))
-  router.get('/calls', createGetUserScheduledCallsController(scheduledCallsService))
+  router.post('/call', wrap(awilixContainer.resolve('addScheduledCallController')))
+  router.post('/meeting', wrap(awilixContainer.resolve('addMeetingController')))
+  router.get('/calls', wrap(awilixContainer.resolve('getUserScheduledCallsController')))
+
   router.put('/:id', updateScheduledEventController)
-  router.delete('/:id', createDeleteScheduledEventController(eventBus))
+  router.delete('/:id', wrap(awilixContainer.resolve('deleteScheduledEventController')))
   router.get('/:id', findScheduledEventController)
 
   return router

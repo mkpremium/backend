@@ -27,6 +27,7 @@ import { ListBuildingProposalsService } from '../building/service/list-building-
 import { asClass, asValue, createContainer } from 'awilix'
 import { setupDependencies as setupBuildingDependencies } from '../building'
 import { setupOwnerDependencies } from '../owner'
+import { setupScheduledEventsDependencies } from '../scheduled-events'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -111,6 +112,7 @@ export const createAwilixContainer = couchbaseBucket => {
 
   setupBuildingDependencies(awilixContainer)
   setupOwnerDependencies(awilixContainer)
+  setupScheduledEventsDependencies(awilixContainer)
 
   return awilixContainer
 }
