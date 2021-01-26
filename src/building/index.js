@@ -14,6 +14,7 @@ import { AddProposalService } from './service/add-proposal.service'
 import { createUpdateBuildingNegotiationStatusController } from './controller/update-building-negotiation-status.controller'
 import { UpdateBuildingNegotiationStatusService } from './service/update-building-negotiation-status.service'
 import { createAddNegotiationProposalController } from './controllers'
+import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -32,7 +33,9 @@ export const setupDependencies = awilixContainer => {
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
     updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
-    addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton()
+    addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),
+
+    scheduledCallListener: asFunction(createScheduledCallListener).singleton()
   })
 }
 
@@ -53,6 +56,7 @@ export const oldInit = (app, awilixContainer, {
     })
     await buildingNotesRepository.save(note)
   })
+  eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 
   const secured = jwt()
   app.use('/buildings', secured, createBuildingRoutes(listBuildingsService, listBuildingProposalsService, awilixContainer.resolve('legacyOwnersRepository'), awilixContainer.resolve('legacyBuildingsRepository'), adminBuildingRepository, awilixContainer.resolve('setBuildingSalePriceService'), getDocumentsSignedURLService, awilixContainer.resolve('listBuildingOwnersController'), awilixContainer))
