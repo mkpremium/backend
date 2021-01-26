@@ -20,8 +20,9 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   ramQuotaMB: BUCKET_MIN_REQUIRED_MB
 })
 
-const CONNECTION_WAIT_TIME = 60000
-const BUCKET_CREATION_WAIT_TIME = 60000
+const ONE_MINUTE = 60000
+const CONNECTION_WAIT_TIME = ONE_MINUTE
+const BUCKET_CREATION_WAIT_TIME = 2 * ONE_MINUTE
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
 
@@ -54,7 +55,7 @@ createBucket()
         .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
         .catch(error => {
           console.warn('Primary index creation failed on first attempt, retrying', { error })
-          return Promise.delay(60000).then(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }))
+          return Promise.delay(ONE_MINUTE).then(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }))
         })
         .catch(error => {
           console.error('Primary index creation failed', { error })
