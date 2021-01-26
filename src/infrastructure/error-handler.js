@@ -9,7 +9,7 @@ export function appErrorHandler (error, req, res, next) {
   }
 
   if (error instanceof EntityNotFound) {
-    res.status(404).send()
+    res.sendStatus(404)
     return
   }
 
