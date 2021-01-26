@@ -3,8 +3,9 @@ import { N1qlQuery } from 'couchbase'
 const statsByPropertyManagerInPeriodQuery = bucketName => `
     SELECT
         stock.close.operatorId as propertyManagerId,
-        SUM(stock.sell.transactionAmount - stock.purchase.transactionAmount) as profitAmount
+        SUM(stock.sell.transactionAmount - stock.purchase.transactionAmount) - SUM(building.totalExpensesAmount) as profitAmount
     FROM ${bucketName} stock
+    LEFT JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = stock.buildingId
     WHERE stock._documentType = 'stock'
       AND stock.close IS NOT NULL
       AND stock.close.transactionDate BETWEEN $1 AND $2
@@ -15,12 +16,15 @@ const propertyManagerProfitInPeriodQuery = bucketName => `
 SELECT
   agent.profitGoal.amount as profitGoal,
   agent.profile.city as agentCity,
-  ARRAY_SUM(ARRAY (s.sell.transactionAmount - s.purchase.transactionAmount) FOR s IN stock END)  as profitAmount
+  ARRAY_SUM(ARRAY (s.sell.transactionAmount - s.purchase.transactionAmount) FOR s IN stock END)
+  - ARRAY_SUM(ARRAY (b.totalExpensesAmount) FOR b IN building END) as profitAmount
 FROM ${bucketName} agent
 LEFT NEST ${bucketName} stock ON stock._documentType = 'stock'
     AND stock.close IS NOT NULL
     AND stock.close.operatorId = agent.id
     AND stock.close.transactionDate BETWEEN $2 AND $3
+LEFT NEST ${bucketName} building ON building._documentType = 'building'
+    AND ANY s IN stock SATISFIES s.buildingId = building.id END
 WHERE agent._documentType = 'operator' AND agent.id = $1
 `
 
