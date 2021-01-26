@@ -48,33 +48,30 @@ createBucket()
     const bucketManager = Promise.promisifyAll(bucket.manager())
 
     console.info({ bucketSource })
-    if (bucketSource === NEW_BUCKET) {
-      console.info('Initializing new bucket')
-      console.info('Creating primary index')
-      return bucketManager
-        .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
-        .catch(error => {
-          console.warn('Primary index creation failed on first attempt, retrying', { error })
-          return Promise.delay(BUCKET_CREATION_WAIT_TIME).then(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }))
-        })
-        .catch(error => {
-          console.error('Primary index creation failed', { error })
-          throw error
-        })
-        .then(() => {
-          console.info('Creating application indexes')
-          return bucketManager.createIndexAsync(
-            `${bucketName}_document-type`,
-            [ '_documentType' ],
-            {
-              ignoreIfExists: true, deferred: false
-            }
-          )
-        })
-    } else {
-      console.info('Flushing existing bucket')
-      return bucketManager.flushAsync()
-    }
+    console.info('Creating primary index')
+    return bucketManager
+      .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
+      .catch(error => {
+        console.warn('Primary index creation failed on first attempt, retrying', { error })
+        return Promise.delay(BUCKET_CREATION_WAIT_TIME).then(() => bucketManager.createPrimaryIndexAsync({
+          name: `${bucketName}_primary`,
+          ignoreIfExists: true
+        }))
+      })
+      .catch(error => {
+        console.error('Primary index creation failed', { error })
+        throw error
+      })
+      .then(() => {
+        console.info('Creating application indexes')
+        return bucketManager.createIndexAsync(
+          `${bucketName}_document-type`,
+          [ '_documentType' ],
+          {
+            ignoreIfExists: true, deferred: false
+          }
+        )
+      })
   })
   .then(() => {
     console.info('Done!')
