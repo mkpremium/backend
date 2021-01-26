@@ -15,6 +15,7 @@ SELECT
     building.ownerId,
     building.negotiationStatus,
     building.salePrice,
+    building.totalExpensesAmount,
 
     stock[0] stock,
 
@@ -90,7 +91,7 @@ export class CommercialsBuildingRepository {
     return buildings.map(
       ({
         id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
-        ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice
+        ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
@@ -154,7 +155,8 @@ export class CommercialsBuildingRepository {
           lastMeeting: (lastMeeting && {
             dateMeeting: moment(lastMeeting.eventDate).format()
           }) || undefined,
-          salePrice: salePrice || undefined
+          salePrice: salePrice || undefined,
+          totalExpensesAmount: totalExpensesAmount || undefined
         })
       }
     )
