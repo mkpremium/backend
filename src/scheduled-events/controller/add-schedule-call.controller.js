@@ -1,8 +1,10 @@
 import { canScheduleCall } from '../../lib/role-operators'
-import { OperatorStats } from '../../stats/models'
-import { OperatorActions } from '../../stats/types'
 
-export const createAddScheduledCallController = ({ scheduledEventsRepository, legacyWorksheetQueueRepository }) => async (req, res) => {
+export const createAddScheduledCallController = ({
+  scheduledEventsRepository,
+  legacyWorksheetQueueRepository,
+  eventBus
+}) => async (req, res) => {
   canScheduleCall(req.user.operator, req.body.notifyTo)
 
   const scheduledEvent = await scheduledEventsRepository.addScheduleCallEvent(req.body, req.user.id)
@@ -10,6 +12,6 @@ export const createAddScheduledCallController = ({ scheduledEventsRepository, le
   const queue = await legacyWorksheetQueueRepository.findByIdOrThrow(req.user.operator.profile.queueId)
   await legacyWorksheetQueueRepository.scheduleWorksheetInQueue(queue, scheduledEvent)
 
-  await OperatorStats.registerAction(req.user.id, OperatorActions.SCHEDULE_CALL)
+  eventBus.publish({ name: 'scheduled_events.call_scheduled', by: req.user.id })
   res.status(201).json(scheduledEvent)
 }
