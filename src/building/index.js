@@ -1,6 +1,6 @@
 import './types'
 import { createBuildingRoutes } from './routes'
-import jwt from '../middleware/jwt'
+import jwt, { permissions } from '../middleware/jwt'
 import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { TNote } from '../notes/types'
 import { aliasTo, asClass, asFunction } from 'awilix'
@@ -15,6 +15,9 @@ import { createUpdateBuildingNegotiationStatusController } from './controller/up
 import { UpdateBuildingNegotiationStatusService } from './service/update-building-negotiation-status.service'
 import { createAddNegotiationProposalController } from './controllers'
 import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
+import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
+import { Router } from 'express'
+import { wrap } from 'express-promise-wrap'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -34,6 +37,7 @@ export const setupDependencies = awilixContainer => {
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
     updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
     addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),
+    setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
 
     scheduledCallListener: asFunction(createScheduledCallListener).singleton()
   })
@@ -59,5 +63,24 @@ export const oldInit = (app, awilixContainer, {
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 
   const secured = jwt()
-  app.use('/buildings', secured, createBuildingRoutes(listBuildingsService, listBuildingProposalsService, awilixContainer.resolve('legacyOwnersRepository'), awilixContainer.resolve('legacyBuildingsRepository'), adminBuildingRepository, awilixContainer.resolve('setBuildingSalePriceService'), getDocumentsSignedURLService, awilixContainer.resolve('listBuildingOwnersController'), awilixContainer))
+  const buildingsRoutes = createBuildingRoutes(
+    listBuildingsService,
+    listBuildingProposalsService,
+    awilixContainer.resolve('legacyOwnersRepository'),
+    awilixContainer.resolve('legacyBuildingsRepository'),
+    adminBuildingRepository,
+    awilixContainer.resolve('setBuildingSalePriceService'),
+    getDocumentsSignedURLService,
+    awilixContainer.resolve('listBuildingOwnersController'),
+    awilixContainer
+  )
+  app.use('/buildings', secured, buildingsRoutes)
+
+  const buildingRoutes = new Router()
+  buildingRoutes.put(
+    '/:buildingId/expenses',
+    permissions.admin,
+    wrap(awilixContainer.resolve('setBuildingExpensesController'))
+  )
+  app.use('/building', secured, buildingRoutes)
 }
