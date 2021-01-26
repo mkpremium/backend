@@ -4,7 +4,7 @@ import { canScheduleCall } from '../../lib/role-operators'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 
-export async function addScheduledCallEvent (req, res) {
+export const createAddScheduledCallController = () => async (req, res) => {
   const repo = new ScheduledEventsRepository()
   const queueRepo = new LegacyWorksheetQueueRepository()
 
@@ -18,5 +18,3 @@ export async function addScheduledCallEvent (req, res) {
   await OperatorStats.registerAction(req.user.id, OperatorActions.SCHEDULE_CALL)
   res.status(201).json(scheduledEvent)
 }
-
-export const createAddScheduledCallEventController = () => addScheduledCallEvent

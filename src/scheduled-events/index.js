@@ -10,7 +10,7 @@ import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
 import { MeetingsService } from './service/meetings.service'
 import { MeetingsRepository } from './repository/meetings.repository'
-import { createAddScheduledCallEventController } from './controller/add-schedule-call.controller'
+import { createAddScheduledCallController } from './controller/add-schedule-call.controller'
 import { createAddScheduledMeetingEventController } from './controller/add-meeting.controller'
 import { createGetUserScheduledCallsController } from './controller/get-user-scheduled-calls.controller'
 import { createDeleteScheduledEventController } from './controller/delete-scheduled-event.controller'
@@ -24,7 +24,7 @@ export const setupScheduledEventsDependencies = awilixContainer => {
     scheduledEventsRepository: asClass(ScheduledEventsRepository).singleton(),
     meetingsService: asClass(MeetingsService).singleton(),
 
-    addScheduledCallController: asFunction(createAddScheduledCallEventController).singleton(),
+    addScheduledCallController: asFunction(createAddScheduledCallController).singleton(),
     addMeetingController: asFunction(createAddScheduledMeetingEventController).singleton(),
     getUserScheduledCallsController: asFunction(createGetUserScheduledCallsController).singleton(),
     deleteScheduledEventController: asFunction(createDeleteScheduledEventController).singleton()
