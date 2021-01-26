@@ -18,6 +18,7 @@ import { createScheduledCallListener } from './event-listener/call-scheduled.lis
 import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
+import { SetBuildingExpensesService } from './service/set-building-expenses.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -28,6 +29,7 @@ export const setupDependencies = awilixContainer => {
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
     addProposalService: asClass(AddProposalService).singleton(),
     updateBuildingNegotiationStatusService: asClass(UpdateBuildingNegotiationStatusService).singleton().classic(),
+    setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),

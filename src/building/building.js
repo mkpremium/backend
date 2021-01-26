@@ -154,6 +154,7 @@ export const Building = t.struct(
     negotiationStatus: NegotiationStatus,
     assignedAgentId: t.maybe(t.String),
     salePrice: t.maybe(t.Number),
+    totalExpensesAmount: t.maybe(t.Number),
     isTest: t.maybe(t.Boolean),
 
     metadata: t.list(BuildingMetadataPreview),
@@ -191,6 +192,14 @@ Building.prototype.changeNegotiationStatus = function (newStatus) {
   return Building.update(this, {
     negotiationStatus: {
       $set: newStatus
+    }
+  })
+}
+
+Building.prototype.withTotalExpensesAmount = function (totalAmount) {
+  return Building.update(this, {
+    totalExpensesAmount: {
+      $set: totalAmount
     }
   })
 }

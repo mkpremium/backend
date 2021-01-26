@@ -2,22 +2,11 @@ import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import { UpdateBuildingNegotiationStatusService } from '../../../src/building/service/update-building-negotiation-status.service'
 import { Building } from '../../../src/building/building'
+import { buildingBuilder } from '../building.builder'
 
 describe('UpdateBuildingNegotiationStatusService', () => {
   let buildingsRepository, service, eventBus
-  const testBuilding = Building({
-    id: 'test-building-id',
-    buildingType: 'VERTICAL',
-    address: {
-      street: 'street, address',
-      number: '2a',
-      postalCode: {
-        verified: false
-      },
-      city: 'BARCELONA'
-    },
-    location: {}
-  })
+  const testBuilding = buildingBuilder().build()
 
   beforeEach(() => {
     buildingsRepository = {
