@@ -1,4 +1,7 @@
-export const createSetBuildingExpensesController = () => (req, res) => {
-  res.sendStatus(501)
-  return Promise.resolve()
+/**
+ * @param {SetBuildingExpensesService} setBuildingExpensesService
+ */
+export const createSetBuildingExpensesController = ({ setBuildingExpensesService }) => (req, res) => {
+  return setBuildingExpensesService.setTotalExpensesAmount(req.params.buildingId, req.body.total)
+    .then(() => res.sendStatus(200))
 }

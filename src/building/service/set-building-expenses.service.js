@@ -1,3 +1,6 @@
+/**
+ * @property {BuildingsRepository} buildingsRepository
+ */
 export class SetBuildingExpensesService {
   constructor ({ buildingsRepository }) {
     this.buildingsRepository = buildingsRepository
