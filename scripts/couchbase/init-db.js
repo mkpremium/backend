@@ -22,7 +22,7 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
 
 const ONE_MINUTE = 60000
 const CONNECTION_WAIT_TIME = ONE_MINUTE
-const BUCKET_CREATION_WAIT_TIME = 2 * ONE_MINUTE
+const RETRY_WAIT_TIME = 3 * ONE_MINUTE
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
 
@@ -30,12 +30,12 @@ console.info(`Initializating bucket with name ${bucketName}`)
 createBucket()
   .then(() => {
     console.info('Bucket created')
-    return Promise.delay(BUCKET_CREATION_WAIT_TIME).then(() => NEW_BUCKET)
+    return Promise.delay(RETRY_WAIT_TIME).then(() => NEW_BUCKET)
   })
   .catch(error => {
     if ([ 'ECONNREFUSED', 'ECONNRESET' ].indexOf(error.code) !== -1) {
       console.info(`Connection error, waiting ${CONNECTION_WAIT_TIME / 1000} seconds before retrying`, { code: error.code })
-      return Promise.delay(CONNECTION_WAIT_TIME).then(createBucket).delay(BUCKET_CREATION_WAIT_TIME).then(() => NEW_BUCKET)
+      return Promise.delay(CONNECTION_WAIT_TIME).then(createBucket).delay(RETRY_WAIT_TIME).then(() => NEW_BUCKET)
     } else if (error.statusCode === 400) {
       console.warn('Guessing error means that bucket already exists', { error })
       return EXISTING_BUCKET
@@ -53,7 +53,7 @@ createBucket()
       .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
       .catch(error => {
         console.warn('Primary index creation failed on first attempt, retrying', { error })
-        return Promise.delay(BUCKET_CREATION_WAIT_TIME).then(() => bucketManager.createPrimaryIndexAsync({
+        return Promise.delay(RETRY_WAIT_TIME).then(() => bucketManager.createPrimaryIndexAsync({
           name: `${bucketName}_primary`,
           ignoreIfExists: true
         }))
