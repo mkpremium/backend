@@ -20,7 +20,7 @@ describe('Assign Flipper To Caller Controller', () => {
     })
     assignFlipperStub.resolves()
 
-    const testResponse = { status: spy(), json: spy() }
+    const testResponse = { status: stub().returnsThis(), json: spy() }
 
     return controller(testRequest, testResponse).then(() => {
       expect(testResponse.status).to.have.been.calledWith(200)
@@ -36,7 +36,7 @@ describe('Assign Flipper To Caller Controller', () => {
     assignFlipperStub.withArgs(testCallerId, testFlipperId)
       .rejects(new CallerToFlipperAssignationRejected('rejection reason'))
 
-    const testResponse = { status: spy(), send: spy() }
+    const testResponse = { status: stub().returnsThis(), send: spy() }
 
     return controller(testRequest, testResponse).then(() => {
       expect(testResponse.status).to.have.been.calledWith(400)

@@ -1,9 +1,7 @@
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import moment from 'moment'
-import {
-  createAssignedFlipperScheduleMeetingController
-} from '../../../src/caller/controller/assigned-flipper-schedule-meeting.controller'
+import { createAssignedFlipperScheduleMeetingController } from '../../../src/caller/controller/assigned-flipper-schedule-meeting.controller'
 import { ClientError } from '../../../src/infrastructure/http'
 
 describe('Assigned Flipper Schedule Meeting Controller', () => {
@@ -35,7 +33,7 @@ describe('Assigned Flipper Schedule Meeting Controller', () => {
       }
     }
     const testResponse = {
-      status: spy(),
+      status: stub().returnsThis(),
       json: spy()
     }
 

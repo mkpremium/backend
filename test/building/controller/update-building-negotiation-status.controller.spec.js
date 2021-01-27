@@ -30,7 +30,8 @@ describe('Update Building Negotiation Status Controller', () => {
       }
     }
     const testResponse = {
-      sendStatus: spy()
+      status: stub().returnsThis(),
+      json: spy()
     }
 
     updateBuildingNegotiationStatusServiceSpy.updateBuildingStatus.resolves()
@@ -41,7 +42,8 @@ describe('Update Building Negotiation Status Controller', () => {
           sourceOwnerId: 'test-source-owner-id',
           status: 'COMPRADO'
         })
-      expect(testResponse.sendStatus).to.have.been.calledWith(200)
+      expect(testResponse.status).to.have.been.calledWith(200)
+      expect(testResponse.json).to.have.been.called
     })
   })
 })
