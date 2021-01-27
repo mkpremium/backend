@@ -3,5 +3,5 @@
  */
 export const createSetBuildingExpensesController = ({ setBuildingExpensesService }) => (req, res) => {
   return setBuildingExpensesService.setTotalExpensesAmount(req.params.buildingId, req.body.total)
-    .then(() => res.sendStatus(200))
+    .then(() => res.status(200).json())
 }

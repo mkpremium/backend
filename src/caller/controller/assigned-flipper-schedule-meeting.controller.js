@@ -26,7 +26,7 @@ export const createAssignedFlipperScheduleMeetingController = ({ createMeetingSe
       worksheetId: createMeetingRequest.worksheetId
     }
   }).then(() => {
-    res.sendStatus(201)
+    res.status(201).json()
   })
 }
 

@@ -8,7 +8,7 @@ export const createAssignFlipperToCallerController = ({ assignFlipperToCallerSer
 
   return assignFlipperToCallerService.assign(callerId, flipperId)
     .then(() => {
-      res.sendStatus(200)
+      res.status(200).json()
     }).catch(error => {
       if (error instanceof CallerToFlipperAssignationRejected) {
         res.status(400)

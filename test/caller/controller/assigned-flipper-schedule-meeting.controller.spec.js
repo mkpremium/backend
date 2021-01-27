@@ -35,7 +35,8 @@ describe('Assigned Flipper Schedule Meeting Controller', () => {
       }
     }
     const testResponse = {
-      sendStatus: spy()
+      status: spy(),
+      json: spy()
     }
 
     return controller(testRequest, testResponse).then(() => {
@@ -53,7 +54,7 @@ describe('Assigned Flipper Schedule Meeting Controller', () => {
         eventDate: testMeetingAt
       }
       expect(createMeetingSpy).to.have.been.calledWith(testRequest.user.operator, expectedCreateMeetingCommand)
-      expect(testResponse.sendStatus).to.have.been.calledWith(201)
+      expect(testResponse.status).to.have.been.calledWith(201)
     })
   })
 
@@ -71,7 +72,8 @@ describe('Assigned Flipper Schedule Meeting Controller', () => {
       body: {}
     }
     const testResponse = {
-      sendStatus: spy()
+      status: spy(),
+      json: spy()
     }
 
     expect(() => controller(testRequest, testResponse)).to.throws(ClientError)

@@ -8,6 +8,6 @@ export function createUpdateBuildingNegotiationStatusController ({ updateBuildin
     const { status, sourceOwnerId } = req.body
     await updateBuildingNegotiationStatusService.updateBuildingStatus(
       req.params.buildingId, { status, sourceOwnerId, userId: req.user.id })
-    res.sendStatus(200)
+    res.status(200).json()
   })
 }

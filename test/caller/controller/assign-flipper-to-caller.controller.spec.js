@@ -20,10 +20,11 @@ describe('Assign Flipper To Caller Controller', () => {
     })
     assignFlipperStub.resolves()
 
-    const testResponse = { sendStatus: spy() }
+    const testResponse = { status: spy(), json: spy() }
 
     return controller(testRequest, testResponse).then(() => {
-      expect(testResponse.sendStatus).to.have.been.calledWith(200)
+      expect(testResponse.status).to.have.been.calledWith(200)
+      expect(testResponse.json).to.have.been.called
     })
   })
 
