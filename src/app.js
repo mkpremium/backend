@@ -36,7 +36,7 @@ import meeting from './meeting'
 import user from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
-import { initCallerModule } from './caller/init'
+import { setupCallerRoutes } from './caller/init'
 import { initFlipperModule } from './flipper/init'
 
 const app = express()
@@ -60,7 +60,7 @@ dependenciesPromise.then(couchbaseBucket => {
   createTestHarness(app, awilixContainer)
   initPropertyManager(app, dependenciesContainer)
   initFlipperModule(app, awilixContainer)
-  initCallerModule(app, awilixContainer)
+  setupCallerRoutes(app, awilixContainer)
   stats(app, awilixContainer)
   app.use(appErrorHandler)
 

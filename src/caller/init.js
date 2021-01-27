@@ -9,18 +9,7 @@ import { AssignFlipperToCallerService } from './service/assign-flipper-to-caller
 import { createAssignedFlipperBlockedAvailabilityController } from './controller/assigned-flipper-blocked-availability.controller'
 import { createAssignedFlipperScheduleMeetingController } from './controller/assigned-flipper-schedule-meeting.controller'
 
-export const initCallerModule = (app, awilixContainer) => {
-  const secured = jwt()
-
-  app.use('/caller',
-    secured,
-    createRouter(awilixContainer)
-  )
-}
-
-const createRouter = (awilixContainer) => {
-  const router = new Router()
-
+export const setupCallerDependencies = awilixContainer => {
   awilixContainer.register({
     getNextCallerWorksheetController: asFunction(createGetNextCallerWorksheetController),
     takeWorksheetInQueueController: asFunction(createTakeWorksheetInQueueController),
@@ -35,6 +24,19 @@ const createRouter = (awilixContainer) => {
         })
       })
   })
+}
+
+export const setupCallerRoutes = (app, awilixContainer) => {
+  const secured = jwt()
+
+  app.use('/caller',
+    secured,
+    createRouter(awilixContainer)
+  )
+}
+
+const createRouter = awilixContainer => {
+  const router = new Router()
 
   router.post('/next-worksheet', permissions.operator, wrap(awilixContainer.resolve('getNextCallerWorksheetController')))
   router.post('/assigned-queue/:worksheetId', wrap(awilixContainer.resolve('takeWorksheetInQueueController')))

@@ -8,16 +8,16 @@ import { WorksheetQueueRepository } from './repository/worksheet-queue.repositor
 import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import { setupEventListeners } from './event-listeners'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
-import { asClass } from 'awilix'
+import { aliasTo, asClass } from 'awilix'
 import { LegacyWorksheetQueueRepository } from './models/queue-repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { WorksheetRepository } from './repository/worksheet.repository'
 
 export const setupWorksheetDependencies = awilixContainer => {
   awilixContainer.register({
-    takeWorksheetService: asClass(WorksheetQueueActionsService).classic().singleton(),
+    worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
+    takeWorksheetService: aliasTo('worksheetQueueActionsService'),
     takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),
-    worksheetQueueActionsService: asClass(TakeNextWorksheetService).classic().singleton(),
     releaseUserOtherActiveWorksheetsInQueueService: asClass(ReleaseUserExtraOpenedWorksheetsInQueueService).classic().singleton()
       .inject(() => ({ maxOpenedWorksheetPerQueueAndUser: 2 })),
 

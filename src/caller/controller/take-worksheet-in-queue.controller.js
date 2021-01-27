@@ -1,8 +1,8 @@
 /**
- * @param {WorksheetQueueActionsService} worksheetQueueActionsService
+ * @param {WorksheetQueueActionsService} takeWorksheetService
  */
-export const createTakeWorksheetInQueueController = ({ worksheetQueueActionsService }) => (req, res) => {
-  return worksheetQueueActionsService.takeWorksheetInQueue(
+export const createTakeWorksheetInQueueController = ({ takeWorksheetService }) => (req, res) => {
+  return takeWorksheetService.takeWorksheetInQueue(
     req.user.operator.profile.queueId,
     req.params.worksheetId,
     req.user.id
