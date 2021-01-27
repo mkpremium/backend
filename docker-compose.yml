@@ -49,18 +49,6 @@ services:
 
     entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "node", "/app/bin/socket.js"]
 
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./infrastructure/nginx/conf:/etc/nginx/conf.d
-      - ./infrastructure/nginx/conf/ssl:/etc/ssl
-    ports:
-      - "80:80"
-      - "443:443"
-    links:
-      - websocket
-      - api
-
   couchbase_db:
     image: "jvelasco/couchbase-dev"
 
