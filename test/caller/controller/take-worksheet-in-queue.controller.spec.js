@@ -13,7 +13,7 @@ describe('Take Worksheet In Queue Controller', () => {
     }
 
     const controller = createTakeWorksheetInQueueController({
-      worksheetQueueActionsService: worksheetQueueActionsServiceMock
+      takeWorksheetService: worksheetQueueActionsServiceMock
     })
 
     const testRequest = {
