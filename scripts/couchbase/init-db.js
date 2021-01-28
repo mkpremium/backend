@@ -7,17 +7,17 @@ const config = {
   password: process.env.COUCHBASE_PASS || 'couchbase',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
 }
-const BUCKET_MIN_REQUIRED_MB = 100
-
 const bucketName = config.bucketName
 
 const cluster = Promise.promisifyAll(new couchbase.Cluster(config.connString))
 
 cluster.authenticate(config.username, config.password)
+
 const clusterManager = Promise.promisifyAll(cluster.manager())
+const CLUSTER_MAX_MEMORY_MB = 512
 const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   flushEnabled: 1,
-  ramQuotaMB: BUCKET_MIN_REQUIRED_MB + 100
+  ramQuotaMB: CLUSTER_MAX_MEMORY_MB
 })
 
 const ONE_MINUTE = 60000
