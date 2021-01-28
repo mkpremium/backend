@@ -16,13 +16,13 @@ export async function deleteAll () {
 
 export const defaultPassword = 'Passw0rd'
 
-export async function operatorLogin (app, credentials = {username: 'admin', password: defaultPassword}) {
+export async function operatorLogin (app, credentials = { username: 'admin', password: defaultPassword }) {
   const response = await request(app)
     .post('/operators/login')
     .send(credentials)
     .expect(200)
 
-  return Object.assign({}, response.body, {authorization: `Bearer ${response.body.token}`})
+  return Object.assign({}, response.body, { authorization: `Bearer ${response.body.token}` })
 }
 
 export async function createFullOperator (object) {
@@ -31,7 +31,7 @@ export async function createFullOperator (object) {
 }
 
 export async function operatorCreate () {
-  return createFullOperator(buildOperator({
+  return createFullOperator(buildUser({
     username: 'operator',
     roles: [
       'OPERATOR'
@@ -43,7 +43,7 @@ const defaultOperatorPrototype = {
   username: `operator`,
   password: defaultPassword,
   agentNumber: `operator`,
-  roles: ['OPERATOR'],
+  roles: [ 'OPERATOR' ],
   profile: {
     queueId: 'queueId',
     firstName: 'operator',
@@ -53,17 +53,26 @@ const defaultOperatorPrototype = {
   }
 }
 
-export const buildOperator = (operator = {}, prototype = defaultOperatorPrototype) => {
+export const buildUser = (operator = {}, prototype = defaultOperatorPrototype) => {
   return {
     ...prototype, ...operator
   }
 }
 
 export async function operatorCreateBusiness () {
-  return createFullOperator(buildOperator({
+  return createFullOperator(buildUser({
     username: 'business',
     roles: [
       'BUSINESS'
+    ]
+  }))
+}
+
+export async function createAdminUser () {
+  return createFullOperator(buildUser({
+    username: 'admin',
+    roles: [
+      'ADMIN'
     ]
   }))
 }

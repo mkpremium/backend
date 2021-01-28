@@ -4,7 +4,7 @@ import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { OperatorRepository } from '../../src/operator/models'
 import { PropertyManagerRepository } from '../../src/property-manager/PropertyManagerRepository'
 import { OperatorRoles } from '../../src/types/operator'
-import { buildOperator } from '../common'
+import { buildUser } from '../common'
 
 describe('PropertyManagerRepository', () => {
   let couchbaseBucket, propertyManagerRepository, operatorRepository
@@ -25,7 +25,7 @@ describe('PropertyManagerRepository', () => {
     })
 
     it('returns only active property managers', async () => {
-      await operatorRepository.save(buildOperator({
+      await operatorRepository.save(buildUser({
         id: 'property-manager-user-id',
         username: 'property-manager-user-name',
         profile: {
