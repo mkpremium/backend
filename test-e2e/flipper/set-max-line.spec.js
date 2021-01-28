@@ -10,7 +10,7 @@ describe('Flipper Max Line', () => {
     const admin = await createAdminUser()
 
     const testMaxLine = 1000000
-    await authenticatedPut(`/flipper/${flipper.id}/max-line`, admin, app, { line: testMaxLine })
+    await authenticatedPut(`/flipper/${flipper.id}/max-line`, admin, app, { maxLine: testMaxLine })
       .then(response => {
         expect(response.status).to.be.equal(200)
       })
