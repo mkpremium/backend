@@ -17,12 +17,12 @@ const clusterManager = Promise.promisifyAll(cluster.manager())
 const CLUSTER_MAX_MEMORY_MB = 512
 const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   flushEnabled: 1,
-  ramQuotaMB: CLUSTER_MAX_MEMORY_MB
+  ramQuotaMB: 100
 })
 
 const ONE_MINUTE = 60000
 const CONNECTION_WAIT_TIME = ONE_MINUTE
-const RETRY_WAIT_TIME = 3 * ONE_MINUTE
+const RETRY_WAIT_TIME = ONE_MINUTE / 3
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
 
