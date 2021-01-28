@@ -108,6 +108,7 @@ export const Operator = t.struct(
     flipperId: t.maybe(t.String),
 
     profitGoal: t.maybe(ProfitGoal),
+    maxLine: t.maybe(t.Number),
     featuredOwners: t.maybe(t.list(t.struct({
       buildingId: t.String,
       ownerId: t.String
@@ -117,7 +118,7 @@ export const Operator = t.struct(
     disabledAt: t.maybe(t.Date),
     favoriteBuildings: t.maybe(t.list(t.String)),
     signatures: t.maybe(OperatorSignatures),
-    _documentType: t.enums.of(['operator'])
+    _documentType: t.enums.of([ 'operator' ])
   },
   {
     name: 'Operator',
@@ -144,6 +145,14 @@ export const Operator = t.struct(
   }
 )
 
+Operator.prototype.withMaxLine = function (maxLine) {
+  return Operator.update(this, {
+    maxLine: {
+      $set: maxLine
+    }
+  })
+}
+
 t.OperatorProfileUpdate = t.struct({
   firstName: t.maybe(t.String),
   lastName: t.maybe(t.String),
@@ -159,7 +168,7 @@ t.OperatorRefreshToken = t.struct(
     id: t.String,
     operatorId: t.String,
     refreshToken: t.String,
-    _documentType: t.enums.of(['operator-refresh_token'])
+    _documentType: t.enums.of([ 'operator-refresh_token' ])
   },
   {
     name: 'OperatorRefreshToken',
