@@ -17,7 +17,7 @@ cluster.authenticate(config.username, config.password)
 const clusterManager = Promise.promisifyAll(cluster.manager())
 const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   flushEnabled: 1,
-  ramQuotaMB: BUCKET_MIN_REQUIRED_MB
+  ramQuotaMB: BUCKET_MIN_REQUIRED_MB + 100
 })
 
 const ONE_MINUTE = 60000
