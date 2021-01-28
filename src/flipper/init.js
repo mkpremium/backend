@@ -1,4 +1,4 @@
-import jwt from '../middleware/jwt'
+import jwt, { permissions } from '../middleware/jwt'
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 import { asClass, asFunction } from 'awilix'
@@ -25,7 +25,7 @@ export const initFlipperModule = (app, awilixContainer) => {
 const createRouter = awilixContainer => {
   const router = new Router()
   router.get('/:flipperId/blocked-availability', wrap(awilixContainer.resolve('flipperBlockedAvailabilityController')))
-  router.put('/:flipperId/max-line', wrap(awilixContainer.resolve('setFlipperMaxLineController')))
+  router.put('/:flipperId/max-line', permissions.admin, wrap(awilixContainer.resolve('setFlipperMaxLineController')))
 
   return router
 }
