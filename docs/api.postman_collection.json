@@ -237,13 +237,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/scheduled-events/id",
+							"raw": "{{apiUrl}}/scheduled-events/:eventId",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"scheduled-events",
-								"id"
+								":eventId"
+							],
+							"variable": [
+								{
+									"key": "eventId",
+									"value": "123"
+								}
 							]
 						}
 					},
@@ -333,12 +339,83 @@
 					"response": []
 				},
 				{
+					"name": "Get all my assigned buildings (flipper)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/buildings?allAssignedToMe=true",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"buildings"
+							],
+							"query": [
+								{
+									"key": "allAssignedToMe",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "List all owners of a building",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{apiUrl}}/buildings/:buildingId/owners",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"buildings",
+								":buildingId",
+								"owners"
+							],
+							"variable": [
+								{
+									"key": "buildingId",
+									"value": "5dfe105f-29ce-4e7f-9ae0-9cc3a3af6534"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set building total expenses amount",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"total\": 55000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/building/:buildingId/expenses",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"building",
+								":buildingId",
+								"expenses"
+							],
+							"variable": [
+								{
+									"key": "buildingId",
+									"value": ""
+								}
+							]
 						}
 					},
 					"response": []
@@ -539,12 +616,12 @@
 							"variable": [
 								{
 									"key": "callerId",
-									"value": "f75a1005-36d1-4688-a48c-141824241d85",
+									"value": "05b4245e-b187-4318-9054-fe03182d310f",
 									"type": "string"
 								},
 								{
 									"key": "flipperId",
-									"value": "f75a1005-36d1-4688-a48c-141824241d85",
+									"value": "183d8c24-98a5-4f0b-bcd0-b14f2ffca457",
 									"type": "string"
 								}
 							]
@@ -558,7 +635,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{apiUrl}}/caller/assigned-flipper/blocked-availability",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"caller",
+								"assigned-flipper",
+								"blocked-availability"
+							]
 						},
 						"description": "It returns the assigned flipper's blocked availability (meetings and restrictions)."
 					},
@@ -569,6 +654,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"contactId\": \"test-contact-id\",\n  \"eventAddress\": \"test meeting adddress\",\n  \"ownerId\": \"test-owner-id\",\n  \"worksheetId\": \"test-worksheet-id\",\n  \"buildingId\": \"test-building-id\",\n  \"meetingAt\": \"2021-01-20T20:00Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{apiUrl}}/caller/assigned-flipper/meetings",
 							"host": [
@@ -606,7 +700,57 @@
 							"variable": [
 								{
 									"key": "flipperId",
-									"value": "f75a1005-36d1-4688-a48c-141824241d85"
+									"value": "183d8c24-98a5-4f0b-bcd0-b14f2ffca457"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stats",
+			"item": [
+				{
+					"name": "All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/stats",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/stats/performance?view=day&dateBetween=2021/1/14,2021/1/21",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"stats",
+								"performance"
+							],
+							"query": [
+								{
+									"key": "view",
+									"value": "day"
+								},
+								{
+									"key": "dateBetween",
+									"value": "2021/1/14,2021/1/21"
 								}
 							]
 						}
