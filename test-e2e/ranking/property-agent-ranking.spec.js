@@ -20,7 +20,8 @@ describe('Property manager profit ranking', () => {
             currentProfit: 0,
             percentageGoal: 0,
             awards: [],
-            rank: 1
+            rank: 1,
+            maxLine: null
           }
         ])
       })

@@ -47,7 +47,8 @@ describe('PropertyManagerRepository', () => {
         id: 'property-manager-user-id',
         userName: 'property-manager-user-name',
         city: 'Barcelona',
-        profitGoal: 100
+        profitGoal: 100,
+        maxLine: null
       })
     })
   })

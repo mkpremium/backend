@@ -28,7 +28,8 @@ export class PropertyManagerRankingService {
         goal,
         currentProfit: profit,
         percentageGoal: profit / goal,
-        awards: []
+        awards: [],
+        maxLine: pm.maxLine
       }
     }).sort((a, b) => b.percentageGoal - a.percentageGoal)
       .map((elem, idx) => ({...elem, rank: idx + 1}))

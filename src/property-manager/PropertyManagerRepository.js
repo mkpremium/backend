@@ -5,7 +5,8 @@ const activePropertyManagersQuery = bucketName => `
       id,
       profile.city,
       username as userName,
-      profitGoal.amount as profitGoal
+      profitGoal.amount as profitGoal,
+      maxLine
     FROM ${bucketName}
     WHERE _documentType = 'operator'
     AND enable = true
