@@ -5,14 +5,14 @@ import { asClass, asFunction } from 'awilix'
 import { createFlipperBlockedAvailabilityController } from './controller/flipper-availability.controller'
 import { FlipperAvailabilityService } from './service/flipper-availability.service'
 import { createSetFlipperMaxLineController } from './controller/set-flipper-max-line.controller'
-import { SetFlipperMaxLineController } from './service/set-flipper-max-line.controller'
+import { SetFlipperMaxLineService } from './service/set-flipper-max-line.service'
 
 export const initFlipperModule = (app, awilixContainer) => {
   const secured = jwt()
 
   awilixContainer.register({
     flipperAvailabilityService: asClass(FlipperAvailabilityService).singleton(),
-    setFlipperMaxLineService: asClass(SetFlipperMaxLineController).singleton(),
+    setFlipperMaxLineService: asClass(SetFlipperMaxLineService).singleton(),
     flipperBlockedAvailabilityController: asFunction(createFlipperBlockedAvailabilityController).singleton(),
     setFlipperMaxLineController: asFunction(createSetFlipperMaxLineController).singleton()
   })
