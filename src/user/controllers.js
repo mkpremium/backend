@@ -5,13 +5,15 @@ export const createMeController = usersRepository => {
       featuredOwners,
       restringedHours,
       signatures,
-      profile
+      profile,
+      maxLine
     } = await usersRepository.get(req.user.operator.id)
     res.json({
       featuredOwners,
       favoriteBuildings,
       restringedHours,
       signatures,
+      maxLine,
       queueId: profile && !!profile.queueId ? profile.queueId : undefined
     })
   }
