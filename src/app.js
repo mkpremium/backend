@@ -33,7 +33,7 @@ import cadastre from './cadastre'
 import preferences from './system-preferences'
 import stock from './stock'
 import meeting from './meeting'
-import user from './user'
+import { setupUserRoutes } from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { setupCallerRoutes } from './caller/init'
@@ -50,7 +50,7 @@ dependenciesPromise.then(couchbaseBucket => {
 
   stock(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
-  user(app, awilixContainer)
+  setupUserRoutes(app, awilixContainer)
 
   oldInit(app, awilixContainer, dependenciesContainer)
   setupOwnersRoutes(app, awilixContainer)

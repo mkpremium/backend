@@ -30,6 +30,7 @@ import { setupOwnerDependencies } from '../owner'
 import { setupScheduledEventsDependencies } from '../scheduled-events'
 import { setupWorksheetDependencies } from '../worksheet'
 import { setupCallerDependencies } from '../caller/init'
+import { setupUserDependencies } from '../user'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
@@ -117,6 +118,7 @@ export const createAwilixContainer = couchbaseBucket => {
   setupScheduledEventsDependencies(awilixContainer)
   setupWorksheetDependencies(awilixContainer)
   setupCallerDependencies(awilixContainer)
+  setupUserDependencies(awilixContainer)
 
   return awilixContainer
 }

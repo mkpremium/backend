@@ -6,14 +6,17 @@ import { AddFavoriteBuildingService } from './service/add-favorite-building.serv
 import { DeleteFavoriteBuildingService } from './service/delete-favorite-building.service'
 import { UserBlockedAvailabilityService } from './service/user-blocked-availability.service'
 
-export default (app, awilixContainer) => {
-  const secured = jwt()
+export const setupUserDependencies = awilixContainer => {
   awilixContainer.register({
     usersRepository: asClass(UserRepository).classic(),
     addFavoriteBuildingService: asClass(AddFavoriteBuildingService).classic(),
     deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic(),
     userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService)
   })
+}
+
+export const setupUserRoutes = (app, awilixContainer) => {
+  const secured = jwt()
 
   app.use('/', secured, userRoutes(awilixContainer))
 }
