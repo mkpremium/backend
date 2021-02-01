@@ -15,9 +15,9 @@ worksheet.id worksheetId,
 owner.name
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
-JOIN mkpremium worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
+JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
 WHERE owner._documentType = 'owner'
-AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 END
+AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 AND c.status != 'BAD' END
 `
 
 const buildingOwnersQuery = bucketName => `
