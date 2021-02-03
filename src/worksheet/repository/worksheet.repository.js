@@ -85,7 +85,7 @@ FROM ${bucketName} worksheet
 JOIN ${bucketName} building ON building._documentType = 'building' AND
 building.id = worksheet.relatedBuildingIds[0]
 NEST ${bucketName} owners ON owners._documentType = 'owner' AND owners.buildingId = building.id
-                          AND owners.status != 'WITHOUT_CONTACT'
+                          AND owners.status NOT IN ['WITHOUT_CONTACT', 'ERRONEO']
 
 WHERE worksheet._documentType = 'worksheet' AND ${conditions.join(' AND ')}
 `
