@@ -22,6 +22,7 @@ import { SetBuildingExpensesService } from './service/set-building-expenses.serv
 import { CommercialsBuildingRepository } from './repository/commercials-building.repository'
 import { ListBuildingsService } from './service/list-buildings.service'
 import { ListBuildingProposalsService } from './service/list-building-proposals.service'
+import { AdminBuildingRepository } from './repository/admin-building.repository'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -40,6 +41,7 @@ export const registerBuildingDependencies = awilixContainer => {
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     commercialsBuildingRepository: asClass(CommercialsBuildingRepository).classic().singleton(),
+    adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
 
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
@@ -52,7 +54,6 @@ export const registerBuildingDependencies = awilixContainer => {
 }
 
 export const oldInit = (app, awilixContainer, {
-  adminBuildingRepository,
   getDocumentsSignedURLService,
   eventBus,
   couchbaseAdapter
@@ -74,7 +75,7 @@ export const oldInit = (app, awilixContainer, {
     awilixContainer.resolve('listBuildingProposalsService'),
     awilixContainer.resolve('legacyOwnersRepository'),
     awilixContainer.resolve('legacyBuildingsRepository'),
-    adminBuildingRepository,
+    awilixContainer.resolve('adminBuildingRepository'),
     awilixContainer.resolve('setBuildingSalePriceService'),
     getDocumentsSignedURLService,
     awilixContainer.resolve('listBuildingOwnersController'),

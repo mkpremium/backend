@@ -2,7 +2,6 @@ import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { BuildingsRepository } from '../building/repository/buildings.repository'
 import { LegacyBuildingRepository } from '../building/models'
-import { AdminBuildingRepository } from '../building/repository/admin-building.repository'
 import { BuildingDocumentsRepository } from '../building/repository/building-documents.repository'
 import { GetDocumentsSignedURLService } from '../building/service/get-documents-signed-URL.service'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/update-building-negotiation-status.service'
@@ -57,7 +56,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.buildingRepository = buildingRepository
 
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
-  container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
   const eventBus = awilixContainer.resolve('eventBus')
   container.eventBus = eventBus
