@@ -23,7 +23,7 @@ import { SetBuildingExpensesService } from './service/set-building-expenses.serv
 /**
  * @param {AwilixContainer} awilixContainer
  */
-export const setupDependencies = awilixContainer => {
+export const registerBuildingDependencies = awilixContainer => {
   awilixContainer.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
