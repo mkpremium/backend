@@ -27,6 +27,7 @@ import { BuildingDocumentsRepository } from './repository/building-documents.rep
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
+import { createMeetingCreatedListener } from './event-listener/meeting-created.listener'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -61,7 +62,8 @@ export const registerBuildingDependencies = awilixContainer => {
     addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
 
-    scheduledCallListener: asFunction(createScheduledCallListener).singleton()
+    scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
+    meetingCreatedListener: asFunction(createMeetingCreatedListener).singleton()
   })
 }
 
@@ -78,6 +80,7 @@ export const oldInit = (app, awilixContainer, {
     })
     await buildingNotesRepository.save(note)
   })
+  eventBus.on('meeting.created', awilixContainer.resolve('meetingCreatedListener'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 
   const secured = jwt()
