@@ -10,7 +10,7 @@ WHERE building._documentType = 'building' AND building.id = $1
 
 const assignBuildingToAgentQuery = bucketName => `
 UPDATE ${bucketName} building
-SET building.assignedAgentId = $2
+SET building.assignedAgentId = $2, building.negotiationStatus = 'PENDIENTE'
 WHERE building._documentType = 'building' AND building.id = $1
 `
 
