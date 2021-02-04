@@ -9,7 +9,7 @@ describe('BuildingDocumentsRepository', () => {
 
   beforeEach(async () => {
     app = await initApplication()
-    buildingDocumentsRepository = app.locals.dependenciesContainer.buildingDocumentsRepository
+    buildingDocumentsRepository = app.locals.diContainer.resolve('buildingDocumentsRepository')
     metadataRepository = app.locals.legacyDependenciesContainer.metadataRepository
   })
 
