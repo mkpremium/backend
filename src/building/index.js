@@ -24,6 +24,9 @@ import { ListBuildingsService } from './service/list-buildings.service'
 import { ListBuildingProposalsService } from './service/list-building-proposals.service'
 import { AdminBuildingRepository } from './repository/admin-building.repository'
 import { BuildingDocumentsRepository } from './repository/building-documents.repository'
+import aws from 'aws-sdk'
+import { metadataS3Config } from '../../config'
+import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -37,6 +40,13 @@ export const registerBuildingDependencies = awilixContainer => {
     setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
     listBuildingsService: asClass(ListBuildingsService).classic().singleton(),
     listBuildingProposalsService: asClass(ListBuildingProposalsService).singleton().classic(),
+    getDocumentsSignedURLService: asClass(GetDocumentsSignedURLService).inject(() => ({
+      s3Client: new aws.S3({
+        signatureVersion: 'v4',
+        region: metadataS3Config.region
+      }),
+      documentBucket: metadataS3Config.bucket
+    })).singleton().classic(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
@@ -56,7 +66,6 @@ export const registerBuildingDependencies = awilixContainer => {
 }
 
 export const oldInit = (app, awilixContainer, {
-  getDocumentsSignedURLService,
   eventBus,
   couchbaseAdapter
 }) => {
@@ -79,7 +88,7 @@ export const oldInit = (app, awilixContainer, {
     awilixContainer.resolve('legacyBuildingsRepository'),
     awilixContainer.resolve('adminBuildingRepository'),
     awilixContainer.resolve('setBuildingSalePriceService'),
-    getDocumentsSignedURLService,
+    awilixContainer.resolve('getDocumentsSignedURLService'),
     awilixContainer.resolve('listBuildingOwnersController'),
     awilixContainer
   )

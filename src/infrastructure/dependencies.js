@@ -1,8 +1,5 @@
-import aws from 'aws-sdk'
-import { metadataS3Config } from '../../config'
 import { BuildingsRepository } from '../building/repository/buildings.repository'
 import { LegacyBuildingRepository } from '../building/models'
-import { GetDocumentsSignedURLService } from '../building/service/get-documents-signed-URL.service'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/update-building-negotiation-status.service'
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
@@ -77,17 +74,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.stockService = new StockService(
     legacyDependenciesContainer.stockRepository,
     container.updateBuildingNegotiationStatusService
-  )
-
-  const buildingDocumentsRepository = awilixContainer.resolve('buildingDocumentsRepository')
-  const buildingDocumentsS3Client = new aws.S3({
-    signatureVersion: 'v4',
-    region: metadataS3Config.region
-  })
-  container.getDocumentsSignedURLService = new GetDocumentsSignedURLService(
-    buildingDocumentsRepository,
-    buildingDocumentsS3Client,
-    metadataS3Config.bucket
   )
 
   container.scheduledCallsService = new ScheduledCallsService(couchbaseAdapter)
