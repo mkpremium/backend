@@ -1,8 +1,6 @@
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { BuildingsRepository } from '../building/repository/buildings.repository'
-import { CommercialsBuildingRepository } from '../building/repository/commercials-building.repository'
-import { ListBuildingsService } from '../building/service/list-buildings.service'
 import { LegacyBuildingRepository } from '../building/models'
 import { AdminBuildingRepository } from '../building/repository/admin-building.repository'
 import { BuildingDocumentsRepository } from '../building/repository/building-documents.repository'
@@ -60,8 +58,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.buildingRepository = buildingRepository
 
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
-  const commercialsBuildingRepository = new CommercialsBuildingRepository(couchbaseAdapter)
-  container.listBuildingsService = new ListBuildingsService(commercialsBuildingRepository)
+  const commercialsBuildingRepository = awilixContainer.resolve('commercialsBuildingRepository')
   container.listBuildingProposalsService = new ListBuildingProposalsService(commercialsBuildingRepository) // TODO move to awilix container
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
