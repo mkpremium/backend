@@ -2,7 +2,6 @@ import './types'
 import { createBuildingsRoutes } from './routes'
 import jwt, { permissions } from '../middleware/jwt'
 import { BuildingNotesRepository } from './repository/building-notes.repository'
-import { TNote } from '../notes/types'
 import { aliasTo, asClass, asFunction } from 'awilix'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
 import { LegacyBuildingRepository } from './models'
@@ -28,6 +27,7 @@ import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
 import { createMeetingCreatedListener } from './event-listener/meeting-created.listener'
+import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -55,6 +55,7 @@ export const registerBuildingDependencies = awilixContainer => {
     commercialsBuildingRepository: asClass(CommercialsBuildingRepository).classic().singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
+    buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
 
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
@@ -63,23 +64,14 @@ export const registerBuildingDependencies = awilixContainer => {
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
 
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
-    meetingCreatedListener: asFunction(createMeetingCreatedListener).singleton()
+    meetingCreatedListener: asFunction(createMeetingCreatedListener).singleton(),
+    worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton()
   })
 }
 
-export const oldInit = (app, awilixContainer, {
-  eventBus,
-  couchbaseAdapter
-}) => {
-  const buildingNotesRepository = new BuildingNotesRepository(couchbaseAdapter)
-  eventBus.on('worksheet.made_available', async ({ buildingId }) => {
-    const note = TNote({
-      note: 'Ficha devuelta al callcenter',
-      createdBy: 'SYSTEM',
-      context: { buildingId }
-    })
-    await buildingNotesRepository.save(note)
-  })
+export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
+  const eventBus = awilixContainer.resolve('eventBus')
+  eventBus.on('worksheet.made_available', awilixContainer.resolve('worksheetMadeAvailableListener'))
   eventBus.on('meeting.created', awilixContainer.resolve('meetingCreatedListener'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 

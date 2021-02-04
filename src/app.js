@@ -22,7 +22,7 @@ import { setupScheduledEventsRoutes } from './scheduled-events'
 import webhooks from './webhooks'
 import history from './history'
 import notes from './notes'
-import { oldInit } from './building'
+import { setupBuildingRoutesAndListeners } from './building'
 import metadata from './metadata'
 import { init as initPropertyManager } from './property-manager'
 
@@ -52,7 +52,7 @@ dependenciesPromise.then(couchbaseBucket => {
   meeting(app, dependenciesContainer)
   setupUserRoutes(app, awilixContainer)
 
-  oldInit(app, awilixContainer, dependenciesContainer)
+  setupBuildingRoutesAndListeners(app, awilixContainer, dependenciesContainer)
   setupOwnersRoutes(app, awilixContainer)
   setupScheduledEventsRoutes(app, awilixContainer)
   setupWorksheetRoutesAndEventListeners(app, awilixContainer)
