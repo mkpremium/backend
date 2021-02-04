@@ -21,7 +21,6 @@ import { StockRepository } from '../stock/StockRepository'
 import { EventBus } from './event-bus'
 import { MetadataRepository } from '../building/repository/metadata.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
-import { ListBuildingProposalsService } from '../building/service/list-building-proposals.service'
 import { asClass, asValue, createContainer } from 'awilix'
 import { registerBuildingDependencies as setupBuildingDependencies } from '../building'
 import { setupOwnerDependencies } from '../owner'
@@ -58,8 +57,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   container.buildingRepository = buildingRepository
 
   container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
-  const commercialsBuildingRepository = awilixContainer.resolve('commercialsBuildingRepository')
-  container.listBuildingProposalsService = new ListBuildingProposalsService(commercialsBuildingRepository) // TODO move to awilix container
   container.adminBuildingRepository = new AdminBuildingRepository(couchbaseAdapter)
 
   const eventBus = awilixContainer.resolve('eventBus')

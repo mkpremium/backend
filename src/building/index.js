@@ -21,6 +21,7 @@ import { wrap } from 'express-promise-wrap'
 import { SetBuildingExpensesService } from './service/set-building-expenses.service'
 import { CommercialsBuildingRepository } from './repository/commercials-building.repository'
 import { ListBuildingsService } from './service/list-buildings.service'
+import { ListBuildingProposalsService } from './service/list-building-proposals.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -33,6 +34,7 @@ export const registerBuildingDependencies = awilixContainer => {
     updateBuildingNegotiationStatusService: asClass(UpdateBuildingNegotiationStatusService).singleton().classic(),
     setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
     listBuildingsService: asClass(ListBuildingsService).classic().singleton(),
+    listBuildingProposalsService: asClass(ListBuildingProposalsService).singleton().classic(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
@@ -50,7 +52,6 @@ export const registerBuildingDependencies = awilixContainer => {
 }
 
 export const oldInit = (app, awilixContainer, {
-  listBuildingProposalsService,
   adminBuildingRepository,
   getDocumentsSignedURLService,
   eventBus,
@@ -70,7 +71,7 @@ export const oldInit = (app, awilixContainer, {
   const secured = jwt()
   const buildingsRoutes = createBuildingRoutes(
     awilixContainer.resolve('listBuildingsService'),
-    listBuildingProposalsService,
+    awilixContainer.resolve('listBuildingProposalsService'),
     awilixContainer.resolve('legacyOwnersRepository'),
     awilixContainer.resolve('legacyBuildingsRepository'),
     adminBuildingRepository,
