@@ -1,5 +1,5 @@
 import './types'
-import { createBuildingRoutes } from './routes'
+import { createBuildingsRoutes } from './routes'
 import jwt, { permissions } from '../middleware/jwt'
 import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { TNote } from '../notes/types'
@@ -81,17 +81,7 @@ export const oldInit = (app, awilixContainer, {
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 
   const secured = jwt()
-  const buildingsRoutes = createBuildingRoutes(
-    awilixContainer.resolve('listBuildingsService'),
-    awilixContainer.resolve('listBuildingProposalsService'),
-    awilixContainer.resolve('legacyOwnersRepository'),
-    awilixContainer.resolve('legacyBuildingsRepository'),
-    awilixContainer.resolve('adminBuildingRepository'),
-    awilixContainer.resolve('setBuildingSalePriceService'),
-    awilixContainer.resolve('getDocumentsSignedURLService'),
-    awilixContainer.resolve('listBuildingOwnersController'),
-    awilixContainer
-  )
+  const buildingsRoutes = createBuildingsRoutes(awilixContainer)
   app.use('/buildings', secured, buildingsRoutes)
 
   const buildingRoutes = new Router()
