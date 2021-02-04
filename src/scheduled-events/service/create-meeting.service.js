@@ -22,7 +22,8 @@ export class CreateMeetingService {
     await this.eventBus.publish({
       name: 'meeting.created',
       userId: createdMeeting.notifyTo,
-      buildingId: createdMeeting.event.buildingId
+      buildingId: createdMeeting.event.buildingId,
+      note: requestBody.note
     })
 
     return createdMeeting
