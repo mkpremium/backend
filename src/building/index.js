@@ -23,6 +23,7 @@ import { CommercialsBuildingRepository } from './repository/commercials-building
 import { ListBuildingsService } from './service/list-buildings.service'
 import { ListBuildingProposalsService } from './service/list-building-proposals.service'
 import { AdminBuildingRepository } from './repository/admin-building.repository'
+import { BuildingDocumentsRepository } from './repository/building-documents.repository'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -42,6 +43,7 @@ export const registerBuildingDependencies = awilixContainer => {
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     commercialsBuildingRepository: asClass(CommercialsBuildingRepository).classic().singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
+    buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
 
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),

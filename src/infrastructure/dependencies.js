@@ -2,7 +2,6 @@ import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { BuildingsRepository } from '../building/repository/buildings.repository'
 import { LegacyBuildingRepository } from '../building/models'
-import { BuildingDocumentsRepository } from '../building/repository/building-documents.repository'
 import { GetDocumentsSignedURLService } from '../building/service/get-documents-signed-URL.service'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/update-building-negotiation-status.service'
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
@@ -80,13 +79,13 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
     container.updateBuildingNegotiationStatusService
   )
 
-  container.buildingDocumentsRepository = new BuildingDocumentsRepository(couchbaseAdapter)
+  const buildingDocumentsRepository = awilixContainer.resolve('buildingDocumentsRepository')
   const buildingDocumentsS3Client = new aws.S3({
     signatureVersion: 'v4',
     region: metadataS3Config.region
   })
   container.getDocumentsSignedURLService = new GetDocumentsSignedURLService(
-    container.buildingDocumentsRepository,
+    buildingDocumentsRepository,
     buildingDocumentsS3Client,
     metadataS3Config.bucket
   )
