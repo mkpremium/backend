@@ -1,4 +1,4 @@
-import { WorkSheetStatus } from '../domain/worksheet'
+import { keepOnlyUserNewestOpenedWorksheets, WorkSheetStatus } from '../domain/worksheet'
 
 /**
  * @property {WorksheetRepository} worksheetRepository
@@ -22,8 +22,8 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
       return
     }
 
-    const [ queueWithMaxWorksheetForUser, releasedWorksheetIds ] = queue.keepOnlyUserNewestOpenedWorksheets(
-      userId, this.maxOpenedWorksheetPerQueueAndUser
+    const [ queueWithMaxWorksheetForUser, releasedWorksheetIds ] = keepOnlyUserNewestOpenedWorksheets(
+      queue, userId, this.maxOpenedWorksheetPerQueueAndUser
     )
 
     await this.worksheetQueueRepository.save(queueWithMaxWorksheetForUser)

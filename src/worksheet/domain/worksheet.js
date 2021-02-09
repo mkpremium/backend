@@ -199,17 +199,21 @@ WorksheetQueue.prototype.removeScheduledCall = function (scheduledCallId) {
   })
 }
 
-WorksheetQueue.prototype.keepOnlyUserNewestOpenedWorksheets = function (userId, n) {
-  const userOpenedWorksheets = this.worksheets
+const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser) => {
+  const userOpenedWorksheets = queue.worksheets
     .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
 
   userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
-  const worksheetIdToDrop = _.map(_.drop(userOpenedWorksheets, n), 'worksheetId')
+  return _.map(_.drop(userOpenedWorksheets, maxOpenedWorksheetsByUser), 'worksheetId')
+}
+
+export const keepOnlyUserNewestOpenedWorksheets = (queue, userId, maxOpenedWorksheetsByUser) => {
+  const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
 
   return [
-    t.update(this, {
+    t.update(queue, {
       worksheets: {
-        $set: this.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
+        $set: queue.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
       }
     }),
     worksheetIdToDrop
