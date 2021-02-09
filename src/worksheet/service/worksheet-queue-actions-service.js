@@ -1,3 +1,5 @@
+import { takeWorksheet } from '../domain/worksheet'
+
 export class WorksheetQueueActionsService {
   /**
    * @param {WorksheetQueueRepository} worksheetQueueRepository
@@ -14,7 +16,7 @@ export class WorksheetQueueActionsService {
     const queue = await this.queueRepository.get(queueId)
     const worksheet = await this.worksheetRepository.get(worksheetId)
 
-    const [ queueWithWorksheet, worksheetInQueue ] = queue.takeWorksheet(worksheet, userId)
+    const [ queueWithWorksheet, worksheetInQueue ] = takeWorksheet(queue, worksheet, userId)
 
     await this.worksheetRepository.save(worksheetInQueue)
     await this.queueRepository.save(queueWithWorksheet)

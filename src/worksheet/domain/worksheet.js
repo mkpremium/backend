@@ -238,24 +238,24 @@ WorksheetQueue.prototype.addWorksheet = function (worksheet) {
   })
 }
 
-WorksheetQueue.prototype.takeWorksheet = function (worksheet, byUserOfId) {
-  const worksheetQueueItem = this.worksheets.find(w => w.worksheetId === worksheet.id)
+export const takeWorksheet = (queue, worksheet, byUserOfId) => {
+  const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
     if (worksheetQueueItem.operatorId !== byUserOfId) {
       throw new WorksheetAlreadyTaken(worksheet.id, worksheetQueueItem.operatorId, byUserOfId)
     }
 
     return [
-      this,
+      queue,
       t.update(worksheet, {
-        queueId: { $set: this.id },
+        queueId: { $set: queue.id },
         viewedAt: { $set: utc().toDate() }
       })
     ]
   }
 
   return [
-    t.update(this, {
+    WorksheetQueue.update(queue, {
       worksheets: {
         $push: [
           QueueItem({
@@ -267,8 +267,8 @@ WorksheetQueue.prototype.takeWorksheet = function (worksheet, byUserOfId) {
         ]
       }
     }),
-    t.update(worksheet, {
-      queueId: { $set: this.id },
+    Worksheet.update(worksheet, {
+      queueId: { $set: queue.id },
       viewedAt: { $set: utc().toDate() }
     })
   ]

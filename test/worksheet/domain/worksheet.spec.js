@@ -1,4 +1,9 @@
-import { Worksheet, WorksheetAlreadyTaken, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
+import {
+  takeWorksheet,
+  Worksheet,
+  WorksheetAlreadyTaken,
+  WorksheetQueue
+} from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
 import { QueueItem } from '../../../src/worksheet/models/queue-item'
 
@@ -10,7 +15,7 @@ describe('WorksheetQueue', () => {
         name: 'test queue'
       })
 
-      const [ queueWithWorksheet ] = testQueue.takeWorksheet(testWorksheet, 'test-user-id')
+      const [ queueWithWorksheet ] = takeWorksheet(testQueue, testWorksheet, 'test-user-id')
 
       expect(queueWithWorksheet.worksheets).to.have.lengthOf(1)
     })
@@ -25,7 +30,7 @@ describe('WorksheetQueue', () => {
         }) ]
       })
 
-      const [ queueWithWorksheet ] = testQueue.takeWorksheet(testWorksheet, 'test-user-id')
+      const [ queueWithWorksheet ] = takeWorksheet(testQueue, testWorksheet, 'test-user-id')
 
       expect(queueWithWorksheet.worksheets).to.have.lengthOf(1)
     })
@@ -40,9 +45,8 @@ describe('WorksheetQueue', () => {
         }) ]
       })
 
-      expect(
-        () => testQueue.takeWorksheet(testWorksheet, 'test-user-id')
-      ).to.throw(WorksheetAlreadyTaken)
+      expect(() => takeWorksheet(testQueue, testWorksheet, 'test-user-id'))
+        .to.throw(WorksheetAlreadyTaken)
     })
   })
 })
