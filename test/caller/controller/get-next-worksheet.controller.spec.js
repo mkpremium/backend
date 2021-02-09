@@ -37,4 +37,20 @@ describe('Get Next Caller Worksheet Controller', () => {
       expect(responseSpy.json).to.have.been.calledWith(nextWorksheetInCallerAssignedQueue)
     })
   })
+
+  it('rejects requests for users without a queue assigned', () => {
+    const controller = createGetNextCallerWorksheetController({})
+
+    const testRequest = {
+      user: {
+        operator: {
+          profile: {
+            queueId: undefined
+          }
+        }
+      }
+    }
+
+    return expect(controller(testRequest)).to.have.been.rejected
+  })
 })
