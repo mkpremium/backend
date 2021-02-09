@@ -73,25 +73,13 @@ function canRegisterVerified (worksheet, newStatus, operatorId) {
     return false
   }
 
-  if (newStatus !== WorkSheetStatus.AVAILABLE) {
-    return false
-  }
-
-  return true
+  return newStatus === WorkSheetStatus.AVAILABLE
 }
 
 export class LegacyWorksheetRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = Worksheet
-  }
-
-  async findBySource ({ source, worksheetIndex }) {
-    const withReferenceResults = await this._findBySourceAndReference(source, worksheetIndex)
-    if (!withReferenceResults || withReferenceResults.length === 0) {
-      return this._findBySourceAndReference(source)
-    }
-    return withReferenceResults
   }
 
   async findByIdOrThrow (worksheetId) {
@@ -154,15 +142,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
   findByBuilding (buildingId) {
     const repo = new LegacyWorksheetRepository()
     return repo.findWorksheetByBuilding(buildingId)
-  }
-
-  async findWorksheetByOwner (ownerId) {
-    const qb = this.getQueryBuilder()
-      .where('ANY v IN t.`relatedOwnerIds` SATISFIES v = ? END', ownerId)
-
-    const results = await this.query(qb)
-
-    return _head(results)
   }
 
   /**
@@ -316,39 +295,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     })
   }
 
-  async _findBySourceAndReference (source, worksheetIndex) {
-    const qb = this.getQueryBuilder()
-      .where('queueId IS NULL')
-      .where('status = \'OPEN\' OR status = \'LOOKING_MEETING\'')
-      .order('t.worksheetIndex')
-      .limit(1)
-
-    Object.keys(source).forEach(key => {
-      const value = source[ key ]
-      if (!_isNil(value)) {
-        qb.where(`t.buildingAddress.${key} IS NOT MISSING`)
-        qb.where(`t.buildingAddress.${key} = ?`, value)
-      }
-    })
-
-    if (worksheetIndex) {
-      qb.where('t.worksheetIndex IS NOT MISSING')
-      qb.where('t.worksheetIndex > ?', worksheetIndex)
-    }
-
-    try {
-      const promise = Promise.resolve(this.query(qb))
-      const result = await promise.timeout(3000)
-      return result
-    } catch (e) {
-      if (e instanceof Promise.TimeoutError) {
-        return Promise.resolve(this.query(qb)).timeout(3000)
-      } else {
-        throw e
-      }
-    }
-  }
-
   async _getNewIndex () {
     const counter = this.getCounter()
     return counter.count(this.getType(), 1)
@@ -403,31 +349,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     results = await Promise.map(results, (worksheet) => this.worksheetWithRelatedBuildings(worksheet))
 
     return fromJSON({ total, results }, t.WorkSheetLitResponse)
-  }
-
-  /**
-   * Find all worksheets with a particular queue id.
-   * @param queueId
-   * @returns {Promise<Array<Worksheet>>}
-   */
-  async findWorksheetsByQueueId (queueId) {
-    const qb = this
-      .getQueryBuilder()
-      .where('queueId = ?', queueId)
-
-    return this.query(qb)
-  }
-
-  /**
-   * Sets to null the queue id of an array of worksheets ids.
-   * @returns {Promise<void>}
-   */
-  async updateQueueId (worksheetIds) {
-    const bucket = this.getBucketName()
-    const cleanQueueIds = N1qlQuery
-      .fromString(`UPDATE ${bucket} t SET queueId = null WHERE META().id IN ${JSON.stringify(worksheetIds)}`)
-
-    return this.queryRaw(cleanQueueIds)
   }
 
   /**
