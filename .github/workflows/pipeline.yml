@@ -108,7 +108,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.api-v2-task-def.outputs.task-definition }}
-          service: api-v2
+          service: apiv2
           cluster: production
           wait-for-minutes: 5
 
