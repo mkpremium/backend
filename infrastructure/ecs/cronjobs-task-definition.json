@@ -37,7 +37,7 @@
         },
         {
           "name": "NODE_ENV",
-          "value": "production"
+          "value": "production_v2"
         },
         {
           "name": "SOCKET_ENABLED",
