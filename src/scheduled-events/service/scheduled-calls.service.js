@@ -15,26 +15,26 @@ export class ScheduledCallsService {
       N1qlQuery.fromString(scheduledCallsForQuery(this.couchbaseAdapter.bucketName)),
       [ userId ]
     ).then(rows => {
-      return rows.map(
-        ({ event, eventDate, building, owner, eventId }) => {
-          const shapedRow = {
-            id: eventId,
-            buildingId: building.id,
-            eventDate,
-            event: {
-              ...event,
-              owner: { ...owner, building }
-            }
-          }
-          try {
-            return fromJSON(shapedRow, ScheduledCallsView)
-          } catch (error) {
-            logger.error('parsing scheduled calls', { error, worksheetId: event.worksheetId })
-            return shapedRow
-          }
-        }
-      )
+      return rows.map(parseRow)
     })
+  }
+}
+
+export const parseRow = ({ event, eventDate, building, owner, eventId }) => {
+  const shapedRow = {
+    id: eventId,
+    buildingId: building.id,
+    eventDate,
+    event: {
+      ...event,
+      owner: { ...owner, building }
+    }
+  }
+  try {
+    return fromJSON(shapedRow, ScheduledCallsView)
+  } catch (error) {
+    logger.error('parsing scheduled calls', { errorMessage: error.message, worksheetId: event.worksheetId })
+    return shapedRow
   }
 }
 
@@ -77,16 +77,16 @@ const ScheduledCallsView = t.struct({
         id: t.String,
         address: t.struct({
           city: t.String,
-          neighborhood: t.String,
+          neighborhood: t.maybe(t.String),
           type: t.maybe(t.String),
           street: t.String,
           number: t.union([ t.String, t.Number ]),
           postalCode: t.maybe(t.struct({
-            number: t.union([ t.String, t.Number ])
+            number: t.maybe(t.union([ t.String, t.Number ]))
           }))
         }),
-        negotiationStatus: NegotiationStatus,
-        floorArea: t.Number,
+        negotiationStatus: t.maybe(NegotiationStatus),
+        floorArea: t.union([ t.String, t.Number ]),
 
         location: t.maybe(t.struct({
           lat: t.maybe(t.Number),
