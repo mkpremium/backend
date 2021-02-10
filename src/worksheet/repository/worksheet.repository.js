@@ -9,7 +9,7 @@ import { CouchbaseRepository } from '../../db/couchbase.repository'
 export const CallcenterView = t.struct({
   id: t.String,
   status: WorkSheetStatusEnum,
-  queueId: t.String,
+  queueId: t.maybe(t.String),
   relatedBuildings: t.list(t.struct({
     id: t.String,
     address: t.struct({
