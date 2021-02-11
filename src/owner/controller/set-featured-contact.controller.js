@@ -1,7 +1,7 @@
 import { FeaturedContact } from '../owner'
 import { newHttpError } from '../../lib/http-error'
-import { OwnerNotFound } from '../repository/owner.repository'
 import { EmptyFeaturedContact } from '../service/set-featured-contact.service'
+import { logger } from '../../infrastructure/logger'
 
 export const createSetFeaturedContactController = setOwnerFeaturedContactService => {
   return async (req, res) => {
@@ -13,10 +13,8 @@ export const createSetFeaturedContactController = setOwnerFeaturedContactService
     } catch (e) {
       if (e instanceof EmptyFeaturedContact) {
         throw newHttpError(400, `Invalid featured contact request.`)
-      } else if (e instanceof OwnerNotFound) {
-        throw newHttpError(400, e.message)
       } else {
-        console.error(e)
+        logger.error(e)
         throw newHttpError(500, `Some error occurred while setting featured contact.`)
       }
     }

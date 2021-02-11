@@ -150,3 +150,13 @@ Owner.prototype.changeContactStatus = function (contactId, newStatus) {
     }
   })
 }
+
+export const mergeFeaturedContact = (owner, featuredContact) => {
+  // TODO mark contact as GOOD
+  // TODO set only given featured contact (phone or email)
+  return Owner.update(owner, {
+    featuredContact: {
+      $set: featuredContact
+    }
+  })
+}

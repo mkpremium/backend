@@ -71,19 +71,6 @@ const BuildingOwner = t.struct({
 })
 
 export class OwnerRepository extends CouchbaseRepository {
-  async setOwnerFeaturedContact (ownerId, featuredContact) {
-    const owner = await this.get(ownerId)
-    if (!owner) {
-      throw new OwnerNotFound(ownerId)
-    }
-
-    const updatedOwner = t.update(owner, {
-      featuredContact: { $set: featuredContact }
-    })
-
-    return this.save(updatedOwner)
-  }
-
   async findByPhoneNumber (phoneNumber) {
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(findOwnerByContactValueQuery(this.bucketName)),
@@ -115,12 +102,5 @@ export class OwnerRepository extends CouchbaseRepository {
 
   struct () {
     return Owner
-  }
-}
-
-export class OwnerNotFound extends Error {
-  constructor (ownerId) {
-    super()
-    this.message = `Owner with id ${ownerId} not found`
   }
 }

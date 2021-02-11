@@ -1,6 +1,10 @@
 import _ from 'lodash'
+import { mergeFeaturedContact } from '../owner'
 
 export class EmptyFeaturedContact extends Error {
+  constructor () {
+    super('No phoneId nor emailId provided')
+  }
 }
 
 export class SetOwnerFeaturedContactService {
@@ -13,6 +17,9 @@ export class SetOwnerFeaturedContactService {
       throw new EmptyFeaturedContact()
     }
 
-    await this.ownersRepository.setOwnerFeaturedContact(ownerId, featuredContact)
+    const owner = await this.ownersRepository.get(ownerId)
+    const ownerWithFeaturedContact = mergeFeaturedContact(owner, featuredContact)
+
+    return this.ownersRepository.save(ownerWithFeaturedContact)
   }
 }
