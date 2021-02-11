@@ -26,8 +26,9 @@ import { BuildingDocumentsRepository } from './repository/building-documents.rep
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
-import { createAddMeetingNoteToBuildingListener } from './event-listener/meeting-created.listener'
+import { createAddMeetingNoteToBuildingListener } from './event-listener/add-meeting-note-to-building.listener'
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
+import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -65,6 +66,7 @@ export const registerBuildingDependencies = awilixContainer => {
 
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
     addMeetingNoteToBuilding: asFunction(createAddMeetingNoteToBuildingListener).singleton(),
+    setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton()
   })
 }
@@ -73,6 +75,7 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
   const eventBus = awilixContainer.resolve('eventBus')
   eventBus.on('worksheet.made_available', awilixContainer.resolve('worksheetMadeAvailableListener'))
   eventBus.on('meeting.created', awilixContainer.resolve('addMeetingNoteToBuilding'))
+  eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 
   const secured = jwt()

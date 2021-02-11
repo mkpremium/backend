@@ -1,4 +1,4 @@
-import { createAddMeetingNoteToBuildingListener } from '../../../src/building/event-listener/meeting-created.listener'
+import { createAddMeetingNoteToBuildingListener } from '../../../src/building/event-listener/add-meeting-note-to-building.listener'
 import { expect } from 'chai'
 import { stub } from 'sinon'
 
