@@ -5,6 +5,7 @@ import { Building } from '../building/building'
 import { SimpleAddress, TypedContactInfo } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { validate } from 'tcomb-validation'
+import { createType } from '../infrastructure/create-type'
 
 export const Person = t.struct(
   {
@@ -149,12 +150,6 @@ Owner.prototype.changeContactStatus = function (contactId, newStatus) {
       })
     }
   })
-}
-
-const createType = (type, getValidationErrorMessage, name) => {
-  const Subtype = t.refinement(type, x => !t.String.is(getValidationErrorMessage(x)), name)
-  Subtype.getValidationErrorMessage = getValidationErrorMessage
-  return Subtype
 }
 
 const RefinedOwner = createType(Owner, o => {
