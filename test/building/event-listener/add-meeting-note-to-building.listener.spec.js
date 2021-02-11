@@ -2,7 +2,7 @@ import { createAddMeetingNoteToBuildingListener } from '../../../src/building/ev
 import { expect } from 'chai'
 import { stub } from 'sinon'
 
-describe('meeting-created.listener', () => {
+describe('add-meeting-note-to-building.listener', () => {
   let listener
   let buildingNotesRepositoryStub
 
