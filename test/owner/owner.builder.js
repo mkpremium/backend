@@ -1,0 +1,33 @@
+import { Owner, Person } from '../../src/owner/owner'
+
+const ownerPrototype = {
+  id: 'test-owner-id',
+  person: Person({
+    name: 'test name'
+  })
+}
+export const ownerBuilder = (overwrites = {}) => {
+  return {
+    build () {
+      return Owner({ ...ownerPrototype, ...overwrites })
+    },
+
+    withPhoneContact (id = 'test-phone-id', status = 'undefined', phoneNumber = '666666666') {
+      if (!overwrites.person) {
+        overwrites.person = ownerPrototype.person
+      }
+
+      overwrites.person = Person.update(overwrites.person, {
+        contacts: {
+          $push: [ {
+            id,
+            type: 'TELEFONO',
+            value: phoneNumber
+          } ]
+        }
+      })
+
+      return this
+    }
+  }
+}

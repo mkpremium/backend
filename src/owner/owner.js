@@ -74,7 +74,7 @@ export const Owner = t.struct(
     status: OwnerStatusEnum,
     personId: t.maybe(t.String),
 
-    person: t.maybe(Person),
+    person: Person,
 
     buildingId: t.maybe(t.String),
     name: t.maybe(t.String),
@@ -154,9 +154,40 @@ Owner.prototype.changeContactStatus = function (contactId, newStatus) {
 export const mergeFeaturedContact = (owner, featuredContact) => {
   // TODO mark contact as GOOD
   // TODO set only given featured contact (phone or email)
+  assertValidFeaturedContact(featuredContact, owner)
   return Owner.update(owner, {
     featuredContact: {
       $set: featuredContact
     }
   })
+}
+
+const assertValidFeaturedContact = (featuredContact, owner) => {
+  if (_.isEmpty(featuredContact.phoneId) && _.isEmpty(featuredContact.emailId)) {
+    throw new EmptyFeaturedContact()
+  }
+
+  if (featuredContact.phoneId && !getOwnerContact(owner, featuredContact.phoneId)) {
+    throw new UnknownOwnerContact(owner.id, featuredContact.phoneId, 'phone')
+  }
+  if (featuredContact.emailId && !getOwnerContact(owner, featuredContact.emailId)) {
+    throw new UnknownOwnerContact(owner.id, featuredContact.phoneId, 'phone')
+  }
+}
+
+const getOwnerContact = (o, contactId) => o.person.contacts.find(({ id }) => id === contactId)
+
+class UnknownOwnerContact extends Error {
+  constructor (ownerId, contactId, contactType) {
+    super('Unknown contact')
+    this.ownerId = ownerId
+    this.contactId = contactId
+    this.contactType = contactType
+  }
+}
+
+export class EmptyFeaturedContact extends Error {
+  constructor () {
+    super('No phoneId nor emailId provided')
+  }
 }

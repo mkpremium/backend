@@ -1,16 +1,7 @@
 import { SetOwnerFeaturedContactService } from '../../../src/owner/service/set-featured-contact.service'
-import { Owner } from '../../../src/owner/owner'
 import { stub } from 'sinon'
 import { expect } from 'chai'
-
-const ownerPrototype = { id: 'test-owner-id' }
-const ownerBuilder = (overwrites = {}) => {
-  return {
-    build () {
-      return Owner({ ...ownerPrototype, overwrites })
-    }
-  }
-}
+import { ownerBuilder } from '../owner.builder'
 
 describe('SetOwnerFeaturedContactService', () => {
   let service
@@ -26,12 +17,13 @@ describe('SetOwnerFeaturedContactService', () => {
 
   it('sets featured contact', () => {
     const testOwnerId = 'test-owner-id'
-    const testOwner = ownerBuilder().build()
+    const testPhoneId = 'test-phone-id'
+    const testOwner = ownerBuilder().withPhoneContact(testPhoneId).build()
     ownersRepositoryStub.get.withArgs(testOwnerId).resolves(testOwner)
 
-    return service.setFeaturedContact(testOwnerId, { phoneId: 'test-phone-id' }).then(() => {
+    return service.setFeaturedContact(testOwnerId, { phoneId: testPhoneId }).then(() => {
       expect(ownersRepositoryStub.save).to.have.been.calledWithMatch(
-        o => o.id === testOwnerId && o.featuredContact.phoneId === 'test-phone-id'
+        o => o.id === testOwnerId && o.featuredContact.phoneId === testPhoneId
       )
     })
   })
