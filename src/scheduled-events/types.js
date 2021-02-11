@@ -11,10 +11,10 @@ export const ScheduledEventTypeEnum = t.enums.of(Object.values(ScheduledEventTyp
 export const Event = t.struct(
   {
     owner: t.maybe(OwnerWithInclude),
-    ownerId: t.maybe(t.String),
+    ownerId: t.String,
     queueId: t.maybe(t.String),
     itemId: t.maybe(t.String),
-    contactId: t.maybe(t.String),
+    contactId: t.String,
     worksheetId: t.maybe(t.String),
     buildingId: t.maybe(t.String),
     eventAddress: t.maybe(t.String),
