@@ -1,6 +1,6 @@
 import { TNote } from '../../notes/types'
 
-export const createMeetingCreatedListener = ({ buildingNotesRepository }) => ({ buildingId, userId, note }) => {
+export const createAddMeetingNoteToBuildingListener = ({ buildingNotesRepository }) => ({ buildingId, userId, note }) => {
   if (!note) {
     return Promise.resolve()
   }
