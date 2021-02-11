@@ -4,6 +4,7 @@ import t from 'tcomb'
 import { Building } from '../building/building'
 import { SimpleAddress, TypedContactInfo } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
+import { validate } from 'tcomb-validation'
 
 export const Person = t.struct(
   {
@@ -61,12 +62,11 @@ export const OwnerConfirmed = t.struct({
   confirmedBy: t.maybe(t.String),
   confirmedAt: t.maybe(t.Date)
 }, 'confirmed')
-export const FeaturedContact = t.struct(
-  {
-    phoneId: t.maybe(t.String),
-    emailId: t.maybe(t.String)
-  }
-)
+export const FeaturedContact = t.refinement(t.struct({
+  phoneId: t.maybe(t.String),
+  emailId: t.maybe(t.String)
+}), ({ phoneId, emailId }) => !!phoneId || !!emailId, 'FeaturedContact')
+
 export const Owner = t.struct(
   {
     id: t.maybe(t.String),
@@ -151,43 +151,38 @@ Owner.prototype.changeContactStatus = function (contactId, newStatus) {
   })
 }
 
+const RefinedOwner = t.refinement(Owner, (o) => {
+  if (o.featuredContact.phoneId && !getOwnerContact(o, o.featuredContact.phoneId)) {
+    return false
+  }
+  if (o.featuredContact.emailId && !getOwnerContact(o, o.featuredContact.emailId)) {
+    return false
+  }
+
+  return true
+})
+
 export const mergeFeaturedContact = (owner, featuredContact) => {
   // TODO mark contact as GOOD
   // TODO set only given featured contact (phone or email)
-  assertValidFeaturedContact(featuredContact, owner)
-  return Owner.update(owner, {
-    featuredContact: {
-      $set: featuredContact
-    }
+  const updatedOwner = Owner.update(owner, {
+    featuredContact: { $set: featuredContact }
   })
-}
-
-const assertValidFeaturedContact = (featuredContact, owner) => {
-  if (_.isEmpty(featuredContact.phoneId) && _.isEmpty(featuredContact.emailId)) {
-    throw new EmptyFeaturedContact()
+  const validationResult = validate(updatedOwner, RefinedOwner)
+  if (!validationResult.isValid()) {
+    throw new WrongFeaturedContact(owner.id, featuredContact, validationResult.errors)
   }
 
-  if (featuredContact.phoneId && !getOwnerContact(owner, featuredContact.phoneId)) {
-    throw new UnknownOwnerContact(owner.id, featuredContact.phoneId, 'phone')
-  }
-  if (featuredContact.emailId && !getOwnerContact(owner, featuredContact.emailId)) {
-    throw new UnknownOwnerContact(owner.id, featuredContact.phoneId, 'phone')
-  }
+  return updatedOwner
 }
 
 const getOwnerContact = (o, contactId) => o.person.contacts.find(({ id }) => id === contactId)
 
-class UnknownOwnerContact extends Error {
-  constructor (ownerId, contactId, contactType) {
-    super('Unknown contact')
+export class WrongFeaturedContact extends Error {
+  constructor (ownerId, featuredContact, validationErrors) {
+    super('Wrong Featured Contact provided')
     this.ownerId = ownerId
-    this.contactId = contactId
-    this.contactType = contactType
-  }
-}
-
-export class EmptyFeaturedContact extends Error {
-  constructor () {
-    super('No phoneId nor emailId provided')
+    this.featuredContact = featuredContact
+    this.errors = validationErrors.map(({ message }) => message)
   }
 }

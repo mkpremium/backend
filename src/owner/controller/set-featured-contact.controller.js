@@ -1,6 +1,5 @@
-import { FeaturedContact } from '../owner'
+import { WrongFeaturedContact, FeaturedContact } from '../owner'
 import { newHttpError } from '../../lib/http-error'
-import { EmptyFeaturedContact } from '../service/set-featured-contact.service'
 import { logger } from '../../infrastructure/logger'
 
 export const createSetFeaturedContactController = setOwnerFeaturedContactService => {
@@ -11,7 +10,7 @@ export const createSetFeaturedContactController = setOwnerFeaturedContactService
 
       res.json()
     } catch (e) {
-      if (e instanceof EmptyFeaturedContact) {
+      if (e instanceof WrongFeaturedContact) {
         throw newHttpError(400, `Invalid featured contact request.`)
       } else {
         logger.error(e)
