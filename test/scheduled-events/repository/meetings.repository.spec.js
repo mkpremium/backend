@@ -25,7 +25,9 @@ describe('MeetingsRepository', () => {
       eventDate: now.toDate(),
       event: {
         inPerson: false,
-        buildingId: 'test-building-id'
+        buildingId: 'test-building-id',
+        ownerId: 'test-owner-id',
+        contactId: 'test-contact-id'
       }
     }
     await scheduledEventsRepository.save(testScheduledEvent)
