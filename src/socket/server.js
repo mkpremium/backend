@@ -79,7 +79,7 @@ export class SocketServer {
                 scheduleRelease()
               }
             })
-            .catch(error => logger.error('SocketServer#onConnection disconnect', { error }))
+            .catch(error => logger.error('SocketServer#onConnection disconnect', { errorMessage: error.message }))
         }, 60 * 1000)
       }
 
@@ -91,7 +91,7 @@ export class SocketServer {
       OperatorRepository
         .setOnline(socket.user.id, this.io.sockets[ socket.user.id ].connected)
         .catch(error => {
-          logger.error('SocketServer#onConnection when online', { error })
+          logger.error('SocketServer#onConnection when online', { errorMessage: error.message })
         })
     })
   }
