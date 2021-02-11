@@ -151,12 +151,18 @@ Owner.prototype.changeContactStatus = function (contactId, newStatus) {
   })
 }
 
-const RefinedOwner = t.refinement(Owner, (o) => {
+const createType = (type, getValidationErrorMessage, name) => {
+  const Subtype = t.refinement(type, x => !t.String.is(getValidationErrorMessage(x)), name)
+  Subtype.getValidationErrorMessage = getValidationErrorMessage
+  return Subtype
+}
+
+const RefinedOwner = createType(Owner, o => {
   if (o.featuredContact.phoneId && !getOwnerContact(o, o.featuredContact.phoneId)) {
-    return false
+    return `Unknown contact phoneId=${o.featuredContact.phoneId} in owner=${o.id}`
   }
   if (o.featuredContact.emailId && !getOwnerContact(o, o.featuredContact.emailId)) {
-    return false
+    return `Unknown contact emailId=${o.featuredContact.emailId} in owner=${o.id}`
   }
 
   return true
