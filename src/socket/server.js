@@ -2,20 +2,13 @@ import Promise from 'bluebird'
 import { logger } from '../infrastructure/logger'
 import socketJwt from '../middleware/socketJwt'
 import socketIO from 'socket.io'
-import _get from 'lodash/get'
-import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
-import { Calls } from '../calls/models'
 import { OperatorRepository } from '../operator/models'
 
 const SYSTEM_ID = 'system' // bite me :lel:
 
 export class SocketServer {
   constructor (server) {
-    // region es6
     this.onConnection = this.onConnection.bind(this)
-    // endregion
-
-    this.timers = {}
 
     this.io = socketIO(server, {
       serveClient: true,
@@ -48,6 +41,7 @@ export class SocketServer {
     this.io.sockets[ socket.user.id ] = socket
 
     if (isSystem) {
+      logger.error('system connected to websocket!')
       socket.on('event', (data, ack) => {
         logger.debug('broadcasting', data.payload.type)
         this.io.emit(data.payload.type, data)
@@ -62,49 +56,12 @@ export class SocketServer {
         })
     }
 
-    if (this.timers[ socket.user.id ]) {
-      clearTimeout(this.timers[ socket.user.id ])
-      delete this.timers[ socket.user.id ]
-    }
-
     socket.on('disconnect', () => {
-      const queueId = _get(socket, 'operator.profile.queueId', null)
-      const operatorId = _get(socket, 'user.operator.id', null)
-
-      const scheduleRelease = () => {
-        this.timers[ socket.user.id ] = setTimeout(() => {
-          releaseTakenWorksheets(operatorId, queueId)
-            .then(needReschedule => {
-              if (needReschedule) {
-                scheduleRelease()
-              }
-            })
-            .catch(error => logger.error('SocketServer#onConnection disconnect', { errorMessage: error.message }))
-        }, 60 * 1000)
-      }
-
-      if (!isSystem && this.io.sockets[ socket.user.id ].id === socket.id && queueId) {
-        logger.debug('SocketServer#onConnection scheduling release taken worksheets for', { userId: socket.user.id })
-        scheduleRelease()
-      }
-
       OperatorRepository
         .setOnline(socket.user.id, this.io.sockets[ socket.user.id ].connected)
         .catch(error => {
           logger.error('SocketServer#onConnection when online', { errorMessage: error.message })
         })
     })
-  }
-}
-
-async function releaseTakenWorksheets (operatorId, queueId) {
-  const modelCall = new Calls()
-  const queueRepo = new LegacyWorksheetQueueRepository()
-  const activeCall = await modelCall.findActiveCallByOperatorId(operatorId)
-  if (activeCall) {
-    return true
-  } else {
-    await queueRepo.releaseWorksheetTakenByOperatorOfId(queueId, operatorId)
-    return false
   }
 }

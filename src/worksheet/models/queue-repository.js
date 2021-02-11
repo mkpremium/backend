@@ -133,21 +133,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
 
   /**
    * @public
-   * @param queueId
-   * @param operatorId
-   * @returns {Promise<void>}
-   */
-  async releaseWorksheetTakenByOperatorOfId (queueId, operatorId) {
-    const queue = await this.findByIdOrThrow(queueId)
-    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
-
-    if (operatorItem) {
-      await this.releaseItemInQueueAndSave(queue, operatorItem, operatorId)
-    }
-  }
-
-  /**
-   * @public
    * @param data
    * @param itemId
    * @param operatorId
