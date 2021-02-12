@@ -53,15 +53,6 @@ export class OwnerRepository extends CouchbaseModel {
     return owner
   }
 
-  async findByMigratedId (migratedId) {
-    const owners = await super.findByMigratedId(migratedId)
-    if (owners.length === 0) {
-      throw new Error(`Cannot find owner by ${migratedId}`)
-    }
-
-    return fromJSON(owners[ 0 ], this.Struct)
-  }
-
   async findByIdWithIncludes (id, includes = []) {
     if (!id) {
       // noinspection HtmlUnknownTag

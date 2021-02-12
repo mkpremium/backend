@@ -122,25 +122,6 @@ export class CouchbaseModel {
     return this.queryRaw(n1ql)
   }
 
-  async whereIdInArray (array) {
-    const bucket = this.getBucketName()
-    const query = `SELECT *  FROM ${bucket} t
-                   WHERE t._documentType = '${this.getType()}'
-                   AND id IN ${JSON.stringify(array)}`
-    const results = await this.raw(query)
-
-    return results.map(r => fromJSON(r.t, this.Struct))
-  }
-
-  async getAllIds () {
-    const bucket = this.getBucketName()
-    const query = `SELECT RAW id  FROM ${bucket} t
-                   WHERE t._documentType = '${this.getType()}'
-                   ORDER BY id`
-
-    return this.raw(query)
-  }
-
   async queryRaw (query) {
     await this._promiseBucket
     try {
@@ -191,17 +172,6 @@ export class CouchbaseModel {
       e.code = 400
       throw e
     }
-  }
-
-  async findByMigratedId (migratedId, required = true) {
-    const qb = this.getQueryBuilder().where('t.`_migrateId` = ?', migratedId)
-    const results = await this.query(qb)
-
-    if (required && (!results || results.length === 0)) {
-      throw new Error(`No records ${this._getMeta().defaultProps._documentType} found by _migrateId: ${migratedId}`)
-    }
-
-    return results
   }
 
   async findById (id) {
