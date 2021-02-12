@@ -283,21 +283,12 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
   }
 
   async preSave (data) {
-    const worksheetIndex = data.worksheetIndex || await this._getNewIndex()
     // never store this
     return t.update(data, {
-      $merge: {
-        worksheetIndex
-      },
       ownerContacts: { $set: [] },
       relatedBuildings: { $set: [] },
       relatedOwners: { $set: [] }
     })
-  }
-
-  async _getNewIndex () {
-    const counter = this.getCounter()
-    return counter.count(this.getType(), 1)
   }
 
   /**

@@ -16,19 +16,6 @@ class CouchbaseModelStruct {
   }
 }
 
-export class CouchbaseCounter {
-  constructor (bucket, options) {
-    this.options = options
-    this.bucket = bucket
-  }
-
-  async count (key, delta = 0) {
-    const counterKey = `counter:${key}`
-    const { value } = await this.bucket.counterAsync(counterKey, delta, this.options)
-    return value
-  }
-}
-
 export class CouchbaseModel {
   constructor () {
     CouchbaseModel.prototype._promiseBucket = CouchbaseModel.prototype._promiseBucket || init()
@@ -127,10 +114,6 @@ export class CouchbaseModel {
     await this._promiseBucket
 
     return this._bucket.queryAsync(searchBuilder)
-  }
-
-  getCounter (options = { initial: 1 }) {
-    return new CouchbaseCounter(this._bucket, options)
   }
 
   async raw (query, consistency = couchbase.consistency) {
