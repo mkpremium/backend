@@ -80,19 +80,19 @@ jobs:
           docker push $ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Render Amazon ECS task definition for API V2 container
-        id: api-v2-task-def
+      - name: Render Amazon ECS task definition for API container
+        id: api-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: infrastructure/ecs/api-v2-task-definition.json
+          task-definition: infrastructure/ecs/api-task-definition.json
           container-name: api
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy Amazon ECS API V2 task definition
+      - name: Deploy Amazon ECS API task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.api-v2-task-def.outputs.task-definition }}
-          service: apiv2
+          task-definition: ${{ steps.api-task-def.outputs.task-definition }}
+          service: api
           cluster: production
           wait-for-minutes: 5
 
@@ -127,18 +127,3 @@ jobs:
           cluster: production
           wait-for-minutes: 5
 
-      - name: Render Amazon ECS task definition for API container
-        id: api-task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: infrastructure/ecs/api-task-definition.json
-          container-name: api
-          image: ${{ steps.build-image.outputs.image }}
-
-#      - name: Deploy Amazon ECS API task definition
-#        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-#        with:
-#          task-definition: ${{ steps.api-task-def.outputs.task-definition }}
-#          service: api
-#          cluster: production
-#          wait-for-minutes: 5
