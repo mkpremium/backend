@@ -2,7 +2,6 @@ import { Router } from 'express'
 
 import {
   findScheduledEventController,
-  listScheduledEventController,
   updateScheduledEventController,
   weekScheduleEventMeetingsController
 } from './controllers'
@@ -12,7 +11,6 @@ export const createScheduleEventsRoutes = awilixContainer => {
   const router = Router()
 
   router.get('/week', weekScheduleEventMeetingsController)
-  router.get('/', listScheduledEventController)
   router.post('/call', wrap(awilixContainer.resolve('addScheduledCallController')))
   router.post('/meeting', wrap(awilixContainer.resolve('addMeetingController')))
   router.get('/calls', wrap(awilixContainer.resolve('getUserScheduledCallsController')))

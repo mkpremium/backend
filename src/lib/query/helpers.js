@@ -13,12 +13,6 @@ export const addDateQueryToBuilder = (queryBuilder, fieldName, value) => {
   queryBuilder.where(`${fieldName} < ?`, m.clone().endOf('day').toDate())
 }
 
-export const addMinuteDateQueryToBuilder = (queryBuilder, fieldName, value) => {
-  const m = utc(value)
-  queryBuilder.where(`${fieldName} >= ?`, m.clone().toDate())
-  queryBuilder.where(`${fieldName} < ?`, m.clone().add(1, 'minutes').toDate())
-}
-
 export const addMinuteBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {
   const [start, end] = splitDateRange(value)
   if (start) {

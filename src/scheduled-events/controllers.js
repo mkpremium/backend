@@ -1,13 +1,6 @@
 import { wrap } from 'express-promise-wrap'
 import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
 
-async function listScheduledEvent (req, res) {
-  const repo = new ScheduledEventsRepository()
-  const scheduledEvents = await repo.list(req.query)
-
-  res.json(scheduledEvents)
-}
-
 async function weekScheduleEventMeetings (req, res) {
   const repo = new ScheduledEventsRepository()
   const { week, year } = req.query
@@ -31,7 +24,6 @@ async function updateScheduledEvent (req, res) {
 
 export const SCHEDULED_EVENT_DELETED = 'SCHEDULED_EVENT_DELETED'
 
-export const listScheduledEventController = wrap(listScheduledEvent)
 export const weekScheduleEventMeetingsController = wrap(weekScheduleEventMeetings)
 export const findScheduledEventController = wrap(findByIdScheduledEvent)
 export const updateScheduledEventController = wrap(updateScheduledEvent)

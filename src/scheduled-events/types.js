@@ -6,7 +6,7 @@ export const ScheduledEventType = {
   MEETINGS: 'MEETINGS'
 }
 
-export const ScheduledEventTypeEnum = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType')
+const ScheduledEventTypeEnum = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType')
 
 export const Event = t.struct(
   {

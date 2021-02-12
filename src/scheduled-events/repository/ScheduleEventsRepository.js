@@ -5,61 +5,19 @@ import { CouchbaseModel } from '../../db/model'
 import { logger } from '../../infrastructure/logger'
 import { buildRangeFromWeek, utc } from '../../lib/date'
 import { newHttpError } from '../../lib/http-error'
-import {
-  addBetweenQueryToBuilder,
-  addDateQueryToBuilder,
-  addMinuteBetweenQueryToBuilder,
-  addMinuteDateQueryToBuilder
-} from '../../lib/query/helpers'
+import { addBetweenQueryToBuilder, addMinuteBetweenQueryToBuilder } from '../../lib/query/helpers'
 import { OwnerRepository } from '../../owner/models'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
-import { ListQuery } from '../../types/params'
-import { StringSplitList } from '../../types/refinement'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import { Event, ScheduledEvent, ScheduledEventType, ScheduledEventTypeEnum } from '../types'
-
-const ScheduleEventsListResponse = t.struct(
-  {
-    total: t.Number,
-    results: t.list(ScheduledEvent)
-  },
-  {
-    name: 'ScheduleEventsListResponse',
-    defaultProps: {
-      total: 0,
-      results: []
-    }
-  }
-)
+import { Event, ScheduledEvent, ScheduledEventType } from '../types'
 
 const UpdateScheduledEvent = t.struct({
   notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date),
   event: t.maybe(Event)
 }, 'UpdateScheduledEvent')
-
-const ScheduledEventListQuery = ListQuery.extend(
-  {
-    createdBy: t.maybe(t.String),
-    notifyAt: t.maybe(t.String),
-    type: t.maybe(ScheduledEventTypeEnum),
-    createdAt: t.maybe(t.String),
-    eventDate: t.maybe(t.String),
-    eventDateBetween: t.maybe(t.String),
-    createdBetween: t.maybe(StringSplitList),
-    notifyBetween: t.maybe(StringSplitList)
-  },
-  {
-    name: 'ScheduledEventListQuery',
-    defaultProps: {
-      createdBetween: ',',
-      notifyBetween: ',',
-      eventDateBetween: ','
-    }
-  }
-)
 
 export class ScheduledEventsRepository extends CouchbaseModel {
   constructor () {
@@ -141,48 +99,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
   async delete (id) {
     const qb = this.getQueryBuilder('delete').where('id = ?', id)
     await this.query(qb)
-  }
-
-  async list (query = {}) {
-    const params = ScheduledEventListQuery(query)
-    const qb = this.getQueryBuilder('select')
-      .limit(params.limit)
-      .offset(params.offset)
-    const qbCount = this.getQueryBuilder('count')
-
-    if (params.createdBy) {
-      qb.where('createdBy = ?', params.createdBy)
-      qbCount.where('createdBy = ?', params.createdBy)
-    }
-
-    if (params.type) {
-      qb.where('type = ?', params.type)
-      qbCount.where('type = ?', params.type)
-    }
-
-    if (params.createdAt) {
-      addDateQueryToBuilder(qb, 'createdAt', params.createdAt)
-      addDateQueryToBuilder(qbCount, 'createdAt', params.createdAt)
-    } else if (params.notifyAt) {
-      addMinuteDateQueryToBuilder(qb, 'notifyAt', params.notifyAt)
-      addMinuteDateQueryToBuilder(qbCount, 'notifyAt', params.notifyAt)
-    } else if (params.eventDate) {
-      addDateQueryToBuilder(qb, 'eventDate', params.eventDate)
-      addDateQueryToBuilder(qbCount, 'eventDate', params.eventDate)
-    } else if (params.eventDateBetween) {
-      addBetweenQueryToBuilder(qb, 'eventDate', params.eventDateBetween)
-      addBetweenQueryToBuilder(qbCount, 'eventDate', params.eventDateBetween)
-    } else if (params.notifyBetween) {
-      addBetweenQueryToBuilder(qb, 'notifyAt', params.notifyBetween)
-      addBetweenQueryToBuilder(qbCount, 'notifyAt', params.notifyBetween)
-    } else if (params.createdBetween) {
-      addBetweenQueryToBuilder(qb, 'createdAt', params.createdBetween)
-      addBetweenQueryToBuilder(qbCount, 'createdAt', params.createdBetween)
-    }
-    const total = await this.countQuery(qbCount)
-    const results = await this.query(qb)
-
-    return fromJSON({ total, results }, ScheduleEventsListResponse)
   }
 
   async weekScheduleEventMeetings (week, year) {
