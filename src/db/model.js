@@ -205,12 +205,7 @@ export class CouchbaseModel {
     return data
   }
 
-  async postSave (data) {
-    // no post-save events operations on base model
-  }
-
   async save (data, sendEvent, opts = {}) {
-    // noinspection JSCheckFunctionSignatures
     const struct = fromJSON(data, this.Struct)
     const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })
     const dataPreSaved = await this.preSave(dataWithId)
@@ -226,14 +221,7 @@ export class CouchbaseModel {
     }
 
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts)
-    // noinspection JSCheckFunctionSignatures
-    const model = fromJSON(result, this.Struct)
-
-    if (result) {
-      await this.postSave(model)
-    }
-
-    return model
+    return fromJSON(result, this.Struct)
   }
 }
 
