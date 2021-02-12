@@ -10,6 +10,7 @@ import { validate } from 'tcomb-validation'
 import init from './couchbase'
 import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
+import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 
 class CouchbaseModelStruct {
   constructor () {

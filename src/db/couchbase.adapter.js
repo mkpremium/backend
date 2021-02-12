@@ -4,6 +4,8 @@ import uuid from 'uuid/v4'
 import { errors } from 'couchbase'
 import { EntityNotFound, QueryError, QueryTimeout } from './errors'
 import { CouchbaseRecordToDomain } from '../infrastructure/couchbase/record-to-domain'
+import { validate } from 'tcomb-validation'
+import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 
 export class CouchbaseAdapter {
   constructor (couchbaseBucket) {
@@ -17,6 +19,11 @@ export class CouchbaseAdapter {
   async save (data, structType) {
     const struct = fromJSON(data, structType)
     const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })
+
+    const validationResult = validate(dataWithId, structType)
+    if (!validationResult.isValid()) {
+      throw new WrongStructRecord(data._documentType, validationResult.errors, data)
+    }
 
     const result = await this.couchbaseBucket.upsertToDb(dataWithId.id, dataWithId)
 
