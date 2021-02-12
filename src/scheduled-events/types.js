@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import { OwnerWithInclude } from '../owner/owner'
+import moment from 'moment'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -31,13 +32,14 @@ export const Event = t.struct(
     }
   })
 
+const DateTimeString = t.refinement(t.String, s => moment(s, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]', true).isValid())
 export const ScheduledEvent = t.struct(
   {
     id: t.maybe(t.String),
     type: ScheduledEventTypeEnum,
     notifyTo: t.String,
     notifyAt: t.Date,
-    eventDate: t.Date,
+    eventDate: t.union([ t.Date, DateTimeString ]),
     createdBy: t.maybe(t.String),
     createdAt: t.Date,
     _documentType: t.String,

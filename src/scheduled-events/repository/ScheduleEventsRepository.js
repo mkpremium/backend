@@ -14,7 +14,6 @@ import {
 import { OwnerRepository } from '../../owner/models'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
-import { SystemPreferencesRepository } from '../../system-preferences/models'
 import { ListQuery } from '../../types/params'
 import { StringSplitList } from '../../types/refinement'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
@@ -75,44 +74,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     }
 
     return scheduledEvent
-  }
-
-  async validateMeeting (data) {
-    if (data.type !== ScheduledEventType.MEETINGS) {
-      return true
-    }
-    // non presencial meetings necesitan validación de tiempo y fecha
-
-    if (!data.event.inPerson) {
-      return true
-    }
-
-    const pref = await SystemPreferencesRepository.getPreferences()
-
-    if (!pref.meetingRestrictions.enable) {
-      return true
-    }
-
-    if (!areMeetingMinutesAllowed(data.eventDate, pref.meetingRestrictions.allowedStartMinutes)) {
-      throw newHttpError(
-        400,
-        `Las reuniones solo puede empezar a los 00 minutos o 30 minutos UTC: ${data.eventDate}|${data.eventDate.toISOString()}`
-      )
-    }
-
-    const previousTime = pref.meetingRestrictions.meetingTime + pref.meetingRestrictions.timeBetweenMeeting
-    const meetingTime = pref.meetingRestrictions.meetingTime
-    const m = utc(data.eventDate)
-    const start = m.clone().subtract(previousTime, 'hours').toISOString()
-    const end = m.clone().add(meetingTime, 'hours').toISOString()
-    const meetingsInRange = await this.findMeetingInRange(data.notifyTo, start, end, data.id)
-    if (meetingsInRange && meetingsInRange.length > 0) {
-      throw newHttpError(
-        400,
-        'Las reuniones no pueden solaparse, tiene una duración de 1h y deben tener 30 minutos entre ellas'
-      )
-    }
-    return true
   }
 
   async findMeetingInRange (notifyTo, start, end, scheduleId) {
@@ -238,7 +199,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
   }
 
   async preSave (scheduleEvent) {
-    await this.validateMeeting(scheduleEvent)
     const ownerId = _get(scheduleEvent, 'event.ownerId')
     if (ownerId) {
       const ownerRepo = new OwnerRepository()
@@ -250,10 +210,4 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     }
     return scheduleEvent
   }
-}
-
-function areMeetingMinutesAllowed (time, allowedMinutes = [ 0, 30 ]) {
-  const min = time.getMinutes()
-
-  return allowedMinutes.indexOf(min) !== -1
 }
