@@ -19,7 +19,7 @@ export const CallcenterView = t.struct({
       postalCode: t.struct({
         number: t.union([ t.String, t.Number ])
       }),
-      neighborhood: t.String,
+      neighborhood: t.maybe(t.String),
       type: t.maybe(t.String)
     }),
 
