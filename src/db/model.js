@@ -5,6 +5,7 @@ import squel from 'squel'
 import { N1qlQuery, SearchQuery } from 'couchbase'
 import _ from 'lodash'
 import { logger } from '../infrastructure/logger'
+import { validate } from 'tcomb-validation'
 
 import init from './couchbase'
 import { couchbase } from '../../config'
@@ -219,6 +220,11 @@ export class CouchbaseModel {
     }
 
     await this._promiseBucket
+    const validationResult = validate(dataPreSaved, struct)
+    if (!validationResult.isValid()) {
+      throw new WrongStructRecord(this.getType(), validationResult.errors, data)
+    }
+
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts)
     // noinspection JSCheckFunctionSignatures
     const model = fromJSON(result, this.Struct)
@@ -228,5 +234,14 @@ export class CouchbaseModel {
     }
 
     return model
+  }
+}
+
+class WrongStructRecord extends Error {
+  constructor (type, errors, data) {
+    super('A wrong struct record was tried to save')
+    this.type = type
+    this.errors = errors
+    this.data = data
   }
 }
