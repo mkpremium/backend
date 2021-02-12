@@ -214,22 +214,13 @@ export class CouchbaseModel {
       throw new Error('it seems you forgot return the data on the preSave(data) method')
     }
 
-    await this._promiseBucket
-    const validationResult = validate(dataPreSaved, struct)
+    const validationResult = validate(dataPreSaved, this.Struct)
     if (!validationResult.isValid()) {
       throw new WrongStructRecord(this.getType(), validationResult.errors, data)
     }
 
+    await this._promiseBucket
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts)
     return fromJSON(result, this.Struct)
-  }
-}
-
-class WrongStructRecord extends Error {
-  constructor (type, errors, data) {
-    super('A wrong struct record was tried to save')
-    this.type = type
-    this.errors = errors
-    this.data = data
   }
 }
