@@ -36,7 +36,6 @@ export const ScheduledEvent = t.struct(
     id: t.maybe(t.String),
     type: ScheduledEventTypeEnum,
     notifyTo: t.String,
-    notifyAt: t.Date,
     eventDate: t.union([ t.Date, DateTimeString ]),
     createdBy: t.maybe(t.String),
     createdAt: t.Date,

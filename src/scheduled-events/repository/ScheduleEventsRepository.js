@@ -14,7 +14,6 @@ import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { Event, ScheduledEvent, ScheduledEventType } from '../types'
 
 const UpdateScheduledEvent = t.struct({
-  notifyAt: t.maybe(t.Date),
   eventDate: t.maybe(t.Date),
   event: t.maybe(Event)
 }, 'UpdateScheduledEvent')
@@ -87,7 +86,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     })
     const updatedScheduledEventData = t.update(scheduledEvent, {
       $merge: {
-        notifyAt: data.notifyAt,
         eventDate: data.eventDate,
         event: updatedEvent
       }
