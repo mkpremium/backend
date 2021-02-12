@@ -5,7 +5,7 @@ import { Building } from '../building/building'
 import { SimpleAddress, TypedContactInfo } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { validate } from 'tcomb-validation'
-import { createType } from '../infrastructure/create-type'
+import { refineType } from '../infrastructure/refine-type'
 
 export const Person = t.struct(
   {
@@ -152,7 +152,7 @@ Owner.prototype.changeContactStatus = function (contactId, newStatus) {
   })
 }
 
-const RefinedOwner = createType(Owner, o => {
+const RefinedOwner = refineType(Owner, o => {
   if (o.featuredContact.phoneId && !getOwnerContact(o, o.featuredContact.phoneId)) {
     return `Unknown contact phoneId=${o.featuredContact.phoneId} in owner=${o.id}`
   }
