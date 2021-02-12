@@ -2,7 +2,7 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import squel from 'squel'
-import { N1qlQuery, SearchQuery, ViewQuery } from 'couchbase'
+import { N1qlQuery, SearchQuery } from 'couchbase'
 import _ from 'lodash'
 import { logger } from '../infrastructure/logger'
 
@@ -42,19 +42,6 @@ export class CouchbaseModel {
     }
 
     return model
-  }
-
-  toStruct (data) {
-    return fromJSON(data, this.Struct)
-  }
-
-  async unlock (id, cas) {
-    await this._promiseBucket
-    return this._bucket.unlockAsync(id, cas)
-  }
-
-  getView (viewName) {
-    return ViewQuery.from('operator', viewName)
   }
 
   getQueryBuilder (method = 'select', prefix = 't', props = this._getMeta().props) {
