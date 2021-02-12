@@ -2,11 +2,10 @@ import { wrap } from 'express-promise-wrap'
 import _get from 'lodash/get'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { History } from '../history/models'
-import { newHttpError } from '../lib/http-error'
 import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { OperatorRoles } from '../types/operator'
-import { QueueRequestParams, LegacyWorksheetRepository } from './models/worksheet-repository'
+import { LegacyWorksheetRepository, QueueRequestParams } from './models/worksheet-repository'
 import { QueueRequestAction } from './types'
 import { WorksheetQueueBody } from './domain/worksheet'
 
@@ -81,39 +80,24 @@ const queueList = worksheetQueueRepository => async (req, res) => {
 
 /**
  * @param {LegacyWorksheetQueueRepository} worksheetQueueRepository
- * @param {TakeNextWorksheetService} takeNextWorksheetService
  */
-const actionsOnWorksheetQueue = (worksheetQueueRepository, takeNextWorksheetService) => async (req, res) => {
+const actionsOnWorksheetQueue = (worksheetQueueRepository) => async (req, res) => {
   const queueId = req.params.id
   const params = QueueRequestParams(req.body)
+  if (params.action !== QueueRequestAction.RELEASE) {
+    return res.status(400).send('Only release action is supportted')
+  }
+
   const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   canOperatorHandleQueue(req.user.operator, queueId)
 
-  switch (params.action) {
-    case QueueRequestAction.NEXT: {
-      const nextWorksheet = await takeNextWorksheetService.nextWorksheetInQueue(queue, req.user.id)
-      if (nextWorksheet === undefined) {
-        throw newHttpError(422, 'No hay items disponibles en la lista')
-      }
-      return res.json(nextWorksheet)
-    }
-    case QueueRequestAction.TAKE: {
-      const worksheet = await worksheetQueueRepository.takeWorksheetInQueue(queue, params.queueItemId, req.user.id)
-      await History.registerTake({
-        contextModel: worksheet,
-        user: req.user
-      })
-      return res.json(worksheet)
-    }
-    case QueueRequestAction.RELEASE: {
-      const releasedWorksheet = await worksheetQueueRepository.releaseWorksheetByIdInQueue(queue, params.worksheetId, req.user.id)
-      await History.registerRelease({
-        contextModel: releasedWorksheet,
-        user: req.user
-      })
-      return res.status(204).send()
-    }
-  }
+  const releasedWorksheet = await worksheetQueueRepository.releaseWorksheetByIdInQueue(queue, params.worksheetId, req.user.id)
+  await History.registerRelease({
+    contextModel: releasedWorksheet,
+    user: req.user
+  })
+
+  return res.status(204).send()
 }
 
 function operatorIdByPermissions (req) {

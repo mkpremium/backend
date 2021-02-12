@@ -1,17 +1,13 @@
 import Promise from 'bluebird'
 import _ from 'lodash'
-import _get from 'lodash/get'
 import _map from 'lodash/map'
 import _set from 'lodash/set'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
 import { logger } from '../../infrastructure/logger'
-import { utc } from '../../lib/date'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
-import { OperatorStats } from '../../stats/models'
-import { OperatorActions } from '../../stats/types'
 import { ListQuery } from '../../types/params'
 import {
   WorkSheetCall,
@@ -129,60 +125,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
     }
 
     return this.releaseItemInQueueAndSave(queue, item, operatorId)
-  }
-
-  /**
-   * @public
-   * @param data
-   * @param itemId
-   * @param operatorId
-   * @returns {Promise<Worksheet>}
-   */
-  async takeWorksheetInQueue (data, itemId, operatorId) {
-    const queue = fromJSON(data, WorksheetQueue)
-    const item = queue.findItemById(itemId)
-    if (!item) {
-      throw newHttpError(400, `El ${itemId} item no fue encontrado en la cola`)
-    }
-
-    if (!item.canBeOpened(operatorId)) {
-      throw newHttpError(409, `El ${itemId} (${item.status}) no esta disponible para su apertura`)
-    }
-
-    const operatorItem = queue.findOpenedItemByOperatorId(operatorId)
-
-    if (operatorItem && operatorItem.id !== item.id) {
-      throw newHttpError(409, `El operador ${operatorId} ya ha tomado un item previamente ${operatorItem.id}`)
-    }
-
-    const worksheet = await this.worksheetRepository.findByIdWIthIncludes(item.worksheetId)
-
-    if (!worksheet) {
-      throw newHttpError(409, `La hoja de trabajo ${item.worksheetId} no puede abrirse, comuníquese con su administrador`)
-    }
-
-    const updatedWorksheet = t.update(worksheet, { viewedAt: { $set: utc().toDate() } })
-    await this.worksheetRepository.save(updatedWorksheet)
-
-    const updatedItem = item.take(operatorId)
-    const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
-    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
-
-    logger.info('WorksheetQueueRepository#takeWorksheetInQueue', {
-      worksheetId: worksheet.id,
-      status: worksheet.status,
-      queueId: queue.id
-    })
-
-    await this.save(updatedQueue)
-
-    if (!operatorItem) {
-      const city = _get(worksheet, 'relatedBuildings.0.address.city')
-      const province = _get(worksheet, 'relatedBuildings.0.address.province')
-      await OperatorStats.registerAction(operatorId, OperatorActions.VIEW_WORKSHEET, { city, province })
-    }
-
-    return this.worksheetRepository.findByIdWIthIncludes(updatedItem.worksheetId)
   }
 
   /**
