@@ -2,6 +2,7 @@ import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { Address, SimpleAddress, SimplePhoneNumber } from '../types/common'
 import { BuildingStateEnum } from '../types/enums'
+import { DateTimeString } from '../infrastructure/shared-types'
 
 const buildingEntitiesDefaultStatus = 'SIN DATOS'
 const buildingEntitiesStatus = {
@@ -53,9 +54,9 @@ export const BuildingProposal = t.struct(
     ownerId: t.maybe(t.String),
     buildingId: t.String,
     accepted: t.Boolean,
-    createdAt: t.Date,
+    createdAt: t.union([ t.Date, DateTimeString ]),
     createdBy: t.String,
-    updatedAt: t.maybe(t.Date),
+    updatedAt: t.maybe(t.union([ t.Date, DateTimeString ])),
     updateBy: t.maybe(t.String),
 
     aspiration: t.maybe(t.Number),

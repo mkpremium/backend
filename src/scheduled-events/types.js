@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import { OwnerWithInclude } from '../owner/owner'
-import moment from 'moment'
+import { DateTimeString } from '../infrastructure/shared-types'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -32,7 +32,6 @@ export const Event = t.struct(
     }
   })
 
-const DateTimeString = t.refinement(t.String, s => moment(s, 'YYYY-MM-DD[T]HH:mm:ss.SSSZ', true).isValid())
 export const ScheduledEvent = t.struct(
   {
     id: t.maybe(t.String),
