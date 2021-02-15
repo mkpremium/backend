@@ -131,27 +131,6 @@ Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   })
 }
 
-Owner.prototype.changeContactStatus = function (contactId, newStatus) {
-  const contact = this.person.contacts.find(c => c.id === contactId)
-  if (!contact) {
-    throw new Error(`Contact "${contactId}" not found in owner "${this.id}"`)
-  }
-  const otherContacts = this.person.contacts.filter(c => c.id !== contactId)
-
-  const contacts = [ { ...contact, status: newStatus, id: contactId }, ...otherContacts ]
-  const updatedStatus = _.some(contacts, c => c.status === 'GOOD') ? OwnerStatus.VERIFIED
-    : (_.every(contacts, c => c.status === 'BAD') ? OwnerStatus.WITHOUT_CONTACT : this.status)
-
-  return t.update(this, {
-    $merge: {
-      status: updatedStatus,
-      person: t.update(this.person, {
-        $merge: { contacts }
-      })
-    }
-  })
-}
-
 const RefinedOwner = refineType(Owner, o => {
   if (o.featuredContact.phoneId && !getOwnerContact(o, o.featuredContact.phoneId)) {
     return `Unknown contact phoneId=${o.featuredContact.phoneId} in owner=${o.id}`
@@ -163,9 +142,29 @@ const RefinedOwner = refineType(Owner, o => {
   return true
 })
 
+export const changeContactStatus = (owner, contactId, newStatus) => {
+  const contact = owner.person.contacts.find(c => c.id === contactId)
+  if (!contact) {
+    throw new Error(`Contact "${contactId}" not found in owner "${owner.id}"`)
+  }
+  const otherContacts = owner.person.contacts.filter(c => c.id !== contactId)
+
+  const contacts = [ { ...contact, status: newStatus, id: contactId }, ...otherContacts ]
+  const updatedStatus = _.some(contacts, c => c.status === 'GOOD') ? OwnerStatus.VERIFIED
+    : (_.every(contacts, c => c.status === 'BAD') ? OwnerStatus.WITHOUT_CONTACT : owner.status)
+
+  return t.update(owner, {
+    $merge: {
+      status: updatedStatus,
+      person: t.update(owner.person, {
+        $merge: { contacts }
+      })
+    }
+  })
+}
+
 export const mergeFeaturedContact = (owner, featuredContact) => {
-  // TODO mark contact as GOOD
-  const updatedOwner = Owner.update(owner, {
+  let updatedOwner = Owner.update(owner, {
     featuredContact: { $set: { ...(owner.featuredContact || {}), ...featuredContact } }
   })
   const validationResult = validate(updatedOwner, RefinedOwner)
@@ -173,7 +172,18 @@ export const mergeFeaturedContact = (owner, featuredContact) => {
     throw new WrongFeaturedContact(owner.id, featuredContact, validationResult.errors)
   }
 
+  if (featuredContact.phoneId) {
+    updatedOwner = changeContactStatus(updatedOwner, featuredContact.phoneId, 'GOOD')
+  }
+  if (featuredContact.emailId) {
+    updatedOwner = changeContactStatus(updatedOwner, featuredContact.emailId, 'GOOD')
+  }
+
   return updatedOwner
+}
+
+export const contactOfId = (owner, contactId) => {
+  return owner.person.contacts.find(({ id }) => id === contactId)
 }
 
 const getOwnerContact = (o, contactId) => o.person.contacts.find(({ id }) => id === contactId)

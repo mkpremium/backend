@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { mergeFeaturedContact } from '../../src/owner/owner'
+import { contactOfId, mergeFeaturedContact } from '../../src/owner/owner'
 import { ownerBuilder } from './owner.builder'
 
 describe('mergeFeaturedContact', () => {
@@ -23,5 +23,21 @@ describe('mergeFeaturedContact', () => {
 
     expect(mergeFeaturedContact(testOwner, { emailId: 'test-email-id' }).featuredContact)
       .to.be.eql({ phoneId: 'test-phone-id', emailId: 'test-email-id' })
+  })
+
+  it('marks featured phone as validated', () => {
+    const testOwner = ownerBuilder().withPhoneContact('test-phone-id').build()
+
+    const updatedOwner = mergeFeaturedContact(testOwner, { phoneId: 'test-phone-id' })
+
+    expect(contactOfId(updatedOwner, 'test-phone-id').status).to.be.equal('GOOD')
+  })
+
+  it('marks featured email as validated', () => {
+    const testOwner = ownerBuilder().withEmailContact('test-email-id').build()
+
+    const updatedOwner = mergeFeaturedContact(testOwner, { emailId: 'test-email-id' })
+
+    expect(contactOfId(updatedOwner, 'test-email-id').status).to.be.equal('GOOD')
   })
 })

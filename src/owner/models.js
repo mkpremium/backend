@@ -12,7 +12,7 @@ import { OperatorRepository } from '../operator/models'
 import { TypedContactInfo } from '../types/common'
 import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
-import { Owner, OwnerBody, Person } from './owner'
+import { changeContactStatus, Owner, OwnerBody, Person } from './owner'
 import { OwnerListQuery } from './types'
 
 function ownerIncludes (qb, includes) {
@@ -71,7 +71,7 @@ export class OwnerRepository extends CouchbaseModel {
 
   async changeContactStatus (ownerId, contactId, newStatus) {
     const owner = await this.findByIdOrThrow(ownerId)
-    const updatedOwner = owner.changeContactStatus(contactId, newStatus)
+    const updatedOwner = changeContactStatus(owner, contactId, newStatus)
 
     return this.save(updatedOwner)
   }
