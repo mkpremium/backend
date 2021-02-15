@@ -6,6 +6,7 @@ import { SimpleAddress, TypedContactInfo } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { validate } from 'tcomb-validation'
 import { refineType } from '../infrastructure/refine-type'
+import { DateTimeString } from '../infrastructure/shared-types'
 
 export const Person = t.struct(
   {
@@ -61,7 +62,7 @@ export const OwnerBody = t.struct(
 export const OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
-  confirmedAt: t.maybe(t.Date)
+  confirmedAt: t.maybe(t.union([ t.Date, DateTimeString ]))
 }, 'confirmed')
 export const FeaturedContact = t.refinement(t.struct({
   phoneId: t.maybe(t.String),
