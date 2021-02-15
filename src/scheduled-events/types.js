@@ -1,4 +1,5 @@
 import t from 'tcomb'
+import { OwnerWithInclude } from '../owner/owner'
 import moment from 'moment'
 
 export const ScheduledEventType = {
@@ -10,6 +11,7 @@ const ScheduledEventTypeEnum = t.enums.of(Object.values(ScheduledEventType), 'Sc
 
 export const Event = t.struct(
   {
+    owner: t.maybe(OwnerWithInclude),
     ownerId: t.String,
     queueId: t.maybe(t.String),
     itemId: t.maybe(t.String),
