@@ -12,7 +12,34 @@ export const ownerBuilder = (overwrites = {}) => {
       return Owner({ ...ownerPrototype, ...overwrites })
     },
 
-    withPhoneContact (id = 'test-phone-id', status = 'undefined', phoneNumber = '666666666') {
+    withPhoneContact (id = 'test-phone-id', status = 'UNDEFINED', phoneNumber = '666666666') {
+      if (!overwrites.person) {
+        overwrites.person = ownerPrototype.person
+      }
+
+      overwrites.person = Person.update(overwrites.person, {
+        contacts: {
+          $push: [ {
+            id,
+            type: 'TELEFONO',
+            value: phoneNumber
+          } ]
+        }
+      })
+
+      return this
+    },
+
+    withFeaturedPhone (phoneId) {
+      if (!overwrites.featuredContact) {
+        overwrites.featuredContact = {}
+      }
+
+      overwrites.featuredContact.phoneId = phoneId
+      return this
+    },
+
+    withEmailContact (id = 'test-email-id', status = 'UNDEFINED', phoneNumber = 'test@example.org') {
       if (!overwrites.person) {
         overwrites.person = ownerPrototype.person
       }

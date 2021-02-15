@@ -14,4 +14,14 @@ describe('mergeFeaturedContact', () => {
     expect(() => mergeFeaturedContact(testOwner, { emailId: 'unknown-contact-id' }))
       .to.throw(/wrong featured contact/i)
   })
+
+  it('adds only given contact id', () => {
+    const testOwner = ownerBuilder()
+      .withPhoneContact('test-phone-id').withFeaturedPhone('test-phone-id')
+      .withEmailContact()
+      .build()
+
+    expect(mergeFeaturedContact(testOwner, { emailId: 'test-email-id' }).featuredContact)
+      .to.be.eql({ phoneId: 'test-phone-id', emailId: 'test-email-id' })
+  })
 })

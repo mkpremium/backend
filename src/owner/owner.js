@@ -165,9 +165,8 @@ const RefinedOwner = refineType(Owner, o => {
 
 export const mergeFeaturedContact = (owner, featuredContact) => {
   // TODO mark contact as GOOD
-  // TODO set only given featured contact (phone or email)
   const updatedOwner = Owner.update(owner, {
-    featuredContact: { $set: featuredContact }
+    featuredContact: { $set: { ...(owner.featuredContact || {}), ...featuredContact } }
   })
   const validationResult = validate(updatedOwner, RefinedOwner)
   if (!validationResult.isValid()) {
