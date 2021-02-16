@@ -10,7 +10,8 @@ const DbMeeting = t.struct({
   notifyTo: t.String,
   eventDate: t.Date,
   event: t.struct({
-    buildingId: t.String
+    buildingId: t.String,
+    inPerson: t.Boolean
   }),
   type: t.irreducible('MeetingDbEventType', dt => dt === 'MEETINGS'),
   _documentType: t.irreducible('MeetingDbDocumentType', dt => dt === 'scheduled-event')
@@ -36,7 +37,8 @@ DbMeeting.fromMeeting = meeting => DbMeeting({
   notifyTo: meeting.withAgentOfId,
   eventDate: meeting.meetingAt.toDate(),
   event: {
-    buildingId: meeting.buildingId
+    buildingId: meeting.buildingId,
+    inPerson: true
   }
 })
 
@@ -45,7 +47,7 @@ SELECT
   id,
   notifyTo,
   eventDate,
-  {"buildingId": event.buildingId} event
+  {"buildingId": event.buildingId, "inPerson": true} event
 FROM ${bucketName}
 WHERE _documentType = 'scheduled-event' AND type = 'MEETINGS'
   AND notifyTo = $1 AND eventDate > NOW_UTC() AND event.inPerson
