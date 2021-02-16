@@ -24,7 +24,7 @@ describe('MeetingsRepository', () => {
       notifyAt: now.toDate(),
       eventDate: now.toDate(),
       event: {
-        inPerson: false,
+        inPerson: true,
         buildingId: 'test-building-id',
         ownerId: 'test-owner-id',
         contactId: 'test-contact-id'

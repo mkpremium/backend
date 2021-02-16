@@ -48,7 +48,7 @@ SELECT
   {"buildingId": event.buildingId} event
 FROM ${bucketName}
 WHERE _documentType = 'scheduled-event' AND type = 'MEETINGS'
-  AND notifyTo = $1 AND eventDate > NOW_UTC()
+  AND notifyTo = $1 AND eventDate > NOW_UTC() AND event.inPerson
 `
 
 export class MeetingsRepository extends CouchbaseRepository {
