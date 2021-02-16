@@ -95,6 +95,10 @@
         {
           "valueFrom": "backend.numintect.api-license",
           "name": "NUMINTEC_API_LICENSE"
+        },
+        {
+          "valueFrom": "backend.jwt_secret",
+          "name": "JWT_SECRET"
         }
       ],
       "dockerSecurityOptions": null,

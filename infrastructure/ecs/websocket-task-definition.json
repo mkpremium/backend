@@ -59,6 +59,10 @@
         {
           "valueFrom": "backend.couchbase_pass",
           "name": "COUCHBASE_PASS"
+        },
+        {
+          "valueFrom": "backend.jwt_secret",
+          "name": "JWT_SECRET"
         }
       ],
       "dockerSecurityOptions": null,

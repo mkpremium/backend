@@ -23,7 +23,7 @@ export const couchbase = {
   uriAPIRest: process.env.COUCHBASE_API_REST || 'http://127.0.0.1:8094/api/index/'
 }
 export const jwt = {
-  secret: process.env.JWT_SECRET || 'Bitdistrict1sGreat',
+  secret: process.env.JWT_SECRET,
   expiresIn: process.env.JWT_EXPIRES || '3 day',
   refreshTokenExpiresIn: process.env.REFRESH_TOKEN_JWT_EXPIRES || '10 days'
 }
