@@ -30,7 +30,7 @@
     "debug": "^3.1.0",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
-    "express-jwt": "^5.3.1",
+    "express-jwt": "^6.0.0",
     "express-jwt-permissions": "^1.1.0",
     "express-promise-wrap": "^0.2.2",
     "faker": "^5.1.0",

@@ -9,7 +9,7 @@ import { OperatorRoles } from '../types/operator'
 import { logger } from '../infrastructure/logger'
 
 export const jwt = (getToken) => {
-  const jwtInstance = jwtMiddleware(Object.assign({}, jwtConfig, { getToken }))
+  const jwtInstance = jwtMiddleware({ ...jwtConfig, getToken, algorithms: [ 'HS256' ] })
   const composedJwt = compose(jwtInstance, wrap(addUserInfo))
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError
   composedJwt.unless = jwtInstance.unless
@@ -28,7 +28,7 @@ async function addUserInfo (req, res, next) {
 
 export function bearerTokenExtractor (req) {
   const authorization = _get(req, 'headers.authorization', '')
-  const [scheme, credentials] = authorization.split(' ')
+  const [ scheme, credentials ] = authorization.split(' ')
   if (scheme && /^Bearer$/i.test(scheme)) {
     return credentials
   } else if (scheme) {
@@ -47,18 +47,18 @@ const guard = jwtPermissions()
 export const permissions = {
   admin: guard.check(OperatorRoles.ADMIN),
   operator: guard.check([
-    [OperatorRoles.ADMIN],
-    [OperatorRoles.MANAGER],
-    [OperatorRoles.OPERATOR]
+    [ OperatorRoles.ADMIN ],
+    [ OperatorRoles.MANAGER ],
+    [ OperatorRoles.OPERATOR ]
   ]),
   manager: guard.check([
-    [OperatorRoles.ADMIN],
-    [OperatorRoles.MANAGER]
+    [ OperatorRoles.ADMIN ],
+    [ OperatorRoles.MANAGER ]
   ]),
   allManagers: guard.check([
-    [OperatorRoles.ADMIN],
-    [OperatorRoles.MANAGER],
-    [OperatorRoles.STREET_MANAGER],
-    [OperatorRoles.STREET_ADMIN]
+    [ OperatorRoles.ADMIN ],
+    [ OperatorRoles.MANAGER ],
+    [ OperatorRoles.STREET_MANAGER ],
+    [ OperatorRoles.STREET_ADMIN ]
   ])
 }
