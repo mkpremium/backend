@@ -24,7 +24,7 @@
     "camaro": "^3.0.16",
     "cli-table": "^0.3.1",
     "commander": "^2.19.0",
-    "compose-middleware": "^4.0.0",
+    "compose-middleware": "^5.0.1",
     "cors": "^2.8.4",
     "couchbase": "^2.6.10",
     "debug": "^3.1.0",

@@ -22,8 +22,16 @@ async function addUserInfo (req, res, next) {
   logger.debug('jwt-middleware#addUserInfo', req.user.id)
   const id = req.user.id
   const userRepo = new OperatorRepository()
-  req.user.operator = await userRepo.findById(id)
-  next()
+
+  return userRepo.findById(id)
+    .then(user => {
+      if (!user || !user.enable) {
+        res.sendStatus(401)
+        return
+      }
+      req.user.operator = user
+      next()
+    })
 }
 
 export function bearerTokenExtractor (req) {
