@@ -15,13 +15,39 @@ describe('SetOwnerFeaturedContactService', () => {
     service = new SetOwnerFeaturedContactService(ownersRepositoryStub)
   })
 
-  it('sets featured contact', () => {
+  it('sets featured contact object', () => {
     const testOwnerId = 'test-owner-id'
     const testPhoneId = 'test-phone-id'
     const testOwner = ownerBuilder().withPhoneContact(testPhoneId).build()
     ownersRepositoryStub.get.withArgs(testOwnerId).resolves(testOwner)
 
     return service.setFeaturedContact(testOwnerId, { phoneId: testPhoneId }).then(() => {
+      expect(ownersRepositoryStub.save).to.have.been.calledWithMatch(
+        o => o.id === testOwnerId && o.featuredContact.phoneId === testPhoneId
+      )
+    })
+  })
+
+  it('features email of given ID', () => {
+    const testOwnerId = 'test-owner-id'
+    const testEmailId = 'test-email-id'
+    const testOwner = ownerBuilder().withEmailContact(testEmailId).build()
+    ownersRepositoryStub.get.withArgs(testOwnerId).resolves(testOwner)
+
+    return service.setFeaturedContact(testOwnerId, testEmailId).then(() => {
+      expect(ownersRepositoryStub.save).to.have.been.calledWithMatch(
+        o => o.id === testOwnerId && o.featuredContact.emailId === testEmailId
+      )
+    })
+  })
+
+  it('features phone of given ID', () => {
+    const testOwnerId = 'test-owner-id'
+    const testPhoneId = 'test-phone-id'
+    const testOwner = ownerBuilder().withPhoneContact(testPhoneId).build()
+    ownersRepositoryStub.get.withArgs(testOwnerId).resolves(testOwner)
+
+    return service.setFeaturedContact(testOwnerId, testPhoneId).then(() => {
       expect(ownersRepositoryStub.save).to.have.been.calledWithMatch(
         o => o.id === testOwnerId && o.featuredContact.phoneId === testPhoneId
       )

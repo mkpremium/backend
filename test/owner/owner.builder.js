@@ -39,7 +39,7 @@ export const ownerBuilder = (overwrites = {}) => {
       return this
     },
 
-    withEmailContact (id = 'test-email-id', status = 'UNDEFINED', phoneNumber = 'test@example.org') {
+    withEmailContact (id = 'test-email-id', status = 'UNDEFINED', email = 'test@example.org') {
       if (!overwrites.person) {
         overwrites.person = ownerPrototype.person
       }
@@ -48,8 +48,8 @@ export const ownerBuilder = (overwrites = {}) => {
         contacts: {
           $push: [ {
             id,
-            type: 'TELEFONO',
-            value: phoneNumber
+            type: 'EMAIL',
+            value: email
           } ]
         }
       })

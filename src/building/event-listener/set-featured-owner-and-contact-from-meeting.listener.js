@@ -11,6 +11,6 @@ export const createSetFeaturedOwnerAndContactFromMeetingListener = ({
 }) => {
   return Promise.all([
     featuredOwnerService.setBuildingFeaturedOwner(buildingId, ownerId),
-    setOwnerFeaturedContactService.setFeaturedContact(ownerId, { phoneId: contactId })
+    setOwnerFeaturedContactService.setFeaturedContact(ownerId, contactId)
   ])
 }

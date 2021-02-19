@@ -33,7 +33,7 @@ describe('set-featured-owner-and-contact-from-meeting.listener', () => {
 
   it('marks contact as featured', () => {
     return result.then(
-      () => expect(setOwnerFeaturedContactServiceStub.setFeaturedContact).to.have.been.calledWith(testOwnerId, { phoneId: testContactId })
+      () => expect(setOwnerFeaturedContactServiceStub.setFeaturedContact).to.have.been.calledWith(testOwnerId, testContactId)
     )
   })
 })
