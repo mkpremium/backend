@@ -19,7 +19,7 @@ SELECT
 
     stock[0] stock,
 
-    ARRAY {m.eventDate, "ownerId": m.event.owner.id} FOR m IN buildingMeetings END buildingMeetings,
+    ARRAY {m.eventDate, "ownerId": m.event.owner.id, "inPerson": m.event.inPerson} FOR m IN buildingMeetings END buildingMeetings,
     ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN owners END owners
 FROM ${bucketName} building
 LEFT NEST ${bucketName} stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
@@ -153,7 +153,8 @@ export class CommercialsBuildingRepository {
             featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
           }) || undefined,
           lastMeeting: (lastMeeting && {
-            dateMeeting: moment(lastMeeting.eventDate).format()
+            dateMeeting: moment(lastMeeting.eventDate).format(),
+            inPerson: lastMeeting.inPerson
           }) || undefined,
           salePrice: salePrice || undefined,
           totalExpensesAmount: totalExpensesAmount || undefined

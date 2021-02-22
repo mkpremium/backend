@@ -147,7 +147,8 @@ describe('Building listing endpoint', () => {
               ]
             },
             lastMeeting: {
-              dateMeeting: moment(building1LastMeeting.eventDate).format()
+              dateMeeting: moment(building1LastMeeting.eventDate).format(),
+              inPerson: true
             }
           },
           {
