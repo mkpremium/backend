@@ -20,7 +20,7 @@ export class UpdateBuildingNegotiationStatusService {
       name: BUILDING_NEGOTIATION_STATUS_CHANGED,
       buildingId,
       userId,
-      status
+      negotiationStatus: status
     })
   }
 }

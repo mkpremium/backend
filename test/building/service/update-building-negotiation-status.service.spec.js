@@ -50,7 +50,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
       name: 'building.negotiation-status-changed',
       buildingId: 'test-building-id',
       userId: 'operator-id',
-      status: 'COMPRADO'
+      negotiationStatus: 'COMPRADO'
     })
   })
 
