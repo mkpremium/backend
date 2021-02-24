@@ -8,15 +8,27 @@ import { logger } from '../../infrastructure/logger'
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
 owner.id,
+owner.name,
 owner.buildingId,
 owner.person.contacts,
 building.address buildingAddress,
 worksheet.id worksheetId,
-owner.name
+{
+  lastEvent.type,
+  lastEvent.eventDate,
+  "inPerson":
+  lastEvent.event.inPerson,
+  "ownerId": lastEvent.event.ownerId,
+  "flipperName": lastEventFlipper.profile.firstName || ' ' || lastEventFlipper.profile.lastName
+} AS lastEvent
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
   AND building.negotiationStatus != 'DESCARTADO'
 JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
+
+LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event' AND lastEvent.id = worksheet.lastAddedMeeting.id
+LEFT JOIN ${bucketName} lastEventFlipper ON  lastEventFlipper._documentType = 'operator' and lastEventFlipper.id = lastEvent.notifyTo
+
 WHERE owner._documentType = 'owner'
 AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 AND c.status != 'BAD' END
 `
