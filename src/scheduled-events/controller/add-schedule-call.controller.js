@@ -14,9 +14,10 @@ export const createAddScheduledCallController = ({
 
   eventBus.publish({
     name: 'scheduled_events.call_scheduled',
-    by: req.user.id,
+    userId: req.user.id,
     ownerId: req.body.event.ownerId,
-    buildingId: req.body.event.buildingId
+    buildingId: req.body.event.buildingId,
+    note: req.body.note
   })
 
   res.status(201).json(scheduledEvent)

@@ -1,4 +1,4 @@
-import { createAddMeetingNoteToBuildingListener } from '../../../src/building/event-listener/add-meeting-note-to-building.listener'
+import { createAddNoteToBuildingListener } from '../../../src/building/event-listener/add-note-to-building.listener'
 import { expect } from 'chai'
 import { stub } from 'sinon'
 
@@ -11,7 +11,7 @@ describe('add-meeting-note-to-building.listener', () => {
       save: stub()
     }
 
-    listener = createAddMeetingNoteToBuildingListener({ buildingNotesRepository: buildingNotesRepositoryStub })
+    listener = createAddNoteToBuildingListener({ buildingNotesRepository: buildingNotesRepositoryStub })
   })
 
   it('creates note in building with meeting note text', () => {

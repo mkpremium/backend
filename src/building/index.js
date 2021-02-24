@@ -26,7 +26,7 @@ import { BuildingDocumentsRepository } from './repository/building-documents.rep
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
-import { createAddMeetingNoteToBuildingListener } from './event-listener/add-meeting-note-to-building.listener'
+import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 
@@ -65,7 +65,7 @@ export const registerBuildingDependencies = awilixContainer => {
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
 
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
-    addMeetingNoteToBuilding: asFunction(createAddMeetingNoteToBuildingListener).singleton(),
+    addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton()
   })
@@ -74,7 +74,8 @@ export const registerBuildingDependencies = awilixContainer => {
 export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
   const eventBus = awilixContainer.resolve('eventBus')
   eventBus.on('worksheet.made_available', awilixContainer.resolve('worksheetMadeAvailableListener'))
-  eventBus.on('meeting.created', awilixContainer.resolve('addMeetingNoteToBuilding'))
+  eventBus.on('meeting.created', awilixContainer.resolve('addNoteToBuilding'))
+  eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('addNoteToBuilding'))
   eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
 
