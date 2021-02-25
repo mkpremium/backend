@@ -4,6 +4,7 @@ import { N1qlQuery } from 'couchbase'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
+import { DateTimeString } from '../../infrastructure/shared-types'
 
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
@@ -14,12 +15,10 @@ owner.person.contacts,
 building.address buildingAddress,
 worksheet.id worksheetId,
 {
-  lastEvent.type,
-  lastEvent.eventDate,
-  "inPerson":
-  lastEvent.event.inPerson,
-  "ownerId": lastEvent.event.ownerId,
-  "flipperName": lastEventFlipper.profile.firstName || ' ' || lastEventFlipper.profile.lastName
+    lastEvent.eventDate,
+    "inPerson": lastEvent.event.inPerson,
+    "ownerId": lastEvent.event.ownerId,
+    "flipperName": lastEventFlipper.profile.firstName || ' ' || lastEventFlipper.profile.lastName
 } AS lastEvent
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
@@ -64,7 +63,13 @@ const FoundOwner = t.struct({
       number: t.maybe(t.union([ t.String, t.Number ]))
     })),
     city: t.maybe(t.String)
-  })
+  }),
+  lastEvent: t.maybe(t.struct({
+    eventDate: DateTimeString,
+    type: t.enums.of([ 'meeting', 'offer-request' ]),
+    ownerId: t.String,
+    flipperName: t.String
+  }))
 })
 
 const BuildingOwner = t.struct({
@@ -72,8 +77,8 @@ const BuildingOwner = t.struct({
   name: t.String,
   contacts: t.list(t.struct({
     id: t.String,
-    status: t.enums.of(['GOOD', 'BAD', 'UNDEFINED']),
-    type: t.enums.of(['TELEFONO', 'MOVIL', 'EMAIL']),
+    status: t.enums.of([ 'GOOD', 'BAD', 'UNDEFINED' ]),
+    type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
     value: t.String
   })),
   featuredContact: t.maybe(t.struct({
@@ -89,7 +94,16 @@ export class OwnerRepository extends CouchbaseRepository {
       [ phoneNumber ]
     ).then(result => fromJSON(result.map(rec => {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
-      return { ...rec, matchingContactId: rec.contacts[ matchingContactIdx ].id }
+      return {
+        ...rec,
+        lastEvent: rec.lastEvent.eventDate !== undefined ? {
+          eventDate: rec.lastEvent.eventDate,
+          type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
+          ownerId: rec.lastEvent.ownerId,
+          flipperName: rec.lastEvent.flipperName
+        } : undefined,
+        matchingContactId: rec.contacts[ matchingContactIdx ].id
+      }
     }), t.list(FoundOwner)))
   }
 
