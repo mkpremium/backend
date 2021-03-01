@@ -5,6 +5,7 @@ import { CouchbaseRepository } from '../../db/couchbase.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
+import { NegotiationStatus } from '../../building/building'
 
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
@@ -13,6 +14,7 @@ owner.name,
 owner.buildingId,
 owner.person.contacts,
 building.address buildingAddress,
+building.negotiationStatus,
 worksheet.id worksheetId,
 {
     lastEvent.eventDate,
@@ -45,6 +47,7 @@ WHERE _documentType = 'owner' and buildingId = $1
 const FoundOwner = t.struct({
   id: t.String,
   buildingId: t.String,
+  negotiationStatus: NegotiationStatus,
   worksheetId: t.String,
   matchingContactId: t.String,
   name: t.String,
@@ -96,6 +99,7 @@ export class OwnerRepository extends CouchbaseRepository {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
       return {
         ...rec,
+        negotiationStatus: rec.negotiationStatus || 'PENDIENTE',
         lastEvent: rec.lastEvent.eventDate !== undefined ? {
           eventDate: rec.lastEvent.eventDate,
           type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
