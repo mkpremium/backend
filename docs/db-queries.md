@@ -8,6 +8,7 @@ AND isTest
 ```
 
 ## Set worksheet status based on building ID
+
 ```n1ql
 UPDATE mkpremium
 SET status = 'LOOKING_MEETING', queueId = null
@@ -35,6 +36,7 @@ AND relatedBuildingIds[0] IN [
 ```
 
 ## Get owners by building ID
+
 ```n1ql
 SELECT id
 FROM mkpremium
@@ -62,6 +64,7 @@ AND buildingId IN [
 ```
 
 ## Delete meetings by worksheetId
+
 ```n1ql
 DELETE FROM mkpremium
 WHERE _documentType = 'scheduled-event' AND event.worksheetId IN [
@@ -85,3 +88,22 @@ WHERE _documentType = 'scheduled-event' AND event.worksheetId IN [
   "ebef0560-11f6-4622-af5b-d92880874ff3"
 ]
 ```
+
+## Delete all test ids (building, owners and worksheet)
+
+TODO proposals, meetings, scheduled-calls, offer requests, stock.
+
+```n1ql
+select
+ARRAY_CONCAT([building.id, worksheet.id], ARRAY o.id FOR o IN owners END) testIds
+from mkpremium building
+left nest mkpremium owners on owners._documentType = 'owner' and owners.buildingId = building.id
+join mkpremium worksheet on worksheet._documentType = 'worksheet' and worksheet.relatedBuildingIds[0] = building.id
+where building._documentType = 'building' and building.isTest
+```
+
+```shell
+pbpaste | jq '[.[].testIds[]]' | pbcopy
+```
+delete from mkpremium
+where id in []
