@@ -24,7 +24,7 @@ worksheet.id worksheetId,
 } AS lastEvent
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
-  AND building.negotiationStatus != 'DESCARTADO'
+  AND (building.negotiationStatus IS MISSING OR building.negotiationStatus != 'DESCARTADO')
 JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
 
 LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event' AND lastEvent.id = worksheet.lastAddedMeeting.id
