@@ -17,7 +17,7 @@ export class TakeNextWorksheetService {
   }
 
   async nextWorksheetInQueue (queue, byUserOfId) {
-    const worksheetFromSource = await this.worksheetRepository.nextAvailableWorksheetInSource(queue.source)
+    const worksheetFromSource = await this.worksheetRepository.nextAvailableWorksheetInSource(queue.source, queue.id)
       .catch(error => {
         error.queueId = queue.id
         error.byUserOfId = byUserOfId

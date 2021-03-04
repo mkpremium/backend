@@ -92,12 +92,15 @@ WHERE worksheet._documentType = 'worksheet' AND ${conditions.join(' AND ')}
 
 const worksheetByIdQuery = bucketName => worksheetForCallcenterViewQuery(bucketName, [ 'worksheet.id = $1' ])
 
-const nextWorksheetAvailableInSourceQuery = (bucketName, source) => {
+const nextWorksheetAvailableInSourceQuery = (bucketName, source, queueId) => {
   const sourceMatchCondition = Object.keys(source).filter(k => !!source[ k ])
     .map(k => `worksheet.buildingAddress.${k} = "${source[ k ]}"`)
 
-  const worksheetQuery = worksheetForCallcenterViewQuery(bucketName,
-    [ 'worksheet.queueId IS NULL', `worksheet.status IN ['OPEN', 'LOOKING_MEETING']`, ...sourceMatchCondition ])
+  const worksheetQuery = worksheetForCallcenterViewQuery(bucketName, [
+    `(worksheet.queueId IS NULL OR worksheet.queueId = '${queueId}')`,
+    `worksheet.status IN ['OPEN', 'LOOKING_MEETING']`,
+    ...sourceMatchCondition
+  ])
 
   return `${worksheetQuery} ORDER BY worksheet.viewedAt LIMIT 1`
 }
@@ -135,8 +138,8 @@ export class WorksheetRepository extends CouchbaseRepository {
     })
   }
 
-  nextAvailableWorksheetInSource (source) {
-    const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source)
+  nextAvailableWorksheetInSource (source, queueId) {
+    const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, queueId)
     return this.couchbaseAdapter.queryAsync(
       N1qlQuery.fromString(q)
     ).then(result => {

@@ -34,7 +34,7 @@ describe('TakeNextWorksheetService', () => {
 
   it('takes next worksheet from source', async () => {
     const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
-    worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source)
+    worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source, testQueue.id)
       .resolves(testNextWorksheet)
 
     await service.nextWorksheetInQueue(testQueue, testUserId)
