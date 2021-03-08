@@ -1,3 +1,7 @@
+/**
+ * @param {UserRepository} usersRepository
+ * @return {function(*, *): Promise<void>}
+ */
 export const createMeController = usersRepository => {
   return async (req, res) => {
     const {
@@ -14,7 +18,9 @@ export const createMeController = usersRepository => {
       restringedHours,
       signatures,
       maxLine,
-      queueId: profile && !!profile.queueId ? profile.queueId : undefined
+      queueId: profile && !!profile.queueId ? profile.queueId : undefined,
+      firstName: profile.firstName,
+      lastName: profile.lastName
     })
   }
 }

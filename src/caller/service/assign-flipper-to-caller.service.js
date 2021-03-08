@@ -3,7 +3,7 @@ import { Operator } from '../../types/operator'
 
 /**
  * @property {ScheduledCallsService} scheduledCallsService
- * @property {UserRepository} UserRepository
+ * @property {UserRepository} usersRepository
  */
 export class AssignFlipperToCallerService {
   constructor (scheduledCallsService, usersRepository) {
