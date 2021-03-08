@@ -241,13 +241,10 @@ WorksheetQueue.prototype.addWorksheet = function (worksheet) {
 export const takeWorksheet = (queue, worksheet, byUserOfId) => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
-    if (worksheetQueueItem.operatorId !== byUserOfId) {
-      throw new WorksheetAlreadyTaken(worksheet.id, worksheetQueueItem.operatorId, byUserOfId)
-    }
-
     return [
       queue,
       t.update(worksheet, {
+        operatorId: { $set: byUserOfId },
         queueId: { $set: queue.id },
         viewedAt: { $set: utc().toDate() }
       })
