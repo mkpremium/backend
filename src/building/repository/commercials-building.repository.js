@@ -135,7 +135,8 @@ export class CommercialsBuildingRepository {
             postalCode: address.postalCode && address.postalCode.number ? {
               number: address.postalCode.number
             } : undefined,
-            city: address.city ? address.city : undefined
+            city: address.city ? address.city : undefined,
+            province: address.province ? address.province : undefined
           } : undefined,
           geolocation: location && (location.lat || location.lng) ? {
             latitude: location.lat ? location.lat : undefined,

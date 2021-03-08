@@ -15,6 +15,7 @@ export const CallcenterView = t.struct({
     address: t.struct({
       number: t.union([ t.String, t.Number ]),
       city: t.String,
+      province: t.String,
       street: t.String,
       postalCode: t.struct({
         number: t.union([ t.String, t.Number ])
