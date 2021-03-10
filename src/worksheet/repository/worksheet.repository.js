@@ -83,8 +83,8 @@ SELECT
   ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
 
 FROM ${bucketName} worksheet
-JOIN ${bucketName} building ON building._documentType = 'building' AND
-building.id = worksheet.relatedBuildingIds[0]
+JOIN ${bucketName} building ON building._documentType = 'building'
+                            AND building.id = worksheet.relatedBuildingIds[0]
 NEST ${bucketName} owners ON owners._documentType = 'owner' AND owners.buildingId = building.id
                           AND owners.status NOT IN ['WITHOUT_CONTACT', 'ERRONEO']
 
@@ -97,13 +97,16 @@ const nextWorksheetAvailableInSourceQuery = (bucketName, source, queueId) => {
   const sourceMatchCondition = Object.keys(source).filter(k => !!source[ k ])
     .map(k => `worksheet.buildingAddress.${k} = "${source[ k ]}"`)
 
-  const worksheetQuery = worksheetForCallcenterViewQuery(bucketName, [
-    `(worksheet.queueId IS NULL OR worksheet.queueId = '${queueId}')`,
-    `worksheet.status IN ['OPEN', 'LOOKING_MEETING']`,
-    ...sourceMatchCondition
-  ])
+  return `
+SELECT worksheet.id
+FROM ${bucketName} worksheet
 
-  return `${worksheetQuery} ORDER BY worksheet.viewedAt LIMIT 1`
+WHERE worksheet._documentType = 'worksheet'
+AND worksheet.status IN ['OPEN', 'LOOKING_MEETING']
+AND (worksheet.queueId IS NULL OR worksheet.queueId = '${queueId}')
+AND ${sourceMatchCondition.join(' AND ')}
+ORDER BY worksheet.viewedAt LIMIT 1
+`
 }
 
 const alreadySoldBuildingWorksheetId = bucketName => `
@@ -147,14 +150,7 @@ export class WorksheetRepository extends CouchbaseRepository {
       if (result.length === 0) {
         return
       }
-
-      try {
-        return fromJSON(result[ 0 ], CallcenterView)
-      } catch (error) {
-        this.logWorksheetParsingError(result[ 0 ].id, error)
-
-        return result[ 0 ]
-      }
+      return this.getForCallcenterView(result[ 0 ].id)
     })
   }
 
