@@ -41,10 +41,11 @@ async function updateOwner (req, res) {
 async function addOwnerContact (req, res) {
   const ownerId = req.params.id
   const repo = new OwnerRepository()
-  const contextModel = await repo.addContact(ownerId, req.body)
-  await History.registerCreate({ contextModel, user: req.user })
+  const updatedOwner = await repo.addContact(ownerId, req.body)
+
+  await History.registerCreate({ contextModel: updatedOwner, user: req.user })
   await LegacyWorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
-  const [ updatedOwner ] = await repo.findByIdWithIncludes(ownerId, [ 'building' ])
+
   res.json(updatedOwner)
 }
 

@@ -12,7 +12,7 @@ import { OperatorRepository } from '../operator/models'
 import { TypedContactInfo } from '../types/common'
 import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
-import { changeContactStatus, Owner, OwnerBody, Person } from './owner'
+import { changeContactStatus, FeaturedContact, Owner, OwnerBody, Person } from './owner'
 import { OwnerListQuery } from './types'
 
 function ownerIncludes (qb, includes) {
@@ -100,14 +100,27 @@ export class OwnerRepository extends CouchbaseModel {
     return owner
   }
 
-  async addContact (ownerId, body) {
+  async addContact (ownerId, addContactRequest) {
     const owner = await this.findByIdOrThrow(ownerId)
-    const updatedOwner = t.update(owner, {
+    let featuredContact = owner.featuredContact
+    const newContact = TypedContactInfo(addContactRequest)
+
+    const { isFeatured } = addContactRequest
+    if (isFeatured) {
+      featuredContact = FeaturedContact.update(featuredContact || FeaturedContact({}), {
+        [ addContactRequest.type === 'EMAIL' ? 'emailId' : 'phoneId' ]: {
+          $set: newContact.id
+        }
+      })
+    }
+
+    const updatedOwner = Owner.update(owner, {
+      featuredContact: { $set: featuredContact },
       $merge: {
-        person: t.update(owner.person, {
+        person: Person.update(owner.person, {
           $merge: {
             contacts: t.update(owner.person.contacts, {
-              $push: [ new TypedContactInfo(body) ]
+              $push: [ newContact ]
             })
           }
         })
