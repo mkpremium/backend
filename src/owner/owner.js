@@ -64,10 +64,10 @@ export const OwnerConfirmed = t.struct({
   confirmedBy: t.maybe(t.String),
   confirmedAt: t.maybe(t.union([ t.Date, DateTimeString ]))
 }, 'confirmed')
-export const FeaturedContact = t.refinement(t.struct({
+export const FeaturedContact = t.struct({
   phoneId: t.maybe(t.String),
   emailId: t.maybe(t.String)
-}), ({ phoneId, emailId }) => !!phoneId || !!emailId, 'FeaturedContact')
+})
 
 export const Owner = t.struct(
   {
