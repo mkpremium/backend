@@ -7,6 +7,7 @@ const buildingPrototype = {
     street: 'street, address',
     number: '2a',
     postalCode: {
+      number: '0000',
       verified: false
     },
     city: 'BARCELONA'

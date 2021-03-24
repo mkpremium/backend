@@ -6,6 +6,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { NegotiationStatus } from '../../building/building'
+import { WorksheetBuilding } from '../../worksheet/repository/worksheet.repository'
 
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
@@ -13,6 +14,17 @@ owner.id,
 owner.name,
 owner.buildingId,
 owner.person.contacts,
+{
+    building.id,
+    building.address,
+    building.metadata,
+    building.\`use\`,
+    building.location,
+    building.recentProposal,
+    building.cadastre,
+    building.floorArea,
+    "featuredOwnerId": building.ownerId
+} as building,
 building.address buildingAddress,
 building.negotiationStatus,
 worksheet.id worksheetId,
@@ -72,7 +84,8 @@ const FoundOwner = t.struct({
     type: t.enums.of([ 'meeting', 'offer-request' ]),
     ownerId: t.String,
     flipperName: t.String
-  }))
+  })),
+  building: WorksheetBuilding
 })
 
 const BuildingOwner = t.struct({
