@@ -2,6 +2,7 @@ import { Owner, Person } from '../../src/owner/owner'
 
 const ownerPrototype = {
   id: 'test-owner-id',
+  name: 'test name',
   person: Person({
     name: 'test name'
   })

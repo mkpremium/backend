@@ -1,15 +1,16 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
-import { errors } from 'couchbase'
+import { errors, N1qlQuery } from 'couchbase'
 import { EntityNotFound, QueryError, QueryTimeout } from './errors'
 import { CouchbaseRecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 import { validate } from 'tcomb-validation'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 
 export class CouchbaseAdapter {
-  constructor (couchbaseBucket) {
+  constructor (couchbaseBucket, forceMaxQueryConsistency) {
     this.couchbaseBucket = couchbaseBucket
+    this.forceMaxQueryConsistency = forceMaxQueryConsistency
   }
 
   get bucketName () {
@@ -49,6 +50,9 @@ export class CouchbaseAdapter {
   }
 
   queryAsync (query, params) {
+    if (this.forceMaxQueryConsistency) {
+      query = query.consistency(N1qlQuery.Consistency.STATEMENT_PLUS)
+    }
     return this.couchbaseBucket.queryAsync(query, params)
       .catch(error => {
         if (error.responseBody === '') {

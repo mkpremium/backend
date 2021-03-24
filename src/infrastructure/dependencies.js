@@ -81,12 +81,12 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   return container
 }
 
-export const createAwilixContainer = couchbaseBucket => {
+export const createAwilixContainer = (couchbaseBucket, forceMaxQueryConsistency = false) => {
   const awilixContainer = createContainer()
 
   awilixContainer.register({
     couchbaseBucket: asValue(couchbaseBucket),
-    couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket)),
+    couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket, forceMaxQueryConsistency)),
     eventBus: asClass(EventBus).singleton()
   })
 
