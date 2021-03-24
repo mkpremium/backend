@@ -1,10 +1,8 @@
-import couchbase from '../../../src/db/couchbase'
-import { createAwilixContainer } from '../../../src/infrastructure/dependencies'
 import { expect } from 'chai'
 import { ownerBuilder } from '../owner.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { worksheetBuilder } from '../../worksheet/worksheet.builder'
-import { Promise } from 'bluebird'
+import { createTestContainer } from '../../create-test-container'
 
 describe('OwnerRepository', () => {
   let repository
@@ -12,17 +10,14 @@ describe('OwnerRepository', () => {
   let worksheetsRepository
 
   beforeEach(async () => {
-    const couchbaseBucket = await couchbase()
-
-    await couchbaseBucket.flushAsync()
-    const diContainer = createAwilixContainer(couchbaseBucket, true)
+    const diContainer = await createTestContainer()
 
     repository = diContainer.resolve('ownersRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
     worksheetsRepository = diContainer.resolve('worksheetRepository')
   })
 
-  it('finds owner by its id', async () => {
+  it('finds owner by its phone contact', async () => {
     const testBuilding = buildingBuilder().build()
     const testWorksheet = worksheetBuilder({ relatedBuildingIds: [ testBuilding.id ] }).build()
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withPhoneContact().build()
