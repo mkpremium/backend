@@ -1,18 +1,17 @@
 import { expect } from 'chai'
-import { initApplication } from '../../../test-e2e/helper/rest-api-helper'
 import { MeetingsRepository } from '../../../src/scheduled-events/repository/meetings.repository'
 import { Meeting } from '../../../src/scheduled-events/domain/meeting'
 import moment from 'moment'
+import { createTestContainer } from '../../create-test-container'
 
 describe('MeetingsRepository', () => {
-  let app
   let scheduledEventsRepository
   let repository
 
   beforeEach(async () => {
-    app = await initApplication()
-    scheduledEventsRepository = app.locals.legacyDependenciesContainer.scheduledEventsRepository
-    repository = new MeetingsRepository(app.locals.dependenciesContainer.couchbaseAdapter)
+    const container = await createTestContainer()
+    scheduledEventsRepository = container.resolve('scheduledEventsRepository')
+    repository = new MeetingsRepository(container.resolve('couchbaseAdapter'))
   })
 
   it('gets meeting saved by scheduled events repository', async () => {
