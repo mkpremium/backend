@@ -4,7 +4,7 @@ const couchbase = require('couchbase')
 const uuid = require('uuid/v4')
 
 const config = {
-  connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
+  connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=120',
   username: process.env.COUCHBASE_USER || 'couchbase',
   password: process.env.COUCHBASE_PASS || 'couchbase',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
