@@ -43,7 +43,7 @@ describe('MeetingsRepository', () => {
   })
 
   describe('futureMeetingsFor', () => {
-    it('returns  only future meetigs for user', async () => {
+    it('returns  only future meetings for user', async () => {
       const pastMeeting = Meeting({
         id: 'test-past-meeting',
         buildingId: 'test-building-id',
