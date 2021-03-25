@@ -1,4 +1,5 @@
 const Promise = require('bluebird')
+const retry = require('bluebird-retry')
 const couchbase = require('couchbase')
 
 const config = {
@@ -44,19 +45,15 @@ createBucket()
     throw error
   })
   .then((bucketSource) => {
-    const bucket = cluster.openBucket(bucketName)
-    const bucketManager = Promise.promisifyAll(bucket.manager())
-
     console.info({ bucketSource })
     console.info('Creating primary index')
-    return bucketManager
-      .createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
-      .catch(error => {
-        console.warn('Primary index creation failed on first attempt, retrying', { error })
-        return Promise.delay(RETRY_WAIT_TIME).then(() => bucketManager.createPrimaryIndexAsync({
-          name: `${bucketName}_primary`,
-          ignoreIfExists: true
-        }))
+
+    const bucket = cluster.openBucket(bucketName)
+    const bucketManager = Promise.promisifyAll(bucket.manager())
+    return retry(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }),
+      {
+        backoff: 1.5,
+        max_tries: 10,
       })
       .catch(error => {
         console.error('Primary index creation failed', { error })
