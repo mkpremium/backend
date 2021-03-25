@@ -4,7 +4,7 @@ const couchbase = require('couchbase')
 const uuid = require('uuid/v4')
 
 const config = {
-  connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=120',
+  connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=180',
   username: process.env.COUCHBASE_USER || 'couchbase',
   password: process.env.COUCHBASE_PASS || 'couchbase',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
@@ -66,11 +66,9 @@ createBucket()
           })
       },
       {
-        backoff: 2,
-        interval: ONE_MINUTE * 2,
-        max_interval: ONE_MINUTE * 5,
-        max_tries: 10,
-        timeout: ONE_MINUTE * 10
+        interval: ONE_MINUTE * 3,
+        max_tries: 4,
+        timeout: ONE_MINUTE * 12
       })
       .catch(error => {
         console.error('Primary index creation failed', { errorMessage: error.message })
