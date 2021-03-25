@@ -1,6 +1,7 @@
 const Promise = require('bluebird')
 const retry = require('bluebird-retry')
 const couchbase = require('couchbase')
+const uuid = require('uuid/v4')
 
 const config = {
   connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
@@ -52,10 +53,11 @@ createBucket()
     const bucketManager = Promise.promisifyAll(bucket.manager())
     return retry(() => {
         console.log('Trying to create primary index')
-        console.time('primaryIndexCreationAttempt')
+        const id = uuid()
+        console.time(`primaryIndexCreationAttempt-${id}`)
         return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
           .then(() => {
-            console.timeEnd('primaryIndexCreationAttempt')
+            console.timeEnd(`primaryIndexCreationAttempt-${id}`)
           })
           .catch(error => {
             console.error('Error on primary index creation attempt', { error })
@@ -64,7 +66,7 @@ createBucket()
       },
       {
         backoff: 2,
-        max_interval: ONE_MINUTE * 5,
+        max_interval: ONE_MINUTE * 10,
         max_tries: 10,
       })
       .catch(error => {
