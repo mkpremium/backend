@@ -85,7 +85,7 @@ const testSaleReservationAmount = 50001
 const testSaleAmount = 100001
 
 export const purchaseBuilding = async (app, { buildingId, propertyAgentId }) => {
-  const { stockService } = app.locals.dependenciesContainer
+  const stockService = app.locals.diContainer.resolve('stockService')
   return stockService.purchaseBuilding({
     buildingId,
     reservationAmount: testPurchaseReservationAmount,
