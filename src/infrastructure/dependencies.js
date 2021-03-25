@@ -14,7 +14,6 @@ import { StockSalesService } from '../stock/service/StockSalesService'
 import { StockService } from '../stock/service/StockService'
 import { StockRepository } from '../stock/StockRepository'
 import { EventBus } from './event-bus'
-import { MetadataRepository } from '../building/repository/metadata.repository'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { asClass, asValue, createContainer } from 'awilix'
 import { registerBuildingDependencies as setupBuildingDependencies } from '../building'
@@ -30,7 +29,6 @@ export const createLegacyDependenciesContainer = () => {
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
   container.scheduledEventsRepository = new ScheduledEventsRepository()
-  container.metadataRepository = new MetadataRepository()
 
   return container
 }
