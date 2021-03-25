@@ -52,7 +52,8 @@ createBucket()
     const bucketManager = Promise.promisifyAll(bucket.manager())
     return retry(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }),
       {
-        backoff: 1.5,
+        backoff: 2,
+        max_interval: ONE_MINUTE * 5,
         max_tries: 10,
       })
       .catch(error => {
