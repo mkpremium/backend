@@ -17,8 +17,10 @@ LEFT JOIN ${bucketName} building ON building.id = meeting.event.buildingId AND b
 
 LEFT JOIN ${bucketName} owner ON owner.id = meeting.event.owner.id AND owner._documentType = 'owner'
 
-WHERE meeting._documentType = 'scheduled-event' AND meeting.type = 'MEETINGS'
-AND meeting.notifyTo = $1
+WHERE meeting._documentType = 'scheduled-event'
+      AND meeting.type = 'MEETINGS'
+      AND meeting.event.inPerson
+      AND meeting.notifyTo = $1
 `
 
 export class UserMeetingsRepository {
