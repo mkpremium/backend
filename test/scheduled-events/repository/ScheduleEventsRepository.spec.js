@@ -1,16 +1,15 @@
-import { initApplication } from '../../../test-e2e/helper/rest-api-helper'
 import { expect } from 'chai'
 import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
+import { createTestContainer } from '../../create-test-container'
 
 describe('ScheduleEventsRepository', () => {
-  let app
   let repository
   let worksheetRepository
 
   beforeEach(async () => {
-    app = await initApplication()
-    repository = app.locals.legacyDependenciesContainer.scheduledEventsRepository
-    worksheetRepository = app.locals.diContainer.resolve('legacyWorksheetRepository')
+    const container = await createTestContainer()
+    repository = container.resolve('scheduledEventsRepository')
+    worksheetRepository = container.resolve('legacyWorksheetRepository')
   })
 
   describe('addScheduledMeetingEvent', () => {
