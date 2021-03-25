@@ -1,15 +1,14 @@
-import { initApplication } from '../../../test-e2e/helper/rest-api-helper'
 import { expect } from 'chai'
+import { createTestContainer } from '../../create-test-container'
 
 describe('LegacyWorksheetQueueRepository', () => {
-  let app
   let repository
   let worksheetRepository
 
   beforeEach(async () => {
-    app = await initApplication()
-    repository = app.locals.diContainer.resolve('legacyWorksheetQueueRepository')
-    worksheetRepository = app.locals.diContainer.resolve('worksheetRepository')
+    const container = await createTestContainer()
+    repository = container.resolve('legacyWorksheetQueueRepository')
+    worksheetRepository = container.resolve('worksheetRepository')
   })
 
   describe('scheduleWorksheetInQueue', () => {
