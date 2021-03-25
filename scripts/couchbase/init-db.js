@@ -61,18 +61,19 @@ createBucket()
           })
           .catch(error => {
             console.timeEnd(`primaryIndexCreationAttempt-${id}`)
-            console.error('Error on primary index creation attempt', { error })
+            console.error('Error on primary index creation attempt', { errorMessage: error.message })
             throw error
           })
       },
       {
         backoff: 2,
         interval: ONE_MINUTE,
-        max_interval: ONE_MINUTE * 10,
+        max_interval: ONE_MINUTE * 5,
         max_tries: 10,
+        timeout: ONE_MINUTE * 10
       })
       .catch(error => {
-        console.error('Primary index creation failed', { error })
+        console.error('Primary index creation failed', { errorMessage: error.message })
         throw error
       })
       .then(() => {
