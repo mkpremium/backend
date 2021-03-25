@@ -5,6 +5,7 @@ import { worksheetBuilder } from '../../worksheet/worksheet.builder'
 import { createTestContainer } from '../../create-test-container'
 import { validate } from 'tcomb-validation'
 import { WorksheetBuilding } from '../../../src/worksheet/repository/worksheet.repository'
+import { Promise } from 'bluebird'
 
 describe('OwnerRepository', () => {
   let repository
@@ -20,7 +21,7 @@ describe('OwnerRepository', () => {
   })
 
   it('finds owner by its phone contact', async function () {
-    this.retries = 1
+    this.retries = 2
     const testBuilding = buildingBuilder().build()
     const testWorksheet = worksheetBuilder({ relatedBuildingIds: [ testBuilding.id ] }).build()
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withPhoneContact().build()
@@ -29,7 +30,7 @@ describe('OwnerRepository', () => {
       repository.save(testOwner),
       buildingsRepository.save(testBuilding),
       worksheetsRepository.save(testWorksheet)
-    ])
+    ]).delay(100)
       .then(() => repository.findByPhoneNumber('666666666'))
       .then(result => {
         expect(result.length).to.be.equal(1)
