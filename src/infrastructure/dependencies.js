@@ -6,7 +6,6 @@ import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
-import { ScheduledEventsRepository } from '../scheduled-events/repository/ScheduleEventsRepository'
 import { StockRepository as LegacyStockRepository } from '../stock/models'
 
 import { StockSalesService } from '../stock/service/StockSalesService'
@@ -27,7 +26,6 @@ export const createLegacyDependenciesContainer = () => {
 
   container.buildingRepository = new LegacyBuildingRepository()
   container.stockRepository = new LegacyStockRepository()
-  container.scheduledEventsRepository = new ScheduledEventsRepository()
 
   return container
 }
