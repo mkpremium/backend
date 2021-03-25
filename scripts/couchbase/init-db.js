@@ -50,7 +50,18 @@ createBucket()
 
     const bucket = cluster.openBucket(bucketName)
     const bucketManager = Promise.promisifyAll(bucket.manager())
-    return retry(() => bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true }),
+    return retry(() => {
+        console.log('Trying to create primary index')
+        console.time('primaryIndexCreationAttempt')
+        return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
+          .then(() => {
+            console.timeEnd('primaryIndexCreationAttempt')
+          })
+          .catch(error => {
+            console.error('Error on primary index creation attempt', { error })
+            throw error
+          })
+      },
       {
         backoff: 2,
         max_interval: ONE_MINUTE * 5,
