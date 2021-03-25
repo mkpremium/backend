@@ -96,7 +96,7 @@ export const purchaseBuilding = async (app, { buildingId, propertyAgentId }) => 
 }
 
 export const sellBuilding = async (app, { buildingId, propertyAgentId }) => {
-  const { stockSalesService } = app.locals.dependenciesContainer
+  const stockSalesService = app.locals.diContainer.resolve('stockSalesService')
   return stockSalesService.sellStock({
     buildingId,
     reservationAmount: testSaleReservationAmount,
