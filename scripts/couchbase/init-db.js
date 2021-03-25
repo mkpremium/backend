@@ -66,6 +66,7 @@ createBucket()
       },
       {
         backoff: 2,
+        interval: ONE_MINUTE,
         max_interval: ONE_MINUTE * 10,
         max_tries: 10,
       })
