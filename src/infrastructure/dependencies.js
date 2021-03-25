@@ -7,7 +7,6 @@ import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
 import { ScheduledEventsRepository } from '../scheduled-events/repository/ScheduleEventsRepository'
-import { CreateMeetingService } from '../scheduled-events/service/create-meeting.service'
 import { StockRepository as LegacyStockRepository } from '../stock/models'
 
 import { StockSalesService } from '../stock/service/StockSalesService'
@@ -54,12 +53,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   const eventBus = awilixContainer.resolve('eventBus')
   container.eventBus = eventBus
   container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
-
-  container.createMeetingService = new CreateMeetingService(
-    legacyDependenciesContainer.scheduledEventsRepository,
-    buildingRepository,
-    eventBus
-  )
 
   container.stockSalesService = new StockSalesService(
     container.updateBuildingNegotiationStatusService,
