@@ -50,17 +50,15 @@ createBucket()
     console.info('Creating primary index')
 
     const bucket = cluster.openBucket(bucketName)
-    const bucketManager = Promise.promisifyAll(bucket.manager())
+    let bucketManager = Promise.promisifyAll(bucket.manager())
     return retry(() => {
+        bucket.connected = true
+        bucketManager = Promise.promisifyAll(bucket.manager())
         console.log('Trying to create primary index')
-        const id = uuid()
-        console.time(`primaryIndexCreationAttempt-${id}`)
         return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
           .then(() => {
-            console.timeEnd(`primaryIndexCreationAttempt-${id}`)
           })
           .catch(error => {
-            console.timeEnd(`primaryIndexCreationAttempt-${id}`)
             console.error('Error on primary index creation attempt', { errorMessage: error.message })
             throw error
           })
@@ -68,7 +66,7 @@ createBucket()
       {
         interval: ONE_MINUTE * 3,
         max_tries: 4,
-        timeout: ONE_MINUTE * 12
+        timeout: ONE_MINUTE * 12,
       })
       .catch(error => {
         console.error('Primary index creation failed', { errorMessage: error.message })
