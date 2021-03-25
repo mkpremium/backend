@@ -4,14 +4,14 @@ import { createTransaction } from '../application'
 import { StockStatuses } from '../types'
 
 export class StockSalesService {
-  constructor (updateBuildingNegotiationStatusService, legacyBuildingRepository, legacyStockRepository) {
+  constructor (updateBuildingNegotiationStatusService, legacyBuildingsRepository, legacyStockRepository) {
     this.legacyStockRepository = legacyStockRepository
-    this.legacyBuildingRepository = legacyBuildingRepository
+    this.legacyBuildingsRepository = legacyBuildingsRepository
     this.updateBuildingNegotiationStatusService = updateBuildingNegotiationStatusService
   }
 
   async sellStock (params = {}, operatorId) {
-    await this.legacyBuildingRepository.findByIdOrThrow(params.buildingId)
+    await this.legacyBuildingsRepository.findByIdOrThrow(params.buildingId)
     const stock = await this.legacyStockRepository.findByBuildingIdOrThrow(params.buildingId)
 
     const sell = createTransaction(params, operatorId)

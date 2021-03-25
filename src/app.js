@@ -31,13 +31,13 @@ import autocomplete from './autocomplete'
 import email from './email'
 import cadastre from './cadastre'
 import preferences from './system-preferences'
-import stock from './stock'
 import meeting from './meeting'
 import { setupUserRoutes } from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { setupCallerRoutes } from './caller/init'
 import { initFlipperModule } from './flipper/init'
+import { setupStockRouter } from './stock/stock-router'
 
 const app = express()
 app.set('IS_READY', false)
@@ -48,7 +48,6 @@ dependenciesPromise.then(couchbaseBucket => {
   const awilixContainer = createAwilixContainer(couchbaseBucket)
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
-  stock(app, dependenciesContainer)
   meeting(app, dependenciesContainer)
   setupUserRoutes(app, awilixContainer)
 
@@ -58,9 +57,10 @@ dependenciesPromise.then(couchbaseBucket => {
   setupWorksheetRoutesAndEventListeners(app, awilixContainer)
 
   createTestHarness(app, awilixContainer)
-  initPropertyManager(app, dependenciesContainer)
+  initPropertyManager(app, awilixContainer)
   initFlipperModule(app, awilixContainer)
   setupCallerRoutes(app, awilixContainer)
+  setupStockRouter(app, awilixContainer)
   stats(app, awilixContainer)
   app.use(appErrorHandler)
 

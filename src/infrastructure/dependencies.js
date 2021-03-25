@@ -4,13 +4,6 @@ import { UpdateBuildingNegotiationStatusService } from '../building/service/upda
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
 import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
-import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
-import { StockRepository as LegacyStockRepository } from '../stock/models'
-
-import { StockSalesService } from '../stock/service/StockSalesService'
-import { StockService } from '../stock/service/StockService'
-import { StockRepository } from '../stock/StockRepository'
 import { EventBus } from './event-bus'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { asClass, asValue, createContainer } from 'awilix'
@@ -20,28 +13,19 @@ import { setupScheduledEventsDependencies } from '../scheduled-events'
 import { setupWorksheetDependencies } from '../worksheet'
 import { setupCallerDependencies } from '../caller/init'
 import { setupUserDependencies } from '../user'
+import { setupStockDependencies } from '../stock/stock-di'
 
 export const createLegacyDependenciesContainer = () => {
   const container = {}
 
   container.buildingRepository = new LegacyBuildingRepository()
-  container.stockRepository = new LegacyStockRepository()
 
   return container
 }
 
 export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesContainer, awilixContainer) => {
   const couchbaseAdapter = awilixContainer.resolve('couchbaseAdapter')
-
-  const propertyManagersRepository = new PropertyManagerRepository(couchbaseAdapter)
-  const stockRepository = new StockRepository(couchbaseAdapter)
-
   const container = {}
-  container.propertyManagerRankingService = new PropertyManagerRankingService(
-    propertyManagersRepository,
-    stockRepository
-  )
-  container.stockRepository = stockRepository
 
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
   container.buildingRepository = buildingRepository
@@ -51,20 +35,7 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
   const eventBus = awilixContainer.resolve('eventBus')
   container.eventBus = eventBus
   container.updateBuildingNegotiationStatusService = new UpdateBuildingNegotiationStatusService(buildingRepository, eventBus)
-
-  container.stockSalesService = new StockSalesService(
-    container.updateBuildingNegotiationStatusService,
-    legacyDependenciesContainer.buildingRepository,
-    legacyDependenciesContainer.stockRepository
-  )
-
   container.couchbaseAdapter = couchbaseAdapter
-
-  container.stockService = new StockService(
-    legacyDependenciesContainer.stockRepository,
-    container.updateBuildingNegotiationStatusService
-  )
-
   container.scheduledCallsService = new ScheduledCallsService(couchbaseAdapter)
 
   return container
@@ -85,6 +56,7 @@ export const createAwilixContainer = (couchbaseBucket, forceMaxQueryConsistency 
   setupWorksheetDependencies(awilixContainer)
   setupCallerDependencies(awilixContainer)
   setupUserDependencies(awilixContainer)
+  setupStockDependencies(awilixContainer)
 
   return awilixContainer
 }
