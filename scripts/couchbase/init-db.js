@@ -60,6 +60,7 @@ createBucket()
             console.timeEnd(`primaryIndexCreationAttempt-${id}`)
           })
           .catch(error => {
+            console.timeEnd(`primaryIndexCreationAttempt-${id}`)
             console.error('Error on primary index creation attempt', { error })
             throw error
           })
