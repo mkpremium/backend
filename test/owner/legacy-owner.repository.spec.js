@@ -1,15 +1,15 @@
 import { OwnerStatus } from '../../src/types/enums'
 import { createOwner, testPhoneContactId } from '../../test-e2e/helper/mother-of-objects'
-import { initApplication } from '../../test-e2e/helper/rest-api-helper'
 import { expect } from 'chai'
+import { createTestContainer } from '../create-test-container'
 
 describe('LegacyOwnerRepository', () => {
-  let app, legacyOwnerRepository, owner
+  let legacyOwnerRepository, owner
 
   beforeEach(async () => {
-    app = await initApplication()
-    owner = await createOwner(app, { status: undefined })
-    legacyOwnerRepository = app.locals.diContainer.resolve('legacyOwnersRepository')
+    const container = await createTestContainer()
+    owner = await createOwner(container, { status: undefined })
+    legacyOwnerRepository = container.resolve('legacyOwnersRepository')
   })
 
   describe('findByIdWithIncludes', () => {

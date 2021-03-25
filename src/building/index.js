@@ -29,6 +29,7 @@ import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL
 import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
+import { MetadataRepository } from './repository/metadata.repository'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -53,6 +54,7 @@ export const registerBuildingDependencies = awilixContainer => {
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
+    legacyMetadataRepository: asClass(MetadataRepository).singleton(),
     commercialsBuildingRepository: asClass(CommercialsBuildingRepository).classic().singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),

@@ -1,16 +1,15 @@
-import { initApplication } from '../../../test-e2e/helper/rest-api-helper'
 import { BuildingMetadata } from '../../../src/building/types'
 import { expect } from 'chai'
+import { createTestContainer } from '../../create-test-container'
 
 describe('BuildingDocumentsRepository', () => {
-  let app
   let buildingDocumentsRepository
   let metadataRepository
 
   beforeEach(async () => {
-    app = await initApplication()
-    buildingDocumentsRepository = app.locals.diContainer.resolve('buildingDocumentsRepository')
-    metadataRepository = app.locals.legacyDependenciesContainer.metadataRepository
+    const container = await createTestContainer()
+    buildingDocumentsRepository = container.resolve('buildingDocumentsRepository')
+    metadataRepository = container.resolve('legacyMetadataRepository')
   })
 
   it('returns array with building documents', async () => {
