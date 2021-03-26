@@ -40,6 +40,7 @@ const getBucketConnection = () => {
   return new Promise((resolve, reject) => {
     bucketConnection = cluster.openBucket(bucketName, (error) => {
       if (error) {
+        console.error('Error opening bucket', { error, bucket: JSON.stringify(bucketConnection) })
         reject(error)
       } else {
         resolve(bucketConnection)
