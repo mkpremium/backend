@@ -41,7 +41,9 @@ const getBucketConnection = () => {
   }
 
   cluster.authenticate(config.username, config.password)
-  bucketConnection = cluster.openBucket(bucketName)
+  bucketConnection = cluster.openBucket(bucketName, (...args) => {
+    console.log('open bucket result', { args })
+  })
   return bucketConnection
 }
 
