@@ -69,10 +69,7 @@ retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
         }),
       {
         interval: ONE_MINUTE / 4,
-        backoff: 2,
-        max_interval: ONE_MINUTE,
-        max_tries: 10,
-        timeout: 5 * ONE_MINUTE,
+        timeout: 2 * ONE_MINUTE,
       })
       .catch(error => {
         console.error('Primary index creation failed', { error })
