@@ -10,7 +10,7 @@ SELECT
     building.floorArea,
     building.location,
     building.cadastre.reference cadastreReference,
-    building.recentProposal.proposal lastProposal,
+    {"amount": building.recentProposal.proposal, "createdAt": building.recentProposal.createdAt} latestProposal,
     building.\`use\`,
     building.ownerId,
     building.negotiationStatus,
@@ -90,7 +90,7 @@ export class CommercialsBuildingRepository {
   static mapToPropertyAgentBuildingView (buildings) {
     return buildings.map(
       ({
-        id, metadata, stock, lastProposal, cadastreReference, address, location, use, floorArea,
+        id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
         ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount
       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
@@ -124,9 +124,7 @@ export class CommercialsBuildingRepository {
               transactionDate: moment(stock.close.transactionDate).format()
             } : undefined
           },
-          latestProposal: lastProposal ? {
-            amount: lastProposal
-          } : undefined,
+          latestProposal,
           address: address ? {
             neighborhood: address.neighborhood ? address.neighborhood : undefined,
             type: address.type ? address.type : undefined,
