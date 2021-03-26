@@ -55,10 +55,11 @@ retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
     console.info({ bucketSource })
     console.info('Creating primary index')
 
-    const bucket = getBucketConnection()
-    const bucketManager = Promise.promisifyAll(bucket.manager())
+    let bucket, bucketManager
 
     return retry(() => {
+        bucket = getBucketConnection()
+        bucketManager = Promise.promisifyAll(bucket.manager())
         if (!bucket.connected) {
           bucket.connected = true
         }
