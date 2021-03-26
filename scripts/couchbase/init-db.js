@@ -65,9 +65,11 @@ createBucket()
           })
       },
       {
-        interval: ONE_MINUTE * 3,
-        max_tries: 4,
-        timeout: ONE_MINUTE * 12,
+        interval: ONE_MINUTE / 6,
+        backoff: 2,
+        max_interval: ONE_MINUTE,
+        max_tries: 10,
+        timeout: 5 * ONE_MINUTE,
       })
       .catch(error => {
         console.error('Primary index creation failed', { error })
