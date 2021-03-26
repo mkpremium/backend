@@ -108,7 +108,7 @@ jobs:
         with:
           task-definition: infrastructure/ecs/api-task-definition.json
           container-name: api
-          image: ${{ IMAGE_URL }}
+          image: ${{ env.IMAGE_URL }}
 
       - name: Deploy Amazon ECS API task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
