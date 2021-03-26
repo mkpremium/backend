@@ -65,7 +65,7 @@ createBucket()
           })
       },
       {
-        interval: ONE_MINUTE / 6,
+        interval: ONE_MINUTE / 4,
         backoff: 2,
         max_interval: ONE_MINUTE,
         max_tries: 10,
