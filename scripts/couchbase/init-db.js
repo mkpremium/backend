@@ -22,7 +22,7 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
 }).catch(error => {
   if (error.statusCode === 400) {
     console.warn('Guessing error means that bucket already exists', { error })
-    return EXISTING_BUCKET
+    return 'EXISTING_BUCKET'
   }
   throw error
 }).then(existingBucket => Promise.resolve(existingBucket ? existingBucket : 'NEW_BUCKET'))
