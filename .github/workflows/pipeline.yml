@@ -62,17 +62,8 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: Lint
+      - name: Install
         run: npm install
-
-      - name: Test
-        uses: nick-invision/retry@v2
-        with:
-          max_attempts: 1
-          retry_on: error
-          timeout_minutes: 20
-          retry_wait_seconds: 120
-          command: ./scripts/test-ci.sh
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
