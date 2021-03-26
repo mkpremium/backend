@@ -5,9 +5,10 @@ on:
 
 name: Deploy to Amazon ECS
 
+env:
+  IMAGE_URL: 173249668334.dkr.ecr.eu-west-1.amazonaws.com/backend:${{ github.sha }}
+
 jobs:
-  env:
-    IMAGE_URL: 173249668334.dkr.ecr.eu-west-1.amazonaws.com/backend:${{ github.sha }}
 
   test:
     runs-on: ubuntu-latest
