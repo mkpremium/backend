@@ -12,7 +12,6 @@ const config = {
 const bucketName = config.bucketName
 
 const cluster = Promise.promisifyAll(new couchbase.Cluster(config.connString))
-
 cluster.authenticate(config.username, config.password)
 
 const clusterManager = Promise.promisifyAll(cluster.manager())
@@ -31,6 +30,21 @@ const ONE_MINUTE = 60000
 const EXISTING_BUCKET = 'EXISTING_BUCKET'
 const NEW_BUCKET = 'NEW_BUCKET'
 
+let bucketConnection
+const getBucketConnection = () => {
+  if (bucketConnection) {
+    if (bucketConnection.connected) {
+      return bucketConnection
+    } else {
+      bucketConnection.disconnect()
+    }
+  }
+
+  cluster.authenticate(config.username, config.password)
+  bucketConnection = cluster.openBucket(bucketName)
+  return bucketConnection
+}
+
 console.info(`Initializating bucket with name ${bucketName}`)
 retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
   .then(() => {
@@ -41,8 +55,9 @@ retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
     console.info({ bucketSource })
     console.info('Creating primary index')
 
-    const bucket = cluster.openBucket(bucketName)
+    const bucket = getBucketConnection()
     const bucketManager = Promise.promisifyAll(bucket.manager())
+
     return retry(() => {
         if (!bucket.connected) {
           bucket.connected = true
