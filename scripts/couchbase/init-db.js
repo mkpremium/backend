@@ -49,13 +49,12 @@ createBucket()
     console.info({ bucketSource })
     console.info('Creating primary index')
 
-    let bucket = cluster.openBucket(bucketName)
-    let bucketManager
+    const bucket = cluster.openBucket(bucketName)
+    const bucketManager = Promise.promisifyAll(bucket.manager())
     return retry(() => {
         if (!bucket.connected) {
-          bucket = cluster.openBucket(bucketName)
+          bucket.connected = true
         }
-        bucketManager = Promise.promisifyAll(bucket.manager())
         console.log('Trying to create primary index')
         return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
           .then(() => {
