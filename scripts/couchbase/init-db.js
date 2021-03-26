@@ -1,20 +1,21 @@
 const Promise = require('bluebird')
 const retry = require('bluebird-retry')
 const couchbase = require('couchbase')
-const uuid = require('uuid/v4')
 
+const ONE_MINUTE = 60000
 const config = {
   connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=180.0',
   username: process.env.COUCHBASE_USER || 'couchbase',
   password: process.env.COUCHBASE_PASS || 'couchbase',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
 }
+
 const bucketName = config.bucketName
-
 const cluster = Promise.promisifyAll(new couchbase.Cluster(config.connString))
-cluster.authenticate(config.username, config.password)
 
+cluster.authenticate(config.username, config.password)
 const clusterManager = Promise.promisifyAll(cluster.manager())
+
 const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   flushEnabled: 1,
   ramQuotaMB: 100
@@ -24,56 +25,48 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
     return EXISTING_BUCKET
   }
   throw error
-})
-
-const ONE_MINUTE = 60000
-const EXISTING_BUCKET = 'EXISTING_BUCKET'
-const NEW_BUCKET = 'NEW_BUCKET'
+}).then(existingBucket => Promise.resolve(existingBucket ? existingBucket : 'NEW_BUCKET'))
 
 let bucketConnection
 const getBucketConnection = () => {
   if (bucketConnection) {
     if (bucketConnection.connected) {
-      return bucketConnection
+      return Promise.resolve(bucketConnection)
     } else {
       bucketConnection.disconnect()
     }
   }
 
-  cluster.authenticate(config.username, config.password)
-  bucketConnection = cluster.openBucket(bucketName, (...args) => {
-    console.log('open bucket result', { args })
+  return new Promise((resolve, reject) => {
+    bucketConnection = cluster.openBucket(bucketName, (error) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(bucketConnection)
+      }
+    })
   })
-  return bucketConnection
 }
 
 console.info(`Initializating bucket with name ${bucketName}`)
 retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
-  .then(() => {
-    console.info('Bucket created')
-    return NEW_BUCKET
-  })
   .then((bucketSource) => {
-    console.info({ bucketSource })
-    console.info('Creating primary index')
+    console.info('Creating primary index', { bucketSource })
 
     let bucket, bucketManager
-
-    return retry(() => {
-        bucket = getBucketConnection()
-        bucketManager = Promise.promisifyAll(bucket.manager())
-        if (!bucket.connected) {
-          bucket.connected = true
-        }
-        console.log('Trying to create primary index')
-        return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
-          .then(() => {
-          })
-          .catch(error => {
-            console.error('Error on primary index creation attempt', { error })
-            throw error
-          })
-      },
+    return retry(() => getBucketConnection()
+        .then(conn => {
+          bucket = conn
+          bucketManager = Promise.promisifyAll(bucket.manager())
+          console.log('Trying to create primary index')
+          return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
+            .then(() => {
+            })
+            .catch(error => {
+              console.error('Error on primary index creation attempt', { error })
+              throw error
+            })
+        }),
       {
         interval: ONE_MINUTE / 4,
         backoff: 2,
