@@ -53,7 +53,8 @@ jobs:
       - name: Extract Couchbase logs
         if: failure()
         run: docker cp `docker ps --format '{{.Names}}'`:/opt/couchbase/var/lib/couchbase/logs couchbase_logs
-      - uses: actions/upload-artifact@v2
+      - name: Upload Couchbase logs artifact
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: couchbase_logs
