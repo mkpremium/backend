@@ -50,7 +50,7 @@ jobs:
           retry_wait_seconds: 30
           command: ./scripts/test-ci.sh
 
-      - run: docker ls
+      - run: docker ps
         if: failure()
       - run: docker cp couchbase_db:/opt/couchbase/var/lib/couchbase/logs couchbase_logs
         if: failure()
