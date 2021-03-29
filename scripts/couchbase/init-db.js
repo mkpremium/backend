@@ -58,7 +58,7 @@ const getBucketConnection = () => {
 }
 
 console.info(`Initializating bucket with name ${bucketName}`)
-const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\'` grep -rq "Enabling traffic to bucket" /opt/couchbase/var/lib/couchbase/logs/info.log'
+const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\'` grep -rq "The following buckets became ready on node" /opt/couchbase/var/lib/couchbase/logs/info.log'
 retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
   .then((bucketSource) => {
     console.info('Waiting for bucket creation', { bucketSource })
