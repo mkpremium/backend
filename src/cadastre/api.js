@@ -1,6 +1,6 @@
 import Promise from 'bluebird'
 import _ from 'lodash'
-import camaro from 'camaro'
+import { transform } from 'camaro'
 import axiosCadastreClient from './axios'
 import { parseCoords } from './coord-parser'
 import { keys, streetTypes, templates, urls } from './constants'
@@ -73,7 +73,7 @@ export class CadastreApi {
     }
 
     const xml = await this.fetchXml(keys.BUILDING_BY_CADASTRE, params, 'post', options)
-    const fetchedData = camaro(xml, templates[keys.BUILDING_BY_CADASTRE])
+    const fetchedData = transform(xml, templates[keys.BUILDING_BY_CADASTRE])
 
     return CadastreApi.parseBuilding(fetchedData)
   }
@@ -87,7 +87,7 @@ export class CadastreApi {
     }
 
     const xml = await this.fetchXml(keys.LOCATION_BY_CADASTRE, params)
-    const result = camaro(xml, templates[keys.LOCATION_BY_CADASTRE])
+    const result = transform(xml, templates[keys.LOCATION_BY_CADASTRE])
 
     if (result.error) {
       throw newHttpError(500, 'Catastro api: ' + result.error)
@@ -100,7 +100,7 @@ export class CadastreApi {
    * @private
    */
   static parseXmlItems (xml, templateKey) {
-    const { items, error } = camaro(xml, templates[templateKey])
+    const { items, error } = transform(xml, templates[templateKey])
 
     if (error) {
       throw newHttpError(500, 'Catastro api: ' + error)
