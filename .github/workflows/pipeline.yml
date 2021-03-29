@@ -26,6 +26,8 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
+        volumes:
+          - /tmp/couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
 
     steps:
       - name: Checkout
@@ -52,13 +54,11 @@ jobs:
 
       - run: docker ps
         if: failure()
-      - run: docker cp couchbase_db:/opt/couchbase/var/lib/couchbase/logs couchbase_logs
-        if: failure()
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: couchbase_logs
-          path: couchbase_logs
+          path: /tmp/couchbase_logs
 
   build:
     name: Build
