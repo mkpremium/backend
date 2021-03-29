@@ -52,7 +52,7 @@ jobs:
           retry_wait_seconds: 30
           command: ./scripts/test-ci.sh
 
-      - run: chmod +r -r /tmp/couchbase_logs
+      - run: chmod +r /tmp/couchbase_logs
         if: failure()
       - uses: actions/upload-artifact@v2
         if: failure()
