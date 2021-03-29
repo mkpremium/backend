@@ -2,7 +2,6 @@
 FROM node:14
 
 RUN ["npm", "install", "-g", "npm"]
-RUN ["npm", "install", "--force", "--global", "bcrypt@latest"]
 
 ENV BUILD_FOLDER "/app/build"
 RUN ["mkdir", "/app"]
