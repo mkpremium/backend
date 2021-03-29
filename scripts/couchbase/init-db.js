@@ -64,7 +64,8 @@ retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
     console.info('Waiting for bucket creation', { bucketSource })
     return retry(() => {
       return new Promise((resolve, reject) => {
-        const child = exec(isBucketReadyCommand, (error) => {
+        const child = exec(isBucketReadyCommand, (error, stout) => {
+          console.log('Checking for bucket readiness', { stout })
           if (error || child.exitCode !== 0) {
             reject()
           } else {
