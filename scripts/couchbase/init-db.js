@@ -36,8 +36,6 @@ const getBucketConnection = () => {
   if (bucketConnection) {
     if (bucketConnection.connected) {
       return Promise.resolve(bucketConnection)
-    } else {
-      bucketConnection.disconnect()
     }
   }
 
