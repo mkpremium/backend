@@ -61,8 +61,6 @@ retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
           bucketManager = Promise.promisifyAll(bucket.manager())
           console.log('Trying to create primary index')
           return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
-            .then(() => {
-            })
             .catch(error => {
               console.error('Error on primary index creation attempt', { error })
               throw error
