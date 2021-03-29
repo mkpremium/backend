@@ -50,6 +50,14 @@ jobs:
           retry_wait_seconds: 30
           command: ./scripts/test-ci.sh
 
+      - run: docker cp couchbase_db /opt/couchbase/var/lib/couchbase/logs couchbase_logs
+        if: failure()
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: couchbase_logs
+          path: couchbase_logs
+
   build:
     name: Build
     runs-on: ubuntu-latest
