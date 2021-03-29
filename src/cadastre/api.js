@@ -57,7 +57,7 @@ export class CadastreApi {
       Puerta: ''
     }
     const xml = await this.fetchXml(keys.BUILDING_BY_ADDRESS, params)
-    const fetchedData = camaro(xml, templates[keys.BUILDING_BY_ADDRESS])
+    const fetchedData = transform(xml, templates[keys.BUILDING_BY_ADDRESS])
 
     return CadastreApi.parseBuilding(fetchedData)
   }
