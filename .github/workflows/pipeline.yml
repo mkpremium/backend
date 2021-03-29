@@ -26,8 +26,8 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
-        volumes:
-          - ${PWD}/couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
+#        volumes:
+#          - ${PWD}/couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
 
     steps:
       - name: Checkout
@@ -52,13 +52,11 @@ jobs:
           retry_wait_seconds: 30
           command: ./scripts/test-ci.sh
 
-      - run: docker ps
-        if: failure()
-      - uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: couchbase_logs
-          path: couchbase_logs
+#      - uses: actions/upload-artifact@v2
+#        if: failure()
+#        with:
+#          name: couchbase_logs
+#          path: couchbase_logs
 
   build:
     name: Build
