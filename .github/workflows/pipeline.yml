@@ -53,6 +53,7 @@ jobs:
           command: ./scripts/test-ci.sh
 
       - run: chmod +r -r /tmp/couchbase_logs
+        if: failure()
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
