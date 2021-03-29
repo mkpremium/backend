@@ -27,7 +27,7 @@ jobs:
           - 8094:8094
           - 11210:11210
         volumes:
-          - /tmp/couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
+          - ./couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
 
     steps:
       - name: Checkout
@@ -58,7 +58,7 @@ jobs:
         if: failure()
         with:
           name: couchbase_logs
-          path: /tmp/couchbase_logs
+          path: couchbase_logs
 
   build:
     name: Build
