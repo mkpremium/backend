@@ -78,7 +78,9 @@ retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
       {
         interval: ONE_MINUTE / 4,
         timeout: 2 * ONE_MINUTE,
-      })
+        predicate: error => error.code !== couchbase.errors.authError
+      }
+    )
       .catch(error => {
         console.error('Primary index creation failed', { error })
         throw error
