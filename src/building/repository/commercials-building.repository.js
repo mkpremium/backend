@@ -125,7 +125,7 @@ export class CommercialsBuildingRepository {
               transactionDate: moment(stock.close.transactionDate).format()
             } : undefined
           },
-          latestProposal: latestProposal.amount ? latestProposal : undefined,
+          latestProposal: latestProposal && latestProposal.amount ? latestProposal : undefined,
           address: address ? {
             neighborhood: address.neighborhood ? address.neighborhood : undefined,
             type: address.type ? address.type : undefined,
