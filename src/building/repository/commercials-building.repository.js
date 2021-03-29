@@ -10,7 +10,8 @@ SELECT
     building.floorArea,
     building.location,
     building.cadastre.reference cadastreReference,
-    {"amount": building.recentProposal.proposal, "createdAt": building.recentProposal.createdAt} latestProposal,
+    {"amount": building.recentProposal.proposal, "createdAt": building.recentProposal.createdAt} 
+    ,
     building.\`use\`,
     building.ownerId,
     building.negotiationStatus,
