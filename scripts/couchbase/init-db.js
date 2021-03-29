@@ -2,6 +2,7 @@ const Promise = require('bluebird')
 const retry = require('bluebird-retry')
 const couchbase = require('couchbase')
 const _ = require('lodash')
+const { exec } = require('child_process')
 
 const ONE_MINUTE = 60000
 const config = {
@@ -57,10 +58,26 @@ const getBucketConnection = () => {
 }
 
 console.info(`Initializating bucket with name ${bucketName}`)
+const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\'` grep -rq "Enabling traffic to bucket" /opt/couchbase/var/lib/couchbase/logs/info.log'
 retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
   .then((bucketSource) => {
-    console.info('Creating primary index', { bucketSource })
-
+    console.info('Waiting for bucket creation', { bucketSource })
+    return retry(() => {
+      return new Promise((resolve, reject) => {
+        const child = exec(isBucketReadyCommand, (error) => {
+          if (error || child.exitCode !== 0) {
+            reject()
+          } else {
+            resolve()
+          }
+        })
+      })
+    }, {
+      interval: ONE_MINUTE / 4,
+      timeout: 3 * ONE_MINUTE,
+    })
+  })
+  .then(() => {
     let bucket, bucketManager
     return retry(() => getBucketConnection()
         .then(conn => {
