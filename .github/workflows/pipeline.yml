@@ -27,7 +27,7 @@ jobs:
           - 8094:8094
           - 11210:11210
         volumes:
-          - ./couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
+          - ${{ env.GITHUB_WORKSPACE }}./couchbase_logs:/opt/couchbase/var/lib/couchbase/logs
 
     steps:
       - name: Checkout
