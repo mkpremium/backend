@@ -1,6 +1,7 @@
 const Promise = require('bluebird')
 const retry = require('bluebird-retry')
 const couchbase = require('couchbase')
+const _ = require('lodash')
 
 const ONE_MINUTE = 60000
 const config = {
@@ -20,12 +21,15 @@ const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   flushEnabled: 1,
   ramQuotaMB: 100
 }).catch(error => {
-  if (error.statusCode === 400) {
-    console.warn('Guessing error means that bucket already exists', { error })
+  if (error.statusCode === 400 && _.get(error, 'response.errors.name') === 'Bucket with given name already exists') {
+    console.warn('Guessing error means that bucket already exists', {
+      error,
+      responseErrors: _.get(error, 'response.errors')
+    })
     return 'EXISTING_BUCKET'
   }
   throw error
-}).then(existingBucket => Promise.resolve(existingBucket ? existingBucket : 'NEW_BUCKET'))
+}).then(existingBucket => (existingBucket ? existingBucket : 'NEW_BUCKET'))
 
 let bucketConnection
 const getBucketConnection = () => {
@@ -40,7 +44,12 @@ const getBucketConnection = () => {
   return new Promise((resolve, reject) => {
     bucketConnection = cluster.openBucket(bucketName, (error) => {
       if (error) {
-        console.error('Error opening bucket', { error, bucket: JSON.stringify(bucketConnection) })
+        console.error('Error opening bucket', {
+          error,
+          bucket: JSON.stringify(bucketConnection),
+          cluster: JSON.stringify(cluster),
+          clusterManager: JSON.stringify(clusterManager),
+        })
         reject(error)
       } else {
         resolve(bucketConnection)
