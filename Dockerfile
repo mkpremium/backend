@@ -1,5 +1,5 @@
 # Build container
-FROM node:12
+FROM node:14
 
 RUN ["npm", "install", "-g", "npm"]
 RUN ["npm", "install", "--force", "--global", "bcrypt@latest"]
@@ -21,7 +21,7 @@ WORKDIR /app/build
 RUN ["npm", "install", "--production"]
 
 # Run container
-FROM node:12
+FROM node:14
 
 RUN ["mkdir", "/app"]
 WORKDIR /app
