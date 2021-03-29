@@ -26,7 +26,7 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
-        options: --health-cmd 'grep -q "Enabling traffic to bucket" /opt/couchbase/var/lib/couchbase/logs/info.log'
+        options: --health-cmd "grep -q 'Enabling traffic to bucket' /opt/couchbase/var/lib/couchbase/logs/info.log"
 
     steps:
       - name: Checkout
