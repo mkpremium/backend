@@ -1,29 +1,37 @@
 #!/usr/bin/env babel-node
 
 import program from 'commander'
-import {actionWrapper} from './lib'
 
 import couchbase from '../src/db/couchbase'
-import {OperatorRoles} from '../src/types/operator'
-import {createFullOperator} from '../test/common'
+import { OperatorRoles } from '../src/types/operator'
+import { createFullOperator } from '../test/common'
 
 program
   .version('0.0.1')
   .option('-u --username <username>', 'Nombre de usuario')
   .option('-P --password <password>', 'Contraseña')
   .option('-r --role <role>', `Rol de usuario (${rolesDesc(', ')})`, rolesArg(), 'OPERATOR')
-  .action(actionWrapper(mainAction))
+  .action((...args) =>
+    mainAction(...args)
+      .then(() => {
+        process.exit(0)
+      })
+      .catch(err => {
+        console.error(err)
+        process.exit(1)
+      })
+  )
   .parse(process.argv)
 
 async function mainAction () {
-  const {username, password, role} = program
+  const { username, password, role } = program
 
   if (!username || !password || !role) {
     program.help()
   }
 
   await couchbase()
-  await createOperator({username, password, role})
+  await createOperator({ username, password, role })
 }
 
 function rolesArg () {
@@ -34,7 +42,7 @@ function rolesDesc (union = '|') {
   return Object.values(OperatorRoles).join(union)
 }
 
-async function createOperator ({username, password, role}) {
+async function createOperator ({ username, password, role }) {
   await createFullOperator({
     username,
     password,
