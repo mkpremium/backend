@@ -338,6 +338,7 @@ const OperatorRequest = t.struct(
     level: t.maybe(t.Number),
     serviceId: t.maybe(t.String),
     enable: t.Bool,
+    flipperId: t.maybe(t.String),
     roles: t.list(OperatorRole),
 
     profile: OperatorProfile
