@@ -20,7 +20,8 @@ const clusterManager = Promise.promisifyAll(cluster.manager())
 
 const createBucket = () => clusterManager.createBucketAsync(bucketName, {
   flushEnabled: 1,
-  ramQuotaMB: 100
+  ramQuotaMB: 100,
+  authType: 'none'
 }).catch(error => {
   if (error.statusCode === 400 && _.get(error, 'response.errors.name') === 'Bucket with given name already exists') {
     console.warn('Guessing error means that bucket already exists', {
