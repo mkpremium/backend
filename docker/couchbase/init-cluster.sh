@@ -12,9 +12,4 @@ curl -v http://127.0.0.1:8091/settings/web -d port=8091 -d username="$COUCHBASE_
 
 curl -i -u "$COUCHBASE_USERNAME":"$COUCHBASE_PASSWORD" http://127.0.0.1:8091/settings/indexes -d 'storageMode=forestdb'
 
-sleep 15
-
-# shellcheck disable=SC2006
-curl -v http://127.0.0.1:8091/query/service -d "statement=CREATE PRIMARY INDEX ON `$COUCHBASE_BUCKET`"
-
 fg 1

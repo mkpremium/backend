@@ -7,8 +7,8 @@ const { exec } = require('child_process')
 const ONE_MINUTE = 60000
 const config = {
   connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=180.0',
-  username: process.env.COUCHBASE_USER || 'couchbase',
-  password: process.env.COUCHBASE_PASS || 'couchbase',
+  username: process.env.COUCHBASE_USER || 'couchbase-user',
+  password: process.env.COUCHBASE_PASS || 'couchbase-password',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
 }
 
@@ -61,7 +61,7 @@ console.info(`Initializating bucket with name ${bucketName}`)
 const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\'` grep -rq "The following buckets became ready on node" /opt/couchbase/var/lib/couchbase/logs/info.log'
 retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
   .then((bucketSource) => {
-    console.info('Waiting for bucket creation', { bucketSource })
+    console.info('Waiting for bucket to be ready', { bucketSource })
     return retry(() => {
       return new Promise((resolve, reject) => {
         const child = exec(isBucketReadyCommand, (error, stout) => {
