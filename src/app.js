@@ -45,7 +45,7 @@ export const dependenciesPromise = couchbase(app)
 
 dependenciesPromise.then(couchbaseBucket => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
-  const awilixContainer = createAwilixContainer(couchbaseBucket)
+  const awilixContainer = createAwilixContainer(couchbaseBucket, process.env.FORCE_MAX_CONSISTENCY === 'true')
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
   meeting(app, dependenciesContainer)
