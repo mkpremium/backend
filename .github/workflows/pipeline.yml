@@ -47,7 +47,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 5
-          retry_wait_seconds: 30
+          retry_wait_seconds: 60
           command: ./scripts/test-ci.sh
 
       - name: Extract Couchbase logs
