@@ -12,6 +12,7 @@ import {
   testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
+import { Promise } from 'bluebird'
 
 describe('Building listing endpoint', () => {
   let app, businessUser
@@ -80,6 +81,8 @@ describe('Building listing endpoint', () => {
     })).close
 
     const building2 = await createBuilding(app, { id: 'test-building2' })
+
+    await Promise.delay(100)
 
     return authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
       .then(response => {
