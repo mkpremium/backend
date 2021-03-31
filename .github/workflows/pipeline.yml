@@ -41,14 +41,19 @@ jobs:
           npm install
           npm run lint
 
-      - name: Test
+      - name: Prepare Test Couchbase
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 5
-          retry_wait_seconds: 60
-          command: ./scripts/test-ci.sh
+          retry_wait_seconds: 30
+          command: node scripts/couchbase/init-db.js
+
+      - name: Test
+        run: |
+          npm run test
+          npm run test:e2e
 
       - name: Extract Couchbase logs
         if: failure()
