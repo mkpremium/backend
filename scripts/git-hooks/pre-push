@@ -5,4 +5,5 @@ set -e
 npm run lint
 
 ./scripts/start-couchbase-and-wait-for-it.sh
-./scripts/test-ci.sh
+npm run test
+npm run test:e2e
