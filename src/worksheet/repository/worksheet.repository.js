@@ -5,10 +5,16 @@ import { N1qlQuery } from 'couchbase'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
+import { DateTimeString } from '../../infrastructure/shared-types'
 
 export const WorksheetBuilding = t.struct({
   id: t.String,
   negotiationStatus: t.String,
+  latestProposal: t.maybe(t.struct({
+    amount: t.Number,
+    createdAt: DateTimeString
+  })),
+  cadastreReference: t.maybe(t.String),
   address: t.struct({
     number: t.union([ t.String, t.Number ]),
     city: t.String,
@@ -137,11 +143,18 @@ export class WorksheetRepository extends CouchbaseRepository {
         throw new WorksheetNotFound(worksheetId)
       }
 
+      const record = rows[ 0 ]
+      if (record.relatedBuildings[ 0 ].recentProposal) {
+        record.relatedBuildings[ 0 ].latestProposal = {
+          amount: record.relatedBuildings[ 0 ].recentProposal.proposal,
+          createdAt: record.relatedBuildings[ 0 ].recentProposal.createdAt
+        }
+      }
       try {
-        return fromJSON(rows[ 0 ], CallcenterView)
+        return fromJSON(record, CallcenterView)
       } catch (error) {
         this.logWorksheetParsingError(worksheetId, error)
-        return rows[ 0 ]
+        return record
       }
     })
   }

@@ -18,7 +18,15 @@ describe('worksheet.repository', () => {
 
   it('gets worksheet with callcenter view', () => {
     const testWorksheetId = 'test-worksheet-id'
-    const testBuilding = buildingBuilder().build()
+    const testBuilding = buildingBuilder({
+      recentProposal: {
+        id: 'test-proposal-id',
+        buildingId: 'test-building-id',
+        createdBy: 'test-created-by',
+        createdAt: '2021-03-31T11:45:00.000Z',
+        proposal: 100000
+      }
+    }).build()
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
     const testWorksheet = worksheetBuilder({
       id: testWorksheetId,
@@ -33,6 +41,7 @@ describe('worksheet.repository', () => {
       repository.getForCallcenterView(testWorksheetId)
         .then(result => {
           expect(validate(result, CallcenterView).errors).to.deep.equal([])
+          expect(result.relatedBuildings[0].latestProposal).not.to.be.undefined
         })
     )
   })

@@ -15,10 +15,10 @@ const buildingPrototype = {
   location: {}
 }
 
-export const buildingBuilder = () => {
+export const buildingBuilder = (overrides = {}) => {
   return {
     build () {
-      return Building(buildingPrototype)
+      return Building({ ...buildingPrototype, ...overrides })
     }
   }
 }
