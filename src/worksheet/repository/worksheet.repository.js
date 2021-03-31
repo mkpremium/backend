@@ -33,6 +33,7 @@ export const WorksheetBuilding = t.struct({
     mimeType: t.String
   })),
   use: t.maybe(t.String),
+  usage: t.maybe(t.String),
   location: t.struct({
     lng: t.maybe(t.Number),
     lat: t.maybe(t.Number)
@@ -84,6 +85,7 @@ SELECT
       building.address,
       building.metadata,
       building.\`use\`,
+      "usage": building.\`use\`,
       building.location,
       building.recentProposal,
       building.cadastre,
