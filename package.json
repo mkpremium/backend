@@ -8,8 +8,6 @@
     "test": "./scripts/run-test.sh test",
     "test:e2e": "./scripts/run-test.sh test-e2e",
     "build": "scripts/build-without-dependencies.sh",
-    "deploy:uat": "scripts/deployment.sh mkpremium-uat",
-    "deploy:prod": "scripts/deployment.sh mkpremium-prod",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "cronjobs": "nodemon bin/freezer.js --exec babel-node"
   },
