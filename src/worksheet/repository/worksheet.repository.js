@@ -89,7 +89,8 @@ SELECT
       building.cadastre,
       building.floorArea,
       building.negotiationStatus,
-      "featuredOwnerId": building.ownerId
+      "featuredOwnerId": building.ownerId,
+      "cadastreReference": building.cadastre.reference
   }] relatedBuildings,
   ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
 

@@ -19,6 +19,10 @@ describe('worksheet.repository', () => {
   it('gets worksheet with callcenter view', () => {
     const testWorksheetId = 'test-worksheet-id'
     const testBuilding = buildingBuilder({
+      cadastre: {
+        reference: 'test-cadastre-reference',
+        address: 'test cadastre address'
+      },
       recentProposal: {
         id: 'test-proposal-id',
         buildingId: 'test-building-id',
@@ -41,7 +45,8 @@ describe('worksheet.repository', () => {
       repository.getForCallcenterView(testWorksheetId)
         .then(result => {
           expect(validate(result, CallcenterView).errors).to.deep.equal([])
-          expect(result.relatedBuildings[0].latestProposal).not.to.be.undefined
+          expect(result.building.latestProposal).not.to.be.undefined
+          expect(result.building.cadastreReference).to.be.equal('test-cadastre-reference')
         })
     )
   })
