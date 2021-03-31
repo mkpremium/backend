@@ -52,6 +52,7 @@ export const CallcenterView = t.struct({
   id: t.String,
   status: WorkSheetStatusEnum,
   queueId: t.maybe(t.String),
+  building: WorksheetBuilding,
   relatedBuildings: t.list(WorksheetBuilding),
   relatedOwners: t.list(t.struct({
     id: t.String,
@@ -150,6 +151,8 @@ export class WorksheetRepository extends CouchbaseRepository {
           createdAt: record.relatedBuildings[ 0 ].recentProposal.createdAt
         }
       }
+      record.building = record.relatedBuildings[ 0 ]
+
       try {
         return fromJSON(record, CallcenterView)
       } catch (error) {
