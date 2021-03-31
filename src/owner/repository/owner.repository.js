@@ -23,6 +23,7 @@ owner.person.contacts,
     building.recentProposal,
     building.cadastre,
     building.floorArea,
+    building.negotiationStatus,
     "featuredOwnerId": building.ownerId
 } as building,
 building.address buildingAddress,
@@ -110,8 +111,17 @@ export class OwnerRepository extends CouchbaseRepository {
       [ phoneNumber ]
     ).then(result => fromJSON(result.map(rec => {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
+      const building = rec.building
+      if (building.recentProposal) {
+        building.latestProposal = {
+          amount: building.recentProposal.proposal,
+          createdAt: building.recentProposal.createdAt
+        }
+      }
+
       return {
         ...rec,
+        building,
         negotiationStatus: rec.negotiationStatus || 'PENDIENTE',
         lastEvent: rec.lastEvent.eventDate !== undefined ? {
           eventDate: rec.lastEvent.eventDate,
