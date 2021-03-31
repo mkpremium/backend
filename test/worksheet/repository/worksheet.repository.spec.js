@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { worksheetBuilder } from '../worksheet.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { ownerBuilder } from '../../owner/owner.builder'
+import { validate } from 'tcomb-validation'
 
 describe('worksheet.repository', () => {
   let repository, buildingsRepository, ownersRepository
@@ -31,7 +32,7 @@ describe('worksheet.repository', () => {
     ]).then(() =>
       repository.getForCallcenterView(testWorksheetId)
         .then(result => {
-          expect(() => CallcenterView(result)).not.throw
+          expect(validate(result, CallcenterView).errors).to.deep.equal([])
         })
     )
   })

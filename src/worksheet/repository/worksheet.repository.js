@@ -8,6 +8,7 @@ import { CouchbaseRepository } from '../../db/couchbase.repository'
 
 export const WorksheetBuilding = t.struct({
   id: t.String,
+  negotiationStatus: t.String,
   address: t.struct({
     number: t.union([ t.String, t.Number ]),
     city: t.String,
@@ -80,6 +81,7 @@ SELECT
       building.recentProposal,
       building.cadastre,
       building.floorArea,
+      building.negotiationStatus,
       "featuredOwnerId": building.ownerId
   }] relatedBuildings,
   ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
