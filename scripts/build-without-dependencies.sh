@@ -13,9 +13,6 @@ npx babel ./ \
   --copy-files \
   --ignore node_modules,docker,test,test-e2e,test-bkp
 
-# Build the package.json
-BUILD_FOLDER=$build_folder scripts/package.js
-
 cd ${build_folder}
 # Create folder for uploads (email attachments)
 mkdir -p .uploads
