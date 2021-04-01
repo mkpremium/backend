@@ -26,7 +26,6 @@ owner.person.contacts,
     building.negotiationStatus,
     "featuredOwnerId": building.ownerId
 } as building,
-building.address buildingAddress,
 building.negotiationStatus,
 worksheet.id worksheetId,
 {
@@ -70,16 +69,6 @@ const FoundOwner = t.struct({
     type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
     status: t.enums.of([ 'UNDEFINED', 'GOOD', 'BAD' ])
   })),
-  buildingAddress: t.struct({
-    neighborhood: t.maybe(t.String),
-    type: t.maybe(t.String),
-    street: t.maybe(t.String),
-    number: t.maybe(t.union([ t.String, t.Number ])),
-    postalCode: t.maybe(t.struct({
-      number: t.maybe(t.union([ t.String, t.Number ]))
-    })),
-    city: t.maybe(t.String)
-  }),
   lastEvent: t.maybe(t.struct({
     eventDate: DateTimeString,
     type: t.enums.of([ 'meeting', 'offer-request' ]),
