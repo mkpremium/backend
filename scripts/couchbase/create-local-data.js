@@ -1,7 +1,6 @@
 const axios = require('axios')
 
 const baseURL = 'http://localhost:9001'
-// TODO create admin user
 
 axios.post(`${baseURL}/operators/login`, {
   username: 'admin',
@@ -39,11 +38,11 @@ function createFlipper (client, queueId) {
   return client.post('/operators', {
     username: 'flipper',
     password: 'flipper1',
-    email: 'flipper@email.test',
     roles: [ 'BUSINESS' ],
     profile: {
       firstName: 'Deyvi',
       lastName: 'Flipper',
+      email: 'flipper@email.test',
       queueId
     }
   })
@@ -64,11 +63,11 @@ function createCaller (client, queueId, flipperId) {
     flipperId,
     username: 'caller',
     password: 'caller10',
-    email: 'caller@email.test',
     roles: [ 'OPERATOR' ],
     profile: {
       firstName: 'Esther',
       lastName: 'Caller',
+      email: 'caller@email.test',
       queueId
     }
   })
@@ -78,11 +77,11 @@ function createFlipperCaller (client, queueId) {
   return client.post('/operators', {
     username: 'flipper-caller',
     password: 'flipper-caller1',
-    email: 'flipper-caller@email.test',
     roles: [ 'OPERATOR', 'BUSINESS' ],
     profile: {
       firstName: 'Maria',
       lastName: 'Flipper Caller',
+      email: 'flipper-caller@email.test',
       queueId
     }
   })
