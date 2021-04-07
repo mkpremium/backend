@@ -28,29 +28,8 @@ services:
       - couchbase_db
     entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "/app/bin/www.js"]
 
-  websocket:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: mk-backend:local
-
-    environment:
-      SOCKET_PORT: "9002"
-      COUCHBASE_URI: "couchbase://couchbase_db"
-      COUCHBASE_BUCKET: "mkpremium"
-      COUCHBASE_USER: "couchbase"
-      COUCHBASE_PASS: "couchbase-password"
-      SOCKET_ENABLED: "true"
-      SOCKET_SERVER: "http://localhost:9002"
-      DEBUG: "ON"
-
-    volumes:
-      - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
-
-    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "node", "/app/bin/socket.js"]
-
   couchbase_db:
-    image: "jvelasco/couchbase-dev"
+    image: "couchbase:community-6.0.0"
 
     ports:
       - "8091:8091" # REST/HTTP including Web UI
