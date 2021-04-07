@@ -7,8 +7,8 @@ const { exec } = require('child_process')
 const ONE_MINUTE = 60000
 const config = {
   connString: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=180.0',
-  username: process.env.COUCHBASE_USER || 'couchbase-user',
-  password: process.env.COUCHBASE_PASS || 'couchbase-password',
+  username: process.env.COUCHBASE_USER || 'couchbase',
+  password: process.env.COUCHBASE_PASS || 'couchbase',
   bucketName: process.env.COUCHBASE_BUCKET || 'mkpremium_test'
 }
 
