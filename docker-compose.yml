@@ -21,10 +21,8 @@ services:
     volumes:
       - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
     links:
-      - "websocket"
       - "couchbase_db"
     depends_on:
-      - websocket
       - couchbase_db
     entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "/app/bin/www.js"]
 
