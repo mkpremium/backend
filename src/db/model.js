@@ -116,7 +116,7 @@ export class CouchbaseModel {
     logger.debug('model#search', { searchBuilder })
     await this._promiseBucket
 
-    return this._bucket.queryAsync(searchBuilder)
+    return this.withRetry(() => this._bucket.queryAsync(searchBuilder))
   }
 
   async raw (query, consistency = couchbase.consistency) {
@@ -128,11 +128,7 @@ export class CouchbaseModel {
   async queryRaw (query) {
     await this._promiseBucket
     try {
-      const result = await retry(() => this._bucket.queryAsync(query), {
-        maxTries: 3,
-        interval: 100,
-        predicate: ({code}) => code === couchbaseErrors.temporaryError
-      })
+      const result = await this.withRetry(() => this._bucket.queryAsync(query))
       logger.debug('model#queryRaw', { query, result })
 
       return result
@@ -152,8 +148,9 @@ export class CouchbaseModel {
 
     try {
       const n1ql = N1qlQuery.fromString(queryParam.text).consistency(consistency)
-      const result = await this._bucket.queryAsync(n1ql, queryParam.values)
+      const result = await this.withRetry(() => this._bucket.queryAsync(n1ql, queryParam.values))
       logger.debug('model#query', { consistency, queryParam, queryBuilder, result })
+
       return result
     } catch (error) {
       logger.error('model#query', { consistency, queryParam, queryBuilder, error })
@@ -191,7 +188,7 @@ export class CouchbaseModel {
         id
       })
       await this._promiseBucket
-      const result = await this._bucket.getAsync(id)
+      const result = await this.withRetry(() => this._bucket.getAsync(id))
       if (result && result.value) {
         return fromJSON(result.value, this.Struct)
       }
@@ -228,5 +225,13 @@ export class CouchbaseModel {
     await this._promiseBucket
     const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts)
     return fromJSON(result, this.Struct)
+  }
+
+  withRetry (fn) {
+    return retry(fn, {
+      maxTries: 3,
+      interval: 100,
+      predicate: ({ code }) => code === couchbaseErrors.temporaryError
+    })
   }
 }
