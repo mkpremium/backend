@@ -94,7 +94,16 @@ SELECT
       "featuredOwnerId": building.ownerId,
       "cadastreReference": building.cadastre.reference
   }] relatedBuildings,
-  ARRAY {o.id, o.name, o.featuredContact, o.type, o.status, 'person': {o.person.contacts} } FOR o IN owners END relatedOwners
+  ARRAY {
+    o.id,
+    o.name,
+    o.featuredContact,
+    o.type,
+    o.status,
+    "person": {
+        "contacts": ARRAY c FOR c IN o.person.contacts WHEN c.status != 'BAD' END
+    }
+  } FOR o IN owners END relatedOwners
 
 FROM ${bucketName} worksheet
 JOIN ${bucketName} building ON building._documentType = 'building'
