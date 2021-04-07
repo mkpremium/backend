@@ -2,8 +2,8 @@
 
 #set -e
 readonly appName=${1:-www}
-echo "appName: ${appName}"
 
+set -xe
 ./scripts/start-couchbase-and-wait-for-it.sh
 
 set -a && . .env
