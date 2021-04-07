@@ -20,8 +20,6 @@ jobs:
     services:
       couchbase_db:
         image: "couchbase:community-6.0.0"
-        volumes:
-          - ${{ github.workspace }}/docker/couchbase-ci-volume:/opt/couchbase/var/lib
         ports:
           - 8091:8091
           - 8092:8092
@@ -42,6 +40,15 @@ jobs:
         run: |
           npm install
           npm run lint
+
+      - name: Prepare Couchbase
+        uses: nick-invision/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          timeout_minutes: 5
+          retry_wait_seconds: 30
+          command: node scripts/couchbase/init-db.js
 
       - name: Test
         run: |
@@ -89,7 +96,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ build, test ]
 
     steps:
       - name: Checkout
