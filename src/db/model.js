@@ -2,7 +2,7 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import squel from 'squel'
-import { N1qlQuery, SearchQuery } from 'couchbase'
+import { N1qlQuery, SearchQuery, errors as couchbaseErrors } from 'couchbase'
 import _ from 'lodash'
 import { logger } from '../infrastructure/logger'
 import { validate } from 'tcomb-validation'
@@ -11,6 +11,7 @@ import init from './couchbase'
 import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
+import retry from 'bluebird-retry'
 
 class CouchbaseModelStruct {
   constructor () {
@@ -127,7 +128,11 @@ export class CouchbaseModel {
   async queryRaw (query) {
     await this._promiseBucket
     try {
-      const result = await this._bucket.queryAsync(query)
+      const result = await retry(() => this._bucket.queryAsync(query), {
+        maxTries: 3,
+        interval: 100,
+        predicate: ({code}) => code === couchbaseErrors.temporaryError
+      })
       logger.debug('model#queryRaw', { query, result })
 
       return result
