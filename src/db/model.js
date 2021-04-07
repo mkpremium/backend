@@ -149,11 +149,11 @@ export class CouchbaseModel {
     try {
       const n1ql = N1qlQuery.fromString(queryParam.text).consistency(consistency)
       const result = await this.withRetry(() => this._bucket.queryAsync(n1ql, queryParam.values))
-      logger.debug('model#query', { consistency, queryParam, queryBuilder, result })
+      logger.debug('model#query', { consistency, queryParam, result })
 
       return result
     } catch (error) {
-      logger.error('model#query', { consistency, queryParam, queryBuilder, error })
+      logger.error('model#query', { consistency, queryParam, error })
       throw error
     }
   }
