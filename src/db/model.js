@@ -19,6 +19,9 @@ class CouchbaseModelStruct {
   }
 }
 
+/**
+ * @deprecated use CouchbaseRepository instead.
+ */
 export class CouchbaseModel {
   constructor () {
     CouchbaseModel.prototype._promiseBucket = CouchbaseModel.prototype._promiseBucket || init()
