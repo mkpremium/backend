@@ -87,10 +87,6 @@ export const Worksheet = t.struct({
 })
 
 Worksheet.prototype.setStatus = function (newStatus) {
-  if (newStatus === this.status) {
-    return this
-  }
-
   return Worksheet.update(this, {
     status: { $set: newStatus },
     statusChangedAt: { $set: utc().toDate() },
