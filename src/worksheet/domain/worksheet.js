@@ -90,7 +90,7 @@ Worksheet.prototype.setStatus = function (newStatus) {
   return Worksheet.update(this, {
     status: { $set: newStatus },
     statusChangedAt: { $set: utc().toDate() },
-    freezer: { $set: newStatus === WorkSheetStatus.NO_SALE }
+    inFreezer: { $set: newStatus === WorkSheetStatus.NO_SALE }
   })
 }
 
