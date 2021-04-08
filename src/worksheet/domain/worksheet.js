@@ -5,7 +5,6 @@ import _get from 'lodash/get'
 import _ from 'lodash'
 import t from 'tcomb'
 import { Building } from '../../building/building'
-import { logger } from '../../infrastructure/logger'
 import { utc } from '../../lib/date'
 import { OwnerWithInclude } from '../../owner/owner'
 import { OwnerCompactView } from '../../owner/types'
@@ -89,12 +88,14 @@ export const Worksheet = t.struct({
 
 Worksheet.prototype.setStatus = function (newStatus) {
   if (newStatus === this.status) {
-    logger.debug('WorkSheet#setStatus status remains equals', { status: this.status, id: this.id })
     return this
-  } else {
-    logger.debug('WorkSheet#setStatus status changed', { oldStatus: this.status, newStatus, id: this.id })
-    return t.update(this, { status: { $set: newStatus }, statusChangedAt: { $set: utc().toDate() } })
   }
+
+  return Worksheet.update(this, {
+    status: { $set: newStatus },
+    statusChangedAt: { $set: utc().toDate() },
+    freezer: { $set: newStatus === WorkSheetStatus.NO_SALE }
+  })
 }
 
 Worksheet.prototype.pullOutFreezer = function (newStatus) {
