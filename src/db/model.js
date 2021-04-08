@@ -223,7 +223,7 @@ export class CouchbaseModel {
     }
 
     await this._promiseBucket
-    const result = await this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts)
+    const result = await this.withRetry(() => this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts))
     return fromJSON(result, this.Struct)
   }
 
