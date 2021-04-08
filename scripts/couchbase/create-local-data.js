@@ -16,10 +16,10 @@ axios.post(`${baseURL}/operators/login`, {
   })
   .then(client => createWorksheetQueue(client)
     .then(
-      ({ id: queueId }) =>
+      ({ data: { id: queueId } }) =>
         Promise.all([
           createFlipper(client, queueId)
-            .then(({ id: flipperId }) => createCaller(client, queueId, flipperId)),
+            .then(({ data: { id: flipperId } }) => createCaller(client, queueId, flipperId)),
           createFlipperCaller(client, queueId),
           createTestBuildings(client, 100).catch(error => {
             console.error('Error creating buildings', { error })
