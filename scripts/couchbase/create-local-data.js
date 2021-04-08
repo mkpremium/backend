@@ -5,14 +5,15 @@ const baseURL = 'http://localhost:9001'
 axios.post(`${baseURL}/operators/login`, {
   username: 'admin',
   password: 'admin'
-}).then(({ data: { token } }) => {
-  return axios.create({
-    baseURL: `${baseURL}`,
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
 })
+  .then(({ data: { token } }) => {
+    return axios.create({
+      baseURL: `${baseURL}`,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+  })
   .then(client => createWorksheetQueue(client)
     .then(
       ({ id: queueId }) =>
@@ -20,7 +21,7 @@ axios.post(`${baseURL}/operators/login`, {
           createFlipper(client, queueId)
             .then(({ id: flipperId }) => createCaller(client, queueId, flipperId)),
           createFlipperCaller(client, queueId),
-          createTestBuildings(client  , 100).catch(error => {
+          createTestBuildings(client, 100).catch(error => {
             console.error('Error creating buildings', { error })
           })
         ])
