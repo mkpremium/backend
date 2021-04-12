@@ -9,15 +9,12 @@ describe('AddEvaluationRequestService', () => {
   let buildingsRepositoryStub
 
   const testCmd = {
-    type: 'MEETINGS',
-    event: {
-      ownerId: 'owner-id',
-      contactId: 'contact-id'
-    },
-    reporterContactId: 'reporter-contact-id',
+    ownerId: 'owner-id',
+    destinationContactId: 'email-contact-id',
+    reporterContactId: 'phone-reporter-contact-id',
     buildingId: 'building-id',
-    notifyTo: 'flipper-id',
-    eventDate: '2021-04-12T18:20:22.000Z'
+    flipperId: 'flipper-id',
+    worksheetId: 'worksheet-id'
   }
 
   beforeEach(() => {
@@ -37,11 +34,7 @@ describe('AddEvaluationRequestService', () => {
   it('adds evaluation request to repository', () => {
     return service.addEvaluationRequest(testCmd)
       .then(() => {
-        expect(evaluationRequestsRepositoryStub.add).to.have.been.calledWith({
-          buildingId: testCmd.buildingId,
-          withAgentOfId: testCmd.notifyTo,
-          meetingAt: testCmd.eventDate
-        })
+        expect(evaluationRequestsRepositoryStub.add).to.have.been.calledWith(testCmd)
       })
   })
 
