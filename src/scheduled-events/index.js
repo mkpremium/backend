@@ -6,7 +6,7 @@ import { setupEventListeners } from './event-listeners'
 import { ScheduledCallsRepository } from './repository/scheduled-calls.repository'
 import { asClass, asFunction } from 'awilix'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
-import { CreateMeetingService } from './service/create-meeting.service'
+import { LegacyCreateMeetingService } from './service/legacy-create-meeting.service'
 import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
 import { MeetingsService } from './service/meetings.service'
 import { MeetingsRepository } from './repository/meetings.repository'
@@ -18,7 +18,7 @@ import { createDeleteScheduledEventController } from './controller/delete-schedu
 export const setupScheduledEventsDependencies = awilixContainer => {
   awilixContainer.register({
     meetingsRepository: asClass(MeetingsRepository).classic(),
-    createMeetingService: asClass(CreateMeetingService).classic(),
+    createMeetingService: asClass(LegacyCreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
     scheduledEventsRepository: asClass(ScheduledEventsRepository).singleton(),
