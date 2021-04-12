@@ -8,18 +8,21 @@ const AddMeetingRequest = ScheduledEvent.extend({
 })
 
 export class AddMeetingService {
-  constructor (meetingsRepository) {
+  constructor (meetingsRepository, buildingsRepository) {
     this.meetingsRepository = meetingsRepository
+    this.buildingsRepository = buildingsRepository
   }
 
   async createMeeting (command) {
     this.assertValidCommand(command)
 
-    this.meetingsRepository.add({
+    await this.meetingsRepository.add({
       buildingId: command.buildingId,
       withAgentOfId: command.notifyTo,
       meetingAt: command.eventDate
     })
+
+    await this.buildingsRepository.assignBuildingToAgent(command.notifyTo)
   }
 
   assertValidCommand (command) {

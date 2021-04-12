@@ -1,11 +1,12 @@
 import { AddMeetingService } from '../../../src/scheduled-events/service/add-meeting.service'
 import { expect } from 'chai'
-import { spy } from 'sinon'
+import { stub } from 'sinon'
 import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
 
 describe('AddMeetingService', () => {
   let service
   let meetingsRepositorySpy
+  let buildingsRepositorySpy
 
   const testCmd = {
     type: 'MEETINGS',
@@ -21,10 +22,13 @@ describe('AddMeetingService', () => {
 
   beforeEach(() => {
     meetingsRepositorySpy = {
-      add: spy()
+      add: stub().resolves()
+    }
+    buildingsRepositorySpy = {
+      assignBuildingToAgent: stub().resolves()
     }
 
-    service = new AddMeetingService(meetingsRepositorySpy)
+    service = new AddMeetingService(meetingsRepositorySpy, buildingsRepositorySpy)
   })
 
   it('adds meeting in in repository', () => {
@@ -35,6 +39,13 @@ describe('AddMeetingService', () => {
           withAgentOfId: testCmd.notifyTo,
           meetingAt: testCmd.eventDate
         })
+      })
+  })
+
+  it('assigns building to evaluator flipper', () => {
+    return service.createMeeting(testCmd)
+      .then(() => {
+        expect(buildingsRepositorySpy.assignBuildingToAgent).to.have.been.calledWith(testCmd.notifyTo)
       })
   })
 
