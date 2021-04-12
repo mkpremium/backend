@@ -31,7 +31,6 @@ import autocomplete from './autocomplete'
 import email from './email'
 import cadastre from './cadastre'
 import preferences from './system-preferences'
-import meeting from './meeting'
 import { setupUserRoutes } from './user'
 import appErrorHandler from './infrastructure/error-handler'
 import maintenanceMode from './system-preferences/maintenance-mode-middleware'
@@ -48,7 +47,6 @@ dependenciesPromise.then(couchbaseBucket => {
   const awilixContainer = createAwilixContainer(couchbaseBucket, process.env.FORCE_MAX_CONSISTENCY === 'true')
   const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
 
-  meeting(app, dependenciesContainer)
   setupUserRoutes(app, awilixContainer)
 
   setupBuildingRoutesAndListeners(app, awilixContainer, dependenciesContainer)

@@ -1,7 +1,7 @@
 /**
- * @property {UserMeetingsRepository} userMeetingsRepository
+ * @property {SelfMeetingsRepository} userMeetingsRepository
  */
-export class GetUserMeetingsService {
+export class GetSelfMeetingsService {
   constructor (userMeetingsRepository) {
     this.userMeetingsRepository = userMeetingsRepository
   }

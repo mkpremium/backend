@@ -9,7 +9,19 @@ describe('EvaluationRequestsRepository', () => {
     repository = container.resolve('evaluationRequestsRepository')
   })
 
-  it('works!', () => {
-    expect(repository).to.not.be.undefined
+  it('adds evaluation request to scheduled-events', () => {
+    const testEvaluationRequest = {
+      ownerId: 'owner-id',
+      destinationContactId: 'email-contact-id',
+      reporterContactId: 'phone-reporter-contact-id',
+      buildingId: 'building-id',
+      flipperId: 'flipper-id',
+      worksheetId: 'worksheet-id'
+    }
+
+    return repository.add(testEvaluationRequest)
+      .then(() => {
+        expect()
+      })
   })
 })

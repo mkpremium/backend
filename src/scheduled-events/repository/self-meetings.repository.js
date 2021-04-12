@@ -23,7 +23,7 @@ WHERE meeting._documentType = 'scheduled-event'
       AND meeting.notifyTo = $1
 `
 
-export class UserMeetingsRepository {
+export class SelfMeetingsRepository {
   /**
    * @param {CouchbaseAdapter} couchbaseAdapter
    */
@@ -37,7 +37,18 @@ export class UserMeetingsRepository {
       [ userId ]
     ).then(meetings =>
       meetings.map(
-        ({ id, meetingAddress, meetingAt, buildingId, inPerson, proposalValue, contactId, contacts, contactName, metadata = [] }) => {
+        ({
+          id,
+          meetingAddress,
+          meetingAt,
+          buildingId,
+          inPerson,
+          proposalValue,
+          contactId,
+          contacts,
+          contactName,
+          metadata = []
+        }) => {
           const thumbnails = metadata.filter(m => m.mimeType === 'image/jpeg').map(({ id, mimeType, previewUrl }) => ({
             id,
             mimeType,

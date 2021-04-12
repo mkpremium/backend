@@ -2,8 +2,6 @@ import { BuildingsRepository } from '../building/repository/buildings.repository
 import { LegacyBuildingRepository } from '../building/models'
 import { UpdateBuildingNegotiationStatusService } from '../building/service/update-building-negotiation-status.service'
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
-import { GetUserMeetingsService } from '../meeting/GetUserMeetingsService'
-import { UserMeetingsRepository } from '../meeting/UserMeetingsRepository'
 import { EventBus } from './event-bus'
 import { ScheduledCallsService } from '../scheduled-events/service/scheduled-calls.service'
 import { asClass, asValue, createContainer } from 'awilix'
@@ -29,8 +27,6 @@ export const createDependenciesContainer = (couchbaseBucket, legacyDependenciesC
 
   const buildingRepository = new BuildingsRepository(couchbaseAdapter)
   container.buildingRepository = buildingRepository
-
-  container.getUserMeetingsService = new GetUserMeetingsService(new UserMeetingsRepository(couchbaseAdapter))
 
   const eventBus = awilixContainer.resolve('eventBus')
   container.eventBus = eventBus
