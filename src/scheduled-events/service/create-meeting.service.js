@@ -1,7 +1,7 @@
 import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
 
-export class LegacyCreateMeetingService {
+export class CreateMeetingService {
   /**
    * @param {ScheduledEventsRepository} scheduledEventsRepository
    * @param {BuildingsRepository} buildingsRepository
