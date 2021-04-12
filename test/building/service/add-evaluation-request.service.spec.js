@@ -1,4 +1,4 @@
-import { AddEvaluationRequestService } from '../../../src/scheduled-events/service/add-evaluation-request.service'
+import { AddEvaluationRequestService } from '../../../src/building/service/add-evaluation-request.service'
 import { expect } from 'chai'
 import { stub, spy } from 'sinon'
 import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
