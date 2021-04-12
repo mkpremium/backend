@@ -12,16 +12,22 @@ const AddEvaluationRequestCommand = t.struct({
 })
 
 export class AddEvaluationRequestService {
-  constructor (evaluationRequestsRepository, buildingsRepository) {
+  constructor (evaluationRequestsRepository, buildingsRepository, eventBus) {
     this.evaluationRequestsRepository = evaluationRequestsRepository
     this.buildingsRepository = buildingsRepository
+    this.eventBus = eventBus
   }
 
   async addEvaluationRequest (command) {
     this.assertValidCommand(command)
 
-    await this.evaluationRequestsRepository.add(command)
+    const storedRequest = await this.evaluationRequestsRepository.add(command)
     await this.buildingsRepository.assignBuildingToAgent(command.notifyTo)
+
+    this.eventBus.publish({
+      name: 'evaluation-request.created',
+      request: storedRequest
+    })
   }
 
   assertValidCommand (command) {
