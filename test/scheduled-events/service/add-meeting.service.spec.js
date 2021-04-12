@@ -1,12 +1,19 @@
 import { AddMeetingService } from '../../../src/scheduled-events/service/add-meeting.service'
 import { expect } from 'chai'
 import { spy } from 'sinon'
+import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
 
 describe('AddMeetingService', () => {
   let service
   let meetingsRepositorySpy
 
   const testCmd = {
+    type: 'MEETINGS',
+    event: {
+      ownerId: 'owner-id',
+      contactId: 'contact-id'
+    },
+    reporterContactId: 'reporter-contact-id',
     buildingId: 'building-id',
     notifyTo: 'flipper-id',
     eventDate: '2021-04-12T18:20:22.000Z'
@@ -16,6 +23,7 @@ describe('AddMeetingService', () => {
     meetingsRepositorySpy = {
       add: spy()
     }
+
     service = new AddMeetingService(meetingsRepositorySpy)
   })
 
@@ -28,5 +36,9 @@ describe('AddMeetingService', () => {
           meetingAt: testCmd.eventDate
         })
       })
+  })
+
+  it('fails on invalid command', () => {
+    return expect(service.createMeeting({})).to.be.rejectedWith(InvalidCommand)
   })
 })
