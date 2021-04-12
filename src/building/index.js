@@ -30,6 +30,7 @@ import { createAddNoteToBuildingListener } from './event-listener/add-note-to-bu
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { MetadataRepository } from './repository/metadata.repository'
+import { EvaluationRequestsRepository } from './repository/evaluation-requests.repository'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -59,6 +60,7 @@ export const registerBuildingDependencies = awilixContainer => {
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
+    evaluationRequestsRepository: asClass(EvaluationRequestsRepository).classic().singleton(),
 
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
