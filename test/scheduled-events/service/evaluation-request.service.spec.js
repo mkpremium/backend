@@ -1,12 +1,12 @@
-import { AddMeetingService } from '../../../src/scheduled-events/service/add-meeting.service'
+import { AddEvaluationRequestService } from '../../../src/scheduled-events/service/add-evaluation-request.service'
 import { expect } from 'chai'
 import { stub } from 'sinon'
 import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
 
-describe('AddMeetingService', () => {
+describe('AddEvaluationRequestService', () => {
   let service
-  let meetingsRepositorySpy
-  let buildingsRepositorySpy
+  let evaluationRequestsRepositoryStub
+  let buildingsRepositoryStub
 
   const testCmd = {
     type: 'MEETINGS',
@@ -21,20 +21,23 @@ describe('AddMeetingService', () => {
   }
 
   beforeEach(() => {
-    meetingsRepositorySpy = {
+    evaluationRequestsRepositoryStub = {
       add: stub().resolves()
     }
-    buildingsRepositorySpy = {
+    buildingsRepositoryStub = {
       assignBuildingToAgent: stub().resolves()
     }
 
-    service = new AddMeetingService(meetingsRepositorySpy, buildingsRepositorySpy)
+    service = new AddEvaluationRequestService(
+      evaluationRequestsRepositoryStub,
+      buildingsRepositoryStub
+    )
   })
 
-  it('adds meeting in in repository', () => {
-    return service.createMeeting(testCmd)
+  it('adds evaluation request to repository', () => {
+    return service.addEvaluationRequest(testCmd)
       .then(() => {
-        expect(meetingsRepositorySpy.add).to.have.been.calledWith({
+        expect(evaluationRequestsRepositoryStub.add).to.have.been.calledWith({
           buildingId: testCmd.buildingId,
           withAgentOfId: testCmd.notifyTo,
           meetingAt: testCmd.eventDate
@@ -43,13 +46,13 @@ describe('AddMeetingService', () => {
   })
 
   it('assigns building to evaluator flipper', () => {
-    return service.createMeeting(testCmd)
+    return service.addEvaluationRequest(testCmd)
       .then(() => {
-        expect(buildingsRepositorySpy.assignBuildingToAgent).to.have.been.calledWith(testCmd.notifyTo)
+        expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.notifyTo)
       })
   })
 
   it('fails on invalid command', () => {
-    return expect(service.createMeeting({})).to.be.rejectedWith(InvalidCommand)
+    return expect(service.addEvaluationRequest({})).to.be.rejectedWith(InvalidCommand)
   })
 })

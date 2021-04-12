@@ -7,13 +7,13 @@ const AddMeetingRequest = ScheduledEvent.extend({
   reporterContactId: t.String
 })
 
-export class AddMeetingService {
+export class AddEvaluationRequestService {
   constructor (meetingsRepository, buildingsRepository) {
     this.meetingsRepository = meetingsRepository
     this.buildingsRepository = buildingsRepository
   }
 
-  async createMeeting (command) {
+  async addEvaluationRequest (command) {
     this.assertValidCommand(command)
 
     await this.meetingsRepository.add({
