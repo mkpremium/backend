@@ -7,6 +7,7 @@ const AddEvaluationRequestCommand = t.struct({
   destinationContactId: t.String,
   reporterContactId: t.String,
   buildingId: t.String,
+  callerId: t.String,
   flipperId: t.String,
   worksheetId: t.String
 })
@@ -23,11 +24,11 @@ export class AddEvaluationRequestService {
     this.eventBus = eventBus
   }
 
-  async addEvaluationRequest (command) {
-    this.assertValidCommand(command)
+  async addEvaluationRequest (evaluationRequest) {
+    this.assertValidCommand(evaluationRequest)
 
-    const storedRequest = await this.evaluationRequestsRepository.add(command)
-    await this.buildingsRepository.assignBuildingToAgent(command.notifyTo)
+    const storedRequest = await this.evaluationRequestsRepository.add(evaluationRequest)
+    await this.buildingsRepository.assignBuildingToAgent(evaluationRequest.flipperId)
 
     this.eventBus.publish({
       name: 'evaluation-request.created',

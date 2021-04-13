@@ -15,6 +15,7 @@ describe('AddEvaluationRequestService', () => {
     reporterContactId: 'phone-reporter-contact-id',
     buildingId: 'building-id',
     flipperId: 'flipper-id',
+    callerId: 'caller-id',
     worksheetId: 'worksheet-id'
   }
 
@@ -46,7 +47,7 @@ describe('AddEvaluationRequestService', () => {
   it('assigns building to evaluator flipper', () => {
     return service.addEvaluationRequest(testCmd)
       .then(() => {
-        expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.notifyTo)
+        expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.flipperId)
       })
   })
 
