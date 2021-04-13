@@ -1,9 +1,9 @@
 /**
- * @param {GetSelfMeetingsService} getUserMeetingsService
+ * @param {GetSelfMeetingsService} selfMeetingsRepository
  */
-export const getUserMeetingsController = ({ getUserMeetingsService }) => {
+export const selfMeetingsController = ({ selfMeetingsRepository }) => {
   return async (req, res) => {
-    const userMeetings = await getUserMeetingsService.getMeetingsFor(req.user.id)
+    const userMeetings = await selfMeetingsRepository.getMeetingsFor(req.user.id)
     res.send(userMeetings)
   }
 }

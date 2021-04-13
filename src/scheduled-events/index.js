@@ -15,7 +15,7 @@ import { createAddScheduledMeetingEventController } from './controller/add-meeti
 import { createGetUserScheduledCallsController } from './controller/get-user-scheduled-calls.controller'
 import { createDeleteScheduledEventController } from './controller/delete-scheduled-event.controller'
 import { wrap } from 'express-promise-wrap'
-import { getUserMeetingsController } from './controller/get-self-meetings.controller'
+import { selfMeetingsController } from './controller/get-self-meetings.controller'
 import { GetSelfMeetingsService } from './service/get-self-meetings.service'
 import { SelfMeetingsRepository } from './repository/self-meetings.repository'
 
@@ -26,7 +26,7 @@ export const setupScheduledEventsDependencies = awilixContainer => {
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
     scheduledEventsRepository: asClass(ScheduledEventsRepository).singleton(),
-    userMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
+    selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
     meetingsService: asClass(MeetingsService).singleton(),
 
     getUserMeetingsService: asClass(GetSelfMeetingsService).classic().singleton(),
@@ -35,7 +35,7 @@ export const setupScheduledEventsDependencies = awilixContainer => {
     addMeetingController: asFunction(createAddScheduledMeetingEventController).singleton(),
     getUserScheduledCallsController: asFunction(createGetUserScheduledCallsController).singleton(),
     deleteScheduledEventController: asFunction(createDeleteScheduledEventController).singleton(),
-    getUserMeetingsController: asFunction(getUserMeetingsController).singleton()
+    selfMeetingsController: asFunction(selfMeetingsController).singleton()
   })
 }
 
@@ -46,7 +46,7 @@ export const setupScheduledEventsRoutes = (app, awilixContainer) => {
   const secured = jwt()
 
   app.use('/scheduled-events', secured, createScheduleEventsRoutes(awilixContainer))
-  app.get('/me/meetings', secured, wrap(awilixContainer.resolve('getUserMeetingsController')))
+  app.get('/me/meetings', secured, wrap(awilixContainer.resolve('selfMeetingsController')))
 
   setupEventListeners(awilixContainer.resolve('eventBus'), {
     scheduledCallRepository: awilixContainer.resolve('scheduledCallsRepository')

@@ -12,6 +12,11 @@ const AddEvaluationRequestCommand = t.struct({
 })
 
 export class AddEvaluationRequestService {
+  /**
+   * @param {EvaluationRequestsRepository} evaluationRequestsRepository
+   * @param buildingsRepository
+   * @param eventBus
+   */
   constructor (evaluationRequestsRepository, buildingsRepository, eventBus) {
     this.evaluationRequestsRepository = evaluationRequestsRepository
     this.buildingsRepository = buildingsRepository
