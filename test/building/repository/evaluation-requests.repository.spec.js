@@ -1,27 +1,43 @@
 import { createTestContainer } from '../../create-test-container'
 import { expect } from 'chai'
+import { buildingBuilder } from '../building.builder'
+import { ownerBuilder } from '../../owner/owner.builder'
+import moment from 'moment'
+import { Promise } from 'bluebird'
 
 describe('EvaluationRequestsRepository', () => {
+  const testBuilding = buildingBuilder().build()
+  const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
   let repository
+  let flipperNegotiationsRepository
+  let buildingsRepository
+  let ownersRepository
 
-  beforeEach(async () => {
+  before(async () => {
     const container = await createTestContainer()
+    buildingsRepository = container.resolve('buildingsRepository')
+    ownersRepository = container.resolve('ownersRepository')
     repository = container.resolve('evaluationRequestsRepository')
+    flipperNegotiationsRepository = container.resolve('commercialsBuildingRepository')
   })
 
-  it('adds evaluation request to scheduled-events', () => {
+  it('adds evaluation request to flipper negotiations', () => {
     const testEvaluationRequest = {
-      ownerId: 'owner-id',
+      ownerId: testOwner.id,
       destinationContactId: 'email-contact-id',
       reporterContactId: 'phone-reporter-contact-id',
-      buildingId: 'building-id',
+      buildingId: testBuilding.id,
       flipperId: 'flipper-id',
       worksheetId: 'worksheet-id'
     }
 
-    return repository.add(testEvaluationRequest)
-      .then(() => {
-        expect()
+    return Promise.all([ buildingsRepository.save(testBuilding), ownersRepository.save(testOwner) ])
+      .then(() => repository.add(testEvaluationRequest))
+      .then(async () => {
+        const flipperNegotiations = await flipperNegotiationsRepository.listById([ testBuilding.id ])
+        expect(flipperNegotiations).to.be.lengthOf(1)
+        expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
+        expect(moment(flipperNegotiations[ 0 ].lastMeeting.dateMeeting).isSame(moment(), 'day')).to.be.true
       })
   })
 })
