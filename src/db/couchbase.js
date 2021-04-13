@@ -9,17 +9,14 @@ import { CouchbaseModel } from './model'
 import { defer } from '../lib/promise-util'
 import { logger } from '../infrastructure/logger'
 
-export default (app) => {
+export default () => {
   logger.info(`initializing couchbase connection with "${couchbase.uri}"`)
   const cluster = new Couchbase.Cluster(couchbase.uri)
   cluster.authenticate(couchbase.user, couchbase.pass)
 
-  const { promise, bucket } = connectToBucket(cluster, couchbase.bucket)
+  const promise = connectToBucket(cluster, couchbase.bucket)
 
   CouchbaseModel.prototype._promiseBucket = promise
-  if (app) {
-    Object.assign(app.locals, { cluster, bucket, bucketPromise: promise })
-  }
 
   return promise
 }
@@ -33,13 +30,14 @@ function connectToBucket (cluster, bucketName) {
     logger.error('couchbase connection error', { error })
     reject(error)
   })
-  bucket.on('connect', (...args) => {
+  bucket.on('connect', () => {
     attachHelpers(bucket)
     attachModel(bucket, cluster)
     resolve(bucket)
     logger.info('successfully connected to Couchbase')
   })
-  return { promise, bucket }
+
+  return promise
 }
 
 function attachModel (bucket, cluster) {

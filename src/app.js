@@ -40,7 +40,7 @@ import { setupStockRouter } from './stock/stock-router'
 
 const app = express()
 app.set('IS_READY', false)
-export const dependenciesPromise = couchbase(app)
+export const dependenciesPromise = couchbase()
 
 dependenciesPromise.then(couchbaseBucket => {
   const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)

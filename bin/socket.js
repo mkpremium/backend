@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import Promise from 'bluebird'
+
 import express from 'express'
 import { Server } from 'http'
 import { logger } from '../src/infrastructure/logger'
@@ -23,9 +23,7 @@ app.get('/_ready', (req, res) => {
 const httpServer = Server(app)
 const server = httpServer.listen(socketConfig.port, listenHandler)
 
-Promise.all([
-  couchbase(app)
-])
+couchbase()
   .then(() => {
     app.set('IS_READY', true)
   })
