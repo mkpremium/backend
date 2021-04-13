@@ -1,17 +1,5 @@
 import t from 'tcomb'
 
-t.BuildingType = t.enums({
-  VERTICAL: 'vertical',
-  HORIZONTAL: 'horizontal'
-}, 'BuildingType')
-
-export const BuildingState = {
-  BUENO: 'BUENO',
-  MALO: 'MALO'
-}
-
-export const BuildingStateEnum = t.BuildingState = t.enums(BuildingState, 'BuildingState')
-
 export const TypeContact = t.TypeContact = t.enums({
   TELEFONO: 'TELEFONO',
   FAX: 'FAX',

@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { Address, SimpleAddress, SimplePhoneNumber } from '../types/common'
-import { BuildingStateEnum } from '../types/enums'
 import { DateTimeString } from '../infrastructure/shared-types'
 
 const buildingEntitiesDefaultStatus = 'SIN DATOS'
@@ -131,11 +130,12 @@ export const buildingNegotiationStatus = [
 ]
 
 export const NegotiationStatus = t.enums.of(buildingNegotiationStatus)
+
 export const Building = t.struct(
   {
     id: t.String,
     address: Address,
-    buildingType: t.BuildingType,
+    buildingType: t.enums.of([ 'VERTICAL', 'HORIZONTAL' ]),
     cadastre: t.maybe(BuildingCadastre),
     floorArea: t.union([ t.Number, t.String ]),
     landArea: t.union([ t.Number, t.String ]),
@@ -149,7 +149,7 @@ export const Building = t.struct(
     entities: t.list(BuildingEntity),
     ownerId: t.maybe(t.String),
     owner: t.maybe(BuildingOwner),
-    state: BuildingStateEnum,
+    state: t.enums.of([ 'BUENO', 'MALO' ]),
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),
     negotiationStatus: NegotiationStatus,
