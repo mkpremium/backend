@@ -24,7 +24,9 @@ export class EvaluationRequestsRepository extends CouchbaseRepository {
       }
     })
 
-    return this.save(scheduledEvent)
+    await this.save(scheduledEvent)
+
+    return { ...evaluation, id: scheduledEvent.id }
   }
 
   struct () {
