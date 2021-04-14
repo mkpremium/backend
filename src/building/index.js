@@ -31,6 +31,8 @@ import { createWorksheetMadeAvailableListener } from './event-listener/worksheet
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { MetadataRepository } from './repository/metadata.repository'
 import { EvaluationRequestsRepository } from './repository/evaluation-requests.repository'
+import { createSetFeaturedContactFromEvaluationRequestListener } from './event-listener/set-featured-contact-from-evaluation-request'
+import { AddEvaluationRequestService } from './service/add-evaluation-request.service'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -51,6 +53,7 @@ export const registerBuildingDependencies = awilixContainer => {
       }),
       documentBucket: metadataS3Config.bucket
     })).singleton().classic(),
+    addEvaluationRequestService: asClass(AddEvaluationRequestService).classic().singleton(),
 
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
@@ -71,7 +74,8 @@ export const registerBuildingDependencies = awilixContainer => {
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
-    worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton()
+    worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton(),
+    createSetFeaturedContactFromEvaluationRequestListener: asFunction(createSetFeaturedContactFromEvaluationRequestListener).singleton()
   })
 }
 
@@ -82,6 +86,7 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('addNoteToBuilding'))
   eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
+  eventBus.on('evaluation-request.created', awilixContainer.resolve('createSetFeaturedContactFromEvaluationRequestListener'))
 
   const secured = jwt()
   const buildingsRoutes = createBuildingsRoutes(awilixContainer)
