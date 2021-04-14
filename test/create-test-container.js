@@ -1,11 +1,11 @@
 import couchbase from '../src/db/couchbase'
-import { createAwilixContainer } from '../src/infrastructure/dependencies'
+import { createDiContainer } from '../src/infrastructure/dependencies'
 
 /**
  * @return {PromiseLike<AwilixContainer>}
  */
 export const createTestContainer = () => {
   return couchbase()
-    .then(bucket => Promise.all([ bucket.flushAsync(), createAwilixContainer(bucket, true) ]))
+    .then(bucket => Promise.all([ bucket.flushAsync(), createDiContainer(bucket, true) ]))
     .then(([ _, container ]) => container)
 }

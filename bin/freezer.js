@@ -1,5 +1,5 @@
 import { moveWorksheetOutOfFreezer } from '../src/business/worksheets/freezer'
-import { createAwilixContainer } from '../src/infrastructure/dependencies'
+import { createDiContainer } from '../src/infrastructure/dependencies'
 import { logger } from '../src/infrastructure/logger'
 import { SystemPreferencesRepository } from '../src/system-preferences/models'
 import '../src/types'
@@ -14,7 +14,7 @@ SystemPreferencesRepository
       logger.info(`Executing freezer cron`)
 
       CouchbaseModel.prototype._promiseBucket.then(async (couchbaseBucket) => {
-        const awilixContainer = createAwilixContainer(couchbaseBucket)
+        const awilixContainer = createDiContainer(couchbaseBucket)
         await moveWorksheetOutOfFreezer(false, 500, awilixContainer.resolve('buildingsRepository'))
       })
     } else {

@@ -7,11 +7,7 @@ import couchbase from './db/couchbase'
 import { logger } from './infrastructure/logger'
 // app aware types
 import './types'
-import {
-  createAwilixContainer,
-  createDependenciesContainer,
-  createLegacyDependenciesContainer
-} from './infrastructure/dependencies'
+import { createDiContainer } from './infrastructure/dependencies'
 // modules
 import operator from './operator'
 import { createTestHarness } from './test-harness/routes'
@@ -61,29 +57,27 @@ export const createApp = () => {
 
   return couchbase()
     .then(couchbaseBucket => {
-      const legacyDependenciesContainer = createLegacyDependenciesContainer(couchbaseBucket)
-      const awilixContainer = createAwilixContainer(couchbaseBucket, process.env.FORCE_MAX_CONSISTENCY === 'true')
-      const dependenciesContainer = createDependenciesContainer(couchbaseBucket, legacyDependenciesContainer, awilixContainer)
-
-      app.locals.dependenciesContainer = dependenciesContainer
-      app.locals.legacyDependenciesContainer = legacyDependenciesContainer
-      app.locals.diContainer = awilixContainer
+      const diContainer = createDiContainer(
+        couchbaseBucket,
+        process.env.FORCE_MAX_CONSISTENCY === 'true'
+      )
+      app.locals.diContainer = diContainer
 
       operator(app) // start with login router
 
-      setupUserRoutes(app, awilixContainer)
-      setupBuildingRoutesAndListeners(app, awilixContainer, dependenciesContainer)
-      setupOwnersRoutes(app, awilixContainer)
+      setupUserRoutes(app, diContainer)
+      setupBuildingRoutesAndListeners(app, diContainer)
+      setupOwnersRoutes(app, diContainer)
 
-      setupScheduledEventsRoutes(app, awilixContainer)
-      setupWorksheetRoutesAndEventListeners(app, awilixContainer)
-      createTestHarness(app, awilixContainer)
-      initPropertyManager(app, awilixContainer)
-      initFlipperModule(app, awilixContainer)
-      setupCallerRoutes(app, awilixContainer)
-      setupStockRouter(app, awilixContainer)
+      setupScheduledEventsRoutes(app, diContainer)
+      setupWorksheetRoutesAndEventListeners(app, diContainer)
+      createTestHarness(app, diContainer)
+      initPropertyManager(app, diContainer)
+      initFlipperModule(app, diContainer)
+      setupCallerRoutes(app, diContainer)
+      setupStockRouter(app, diContainer)
 
-      stats(app, awilixContainer)
+      stats(app, diContainer)
       webhooks(app)
       maintenanceMode(app)
       calls(app)
