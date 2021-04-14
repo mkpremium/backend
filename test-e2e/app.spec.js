@@ -1,4 +1,4 @@
-import app, { dependenciesPromise } from '../src/app'
+import app from '../src/app'
 import request from 'supertest'
 import { expect } from 'chai'
 
@@ -8,8 +8,6 @@ describe('Backend Application', () => {
     await request(app)
       .get('/_ready')
       .expect(503)
-
-    await dependenciesPromise
 
     expect(app.get('IS_READY')).to.be.true
     await request(app)

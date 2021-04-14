@@ -4,15 +4,22 @@ import http from 'http'
 import { logger } from '../src/infrastructure/logger'
 
 import { port } from '../config'
-import app from '../src/app'
+import { createApp } from '../src/app'
 
-const server = http.createServer(app)
+createApp()
+  .then(app => {
+    const server = http.createServer(app)
 
-server.listen(port)
-server.on('error', errorHandler)
-server.on('listen', listenHandler)
+    server.listen(port)
+    server.on('error', errorHandler)
+    server.on('listen', createListenHandler(server))
+  })
+  .catch(error => {
+    logger.error('Starting application', { error })
+    process.exit(1)
+  })
 
-function listenHandler () {
+const createListenHandler = (server) => () => {
   const addr = server.address()
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr

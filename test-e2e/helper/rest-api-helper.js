@@ -1,21 +1,19 @@
-import globalApp, { dependenciesPromise } from '../../src/app'
-import { defaultPassword, deleteAll, operatorLogin } from '../../test/common'
+import { createApp } from '../../src/app'
+import { defaultPassword, operatorLogin } from '../../test/common'
 import request from 'supertest'
 
 const DEFAULT_MILLISECONDS_TO_WAIT = 1000
 
-export const initApplication = async () => {
-  await dependenciesPromise
+export const initApplication = () => createApp()
+  .then(async (app) => {
+    await app.locals.diContainer.resolve('couchbaseBucket').flushAsync()
 
-  await deleteAll()
-  await new Promise(resolve => setTimeout(resolve, 100))
-
-  return globalApp
-}
+    return app
+  })
 
 export const authenticatedGet = async (endpoint, user, app) => {
   const authenticatedUser = await operatorLogin(app,
-    {username: user.username, password: defaultPassword})
+    { username: user.username, password: defaultPassword })
 
   return request(app)
     .get(endpoint)
@@ -25,7 +23,7 @@ export const authenticatedGet = async (endpoint, user, app) => {
 
 export const authenticatedDelete = async (endpoint, user, app) => {
   const authenticatedUser = await operatorLogin(app,
-    {username: user.username, password: defaultPassword})
+    { username: user.username, password: defaultPassword })
 
   return request(app)
     .delete(endpoint)
@@ -35,7 +33,7 @@ export const authenticatedDelete = async (endpoint, user, app) => {
 
 export const authenticatedPost = async (endpoint, user, app, body) => {
   const authenticatedUser = await operatorLogin(app,
-    {username: user.username, password: defaultPassword})
+    { username: user.username, password: defaultPassword })
 
   return request(app)
     .post(endpoint)
@@ -47,7 +45,7 @@ export const authenticatedPost = async (endpoint, user, app, body) => {
 
 export const authenticatedPut = async (endpoint, user, app, body) => {
   const authenticatedUser = await operatorLogin(app,
-    {username: user.username, password: defaultPassword})
+    { username: user.username, password: defaultPassword })
 
   return request(app)
     .put(endpoint)

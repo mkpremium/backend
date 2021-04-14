@@ -79,7 +79,6 @@ describe('Building listing endpoint', () => {
       buildingId: building1.id,
       propertyAgentId: businessUser.id
     })).close
-
     const building2 = await createBuilding(app, { id: 'test-building2' })
 
     await Promise.delay(100)

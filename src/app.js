@@ -38,63 +38,70 @@ import { setupCallerRoutes } from './caller/init'
 import { initFlipperModule } from './flipper/init'
 import { setupStockRouter } from './stock/stock-router'
 
-const app = express()
-app.set('IS_READY', false)
-export const dependenciesPromise = couchbase()
-
-dependenciesPromise.then(couchbaseBucket => {
-  const legacyDependenciesContainer = createLegacyDependenciesContainer(app.locals.bucket)
-  const awilixContainer = createAwilixContainer(couchbaseBucket, process.env.FORCE_MAX_CONSISTENCY === 'true')
-  const dependenciesContainer = createDependenciesContainer(app.locals.bucket, legacyDependenciesContainer, awilixContainer)
-
-  setupUserRoutes(app, awilixContainer)
-
-  setupBuildingRoutesAndListeners(app, awilixContainer, dependenciesContainer)
-  setupOwnersRoutes(app, awilixContainer)
-  setupScheduledEventsRoutes(app, awilixContainer)
-  setupWorksheetRoutesAndEventListeners(app, awilixContainer)
-
-  createTestHarness(app, awilixContainer)
-  initPropertyManager(app, awilixContainer)
-  initFlipperModule(app, awilixContainer)
-  setupCallerRoutes(app, awilixContainer)
-  setupStockRouter(app, awilixContainer)
-  stats(app, awilixContainer)
-  app.use(appErrorHandler)
-
-  app.locals.dependenciesContainer = dependenciesContainer
-  app.locals.legacyDependenciesContainer = legacyDependenciesContainer
-  app.locals.diContainer = awilixContainer
-
-  app.set('IS_READY', true)
-}).catch(error => {
-  logger.error('error starting application', { error })
-  throw error
-})
-
-app.get('/_ready', (req, res) => {
-  if (app.get('IS_READY')) {
-    res.sendStatus(200)
-  } else {
-    res.sendStatus(503)
+let app
+export const createApp = () => {
+  if (app) {
+    return Promise.resolve(app)
   }
-})
+  app = express()
 
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
-app.use(morgan('combined'))
-app.use(cors())
+  app.set('IS_READY', false)
+  app.get('/_ready', (req, res) => {
+    if (app.get('IS_READY')) {
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(503)
+    }
+  })
 
-webhooks(app)
-maintenanceMode(app)
-operator(app)
-calls(app)
-history(app)
-notes(app)
-metadata(app)
-autocomplete(app)
-email(app)
-cadastre(app)
-preferences(app)
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.json())
+  app.use(morgan('combined'))
+  app.use(cors())
 
-export default app
+  return couchbase()
+    .then(couchbaseBucket => {
+      const legacyDependenciesContainer = createLegacyDependenciesContainer(couchbaseBucket)
+      const awilixContainer = createAwilixContainer(couchbaseBucket, process.env.FORCE_MAX_CONSISTENCY === 'true')
+      const dependenciesContainer = createDependenciesContainer(couchbaseBucket, legacyDependenciesContainer, awilixContainer)
+
+      app.locals.dependenciesContainer = dependenciesContainer
+      app.locals.legacyDependenciesContainer = legacyDependenciesContainer
+      app.locals.diContainer = awilixContainer
+
+      operator(app) // start with login router
+
+      setupUserRoutes(app, awilixContainer)
+      setupBuildingRoutesAndListeners(app, awilixContainer, dependenciesContainer)
+      setupOwnersRoutes(app, awilixContainer)
+
+      setupScheduledEventsRoutes(app, awilixContainer)
+      setupWorksheetRoutesAndEventListeners(app, awilixContainer)
+      createTestHarness(app, awilixContainer)
+      initPropertyManager(app, awilixContainer)
+      initFlipperModule(app, awilixContainer)
+      setupCallerRoutes(app, awilixContainer)
+      setupStockRouter(app, awilixContainer)
+
+      stats(app, awilixContainer)
+      webhooks(app)
+      maintenanceMode(app)
+      calls(app)
+      history(app)
+      notes(app)
+      metadata(app)
+      autocomplete(app)
+      email(app)
+      cadastre(app)
+      preferences(app)
+
+      app.use(appErrorHandler)
+      app.set('IS_READY', true)
+
+      return app
+    })
+    .catch(error => {
+      logger.error('error starting application', { error })
+      throw error
+    })
+}
