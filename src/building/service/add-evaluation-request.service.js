@@ -28,7 +28,7 @@ export class AddEvaluationRequestService {
     this.assertValidCommand(evaluationRequest)
 
     const storedRequest = await this.evaluationRequestsRepository.add(evaluationRequest)
-    await this.buildingsRepository.assignBuildingToAgent(evaluationRequest.flipperId)
+    await this.buildingsRepository.assignBuildingToAgent(evaluationRequest.buildingId, evaluationRequest.flipperId)
 
     this.eventBus.publish({
       name: 'evaluation-request.created',

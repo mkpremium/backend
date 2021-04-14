@@ -47,7 +47,7 @@ describe('AddEvaluationRequestService', () => {
   it('assigns building to evaluator flipper', () => {
     return service.addEvaluationRequest(testCmd)
       .then(() => {
-        expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.flipperId)
+        expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.buildingId, testCmd.flipperId)
       })
   })
 
