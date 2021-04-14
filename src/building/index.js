@@ -33,6 +33,7 @@ import { MetadataRepository } from './repository/metadata.repository'
 import { EvaluationRequestsRepository } from './repository/evaluation-requests.repository'
 import { createSetFeaturedContactFromEvaluationRequestListener } from './event-listener/set-featured-contact-from-evaluation-request'
 import { AddEvaluationRequestService } from './service/add-evaluation-request.service'
+import { createAddEvaluationRequestController } from './controller/add-evaluation-request.controller'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -53,9 +54,8 @@ export const registerBuildingDependencies = awilixContainer => {
       }),
       documentBucket: metadataS3Config.bucket
     })).singleton().classic(),
-    addEvaluationRequestService: asClass(AddEvaluationRequestService).classic().singleton(),
-
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
+
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     legacyMetadataRepository: asClass(MetadataRepository).singleton(),
@@ -63,19 +63,22 @@ export const registerBuildingDependencies = awilixContainer => {
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
-    evaluationRequestsRepository: asClass(EvaluationRequestsRepository).classic().singleton(),
-
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
+
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
     updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
     addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
-
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
+
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton(),
-    createSetFeaturedContactFromEvaluationRequestListener: asFunction(createSetFeaturedContactFromEvaluationRequestListener).singleton()
+
+    evaluationRequestsRepository: asClass(EvaluationRequestsRepository).classic().singleton(),
+    addEvaluationRequestService: asClass(AddEvaluationRequestService).classic().singleton(),
+    createSetFeaturedContactFromEvaluationRequestListener: asFunction(createSetFeaturedContactFromEvaluationRequestListener).singleton(),
+    addEvaluationRequestController: asFunction(createAddEvaluationRequestController)
   })
 }
 
@@ -98,5 +101,11 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
     permissions.admin,
     wrap(awilixContainer.resolve('setBuildingExpensesController'))
   )
+  buildingRoutes.post(
+    '/:buildingId/evaluation-request',
+    secured,
+    wrap(awilixContainer.resolve('addEvaluationRequestController'))
+  )
+
   app.use('/building', secured, buildingRoutes)
 }

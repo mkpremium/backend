@@ -2,6 +2,7 @@ import { logger } from './logger'
 import { EntityNotFound } from '../db/errors'
 import { HttpError } from '../lib/http-error'
 import { ClientError } from './http'
+import { InvalidCommand } from './invalid-command.error'
 
 export function appErrorHandler (error, req, res, next) {
   if (res.headersSent) {
@@ -10,6 +11,11 @@ export function appErrorHandler (error, req, res, next) {
 
   if (error instanceof EntityNotFound) {
     res.status(404).json()
+    return
+  }
+
+  if (error instanceof InvalidCommand) {
+    res.status(400).json(error)
     return
   }
 
