@@ -4,8 +4,8 @@ import { expect } from 'chai'
 import { OperatorRepository } from '../../../src/operator/models'
 import { StockRepository } from '../../../src/stock/models'
 import { LegacyBuildingRepository } from '../../../src/building/models'
-import app from '../../../src/app'
 import request from 'supertest'
+import { createTestApp } from '../../integration/create-test-app'
 
 describe('profit goals', () => {
   let salesAgent
@@ -30,7 +30,7 @@ describe('profit goals', () => {
 
       const result = await setProfitGoalToOperator({ operatorId: salesAgent.id, profitAmount: 1500 }, nowStub)
 
-      expect(result.profitGoal).to.deep.equal({amount: 1500, updatedAt: now})
+      expect(result.profitGoal).to.deep.equal({ amount: 1500, updatedAt: now })
     })
 
     it('throws an error when setting profit goal for an non existing sales agent', async () => {
@@ -48,10 +48,16 @@ describe('profit goals', () => {
   })
 
   describe('endpoint', () => {
+    let app
+
+    before(async () => {
+      app = await createTestApp()
+    })
+
     it('sets profit goal to a sales agent', async () => {
       const operator = await operatorCreate()
       const authenticatedOperator = await operatorLogin(app,
-        {username: operator.username, password: defaultPassword})
+        { username: operator.username, password: defaultPassword })
 
       await request(app)
         .post('/operators/profit/goal')
