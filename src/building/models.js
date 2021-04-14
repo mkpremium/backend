@@ -13,14 +13,12 @@ import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposal
 import { logger } from '../infrastructure/logger'
 import { MetadataRepository } from './repository/metadata.repository'
 
-export class BuildingProposal extends CouchbaseModel {
+export class BuildingProposalRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = BuildingProposalStruct
   }
-}
 
-export class BuildingProposalRepository extends BuildingProposal {
   async save (data, sendEvent) {
     return super.save(data, sendEvent)
   }
