@@ -89,8 +89,8 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('addNoteToBuilding'))
   eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
-  eventBus.on('evaluation-request.created', awilixContainer.resolve('createSetFeaturedContactFromEvaluationRequestListener'))
-  eventBus.on('evaluation-request.created', awilixContainer.resolve('addNoteToBuilding'))
+  eventBus.on('offer-request.created', awilixContainer.resolve('createSetFeaturedContactFromEvaluationRequestListener'))
+  eventBus.on('offer-request.created', awilixContainer.resolve('addNoteToBuilding'))
 
   const secured = jwt()
   const buildingsRoutes = createBuildingsRoutes(awilixContainer)

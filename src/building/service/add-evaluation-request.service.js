@@ -32,7 +32,7 @@ export class AddEvaluationRequestService {
     await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
     this.eventBus.publish({
-      name: 'evaluation-request.created',
+      name: 'offer-request.created',
       note: addRequestCommand.note,
       userId: addRequestCommand.callerId,
       buildingId: addRequestCommand.buildingId,
