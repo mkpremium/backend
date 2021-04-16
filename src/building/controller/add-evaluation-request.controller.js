@@ -4,7 +4,7 @@ export const createAddEvaluationRequestController = ({ addEvaluationRequestServi
     buildingId: req.params.buildingId,
     callerId: req.user.id
   }
-  return addEvaluationRequestService.addEvaluationRequest(evaluationRequest)
+  return addEvaluationRequestService.addOfferRequest(evaluationRequest)
     .then(() => {
       res.status(201).json({})
     })

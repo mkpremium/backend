@@ -16,7 +16,8 @@ describe('AddEvaluationRequestService', () => {
     buildingId: 'building-id',
     flipperId: 'flipper-id',
     callerId: 'caller-id',
-    worksheetId: 'worksheet-id'
+    worksheetId: 'worksheet-id',
+    note: 'test-note'
   }
 
   beforeEach(() => {
@@ -38,14 +39,14 @@ describe('AddEvaluationRequestService', () => {
   })
 
   it('adds evaluation request to repository', () => {
-    return service.addEvaluationRequest(testCmd)
+    return service.addOfferRequest(testCmd)
       .then(() => {
         expect(evaluationRequestsRepositoryStub.add).to.have.been.calledWith(testCmd)
       })
   })
 
   it('assigns building to evaluator flipper', () => {
-    return service.addEvaluationRequest(testCmd)
+    return service.addOfferRequest(testCmd)
       .then(() => {
         expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.buildingId, testCmd.flipperId)
       })
@@ -55,16 +56,17 @@ describe('AddEvaluationRequestService', () => {
     const storedEvaluationRequest = {}
     evaluationRequestsRepositoryStub.add.resolves(storedEvaluationRequest)
 
-    return service.addEvaluationRequest(testCmd)
+    return service.addOfferRequest(testCmd)
       .then(() => {
         expect(eventBusSpy.publish).to.have.been.calledWith({
           name: 'evaluation-request.created',
+          note: testCmd.note,
           request: storedEvaluationRequest
         })
       })
   })
 
   it('fails on invalid command', () => {
-    return expect(service.addEvaluationRequest({})).to.be.rejectedWith(InvalidCommand)
+    return expect(service.addOfferRequest({})).to.be.rejectedWith(InvalidCommand)
   })
 })

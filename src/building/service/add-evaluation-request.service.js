@@ -9,7 +9,8 @@ const AddEvaluationRequestCommand = t.struct({
   buildingId: t.String,
   callerId: t.String,
   flipperId: t.String,
-  worksheetId: t.String
+  worksheetId: t.String,
+  note: t.String
 })
 
 export class AddEvaluationRequestService {
@@ -24,15 +25,16 @@ export class AddEvaluationRequestService {
     this.eventBus = eventBus
   }
 
-  async addEvaluationRequest (evaluationRequest) {
-    this.assertValidCommand(evaluationRequest)
+  async addOfferRequest (addRequestCommand) {
+    this.assertValidCommand(addRequestCommand)
 
-    const storedRequest = await this.evaluationRequestsRepository.add(evaluationRequest)
-    await this.buildingsRepository.assignBuildingToAgent(evaluationRequest.buildingId, evaluationRequest.flipperId)
+    const offerRequest = await this.evaluationRequestsRepository.add(addRequestCommand)
+    await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
     this.eventBus.publish({
       name: 'evaluation-request.created',
-      request: storedRequest
+      note: addRequestCommand.note,
+      request: offerRequest
     })
   }
 
