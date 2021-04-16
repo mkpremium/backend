@@ -61,6 +61,8 @@ describe('AddEvaluationRequestService', () => {
         expect(eventBusSpy.publish).to.have.been.calledWith({
           name: 'evaluation-request.created',
           note: testCmd.note,
+          userId: testCmd.callerId,
+          buildingId: testCmd.buildingId,
           request: storedEvaluationRequest
         })
       })

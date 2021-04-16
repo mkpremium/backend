@@ -34,6 +34,8 @@ export class AddEvaluationRequestService {
     this.eventBus.publish({
       name: 'evaluation-request.created',
       note: addRequestCommand.note,
+      userId: addRequestCommand.callerId,
+      buildingId: addRequestCommand.buildingId,
       request: offerRequest
     })
   }
