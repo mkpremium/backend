@@ -8,33 +8,43 @@ async function delayForConsistency () {
 }
 
 describe('AddEvaluationRequest', () => {
+  const testCmd = {
+    ownerId: 'owner-id',
+    destinationContactId: 'email-contact-id',
+    reporterContactId: 'phone-reporter-contact-id',
+    buildingId: 'building-id',
+    flipperId: 'flipper-id',
+    callerId: 'caller-id',
+    worksheetId: 'worksheet-id',
+    note: 'test note'
+  }
+
   let addEvaluationRequestService
   let ownersRepository
+  let buildingNotesRepository
 
   before(async () => {
     const { locals: { diContainer } } = await createTestApp()
     addEvaluationRequestService = diContainer.resolve('addEvaluationRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
-  })
-
-  it('sets destination contact id as featured email', async () => {
-    const testCmd = {
-      ownerId: 'owner-id',
-      destinationContactId: 'email-contact-id',
-      reporterContactId: 'phone-reporter-contact-id',
-      buildingId: 'building-id',
-      flipperId: 'flipper-id',
-      callerId: 'caller-id',
-      worksheetId: 'worksheet-id'
-    }
+    buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
 
     await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId }).withEmailContact(testCmd.destinationContactId).build())
     await addEvaluationRequestService.addEvaluationRequest(testCmd)
 
     await delayForConsistency()
+  })
 
+  it('sets destination contact id as featured email', async () => {
     const owner = await ownersRepository.get(testCmd.ownerId)
 
     expect(owner.featuredContact.emailId).to.be.equal(testCmd.destinationContactId)
+  })
+
+  it('adds note to building', async () => {
+    const notes = await buildingNotesRepository.forBuildingOfId(testCmd.buildingId)
+
+    expect(notes).to.be.lengthOf(1)
+    expect(notes[ 0 ].note).to.be.equal(testCmd.note)
   })
 })
