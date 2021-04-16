@@ -102,7 +102,7 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
     wrap(awilixContainer.resolve('setBuildingExpensesController'))
   )
   buildingRoutes.post(
-    '/:buildingId/evaluation-request',
+    '/:buildingId/evaluation-requests',
     secured,
     wrap(awilixContainer.resolve('addEvaluationRequestController'))
   )
