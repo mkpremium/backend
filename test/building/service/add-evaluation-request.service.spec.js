@@ -5,7 +5,7 @@ import { InvalidCommand } from '../../../src/infrastructure/invalid-command.erro
 
 describe('AddEvaluationRequestService', () => {
   let service
-  let evaluationRequestsRepositoryStub
+  let offerRequestsRepositoryStub
   let buildingsRepositoryStub
   let eventBusSpy
 
@@ -21,7 +21,7 @@ describe('AddEvaluationRequestService', () => {
   }
 
   beforeEach(() => {
-    evaluationRequestsRepositoryStub = {
+    offerRequestsRepositoryStub = {
       add: stub().resolves()
     }
     buildingsRepositoryStub = {
@@ -32,7 +32,7 @@ describe('AddEvaluationRequestService', () => {
     }
 
     service = new AddEvaluationRequestService(
-      evaluationRequestsRepositoryStub,
+      offerRequestsRepositoryStub,
       buildingsRepositoryStub,
       eventBusSpy
     )
@@ -41,7 +41,7 @@ describe('AddEvaluationRequestService', () => {
   it('adds evaluation request to repository', () => {
     return service.addOfferRequest(testCmd)
       .then(() => {
-        expect(evaluationRequestsRepositoryStub.add).to.have.been.calledWith(testCmd)
+        expect(offerRequestsRepositoryStub.add).to.have.been.calledWith(testCmd)
       })
   })
 
@@ -54,7 +54,7 @@ describe('AddEvaluationRequestService', () => {
 
   it('publishes event when done', () => {
     const storedEvaluationRequest = {}
-    evaluationRequestsRepositoryStub.add.resolves(storedEvaluationRequest)
+    offerRequestsRepositoryStub.add.resolves(storedEvaluationRequest)
 
     return service.addOfferRequest(testCmd)
       .then(() => {

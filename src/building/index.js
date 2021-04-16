@@ -30,7 +30,7 @@ import { createAddNoteToBuildingListener } from './event-listener/add-note-to-bu
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { MetadataRepository } from './repository/metadata.repository'
-import { EvaluationRequestsRepository } from './repository/evaluation-requests.repository'
+import { OfferRequestsRepository } from './repository/offer-requests.repository'
 import { createSetFeaturedContactFromEvaluationRequestListener } from './event-listener/set-featured-contact-from-evaluation-request'
 import { AddEvaluationRequestService } from './service/add-evaluation-request.service'
 import { createAddEvaluationRequestController } from './controller/add-evaluation-request.controller'
@@ -75,7 +75,7 @@ export const registerBuildingDependencies = awilixContainer => {
     setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton(),
 
-    evaluationRequestsRepository: asClass(EvaluationRequestsRepository).classic().singleton(),
+    offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
     addEvaluationRequestService: asClass(AddEvaluationRequestService).classic().singleton(),
     createSetFeaturedContactFromEvaluationRequestListener: asFunction(createSetFeaturedContactFromEvaluationRequestListener).singleton(),
     addEvaluationRequestController: asFunction(createAddEvaluationRequestController)

@@ -5,7 +5,7 @@ import { ownerBuilder } from '../../owner/owner.builder'
 import moment from 'moment'
 import { Promise } from 'bluebird'
 
-describe('EvaluationRequestsRepository', () => {
+describe('OfferRequestsRepository', () => {
   const testBuilding = buildingBuilder().build()
   const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
   let repository
@@ -17,12 +17,12 @@ describe('EvaluationRequestsRepository', () => {
     const container = await createTestContainer()
     buildingsRepository = container.resolve('buildingsRepository')
     ownersRepository = container.resolve('ownersRepository')
-    repository = container.resolve('evaluationRequestsRepository')
+    repository = container.resolve('offerRequestsRepository')
     flipperNegotiationsRepository = container.resolve('commercialsBuildingRepository')
   })
 
-  it('adds evaluation request to flipper negotiations', () => {
-    const testEvaluationRequest = {
+  it('adds offer request to flipper negotiations', () => {
+    const testOfferRequest = {
       ownerId: testOwner.id,
       destinationContactId: 'email-contact-id',
       reporterContactId: 'phone-reporter-contact-id',
@@ -32,7 +32,7 @@ describe('EvaluationRequestsRepository', () => {
     }
 
     return Promise.all([ buildingsRepository.save(testBuilding), ownersRepository.save(testOwner) ])
-      .then(() => repository.add(testEvaluationRequest))
+      .then(() => repository.add(testOfferRequest))
       .then(async () => {
         const flipperNegotiations = await flipperNegotiationsRepository.listById([ testBuilding.id ])
         expect(flipperNegotiations).to.be.lengthOf(1)

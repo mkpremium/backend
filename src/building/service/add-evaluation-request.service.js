@@ -15,12 +15,12 @@ const AddEvaluationRequestCommand = t.struct({
 
 export class AddEvaluationRequestService {
   /**
-   * @param {EvaluationRequestsRepository} evaluationRequestsRepository
+   * @param {offerRequestsRepository} offerRequestsRepository
    * @param buildingsRepository
    * @param eventBus
    */
-  constructor (evaluationRequestsRepository, buildingsRepository, eventBus) {
-    this.evaluationRequestsRepository = evaluationRequestsRepository
+  constructor (offerRequestsRepository, buildingsRepository, eventBus) {
+    this.offerRequestsRepository = offerRequestsRepository
     this.buildingsRepository = buildingsRepository
     this.eventBus = eventBus
   }
@@ -28,7 +28,7 @@ export class AddEvaluationRequestService {
   async addOfferRequest (addRequestCommand) {
     this.assertValidCommand(addRequestCommand)
 
-    const offerRequest = await this.evaluationRequestsRepository.add(addRequestCommand)
+    const offerRequest = await this.offerRequestsRepository.add(addRequestCommand)
     await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
     this.eventBus.publish({
