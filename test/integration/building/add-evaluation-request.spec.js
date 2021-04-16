@@ -30,7 +30,7 @@ describe('AddEvaluationRequest', () => {
     buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
 
     await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId }).withEmailContact(testCmd.destinationContactId).build())
-    await addEvaluationRequestService.addEvaluationRequest(testCmd)
+    await addEvaluationRequestService.addOfferRequest(testCmd)
 
     await delayForConsistency()
   })
