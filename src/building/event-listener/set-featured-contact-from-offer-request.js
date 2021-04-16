@@ -1,4 +1,4 @@
-export const createSetFeaturedContactFromEvaluationRequestListener = ({ setOwnerFeaturedContactService }) =>
+export const createSetFeaturedContactFromOfferRequestListener = ({ setOwnerFeaturedContactService }) =>
   ({
     request: {
       ownerId,

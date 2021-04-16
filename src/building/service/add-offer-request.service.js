@@ -2,7 +2,7 @@ import t from 'tcomb'
 import { validate } from 'tcomb-validation'
 import { InvalidCommand } from '../../infrastructure/invalid-command.error'
 
-const AddEvaluationRequestCommand = t.struct({
+const AddOfferRequestCommand = t.struct({
   ownerId: t.String,
   destinationContactId: t.String,
   reporterContactId: t.String,
@@ -13,7 +13,7 @@ const AddEvaluationRequestCommand = t.struct({
   note: t.String
 })
 
-export class AddEvaluationRequestService {
+export class AddOfferRequestService {
   /**
    * @param {offerRequestsRepository} offerRequestsRepository
    * @param buildingsRepository
@@ -41,7 +41,7 @@ export class AddEvaluationRequestService {
   }
 
   assertValidCommand (command) {
-    const validation = validate(command, AddEvaluationRequestCommand)
+    const validation = validate(command, AddOfferRequestCommand)
     if (!validation.isValid()) {
       throw new InvalidCommand(validation.errors)
     }

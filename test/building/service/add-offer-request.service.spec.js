@@ -1,9 +1,9 @@
-import { AddEvaluationRequestService } from '../../../src/building/service/add-evaluation-request.service'
+import { AddOfferRequestService } from '../../../src/building/service/add-offer-request.service'
 import { expect } from 'chai'
 import { stub, spy } from 'sinon'
 import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
 
-describe('AddEvaluationRequestService', () => {
+describe('addOfferRequestService', () => {
   let service
   let offerRequestsRepositoryStub
   let buildingsRepositoryStub
@@ -31,14 +31,14 @@ describe('AddEvaluationRequestService', () => {
       publish: spy()
     }
 
-    service = new AddEvaluationRequestService(
+    service = new AddOfferRequestService(
       offerRequestsRepositoryStub,
       buildingsRepositoryStub,
       eventBusSpy
     )
   })
 
-  it('adds evaluation request to repository', () => {
+  it('adds offer request to repository', () => {
     return service.addOfferRequest(testCmd)
       .then(() => {
         expect(offerRequestsRepositoryStub.add).to.have.been.calledWith(testCmd)
@@ -53,8 +53,8 @@ describe('AddEvaluationRequestService', () => {
   })
 
   it('publishes event when done', () => {
-    const storedEvaluationRequest = {}
-    offerRequestsRepositoryStub.add.resolves(storedEvaluationRequest)
+    const storedOfferRequest = {}
+    offerRequestsRepositoryStub.add.resolves(storedOfferRequest)
 
     return service.addOfferRequest(testCmd)
       .then(() => {
@@ -63,7 +63,7 @@ describe('AddEvaluationRequestService', () => {
           note: testCmd.note,
           userId: testCmd.callerId,
           buildingId: testCmd.buildingId,
-          request: storedEvaluationRequest
+          request: storedOfferRequest
         })
       })
   })

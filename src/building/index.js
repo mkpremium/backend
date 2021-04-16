@@ -31,9 +31,9 @@ import { createWorksheetMadeAvailableListener } from './event-listener/worksheet
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { MetadataRepository } from './repository/metadata.repository'
 import { OfferRequestsRepository } from './repository/offer-requests.repository'
-import { createSetFeaturedContactFromEvaluationRequestListener } from './event-listener/set-featured-contact-from-evaluation-request'
-import { AddEvaluationRequestService } from './service/add-evaluation-request.service'
-import { createAddEvaluationRequestController } from './controller/add-evaluation-request.controller'
+import { createSetFeaturedContactFromOfferRequestListener } from './event-listener/set-featured-contact-from-offer-request'
+import { AddOfferRequestService } from './service/add-offer-request.service'
+import { createAddOfferRequestController } from './controller/add-offer-request.controller'
 
 /**
  * @param {AwilixContainer} awilixContainer
@@ -76,9 +76,9 @@ export const registerBuildingDependencies = awilixContainer => {
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton(),
 
     offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
-    addEvaluationRequestService: asClass(AddEvaluationRequestService).classic().singleton(),
-    createSetFeaturedContactFromEvaluationRequestListener: asFunction(createSetFeaturedContactFromEvaluationRequestListener).singleton(),
-    addEvaluationRequestController: asFunction(createAddEvaluationRequestController)
+    addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
+    createSetFeaturedContactFromOfferRequestListener: asFunction(createSetFeaturedContactFromOfferRequestListener).singleton(),
+    addOfferRequestController: asFunction(createAddOfferRequestController)
   })
 }
 
@@ -89,7 +89,7 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('addNoteToBuilding'))
   eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
-  eventBus.on('offer-request.created', awilixContainer.resolve('createSetFeaturedContactFromEvaluationRequestListener'))
+  eventBus.on('offer-request.created', awilixContainer.resolve('createSetFeaturedContactFromOfferRequestListener'))
   eventBus.on('offer-request.created', awilixContainer.resolve('addNoteToBuilding'))
 
   const secured = jwt()
@@ -103,9 +103,9 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
     wrap(awilixContainer.resolve('setBuildingExpensesController'))
   )
   buildingRoutes.post(
-    '/:buildingId/evaluation-requests',
+    '/:buildingId/offer-requests',
     secured,
-    wrap(awilixContainer.resolve('addEvaluationRequestController'))
+    wrap(awilixContainer.resolve('addOfferRequestController'))
   )
 
   app.use('/building', secured, buildingRoutes)
