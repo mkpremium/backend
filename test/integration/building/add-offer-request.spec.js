@@ -7,7 +7,7 @@ async function delayForConsistency () {
   await Promise.delay(100)
 }
 
-describe('AddEvaluationRequest', () => {
+describe('AddOfferRequest', () => {
   const testCmd = {
     ownerId: 'owner-id',
     destinationContactId: 'email-contact-id',
@@ -19,18 +19,18 @@ describe('AddEvaluationRequest', () => {
     note: 'test note'
   }
 
-  let addEvaluationRequestService
+  let addOfferRequestService
   let ownersRepository
   let buildingNotesRepository
 
   before(async () => {
     const { locals: { diContainer } } = await createTestApp()
-    addEvaluationRequestService = diContainer.resolve('addEvaluationRequestService')
+    addOfferRequestService = diContainer.resolve('addOfferRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
 
     await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId }).withEmailContact(testCmd.destinationContactId).build())
-    await addEvaluationRequestService.addOfferRequest(testCmd)
+    await addOfferRequestService.addOfferRequest(testCmd)
 
     await delayForConsistency()
   })
