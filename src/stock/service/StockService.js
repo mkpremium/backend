@@ -13,10 +13,10 @@ export class StockService {
     this.updateBuildingNegotiationStatusService = updateBuildingNegotiationStatusService
   }
 
-  async purchaseBuilding (params, agentId) {
+  async purchaseBuilding (params, flipperId) {
     const createStockParams = fromJSON(params, TransactionParams)
 
-    const purchase = createTransaction(params, agentId)
+    const purchase = createTransaction(params, flipperId)
 
     const stockExist = await this.legacyStockRepository.findByBuildingIdOrDefault(params.buildingId)
 
@@ -25,7 +25,10 @@ export class StockService {
     }
 
     const { buildingId } = createStockParams
-    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, 'COMPRADO', agentId)
+    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, {
+      status: 'COMPRADO',
+      userId: flipperId
+    })
 
     const stock = {
       buildingId: createStockParams.buildingId,
@@ -50,7 +53,10 @@ export class StockService {
 
     const updatedStock = await this.legacyStockRepository.save(stock)
 
-    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, 'COMPRADO', operatorId)
+    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, {
+      status: 'COMPRADO',
+      userId: operatorId
+    })
 
     return updatedStock
   }
