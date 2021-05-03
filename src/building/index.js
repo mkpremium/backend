@@ -31,7 +31,7 @@ import { createWorksheetMadeAvailableListener } from './event-listener/worksheet
 import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { MetadataRepository } from './repository/metadata.repository'
 import { OfferRequestsRepository } from './repository/offer-requests.repository'
-import { createSetFeaturedContactFromOfferRequestListener } from './event-listener/set-featured-contact-from-offer-request'
+import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
 import { AddOfferRequestService } from './service/add-offer-request.service'
 import { createAddOfferRequestController } from './controller/add-offer-request.controller'
 
@@ -77,7 +77,7 @@ export const registerBuildingDependencies = awilixContainer => {
 
     offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
-    createSetFeaturedContactFromOfferRequestListener: asFunction(createSetFeaturedContactFromOfferRequestListener).singleton(),
+    setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController)
   })
 }
@@ -89,7 +89,7 @@ export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('addNoteToBuilding'))
   eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
-  eventBus.on('offer-request.created', awilixContainer.resolve('createSetFeaturedContactFromOfferRequestListener'))
+  eventBus.on('offer-request.created', awilixContainer.resolve('setFeaturedOwnerFromOfferRequestListener'))
   eventBus.on('offer-request.created', awilixContainer.resolve('addNoteToBuilding'))
 
   const secured = jwt()
