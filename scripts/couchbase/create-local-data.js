@@ -21,7 +21,7 @@ axios.post(`${baseURL}/operators/login`, {
           createFlipper(client, queueId)
             .then(({ data: { id: flipperId } }) => createCaller(client, queueId, flipperId)),
           createFlipperCaller(client, queueId),
-          createTestBuildings(client, 100).catch(error => {
+          createTestBuildings(client, 20).catch(error => {
             console.error('Error creating buildings', { error })
           })
         ])
