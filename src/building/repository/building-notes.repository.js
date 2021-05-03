@@ -1,8 +1,8 @@
+import { N1qlQuery } from 'couchbase'
+import t from 'tcomb'
+import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { TNote } from '../../notes/types'
-import { N1qlQuery } from 'couchbase'
-import fromJSON from 'tcomb/lib/fromJSON'
-import t from 'tcomb'
 
 const notesForBuildingQuery = bucketName => `
     SELECT notes

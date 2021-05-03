@@ -1,10 +1,11 @@
+import { buildingBuilder } from '../../building/building.builder'
 import { createTestApp } from '../create-test-app'
 import { expect } from 'chai'
 import { ownerBuilder } from '../../owner/owner.builder'
 import { Promise } from 'bluebird'
 
 async function delayForConsistency () {
-  await Promise.delay(100)
+  await Promise.delay(500)
 }
 
 describe('AddOfferRequest', () => {
@@ -22,18 +23,21 @@ describe('AddOfferRequest', () => {
   let addOfferRequestService
   let ownersRepository
   let buildingNotesRepository
+  let buildingsRepository
 
   before(async () => {
     const { locals: { diContainer } } = await createTestApp()
     addOfferRequestService = diContainer.resolve('addOfferRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
+    buildingsRepository = diContainer.resolve('buildingsRepository')
 
     await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId })
       .withEmailContact(testCmd.destinationContactId)
       .withPhoneContact(testCmd.reporterContactId)
       .build()
     )
+    await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
     await addOfferRequestService.addOfferRequest(testCmd)
 
     await delayForConsistency()
@@ -50,5 +54,11 @@ describe('AddOfferRequest', () => {
 
     expect(notes).to.be.lengthOf(1)
     expect(notes[ 0 ].note).to.be.equal(testCmd.note)
+  })
+
+  it('sets owner as featured for building', async () => {
+    const building = await buildingsRepository.get(testCmd.buildingId)
+
+    expect(building.ownerId).to.be.equal(testCmd.ownerId)
   })
 })
