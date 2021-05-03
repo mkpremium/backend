@@ -38,7 +38,7 @@ describe('AddOfferRequest', () => {
   it('sets destination contact id as featured email', async () => {
     const owner = await ownersRepository.get(testCmd.ownerId)
 
-    expect(owner.featuredContact.emailId).to.be.equal(testCmd.destinationContactId)
+    expect(owner.featuredContact.phoneId).to.be.equal(testCmd.reporterContactId)
   })
 
   it('adds note to building', async () => {
