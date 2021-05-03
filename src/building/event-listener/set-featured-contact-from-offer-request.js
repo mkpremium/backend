@@ -2,6 +2,6 @@ export const createSetFeaturedContactFromOfferRequestListener = ({ setOwnerFeatu
   ({
     request: {
       ownerId,
-      destinationContactId
+      reporterContactId
     }
-  }) => setOwnerFeaturedContactService.setFeaturedContact(ownerId, destinationContactId)
+  }) => setOwnerFeaturedContactService.setFeaturedContact(ownerId, reporterContactId)

@@ -15,7 +15,7 @@ const AddOfferRequestCommand = t.struct({
 
 export class AddOfferRequestService {
   /**
-   * @param {offerRequestsRepository} offerRequestsRepository
+   * @param {OfferRequestsRepository} offerRequestsRepository
    * @param buildingsRepository
    * @param eventBus
    */
