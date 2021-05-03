@@ -29,7 +29,11 @@ describe('AddOfferRequest', () => {
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
 
-    await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId }).withEmailContact(testCmd.destinationContactId).build())
+    await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId })
+      .withEmailContact(testCmd.destinationContactId)
+      .withPhoneContact(testCmd.reporterContactId)
+      .build()
+    )
     await addOfferRequestService.addOfferRequest(testCmd)
 
     await delayForConsistency()
