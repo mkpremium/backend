@@ -33,7 +33,9 @@ worksheet.id worksheetId,
     "inPerson": lastEvent.event.inPerson,
     "ownerId": lastEvent.event.ownerId,
     "flipperName": lastEventFlipper.profile.firstName || ' ' || lastEventFlipper.profile.lastName
-} AS lastEvent
+} AS lastEvent,
+ARRAY {"at": sc.eventDate} FOR sc IN  scheduledCalls END as scheduledCalls
+
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
   AND (building.negotiationStatus IS MISSING OR building.negotiationStatus != 'DESCARTADO')
@@ -41,6 +43,9 @@ JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksh
 
 LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event' AND lastEvent.id = worksheet.lastAddedMeeting.id
 LEFT JOIN ${bucketName} lastEventFlipper ON  lastEventFlipper._documentType = 'operator' and lastEventFlipper.id = lastEvent.notifyTo
+LEFT NEST ${bucketName} scheduledCalls ON scheduledCalls._documentType = 'scheduled-event'
+    AND scheduledCalls.type = 'CALLS'
+    AND scheduledCalls.event.ownerId = owner.id
 
 WHERE owner._documentType = 'owner'
 AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 AND c.status != 'BAD' END
@@ -61,6 +66,9 @@ const FoundOwner = t.struct({
   buildingId: t.String,
   negotiationStatus: NegotiationStatus,
   worksheetId: t.String,
+  scheduledCalls: t.list(t.struct({
+    at: DateTimeString
+  })),
   matchingContactId: t.String,
   name: t.String,
   contacts: t.list(t.struct({
