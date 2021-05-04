@@ -234,7 +234,7 @@ export class CouchbaseModel {
     return retry(fn, {
       maxTries: 3,
       interval: 100,
-      predicate: ({ code }) => code === couchbaseErrors.temporaryError
+      predicate: ({ code, message }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }
