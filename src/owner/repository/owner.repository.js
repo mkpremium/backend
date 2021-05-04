@@ -28,6 +28,7 @@ owner.person.contacts,
 } as building,
 building.negotiationStatus,
 worksheet.id worksheetId,
+worksheet.inFreezer isWorksheetInFreezer,
 {
     lastEvent.eventDate,
     "inPerson": lastEvent.event.inPerson,
@@ -61,6 +62,7 @@ const FoundOwner = t.struct({
   buildingId: t.String,
   negotiationStatus: NegotiationStatus,
   worksheetId: t.String,
+  isWorksheetInFreezer: t.Boolean,
   matchingContactId: t.String,
   name: t.String,
   contacts: t.list(t.struct({
