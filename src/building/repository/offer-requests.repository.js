@@ -1,13 +1,20 @@
-import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { ScheduledEvent } from '../../scheduled-events/types'
-import uuid from 'uuid/v4'
 import moment from 'moment'
+import uuid from 'uuid/v4'
+import { ScheduledEvent } from '../../scheduled-events/types'
 
 const DbOfferRequest = ScheduledEvent
 
-export class OfferRequestsRepository extends CouchbaseRepository {
+export class OfferRequestsRepository {
+  /**
+   * @param {ScheduledEventsRepository} scheduledEventsRepository
+   */
+  constructor (scheduledEventsRepository) {
+    this.scheduledEventsRepository = scheduledEventsRepository
+  }
+
   async add (offer) {
     const now = moment().toDate()
+
     const scheduledEvent = DbOfferRequest({
       id: uuid(),
       type: 'MEETINGS',
@@ -24,7 +31,7 @@ export class OfferRequestsRepository extends CouchbaseRepository {
       }
     })
 
-    await this.save(scheduledEvent)
+    await this.scheduledEventsRepository.addScheduledMeetingEvent(scheduledEvent, offer.callerId)
 
     return { ...offer, id: scheduledEvent.id }
   }

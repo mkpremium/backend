@@ -1,9 +1,10 @@
-import { createTestContainer } from '../../create-test-container'
-import { expect } from 'chai'
-import { buildingBuilder } from '../building.builder'
-import { ownerBuilder } from '../../owner/owner.builder'
-import moment from 'moment'
 import { Promise } from 'bluebird'
+import { expect } from 'chai'
+import moment from 'moment'
+import { createTestContainer } from '../../create-test-container'
+import { ownerBuilder } from '../../owner/owner.builder'
+import { worksheetBuilder } from '../../worksheet/worksheet.builder'
+import { buildingBuilder } from '../building.builder'
 
 describe('OfferRequestsRepository', () => {
   const testBuilding = buildingBuilder().build()
@@ -12,11 +13,13 @@ describe('OfferRequestsRepository', () => {
   let flipperNegotiationsRepository
   let buildingsRepository
   let ownersRepository
+  let worksheetRepository
 
   before(async () => {
     const container = await createTestContainer()
     buildingsRepository = container.resolve('buildingsRepository')
     ownersRepository = container.resolve('ownersRepository')
+    worksheetRepository = container.resolve('worksheetRepository')
     repository = container.resolve('offerRequestsRepository')
     flipperNegotiationsRepository = container.resolve('commercialsBuildingRepository')
   })
@@ -28,10 +31,15 @@ describe('OfferRequestsRepository', () => {
       reporterContactId: 'phone-reporter-contact-id',
       buildingId: testBuilding.id,
       flipperId: 'flipper-id',
+      callerId: 'caller-id',
       worksheetId: 'worksheet-id'
     }
 
-    return Promise.all([ buildingsRepository.save(testBuilding), ownersRepository.save(testOwner) ])
+    return Promise.all([
+      buildingsRepository.save(testBuilding),
+      ownersRepository.save(testOwner),
+      worksheetRepository.save(worksheetBuilder({ id: testOfferRequest.worksheetId }).build())
+    ])
       .then(() => repository.add(testOfferRequest))
       .then(async () => {
         const flipperNegotiations = await flipperNegotiationsRepository.listById([ testBuilding.id ])
