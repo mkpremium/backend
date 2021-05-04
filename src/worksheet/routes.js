@@ -56,5 +56,7 @@ export function worksheetRoutes (awilixContainer) {
       awilixContainer.resolve('eventBus')
     ))
 
+  router.post('/status-changed', awilixContainer.resolve('worksheetStatusChangedController'))
+
   return router
 }

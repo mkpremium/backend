@@ -94,6 +94,12 @@ Worksheet.prototype.setStatus = function (newStatus) {
   })
 }
 
+Worksheet.prototype.statusChanged = function () {
+  return Worksheet.update(this, {
+    statusChangedAt: { $set: utc().toDate() }
+  })
+}
+
 Worksheet.prototype.pullOutFreezer = function (newStatus) {
   const updated = this.setStatus(newStatus)
 

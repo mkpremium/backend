@@ -1,20 +1,23 @@
-import { worksheetRoutes } from './routes'
-import buildingRoutes from './building/routes'
-
-import './types'
+import { aliasTo, asClass, asFunction } from 'awilix'
 import jwt from '../middleware/jwt'
-import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
-import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
-import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
+import buildingRoutes from './building/routes'
+import { createStatusChangedController } from './controller/status-changed.controller'
 import { setupEventListeners } from './event-listeners'
-import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
-import { aliasTo, asClass } from 'awilix'
 import { LegacyWorksheetQueueRepository } from './models/queue-repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
+import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
 import { WorksheetRepository } from './repository/worksheet.repository'
+import { worksheetRoutes } from './routes'
+import { ReleaseUserExtraOpenedWorksheetsInQueueService }
+  from './service/release-user-extra-opened-worksheets-in-queue.service'
+import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
+import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
+import './types'
 
-export const setupWorksheetDependencies = awilixContainer => {
-  awilixContainer.register({
+export const setupWorksheetDependencies = diContainer => {
+  diContainer.register({
+    worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
+
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
     takeWorksheetService: aliasTo('worksheetQueueActionsService'),
     takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),

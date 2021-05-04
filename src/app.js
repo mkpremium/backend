@@ -95,7 +95,7 @@ export const createApp = () => {
       return app
     })
     .catch(error => {
-      logger.error('error starting application', { error })
+      logger.error('error starting application', { error: error.message })
       throw error
     })
 }
