@@ -59,6 +59,7 @@ export class CouchbaseAdapter {
 
     return this.withRetry(() => this.couchbaseBucket.queryAsync(query, params)
       .catch(error => {
+        console.log({ error })
         if (error.responseBody === '') {
           throw new QueryTimeout(query)
         }
@@ -84,7 +85,7 @@ export class CouchbaseAdapter {
     return retry(fn, {
       maxTries: 3,
       interval: 100,
-      predicate: ({ code }) => code === couchbaseErrors.temporaryError
+      predicate: ({ code, message }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }

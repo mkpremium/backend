@@ -1,4 +1,5 @@
 import { buildingBuilder } from '../../building/building.builder'
+import { worksheetBuilder } from '../../worksheet/worksheet.builder'
 import { createTestApp } from '../create-test-app'
 import { expect } from 'chai'
 import { ownerBuilder } from '../../owner/owner.builder'
@@ -24,13 +25,15 @@ describe('AddOfferRequest', () => {
   let ownersRepository
   let buildingNotesRepository
   let buildingsRepository
+  let worksheetRepository
 
   before(async () => {
     const { locals: { diContainer } } = await createTestApp()
     addOfferRequestService = diContainer.resolve('addOfferRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
-    buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
+    buildingNotesRepository = diContainer.resolve('buildingNotesRepository')
+    worksheetRepository = diContainer.resolve('worksheetRepository')
 
     await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId })
       .withEmailContact(testCmd.destinationContactId)
@@ -38,6 +41,7 @@ describe('AddOfferRequest', () => {
       .build()
     )
     await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
+    await worksheetRepository.save(worksheetBuilder({id: testCmd.worksheetId}).build())
     await addOfferRequestService.addOfferRequest(testCmd)
 
     await delayForConsistency()
@@ -60,5 +64,11 @@ describe('AddOfferRequest', () => {
     const building = await buildingsRepository.get(testCmd.buildingId)
 
     expect(building.ownerId).to.be.equal(testCmd.ownerId)
+  })
+
+  it('add request as last meeting in worksheet', async () => {
+    const worksheet = await worksheetRepository.get(testCmd.worksheetId)
+
+    expect(worksheet.lastAddedMeeting).to.not.be.null
   })
 })
