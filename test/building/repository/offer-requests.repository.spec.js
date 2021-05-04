@@ -40,6 +40,7 @@ describe('OfferRequestsRepository', () => {
       ownersRepository.save(testOwner),
       worksheetRepository.save(worksheetBuilder({ id: testOfferRequest.worksheetId }).build())
     ])
+      .delay(200)
       .then(() => repository.add(testOfferRequest))
       .then(async () => {
         const flipperNegotiations = await flipperNegotiationsRepository.listById([ testBuilding.id ])
