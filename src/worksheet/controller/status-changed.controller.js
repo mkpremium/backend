@@ -1,6 +1,9 @@
 export const createStatusChangedController = ({ worksheetRepository }) => (req, res) => {
+  const worksheetsId = typeof req.query.worksheetId === 'string'
+    ? [ req.query.worksheetId ] : req.query.worksheetId
+
   return Promise.all(
-    req.query.worksheetId.map(async worksheetId => {
+    worksheetsId.map(async worksheetId => {
       const worksheet = await worksheetRepository.get(worksheetId)
       return worksheetRepository.save(worksheet.statusChanged())
     })
