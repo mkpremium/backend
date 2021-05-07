@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import couchbase from '../../src/db/couchbase'
+import couchbase from '../../src/db/legacy-connect-couchbase'
 import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { OperatorRepository } from '../../src/operator/models'
 import { PropertyManagerRepository } from '../../src/property-manager/PropertyManagerRepository'

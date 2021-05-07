@@ -1,4 +1,4 @@
-import couchbase from '../src/db/couchbase'
+import couchbase from '../src/db/legacy-connect-couchbase'
 import { createDiContainer } from '../src/infrastructure/dependencies'
 
 /**

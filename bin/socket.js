@@ -8,7 +8,7 @@ import '../src/types'
 
 import { socket as socketConfig } from '../config'
 import socket from '../src/socket'
-import couchbase from '../src/db/couchbase'
+import couchbase from '../src/db/legacy-connect-couchbase'
 
 const app = express()
 app.set('IS_READY', false)

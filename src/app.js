@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 import morgan from 'morgan'
 import cors from 'cors'
 
-import couchbase from './db/couchbase'
+import couchbase from './db/legacy-connect-couchbase'
 import { logger } from './infrastructure/logger'
 // app aware types
 import './types'

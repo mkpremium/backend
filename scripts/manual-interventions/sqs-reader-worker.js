@@ -6,7 +6,7 @@ config()
 const AWS = require('aws-sdk')
 const Promise = require('bluebird')
 const { N1qlQuery } = require('couchbase')
-const couchbase = require('../../src/db/couchbase').default
+const couchbase = require('../../src/db/legacy-connect-couchbase').default
 const t = require('tcomb')
 const { createLegacyDependenciesContainer } = require('../../src/infrastructure/dependencies')
 
