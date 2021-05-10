@@ -116,7 +116,7 @@ describe('Building listing endpoint', () => {
             },
             latestProposal: {
               amount: building1Proposal.proposal,
-              createdAt: building1Proposal.createdAt
+              createdAt: building1Proposal.createdAt.toISOString()
             },
             cadastreReference: building1.cadastre.reference,
             negotiationStatus: 'VENDIDO',
