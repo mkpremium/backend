@@ -1,5 +1,3 @@
-import { N1qlQuery } from 'couchbase'
-
 const { config } = require('dotenv')
 config()
 
@@ -126,7 +124,8 @@ dependenciesPromise
           }
           try {
             await couchbaseAdapter.queryAsync(
-              N1qlQuery.fromString('UPDATE mkpremium SET assignedAgentId = $2 WHERE id = $1'), [ buildingId, assignedAgentId ]
+              'UPDATE mkpremium SET assignedAgentId = $2 WHERE id = $1',
+              [ buildingId, assignedAgentId ]
             )
           } catch (e) {
             return { error: e, buildingId }

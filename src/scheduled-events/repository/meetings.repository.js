@@ -1,9 +1,8 @@
-import { CouchbaseRepository } from '../../db/couchbase.repository'
-import t from 'tcomb'
-import { Meeting } from '../domain/meeting'
 import moment from 'moment'
-import { N1qlQuery } from 'couchbase'
+import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { CouchbaseRepository } from '../../db/couchbase.repository'
+import { Meeting } from '../domain/meeting'
 
 const DbMeeting = t.struct({
   id: t.String,
@@ -64,7 +63,7 @@ export class MeetingsRepository extends CouchbaseRepository {
 
   futureMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(futureMeetingsForQuery(this.bucketName)),
+      futureMeetingsForQuery(this.bucketName),
       [ userId ]
     ).then(rows => rows.map(r => fromJSON(r, DbMeeting).couchbaseToDomain()))
   }

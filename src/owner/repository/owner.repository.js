@@ -1,6 +1,5 @@
 import { Owner } from '../owner'
 import t from 'tcomb'
-import { N1qlQuery } from 'couchbase'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
@@ -104,7 +103,7 @@ const BuildingOwner = t.struct({
 export class OwnerRepository extends CouchbaseRepository {
   async findByPhoneNumber (phoneNumber) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(findOwnerByContactValueQuery(this.bucketName)),
+      findOwnerByContactValueQuery(this.bucketName),
       [ phoneNumber ]
     ).then(result => fromJSON(result.map(rec => {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
@@ -133,7 +132,7 @@ export class OwnerRepository extends CouchbaseRepository {
 
   async buildingOwners (buildingId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(buildingOwnersQuery(this.bucketName)),
+      buildingOwnersQuery(this.bucketName),
       [ buildingId ]
     ).then(rawOwners => rawOwners.map(o => {
       try {

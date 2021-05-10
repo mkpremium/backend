@@ -5,7 +5,6 @@ config()
 
 const AWS = require('aws-sdk')
 const Promise = require('bluebird')
-const { N1qlQuery } = require('couchbase')
 const couchbase = require('../../src/db/legacy-connect-couchbase').default
 const t = require('tcomb')
 const { createLegacyDependenciesContainer } = require('../../src/infrastructure/dependencies')
@@ -16,16 +15,15 @@ const sqsClient = Promise.promisifyAll(new AWS.SQS(), { suffix: 'Promise' })
 const queueUrl = 'https://sqs.eu-west-1.amazonaws.com/173249668334/owners-to-update.fifo'
 
 const personInfoQuery = `
-SELECT
-  person.id,
-  person.name,
-  person.firstName,
-  person.contacts,
-  person.documentNumber,
-  person.addresses
-FROM mkpremium owner
-JOIN mkpremium person ON person.id = owner.personId AND person._documentType = "person"
-WHERE owner._documentType = "owner" AND owner.id = $1
+    SELECT person.id,
+           person.name,
+           person.firstName,
+           person.contacts,
+           person.documentNumber,
+           person.addresses
+    FROM mkpremium owner
+             JOIN mkpremium person ON person.id = owner.personId AND person._documentType = "person"
+    WHERE owner._documentType = "owner" AND owner.id = $1
 `
 
 const maxMessagesToProcess = process.env.MAX_MESSAGES_TO_PROCESS || 1000
@@ -66,40 +64,40 @@ couchbase(app)
 
       function pollForMessages (maxNumberOfMessages = 10) {
         return sqsClient.receiveMessagePromise({
-          QueueUrl: queueUrl,
-          MaxNumberOfMessages: maxNumberOfMessages,
-          WaitTimeSeconds: 20
-        })
-                        .then(result => {
-                          if (!result.Messages) {
-                            console.info('no messages received, exiting')
-                            return NO_MESSAGES
-                          }
+            QueueUrl: queueUrl,
+            MaxNumberOfMessages: maxNumberOfMessages,
+            WaitTimeSeconds: 20
+          })
+          .then(result => {
+            if (!result.Messages) {
+              console.info('no messages received, exiting')
+              return NO_MESSAGES
+            }
 
-                          return Promise.all(result.Messages.map(async (msg) => {
-                            const { ownerId } = JSON.parse(msg.Body)
+            return Promise.all(result.Messages.map(async (msg) => {
+              const { ownerId } = JSON.parse(msg.Body)
 
-                            try {
-                              await embedPersonalInfoIntoOwner(ownerId)
-                            } catch (error) {
-                              console.error('error saving personal data', { ownerId, error })
-                              return
-                            }
+              try {
+                await embedPersonalInfoIntoOwner(ownerId)
+              } catch (error) {
+                console.error('error saving personal data', { ownerId, error })
+                return
+              }
 
-                            console.info('Personal info saved in owner', { ownerId })
+              console.info('Personal info saved in owner', { ownerId })
 
-                            return sqsClient.deleteMessagePromise({
-                              QueueUrl: queueUrl,
-                              ReceiptHandle: msg.ReceiptHandle
-                            }).catch(error => {
-                              console.error('error deleting message', { error, id: msg.MessageId })
-                            })
-                          }))
-                        })
-                        .catch(error => {
-                          console.error('error receiving message', { error })
-                          process.exit(1)
-                        })
+              return sqsClient.deleteMessagePromise({
+                QueueUrl: queueUrl,
+                ReceiptHandle: msg.ReceiptHandle
+              }).catch(error => {
+                console.error('error deleting message', { error, id: msg.MessageId })
+              })
+            }))
+          })
+          .catch(error => {
+            console.error('error receiving message', { error })
+            process.exit(1)
+          })
       }
 
       async function embedPersonalInfoIntoOwner (ownerId) {
@@ -114,10 +112,7 @@ couchbase(app)
           return
         }
 
-        const person = await cbBucket.queryAsync(
-          N1qlQuery.fromString(personInfoQuery),
-          [ ownerId ]
-        )
+        const person = await cbBucket.queryAsync(personInfoQuery, [ ownerId ])
 
         const updatedOwner = t.update(owner, {
           $merge: {

@@ -1,19 +1,16 @@
 import { expect } from 'chai'
-import couchbase from '../../src/db/legacy-connect-couchbase'
-import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { OperatorRepository } from '../../src/operator/models'
-import { PropertyManagerRepository } from '../../src/property-manager/PropertyManagerRepository'
 import { OperatorRoles } from '../../src/types/operator'
 import { buildUser } from '../common'
+import { createTestContainer } from '../create-test-container'
 
 describe('PropertyManagerRepository', () => {
-  let couchbaseBucket, propertyManagerRepository, operatorRepository
+  let propertyManagerRepository, operatorRepository
 
   beforeEach(async () => {
-    couchbaseBucket = await couchbase()
-    propertyManagerRepository = new PropertyManagerRepository(new CouchbaseAdapter(couchbaseBucket))
+    const diContainer = await createTestContainer()
+    propertyManagerRepository = diContainer.resolve('propertyManagersRepository')
     operatorRepository = new OperatorRepository()
-    await couchbaseBucket.flushAsync()
     await new Promise(resolve => setTimeout(resolve, 50))
   })
 

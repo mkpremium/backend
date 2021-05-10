@@ -1,12 +1,10 @@
 import Promise from 'bluebird'
-import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
 import _head from 'lodash/head'
 import _isNil from 'lodash/isNil'
-import _map from 'lodash/map'
 import _some from 'lodash/some'
 import _uniq from 'lodash/uniq'
 import t from 'tcomb'
@@ -24,8 +22,8 @@ import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { OwnerStatus } from '../../types/enums'
-import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 import { Worksheet, WorkSheetStatus } from '../domain/worksheet'
+import { QueueRequestAction, WorksheetListQuery } from '../types'
 
 const QueueRequestParamsBase = t.struct(
   {
@@ -227,7 +225,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
     GROUP BY t.status, t.buildingAddress.province`
 
-    const result = await this.queryRaw(N1qlQuery.fromString(query))
+    const result = await this.queryRaw(query)
 
     const provinces = _.uniq(result.map(r => r.province))
 
@@ -260,7 +258,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
 
     const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
     WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`
-    const results = await this.queryRaw(N1qlQuery.fromString(baseQuery))
+    const results = await this.queryRaw(baseQuery)
     return _get(results, '0.count', 0)
   }
 
@@ -350,18 +348,20 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
    * @returns {Promise<WorksheetSearchResponse>}
    */
   async searchWorksheets (query) {
-    let results = []
-    const params = new WorksheetSearchQuery(query)
-    const qs = this.getSearchBuilder(params.query)
-    qs.limit(Number(params.limit))
-
-    const searchResult = await this.search(qs)
-    const worksheetIds = _map(searchResult, 'id')
-
-    if (worksheetIds.length) {
-      results = await Promise.map(worksheetIds, (worksheetId) => this.findByIdWIthIncludes(worksheetId))
-    }
-    return fromJSON({ results }, WorksheetSearchResponse)
+    // TODO
+    return Promise.reject(new Error('Reimplement with new SDK'))
+    // let results = []
+    // const params = new WorksheetSearchQuery(query)
+    // const qs = this.getSearchBuilder(params.query)
+    // qs.limit(Number(params.limit))
+    //
+    // const searchResult = await this.search(qs)
+    // const worksheetIds = _map(searchResult, 'id')
+    //
+    // if (worksheetIds.length) {
+    //   results = await Promise.map(worksheetIds, (worksheetId) => this.findByIdWIthIncludes(worksheetId))
+    // }
+    // return fromJSON({ results }, WorksheetSearchResponse)
   }
 
   /**

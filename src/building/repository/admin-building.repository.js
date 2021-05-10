@@ -1,4 +1,3 @@
-import {N1qlQuery} from 'couchbase'
 import moment from 'moment'
 
 const allAgentsStockStatsQuery = bucketName => `
@@ -26,7 +25,7 @@ export class AdminBuildingRepository {
 
   allAgentsStockStats () {
     return this.couchbaseAdapter
-      .queryAsync(N1qlQuery.fromString(allAgentsStockStatsQuery(this.couchbaseAdapter.bucketName)))
+      .queryAsync(allAgentsStockStatsQuery(this.couchbaseAdapter.bucketName))
       .then(result =>
         result.map(({
           buildingId, use, landArea, buildingAddress, stock, agentName, agentId

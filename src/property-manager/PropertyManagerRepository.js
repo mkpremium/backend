@@ -1,5 +1,3 @@
-import { N1qlQuery } from 'couchbase'
-
 const activePropertyManagersQuery = bucketName => `
     SELECT
       id,
@@ -23,8 +21,7 @@ export class PropertyManagerRepository {
 
   getActivePropertyManagers () {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(activePropertyManagersQuery(this.couchbaseAdapter.bucketName))
-        .consistency(N1qlQuery.Consistency.STATEMENT_PLUS)
+      activePropertyManagersQuery(this.couchbaseAdapter.bucketName)
     )
   }
 }

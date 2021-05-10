@@ -1,5 +1,4 @@
 import _get from 'lodash/get'
-import promises from './promises'
 import { logger } from '../infrastructure/logger'
 
 export async function upsertToDb (id, data) {
@@ -17,7 +16,6 @@ export async function upsertToDb (id, data) {
 
 function attach (bucket) {
   // this is a naive support for promise of the couchbase
-  promises(bucket)
   bucket.upsertToDb = upsertToDb
 }
 

@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import { DocumentNotFoundError } from 'couchbase'
 import { sign, verify } from 'jsonwebtoken'
 import _isNil from 'lodash/isNil'
 import _omit from 'lodash/omit'
@@ -16,8 +17,8 @@ import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
   {
-    role: t.enums.of([OperatorRoles.OPERATOR, OperatorRoles.BUSINESS]),
-    view: t.enums.of(['day', 'total'])
+    role: t.enums.of([ OperatorRoles.OPERATOR, OperatorRoles.BUSINESS ]),
+    view: t.enums.of([ 'day', 'total' ])
   },
   {
     name: 'ListStats',
@@ -31,7 +32,7 @@ const ListStats = t.struct(
 function defaultCounters () {
   const mappedCounters = {}
   Object.values(OperatorActions).map(statKey => {
-    mappedCounters[statKey] = 0
+    mappedCounters[ statKey ] = 0
   })
 
   return mappedCounters
@@ -83,7 +84,7 @@ class Operator extends CouchbaseModel {
       $merge: data.profile || {}
     })
     const updateOperator = t.update(operator, {
-      $merge: _omit(data, ['profile', 'id']),
+      $merge: _omit(data, [ 'profile', 'id' ]),
       profile: { $set: updatedProfile }
     })
 
@@ -122,12 +123,14 @@ class Operator extends CouchbaseModel {
 
 export class OperatorRepository extends Operator {
   async findByIdOrThrow (operatorId) {
-    const owner = await this.findById(operatorId)
-    if (!owner) {
-      throw newHttpError(404, `El operator ${operatorId} no existe`)
+    try {
+      return await this.findById(operatorId)
+    } catch (error) {
+      if (error instanceof DocumentNotFoundError) {
+        throw newHttpError(404, `El operator ${operatorId} no existe`)
+      }
+      throw error
     }
-
-    return owner
   }
 
   static async setOnline (operatorId, online) {
@@ -144,7 +147,7 @@ export class OperatorRepository extends Operator {
     const qb = this.getQueryBuilder()
       .where('username = ?', username)
       .limit(1)
-    const [operator] = await this.query(qb)
+    const [ operator ] = await this.query(qb)
 
     if (!operator) {
       throw newHttpError(401, 'Contraseña o usuario incorrecto')
@@ -218,13 +221,13 @@ export class OperatorRepository extends Operator {
     switch (args.view) {
       case 'day':
         return operators.results.map(operator => {
-          const counters = results[operator.id] || {}
+          const counters = results[ operator.id ] || {}
           return { operator, onLine: operator.online, counters }
         })
       case 'total':
       default:
         return operators.results.map(operator => {
-          const counters = results[operator.id] || defaultValues
+          const counters = results[ operator.id ] || defaultValues
           return { operator, onLine: operator.online, counters }
         })
     }
@@ -238,24 +241,8 @@ export class OperatorRepository extends Operator {
 
     return operators.results.map(operator => ({
       operator,
-      performance: results[operator.id]
+      performance: results[ operator.id ]
     }))
-  }
-
-  async getOperatorsWithProfitGoal () {
-    const bucket = this.getBucketName()
-    const currentYear = new Date().getFullYear()
-
-    const operatorsProfitGoals = `
-      select * from ${bucket} t
-      where t._documentType = 'operator'
-      AND t.profitGoal IS NOT NULL
-      AND DATE_PART_STR(t.profitGoal.updatedAt,'year') = ${currentYear}
-      AND enable = true
-      AND (ANY V IN roles SATISFIES V = 'BUSINESS' END)
-      `
-
-    return this.raw(operatorsProfitGoals)
   }
 
   async addAnAward (operator, code) {
@@ -265,9 +252,9 @@ export class OperatorRepository extends Operator {
     }
     let updatedOperator
     if (operator.awards) {
-      updatedOperator = t.update(operator, { awards: { $push: [newAward] } })
+      updatedOperator = t.update(operator, { awards: { $push: [ newAward ] } })
     } else {
-      updatedOperator = t.update(operator, { awards: { $set: [newAward] } })
+      updatedOperator = t.update(operator, { awards: { $set: [ newAward ] } })
     }
 
     return this.save(updatedOperator)
@@ -301,7 +288,7 @@ export class OperatorRefreshTokenRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder()
     qb.where('refreshToken = ?', rawToken)
       .limit(1)
-    const [refreshToken] = await this.query(qb)
+    const [ refreshToken ] = await this.query(qb)
     if (!refreshToken) {
       throw newHttpError(401, 'El token es invalido')
     }

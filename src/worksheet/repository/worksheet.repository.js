@@ -1,11 +1,10 @@
-import { Worksheet, WorkSheetStatusEnum } from '../domain/worksheet'
 import t from 'tcomb'
-import { OwnerStatusEnum, OwnerTypeEnum } from '../../types/enums'
-import { N1qlQuery } from 'couchbase'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { logger } from '../../infrastructure/logger'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
+import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
+import { OwnerStatusEnum, OwnerTypeEnum } from '../../types/enums'
+import { Worksheet, WorkSheetStatusEnum } from '../domain/worksheet'
 
 export const WorksheetBuilding = t.struct({
   id: t.String,
@@ -149,8 +148,7 @@ class WorksheetNotFound extends Error {
 export class WorksheetRepository extends CouchbaseRepository {
   getForCallcenterView (worksheetId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(worksheetByIdQuery(this.bucketName)),
-      [ worksheetId ]
+      worksheetByIdQuery(this.bucketName), [ worksheetId ]
     ).then(rows => {
       if (rows.length === 0) {
         throw new WorksheetNotFound(worksheetId)
@@ -176,20 +174,18 @@ export class WorksheetRepository extends CouchbaseRepository {
 
   nextAvailableWorksheetInSource (source, queueId) {
     const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, queueId)
-    return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(q)
-    ).then(result => {
-      if (result.length === 0) {
-        return
-      }
-      return this.getForCallcenterView(result[ 0 ].id)
-    })
+    return this.couchbaseAdapter.queryAsync(q)
+      .then(result => {
+        if (result.length === 0) {
+          return
+        }
+        return this.getForCallcenterView(result[ 0 ].id)
+      })
   }
 
   getAllWorksheetIdForAlreadySoldBuildings () {
-    return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(alreadySoldBuildingWorksheetId(this.bucketName))
-    ).then(result => result.map(({ id }) => id))
+    return this.couchbaseAdapter.queryAsync(alreadySoldBuildingWorksheetId(this.bucketName))
+      .then(result => result.map(({ id }) => id))
   }
 
   logWorksheetParsingError (worksheetId, error) {

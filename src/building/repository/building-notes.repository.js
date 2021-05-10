@@ -1,4 +1,3 @@
-import { N1qlQuery } from 'couchbase'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
@@ -13,7 +12,7 @@ const notesForBuildingQuery = bucketName => `
 export class BuildingNotesRepository extends CouchbaseRepository {
   forBuildingOfId (buildingId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(notesForBuildingQuery(this.bucketName)), [ buildingId ]
+      notesForBuildingQuery(this.bucketName), [ buildingId ]
     ).then(notes => {
       try {
         return fromJSON(notes.map(({ notes }) => notes), t.list(TNote))

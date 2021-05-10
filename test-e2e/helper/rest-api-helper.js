@@ -6,7 +6,8 @@ const DEFAULT_MILLISECONDS_TO_WAIT = 1000
 
 export const initApplication = () => createApp()
   .then(async (app) => {
-    await app.locals.diContainer.resolve('couchbaseBucket').flushAsync()
+    const bucket = app.locals.diContainer.resolve('couchbaseBucket')
+    await bucket.cluster.buckets().flushBucket(bucket.name)
 
     return app
   })

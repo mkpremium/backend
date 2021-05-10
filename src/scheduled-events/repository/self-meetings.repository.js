@@ -1,5 +1,3 @@
-import { N1qlQuery } from 'couchbase'
-
 const getUserMeetingsQuery = bucketName => `
 SELECT meeting.id,
 meeting.event.eventAddress meetingAddress,
@@ -33,8 +31,7 @@ export class SelfMeetingsRepository {
 
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(getUserMeetingsQuery(this.couchbaseAdapter.bucketName)).consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
-      [ userId ]
+      getUserMeetingsQuery(this.couchbaseAdapter.bucketName), [ userId ]
     ).then(meetings =>
       meetings.map(
         ({

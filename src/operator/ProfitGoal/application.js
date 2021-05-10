@@ -1,6 +1,6 @@
-import { OperatorRepository } from '../models'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { OperatorRepository } from '../models'
 
 import { ProfitGoalRequest } from './types'
 
@@ -19,7 +19,5 @@ export async function setProfitGoalToOperator (data, now = () => new Date()) {
 
   const updatedOperator = t.update(operator, { profitGoal: { $set: profitGoal } })
 
-  const result = await operatorRepository.save(updatedOperator)
-
-  return result
+  return operatorRepository.save(updatedOperator)
 }

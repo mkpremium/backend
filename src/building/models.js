@@ -143,11 +143,13 @@ export class LegacyBuildingRepository extends CouchbaseModel {
   }
 
   async searchBuilding (query) {
-    const qs = this.getSearchBuilder(query)
-    qs.highlight()
-    qs.fields('*')
-
-    return this.search(qs)
+    // TODO
+    return Promise.reject(new Error('Reimplement with new SDK'))
+    // const qs = this.getSearchBuilder(query)
+    // qs.highlight()
+    // qs.fields('*')
+    //
+    // return this.search(qs)
   }
 
   async findById (id) {

@@ -1,4 +1,3 @@
-import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import _head from 'lodash/head'
 import _isArray from 'lodash/isArray'
@@ -154,7 +153,7 @@ LET building = (SELECT RAW p FROM ${bucket} \`p\` USE KEYS t.buildingId  WHERE i
 WHERE t.\`_documentType\` = 'owner' AND t.buildingId IS NOT MISSING
 AND LOWER(building[0].address.city) = LOWER('${params.city}')
 GROUP BY t.status, building[0].address.city`
-    const result = await this.queryRaw(N1qlQuery.fromString(query))
+    const result = await this.queryRaw(query)
 
     const totals = {}
 
@@ -182,7 +181,7 @@ AND negotiationStatus IS NOT MISSING
 AND assignedAgentId IS NOT MISSING AND assignedAgentId IS NOT NULL
 GROUP BY negotiationStatus, assignedAgentId
 `
-    const results = await this.queryRaw(N1qlQuery.fromString(query))
+    const results = await this.queryRaw(query)
 
     let owners = await Promise.all(results.map(async (result) => {
       const operatorRepository = new OperatorRepository()
@@ -237,22 +236,5 @@ GROUP BY negotiationStatus, assignedAgentId
     const contacts = _.get(owner, 'person.contacts')
     const goodContacts = contacts.filter(c => c.status === 'GOOD')
     return goodContacts.length > 0
-  }
-
-  async findOwnersByBuildingId (buildingId) {
-    const qb = this.getQueryBuilder()
-      .where('t.`buildingId` = ?', buildingId)
-    const results = await this.query(qb)
-
-    if (!results || results.length === 0) {
-      return []
-    }
-
-    const ownerIds = _.map(results, 'id')
-
-    const qbOwners = this.getQueryBuilder().where(`id IN ${JSON.stringify(ownerIds)}`)
-    const resultOwners = await this.query(qbOwners)
-
-    return resultOwners.map(owner => fromJSON(owner, Owner))
   }
 }

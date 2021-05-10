@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import { NegotiationStatus } from '../../building/building'
 import { TypedContactInfo } from '../../types/common'
-import { N1qlQuery } from 'couchbase'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 
@@ -12,7 +11,7 @@ export class ScheduledCallsService {
 
   scheduledCallsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(scheduledCallsForQuery(this.couchbaseAdapter.bucketName)),
+      scheduledCallsForQuery(this.couchbaseAdapter.bucketName),
       [ userId ]
     ).then(rows => {
       return rows.map(parseRow)

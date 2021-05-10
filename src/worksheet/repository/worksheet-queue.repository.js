@@ -1,6 +1,5 @@
 import { WorksheetQueue } from '../domain/worksheet'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { N1qlQuery } from 'couchbase'
 import fromJSON from 'tcomb/lib/fromJSON'
 
 const queueWithScheduledCallOfIdQuery = bucketName => `
@@ -24,8 +23,7 @@ export class WorksheetQueueRepository extends CouchbaseRepository {
    */
   async findQueueWithScheduledCallOfId (scheduledCallId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(queueWithScheduledCallOfIdQuery(this.bucketName)),
-      [ scheduledCallId ]
+      queueWithScheduledCallOfIdQuery(this.bucketName), [ scheduledCallId ]
     ).then(rows => {
       if (rows.length === 0) {
         return

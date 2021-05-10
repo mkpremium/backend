@@ -1,8 +1,6 @@
-import { N1qlQuery } from 'couchbase'
 import multer from 'multer'
 import nodemailer from 'nodemailer'
 import { join } from 'path'
-import t from 'tcomb'
 import { logger } from './src/infrastructure/logger'
 
 export const port = parseInt(process.env.APP_PORT || '9001')
@@ -16,8 +14,7 @@ export const couchbase = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
   bucket: process.env.COUCHBASE_BUCKET || 'mkpremium',
   user: process.env.COUCHBASE_USER || 'Administrator',
-  pass: process.env.COUCHBASE_PASS || 'password',
-  consistency: parseInt(process.env.COUCHBASE_CONSISTENCY || N1qlQuery.Consistency.STATEMENT_PLUS)
+  pass: process.env.COUCHBASE_PASS || 'password'
 }
 
 export const jwt = {
@@ -39,7 +36,6 @@ export const metadataS3Config = {
 }
 
 export const isTest = () => process.env.NODE_ENV === 'test'
-export const isMaybeTesting = v => isTest() ? t.maybe(v) : v
 
 const defaultUploadDir = join(__dirname, '.uploads')
 

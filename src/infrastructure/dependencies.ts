@@ -8,13 +8,15 @@ import { setupWorksheetDependencies } from '../worksheet'
 import { setupCallerDependencies } from '../caller/init'
 import { setupUserDependencies } from '../user'
 import { setupStockDependencies } from '../stock/stock-di'
+import { Bucket } from 'couchbase'
 
-export const createDiContainer = (couchbaseBucket, forceMaxQueryConsistency = false) => {
+export const createDiContainer = (couchbaseBucket: Bucket) => {
   const awilixContainer = createContainer()
 
   awilixContainer.register({
     couchbaseBucket: asValue(couchbaseBucket),
-    couchbaseAdapter: asValue(new CouchbaseAdapter(couchbaseBucket, forceMaxQueryConsistency)),
+    couchbaseCluster: asValue(couchbaseBucket.cluster),
+    couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     eventBus: asClass(EventBus).singleton()
   })
 

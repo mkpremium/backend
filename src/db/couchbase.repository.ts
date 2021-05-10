@@ -1,9 +1,10 @@
-/**
- * @property {CouchbaseAdapter} couchbaseAdapter
- */
+import { CouchbaseAdapter } from './couchbase.adapter'
+import { Struct } from 'tcomb'
+
 export class CouchbaseRepository {
-  constructor (couchbaseAdapter) {
-    this.couchbaseAdapter = couchbaseAdapter
+  constructor (
+    protected couchbaseAdapter: CouchbaseAdapter
+  ) {
   }
 
   get bucketName () {
@@ -25,7 +26,7 @@ export class CouchbaseRepository {
     return this.couchbaseAdapter.save(entityData, this.struct())
   }
 
-  struct () {
+  struct (): Struct<any> {
     throw new Error('Couchbase repository must implement struct method')
   }
 }

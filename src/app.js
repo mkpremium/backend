@@ -57,10 +57,7 @@ export const createApp = () => {
 
   return couchbase()
     .then(couchbaseBucket => {
-      const diContainer = createDiContainer(
-        couchbaseBucket,
-        process.env.FORCE_MAX_CONSISTENCY === 'true'
-      )
+      const diContainer = createDiContainer(couchbaseBucket)
       app.locals.diContainer = diContainer
 
       operator(app) // start with login router

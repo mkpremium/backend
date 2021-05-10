@@ -1,6 +1,6 @@
-import { N1qlQuery } from 'couchbase'
 import _ from 'lodash'
 import moment from 'moment'
+import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 
 const listBuildingsByIdQuery = bucketName => `
 SELECT
@@ -56,16 +56,14 @@ WHERE _documentType = 'building'
 `
 
 export class CommercialsBuildingRepository {
-  /**
-   * @param {CouchbaseAdapter} couchbaseAdapter
-   */
-  constructor (couchbaseAdapter) {
-    this.couchbaseAdapter = couchbaseAdapter
+  constructor(
+    private couchbaseAdapter: CouchbaseAdapter
+  ) {
   }
 
   listById (ids) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(listBuildingsByIdQuery(this.couchbaseAdapter.bucketName)).consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
+      listBuildingsByIdQuery(this.couchbaseAdapter.bucketName),
       [ ids ]
     ).then(CommercialsBuildingRepository.mapToPropertyAgentBuildingView)
   }
@@ -77,13 +75,14 @@ export class CommercialsBuildingRepository {
 
   listProposalsForBuilding (buildingId) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(listProposalsForBuildingIdQuery(this.couchbaseAdapter.bucketName)), [ buildingId ]
+      listProposalsForBuildingIdQuery(this.couchbaseAdapter.bucketName),
+      [ buildingId ]
     )
   }
 
   allAssignedBuildingsId (agentId) {
     return this.couchbaseAdapter
-      .queryAsync(N1qlQuery.fromString(assignedBuildingsIdForAgentQuery(this.couchbaseAdapter.bucketName)), [ agentId ])
+      .queryAsync(assignedBuildingsIdForAgentQuery(this.couchbaseAdapter.bucketName), [ agentId ])
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 

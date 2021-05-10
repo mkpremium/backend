@@ -1,5 +1,4 @@
-import Couchbase, { N1qlQuery, SearchQuery } from 'couchbase'
-import Consistency = SearchQuery.Consistency
+import { Cluster } from 'couchbase'
 
 const config = {
     uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
@@ -10,12 +9,8 @@ const config = {
 
 
 export function connectCouchbaseBucket() {
-    const cluster = new Couchbase.Cluster(config.uri)
-    cluster.authenticate(config.username, config.password)
-
-    return new Promise((resolve, reject) => {
-        const bucket = cluster.openBucket(config.bucketName)
-        bucket.on('connect', () => resolve(bucket))
-        bucket.on('error', error => reject(error))
-    })
+    return Cluster.connect(config.uri, {
+        username: config.username,
+        password: config.password
+    }).then(cluster => cluster.bucket(config.bucketName))
 }

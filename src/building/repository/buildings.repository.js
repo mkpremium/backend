@@ -1,4 +1,3 @@
-import { N1qlQuery } from 'couchbase'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { Building } from '../building'
 
@@ -23,20 +22,20 @@ WHERE building._documentType = 'building' AND building.id IN $1
 export class BuildingsRepository extends CouchbaseRepository {
   async setBuildingFeaturedOwner (buildingId, ownerId) {
     await this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(setBuildingFeaturedOwner(this.bucketName)),
+      setBuildingFeaturedOwner(this.bucketName),
       [ buildingId, ownerId ]
     )
   }
 
   async assignBuildingToAgent (buildingId, agentId) {
     await this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(assignBuildingToAgentQuery(this.bucketName)), [ buildingId, agentId ]
+      assignBuildingToAgentQuery(this.bucketName), [ buildingId, agentId ]
     )
   }
 
   async pullBuildingsOutOfFreezer (buildingIds) {
     await this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(pullBuildingOutOfFreezerQuery(this.bucketName)), [ buildingIds ]
+      pullBuildingOutOfFreezerQuery(this.bucketName), [ buildingIds ]
     )
   }
 

@@ -1,5 +1,3 @@
-import { N1qlQuery } from 'couchbase'
-
 const statsByPropertyManagerInPeriodQuery = bucketName => `
     SELECT
         stock.close.operatorId as propertyManagerId,
@@ -41,8 +39,7 @@ export class StockRepository {
 
   getTotalProfitInPeriodByPropertyManager (since, until) {
     return this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(statsByPropertyManagerInPeriodQuery(this.couchbaseAdapter.bucketName))
-        .consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
+      statsByPropertyManagerInPeriodQuery(this.couchbaseAdapter.bucketName),
       [ since.format('YYYY-MM-DD'), until.format('YYYY-MM-DD') ]
     ).catch(error => {
       throw error
@@ -51,8 +48,7 @@ export class StockRepository {
 
   async getPropertyManagerProfitInPeriod (propertyManagerId, since, until) {
     const result = await this.couchbaseAdapter.queryAsync(
-      N1qlQuery.fromString(propertyManagerProfitInPeriodQuery(this.couchbaseAdapter.bucketName))
-        .consistency(N1qlQuery.Consistency.STATEMENT_PLUS),
+      propertyManagerProfitInPeriodQuery(this.couchbaseAdapter.bucketName),
       [ propertyManagerId, since.format('YYYY-MM-DD'), until.format('YYYY-MM-DD') ]
     )
 
