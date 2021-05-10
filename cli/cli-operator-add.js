@@ -1,8 +1,9 @@
 #!/usr/bin/env babel-node
 
 import program from 'commander'
+import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
+import { CouchbaseModel } from '../src/db/model'
 
-import couchbase from '../src/db/couchbase'
 import { OperatorRoles } from '../src/types/operator'
 import { createFullOperator } from '../test/common'
 
@@ -30,7 +31,7 @@ async function mainAction () {
     program.help()
   }
 
-  await couchbase()
+  CouchbaseModel.prototype._bucket = await connectCouchbaseBucket()
   await createOperator({ username, password, role })
 }
 
