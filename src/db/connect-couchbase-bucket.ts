@@ -1,4 +1,5 @@
 import { Cluster } from 'couchbase'
+import { CouchbaseModel } from './model'
 
 const config = {
     uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
@@ -13,4 +14,8 @@ export function connectCouchbaseBucket() {
         username: config.username,
         password: config.password
     }).then(cluster => cluster.bucket(config.bucketName))
+      .then(bucket => {
+          CouchbaseModel.setCouchbaseBucket(bucket)
+          return bucket
+      })
 }

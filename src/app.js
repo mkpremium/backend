@@ -93,6 +93,6 @@ export const createApp = () => {
     })
     .catch(error => {
       logger.error('error starting application', { error: error.message })
-      throw error
+      process.exit(1)
     })
 }

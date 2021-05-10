@@ -2,5 +2,5 @@
 
 set -x
 
-./scripts/create-user.sh admin admin ADMIN
-node ./scripts/couchbase/create-local-data.js
+npx ts-node ./scripts/create-user.ts admin admin ADMIN
+npx ts-node ./scripts/couchbase/create-local-data.js
