@@ -5,28 +5,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: .env
     image: mk-backend:local
 
+    restart: on-failure
     environment:
-      APP_PORT: "9001"
-      COUCHBASE_URI: "couchbase://couchbase_db"
-      COUCHBASE_BUCKET: "mkpremium"
-      COUCHBASE_USER: "couchbase-user"
-      COUCHBASE_PASS: "couchbase-password"
-      SOCKET_ENABLED: "false"
-      SOCKET_SERVER: "http://websocket:9002"
-      DEBUG: "ON"
+      COUCHBASE_URI: "couchbase://couchbasedb?detailed_errcodes=1"
     expose:
       - "9001"
+    ports:
+      - "9001:9001"
     volumes:
       - ./docker/wait-for-it.sh:/tmp/wait-for-it.sh
     links:
-      - "couchbase_db"
+      - couchbasedb
     depends_on:
-      - couchbase_db
-    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "/app/bin/www.js"]
+      - couchbasedb
+    entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "node", "/app/bin/www.js"]
 
-  couchbase_db:
+  couchbasedb:
     image: "couchbase:community-6.0.0"
 
     ports:

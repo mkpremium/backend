@@ -3,7 +3,6 @@ FROM node:14
 
 RUN ["npm", "install", "-g", "npm"]
 
-ENV BUILD_FOLDER "/app/build"
 RUN ["mkdir", "/app"]
 WORKDIR /app
 
@@ -13,10 +12,11 @@ RUN ["npm", "install"]
 
 COPY . .
 
-RUN ["scripts/build-without-dependencies.sh"]
+RUN ["npm", "run", "build"]
+COPY package.json build
+COPY package-lock.json build
 
 WORKDIR /app/build
-
 RUN ["npm", "install", "--production"]
 
 # Run container

@@ -7,7 +7,7 @@
     "start": "./scripts/start-local-app.sh",
     "test": "./scripts/run-test.sh test",
     "test:e2e": "./scripts/run-test.sh test-e2e",
-    "build": "scripts/build-without-dependencies.sh",
+    "build": "tsc",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "cronjobs": "nodemon bin/freezer.js --exec babel-node"
   },
