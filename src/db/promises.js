@@ -17,12 +17,8 @@ function turnsAsync (bucket, name) {
 
 export default function promises (bucket) {
   const manager = bucket.manager()
-  bucket.createIndexAsync = turnsAsync(manager, 'createIndex')
   bucket.flushAsync = turnsAsync(manager, 'flush')
   bucket.queryAsync = turnsAsync(bucket, 'query')
   bucket.upsertAsync = turnsAsync(bucket, 'upsert')
   bucket.getAsync = turnsAsync(bucket, 'get')
-  bucket.getAndLockAsync = turnsAsync(bucket, 'getAndLock')
-  bucket.unlockAsync = turnsAsync(bucket, 'unlock')
-  bucket.counterAsync = turnsAsync(bucket, 'counter')
 }
