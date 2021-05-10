@@ -2,7 +2,6 @@
  * This code is necessary because couchbase callback doesn't play well
  * with Bluebird promisify functions
  */
-
 function turnsAsync (bucket, name) {
   return (...args) => new Promise((resolve, reject) => {
     const cb = (err, result) => {

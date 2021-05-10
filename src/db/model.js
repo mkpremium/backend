@@ -7,7 +7,6 @@ import _ from 'lodash'
 import { logger } from '../infrastructure/logger'
 import { validate } from 'tcomb-validation'
 
-import init from './legacy-connect-couchbase'
 import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
@@ -24,7 +23,6 @@ class CouchbaseModelStruct {
  */
 export class CouchbaseModel {
   constructor () {
-    CouchbaseModel.prototype._promiseBucket = CouchbaseModel.prototype._promiseBucket || init()
     this.Struct = CouchbaseModelStruct
   }
 
@@ -117,7 +115,6 @@ export class CouchbaseModel {
 
   async search (searchBuilder) {
     logger.debug('model#search', { searchBuilder })
-    await this._promiseBucket
 
     return this.withRetry(() => this._bucket.queryAsync(searchBuilder))
   }
@@ -129,7 +126,6 @@ export class CouchbaseModel {
   }
 
   async queryRaw (query) {
-    await this._promiseBucket
     try {
       const result = await this.withRetry(() => this._bucket.queryAsync(query))
       logger.debug('model#queryRaw', { query, result })
@@ -146,7 +142,6 @@ export class CouchbaseModel {
   }
 
   async query (queryBuilder = this.getQueryBuilder(), consistency = couchbase.consistency) {
-    await this._promiseBucket
     const queryParam = queryBuilder.toParam()
 
     try {
@@ -190,7 +185,6 @@ export class CouchbaseModel {
         documentType: this._getMeta().defaultProps._documentType,
         id
       })
-      await this._promiseBucket
       const result = await this.withRetry(() => this._bucket.getAsync(id))
       if (result && result.value) {
         return fromJSON(result.value, this.Struct)
@@ -225,7 +219,6 @@ export class CouchbaseModel {
       throw new WrongStructRecord(this.getType(), validationResult.errors, data)
     }
 
-    await this._promiseBucket
     const result = await this.withRetry(() => this._bucket.upsertToDb(dataPreSaved.id, dataPreSaved, opts))
     return fromJSON(result, this.Struct)
   }

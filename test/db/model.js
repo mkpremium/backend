@@ -6,7 +6,6 @@ import t from 'tcomb'
 describe('getQueryBuilder', () => {
   let fixture
   beforeEach(() => {
-    CouchbaseModel.prototype._promiseBucket = {}
     fixture = new ModelFixture()
   })
 
