@@ -13,7 +13,7 @@ describe('PropertyManagerRepository', () => {
     couchbaseBucket = await couchbase()
     propertyManagerRepository = new PropertyManagerRepository(new CouchbaseAdapter(couchbaseBucket))
     operatorRepository = new OperatorRepository()
-    await couchbaseBucket.flush()
+    await couchbaseBucket.flushAsync()
     await new Promise(resolve => setTimeout(resolve, 50))
   })
 
