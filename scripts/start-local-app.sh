@@ -8,7 +8,7 @@ set -x
 set -a && . .env
 
 if [[ -f "bin/${appName}.js" ]];then
-  npx nodemon bin/"${appName}".js --exec ts-node
+  npx ts-node-dev --respawn -- bin/"${appName}".js
 else
-  npx nodemon bin/"${appName}".ts
+  npx ts-node-dev --respawn -- bin/"${appName}".ts
 fi
