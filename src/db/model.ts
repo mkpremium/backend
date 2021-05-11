@@ -2,7 +2,7 @@ import t, { Struct as TcombStruct } from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import squel from 'squel'
-import { Bucket, Cluster, QueryScanConsistency, TemporaryFailureError } from 'couchbase'
+import { Bucket, Cluster, InternalServerFailureError, QueryScanConsistency, TemporaryFailureError } from 'couchbase'
 import _ from 'lodash'
 import { logger } from '../infrastructure/logger'
 import { validate } from 'tcomb-validation'
@@ -226,7 +226,7 @@ export class CouchbaseModel {
         return retry(fn, {
             maxTries: 3,
             interval: 100,
-            predicate: error => error instanceof TemporaryFailureError || error.message.includes('Indexer rollback from')
+            predicate: error => error instanceof TemporaryFailureError || error instanceof InternalServerFailureError
         })
     }
 }
