@@ -5,7 +5,7 @@ import request from 'supertest'
 const DEFAULT_MILLISECONDS_TO_WAIT = 1000
 
 export const initApplication = () => createApp()
-  .then(async (app) => {
+  .then(app => {
     const bucket = app.locals.diContainer.resolve('couchbaseBucket')
     return new Promise(resolve => {
       bucket.manager().flush(() => resolve(app))
