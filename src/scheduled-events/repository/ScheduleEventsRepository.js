@@ -61,6 +61,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
         lastAddedMeeting: { $set: scheduledEvent },
         status: { $set: WorkSheetStatus.MEETING }
       })
+
       await worksheetRepo.save(updatedWorksheet, false)
       if (worksheet.lastAddedMeeting === null) {
         const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING

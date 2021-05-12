@@ -5,22 +5,23 @@ import { EntityNotFound, QueryError } from './errors'
 import { validate } from 'tcomb-validation'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
-import {
-  Bucket,
-  Cluster,
-  DocumentNotFoundError,
-  InternalServerFailureError,
-  QueryScanConsistency,
-  TemporaryFailureError
-} from 'couchbase'
+import { Bucket, errors as couchbaseErrors, errors, N1qlQuery } from 'couchbase'
 import { CouchbaseRecordToDomain } from '../infrastructure/couchbase/record-to-domain'
+import { promisifyAll } from 'bluebird'
+import Consistency = N1qlQuery.Consistency
 
+export type PromisifiedBucket = Bucket & {
+  queryAsync: (query: N1qlQuery, params?: { [param: string]: any } | any[]) => Promise<any[] | null>,
+  getAsync: (key: string) => Promise<{ value: any, cas: any }>
+  upsertAsync: (key: string, value: any) => Promise<any>
+  name: string
+}
 
 export class CouchbaseAdapter {
-  constructor(
-    private couchbaseBucket: Bucket,
-    private couchbaseCluster: Cluster
-  ) {
+  private couchbaseBucket: PromisifiedBucket
+
+  constructor(couchbaseBucket: Bucket) {
+    this.couchbaseBucket = promisifyAll(couchbaseBucket) as PromisifiedBucket
   }
 
   get bucketName() {
@@ -37,7 +38,7 @@ export class CouchbaseAdapter {
     }
 
     await this.withRetry(() =>
-      this.couchbaseBucket.defaultCollection().upsert(dataWithId.id, dataWithId)
+      this.couchbaseBucket.upsertAsync(dataWithId.id, dataWithId)
     )
 
     return fromJSON(dataWithId, structType)
@@ -45,11 +46,9 @@ export class CouchbaseAdapter {
 
   getEntity(structType, entityId) {
     return this.withRetry(
-      () => this.couchbaseBucket
-        .defaultCollection()
-        .get(entityId)
+      () => this.couchbaseBucket.getAsync(entityId)
         .catch(error => {
-          if (error instanceof DocumentNotFoundError) {
+          if (error.code === errors.keyNotFound) {
             throw new EntityNotFound(entityId, structType)
           }
           throw error
@@ -65,20 +64,16 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync(query, params) {
-    return this.withRetry(
-      () => this.couchbaseCluster.query(query, {
-        parameters: params,
-        scanConsistency: QueryScanConsistency.RequestPlus
-      })
-    ).then(({ rows }) => rows)
-      .catch(error => {
-        if (error.code) {
-          this.throwCouchbaseError(error, query)
-        } else {
-          throw error
-        }
-      })
+  queryAsync(query: string, params) {
+    return this.withRetry(() =>
+      this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
+    ).catch(error => {
+      if (error.code) {
+        this.throwCouchbaseError(error, query)
+      } else {
+        throw error
+      }
+    })
   }
 
   throwCouchbaseError(error, query) {
@@ -93,7 +88,10 @@ export class CouchbaseAdapter {
     return retry(fn, {
       maxTries: 3,
       interval: 100,
-      predicate: error => error instanceof TemporaryFailureError || error instanceof InternalServerFailureError
+      predicate: ({
+                    code,
+                    message
+                  }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }

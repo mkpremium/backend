@@ -1,24 +1,17 @@
-import { defaultPassword, operatorCreate, operatorCreateBusiness, operatorLogin } from '../../common'
-import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/application'
 import { expect } from 'chai'
-import { OperatorRepository } from '../../../src/operator/models'
-import { StockRepository } from '../../../src/stock/models'
-import { LegacyBuildingRepository } from '../../../src/building/models'
 import request from 'supertest'
+import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/application'
+import { defaultPassword, operatorCreate, operatorCreateBusiness, operatorLogin } from '../../common'
 import { createTestApp } from '../../integration/create-test-app'
 
 describe('profit goals', () => {
   let salesAgent
+  let app
 
   const salesAgentProfitGoal = 1500
-  const legacyBuildingRepository = new LegacyBuildingRepository()
-  const stockRepository = new StockRepository()
-  const operatorRepository = new OperatorRepository()
 
   beforeEach(async () => {
-    await legacyBuildingRepository.deleteQuery()
-    await stockRepository.deleteQuery()
-    await operatorRepository.deleteQuery()
+    app = await createTestApp()
 
     salesAgent = await operatorCreateBusiness()
   })
@@ -48,12 +41,6 @@ describe('profit goals', () => {
   })
 
   describe('endpoint', () => {
-    let app
-
-    before(async () => {
-      app = await createTestApp()
-    })
-
     it('sets profit goal to a sales agent', async () => {
       const operator = await operatorCreate()
       const authenticatedOperator = await operatorLogin(app,

@@ -1,10 +1,12 @@
-import { Bucket } from 'couchbase';
+import { Bucket } from 'couchbase'
 import { createApp } from '../../src/app'
 
 export const createTestApp = () => createApp()
-  .then(async (app) => {
+  .then(app => {
     const bucket: Bucket = app.locals.diContainer.resolve('couchbaseBucket')
-    await bucket.cluster.buckets().flushBucket(bucket.name)
-
-    return app
+    return new Promise((resolve) => {
+      bucket.manager().flush(() => {
+        resolve(app)
+      })
+    })
   })

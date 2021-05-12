@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt'
-import { DocumentNotFoundError } from 'couchbase'
 import { sign, verify } from 'jsonwebtoken'
 import _isNil from 'lodash/isNil'
 import _omit from 'lodash/omit'
@@ -123,14 +122,12 @@ class Operator extends CouchbaseModel {
 
 export class OperatorRepository extends Operator {
   async findByIdOrThrow (operatorId) {
-    try {
-      return await this.findById(operatorId)
-    } catch (error) {
-      if (error instanceof DocumentNotFoundError) {
-        throw newHttpError(404, `El operator ${operatorId} no existe`)
-      }
-      throw error
+    const operator = await this.findById(operatorId)
+    if (!operator) {
+      throw newHttpError(404, `El operator ${operatorId} no existe`)
     }
+
+    return operator
   }
 
   static async setOnline (operatorId, online) {

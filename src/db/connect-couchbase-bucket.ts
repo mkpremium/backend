@@ -9,17 +9,21 @@ const config = {
   password: process.env.COUCHBASE_PASS || 'couchbase',
 }
 
-
 export function connectCouchbaseBucket() {
   return retry(
-    () => Cluster.connect(config.uri, {
-      username: config.username,
-      password: config.password
-    }).then(cluster => cluster.bucket(config.bucketName))
-      .then(bucket => {
-        CouchbaseModel.setCouchbaseBucket(bucket)
-        return bucket
-      }),
+    () => {
+      const cluster = new Cluster(config.uri)
+      cluster.authenticate(config.username, config.password)
+
+      return new Promise((resolve, reject) => {
+        const bucket = cluster.openBucket(config.bucketName)
+        bucket.on('connect', () => {
+          CouchbaseModel.setCouchbaseBucket(bucket)
+          resolve(bucket)
+        })
+        bucket.on('error', error => reject(error))
+      })
+    },
     {
       maxTries: 3,
       interval: 100,

@@ -15,7 +15,6 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
 
   awilixContainer.register({
     couchbaseBucket: asValue(couchbaseBucket),
-    couchbaseCluster: asValue(couchbaseBucket.cluster),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     eventBus: asClass(EventBus).singleton()
   })
