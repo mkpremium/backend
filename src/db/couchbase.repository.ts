@@ -1,7 +1,8 @@
 import { CouchbaseAdapter } from './couchbase.adapter'
 import { Struct } from 'tcomb'
+import { RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 
-export class CouchbaseRepository {
+export class CouchbaseRepository<T> {
   constructor (
     protected couchbaseAdapter: CouchbaseAdapter
   ) {
@@ -11,7 +12,7 @@ export class CouchbaseRepository {
     return this.couchbaseAdapter.bucketName
   }
 
-  get (entityId) {
+  get (entityId): Promise<T> {
     return this.couchbaseAdapter.getEntity(this.struct(), entityId)
   }
 
@@ -26,7 +27,7 @@ export class CouchbaseRepository {
     return this.couchbaseAdapter.save(entityData, this.struct())
   }
 
-  struct (): Struct<any> {
+  struct (): Struct<any> & RecordToDomain {
     throw new Error('Couchbase repository must implement struct method')
   }
 }

@@ -6,7 +6,7 @@ import { validate } from 'tcomb-validation'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
 import { Bucket, errors as couchbaseErrors, errors, N1qlQuery } from 'couchbase'
-import { CouchbaseRecordToDomain } from '../infrastructure/couchbase/record-to-domain'
+import { CouchbaseRecordToDomain, RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 import { promisifyAll } from 'bluebird'
 import Consistency = N1qlQuery.Consistency
 
@@ -24,11 +24,11 @@ export class CouchbaseAdapter {
     this.couchbaseBucket = promisifyAll(couchbaseBucket) as PromisifiedBucket
   }
 
-  get bucketName() {
+  get bucketName(): string {
     return this.couchbaseBucket.name
   }
 
-  async save(data, structType) {
+  async save<T extends { _documentType: string, id?: string }>(data: T, structType: t.Type<T>) {
     const struct = fromJSON(data, structType)
     const dataWithId: any = t.update(struct, { id: { $set: data.id || uuid() } })
 
@@ -44,7 +44,7 @@ export class CouchbaseAdapter {
     return fromJSON(dataWithId, structType)
   }
 
-  getEntity(structType, entityId) {
+  getEntity<T>(structType: t.Type<T> & RecordToDomain, entityId): Promise<T> {
     return this.withRetry(
       () => this.couchbaseBucket.getAsync(entityId)
         .catch(error => {
@@ -56,7 +56,7 @@ export class CouchbaseAdapter {
         .then(result => {
           const parsedRecord = fromJSON(result.value, structType)
           if (CouchbaseRecordToDomain.is(parsedRecord)) {
-            return parsedRecord.couchbaseToDomain()
+            return (parsedRecord as unknown as RecordToDomain).couchbaseToDomain()
           }
 
           return parsedRecord
@@ -64,7 +64,7 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync(query: string, params) {
+  queryAsync(query: string, params): Promise<any> {
     return this.withRetry(() =>
       this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
     ).catch(error => {
@@ -76,7 +76,7 @@ export class CouchbaseAdapter {
     })
   }
 
-  throwCouchbaseError(error, query) {
+  private throwCouchbaseError(error, query) {
     if (error.code) {
       throw new QueryError(query, error.code, error.message)
     } else {
@@ -84,7 +84,7 @@ export class CouchbaseAdapter {
     }
   }
 
-  withRetry(fn) {
+  private withRetry(fn) {
     return retry(fn, {
       maxTries: 3,
       interval: 100,
