@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 const createCluster = require('./couchbase/create-cluster')
 const createBucket = require('./couchbase/create-bucket')
 
