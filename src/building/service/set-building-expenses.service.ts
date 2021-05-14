@@ -1,12 +1,13 @@
-/**
- * @property {BuildingsRepository} buildingsRepository
- */
+import { BuildingsRepository } from '../repository/buildings.repository'
+
 export class SetBuildingExpensesService {
-  constructor ({ buildingsRepository }) {
+  private buildingsRepository: BuildingsRepository
+
+  constructor({ buildingsRepository }) {
     this.buildingsRepository = buildingsRepository
   }
 
-  async setTotalExpensesAmount (buildingId, totalAmount) {
+  async setTotalExpensesAmount(buildingId, totalAmount) {
     const building = await this.buildingsRepository.get(buildingId)
     const updatedBuilding = building.withTotalExpensesAmount(totalAmount)
 
