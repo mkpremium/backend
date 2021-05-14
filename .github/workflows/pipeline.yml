@@ -48,7 +48,7 @@ jobs:
           retry_on: error
           timeout_minutes: 5
           retry_wait_seconds: 30
-          command: node scripts/couchbase/init-db.js
+          command: npx ts-node scripts/couchbase/init-db.js
 
       - name: Test
         run: |
