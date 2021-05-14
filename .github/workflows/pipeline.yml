@@ -19,7 +19,7 @@ jobs:
 
     services:
       couchbase_db:
-        image: "couchbase:community-6.0.0"
+        image: "couchbase:community-6.6.0"
         ports:
           - 8091:8091
           - 8092:8092

@@ -24,7 +24,7 @@ services:
     entrypoint: ["/tmp/wait-for-it.sh", "couchbase_db:8091", "--", "node", "/app/bin/www.js"]
 
   couchbasedb:
-    image: "couchbase:community-6.0.0"
+    image: "couchbase:community-6.6.0"
 
     ports:
       - "8091:8091" # REST/HTTP including Web UI
