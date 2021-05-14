@@ -1,38 +1,39 @@
-import express from 'express'
 import bodyParser from 'body-parser'
-import morgan from 'morgan'
 import cors from 'cors'
+import express from 'express'
+import morgan from 'morgan'
+import autocomplete from './autocomplete'
+import { buildingEventListeners } from './building/listeners'
+import { buildingRoutes } from './building/routing'
+import cadastre from './cadastre'
+import { setupCallerRoutes } from './caller/init'
+import calls from './calls'
 
 import couchbase from './db/legacy-connect-couchbase'
-import { logger } from './infrastructure/logger'
-// app aware types
-import './types'
+import email from './email'
+import { initFlipperModule } from './flipper/init'
+import history from './history'
 import { createDiContainer } from './infrastructure/dependencies'
+import appErrorHandler from './infrastructure/error-handler'
+import { logger } from './infrastructure/logger'
+import metadata from './metadata'
+import notes from './notes'
 // modules
 import operator from './operator'
-import { createTestHarness } from './test-harness/routes'
-import { setupWorksheetRoutesAndEventListeners } from './worksheet'
 import { setupOwnersRoutes } from './owner'
-import calls from './calls'
-import { setupScheduledEventsRoutes } from './scheduled-events'
-import webhooks from './webhooks'
-import history from './history'
-import notes from './notes'
-import { setupBuildingRoutesAndListeners } from './building'
-import metadata from './metadata'
 import { init as initPropertyManager } from './property-manager'
+import { setupScheduledEventsRoutes } from './scheduled-events'
 
 import stats from './stats'
-import autocomplete from './autocomplete'
-import email from './email'
-import cadastre from './cadastre'
-import preferences from './system-preferences'
-import { setupUserRoutes } from './user'
-import appErrorHandler from './infrastructure/error-handler'
-import maintenanceMode from './system-preferences/maintenance-mode-middleware'
-import { setupCallerRoutes } from './caller/init'
-import { initFlipperModule } from './flipper/init'
 import { setupStockRouter } from './stock/stock-router'
+import preferences from './system-preferences'
+import maintenanceMode from './system-preferences/maintenance-mode-middleware'
+import { createTestHarness } from './test-harness/routes'
+// app aware types
+import './types'
+import { setupUserRoutes } from './user'
+import webhooks from './webhooks'
+import { setupWorksheetRoutesAndEventListeners } from './worksheet'
 
 let app
 export const createApp = () => {
@@ -63,7 +64,8 @@ export const createApp = () => {
       operator(app) // start with login router
 
       setupUserRoutes(app, diContainer)
-      setupBuildingRoutesAndListeners(app, diContainer)
+      buildingEventListeners(diContainer)
+      buildingRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
 
       setupScheduledEventsRoutes(app, diContainer)

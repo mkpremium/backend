@@ -1,45 +1,37 @@
-import './types'
-import { createBuildingsRoutes } from './routes'
-import jwt, { permissions } from '../middleware/jwt'
-import { BuildingNotesRepository } from './repository/building-notes.repository'
-import { aliasTo, asClass, asFunction } from 'awilix'
-import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
-import { LegacyBuildingRepository } from './models'
-import { BuildingsRepository } from './repository/buildings.repository'
+import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
 import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
-import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
 import { FeaturedOwnerService } from './service/featured-owner.service'
 import { AddProposalService } from './service/add-proposal.service'
-import { createUpdateBuildingNegotiationStatusController } from './controller/update-building-negotiation-status.controller'
 import { UpdateBuildingNegotiationStatusService } from './service/update-building-negotiation-status.service'
-import { createAddNegotiationProposalController } from './controllers'
-import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
-import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
-import { Router } from 'express'
-import { wrap } from 'express-promise-wrap'
 import { SetBuildingExpensesService } from './service/set-building-expenses.service'
-import { CommercialsBuildingRepository } from './repository/commercials-building.repository'
 import { ListBuildingsService } from './service/list-buildings.service'
 import { ListBuildingProposalsService } from './service/list-building-proposals.service'
-import { AdminBuildingRepository } from './repository/admin-building.repository'
-import { BuildingDocumentsRepository } from './repository/building-documents.repository'
+import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
-import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
-import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
-import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
-import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
+import { BuildingsRepository } from './repository/buildings.repository'
+import { LegacyBuildingRepository } from './models'
 import { MetadataRepository } from './repository/metadata.repository'
+import { CommercialsBuildingRepository } from './repository/commercials-building.repository'
+import { AdminBuildingRepository } from './repository/admin-building.repository'
+import { BuildingDocumentsRepository } from './repository/building-documents.repository'
+import { BuildingNotesRepository } from './repository/building-notes.repository'
+import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
+import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
+import { createUpdateBuildingNegotiationStatusController } from './controller/update-building-negotiation-status.controller'
+import { createAddNegotiationProposalController } from './controllers'
+import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
+import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
+import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
+import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
+import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 import { OfferRequestsRepository } from './repository/offer-requests.repository'
-import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
 import { AddOfferRequestService } from './service/add-offer-request.service'
+import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
 import { createAddOfferRequestController } from './controller/add-offer-request.controller'
 
-/**
- * @param {AwilixContainer} awilixContainer
- */
-export const registerBuildingDependencies = awilixContainer => {
-  awilixContainer.register({
+export const setupBuildingDependencies = (container: AwilixContainer) => {
+  container.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
     addProposalService: asClass(AddProposalService).singleton(),
@@ -80,33 +72,4 @@ export const registerBuildingDependencies = awilixContainer => {
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController)
   })
-}
-
-export const setupBuildingRoutesAndListeners = (app, awilixContainer) => {
-  const eventBus = awilixContainer.resolve('eventBus')
-  eventBus.on('worksheet.made_available', awilixContainer.resolve('worksheetMadeAvailableListener'))
-  eventBus.on('meeting.created', awilixContainer.resolve('addNoteToBuilding'))
-  eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('addNoteToBuilding'))
-  eventBus.on('meeting.created', awilixContainer.resolve('setFeaturedOwnerAndContactFromMeeting'))
-  eventBus.on('scheduled_events.call_scheduled', awilixContainer.resolve('scheduledCallListener'))
-  eventBus.on('offer-request.created', awilixContainer.resolve('setFeaturedOwnerFromOfferRequestListener'))
-  eventBus.on('offer-request.created', awilixContainer.resolve('addNoteToBuilding'))
-
-  const secured = jwt()
-  const buildingsRoutes = createBuildingsRoutes(awilixContainer)
-  app.use('/buildings', secured, buildingsRoutes)
-
-  const buildingRoutes = new Router()
-  buildingRoutes.put(
-    '/:buildingId/expenses',
-    permissions.admin,
-    wrap(awilixContainer.resolve('setBuildingExpensesController'))
-  )
-  buildingRoutes.post(
-    '/:buildingId/offer-requests',
-    secured,
-    wrap(awilixContainer.resolve('addOfferRequestController'))
-  )
-
-  app.use('/building', secured, buildingRoutes)
 }

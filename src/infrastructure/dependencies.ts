@@ -1,7 +1,7 @@
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { EventBus } from './event-bus'
 import { asClass, asValue, createContainer } from 'awilix'
-import { registerBuildingDependencies as setupBuildingDependencies } from '../building'
+import { setupBuildingDependencies } from '../building/dependencies'
 import { setupOwnerDependencies } from '../owner'
 import { setupScheduledEventsDependencies } from '../scheduled-events'
 import { setupWorksheetDependencies } from '../worksheet'
