@@ -29,6 +29,7 @@ import { OfferRequestsRepository } from './repository/offer-requests.repository'
 import { AddOfferRequestService } from './service/add-offer-request.service'
 import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
 import { createAddOfferRequestController } from './controller/add-offer-request.controller'
+import { createAddProposalController } from './controller/add-proposal.controller'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -62,6 +63,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
+    addProposalController: asFunction(createAddProposalController).singleton(),
 
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),

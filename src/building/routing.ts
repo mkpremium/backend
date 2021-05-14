@@ -20,6 +20,11 @@ export function buildingRoutes(awilixContainer: AwilixContainer, app) {
     secured,
     wrap(awilixContainer.resolve('addOfferRequestController'))
   )
+  buildingRoutes.post(
+    '/:buildingId/proposals',
+    secured,
+    wrap(awilixContainer.resolve('addProposalController'))
+  )
 
   app.use('/building', secured, buildingRoutes)
 }
