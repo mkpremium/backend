@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express from 'express'
+import express, { Express } from 'express'
 import morgan from 'morgan'
 import autocomplete from './autocomplete'
 import { buildingEventListeners } from './building/listeners'
@@ -35,8 +35,8 @@ import { setupUserRoutes } from './user'
 import webhooks from './webhooks'
 import { setupWorksheetRoutesAndEventListeners } from './worksheet'
 
-let app
-export const createApp = () => {
+let app: Express
+export const createApp = (): Promise<Express> => {
   if (app) {
     return Promise.resolve(app)
   }
