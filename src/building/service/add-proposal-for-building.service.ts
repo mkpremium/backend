@@ -2,7 +2,8 @@ interface CreateProposalCommand {
   amount: number;
   contactId: string;
   ownerId: string;
-  message?: string
+  createdBy: string;
+  message?: string;
 }
 
 export class AddProposalForBuildingService {

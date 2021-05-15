@@ -8,6 +8,7 @@ const testProposalAmount = 100000
 const testContactId = 'test-contact-id'
 const testEmailMessage = 'email message'
 
+const testFlipperId = 'test-flipper-id'
 describe('add-proposal.controller', () => {
   let controller
   let addProposalForBuildingServiceSpy
@@ -24,6 +25,7 @@ describe('add-proposal.controller', () => {
   it('add proposal for building', () => {
     const testRequest = {
       params: { buildingId: testBuildingId },
+      user: { id: testFlipperId },
       body: {
         ownerId: testOwnerId,
         amount: testProposalAmount,
@@ -42,6 +44,7 @@ describe('add-proposal.controller', () => {
         expect(addProposalForBuildingServiceSpy.add).to.have.been
           .calledWith(testBuildingId, {
             ownerId: testOwnerId,
+            createdBy: testFlipperId,
             amount: testProposalAmount,
             contactId: testContactId,
             message: testEmailMessage
