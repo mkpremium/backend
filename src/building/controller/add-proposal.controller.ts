@@ -4,7 +4,16 @@ import { mailer } from '../../../config'
 import { Attachment } from 'nodemailer/lib/mailer'
 import path from 'path'
 
-export const createAddProposalController = () => (req: Request, res: Response) => {
+export const createAddProposalController = ({ addProposalForBuildingService }) => (req: Request, res: Response) => {
+  const { ownerId, contactId, message, amount } = req.body
+  return addProposalForBuildingService
+    .add(req.params.buildingId, { ownerId, contactId, message, amount })
+    .then(() => {
+      res.status(201).json()
+    })
+}
+
+const sendProposalEmail = () => {
   return createPdf('Romo Rampa 295, TEST_PORTO', '123456789', 1000)
     .then(pdf => {
       return new Promise((resolve, reject) => {
@@ -34,7 +43,7 @@ export const createAddProposalController = () => (req: Request, res: Response) =
 
         pdf.end()
       })
-    }).then(() => res.status(201).json())
+    })
 }
 
 const emailCopies = {
