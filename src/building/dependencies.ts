@@ -30,6 +30,7 @@ import { AddOfferRequestService } from './service/add-offer-request.service'
 import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
 import { createAddOfferRequestController } from './controller/add-offer-request.controller'
 import { createAddProposalController } from './controller/add-proposal.controller'
+import { AddProposalForBuildingService } from './service/add-proposal-for-building.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -40,6 +41,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
     listBuildingsService: asClass(ListBuildingsService).classic().singleton(),
     listBuildingProposalsService: asClass(ListBuildingProposalsService).singleton().classic(),
+    addProposalForBuildingService: asClass(AddProposalForBuildingService).singleton().classic(),
     getDocumentsSignedURLService: asClass(GetDocumentsSignedURLService).inject(() => ({
       s3Client: new aws.S3({
         signatureVersion: 'v4',

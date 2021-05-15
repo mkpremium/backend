@@ -3,8 +3,9 @@ import PdfPrinter from 'pdfmake'
 import { mailer } from '../../../config'
 import { Attachment } from 'nodemailer/lib/mailer'
 import path from 'path'
+import { AddProposalForBuildingService } from '../service/add-proposal-for-building.service'
 
-export const createAddProposalController = ({ addProposalForBuildingService }) => (req: Request, res: Response) => {
+export const createAddProposalController = ({ addProposalForBuildingService }: { addProposalForBuildingService: AddProposalForBuildingService }) => (req: Request, res: Response) => {
   const { ownerId, contactId, message, amount } = req.body
   return addProposalForBuildingService
     .add(req.params.buildingId, { ownerId, contactId, message, amount })
