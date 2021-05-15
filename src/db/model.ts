@@ -202,7 +202,7 @@ export class CouchbaseModel {
     return data
   }
 
-  async save (data, sendEvent?, opts = {}) {
+  async save (data) {
     const struct = fromJSON(data, this.Struct)
     const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })
     const dataPreSaved = await this.preSave(dataWithId)
