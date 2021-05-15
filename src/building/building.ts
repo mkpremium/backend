@@ -50,13 +50,11 @@ const BuildingProposalStatus = {
 export const BuildingProposal = t.struct(
   {
     id: t.String,
-    ownerId: t.maybe(t.String),
+    ownerId: t.String,
     buildingId: t.String,
-    accepted: t.Boolean,
     createdAt: t.union([ t.Date, DateTimeString ]),
     createdBy: t.String,
     updatedAt: t.maybe(t.union([ t.Date, DateTimeString ])),
-    updateBy: t.maybe(t.String),
 
     aspiration: t.maybe(t.Number),
     proposal: t.maybe(t.Number),
