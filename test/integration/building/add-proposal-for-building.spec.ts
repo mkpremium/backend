@@ -7,6 +7,7 @@ import { BuildingsRepository } from '../../../src/building/repository/buildings.
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { LegacyBuildingRepository } from '../../../src/building/models'
 import moment from 'moment'
+import { contactOfId } from '../../../src/owner/owner'
 
 describe('AddProposalForBuilding - Integration', () => {
   let addProposalForBuildingService: AddProposalForBuildingService
@@ -22,19 +23,19 @@ describe('AddProposalForBuilding - Integration', () => {
     createdBy: 'test-flipper-id',
     message: 'test email message'
   }
+  const testOwner = ownerBuilder({ id: testCmd.ownerId })
+    .withEmailContact(testCmd.contactId)
+    .build()
 
   before(async () => {
     const { locals: { diContainer } } = await createTestApp()
-    addProposalForBuildingService = diContainer.resolve('addProposalForBuildingService')
 
+    addProposalForBuildingService = diContainer.resolve('addProposalForBuildingService')
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
-    legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
 
-    await ownersRepository.save(ownerBuilder({ id: testCmd.ownerId })
-      .withEmailContact(testCmd.contactId)
-      .build()
-    )
+    legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
+    await ownersRepository.save(testOwner)
     await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
     await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
   })
@@ -50,6 +51,7 @@ describe('AddProposalForBuilding - Integration', () => {
           proposal: testCmd.amount,
           message: testCmd.message,
           notificationStatus: 'PENDING',
+          notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
         })
         expect(moment((proposals[0] as any).createdAt).isSame(moment(), 'day'))
           .to.be.true

@@ -61,6 +61,7 @@ export const BuildingProposal = t.struct(
     state: t.enums.of(Object.values(BuildingProposalStatus)),
     message: t.maybe(t.String),
     notificationStatus: t.maybe(t.enums.of([ 'PENDING' ])),
+    notificationEmail: t.maybe(t.String),
 
     _documentType: t.enums.of([ 'building-proposal' ])
   },

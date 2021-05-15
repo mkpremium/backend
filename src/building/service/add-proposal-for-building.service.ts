@@ -1,4 +1,6 @@
 import { AddProposalService } from './add-proposal.service'
+import { OwnerRepository } from '../../owner/repository/owner.repository'
+import { contactOfId } from '../../owner/owner'
 
 interface CreateProposalCommand {
   amount: number;
@@ -10,17 +12,20 @@ interface CreateProposalCommand {
 
 export class AddProposalForBuildingService {
   constructor(
-    private addProposalService: AddProposalService
+    private addProposalService: AddProposalService,
+    private ownersRepository: OwnerRepository
   ) {
   }
 
-  add(buildingId: string, cmd: CreateProposalCommand) {
+  async add (buildingId: string, cmd: CreateProposalCommand) {
+    const owner = await this.ownersRepository.get(cmd.ownerId)
     return this.addProposalService.addProposal(buildingId, cmd.createdBy, {
       state: 'pendiente',
       ownerId: cmd.ownerId,
       proposal: cmd.amount,
       message: cmd.message,
       notificationStatus: 'PENDING',
+      notificationEmail: contactOfId(owner, cmd.contactId).value,
     })
   }
 }
