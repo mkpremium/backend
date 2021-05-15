@@ -20,15 +20,15 @@ export type PromisifiedBucket = Bucket & {
 export class CouchbaseAdapter {
   private couchbaseBucket: PromisifiedBucket
 
-  constructor(couchbaseBucket: Bucket) {
+  constructor (couchbaseBucket: Bucket) {
     this.couchbaseBucket = promisifyAll(couchbaseBucket) as PromisifiedBucket
   }
 
-  get bucketName(): string {
+  get bucketName (): string {
     return this.couchbaseBucket.name
   }
 
-  async save<T extends { _documentType: string, id?: string }>(data: T, structType: t.Type<T>) {
+  async save<T extends { _documentType: string, id?: string }> (data: T, structType: t.Type<T>) {
     const struct = fromJSON(data, structType)
     const dataWithId: any = t.update(struct, { id: { $set: data.id || uuid() } })
 
@@ -44,7 +44,7 @@ export class CouchbaseAdapter {
     return fromJSON(dataWithId, structType)
   }
 
-  getEntity<T>(structType: t.Type<T> & RecordToDomain, entityId): Promise<T> {
+  getEntity<T> (structType: t.Type<T> & RecordToDomain, entityId): Promise<T> {
     return this.withRetry(
       () => this.couchbaseBucket.getAsync(entityId)
         .catch(error => {
@@ -64,7 +64,7 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync(query: string, params): Promise<any> {
+  queryAsync (query: string, params): Promise<any> {
     return this.withRetry(() =>
       this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
     ).catch(error => {
@@ -76,7 +76,7 @@ export class CouchbaseAdapter {
     })
   }
 
-  private throwCouchbaseError(error, query) {
+  private throwCouchbaseError (error, query) {
     if (error.code) {
       throw new QueryError(query, error.code, error.message)
     } else {
@@ -84,10 +84,10 @@ export class CouchbaseAdapter {
     }
   }
 
-  private withRetry(fn) {
-    return retry(fn, {
-      maxTries: 3,
-      interval: 100,
+  private withRetry<T> (fn: () => Promise<T>): Promise<T> {
+    return retry<T>(fn, {
+      max_tries: 3,
+      interval: 1000,
       predicate: ({
                     code,
                     message

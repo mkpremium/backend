@@ -1,6 +1,7 @@
-import { Cluster } from 'couchbase'
+import { Bucket, Cluster } from 'couchbase'
 import { CouchbaseModel } from './model'
 import retry from 'bluebird-retry'
+import { CouchbaseAdapter } from './couchbase.adapter'
 
 const config = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
@@ -10,7 +11,7 @@ const config = {
 }
 
 export function connectCouchbaseBucket() {
-  return retry(
+  return retry<Bucket>(
     () => {
       const cluster = new Cluster(config.uri)
       cluster.authenticate(config.username, config.password)
@@ -18,14 +19,14 @@ export function connectCouchbaseBucket() {
       return new Promise((resolve, reject) => {
         const bucket = cluster.openBucket(config.bucketName)
         bucket.on('connect', () => {
-          CouchbaseModel.setCouchbaseBucket(bucket)
+          CouchbaseModel.setCouchbaseBucket(bucket, new CouchbaseAdapter(bucket))
           resolve(bucket)
         })
         bucket.on('error', error => reject(error))
       })
     },
     {
-      maxTries: 3,
+      max_tries: 3,
       interval: 100,
     }
   )
