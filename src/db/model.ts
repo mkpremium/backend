@@ -13,20 +13,27 @@ import retry from 'bluebird-retry'
 import { Bucket, N1qlQuery, errors as couchbaseErrors } from 'couchbase'
 import { promisifyAll } from 'bluebird'
 import Consistency = N1qlQuery.Consistency
-import { PromisifiedBucket } from './couchbase.adapter'
+import { CouchbaseAdapter, PromisifiedBucket } from './couchbase.adapter'
 
 /**
  * @deprecated use CouchbaseRepository instead.
  */
 export class CouchbaseModel {
   protected Struct?: TcombStruct<any>
+  /** @deprecated use couchbaseAdapter instead **/
   private static bucket: PromisifiedBucket
+  private static couchbaseAdapter: CouchbaseAdapter
 
-  static setCouchbaseBucket(bucket: Bucket) {
+  static setCouchbaseBucket (bucket: Bucket, couchbaseAdapter: CouchbaseAdapter) {
     CouchbaseModel.bucket = promisifyAll(bucket) as PromisifiedBucket
+    CouchbaseModel.couchbaseAdapter = couchbaseAdapter
   }
 
-  async findByIdOrThrow(id) {
+  get couchbaseAdapter () {
+    return CouchbaseModel.couchbaseAdapter
+  }
+
+  async findByIdOrThrow (id) {
     const model = await this.findById(id)
     if (!model) {
       throw newHttpError(404, `${this._getMeta().name} ${id} no existe`)
@@ -35,7 +42,7 @@ export class CouchbaseModel {
     return model
   }
 
-  getQueryBuilder(method = 'select', prefix = 't', props = this._getMeta().props) {
+  getQueryBuilder (method = 'select', prefix = 't', props = this._getMeta().props) {
     let qb
 
     switch (method) {
@@ -76,7 +83,7 @@ export class CouchbaseModel {
     return qb
   }
 
-  _getMeta() {
+  _getMeta () {
     if (typeof this.Struct === 'undefined') {
       throw new Error([
         'Something really bad happened, Struct should be defined in some way.',
@@ -92,21 +99,21 @@ export class CouchbaseModel {
     return this.Struct.meta
   }
 
-  getType() {
+  getType () {
     return (this._getMeta().defaultProps as any)._documentType
   }
 
-  async countQuery(queryBuilder = this.getQueryBuilder('count')) {
+  async countQuery (queryBuilder = this.getQueryBuilder('count')) {
     const [ { count } ] = await this.query(queryBuilder)
 
     return count
   }
 
-  async deleteQuery(queryBuilder = this.getQueryBuilder('delete')) {
+  async deleteQuery (queryBuilder = this.getQueryBuilder('delete')) {
     return this.query(queryBuilder)
   }
 
-  async queryRaw(query: string) {
+  async queryRaw (query: string) {
     try {
       const result = await this.withRetry(() => CouchbaseModel.bucket.queryAsync(N1qlQuery.fromString(query)))
       logger.debug('model#queryRaw', { query, result })
@@ -118,11 +125,11 @@ export class CouchbaseModel {
     }
   }
 
-  getBucketName() {
+  getBucketName () {
     return couchbase.bucket
   }
 
-  async query(queryBuilder = this.getQueryBuilder()) {
+  async query (queryBuilder = this.getQueryBuilder()) {
     const queryParam = queryBuilder.toParam()
 
     try {
@@ -141,7 +148,7 @@ export class CouchbaseModel {
     }
   }
 
-  async unique(data, field) {
+  async unique (data, field) {
     const value = data[field]
     const query = this.getQueryBuilder().where(`${field} = ?`, value).limit(1)
 
@@ -161,7 +168,7 @@ export class CouchbaseModel {
     }
   }
 
-  async findById(id) {
+  async findById (id) {
     if (_.isEmpty(id)) {
       throw new Error('id should be defined')
     }
@@ -186,16 +193,16 @@ export class CouchbaseModel {
     }
   }
 
-  private getDocumentType() {
+  private getDocumentType () {
     return (this._getMeta().defaultProps as any)._documentType
   }
 
-  async preSave(data) {
+  async preSave (data) {
     // no pre-save operations on base model
     return data
   }
 
-  async save(data, sendEvent, opts = {}) {
+  async save (data, sendEvent?, opts = {}) {
     const struct = fromJSON(data, this.Struct)
     const dataWithId = t.update(struct, { id: { $set: data.id || uuid() } })
     const dataPreSaved = await this.preSave(dataWithId)
@@ -216,10 +223,10 @@ export class CouchbaseModel {
     return fromJSON(dataPreSaved, this.Struct)
   }
 
-  withRetry<T>(fn: () => T): T {
-    return retry(fn, {
-      maxTries: 3,
-      interval: 100,
+  private withRetry<T> (fn: () => Promise<T>): Promise<T> {
+    return retry<T>(fn, {
+      max_tries: 3,
+      interval: 1000,
       predicate: ({
                     code,
                     message

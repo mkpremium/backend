@@ -8,19 +8,21 @@ import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Building, BuildingMetadataPreview, BuildingProposal as BuildingProposalStruct } from './building'
+import {
+  Building,
+  BuildingMetadataPreview,
+  BuildingProposal,
+  BuildingProposal as BuildingProposalStruct
+} from './building'
 
 import { logger } from '../infrastructure/logger'
 import { MetadataRepository } from './repository/metadata.repository'
+import fromJSON from 'tcomb/lib/fromJSON'
 
 export class BuildingProposalRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = BuildingProposalStruct
-  }
-
-  async save (data, sendEvent) {
-    return super.save(data, sendEvent)
   }
 
   async findByIdOrThrow (proposalId) {
@@ -135,6 +137,15 @@ export class LegacyBuildingRepository extends CouchbaseModel {
     await this.save(updatedBuilding)
 
     return proposal
+  }
+
+  listProposalsForBuilding (buildingId) {
+    return this.couchbaseAdapter
+      .queryAsync(`SELECT proposals.*
+                   FROM ${this.getBucketName()} proposals
+                   WHERE _documentType = 'building-proposal' AND buildingId = $1`,
+        [ buildingId ]
+      ).then(rows => fromJSON(rows, t.list(BuildingProposalStruct)))
   }
 
   async update (building, $merge) {
