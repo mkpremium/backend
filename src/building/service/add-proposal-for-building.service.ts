@@ -1,3 +1,5 @@
+import { AddProposalService } from './add-proposal.service'
+
 interface CreateProposalCommand {
   amount: number;
   contactId: string;
@@ -7,7 +9,16 @@ interface CreateProposalCommand {
 }
 
 export class AddProposalForBuildingService {
-  add(buildingId: string, proposal: CreateProposalCommand) {
-    return Promise.reject(new Error('Not implemented'))
+  constructor(
+    private addProposalService: AddProposalService
+  ) {
+  }
+
+  add(buildingId: string, cmd: CreateProposalCommand) {
+    return this.addProposalService.addProposal(buildingId, cmd.createdBy, {
+      state: 'pendiente',
+      ownerId: cmd.ownerId,
+      proposal: cmd.amount
+    })
   }
 }

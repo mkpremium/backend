@@ -7,8 +7,8 @@ const testOwnerId = 'test-owner-id'
 const testProposalAmount = 100000
 const testContactId = 'test-contact-id'
 const testEmailMessage = 'email message'
-
 const testFlipperId = 'test-flipper-id'
+
 describe('add-proposal.controller', () => {
   let controller
   let addProposalForBuildingServiceSpy
