@@ -6,8 +6,9 @@ import { AddProposalForBuildingService } from '../../../src/building/service/add
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { LegacyBuildingRepository } from '../../../src/building/models'
+import moment from 'moment'
 
-describe('AddProposalForBuilding', () => {
+describe('AddProposalForBuilding - Integration', () => {
   let addProposalForBuildingService: AddProposalForBuildingService
   let ownersRepository: OwnerRepository
   let buildingsRepository: BuildingsRepository
@@ -46,8 +47,12 @@ describe('AddProposalForBuilding', () => {
           ownerId: testCmd.ownerId,
           buildingId: testCmd.buildingId,
           createdBy: testCmd.createdBy,
-          proposal: testCmd.amount
+          proposal: testCmd.amount,
+          message: testCmd.message,
+          notificationStatus: 'PENDING',
         })
+        expect(moment((proposals[0] as any).createdAt).isSame(moment(), 'day'))
+          .to.be.true
       })
   })
 })

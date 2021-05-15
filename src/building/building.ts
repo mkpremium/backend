@@ -59,6 +59,8 @@ export const BuildingProposal = t.struct(
     aspiration: t.maybe(t.Number),
     proposal: t.maybe(t.Number),
     state: t.enums.of(Object.values(BuildingProposalStatus)),
+    message: t.maybe(t.String),
+    notificationStatus: t.maybe(t.enums.of([ 'PENDING' ])),
 
     _documentType: t.enums.of([ 'building-proposal' ])
   },

@@ -34,7 +34,9 @@ describe('AddProposalForBuildingService', () => {
         testBuildingId, testFlipperId, {
           state: 'pendiente',
           ownerId: testOwnerId,
-          proposal: testProposalAmount
+          proposal: testProposalAmount,
+          notificationStatus: 'PENDING',
+          message: testEmailMessage,
         }
       )
     })

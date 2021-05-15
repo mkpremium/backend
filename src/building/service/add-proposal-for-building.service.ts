@@ -18,7 +18,9 @@ export class AddProposalForBuildingService {
     return this.addProposalService.addProposal(buildingId, cmd.createdBy, {
       state: 'pendiente',
       ownerId: cmd.ownerId,
-      proposal: cmd.amount
+      proposal: cmd.amount,
+      message: cmd.message,
+      notificationStatus: 'PENDING',
     })
   }
 }
