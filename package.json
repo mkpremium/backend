@@ -7,6 +7,8 @@
     "start": "./scripts/start-local-app.sh",
     "test": "./scripts/run-test.sh test",
     "test:e2e": "./scripts/run-test.sh test-e2e",
+    "test-watch": "./scripts/run-test.sh test -w --watch-files src --watch-files test",
+    "test-watch:e2e": "./scripts/run-test.sh test-e2e -w --watch-files src --watch-files test-e2e",
     "build": "tsc",
     "socket": "nodemon bin/socket.js --exec babel-node",
     "cronjobs": "nodemon bin/freezer.js --exec babel-node"
