@@ -4,13 +4,13 @@ import { asClass, asFunction, asValue, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupOwnerDependencies } from '../owner'
 import { setupScheduledEventsDependencies } from '../scheduled-events'
-import { setupWorksheetDependencies } from '../worksheet'
 import { setupCallerDependencies } from '../caller/init'
 import { setupUserDependencies } from '../user'
 import { setupStockDependencies } from '../stock/stock-di'
 import { Bucket } from 'couchbase'
 import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
+import { setupWorksheetDependencies } from '../worksheet/dependencies'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()

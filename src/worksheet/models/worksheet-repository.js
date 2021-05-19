@@ -27,12 +27,26 @@ import { QueueRequestAction, WorksheetListQuery } from '../types'
 
 const QueueRequestParamsBase = t.struct(
   {
-    action: t.maybe(t.QueueRequestAction)
+    action: t.maybe(t.enums(QueueRequestAction))
   },
   {
     name: 'QueueRequest',
     defaultProps: {
       action: QueueRequestAction.TAKE
+    }
+  }
+)
+
+const WorkSheetListResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(Worksheet)
+  },
+  {
+    name: 'WorksheetListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
     }
   }
 )
@@ -221,9 +235,10 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
   async worksheetStats () {
     const bucket = this.getBucketName()
 
-    const query = `SELECT t.buildingAddress.province, t.status, COUNT(*) as count FROM ${bucket} t
-    WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-    GROUP BY t.status, t.buildingAddress.province`
+    const query = `SELECT t.buildingAddress.province, t.status, COUNT(*) as count
+                   FROM ${bucket} t
+                   WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
+                   GROUP BY t.status, t.buildingAddress.province`
 
     const result = await this.queryRaw(query)
 
@@ -256,8 +271,12 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
       ? 'AND ' + sourceFilter.join(' AND ')
       : ''
 
-    const baseQuery = `SELECT COUNT(*) as count FROM ${bucket} t
-    WHERE (t._documentType = 'worksheet') AND (queueId IS NULL) AND (status = 'OPEN' OR status = 'LOOKING_MEETING') ${filter}`
+    const baseQuery = `SELECT COUNT(*) as count
+                       FROM ${bucket} t
+                       WHERE (t._documentType = 'worksheet')
+                         AND (queueId IS NULL)
+                         AND (status = 'OPEN'
+                          OR status = 'LOOKING_MEETING') ${filter}`
     const results = await this.queryRaw(baseQuery)
     return _get(results, '0.count', 0)
   }
@@ -337,7 +356,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
 
     results = await Promise.map(results, (worksheet) => this.worksheetWithRelatedBuildings(worksheet))
 
-    return fromJSON({ total, results }, t.WorkSheetLitResponse)
+    return fromJSON({ total, results }, WorkSheetListResponse)
   }
 
   /**

@@ -33,7 +33,8 @@ import { createTestHarness } from './test-harness/routes'
 import './types'
 import { setupUserRoutes } from './user'
 import webhooks from './webhooks'
-import { setupWorksheetRoutesAndEventListeners } from './worksheet'
+import { worksheetEventListeners } from './worksheet/listeners'
+import { worksheetsRoutes } from './worksheet/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -65,11 +66,12 @@ export const createApp = (): Promise<Express> => {
 
       setupUserRoutes(app, diContainer)
       buildingEventListeners(diContainer)
+      worksheetEventListeners(diContainer)
       buildingRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
 
       setupScheduledEventsRoutes(app, diContainer)
-      setupWorksheetRoutesAndEventListeners(app, diContainer)
+      worksheetsRoutes(app, diContainer)
       createTestHarness(app, diContainer)
       initPropertyManager(app, diContainer)
       initFlipperModule(app, diContainer)

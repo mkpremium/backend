@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import { ListQuery } from '../types/params'
 import { Positive, StringSplitList } from '../types/refinement'
-import { WorkSheetQueueStatus } from './models/queue-item'
 import { Worksheet, WorkSheetStatusEnum } from './domain/worksheet'
 
 export const QueueRequestAction = {
@@ -9,8 +8,6 @@ export const QueueRequestAction = {
   RELEASE: 'RELEASE',
   NEXT: 'NEXT'
 }
-
-t.QueueRequestAction = t.enums(QueueRequestAction)
 
 export const WorksheetListQuery = ListQuery.extend(
   {
@@ -23,27 +20,6 @@ export const WorksheetListQuery = ListQuery.extend(
     name: 'WorksheetListQuery',
     defaultProps: {
       viewedBetween: ','
-    }
-  }
-)
-
-t.WorksheeQueueListQuery = ListQuery.extend({
-  status: t.maybe(WorkSheetQueueStatus),
-  operatorId: t.maybe(t.String),
-  date: t.maybe(t.String),
-  dateRange: t.list(t.String)
-})
-
-t.WorkSheetLitResponse = t.struct(
-  {
-    total: t.Number,
-    results: t.list(Worksheet)
-  },
-  {
-    name: 'WorksheetLitResponse',
-    defaultProps: {
-      total: 0,
-      results: []
     }
   }
 )
