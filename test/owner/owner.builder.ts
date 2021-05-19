@@ -10,8 +10,8 @@ const ownerPrototype: Partial<OwnerProps> = {
 
 export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
   return {
-    build () {
-      return OwnerStruct({ ...ownerPrototype, ...overwrites })
+    build (): OwnerProps {
+      return OwnerStruct({ ...ownerPrototype, ...overwrites }) as OwnerProps
     },
 
     withPhoneContact (id = 'test-phone-id', status = 'UNDEFINED', phoneNumber = '666666666') {
