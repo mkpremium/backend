@@ -59,12 +59,6 @@ describe('worksheetEventListeners', () => {
     eventSubscribers['owner.status_changed'](testEvent)
 
     expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
-      .to.have.been.calledWith(testOwner.buildingId, {
-        buildingId: testOwner.buildingId,
-        ownerId: testOwner.id,
-        oldStatus: 'NO_VERIFICADO',
-        newStatus: 'WITHOUT_CONTACT',
-      }
-    )
+      .to.have.been.calledWith(testOwner.buildingId, testEvent)
   })
 })
