@@ -9,6 +9,7 @@ import { setupCallerDependencies } from '../caller/init'
 import { setupUserDependencies } from '../user'
 import { setupStockDependencies } from '../stock/stock-di'
 import { Bucket } from 'couchbase'
+import { setupHistoryDependencies } from '../history/dependencies'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const awilixContainer = createContainer()
@@ -26,6 +27,7 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
   setupCallerDependencies(awilixContainer)
   setupUserDependencies(awilixContainer)
   setupStockDependencies(awilixContainer)
+  setupHistoryDependencies(awilixContainer)
 
   return awilixContainer
 }

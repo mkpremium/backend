@@ -1,6 +1,6 @@
-export const createSearchOwnersController = (ownerRepository) => async (req, res) => {
+export const createSearchOwnersController = (ownersRepository) => async (req, res) => {
   const phoneNumber = req.body.phoneNumber
-  const foundOwners = await ownerRepository.findByPhoneNumber(phoneNumber)
+  const foundOwners = await ownersRepository.findByPhoneNumber(phoneNumber)
 
   res.json(foundOwners)
 }

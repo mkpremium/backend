@@ -5,19 +5,6 @@ import { OwnerRepository } from './models'
 import { Owner } from './owner'
 import t from './types'
 
-async function updateOwnerContactStatus (req, res) {
-  const ownerId = req.params.id
-  const contactId = req.params.contactId
-  const contextModel = { _documentType: 'owner-contact', contactId }
-
-  const { status } = req.body
-  const repo = new OwnerRepository()
-  await repo.changeContactStatus(ownerId, contactId, status)
-  await History.registerUpdate({ contextModel, user: req.user })
-
-  res.status(204).send()
-}
-
 async function updateOwner (req, res) {
   const id = req.params.id
   const contextModel = { _documentType: 'owner', id }
@@ -55,7 +42,6 @@ async function ownerList (req, res) {
   res.json(owners)
 }
 
-export const updateOwnerContactController = wrap(updateOwnerContactStatus)
 export const updateOwnerController = wrap(updateOwner)
 export const addOwnerContactController = wrap(addOwnerContact)
 export const listOwnerController = wrap(ownerList)
