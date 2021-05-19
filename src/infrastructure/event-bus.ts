@@ -1,9 +1,10 @@
 import { EventEmitter } from 'events'
-import { logger } from './logger'
+import { Logger } from 'winston'
 
 export class EventBus {
-  constructor (logger) {
-    this.emitter = new EventEmitter()
+  private emitter = new EventEmitter()
+
+  constructor (private logger: Logger) {
     this.emitter.on('error', error => {
       logger.crit('error event received', { error })
     })
@@ -29,7 +30,7 @@ export class EventBus {
 }
 
 function logSubscriberError (event, eventName, error) {
-  logger.crit('error processing event', {
+  this.logger.crit('error processing event', {
     event,
     eventName,
     error: {
