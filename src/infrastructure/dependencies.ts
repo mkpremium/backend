@@ -13,23 +13,23 @@ import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
-  const awilixContainer = createContainer()
+  const container = createContainer()
 
-  awilixContainer.register({
+  container.register({
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     eventBus: asClass(EventBus).classic().singleton(),
     logger: asFunction(initLogger).singleton(),
   })
 
-  setupBuildingDependencies(awilixContainer)
-  setupOwnerDependencies(awilixContainer)
-  setupScheduledEventsDependencies(awilixContainer)
-  setupWorksheetDependencies(awilixContainer)
-  setupCallerDependencies(awilixContainer)
-  setupUserDependencies(awilixContainer)
-  setupStockDependencies(awilixContainer)
-  setupHistoryDependencies(awilixContainer)
+  setupBuildingDependencies(container)
+  setupOwnerDependencies(container)
+  setupScheduledEventsDependencies(container)
+  setupWorksheetDependencies(container)
+  setupCallerDependencies(container)
+  setupUserDependencies(container)
+  setupStockDependencies(container)
+  setupHistoryDependencies(container)
 
-  return awilixContainer
+  return container
 }
