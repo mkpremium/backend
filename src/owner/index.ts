@@ -10,6 +10,7 @@ import { SetOwnerFeaturedContactService } from './service/set-featured-contact.s
 import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { OwnerRepository as LegacyOwnerRepository } from './models'
 import { Express } from 'express'
+import { ChangeContactStatusService } from './service/change-contact-status.service'
 
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
@@ -17,6 +18,8 @@ export const setupOwnerDependencies = (container: AwilixContainer) => {
     setFeaturedOwnerController: asFunction(createSetFeaturedContactController).classic().singleton(),
     searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
     ownersRepository: asClass(OwnerRepository).singleton().classic(),
+
+    changeContactStatusService: asClass(ChangeContactStatusService).singleton().classic(),
     setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
 
     legacyOwnersRepository: asClass(LegacyOwnerRepository).singleton()
