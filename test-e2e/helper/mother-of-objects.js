@@ -70,10 +70,11 @@ export const associateBuildingWithOwner = (app, owner, buildingId) => {
   return ownerRepository.save(updatedOwner)
 }
 
-export const createProposalForBuilding = (app, { propertyAgentId, buildingId }) => {
+export const createProposalForBuilding = (app, { propertyAgentId, buildingId, ownerId = 'test-owner-id' }) => {
   const addProposalService = app.locals.diContainer.resolve('addProposalService')
 
   return addProposalService.addProposal(buildingId, propertyAgentId, {
+    ownerId,
     aspiration: -1,
     proposal: 100000
   })
