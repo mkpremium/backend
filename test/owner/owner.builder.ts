@@ -1,4 +1,34 @@
-import { Owner, Person } from '../../src/owner/owner'
+import { Owner as OwnerStruct, Person } from '../../src/owner/owner'
+
+interface ContactProps {
+  id: string;
+  type: 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB';
+  value: string;
+  status: 'UNDEFINED' | 'GOOD' | 'BAD';
+}
+
+interface PersonProps {
+  id: string;
+  name: string;
+  firstName: string,
+  firstSurname: string,
+  secondSurname: string,
+
+  contacts: ContactProps[],
+}
+
+interface OwnerProps {
+  id: string;
+  type: 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA';
+  status: 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT';
+  person: PersonProps;
+  buildingId: string,
+  name: string,
+  featuredContact?: {
+    phoneId?: string;
+    emailId?: string;
+  };
+}
 
 const ownerPrototype = {
   id: 'test-owner-id',
@@ -7,10 +37,11 @@ const ownerPrototype = {
     name: 'test name'
   })
 }
-export const ownerBuilder = (overwrites = {}) => {
+
+export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
   return {
     build () {
-      return Owner({ ...ownerPrototype, ...overwrites })
+      return OwnerStruct({ ...ownerPrototype, ...overwrites })
     },
 
     withPhoneContact (id = 'test-phone-id', status = 'UNDEFINED', phoneNumber = '666666666') {

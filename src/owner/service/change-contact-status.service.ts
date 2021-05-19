@@ -18,8 +18,7 @@ export class ChangeContactStatusService {
 
     this.eventBus.publish({
       name: 'owner.contact_status_changed',
-      ownerId,
-      updatedOwner
+      owner: updatedOwner
     })
   }
 }

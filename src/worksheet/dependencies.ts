@@ -7,12 +7,14 @@ import { WorksheetRepository } from './repository/worksheet.repository'
 import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { LegacyWorksheetQueueRepository } from './models/queue-repository'
+import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 
 export const setupWorksheetDependencies = diContainer => {
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
+    updateWorksheetStatusOnOwnerChangeService: asClass(UpdateWorksheetStatusOnOwnerChangeService).classic().singleton(),
     takeWorksheetService: aliasTo('worksheetQueueActionsService'),
     takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),
     releaseUserOtherActiveWorksheetsInQueueService: asClass(ReleaseUserExtraOpenedWorksheetsInQueueService).classic().singleton()
