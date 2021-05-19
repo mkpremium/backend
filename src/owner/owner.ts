@@ -143,7 +143,7 @@ const RefinedOwner = refineType(Owner, o => {
   return true
 })
 
-export const changeContactStatus = (owner, contactId, newStatus) => {
+export const changeContactStatus = (owner, contactId, newStatus): OwnerProps => {
   const contact = owner.person.contacts.find(c => c.id === contactId)
   if (!contact) {
     throw new Error(`Contact "${contactId}" not found in owner "${owner.id}"`)
@@ -161,10 +161,10 @@ export const changeContactStatus = (owner, contactId, newStatus) => {
         $merge: { contacts }
       })
     }
-  })
+  }) as OwnerProps
 }
 
-export const mergeFeaturedContact = (owner, featuredContact) => {
+export const mergeFeaturedContact = (owner: OwnerProps, featuredContact) => {
   let updatedOwner = Owner.update(owner, {
     featuredContact: { $set: { ...(owner.featuredContact || {}), ...featuredContact } }
   })
@@ -190,10 +190,44 @@ export const contactOfId = (owner, contactId) => {
 const getOwnerContact = (o, contactId) => o.person.contacts.find(({ id }) => id === contactId)
 
 export class WrongFeaturedContact extends Error {
-  constructor (ownerId, featuredContact, validationErrors) {
+  readonly errors: string[]
+
+  constructor (
+    readonly ownerId: string,
+    readonly featuredContact: any,
+    validationErrors
+  ) {
     super('Wrong Featured Contact provided')
-    this.ownerId = ownerId
-    this.featuredContact = featuredContact
     this.errors = validationErrors.map(({ message }) => message)
   }
+}
+
+interface ContactProps {
+  id: string;
+  type: 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB';
+  value: string;
+  status: 'UNDEFINED' | 'GOOD' | 'BAD';
+}
+
+export interface PersonProps {
+  id: string;
+  name: string;
+  firstName: string,
+  firstSurname: string,
+  secondSurname: string,
+
+  contacts: ContactProps[],
+}
+
+export interface OwnerProps {
+  id: string;
+  type: 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA';
+  status: 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT';
+  person: PersonProps;
+  buildingId: string,
+  name: string,
+  featuredContact?: {
+    phoneId?: string;
+    emailId?: string;
+  };
 }

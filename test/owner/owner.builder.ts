@@ -1,41 +1,11 @@
-import { Owner as OwnerStruct, Person } from '../../src/owner/owner'
+import { Owner as OwnerStruct, OwnerProps, Person, PersonProps } from '../../src/owner/owner'
 
-interface ContactProps {
-  id: string;
-  type: 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB';
-  value: string;
-  status: 'UNDEFINED' | 'GOOD' | 'BAD';
-}
-
-interface PersonProps {
-  id: string;
-  name: string;
-  firstName: string,
-  firstSurname: string,
-  secondSurname: string,
-
-  contacts: ContactProps[],
-}
-
-interface OwnerProps {
-  id: string;
-  type: 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA';
-  status: 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT';
-  person: PersonProps;
-  buildingId: string,
-  name: string,
-  featuredContact?: {
-    phoneId?: string;
-    emailId?: string;
-  };
-}
-
-const ownerPrototype = {
+const ownerPrototype: Partial<OwnerProps> = {
   id: 'test-owner-id',
   name: 'test name',
   person: Person({
     name: 'test name'
-  })
+  }) as PersonProps
 }
 
 export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
@@ -57,7 +27,7 @@ export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
             value: phoneNumber
           } ]
         }
-      })
+      }) as PersonProps
 
       return this
     },
@@ -84,7 +54,7 @@ export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
             value: email
           } ]
         }
-      })
+      }) as PersonProps
 
       return this
     }
