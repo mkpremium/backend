@@ -22,7 +22,7 @@ describe('ChangeContactStatusService', () => {
       ownerId: owner.id,
       contactId: testPhoneContactId,
       status: 'GOOD'
-    }, {})
+    }, {id: 'test-caller-id'})
 
     expect(updatedOwner.status).to.be.equal(OwnerStatus.VERIFIED)
   })
@@ -34,7 +34,7 @@ describe('ChangeContactStatusService', () => {
       ownerId: owner.id,
       contactId: testPhoneContactId,
       status: 'BAD'
-    }, {})
+    }, {id: 'test-caller-id'})
     expect(updatedOwner.status).to.be.equal(OwnerStatus.WITHOUT_CONTACT)
   })
 })

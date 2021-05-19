@@ -1,7 +1,15 @@
 import { History } from '../../history/models'
 import { EventBus } from '../../infrastructure/event-bus'
 import { OwnerRepository } from '../repository/owner.repository'
-import { changeContactStatus, OwnerProps } from '../owner'
+import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
+
+export interface OwnerStatusChangedEvent {
+  name: 'owner.status_changed';
+  ownerId: string;
+  buildingId: string;
+  oldStatus: OwnerStatus;
+  newStatus: OwnerStatus;
+}
 
 export class ChangeContactStatusService {
   constructor (
@@ -14,18 +22,20 @@ export class ChangeContactStatusService {
   async change ({ ownerId, contactId, status }, user): Promise<OwnerProps> {
     const contextModel = { _documentType: 'owner-contact', contactId }
 
-    const owner = await this.ownersRepository.get(ownerId)
-    const updatedOwner = changeContactStatus(owner, contactId, status)
+    const owner = await this.ownersRepository.get(ownerId) as OwnerProps
+    const updatedOwner = changeContactStatus(owner, contactId, status) as OwnerProps
 
     await this.historyRepository.register({ type: 'UPDATE', contextModel, user })
 
     if (owner.status !== updatedOwner.status) {
-      this.eventBus.publish({
+      const event: OwnerStatusChangedEvent = {
         name: 'owner.status_changed',
         ownerId,
+        buildingId: owner.buildingId,
         oldStatus: owner.status,
         newStatus: updatedOwner.status
-      })
+      }
+      this.eventBus.publish(event)
     }
 
     return updatedOwner

@@ -219,10 +219,12 @@ export interface PersonProps {
   contacts: ContactProps[],
 }
 
+export type OwnerStatus = 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT'
+
 export interface OwnerProps {
   id: string;
   type: 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA';
-  status: 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT';
+  status: OwnerStatus;
   person: PersonProps;
   buildingId: string,
   name: string,

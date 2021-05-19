@@ -4,6 +4,7 @@ import { asValue, createContainer } from 'awilix'
 import { worksheetEventListeners } from '../../src/worksheet/listeners'
 import Sinon from 'sinon'
 import { ownerBuilder } from '../owner/owner.builder'
+import { OwnerStatusChangedEvent } from '../../src/owner/service/change-contact-status.service'
 
 describe('worksheetEventListeners', () => {
   let eventSubscribers
@@ -48,9 +49,22 @@ describe('worksheetEventListeners', () => {
       buildingId: 'test-building-id'
     }).build()
 
-    eventSubscribers['owner.contact_status_changed']({ owner: testOwner })
+    const testEvent: OwnerStatusChangedEvent = {
+      name: 'owner.status_changed',
+      buildingId: testOwner.buildingId,
+      ownerId: testOwner.id,
+      oldStatus: 'NO_VERIFICADO',
+      newStatus: 'WITHOUT_CONTACT',
+    }
+    eventSubscribers['owner.status_changed'](testEvent)
 
     expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
-      .to.have.been.calledWith(testOwner.buildingId, testOwner.id)
+      .to.have.been.calledWith(testOwner.buildingId, {
+        buildingId: testOwner.buildingId,
+        ownerId: testOwner.id,
+        oldStatus: 'NO_VERIFICADO',
+        newStatus: 'WITHOUT_CONTACT',
+      }
+    )
   })
 })

@@ -7,6 +7,7 @@ import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-
 import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/update-building-negotiation-status.service'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
+import { OwnerStatusChangedEvent } from '../owner/service/change-contact-status.service'
 
 export function worksheetEventListeners (container: AwilixContainer) {
   const eventBus = container.resolve('eventBus') as EventBus
@@ -39,7 +40,7 @@ export function worksheetEventListeners (container: AwilixContainer) {
     await releaseUserOtherActiveWorksheetsInQueueService.release(by, queueId)
   })
 
-  eventBus.on('owner.contact_status_changed', ({ owner }) => {
-    return updateWorksheetStatusOnOwnerChangeService.updateWorksheet(owner.buildingId, owner.id)
+  eventBus.on('owner.status_changed', (evt: OwnerStatusChangedEvent) => {
+    return updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt)
   })
 }
