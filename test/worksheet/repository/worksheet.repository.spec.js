@@ -26,11 +26,13 @@ describe('worksheet.repository', () => {
       recentProposal: {
         id: 'test-proposal-id',
         buildingId: 'test-building-id',
+        ownerId: 'test-owner-id',
         createdBy: 'test-created-by',
         createdAt: '2021-03-31T11:45:00.000Z',
         proposal: 100000
       }
     }).build()
+
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
     const testWorksheet = worksheetBuilder({
       id: testWorksheetId,
