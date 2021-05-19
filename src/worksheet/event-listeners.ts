@@ -1,11 +1,22 @@
 import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/update-building-negotiation-status.service'
 import { logger } from '../infrastructure/logger'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
+import { EventBus } from '../infrastructure/event-bus'
+import { LegacyWorksheetRepository } from './models/worksheet-repository'
+import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
+import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
 
-export function setupEventListeners (
-  eventBus,
-  { legacyWorksheetRepository, worksheetQueueActionsService, releaseUserOtherActiveWorksheetsInQueueService }
-) {
+interface WorksheetListenersDependencies {
+  legacyWorksheetRepository: LegacyWorksheetRepository;
+  worksheetQueueActionsService: WorksheetQueueActionsService;
+  releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService;
+}
+
+export function setupEventListeners (eventBus: EventBus, {
+  legacyWorksheetRepository,
+  worksheetQueueActionsService,
+  releaseUserOtherActiveWorksheetsInQueueService
+}: WorksheetListenersDependencies) {
   eventBus
     .on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({ buildingId, operatorId }) => {
       logger.info('updating worksheet because building negotiation status changed', { buildingId, operatorId })
@@ -29,7 +40,7 @@ export function setupEventListeners (
     })
 
   eventBus
-    .on('worksheet.taken', async ({ worksheetId, queueId, by }) => {
-      await releaseUserOtherActiveWorksheetsInQueueService.release(by, queueId, worksheetId)
+    .on('worksheet.taken', async ({ queueId, by }) => {
+      await releaseUserOtherActiveWorksheetsInQueueService.release(by, queueId)
     })
 }
