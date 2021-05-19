@@ -1,6 +1,5 @@
 import _filter from 'lodash/filter'
 import _find from 'lodash/find'
-import _findIndex from 'lodash/findIndex'
 import _get from 'lodash/get'
 import _ from 'lodash'
 import t from 'tcomb'
@@ -183,13 +182,6 @@ WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
 
 WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
   return _filter(this.worksheets, { operatorId, status: QueueStatus.SCHEDULED })
-}
-
-WorksheetQueue.prototype.findNextAvailableInQueue = function (currentItem = null) {
-  const currentItemId = currentItem ? currentItem.id : -1
-  const currentIndex = _findIndex(this.worksheets, { id: currentItemId })
-  const worksheets = currentIndex !== -1 ? this.worksheets.slice(currentIndex) : this.worksheets
-  return _find(worksheets, { status: QueueStatus.AVAILABLE })
 }
 
 WorksheetQueue.prototype.removeScheduledCall = function (scheduledCallId) {
