@@ -10,11 +10,11 @@ export class EventBus {
     })
   }
 
-  publish (event) {
+  publish<T extends { name: string }> (event: T) {
     this.emitter.emit(event.name, event)
   }
 
-  on (eventName, subscriber) {
+  on (eventName: string, subscriber: (event: any) => Promise<any>) {
     this.emitter
       .addListener(eventName, (event) => {
         try {
