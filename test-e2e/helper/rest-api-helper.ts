@@ -10,7 +10,7 @@ export const initApplication = (): Promise<Express> => createApp()
   .then(app => {
     const bucket = app.locals.diContainer.resolve('couchbaseBucket') as Bucket & { name: string }
     return new Promise((resolve, reject) => {
-      bucket.query(N1qlQuery.fromString(`DELETE * FROM ${bucket.name}`), error => {
+      bucket.query(N1qlQuery.fromString(`DELETE FROM ${bucket.name}`), error => {
         if (error) {
           reject(error)
         } else {
