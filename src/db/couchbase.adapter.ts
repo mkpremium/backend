@@ -88,6 +88,7 @@ export class CouchbaseAdapter {
     return retry<T>(fn, {
       max_tries: 3,
       interval: 1000,
+      backoff: 2,
       predicate: ({
                     code,
                     message
