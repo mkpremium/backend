@@ -1,6 +1,13 @@
 import { expect } from 'chai'
 import { operatorCreateBusiness } from '../../test/common'
-import { createOwner, testContactPhone, testPhoneContactId } from '../helper/mother-of-objects'
+import {
+  associateBuildingWithOwner,
+  createBuilding,
+  createOwner,
+  createWorksheetForBuilding,
+  testContactPhone,
+  testPhoneContactId
+} from '../helper/mother-of-objects'
 import { authenticatedGet, authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
 
 describe('Building owner contacts management', () => {
@@ -10,6 +17,11 @@ describe('Building owner contacts management', () => {
     app = await initApplication()
     businessUser = await operatorCreateBusiness()
     owner = await createOwner(app)
+
+    // create worksheet to change status depending on owner status
+    const building = await createBuilding(app)
+    await createWorksheetForBuilding(app, building)
+    await associateBuildingWithOwner(app, owner, building.id)
   })
 
   it('updates contact status', async () => {
@@ -20,7 +32,7 @@ describe('Building owner contacts management', () => {
         const savedOwner = await ownerRepository.findById(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(1)
-        expect(savedOwner.person.contacts[0]).to.be.deep.equal({
+        expect(savedOwner.person.contacts[ 0 ]).to.be.deep.equal({
           id: testPhoneContactId,
           note: null,
           type: 'TELEFONO',
@@ -44,7 +56,7 @@ describe('Building owner contacts management', () => {
         const savedOwner = await ownerRepository.findById(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(2)
-        expect(savedOwner.person.contacts[1]).to.include(contactInfoToAdd)
+        expect(savedOwner.person.contacts[ 1 ]).to.include(contactInfoToAdd)
       })
   })
 
@@ -54,7 +66,7 @@ describe('Building owner contacts management', () => {
         expect(response.status).to.be.equal(200)
 
         expect(response.body.results).to.have.lengthOf(1)
-        expect(response.body.results[0]).to.include({
+        expect(response.body.results[ 0 ]).to.include({
           id: owner.id
         })
       })
