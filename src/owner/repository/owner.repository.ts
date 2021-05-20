@@ -1,4 +1,4 @@
-import { Owner } from '../owner'
+import { Owner, OwnerProps } from '../owner'
 import t from 'tcomb'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -100,7 +100,7 @@ const BuildingOwner = t.struct({
   }))
 })
 
-export class OwnerRepository extends CouchbaseRepository {
+export class OwnerRepository extends CouchbaseRepository<OwnerProps> {
   async findByPhoneNumber (phoneNumber) {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),
@@ -130,7 +130,7 @@ export class OwnerRepository extends CouchbaseRepository {
     }), t.list(FoundOwner)))
   }
 
-  async buildingOwners (buildingId) {
+  async buildingOwners (buildingId): Promise<OwnerProps[]> {
     return this.couchbaseAdapter.queryAsync(
       buildingOwnersQuery(this.bucketName),
       [ buildingId ]
@@ -150,6 +150,6 @@ export class OwnerRepository extends CouchbaseRepository {
   }
 
   struct () {
-    return Owner
+    return Owner as any
   }
 }

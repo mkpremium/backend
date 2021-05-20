@@ -20,22 +20,22 @@ export class EventBus {
         try {
           subscriber(event)
             .catch(error => {
-              logSubscriberError(event, eventName, error)
+              this.logSubscriberError(event, eventName, error)
             })
         } catch (error) {
-          logSubscriberError(event, eventName, error)
+          this.logSubscriberError(event, eventName, error)
         }
       })
   }
-}
 
-function logSubscriberError (event, eventName, error) {
-  this.logger.crit('error processing event', {
-    event,
-    eventName,
-    error: {
-      message: error.message ? error.message : error.toString(),
-      stack: error.stack ? error.stack : undefined
-    }
-  })
+  logSubscriberError (event, eventName, error) {
+    this.logger.crit('error processing event', {
+      event,
+      eventName,
+      error: {
+        message: error.message ? error.message : error.toString(),
+        stack: error.stack ? error.stack : undefined
+      }
+    })
+  }
 }

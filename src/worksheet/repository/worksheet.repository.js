@@ -1,6 +1,7 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
+import { EntityNotFound } from '../../db/errors'
 import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { OwnerStatusEnum, OwnerTypeEnum } from '../../types/enums'
@@ -188,15 +189,31 @@ export class WorksheetRepository extends CouchbaseRepository {
       .then(result => result.map(({ id }) => id))
   }
 
+  ofBuildingId (buildingId) {
+    return this.couchbaseAdapter.queryAsync(`
+                SELECT worksheet.*
+                FROM ${this.bucketName} worksheet
+                WHERE worksheet._documentType = 'worksheet'
+                  AND worksheet.relatedBuildingIds[0] = $1
+      `, [ buildingId ])
+      .then(rows => {
+        if (!rows || rows.length === 0) {
+          throw new EntityNotFound(`worksheet.buildingId=${buildingId}`, this.struct())
+        }
+
+        return fromJSON(rows[ 0 ], this.struct())
+      })
+  }
+
+  struct () {
+    return Worksheet
+  }
+
   logWorksheetParsingError (worksheetId, error) {
     logger.error('parsing worksheet with CallcenterView', {
       worksheetId,
       errorMessage: error.message,
       stack: error.stack
     })
-  }
-
-  struct () {
-    return Worksheet
   }
 }
