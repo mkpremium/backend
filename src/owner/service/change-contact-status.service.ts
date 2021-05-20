@@ -23,7 +23,7 @@ export class ChangeContactStatusService {
     const contextModel = { _documentType: 'owner-contact', contactId }
 
     const owner = await this.ownersRepository.get(ownerId) as OwnerProps
-    const updatedOwner = changeContactStatus(owner, contactId, status) as OwnerProps
+    const updatedOwner = await this.ownersRepository.save(changeContactStatus(owner, contactId, status)) as OwnerProps
 
     await this.historyRepository.register({ type: 'UPDATE', contextModel, user })
 
