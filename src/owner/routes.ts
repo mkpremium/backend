@@ -8,8 +8,8 @@ export const ownersRouting = (container: AwilixContainer) => {
 
   router.put('/:id', updateOwnerController)
 
-  router.put('/:id/contacts/:contactId', wrap(container.resolve('changeContactStatusController')))
-  router.put('/:id/contacts/:contactId/status', wrap(container.resolve('changeContactStatusController')))
+  router.put('/:ownerId/contacts/:contactId', wrap(container.resolve('changeContactStatusController')))
+  router.put('/:ownerId/contacts/:contactId/status', wrap(container.resolve('changeContactStatusController')))
 
   router.post('/:id/contacts', addOwnerContactController)
 
