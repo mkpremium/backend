@@ -10,7 +10,7 @@ export const createTestApp = (): Promise<Express> => createApp()
         if (error) {
           reject(error)
         } else {
-          resolve(app)
+          setTimeout(() => resolve(app), 500)
         }
       })
     })

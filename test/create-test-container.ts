@@ -10,7 +10,7 @@ export const createTestContainer = () => {
           if (error) {
             reject(error)
           } else {
-            resolve(undefined)
+            setTimeout(resolve, 500)
           }
         })
       }),
