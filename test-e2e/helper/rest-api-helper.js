@@ -1,22 +1,14 @@
 import { createApp } from '../../src/app'
 import { defaultPassword, operatorLogin } from '../../test/common'
 import request from 'supertest'
-import { Bucket, N1qlQuery } from 'couchbase'
-import { Express } from 'express'
 
 const DEFAULT_MILLISECONDS_TO_WAIT = 1000
 
-export const initApplication = (): Promise<Express> => createApp()
+export const initApplication = () => createApp()
   .then(app => {
-    const bucket = app.locals.diContainer.resolve('couchbaseBucket') as Bucket & { name: string }
-    return new Promise((resolve, reject) => {
-      bucket.query(N1qlQuery.fromString(`DELETE FROM ${bucket.name}`), error => {
-        if (error) {
-          reject(error)
-        } else {
-          setTimeout(() => resolve(app), 500)
-        }
-      })
+    const bucket = app.locals.diContainer.resolve('couchbaseBucket')
+    return new Promise(resolve => {
+      bucket.manager().flush(() => setTimeout(() => resolve(app), 500))
     })
   })
 
