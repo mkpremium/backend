@@ -2,11 +2,12 @@ import _ from 'lodash'
 import _find from 'lodash/find'
 import t from 'tcomb'
 import { Building } from '../building/building'
-import { SimpleAddress, TypedContactInfo } from '../types/common'
+import { SimpleAddress } from '../types/common'
 import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { validate } from 'tcomb-validation'
 import { refineType } from '../infrastructure/refine-type'
 import { DateTimeString } from '../infrastructure/shared-types'
+import { TypedContactInfo } from './contact'
 
 export const Person = t.struct(
   {

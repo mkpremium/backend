@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import { NegotiationStatus } from '../../building/building'
-import { TypedContactInfo } from '../../types/common'
+import { TypedContactInfo } from '../../owner/contact'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 

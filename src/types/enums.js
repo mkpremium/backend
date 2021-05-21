@@ -1,13 +1,5 @@
 import t from 'tcomb'
 
-export const TypeContact = t.enums({
-  TELEFONO: 'TELEFONO',
-  FAX: 'FAX',
-  MOVIL: 'MOVIL',
-  EMAIL: 'EMAIL',
-  SITIO_WEB: 'SITIO_WEB'
-}, 'TypeContact')
-
 export const OwnerType = {
   NONE: 'NINGUNO',
   PRINCIPAL: 'PRINCIPAL',

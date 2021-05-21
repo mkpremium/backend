@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { TypedContactInfo } from '../owner/contact'
 import { Owner } from '../owner/owner'
-import { TypedContactInfo } from '../types/common'
 import { OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 
 export const CreateOwnerCmd = t.struct({
