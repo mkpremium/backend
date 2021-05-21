@@ -1,39 +1,13 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 
-/**
- * @swagger
- * definitions:
- *  Calls:
- *     properties:
- *       id:
- *         type: string
- *         format: uuid/v4
- *         description: Id de registro de llamada
- *       userId:
- *         type: string
- *         format: uuid/v4
- *         description: Id del usuario quien realiza la llamada
- *       from:
- *         type: string
- *         description: Extension que realiza la llamada
- *       to:
- *         type: string
- *         description: Numero a quien se realizo la llamada
- *       callId:
- *         type: integer
- *         description: Identificador de llamada realizada
- *       note:
- *         type: string
- *         description: Nota de llamada
- *       date:
- *         type: string
- *         description: Fecha y hora del registro de llamada
- *       status:
- *         type: string
- *         description: Estado de la llamada
- *
- */
+export const CallStatus = {
+  early: 'INICIADA',
+  confirmed: 'EN_PROGRESO',
+  terminated: 'FINALIZADA',
+  unknown: 'DESCONOCIDO'
+}
+
 t.Calls = t.struct(
   {
     id: t.maybe(t.String),
@@ -44,7 +18,7 @@ t.Calls = t.struct(
     notes: t.Array,
     events: t.Array,
     date: t.Date,
-    status: t.CallStatus,
+    status: t.enums.of(Object.values(CallStatus), 'CallStatus'),
     origin: t.String,
     _documentType: t.String
   },
@@ -69,42 +43,14 @@ t.CallService = t.struct({
   return_id: t.Boolean
 }, 'CallService')
 
-/**
- * @swagger
- * definitions:
- *   CallBody:
- *     properties:
- *       contactId:
- *         type: string
- */
 t.CallBody = t.struct({
   contactId: t.maybe(t.String)
 }, 'CallBody')
 
-/**
- * @swagger
- * definitions:
- *  HangupSuccessResponse:
- *     properties:
- *      status:
- *        type: string
- */
 t.HangupSuccessResponse = t.struct({
   status: t.maybe(t.String)
 }, 'HangupSuccessResponse')
 
-/**
- * @swagger
- * definitions:
- *  CallErrorResponse:
- *     properties:
- *      status:
- *        type: string
- *      error_code:
- *        type: integer
- *      description:
- *        type: string
- */
 t.CallErrorResponse = t.struct({
   status: t.maybe(t.String),
   error_code: t.maybe(t.Integer),
@@ -131,14 +77,6 @@ t.CallsRawEvents = t.struct(
     }
   })
 
-/**
- * @swagger
- * definitions:
- *   AddCallNote:
- *     properties:
- *       note:
- *         type: string
- */
 t.AddCallNote = t.struct({
   id: t.maybe(t.String),
   note: t.maybe(t.String)

@@ -33,12 +33,3 @@ export const OwnerBusinessStatus = {
 
 export const OwnerTypeEnum = t.enums.of(Object.values(OwnerType), 'OwnerType')
 export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
-
-export const CallStatus = {
-  early: 'INICIADA',
-  confirmed: 'EN_PROGRESO',
-  terminated: 'FINALIZADA',
-  unknown: 'DESCONOCIDO'
-}
-
-t.CallStatus = t.enums.of(Object.values(CallStatus), 'CallStatus')

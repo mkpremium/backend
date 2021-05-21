@@ -1,6 +1,6 @@
 import _get from 'lodash/get'
 import { CallsRawEvents } from './models'
-import { CallStatus } from '../types/enums'
+import { CallStatus } from './types'
 
 export const encodePlusSign = (string) => {
   return string.replace(/\+/g, '%2B')
