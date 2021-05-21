@@ -1,5 +1,4 @@
 import './default-types'
-import './enums'
 import './refinement'
 import './params'
 import './common'

@@ -4,7 +4,7 @@ import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { EntityNotFound } from '../../db/errors'
 import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
-import { OwnerStatusEnum, OwnerTypeEnum } from '../../types/enums'
+import { OwnerStatusEnum, OwnerTypeEnum } from '../../owner/owner'
 import { Worksheet, WorkSheetStatusEnum } from '../domain/worksheet'
 
 export const WorksheetBuilding = t.struct({

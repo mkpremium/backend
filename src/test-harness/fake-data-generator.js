@@ -1,6 +1,6 @@
 import faker from 'faker/locale/es'
 import uuid from 'uuid/v4'
-import { OwnerType } from '../types/enums'
+import { OwnerType } from '../owner/owner'
 import _ from 'lodash'
 
 export const createOwnerCmd = buildingId => {

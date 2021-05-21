@@ -3,10 +3,9 @@ import _flatten from 'lodash/flatten'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { isTest } from '../../config'
-import { OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { ListQuery } from '../types/params'
 import { TypedContactInfo } from './contact'
-import { OwnerConfirmed, OwnerWithInclude } from './owner'
+import { OwnerConfirmed, OwnerStatusEnum, OwnerTypeEnum, OwnerWithInclude } from './owner'
 
 export const OwnerCompactView = t.struct(
   {

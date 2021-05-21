@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { OwnerBusinessStatus } from '../../types/enums'
+import { OwnerBusinessStatus } from '../../owner/owner'
 import { createTransaction } from '../application'
 import { StockStatuses } from '../types'
 

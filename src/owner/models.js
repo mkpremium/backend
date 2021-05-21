@@ -8,10 +8,17 @@ import { LegacyBuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
-import { OwnerBusinessStatus, OwnerStatus } from '../types/enums'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { TypedContactInfo } from './contact'
-import { changeContactStatus, FeaturedContact, Owner, OwnerBody, Person } from './owner'
+import {
+  changeContactStatus,
+  FeaturedContact,
+  Owner,
+  OwnerBody,
+  OwnerBusinessStatus,
+  OwnerStatus,
+  Person
+} from './owner'
 import { OwnerListQuery } from './types'
 
 function ownerIncludes (qb, includes) {

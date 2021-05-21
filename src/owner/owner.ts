@@ -3,7 +3,6 @@ import _find from 'lodash/find'
 import t from 'tcomb'
 import { Building } from '../building/building'
 import { SimpleAddress } from '../types/common'
-import { OwnerStatus, OwnerStatusEnum, OwnerTypeEnum } from '../types/enums'
 import { validate } from 'tcomb-validation'
 import { refineType } from '../infrastructure/refine-type'
 import { DateTimeString } from '../infrastructure/shared-types'
@@ -39,6 +38,37 @@ Person.prototype.fullName = function () {
   return `${this.name}`.trim()
 }
 
+export const OwnerStatus = {
+  NON_VERIFIED: 'NO_VERIFICADO',
+  VERIFIED: 'VERIFICADO',
+  ERROR: 'ERRONEO',
+  PUBLIC: 'ENTE_PUBLICO',
+  WITHOUT_CONTACT: 'WITHOUT_CONTACT'
+}
+export const OwnerBusinessStatus = {
+  PENDING: 'PENDIENTE',
+  PROPOSAL_REJECTED: 'PROPUESTA RECHAZADA',
+  PROPOSAL_SENT: 'PROPUESTA ENVIADA',
+  PROPOSAL_ACCEPTED: 'PRE-CIERRE',
+  PURCHASED: 'COMPRADO',
+
+  ALREADY_SOLD: 'VENDIDO',
+  NO_SALE: 'NO VENDE',
+  DISCARDED: 'DESCARTADO'
+}
+
+export const OwnerType = {
+  NONE: 'NINGUNO',
+  PRINCIPAL: 'PRINCIPAL',
+  SECONDARY: 'SECUNDARIO',
+  NEIGHBOUR: 'VECINO',
+  FAMILY: 'FAMILIAR',
+  RELATED: 'HERMANOS',
+  CHILDREN: 'HIJOS',
+  SAME_HOUSE: 'MISMA CASA'
+}
+export const OwnerTypeEnum = t.enums.of(Object.values(OwnerType), 'OwnerType')
+export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
 export const OwnerBody = t.struct(
   {
     type: t.maybe(OwnerTypeEnum),
@@ -183,9 +213,9 @@ export const mergeFeaturedContact = (owner: OwnerProps, featuredContact) => {
 
   return updatedOwner
 }
-
 export const contactOfId = (owner, contactId) => {
   return owner.person.contacts.find(({ id }) => id === contactId)
+
 }
 
 const getOwnerContact = (o, contactId) => o.person.contacts.find(({ id }) => id === contactId)

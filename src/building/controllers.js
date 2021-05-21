@@ -2,7 +2,7 @@ import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
-import { OwnerBusinessStatus } from '../types/enums'
+import { OwnerBusinessStatus } from '../owner/owner'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { BuildingProposalRepository, LegacyBuildingRepository } from './models'
 

@@ -2,7 +2,7 @@ import { ChangeContactStatusService } from '../../../src/owner/service/change-co
 import { createOwner, testPhoneContactId } from '../../../test-e2e/helper/mother-of-objects'
 import { createTestContainer } from '../../create-test-container'
 import { expect } from 'chai'
-import { OwnerStatus } from '../../../src/types/enums'
+import { OwnerStatus } from '../../../src/owner/owner'
 
 describe('ChangeContactStatusService', () => {
   let service: ChangeContactStatusService
