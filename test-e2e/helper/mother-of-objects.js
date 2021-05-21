@@ -14,24 +14,23 @@ export const testOwnerName = 'Owner Name'
 export const testOwnerFirstName = 'Owner First Name'
 
 export const createBuilding = async (app, buildingProperties) => {
-  const owner = await createOwner(app)
+  const owner = await (buildingProperties.owner ? Promise.resolve(buildingProperties.owner) : createOwner(app))
+  delete buildingProperties.owner
   const legacyBuildingsRepository = app.locals.diContainer.resolve('legacyBuildingsRepository')
   const building = {
-    ...{
-      id: testBuildingId,
-      buildingType: 'VERTICAL',
-      ownerId: owner.id,
-      owner: { id: owner.id, address: {} },
-      address: {
-        street: 'street, address',
-        number: '2a',
-        postalCode: {
-          verified: false
-        },
-        city: 'BARCELONA'
+    id: testBuildingId,
+    buildingType: 'VERTICAL',
+    ownerId: owner.id,
+    owner: { id: owner.id, address: {} },
+    address: {
+      street: 'street, address',
+      number: '2a',
+      postalCode: {
+        verified: false
       },
-      location: {}
+      city: 'BARCELONA'
     },
+    location: {},
     ...buildingProperties
   }
   const savedBuilding = await legacyBuildingsRepository.save(building)

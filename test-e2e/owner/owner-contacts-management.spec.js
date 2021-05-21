@@ -19,7 +19,7 @@ describe('Building owner contacts management', () => {
     owner = await createOwner(app)
 
     // create worksheet to change status depending on owner status
-    const building = await createBuilding(app)
+    const building = await createBuilding(app, { owner })
     await createWorksheetForBuilding(app, building)
     await associateBuildingWithOwner(app, owner, building.id)
   })
