@@ -1,8 +1,9 @@
-/**
- * @field {LegacyBuildingRepository} legacyBuildingsRepository
- */
+import { LegacyBuildingRepository } from '../models'
+
 export class AddProposalService {
-  constructor ({ legacyBuildingsRepository }) {
+  private legacyBuildingsRepository: LegacyBuildingRepository
+
+  constructor ({ legacyBuildingsRepository }: { legacyBuildingsRepository: LegacyBuildingRepository }) {
     this.legacyBuildingsRepository = legacyBuildingsRepository
   }
 
