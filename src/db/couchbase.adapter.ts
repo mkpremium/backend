@@ -86,13 +86,14 @@ export class CouchbaseAdapter {
 
   private withRetry<T> (fn: () => Promise<T>): Promise<T> {
     return retry<T>(fn, {
-      max_tries: 3,
+      max_tries: 5,
       interval: 1000,
-      backoff: 2,
+      backoff: 1.5,
       predicate: ({
                     code,
-                    message
-                  }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
+                    message,
+                    isOperational
+                  }) => isOperational || code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }
