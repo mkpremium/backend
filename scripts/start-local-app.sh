@@ -7,8 +7,4 @@ set -x
 
 set -a && . .env
 
-if [[ -f "bin/${appName}.js" ]];then
-  npx ts-node-dev --respawn --trace-warnings -- bin/"${appName}".js
-else
-  npx ts-node-dev --respawn --trace-warnings -- bin/"${appName}".ts
-fi
+npx ts-node-dev --respawn --trace-warnings -- bin/"${appName}"
