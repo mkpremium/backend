@@ -13,7 +13,7 @@ export const testContactPhone = '666666666'
 export const testOwnerName = 'Owner Name'
 export const testOwnerFirstName = 'Owner First Name'
 
-export const createBuilding = async (app, buildingProperties) => {
+export const createBuilding = async (app, buildingProperties = {}) => {
   const owner = await (buildingProperties.owner ? Promise.resolve(buildingProperties.owner) : createOwner(app))
   delete buildingProperties.owner
   const legacyBuildingsRepository = app.locals.diContainer.resolve('legacyBuildingsRepository')
