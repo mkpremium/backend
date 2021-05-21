@@ -34,30 +34,6 @@ export const OwnerBusinessStatus = {
 export const OwnerTypeEnum = t.enums.of(Object.values(OwnerType), 'OwnerType')
 export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
 
-t.RecordAction = t.enums.of([
-  'UPDATE',
-  'CREATE',
-  'DELETE',
-  'GET',
-  'OPEN',
-  'LIST',
-  'RELEASE',
-  'TAKE',
-  'ERROR'
-])
-
-t.RecordContext = t.enums({
-  OWNER: 'Propietario',
-  OWNERS: 'Propietarios',
-  OWNER_CONTACT: 'Contacto de propietario',
-  WORKSHEET: 'Ficha de trabajo',
-  WORKSHEETS: 'Fichas de trabajo',
-  OPERATOR: 'Operador',
-  OPERATORS: 'Operadores',
-  WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
-  SYSTEM_QUEUE: 'Colas del sistema'
-})
-
 export const CallStatus = {
   early: 'INICIADA',
   confirmed: 'EN_PROGRESO',

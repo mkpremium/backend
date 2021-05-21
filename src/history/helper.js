@@ -1,7 +1,16 @@
 import _ from 'lodash'
-import t from 'tcomb'
 
-const recordContexts = t.RecordContext.meta.map
+const recordContexts = {
+  OWNER: 'Propietario',
+  OWNERS: 'Propietarios',
+  OWNER_CONTACT: 'Contacto de propietario',
+  WORKSHEET: 'Ficha de trabajo',
+  WORKSHEETS: 'Fichas de trabajo',
+  OPERATOR: 'Operador',
+  OPERATORS: 'Operadores',
+  WORKSHEET_QUEUE: 'Cola de fichas de trabajo',
+  SYSTEM_QUEUE: 'Colas del sistema'
+}
 
 function getModelName (contextModel) {
   if (!contextModel) return 'UNDEFINED'
@@ -59,6 +68,6 @@ export function getHistoryStruct ({ type, contextModel, user }) {
     modelId: id,
     operatorId: user.id,
     type: recordType,
-    description: getRecordDescription(model, username)[type]
+    description: getRecordDescription(model, username)[ type ]
   }
 }
