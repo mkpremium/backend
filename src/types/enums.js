@@ -1,6 +1,6 @@
 import t from 'tcomb'
 
-export const TypeContact = t.TypeContact = t.enums({
+export const TypeContact = t.enums({
   TELEFONO: 'TELEFONO',
   FAX: 'FAX',
   MOVIL: 'MOVIL',
@@ -41,27 +41,6 @@ export const OwnerBusinessStatus = {
 
 export const OwnerTypeEnum = t.enums.of(Object.values(OwnerType), 'OwnerType')
 export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
-t.OwnerBusinessStatus = t.enums.of(Object.values(OwnerBusinessStatus), 'OwnerBusinessStatus')
-
-t.Gender = t.enums({
-  NINGUNO: 'NINGUNO',
-  FEMENINO: 'FEMENINO',
-  MASCULINO: 'MASCULINO'
-})
-
-t.PersonType = t.enums({
-  NATURAL: 'NATURAL',
-  JURIDICA: 'JURIDICA',
-  NONE: 'NINGUNO'
-})
-
-t.EventType = t.enums({
-  add: 'add',
-  update: 'update',
-  remove: 'revome',
-  read: 'read',
-  custom: 'custom'
-})
 
 t.RecordAction = t.enums.of([
   'UPDATE',
