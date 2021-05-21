@@ -1,9 +1,11 @@
+import _get from 'lodash/get'
 import moment from 'moment'
 import t from 'tcomb'
+import uuid from 'uuid/v4'
 import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/ScheduleEventsRepository'
 import { closeSellStock } from '../../src/stock/application'
 import { OwnerStatus } from '../../src/types/enums'
-import { LegacyWorksheetRepository } from '../../src/worksheet/models/worksheet-repository'
+import { Worksheet, WorkSheetStatus } from '../../src/worksheet/domain/worksheet'
 
 const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
@@ -38,8 +40,17 @@ export const createBuilding = async (app, buildingProperties) => {
   return savedBuilding
 }
 
-export const createWorksheetForBuilding = async (app, building) => {
-  await LegacyWorksheetRepository.createNewForBuilding(building)
+export const createWorksheetForBuilding = (app, building) => {
+  const legacyWorksheetRepository = app.locals.diContainer.resolve('legacyWorksheetRepository')
+  return legacyWorksheetRepository.save(Worksheet({
+    id: uuid(),
+    _relatedTo: _get(building, 'owner.name'),
+    relatedBuildingIds: [ building.id ],
+    relatedOwnerIds: [],
+    buildingAddress: building.address,
+    status: WorkSheetStatus.INVALID,
+    queueId: null
+  }))
 }
 
 export const createOwner = async (app, { status } = { status: OwnerStatus.VERIFIED }) => {
