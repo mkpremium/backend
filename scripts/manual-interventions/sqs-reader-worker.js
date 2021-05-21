@@ -5,7 +5,7 @@ config()
 
 const AWS = require('aws-sdk')
 const Promise = require('bluebird')
-const couchbase = require('../../src/db/legacy-connect-couchbase').default
+const { connectCouchbaseBucket } = require('../../src/db/connect-couchbase-bucket')
 const t = require('tcomb')
 const { createLegacyDependenciesContainer } = require('../../src/infrastructure/dependencies')
 
@@ -32,7 +32,7 @@ const app = { locals: {} }
 
 const NO_MESSAGES = 'NO-MESSAGES'
 
-couchbase(app)
+connectCouchbaseBucket()
   .then(cbBucket => {
     const legacyDependenciesContainer = createLegacyDependenciesContainer(cbBucket)
     return { cbBucket, legacyDependenciesContainer }

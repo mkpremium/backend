@@ -2,13 +2,14 @@
 
 import express from 'express'
 import { Server } from 'http'
-import { logger } from '../src/infrastructure/logger'
-
-import '../src/types'
 
 import { socket as socketConfig } from '../config'
+import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
+import '../src/db/legacy-connect-couchbase'
+import { logger } from '../src/infrastructure/logger'
 import socket from '../src/socket'
-import couchbase from '../src/db/legacy-connect-couchbase'
+
+import '../src/types'
 
 const app = express()
 app.set('IS_READY', false)
@@ -23,7 +24,7 @@ app.get('/_ready', (req, res) => {
 const httpServer = Server(app)
 const server = httpServer.listen(socketConfig.port, listenHandler)
 
-couchbase()
+connectCouchbaseBucket()
   .then(() => {
     app.set('IS_READY', true)
   })

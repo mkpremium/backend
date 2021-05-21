@@ -9,7 +9,7 @@ import cadastre from './cadastre'
 import { setupCallerRoutes } from './caller/init'
 import calls from './calls'
 
-import couchbase from './db/legacy-connect-couchbase'
+import './db/legacy-connect-couchbase'
 import email from './email'
 import { initFlipperModule } from './flipper/init'
 import history from './history'
@@ -35,6 +35,7 @@ import { setupUserRoutes } from './user'
 import webhooks from './webhooks'
 import { worksheetEventListeners } from './worksheet/listeners'
 import { worksheetsRoutes } from './worksheet/routing'
+import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -57,7 +58,7 @@ export const createApp = (): Promise<Express> => {
   app.use(morgan('combined'))
   app.use(cors())
 
-  return couchbase()
+  return connectCouchbaseBucket()
     .then(couchbaseBucket => {
       const diContainer = createDiContainer(couchbaseBucket)
       app.locals.diContainer = diContainer
