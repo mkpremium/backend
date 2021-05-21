@@ -1,6 +1,5 @@
 import { createChangeContactStatusController } from './controller/change-contact-status.controller'
 import { createSearchOwnersController } from './controller/search-owners.controller'
-import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
 import { ownersRouting } from './routes'
 
 import './types'
@@ -15,7 +14,6 @@ import { ChangeContactStatusService } from './service/change-contact-status.serv
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
-    setFeaturedOwnerController: asFunction(createSetFeaturedContactController).classic().singleton(),
     searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
     ownersRepository: asClass(OwnerRepository).singleton().classic(),
 
