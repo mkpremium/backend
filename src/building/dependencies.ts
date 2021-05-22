@@ -32,6 +32,8 @@ import { createAddOfferRequestController } from './controller/add-offer-request.
 import { createAddProposalController } from './controller/add-proposal.controller'
 import { AddProposalForBuildingService } from './service/add-proposal-for-building.service'
 import { ProposalsSenderService } from './service/proposals-sender.service'
+import { ProposalsRepository } from './repository/proposals.repository'
+import { PdfProposalComposer } from './service/pdf-proposal-composer'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -50,6 +52,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
       }),
       documentBucket: metadataS3Config.bucket
     })).singleton().classic(),
+    pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
 
@@ -60,8 +63,9 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
-    listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
+    proposalsRepository: asClass(ProposalsRepository).classic().singleton(),
 
+    listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
     updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
     addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),

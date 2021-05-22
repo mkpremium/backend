@@ -1,26 +1,17 @@
 import { emailCopies } from './email-copies'
-import { BuildingProps } from '../building'
+import { BuildingProps, proposalSent } from '../building'
 import { BuildingsRepository } from '../repository/buildings.repository'
+import { ProposalsRepository } from '../repository/proposals.repository'
+import { EmailSenderService } from '../../email/email-sender.service'
+import { UserRepository } from '../../user/repository/user.repository'
+import { PdfProposalComposer } from './pdf-proposal-composer'
 
 export class ProposalsSenderService {
   constructor (
-    private proposalsRepository: {
-      pendingToSend: () => Promise<any[]>,
-      save: (proposal: any) => Promise<void>
-    },
-    private emailSender: {
-      sendMail: (email: {
-        to: string,
-        subject: string,
-        from: any,
-        message: string,
-        attachment: Buffer[]
-      }) => Promise<void>
-    },
-    private usersRepository: { get: (userId: string) => Promise<any> },
-    private pdfProposalComposer: {
-      composeProposal: (building: BuildingProps, proposalAmount: number) => Promise<Buffer[]>
-    },
+    private proposalsRepository: ProposalsRepository,
+    private emailSender: EmailSenderService,
+    private usersRepository: UserRepository,
+    private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
   ) {
   }
@@ -44,7 +35,7 @@ export class ProposalsSenderService {
               from: sender,
               attachment: proposalPDF,
             })
-          }).then(() => this.proposalsRepository.save(p.sent()))
+          }).then(() => this.proposalsRepository.save(proposalSent(p)))
       })
     )
   }

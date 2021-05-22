@@ -11,6 +11,7 @@ import { Bucket } from 'couchbase'
 import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
 import { setupWorksheetDependencies } from '../worksheet/dependencies'
+import { setupEmailDependencies } from '../email/dependencies'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -30,6 +31,7 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
   setupUserDependencies(container)
   setupStockDependencies(container)
   setupHistoryDependencies(container)
+  setupEmailDependencies(container)
 
   return container
 }

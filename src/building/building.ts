@@ -90,15 +90,14 @@ export const BuildingProposal = t.struct<ProposalProps>(
       _documentType: 'building-proposal'
     }
   }
-)
+) as Struct<ProposalProps>
 
-BuildingProposal.prototype.sent = function () {
-  return BuildingProposal.update(this, {
-    notificationStatus: {
-      $set: 'SENT'
-    }
-  })
-}
+
+export const proposalSent = (proposal: ProposalProps) => BuildingProposal.update(proposal, {
+  notificationStatus: {
+    $set: 'SENT'
+  }
+})
 
 const BuildingEntity = t.struct(
   {
