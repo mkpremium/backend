@@ -52,10 +52,10 @@ export interface ProposalProps {
   buildingId: string;
   ownerId: string;
   createdBy: string;
-  notificationEmail: string;
-  notificationStatus: 'PENDING' | 'SENT';
-  message: string;
   proposal: number;
+  notificationEmail?: string;
+  notificationStatus?: 'PENDING' | 'SENT';
+  message?: string;
 }
 
 export const BuildingProposal = t.struct<ProposalProps>(
