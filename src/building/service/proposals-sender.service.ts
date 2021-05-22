@@ -5,6 +5,7 @@ import { ProposalsRepository } from '../repository/proposals.repository'
 import { EmailSenderService } from '../../email/email-sender.service'
 import { UserRepository } from '../../user/repository/user.repository'
 import { PdfProposalComposer } from './pdf-proposal-composer'
+import { Logger } from 'winston'
 
 export class ProposalsSenderService {
   constructor (
@@ -13,6 +14,7 @@ export class ProposalsSenderService {
     private usersRepository: UserRepository,
     private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
+    private logger: Logger,
   ) {
   }
 
@@ -20,7 +22,15 @@ export class ProposalsSenderService {
     const proposals = await this.proposalsRepository.pendingProposals()
 
     for (let proposal of proposals) {
-      await this.processProposal(proposal)
+      try {
+        await this.processProposal(proposal)
+      } catch (error) {
+        this.logger.crit('pending proposal not sent', {
+          error,
+          errorMessage: error.message,
+          proposalId: proposal.id
+        })
+      }
     }
   }
 

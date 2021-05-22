@@ -47,7 +47,8 @@ describe('ProposalsSenderService', () => {
       emailSenderStub,
       usersRepositoryStub,
       pdfProposalComposerStub,
-      buildingsRepositoryStub
+      buildingsRepositoryStub,
+      undefined
     )
 
     usersRepositoryStub.get.withArgs(testCaller.id).resolves(testCaller)
