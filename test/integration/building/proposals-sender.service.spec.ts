@@ -10,7 +10,7 @@ import { ownerBuilder } from '../../owner/owner.builder'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 
-describe('ProposalsSenderService', () => {
+describe('ProposalsSenderService - Integration', () => {
   let service!: ProposalsSenderService
   let addProposalForBuildingService!: AddProposalForBuildingService
   let mailerSpy
@@ -34,17 +34,6 @@ describe('ProposalsSenderService', () => {
   })
 
   it('sends emails older than 3 days', () => {
-    const testProposalToBeSend = BuildingProposal({
-      ownerId: 'test-owner-id',
-      buildingId: testBuilding.id,
-      createdBy: 'test-caller-id',
-
-      proposal: 10000,
-      message: 'test email message',
-      notificationStatus: 'PENDING',
-      notificationEmail: 'owner@test.email',
-    })
-
     mailerSpy.sendMail.resolves()
     const testAddProposalCmd = {
       amount: 100000,
