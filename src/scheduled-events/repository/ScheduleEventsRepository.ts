@@ -26,10 +26,7 @@ const UpdateScheduledEvent = t.struct({
 
 
 export class ScheduledEventsRepository extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = ScheduledEvent
-  }
+  protected Struct = ScheduledEvent
 
   async findByIdOrThrow (id) {
     const scheduledEvent = await this.findById(id)

@@ -18,8 +18,8 @@ import { CouchbaseAdapter, PromisifiedBucket } from './couchbase.adapter'
 /**
  * @deprecated use CouchbaseRepository instead.
  */
-export class CouchbaseModel {
-  protected Struct?: TcombStruct<any>
+export abstract class CouchbaseModel {
+  protected abstract Struct: TcombStruct<any>
   /** @deprecated use couchbaseAdapter instead **/
   private static bucket: PromisifiedBucket
   private static couchbaseAdapter: CouchbaseAdapter

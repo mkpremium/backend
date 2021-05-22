@@ -19,10 +19,7 @@ import { MetadataRepository } from './repository/metadata.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
 
 export class BuildingProposalRepository extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = BuildingProposal
-  }
+  protected Struct = BuildingProposal
 
   async findByIdOrThrow (proposalId) {
     const proposal = await this.findById(proposalId)
@@ -35,10 +32,7 @@ export class BuildingProposalRepository extends CouchbaseModel {
 }
 
 export class LegacyBuildingRepository extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = Building
-  }
+  protected Struct = Building
 
   async findByIdOrThrow (buildingId) {
     const building = await this.findById(buildingId)
