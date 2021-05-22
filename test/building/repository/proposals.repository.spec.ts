@@ -17,7 +17,7 @@ describe('ProposalsRepository', () => {
     repository = container.resolve('proposalsRepository')
 
     await repository.save(testPendingProposal)
-    proposalsToBeSend = await repository.pendingToSend()
+    proposalsToBeSend = await repository.pendingProposals()
   })
 
   it('returns all pending proposals', () => {

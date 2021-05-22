@@ -12,7 +12,7 @@ const pendingProposalToSendQuery = bucketName => `
 `
 
 export class ProposalsRepository extends CouchbaseRepository<ProposalProps> {
-  pendingToSend (): Promise<ProposalProps[]> {
+  pendingProposals (): Promise<ProposalProps[]> {
     return this.couchbaseAdapter.queryAsync(pendingProposalToSendQuery(this.bucketName))
       .then(rows => fromJSON(rows, t.list(this.struct())))
   }

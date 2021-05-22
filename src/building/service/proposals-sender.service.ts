@@ -17,7 +17,7 @@ export class ProposalsSenderService {
   }
 
   async checkAndSendProposals () {
-    const proposals = await this.proposalsRepository.pendingToSend()
+    const proposals = await this.proposalsRepository.pendingProposals()
 
     return Promise.all(
       proposals.map(p => {

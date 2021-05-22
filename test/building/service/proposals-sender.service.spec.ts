@@ -26,7 +26,7 @@ describe('ProposalsSenderService', () => {
 
   beforeEach(() => {
     proposalsRepositoryStub = {
-      pendingToSend: stub(),
+      pendingProposals: stub(),
       save: stub().resolves()
     }
     emailSenderStub = {
@@ -52,7 +52,7 @@ describe('ProposalsSenderService', () => {
 
     usersRepositoryStub.get.withArgs(testCaller.id).resolves(testCaller)
     buildingsRepositoryStub.get.withArgs(testProposal.buildingId).resolves(testBuilding)
-    proposalsRepositoryStub.pendingToSend.resolves([ testProposal ])
+    proposalsRepositoryStub.pendingProposals.resolves([ testProposal ])
     emailSenderStub.sendMail.resolves()
     pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal)
       .resolves(testProposalPdf)
