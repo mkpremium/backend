@@ -6,6 +6,7 @@ import { buildingBuilder } from '../building.builder'
 import { proposalBuilder } from '../proposal.builder'
 import { ScheduledEvent } from '../../../src/scheduled-events/types'
 import moment from 'moment'
+import { meetingBuilder } from '../../scheduled-events/meeting.builder'
 
 describe('ProposalsSenderService', () => {
   let service!: ProposalsSenderService
@@ -86,17 +87,10 @@ describe('ProposalsSenderService', () => {
   })
 
   it('does not send proposal for building with last scheduled event within last 3 days', async () => {
-    const testYesterdayMeeting = ScheduledEvent({
-      type: 'MEETINGS',
-      notifyTo: 'test-flipper-id',
+    const testYesterdayMeeting = meetingBuilder({
       eventDate: moment().add(-1, 'day').format(),
       createdAt: moment().add(-7, 'day').toDate(),
-      event: {
-        ownerId: testProposal.ownerId,
-        contactId: 'test-meeting-contact-id',
-        inPerson: true
-      }
-    })
+    }).build()
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId)
       .resolves(testYesterdayMeeting)
 

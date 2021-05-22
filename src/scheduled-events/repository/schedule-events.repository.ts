@@ -24,7 +24,6 @@ const UpdateScheduledEvent = t.struct({
   event: t.maybe(Event)
 }, 'UpdateScheduledEvent')
 
-
 export class ScheduledEventsRepository extends CouchbaseModel {
   protected Struct = ScheduledEvent
 
@@ -112,8 +111,16 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return this.query(qb)
   }
 
-  lastScheduledEventForBuilding (buildingId): Promise<MeetingProps | OfferRequestProps | undefined> {
-    return Promise.reject(new Error('not implemented'))
+  lastScheduledEventForBuilding (buildingId): Promise<ScheduledEventProps | undefined> {
+    return this.couchbaseAdapter.queryAsync(
+      `SELECT event.*
+       FROM ${this.getBucketName()} event
+       WHERE event._documentType = 'scheduled-event'
+         AND event.event.buildingId = $1
+       ORDER BY event.eventDate DESC
+       LIMIT 1
+      `, [ buildingId ]
+    ).then(rows => rows.length === 1 ? fromJSON(rows[0], ScheduledEvent) : undefined)
   }
 
   async preSave (scheduleEvent) {

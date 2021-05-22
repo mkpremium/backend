@@ -33,7 +33,7 @@ export const Event = t.struct(
     }
   })
 
-export const ScheduledEvent = t.struct(
+export const ScheduledEvent = t.struct<ScheduledEventProps>(
   {
     id: t.maybe(t.String),
     type: ScheduledEventTypeEnum,
