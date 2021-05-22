@@ -1,4 +1,4 @@
-import { ScheduledEventsRepository } from '../repository/ScheduleEventsRepository'
+import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { SCHEDULED_EVENT_DELETED } from '../controllers'
 
 class ScheduledEventDeleted {

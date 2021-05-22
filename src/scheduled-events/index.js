@@ -7,7 +7,7 @@ import { ScheduledCallsRepository } from './repository/scheduled-calls.repositor
 import { asClass, asFunction } from 'awilix'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
 import { CreateMeetingService } from './service/create-meeting.service'
-import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
+import { ScheduledEventsRepository } from './repository/schedule-events.repository'
 import { MeetingsService } from './service/meetings.service'
 import { MeetingsRepository } from './repository/meetings.repository'
 import { createAddScheduledCallController } from './controller/add-schedule-call.controller'

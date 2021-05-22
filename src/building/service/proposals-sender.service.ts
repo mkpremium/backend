@@ -6,7 +6,7 @@ import { EmailSenderService } from '../../email/email-sender.service'
 import { UserRepository } from '../../user/repository/user.repository'
 import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
-import { ScheduledEventsRepository } from '../../scheduled-events/repository/ScheduleEventsRepository'
+import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import moment from 'moment'
 
 export class ProposalsSenderService {

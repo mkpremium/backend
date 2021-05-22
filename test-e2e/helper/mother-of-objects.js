@@ -3,7 +3,7 @@ import moment from 'moment'
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { OwnerStatus } from '../../src/owner/owner'
-import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/ScheduleEventsRepository'
+import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/schedule-events.repository'
 import { closeSellStock } from '../../src/stock/application'
 import { Worksheet, WorkSheetStatus } from '../../src/worksheet/domain/worksheet'
 

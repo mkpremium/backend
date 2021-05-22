@@ -1,5 +1,5 @@
 import { wrap } from 'express-promise-wrap'
-import { ScheduledEventsRepository } from './repository/ScheduleEventsRepository'
+import { ScheduledEventsRepository } from './repository/schedule-events.repository'
 
 async function weekScheduleEventMeetings (req, res) {
   const repo = new ScheduledEventsRepository()

@@ -18,7 +18,7 @@ import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query
 import { OwnerRepository } from '../../owner/models'
 import { OwnerStatus } from '../../owner/owner'
 import { ownersContactViews } from '../../owner/types'
-import { ScheduledEventsRepository } from '../../scheduled-events/repository/ScheduleEventsRepository'
+import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
