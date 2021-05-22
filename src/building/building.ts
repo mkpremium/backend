@@ -47,7 +47,18 @@ const BuildingProposalStatus = {
   PENDING: 'pendiente'
 }
 
-export const BuildingProposal = t.struct(
+export interface ProposalProps {
+  id: string;
+  buildingId: string;
+  ownerId: string;
+  createdBy: string;
+  notificationEmail: string;
+  notificationStatus: 'PENDING' | 'SENT';
+  message: string;
+  proposal: number;
+}
+
+export const BuildingProposal = t.struct<ProposalProps>(
   {
     id: t.String,
     ownerId: t.String,
@@ -60,7 +71,7 @@ export const BuildingProposal = t.struct(
     proposal: t.maybe(t.Number),
     state: t.enums.of(Object.values(BuildingProposalStatus)),
     message: t.maybe(t.String),
-    notificationStatus: t.maybe(t.enums.of([ 'PENDING' ])),
+    notificationStatus: t.maybe(t.enums.of([ 'PENDING', 'SENT' ])),
     notificationEmail: t.maybe(t.String),
 
     _documentType: t.enums.of([ 'building-proposal' ])
@@ -80,6 +91,14 @@ export const BuildingProposal = t.struct(
     }
   }
 )
+
+BuildingProposal.prototype.sent = function () {
+  return BuildingProposal.update(this, {
+    notificationStatus: {
+      $set: 'SENT'
+    }
+  })
+}
 
 const BuildingEntity = t.struct(
   {

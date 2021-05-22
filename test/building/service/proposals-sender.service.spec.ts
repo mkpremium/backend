@@ -3,6 +3,7 @@ import { stub } from 'sinon'
 import { ProposalsSenderService } from '../../../src/building/service/proposals-sender.service'
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
+import { BuildingProposal } from '../../../src/building/building'
 
 describe('ProposalsSenderService', () => {
   let service!: ProposalsSenderService
@@ -12,9 +13,29 @@ describe('ProposalsSenderService', () => {
   let buildingsRepositoryStub
   let pdfProposalComposerStub
 
+  const testProposal = BuildingProposal({
+    id: 'test-proposal-id',
+    buildingId: 'test-building-id',
+    ownerId: 'test-owner-id',
+    notificationEmail: 'owner@email.test',
+    notificationStatus: 'PENDING',
+    createdBy: 'test-flipper-id',
+    message: 'test proposal message',
+    proposal: 1000000,
+  })
+  const testCaller = {
+    id: testProposal.createdBy,
+    profile: {
+      language: 'pt'
+    }
+  }
+  const testProposalPdf = Buffer.from('test proposal pdf', 'utf-8')
+  const testBuilding = buildingBuilder().build()
+
   beforeEach(() => {
     proposalsRepositoryStub = {
-      pendingToSend: stub()
+      pendingToSend: stub(),
+      save: stub().resolves()
     }
     emailSenderStub = {
       sendMail: stub()
@@ -36,24 +57,6 @@ describe('ProposalsSenderService', () => {
       pdfProposalComposerStub,
       buildingsRepositoryStub
     )
-  })
-
-  it('sends email for pending proposal', async () => {
-    const testProposal = {
-      buildingId: 'test-building-id',
-      notificationEmail: 'owner@email.test',
-      createdBy: 'test-flipper-id',
-      message: 'test proposal message',
-      proposal: 1000000
-    }
-    const testCaller = {
-      id: testProposal.createdBy,
-      profile: {
-        language: 'pt'
-      }
-    }
-    const testProposalPdf = Buffer.from('test proposal pdf', 'utf-8')
-    const testBuilding = buildingBuilder().build()
 
     usersRepositoryStub.get.withArgs(testCaller.id).resolves(testCaller)
     buildingsRepositoryStub.get.withArgs(testProposal.buildingId).resolves(testBuilding)
@@ -61,7 +64,9 @@ describe('ProposalsSenderService', () => {
     emailSenderStub.sendMail.resolves()
     pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal)
       .resolves(testProposalPdf)
+  })
 
+  it('sends email for pending proposal', async () => {
     await service.checkAndSendProposals()
 
     expect(emailSenderStub.sendMail).to.have.been.calledWith({
@@ -71,5 +76,12 @@ describe('ProposalsSenderService', () => {
       message: testProposal.message,
       attachment: testProposalPdf,
     })
+  })
+
+  it('updates notification status after send email', async () => {
+    await service.checkAndSendProposals()
+
+    expect(proposalsRepositoryStub.save).to.have.been
+      .calledWithMatch(p => p.notificationStatus === 'SENT' && p.id === testProposal.id)
   })
 })
