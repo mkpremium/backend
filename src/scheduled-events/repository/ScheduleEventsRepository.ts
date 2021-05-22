@@ -2,7 +2,6 @@ import _get from 'lodash/get'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
-import { logger } from '../../infrastructure/logger'
 import { buildRangeFromWeek, utc } from '../../lib/date'
 import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder, addMinuteBetweenQueryToBuilder } from '../../lib/query/helpers'
@@ -11,12 +10,20 @@ import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import { Event, ScheduledEvent, ScheduledEventType } from '../types'
+import {
+  Event,
+  MeetingProps,
+  OfferRequestProps,
+  ScheduledEvent,
+  ScheduledEventProps,
+  ScheduledEventType
+} from '../types'
 
 const UpdateScheduledEvent = t.struct({
   eventDate: t.maybe(t.Date),
   event: t.maybe(Event)
 }, 'UpdateScheduledEvent')
+
 
 export class ScheduledEventsRepository extends CouchbaseModel {
   constructor () {
@@ -45,11 +52,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return this.query(qb)
   }
 
-  /**
-   * @param {ScheduledEvent} data
-   * @param {string} createdBy
-   */
-  async addScheduledMeetingEvent (data = {}, createdBy) {
+  async addScheduledMeetingEvent (data: ScheduledEventProps, createdBy: string) {
     const params = { ...data, createdBy, type: 'MEETINGS' }
     const scheduledEvent = await this.save(params)
 
@@ -62,7 +65,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
         status: { $set: WorkSheetStatus.MEETING }
       })
 
-      await worksheetRepo.save(updatedWorksheet, false)
+      await worksheetRepo.save(updatedWorksheet)
       if (worksheet.lastAddedMeeting === null) {
         const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING
         await OperatorStats.registerAction(createdBy, action, { city, province })
@@ -78,8 +81,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return this.save(params)
   }
 
-  async update (id, data = {}) {
-    logger.debug('scheduled-events-model#update', { id, data })
+  async update (id: string, data: ScheduledEventProps) {
     const scheduledEvent = await this.findByIdOrThrow(id)
     fromJSON(data, UpdateScheduledEvent)
     const updatedEvent = t.update(scheduledEvent.event, {
@@ -111,6 +113,10 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     qb.where('type = ?', 'MEETINGS')
 
     return this.query(qb)
+  }
+
+  lastScheduledEventForBuilding (buildingId): Promise<MeetingProps | OfferRequestProps | undefined> {
+    return Promise.reject(new Error('not implemented'))
   }
 
   async preSave (scheduleEvent) {

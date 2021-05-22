@@ -3,8 +3,9 @@ import { stub } from 'sinon'
 import { ProposalsSenderService } from '../../../src/building/service/proposals-sender.service'
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
-import { BuildingProposal } from '../../../src/building/building'
 import { proposalBuilder } from '../proposal.builder'
+import { ScheduledEvent } from '../../../src/scheduled-events/types'
+import moment from 'moment'
 
 describe('ProposalsSenderService', () => {
   let service!: ProposalsSenderService
@@ -13,6 +14,7 @@ describe('ProposalsSenderService', () => {
   let usersRepositoryStub
   let buildingsRepositoryStub
   let pdfProposalComposerStub
+  let scheduledEventsRepositoryStub
 
   const testProposal = proposalBuilder().build()
   const testCaller = {
@@ -22,8 +24,8 @@ describe('ProposalsSenderService', () => {
     }
   }
   const testProposalPdf = Buffer.from('test proposal pdf', 'utf-8')
-  const testBuilding = buildingBuilder().build()
 
+  const testBuilding = buildingBuilder().build()
   beforeEach(() => {
     proposalsRepositoryStub = {
       pendingProposals: stub(),
@@ -38,16 +40,20 @@ describe('ProposalsSenderService', () => {
     pdfProposalComposerStub = {
       composeProposal: stub()
     }
+    scheduledEventsRepositoryStub = {
+      lastScheduledEventForBuilding: stub()
+    }
+
     buildingsRepositoryStub = {
       get: stub()
     }
-
     service = new ProposalsSenderService(
       proposalsRepositoryStub,
       emailSenderStub,
       usersRepositoryStub,
       pdfProposalComposerStub,
       buildingsRepositoryStub,
+      scheduledEventsRepositoryStub,
       undefined
     )
 
@@ -57,6 +63,7 @@ describe('ProposalsSenderService', () => {
     emailSenderStub.sendMail.resolves()
     pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal)
       .resolves(testProposalPdf)
+    scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId).resolves(undefined)
   })
 
   it('sends email for pending proposal', async () => {
@@ -76,5 +83,25 @@ describe('ProposalsSenderService', () => {
 
     expect(proposalsRepositoryStub.save).to.have.been
       .calledWithMatch(p => p.notificationStatus === 'SENT' && p.id === testProposal.id)
+  })
+
+  it('does not send proposal for building with last scheduled event within last 3 days', async () => {
+    const testYesterdayMeeting = ScheduledEvent({
+      type: 'MEETINGS',
+      notifyTo: 'test-flipper-id',
+      eventDate: moment().add(-1, 'day').format(),
+      createdAt: moment().add(-7, 'day').toDate(),
+      event: {
+        ownerId: testProposal.ownerId,
+        contactId: 'test-meeting-contact-id',
+        inPerson: true
+      }
+    })
+    scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId)
+      .resolves(testYesterdayMeeting)
+
+    await service.checkAndSendProposals()
+
+    expect(emailSenderStub.sendMail).to.not.have.been.called
   })
 })

@@ -1,6 +1,7 @@
 import t from 'tcomb'
 import { OwnerWithInclude } from '../owner/owner'
 import { DateTimeString } from '../infrastructure/shared-types'
+import exp from 'constants'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -38,8 +39,8 @@ export const ScheduledEvent = t.struct(
     type: ScheduledEventTypeEnum,
     notifyTo: t.String,
     eventDate: t.union([ t.Date, DateTimeString ]),
-    createdBy: t.maybe(t.String),
     createdAt: t.Date,
+    createdBy: t.maybe(t.String),
     _documentType: t.String,
     event: Event
   },
@@ -56,3 +57,37 @@ export const ScheduledEvent = t.struct(
 )
 
 export default t
+
+interface EventProps {
+  ownerId: string;
+  contactId: string;
+  buildingId: string;
+  inPerson: boolean
+}
+
+interface MeetingEventProps extends EventProps {
+  inPerson: true
+}
+interface OfferRequestEventProps extends EventProps {
+  inPerson: false
+}
+
+export interface ScheduledEventProps {
+  id: string;
+  type: 'CALLS' | 'MEETINGS';
+  notifyTo: string;
+  eventDate: Date | string;
+  createdAt: Date;
+  createdBy: string;
+  _documentType: 'scheduled-event'
+  event: EventProps
+}
+
+export interface MeetingProps extends ScheduledEventProps {
+  event: MeetingEventProps
+}
+
+export interface OfferRequestProps extends ScheduledEventProps {
+  event: OfferRequestEventProps
+}
+
