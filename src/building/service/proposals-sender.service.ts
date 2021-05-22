@@ -1,5 +1,5 @@
 import { emailCopies } from './email-copies'
-import { BuildingProps, proposalSent } from '../building'
+import { BuildingProps, ProposalProps, proposalSent } from '../building'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { ProposalsRepository } from '../repository/proposals.repository'
 import { EmailSenderService } from '../../email/email-sender.service'
@@ -19,24 +19,26 @@ export class ProposalsSenderService {
   async checkAndSendProposals () {
     const proposals = await this.proposalsRepository.pendingProposals()
 
-    return Promise.all(
-      proposals.map(p => {
-        return Promise.all([
-          this.buildingsRepository.get(p.buildingId),
-          this.usersRepository.get(p.createdBy),
-        ])
-          .then(async ([ building, sender ]) => {
-            const proposalPDF = await this.pdfProposalComposer.composeProposal(building, p.proposal)
+    for (let proposal of proposals) {
+      await this.processProposal(proposal)
+    }
+  }
 
-            await this.emailSender.sendMail({
-              to: p.notificationEmail,
-              subject: emailCopies[sender.profile.language].mailSubject,
-              message: p.message,
-              from: sender,
-              attachment: proposalPDF,
-            })
-          }).then(() => this.proposalsRepository.save(proposalSent(p)))
-      })
-    )
+  private processProposal (proposal: ProposalProps) {
+    return Promise.all([
+      this.buildingsRepository.get(proposal.buildingId),
+      this.usersRepository.get(proposal.createdBy),
+    ])
+      .then(async ([ building, sender ]) => {
+        const proposalPDF = await this.pdfProposalComposer.composeProposal(building, proposal.proposal)
+
+        await this.emailSender.sendMail({
+          to: proposal.notificationEmail,
+          subject: emailCopies[sender.profile.language].mailSubject,
+          message: proposal.message,
+          from: sender,
+          attachment: proposalPDF,
+        })
+      }).then(() => this.proposalsRepository.save(proposalSent(proposal)))
   }
 }
