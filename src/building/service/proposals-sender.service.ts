@@ -24,21 +24,21 @@ export class ProposalsSenderService {
     }
   }
 
-  private processProposal (proposal: ProposalProps) {
-    return Promise.all([
+  private async processProposal (proposal: ProposalProps) {
+    const [ building, sender ] = await Promise.all([
       this.buildingsRepository.get(proposal.buildingId),
       this.usersRepository.get(proposal.createdBy),
     ])
-      .then(async ([ building, sender ]) => {
-        const proposalPDF = await this.pdfProposalComposer.composeProposal(building, proposal.proposal)
+    const proposalPDF = await this.pdfProposalComposer.composeProposal(building, proposal.proposal)
 
-        await this.emailSender.sendMail({
-          to: proposal.notificationEmail,
-          subject: emailCopies[sender.profile.language].mailSubject,
-          message: proposal.message,
-          from: sender,
-          attachment: proposalPDF,
-        })
-      }).then(() => this.proposalsRepository.save(proposalSent(proposal)))
+    await this.emailSender.sendMail({
+      to: proposal.notificationEmail,
+      subject: emailCopies[sender.profile.language].mailSubject,
+      message: proposal.message,
+      from: sender,
+      attachment: proposalPDF,
+    })
+
+    await this.proposalsRepository.save(proposalSent(proposal))
   }
 }
