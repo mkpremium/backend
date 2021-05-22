@@ -31,6 +31,7 @@ import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener
 import { createAddOfferRequestController } from './controller/add-offer-request.controller'
 import { createAddProposalController } from './controller/add-proposal.controller'
 import { AddProposalForBuildingService } from './service/add-proposal-for-building.service'
+import { ProposalsSenderService } from './service/proposals-sender.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -49,6 +50,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
       }),
       documentBucket: metadataS3Config.bucket
     })).singleton().classic(),
+    proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
 
     buildingRepository: aliasTo('buildingsRepository'),

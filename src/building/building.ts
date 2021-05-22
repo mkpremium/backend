@@ -1,4 +1,4 @@
-import t from 'tcomb'
+import t, { Struct } from 'tcomb'
 import uuid from 'uuid/v4'
 import { Address, SimpleAddress, SimplePhoneNumber } from '../types/common'
 import { DateTimeString } from '../infrastructure/shared-types'
@@ -132,6 +132,13 @@ export const buildingNegotiationStatus = [
 
 export const NegotiationStatus = t.enums.of(buildingNegotiationStatus)
 
+export interface BuildingProps {
+  id: string;
+  ownerId?: string;
+  negotiationStatus: 'PENDIENTE' | 'PROPUESTA ENVIADA' | 'COMPRADO' | 'VENDIDO' | 'NO VENDE' | 'DESCARTADO' | 'YA VENDIO';
+  assignedAgentId?: string;
+}
+
 export const Building = t.struct(
   {
     id: t.String,
@@ -188,7 +195,7 @@ export const Building = t.struct(
       _documentType: 'building'
     }
   }
-)
+) as Struct<BuildingProps>
 
 Building.prototype.changeNegotiationStatus = function (newStatus) {
   return Building.update(this, {

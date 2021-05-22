@@ -28,7 +28,7 @@ export const OperatorRole = t.enums.of(Object.values(OperatorRoles))
 export const OperatorFirebaseStatesEnum = t.enums.of(Object.values(OperatorFirebaseStates))
 export const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
-export const OperatorProfile = t.OperatorProfile = t.struct(
+export const OperatorProfile = t.struct(
   {
     firstName: t.String,
     lastName: t.String,

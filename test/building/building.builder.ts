@@ -1,4 +1,4 @@
-import { Building } from '../../src/building/building'
+import { Building, BuildingProps } from '../../src/building/building'
 
 const buildingPrototype = {
   id: 'test-building-id',
@@ -17,8 +17,8 @@ const buildingPrototype = {
 
 export const buildingBuilder = (overrides = {}) => {
   return {
-    build () {
-      return Building({ ...buildingPrototype, ...overrides })
+    build (): BuildingProps {
+      return Building({ ...buildingPrototype, ...overrides } as any)
     }
   }
 }
