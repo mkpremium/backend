@@ -2,7 +2,7 @@ import { CouchbaseAdapter } from './couchbase.adapter'
 import { Struct } from 'tcomb'
 import { RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 
-export class CouchbaseRepository<T> {
+export abstract class CouchbaseRepository<T> {
   constructor (
     protected couchbaseAdapter: CouchbaseAdapter
   ) {
@@ -27,7 +27,5 @@ export class CouchbaseRepository<T> {
     return this.couchbaseAdapter.save(entityData, this.struct())
   }
 
-  struct (): Struct<any> & RecordToDomain {
-    throw new Error('Couchbase repository must implement struct method')
-  }
+  protected abstract struct (): Struct<any> & RecordToDomain
 }

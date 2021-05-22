@@ -64,7 +64,7 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync (query: string, params): Promise<any> {
+  queryAsync (query: string, params?): Promise<any> {
     return this.withRetry(() =>
       this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
     ).catch(error => {

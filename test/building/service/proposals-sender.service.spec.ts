@@ -4,6 +4,7 @@ import { ProposalsSenderService } from '../../../src/building/service/proposals-
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
 import { BuildingProposal } from '../../../src/building/building'
+import { proposalBuilder } from '../proposal.builder'
 
 describe('ProposalsSenderService', () => {
   let service!: ProposalsSenderService
@@ -13,16 +14,7 @@ describe('ProposalsSenderService', () => {
   let buildingsRepositoryStub
   let pdfProposalComposerStub
 
-  const testProposal = BuildingProposal({
-    id: 'test-proposal-id',
-    buildingId: 'test-building-id',
-    ownerId: 'test-owner-id',
-    notificationEmail: 'owner@email.test',
-    notificationStatus: 'PENDING',
-    createdBy: 'test-flipper-id',
-    message: 'test proposal message',
-    proposal: 1000000,
-  })
+  const testProposal = proposalBuilder().build()
   const testCaller = {
     id: testProposal.createdBy,
     profile: {
