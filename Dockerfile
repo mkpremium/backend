@@ -18,6 +18,7 @@ COPY package-lock.json build
 
 WORKDIR /app/build
 RUN ["npm", "install", "--production"]
+RUN ["mkdir", ".uploads"]
 
 # Run container
 FROM node:14
