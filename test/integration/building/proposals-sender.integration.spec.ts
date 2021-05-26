@@ -9,7 +9,7 @@ import { ownerBuilder } from '../../owner/owner.builder'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 
-describe('ProposalsSenderService - Integration', () => {
+describe.skip('ProposalsSenderService - Integration', () => {
   let service!: ProposalsSenderService
   let addProposalForBuildingService!: AddProposalForBuildingService
   let mailerSpy
