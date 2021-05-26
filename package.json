@@ -17,7 +17,7 @@
     "@babel/polyfill": "^7.7.0",
     "@types/couchbase": "^2.4.2",
     "awilix": "^4.3.1",
-    "aws-sdk": "^2.704.0",
+    "aws-sdk": "^2.914.0",
     "axios": "^0.18.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.5.1",
