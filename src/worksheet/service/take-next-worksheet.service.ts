@@ -1,15 +1,15 @@
-/**
- * @property {WorksheetQueueActionsService} takeWorksheetService
- * @property {WorksheetRepository}  worksheetRepository
- * @property {WorksheetQueueRepository}  worksheetQueueRepository
- * @property {EventBus} eventBus
- */
+import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
+import { WorksheetRepository } from '../repository/worksheet.repository'
+import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
+import { EventBus } from '../../infrastructure/event-bus'
+
 export class TakeNextWorksheetService {
-  constructor (takeWorksheetService, worksheetRepository, worksheetQueueRepository, eventBus) {
-    this.takeWorksheetService = takeWorksheetService
-    this.worksheetRepository = worksheetRepository
-    this.worksheetQueueRepository = worksheetQueueRepository
-    this.eventBus = eventBus
+  constructor (
+    private takeWorksheetService: WorksheetQueueActionsService,
+    private worksheetRepository: WorksheetRepository,
+    private worksheetQueueRepository: WorksheetQueueRepository,
+    private eventBus: EventBus
+  ) {
   }
 
   nextWorksheetInQueueOfId (queueId, byUserOfId) {
