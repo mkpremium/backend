@@ -1,16 +1,15 @@
 import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
+import { EventBus } from '../../infrastructure/event-bus'
+import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
+import { BuildingsRepository } from '../../building/repository/buildings.repository'
 
 export class CreateMeetingService {
-  /**
-   * @param {ScheduledEventsRepository} scheduledEventsRepository
-   * @param {BuildingsRepository} buildingsRepository
-   * @param {EventBus} eventBus
-   */
-  constructor (scheduledEventsRepository, buildingsRepository, eventBus) {
-    this.buildingsRepository = buildingsRepository
-    this.scheduledEventsRepository = scheduledEventsRepository
-    this.eventBus = eventBus
+  constructor (
+    private scheduledEventsRepository: ScheduledEventsRepository,
+    private buildingsRepository: BuildingsRepository,
+    private eventBus: EventBus,
+  ) {
   }
 
   async createMeeting (operator, requestBody) {
