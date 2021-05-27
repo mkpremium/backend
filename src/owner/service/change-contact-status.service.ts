@@ -35,7 +35,7 @@ export class ChangeContactStatusService {
         oldStatus: owner.status,
         newStatus: updatedOwner.status
       }
-      this.eventBus.publish(event)
+      await this.eventBus.publish(event)
     }
 
     return updatedOwner

@@ -30,7 +30,7 @@ export class AddOfferRequestService {
     const offerRequest = await this.offerRequestsRepository.add(addRequestCommand)
     await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
-    this.eventBus.publish({
+    await this.eventBus.publish({
       name: 'offer-request.created',
       note: addRequestCommand.note,
       userId: addRequestCommand.callerId,

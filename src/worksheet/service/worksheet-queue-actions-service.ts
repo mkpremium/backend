@@ -19,7 +19,7 @@ export class WorksheetQueueActionsService {
 
     await this.worksheetRepository.save(worksheetInQueue)
     await this.worksheetQueueRepository.save(queueWithWorksheet)
-    this.eventBus.publish({ name: 'worksheet.taken', worksheetId, queueId, by: userId })
+    await this.eventBus.publish({ name: 'worksheet.taken', worksheetId, queueId, by: userId })
 
     return this.worksheetRepository.getForCallcenterView(worksheetId)
   }

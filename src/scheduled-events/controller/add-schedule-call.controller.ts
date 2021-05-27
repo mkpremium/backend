@@ -20,7 +20,7 @@ export const createAddScheduledCallController = ({
   const queue = await legacyWorksheetQueueRepository.findByIdOrThrow(req.user.operator.profile.queueId)
   await legacyWorksheetQueueRepository.scheduleWorksheetInQueue(queue, scheduledEvent)
 
-  eventBus.publish({
+  await eventBus.publish({
     name: 'scheduled_events.call_scheduled',
     userId: req.user.id,
     ownerId: req.body.event.ownerId,

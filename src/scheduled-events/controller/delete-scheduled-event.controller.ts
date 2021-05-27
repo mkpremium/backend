@@ -6,7 +6,7 @@ const deleteScheduledEvent = (eventBus: EventBus) => async (req, res) => {
   const id = req.params.id
   const repo = new ScheduledEventsRepository()
   await repo.delete(id)
-  eventBus.publish({
+  await eventBus.publish({
     id,
     name: SCHEDULED_EVENT_DELETED,
   })
