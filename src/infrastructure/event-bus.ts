@@ -19,12 +19,16 @@ export class EventBus {
   }
 
   publish<T extends { name: string }> (event: T): Promise<void> {
-    try {
-      this.emitter.emit(event.name, event)
-      return Promise.resolve()
-    } catch (error) {
-      return Promise.reject(error)
-    }
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          this.emitter.emit(event.name, event)
+          return resolve()
+        } catch (error) {
+          return reject(error)
+        }
+      }, 500)
+    })
   }
 
   on (eventName: string, subscriber: (event: any) => Promise<any>) {
