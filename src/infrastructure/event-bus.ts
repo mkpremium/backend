@@ -1,14 +1,14 @@
 import { EventEmitter } from 'events'
 import { Logger } from 'winston'
-import { logger } from './logger'
 
 export class EventBus {
   private emitter = new EventEmitter()
 
   get info () {
-    const eventNames = this.emitter.eventNames()
-
-    return eventNames.map(name => ({ name, count: this.emitter.listenerCount(name) }))
+    return this.emitter.eventNames().reduce((acc, name) => {
+      acc[name] = this.emitter.listenerCount(name)
+      return acc
+    }, {})
   }
 
   constructor (private logger: Logger) {
