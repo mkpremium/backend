@@ -1,5 +1,4 @@
 import t from 'tcomb'
-import uuid from 'uuid/v4'
 import { RestringedHourObject } from '../operator/restringed-hours/types'
 
 export const OperatorRoles = {
@@ -52,19 +51,6 @@ OperatorProfile.prototype.fullName = function () {
   return `${this.firstName} ${this.lastName}`.trim()
 }
 
-OperatorProfile.prototype.getStateMessage = function () {
-  switch (this.state) {
-    case OperatorFirebaseStates.BLOCKED:
-      return 'bloqueado'
-    case OperatorFirebaseStates.ENABLED:
-      return 'activo'
-    case OperatorFirebaseStates.PAUSED:
-      return 'en pausa'
-    default:
-      return 'error de estado'
-  }
-}
-
 export const ProfitGoal = t.struct(
   {
     amount: t.Number,
@@ -72,7 +58,7 @@ export const ProfitGoal = t.struct(
   }
 )
 
-export const Award = t.Award = t.struct(
+const Award = t.struct(
   {
     code: t.String,
     awardedAt: t.Date
@@ -99,9 +85,9 @@ export const Operator = t.struct(
     level: t.maybe(t.Number),
     features: t.list(OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
-    enable: t.Bool,
+    enable: t.Boolean,
     roles: t.list(OperatorRole),
-    online: t.Bool,
+    online: t.Boolean,
 
     profile: OperatorProfile,
     restringedHours: t.maybe(RestringedHourObject),
@@ -152,31 +138,3 @@ Operator.prototype.withMaxLine = function (maxLine) {
     }
   })
 }
-
-t.OperatorProfileUpdate = t.struct({
-  firstName: t.maybe(t.String),
-  lastName: t.maybe(t.String),
-  city: t.maybe(t.String),
-  neighborhood: t.maybe(t.String),
-  state: t.maybe(OperatorFirebaseStatesEnum),
-  queueId: t.maybe(t.String),
-  email: t.maybe(t.String)
-})
-
-t.OperatorRefreshToken = t.struct(
-  {
-    id: t.String,
-    operatorId: t.String,
-    refreshToken: t.String,
-    _documentType: t.enums.of([ 'operator-refresh_token' ])
-  },
-  {
-    name: 'OperatorRefreshToken',
-    defaultProps: {
-      get id () {
-        return uuid()
-      },
-      _documentType: 'operator-refresh_token'
-    }
-  }
-)

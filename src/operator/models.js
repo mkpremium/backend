@@ -4,6 +4,7 @@ import _isNil from 'lodash/isNil'
 import _omit from 'lodash/omit'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
+import uuid from 'uuid/v4'
 
 import { jwt, saltFactor } from '../../config'
 import { CouchbaseModel } from '../db/model'
@@ -258,10 +259,28 @@ export class OperatorRepository extends Operator {
   }
 }
 
+const OperatorRefreshToken = t.struct(
+  {
+    id: t.String,
+    operatorId: t.String,
+    refreshToken: t.String,
+    _documentType: t.enums.of([ 'operator-refresh_token' ])
+  },
+  {
+    name: 'OperatorRefreshToken',
+    defaultProps: {
+      get id () {
+        return uuid()
+      },
+      _documentType: 'operator-refresh_token'
+    }
+  }
+)
+
 export class OperatorRefreshTokenRepository extends CouchbaseModel {
   constructor () {
     super()
-    this.Struct = t.OperatorRefreshToken
+    this.Struct = OperatorRefreshToken
   }
 
   static async createRefreshToken (payload) {
