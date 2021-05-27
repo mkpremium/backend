@@ -11,7 +11,10 @@ export class EventBus {
     }, {})
   }
 
-  constructor (private logger: Logger) {
+  constructor (
+    private logger: Logger,
+    private consistencyDelay: number
+  ) {
     this.emitter.setMaxListeners(0)
     this.emitter.on('error', error => {
       logger.crit('error event received', { error })
@@ -27,7 +30,7 @@ export class EventBus {
         } catch (error) {
           return reject(error)
         }
-      }, 500)
+      }, this.consistencyDelay)
     })
   }
 

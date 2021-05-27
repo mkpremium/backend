@@ -19,7 +19,9 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
-    eventBus: asClass(EventBus).classic().singleton(),
+    eventBus: asClass(EventBus).inject(() => ({
+      consistencyDelay: process.env.EVENTUAL_CONSISTENCY_DELAY
+    })).classic().singleton(),
     logger: asFunction(initLogger).singleton(),
   })
 
