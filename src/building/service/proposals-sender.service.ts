@@ -49,7 +49,7 @@ export class ProposalsSenderService {
     }
 
     const proposalPDF = await this.pdfProposalComposer.composeProposal(
-      building, proposal.proposal, sender.profile.language
+      building, proposal.proposal, sender
     )
 
     await this.emailSender.sendMail({
