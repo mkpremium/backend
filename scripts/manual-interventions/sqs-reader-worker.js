@@ -1,8 +1,5 @@
 const { Person } = require('../../src/owner/owner')
 
-const { config } = require('dotenv')
-config()
-
 const AWS = require('aws-sdk')
 const Promise = require('bluebird')
 const { connectCouchbaseBucket } = require('../../src/db/connect-couchbase-bucket')

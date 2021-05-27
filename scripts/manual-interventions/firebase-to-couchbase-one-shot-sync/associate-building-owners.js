@@ -1,7 +1,3 @@
-const { resolve } = require('path')
-const { config } = require('dotenv')
-config()
-
 const app = require('../../../src/app')
 const { dependenciesPromise } = app
 const buildingOwners = require('../../owner-fix/building-owners')

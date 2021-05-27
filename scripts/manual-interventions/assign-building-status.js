@@ -1,6 +1,3 @@
-const { config } = require('dotenv')
-config()
-
 const app = require('../../src/app')
 const { dependenciesPromise } = app
 

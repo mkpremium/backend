@@ -1,7 +1,3 @@
-const { resolve } = require('path')
-const { config } = require('dotenv')
-config({ path: resolve(__dirname, '..', '.env') })
-
 import moment from 'moment'
 
 const appMod = require('../../../src/app')

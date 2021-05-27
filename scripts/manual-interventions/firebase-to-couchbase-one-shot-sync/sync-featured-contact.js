@@ -1,7 +1,3 @@
-const { resolve } = require('path')
-const { config } = require('dotenv')
-config({ path: resolve(__dirname, '../..', '.env') })
-
 const appMod = require('../../../src/app')
 const app = appMod.default
 const { dependenciesPromise } = appMod
