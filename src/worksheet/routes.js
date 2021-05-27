@@ -16,7 +16,6 @@ import {
 } from './controllers'
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
-import { createMakeAlreadySoldWorksheetAvailable } from './controller/make-already-sold-worksheets-available'
 
 export function worksheetRoutes (awilixContainer) {
   const router = Router()
@@ -49,12 +48,6 @@ export function worksheetRoutes (awilixContainer) {
   router.get('/:id', worksheetFindByIdController)
 
   router.post('/:id/owners', addOwnerToWorksheetController)
-
-  router.post('/republish-already-sold', permissions.admin,
-    createMakeAlreadySoldWorksheetAvailable(
-      awilixContainer.resolve('worksheetRepository'),
-      awilixContainer.resolve('eventBus')
-    ))
 
   router.post('/status-changed', awilixContainer.resolve('worksheetStatusChangedController'))
 
