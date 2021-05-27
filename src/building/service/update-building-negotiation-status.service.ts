@@ -1,11 +1,11 @@
-/**
- * @property {BuildingsRepository} buildingsRepository
- * @property {EventBus} eventBus
- */
+import { EventBus } from '../../infrastructure/event-bus'
+import { BuildingsRepository } from '../repository/buildings.repository'
+
 export class UpdateBuildingNegotiationStatusService {
-  constructor (buildingsRepository, eventBus) {
-    this.buildingsRepository = buildingsRepository
-    this.eventBus = eventBus
+  constructor (
+    private buildingsRepository: BuildingsRepository,
+    private eventBus: EventBus
+  ) {
   }
 
   async updateBuildingStatus (buildingId, { status, userId, sourceOwnerId }) {
