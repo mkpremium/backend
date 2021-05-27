@@ -48,7 +48,9 @@ export class ProposalsSenderService {
       return
     }
 
-    const proposalPDF = await this.pdfProposalComposer.composeProposal(building, proposal.proposal)
+    const proposalPDF = await this.pdfProposalComposer.composeProposal(
+      building, proposal.proposal, sender.profile.language
+    )
 
     await this.emailSender.sendMail({
       to: proposal.notificationEmail,

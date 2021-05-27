@@ -4,7 +4,6 @@ import { ProposalsSenderService } from '../../../src/building/service/proposals-
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
 import { proposalBuilder } from '../proposal.builder'
-import { ScheduledEvent } from '../../../src/scheduled-events/types'
 import moment from 'moment'
 import { meetingBuilder } from '../../scheduled-events/meeting.builder'
 
@@ -62,7 +61,7 @@ describe('ProposalsSenderService', () => {
     buildingsRepositoryStub.get.withArgs(testProposal.buildingId).resolves(testBuilding)
     proposalsRepositoryStub.pendingProposals.resolves([ testProposal ])
     emailSenderStub.sendMail.resolves()
-    pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal)
+    pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal, testCaller.profile.language)
       .resolves(testProposalPdf)
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId).resolves(undefined)
   })
