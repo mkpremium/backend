@@ -15,7 +15,7 @@ import { initFlipperModule } from './flipper/init'
 import history from './history'
 import { createDiContainer } from './infrastructure/dependencies'
 import appErrorHandler from './infrastructure/error-handler'
-import { logger } from './infrastructure/logger'
+import { initLogger, logger } from './infrastructure/logger'
 import metadata from './metadata'
 import notes from './notes'
 // modules
@@ -36,9 +36,13 @@ import webhooks from './webhooks'
 import { worksheetEventListeners } from './worksheet/listeners'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
+import { EventBus } from './infrastructure/event-bus'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
+  const logger = initLogger()
+  logger.info('starting app')
+
   if (app) {
     return Promise.resolve(app)
   }
@@ -93,6 +97,10 @@ export const createApp = (): Promise<Express> => {
 
       app.use(appErrorHandler)
       app.set('IS_READY', true)
+      const eventBus: EventBus = diContainer.resolve('eventBus')
+      logger.info('App is ready', {
+        eventSubscribersInfo: eventBus.info
+      })
 
       return app
     })
