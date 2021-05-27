@@ -9,12 +9,9 @@
     "test:e2e": "./scripts/run-test.sh test-e2e",
     "test-watch": "./scripts/run-test.sh test -w --watch-files src --watch-files test",
     "test-watch:e2e": "./scripts/run-test.sh test-e2e -w --watch-files src --watch-files test-e2e",
-    "build": "tsc",
-    "socket": "nodemon bin/socket.js --exec babel-node",
-    "cronjobs": "nodemon bin/freezer.js --exec babel-node"
+    "build": "tsc"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.7.0",
     "@types/couchbase": "^2.4.2",
     "awilix": "^4.3.1",
     "aws-sdk": "^2.704.0",
@@ -57,11 +54,6 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.13.15",
-    "@babel/node": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/register": "^7.7.7",
     "@types/bluebird": "^3.5.34",
     "@types/bluebird-retry": "^0.11.4",
     "@types/chai": "^4.2.18",
@@ -78,7 +70,6 @@
     "chance": "^1.0.16",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-babel": "^4.1.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.8.0",

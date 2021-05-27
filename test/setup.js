@@ -1,5 +1,3 @@
-require('@babel/register')
-require('@babel/polyfill')
 require('../src/types')
 
 const chai = require('chai')
