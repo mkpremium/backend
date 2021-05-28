@@ -74,7 +74,7 @@ describe('ProposalsSenderService', () => {
       subject: emailCopies[testCaller.profile.language]['mailSubject'],
       from: testCaller,
       message: testProposal.message,
-      attachment: testProposalPdf,
+      attachment: { content: testProposalPdf, filename: 'propuesta.pdf' },
     })
   })
 
