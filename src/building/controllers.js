@@ -6,18 +6,6 @@ import { OwnerBusinessStatus } from '../owner/owner'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { BuildingProposalRepository, LegacyBuildingRepository } from './models'
 
-export function createListBuildingsController (listBuildingsService) {
-  return wrap(async (req, res) => {
-    if (req.query.id) {
-      res.send(await listBuildingsService.buildingsOfId(req.query.id))
-    } else if (req.query.allAssignedToMe !== undefined) {
-      res.send(await listBuildingsService.buildingsAssignedTo(req.user.operator.id))
-    } else {
-      res.status(400).json({ error: 'No id or allAssignedToMe provided' })
-    }
-  })
-}
-
 export function createListBuildingProposalsController (listBuildingProposalsService) {
   return wrap(async (req, res) => {
     res.send(await listBuildingProposalsService.forBuilding(req.params.buildingId))

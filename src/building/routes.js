@@ -4,7 +4,6 @@ import {
   addOwnerToBuildingController,
   createAllAgentsStockStatsController,
   createListBuildingProposalsController,
-  createListBuildingsController,
   createListVerifiedOwnersController,
   createMetadataUploadUrlController,
   createSetBuildingSalePriceController,
@@ -36,7 +35,7 @@ export const createBuildingsRoutes = container => {
 
   router.get('/:buildingId/verified-owners', createListVerifiedOwnersController(container.resolve('legacyOwnersRepository')))
 
-  router.get('/', createListBuildingsController(container.resolve('listBuildingsService')))
+  router.get('/', wrap(container.resolve('listBuildingsController')))
 
   router.put(
     '/:buildingId/negotiation-status',

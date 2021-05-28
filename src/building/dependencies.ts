@@ -34,6 +34,7 @@ import { AddProposalForBuildingService } from './service/add-proposal-for-buildi
 import { ProposalsSenderService } from './service/proposals-sender.service'
 import { ProposalsRepository } from './repository/proposals.repository'
 import { PdfProposalComposer } from './service/pdf-proposal-composer'
+import { createListBuildingsController } from './controller/list-buildings.controller'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -65,6 +66,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
     proposalsRepository: asClass(ProposalsRepository).classic().singleton(),
 
+    listBuildingsController: asFunction(createListBuildingsController).singleton(),
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
     updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
