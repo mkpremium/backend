@@ -76,7 +76,7 @@ export class CouchbaseAdapter {
     })
   }
 
-  private throwCouchbaseError (error, query) {
+  private throwCouchbaseError (error, query: string) {
     if (error.code) {
       throw new QueryError(query, error.code, error.message)
     } else {
