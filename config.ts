@@ -28,7 +28,7 @@ export const numintec = {
   apiKey: process.env.NUMINTEC_API_LICENSE
 }
 
-export const saltFactor = parseInt(process.env.SALT_FACTOR || 10)
+export const saltFactor = parseInt(process.env.SALT_FACTOR || '10')
 
 export const metadataS3Config = {
   region: process.env.METADATA_S3_REGION || 'eu-west-2',
@@ -58,17 +58,12 @@ export const mailer = {
   transporter: nodemailer.createTransport({
     host: process.env.MAILER_HOST,
     port: Number(process.env.MAILER_PORT || '587'),
-    secure: JSON.parse(process.env.MAILER_SECURE || false),
+    secure: process.env.MAILER_SECURE === 'true',
     connectionTimeout: 2000,
     auth: {
       user: process.env.MAILER_USER,
       pass: process.env.MAILER_PASS
     },
-    logger: logger,
-    debug: process.env.DEBUG === 'ON',
-    tls: {
-      rejectUnauthorized: false
-    }
   })
 }
 
