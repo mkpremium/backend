@@ -13,7 +13,7 @@ const buildingEntitiesStatus = {
 
 export const BuildingCadastre = t.struct({
   reference: t.String,
-  address: t.String
+  address: t.maybe(t.String),
 }, 'Cadastre')
 
 export const BuildingLocation = t.struct({
@@ -150,8 +150,29 @@ export const buildingNegotiationStatus = [
 
 export const NegotiationStatus = t.enums.of(buildingNegotiationStatus)
 
+export interface BuildingAddressProps {
+  street: string;
+  number: number | string;
+  fullAddress: string;
+  postalCode: {
+    number: number | string;
+    verified: boolean;
+  }
+  city: string;
+  province: string;
+  neighborhood: string;
+}
+
 export interface BuildingProps {
   id: string;
+  cadastre?: {
+    reference: string;
+  };
+  address: BuildingAddressProps;
+  location: {
+    lat: number;
+    lng: number;
+  };
   ownerId?: string;
   negotiationStatus: 'PENDIENTE' | 'PROPUESTA ENVIADA' | 'COMPRADO' | 'VENDIDO' | 'NO VENDE' | 'DESCARTADO' | 'YA VENDIO';
   assignedAgentId?: string;

@@ -4,7 +4,7 @@ export class EmailSenderService {
     subject: string,
     from: any,
     message: string,
-    attachment: Buffer[]
+    attachment: Buffer
   }): Promise<void> {
     return Promise.reject(new Error('not implemented'))
   }

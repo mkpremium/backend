@@ -75,6 +75,13 @@ const OperatorSignatures = t.struct({
   city: Signature
 })
 
+export interface OperatorProfileProps {
+  firstName: string;
+  lastName: string;
+  city: string;
+  language: 'es' | 'pt';
+}
+
 export const Operator = t.struct(
   {
     id: t.maybe(t.String),

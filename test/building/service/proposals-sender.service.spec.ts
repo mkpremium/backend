@@ -61,7 +61,7 @@ describe('ProposalsSenderService', () => {
     buildingsRepositoryStub.get.withArgs(testProposal.buildingId).resolves(testBuilding)
     proposalsRepositoryStub.pendingProposals.resolves([ testProposal ])
     emailSenderStub.sendMail.resolves()
-    pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal, testCaller)
+    pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal, testCaller.profile)
       .resolves(testProposalPdf)
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId).resolves(undefined)
   })
