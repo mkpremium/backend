@@ -15,7 +15,7 @@ import { authenticatedGet, authenticatedPost, initApplication } from '../helper/
 describe('Users Meetings', () => {
   let app, businessUser
 
-  before(async () => {
+  beforeEach(async () => {
     app = await initApplication()
     businessUser = await operatorCreateBusiness()
   })
