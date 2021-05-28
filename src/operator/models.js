@@ -12,18 +12,18 @@ import { newHttpError } from '../lib/http-error'
 import { bearerTokenExtractor } from '../middleware/jwt'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Operator as OperatorType, OperatorProfile, OperatorRole, OperatorRoles } from '../types/operator'
+import { User as OperatorType, UserProfile, UserRole, UserRoles } from '../types/user'
 import { OperatorListResponse } from './types'
 
 const ListStats = t.struct(
   {
-    role: t.enums.of([ OperatorRoles.OPERATOR, OperatorRoles.BUSINESS ]),
+    role: t.enums.of([ UserRoles.OPERATOR, UserRoles.BUSINESS ]),
     view: t.enums.of([ 'day', 'total' ])
   },
   {
     name: 'ListStats',
     defaultProps: {
-      role: OperatorRoles.OPERATOR,
+      role: UserRoles.OPERATOR,
       view: 'total'
     }
   }
@@ -232,7 +232,7 @@ export class OperatorRepository extends Operator {
   }
 
   async listWithPerformance (params) {
-    const operators = await this.list({ role: OperatorRoles.OPERATOR })
+    const operators = await this.list({ role: UserRoles.OPERATOR })
     const statsRepo = new OperatorStatsRepository()
 
     const results = await statsRepo.getPerformance(params)
@@ -342,9 +342,9 @@ const OperatorRequest = t.struct(
     serviceId: t.maybe(t.String),
     enable: t.Bool,
     flipperId: t.maybe(t.String),
-    roles: t.list(OperatorRole),
+    roles: t.list(UserRole),
 
-    profile: OperatorProfile
+    profile: UserProfile
   },
   {
     name: 'OperatorRequest',

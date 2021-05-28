@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { OperatorRepository } from '../../src/operator/models'
-import { OperatorRoles } from '../../src/types/operator'
+import { UserRoles } from '../../src/types/user'
 import { buildUser } from '../common'
 import { createTestContainer } from '../create-test-container'
 
@@ -30,7 +30,7 @@ describe('PropertyManagerRepository', () => {
           lastName: 'ignored',
           city: 'Barcelona'
         },
-        roles: [ OperatorRoles.BUSINESS ],
+        roles: [ UserRoles.BUSINESS ],
         profitGoal: {
           amount: 100,
           updatedAt: new Date()

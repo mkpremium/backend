@@ -1,5 +1,5 @@
 import { CallerToFlipperAssignationRejected } from './caller-to-flipper-assignation-rejected.error'
-import { Operator } from '../../types/operator'
+import { User } from '../../types/user'
 
 /**
  * @property {ScheduledCallsService} scheduledCallsService
@@ -29,7 +29,7 @@ export class AssignFlipperToCallerService {
         )
       }
 
-      return this.usersRepository.save(Operator.update(caller, {
+      return this.usersRepository.save(User.update(caller, {
         flipperId: {
           $set: flipperId
         }

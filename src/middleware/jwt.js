@@ -5,7 +5,7 @@ import jwtPermissions from 'express-jwt-permissions'
 import _get from 'lodash/get'
 import { jwt as jwtConfig } from '../../config'
 import { OperatorRepository } from '../operator/models'
-import { OperatorRoles } from '../types/operator'
+import { UserRoles } from '../types/user'
 import { logger } from '../infrastructure/logger'
 
 export const jwt = (getToken) => {
@@ -53,20 +53,20 @@ function appTokenExtractor (req) {
 const guard = jwtPermissions()
 
 export const permissions = {
-  admin: guard.check(OperatorRoles.ADMIN),
+  admin: guard.check(UserRoles.ADMIN),
   operator: guard.check([
-    [ OperatorRoles.ADMIN ],
-    [ OperatorRoles.MANAGER ],
-    [ OperatorRoles.OPERATOR ]
+    [ UserRoles.ADMIN ],
+    [ UserRoles.MANAGER ],
+    [ UserRoles.OPERATOR ]
   ]),
   manager: guard.check([
-    [ OperatorRoles.ADMIN ],
-    [ OperatorRoles.MANAGER ]
+    [ UserRoles.ADMIN ],
+    [ UserRoles.MANAGER ]
   ]),
   allManagers: guard.check([
-    [ OperatorRoles.ADMIN ],
-    [ OperatorRoles.MANAGER ],
-    [ OperatorRoles.STREET_MANAGER ],
-    [ OperatorRoles.STREET_ADMIN ]
+    [ UserRoles.ADMIN ],
+    [ UserRoles.MANAGER ],
+    [ UserRoles.STREET_MANAGER ],
+    [ UserRoles.STREET_ADMIN ]
   ])
 }

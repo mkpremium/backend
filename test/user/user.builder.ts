@@ -1,6 +1,6 @@
-import { Operator, OperatorProps } from '../../src/types/operator'
+import { User, UserProps } from '../../src/types/user'
 
-const userPrototype: OperatorProps = {
+const userPrototype: UserProps = {
   id: 'test-user-id',
   email: 'user@email.test',
   username: 'test-user',
@@ -12,8 +12,8 @@ const userPrototype: OperatorProps = {
     language: 'es',
   }
 }
-export const userBuilder = (overrides: Partial<OperatorProps> = {}) => ({
+export const userBuilder = (overrides: Partial<UserProps> = {}) => ({
   build () {
-    return Operator({ ...userPrototype, ...overrides })
+    return User({ ...userPrototype, ...overrides })
   }
 })

@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import { RestringedHourObject } from '../operator/restringed-hours/types'
 
-export const OperatorRoles = {
+export const UserRoles = {
   OPERATOR: 'OPERATOR',
   MANAGER: 'MANAGER',
   BUSINESS: 'BUSINESS',
@@ -23,11 +23,11 @@ export const OperatorFeatures = {
   ALL: 'Todas'
 }
 
-export const OperatorRole = t.enums.of(Object.values(OperatorRoles))
+export const UserRole = t.enums.of(Object.values(UserRoles))
 export const OperatorFirebaseStatesEnum = t.enums.of(Object.values(OperatorFirebaseStates))
 export const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
-export const OperatorProfile = t.struct(
+export const UserProfile = t.struct(
   {
     firstName: t.String,
     lastName: t.String,
@@ -39,7 +39,7 @@ export const OperatorProfile = t.struct(
     language: t.maybe(t.String)
   },
   {
-    name: 'OperatorProfile',
+    name: 'UserProfile',
     defaultProps: {
       state: OperatorFirebaseStates.ENABLED,
       language: 'es'
@@ -47,7 +47,7 @@ export const OperatorProfile = t.struct(
   }
 )
 
-OperatorProfile.prototype.fullName = function () {
+UserProfile.prototype.fullName = function () {
   return `${this.firstName} ${this.lastName}`.trim()
 }
 
@@ -70,27 +70,27 @@ const Signature = t.struct({
   image: t.String, // base64 png
   description: t.String
 })
-const OperatorSignatures = t.struct({
+const UserSignatures = t.struct({
   user: Signature,
   city: Signature
 })
 
-export interface OperatorProfileProps {
+export interface UserProfileProps {
   firstName: string;
   lastName: string;
   city: string;
   language: 'es' | 'pt';
 }
 
-export interface OperatorProps {
+export interface UserProps {
   id: string;
   username: string;
   password: string;
   email: string;
-  profile: OperatorProfileProps;
+  profile: UserProfileProps;
 }
 
-export const Operator = t.struct<OperatorProps>(
+export const User = t.struct<UserProps>(
   {
     id: t.maybe(t.String),
     username: t.String,
@@ -101,10 +101,10 @@ export const Operator = t.struct<OperatorProps>(
     features: t.list(OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
     enable: t.Boolean,
-    roles: t.list(OperatorRole),
+    roles: t.list(UserRole),
     online: t.Boolean,
 
-    profile: OperatorProfile,
+    profile: UserProfile,
     restringedHours: t.maybe(RestringedHourObject),
     flipperId: t.maybe(t.String),
 
@@ -118,11 +118,11 @@ export const Operator = t.struct<OperatorProps>(
     createdAt: t.Date,
     disabledAt: t.maybe(t.Date),
     favoriteBuildings: t.maybe(t.list(t.String)),
-    signatures: t.maybe(OperatorSignatures),
+    signatures: t.maybe(UserSignatures),
     _documentType: t.enums.of([ 'operator' ])
   },
   {
-    name: 'Operator',
+    name: 'User',
     defaultProps: {
       enable: true,
       online: false,
@@ -146,8 +146,8 @@ export const Operator = t.struct<OperatorProps>(
   }
 )
 
-Operator.prototype.withMaxLine = function (maxLine) {
-  return Operator.update(this, {
+User.prototype.withMaxLine = function (maxLine) {
+  return User.update(this, {
     maxLine: {
       $set: maxLine
     }

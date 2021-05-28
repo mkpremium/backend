@@ -4,7 +4,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { History } from '../history/models'
 import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
-import { OperatorRoles } from '../types/operator'
+import { UserRoles } from '../types/user'
 import { LegacyWorksheetRepository, QueueRequestParams } from './models/worksheet-repository'
 import { QueueRequestAction } from './types'
 import { WorksheetQueueBody } from './domain/worksheet'
@@ -101,7 +101,7 @@ const actionsOnWorksheetQueue = (worksheetQueueRepository) => async (req, res) =
 }
 
 function operatorIdByPermissions (req) {
-  const allowQuery = req.user.permissions.indexOf(OperatorRoles.MANAGER) !== -1
+  const allowQuery = req.user.permissions.indexOf(UserRoles.MANAGER) !== -1
   return allowQuery
     ? req.query.operationId || req.user.id
     : req.user.id

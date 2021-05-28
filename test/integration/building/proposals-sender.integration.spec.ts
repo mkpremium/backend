@@ -9,7 +9,7 @@ import { ownerBuilder } from '../../owner/owner.builder'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { UserRepository } from '../../../src/user/repository/user.repository'
-import { OperatorProps } from '../../../src/types/operator'
+import { UserProps } from '../../../src/types/user'
 import { userBuilder } from '../../user/user.builder'
 
 describe.skip('ProposalsSenderService - Integration', () => {
@@ -18,7 +18,7 @@ describe.skip('ProposalsSenderService - Integration', () => {
   let mailerSpy
   const testBuilding = buildingBuilder({ cadastre: { reference: '123456789' } }).build()
   const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withEmailContact('test-email-id').build()
-  const testCaller: OperatorProps = userBuilder().build()
+  const testCaller: UserProps = userBuilder().build()
 
   beforeEach(async () => {
     const container = await createTestContainer()

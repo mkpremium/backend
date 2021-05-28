@@ -1,45 +1,45 @@
 import _get from 'lodash/get'
 import _intersection from 'lodash/intersection'
-import { OperatorRoles } from '../types/operator'
+import { UserRoles } from '../types/user'
 import { newHttpError } from './http-error'
 
 export function isStreetAdmin (roles) {
-  const { STREET_ADMIN } = OperatorRoles
+  const { STREET_ADMIN } = UserRoles
   return _intersection(roles, [STREET_ADMIN]).length === 1
 }
 
 export function canManageStreet (roles) {
-  const { STREET_MANAGER, STREET_ADMIN } = OperatorRoles
+  const { STREET_MANAGER, STREET_ADMIN } = UserRoles
   return _intersection(roles, [STREET_MANAGER, STREET_ADMIN]).length === 1
 }
 
 export function nonAdminStreet (roles) {
-  const { STREET_MANAGER, STREET } = OperatorRoles
+  const { STREET_MANAGER, STREET } = UserRoles
   return _intersection(roles, [STREET_MANAGER, STREET]).length === 1
 }
 
 export function isOnlyStreet (roles) {
-  const { STREET } = OperatorRoles
+  const { STREET } = UserRoles
   return _intersection(roles, [STREET]).length === 1
 }
 
 export function isAdmin (roles) {
-  const { ADMIN } = OperatorRoles
+  const { ADMIN } = UserRoles
   return _intersection(roles, [ADMIN]).length === 1
 }
 
 export function isBusiness (roles) {
-  const { BUSINESS } = OperatorRoles
+  const { BUSINESS } = UserRoles
   return _intersection(roles, [BUSINESS]).length === 1
 }
 
 export function isManager (roles) {
-  const { MANAGER, ADMIN } = OperatorRoles
+  const { MANAGER, ADMIN } = UserRoles
   return _intersection(roles, [MANAGER, ADMIN]).length === 1
 }
 
 export function isOperator (roles) {
-  const { OPERATOR } = OperatorRoles
+  const { OPERATOR } = UserRoles
   return _intersection(roles, [OPERATOR]).length === 1
 }
 

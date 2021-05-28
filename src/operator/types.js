@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { Operator, OperatorProfile, OperatorRole } from '../types/operator'
+import { User, UserProfile, UserRole } from '../types/user'
 import { ListQuery } from '../types/params'
 import { RestringedHourObject } from './restringed-hours/types'
 
@@ -41,7 +41,7 @@ t.OperatorLimitedListQuery = ListQuery.extend(
 export const OperatorListResponse = t.struct(
   {
     total: t.Number,
-    results: t.list(Operator)
+    results: t.list(User)
   },
   {
     name: 'OperatorListResponse',
@@ -56,8 +56,8 @@ t.OperatorView = t.struct(
   {
     id: t.maybe(t.String),
     username: t.String,
-    roles: t.list(OperatorRole),
-    profile: OperatorProfile,
+    roles: t.list(UserRole),
+    profile: UserProfile,
     restringedHours: t.maybe(RestringedHourObject)
   },
   {

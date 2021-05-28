@@ -1,5 +1,5 @@
 import { BuildingProps } from '../building'
-import { OperatorProfileProps } from '../../types/operator'
+import { UserProfileProps } from '../../types/user'
 import PdfPrinter from 'pdfmake'
 import path from 'path'
 import { emailCopies } from './email-copies'
@@ -9,7 +9,7 @@ export class PdfProposalComposer {
   composeProposal (
     building: BuildingProps,
     proposalAmount: number,
-    sender: OperatorProfileProps
+    sender: UserProfileProps
   ): Promise<Buffer> {
     const address = building.address
     return createPdf(
@@ -38,7 +38,7 @@ const createPdf = (
   address: string,
   cadastreReference: string,
   proposalAmount: number,
-  sender: OperatorProfileProps
+  sender: UserProfileProps
 ): Promise<Buffer> => {
   return new Promise(resolve => {
     const lang = sender.language

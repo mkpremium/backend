@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { stub } from 'sinon'
 import { buildUser } from '../../common'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { Operator } from '../../../src/types/operator'
+import { User } from '../../../src/types/user'
 
 describe('SetFlipperMaxLineService', () => {
   const testMaxLine = 1000000
@@ -21,7 +21,7 @@ describe('SetFlipperMaxLineService', () => {
   })
 
   it('save flipper with setup max line', async () => {
-    const testFlipper = fromJSON(buildUser({ id: testFlipperId, roles: [ 'BUSINESS' ] }), Operator)
+    const testFlipper = fromJSON(buildUser({ id: testFlipperId, roles: [ 'BUSINESS' ] }), User)
     usersRepositoryStub.get.withArgs(testFlipperId).resolves(testFlipper)
     usersRepositoryStub.save.resolves()
 

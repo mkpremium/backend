@@ -1,10 +1,10 @@
-import { Operator } from '../../types/operator'
+import { User } from '../../types/user'
 import t from 'tcomb'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 
 export class UserRepository extends CouchbaseRepository {
   struct () {
-    return Operator
+    return User
   }
 
   async addFavoriteBuildingToUserOfId (userId, buildingId) {
@@ -22,7 +22,7 @@ export class UserRepository extends CouchbaseRepository {
       }
     })
 
-    return this.couchbaseAdapter.save(updatedUser, Operator)
+    return this.couchbaseAdapter.save(updatedUser, User)
   }
 
   async removeFavoriteBuildingToUserOfId (userId, buildingId) {
@@ -40,7 +40,7 @@ export class UserRepository extends CouchbaseRepository {
       }
     })
 
-    return this.couchbaseAdapter.save(updatedUser, Operator)
+    return this.couchbaseAdapter.save(updatedUser, User)
   }
 }
 

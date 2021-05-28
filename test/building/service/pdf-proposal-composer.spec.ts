@@ -1,6 +1,6 @@
 import { PdfProposalComposer } from '../../../src/building/service/pdf-proposal-composer'
 import { buildingBuilder } from '../building.builder'
-import { OperatorProfileProps } from '../../../src/types/operator'
+import { UserProfileProps } from '../../../src/types/user'
 
 describe('PdfProposalComposer', () => {
   const testBuilding = buildingBuilder({
@@ -20,7 +20,7 @@ describe('PdfProposalComposer', () => {
       reference: '123456789',
     }
   }).build()
-  const testFlipper: OperatorProfileProps = {
+  const testFlipper: UserProfileProps = {
     firstName: 'Flipper-Name',
     lastName: 'Flipper-Surname',
     city: 'FLIPPER CITY',
