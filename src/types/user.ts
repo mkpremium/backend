@@ -11,21 +11,7 @@ export const UserRoles = {
   STREET_ADMIN: 'STREET_ADMIN'
 }
 
-export const OperatorFirebaseStates = {
-  ENABLED: 'A',
-  BLOCKED: 'B',
-  PAUSED: 'P'
-}
-
-export const OperatorFeatures = {
-  CHAT: 'Chat',
-  STATS: 'Estadísticas',
-  ALL: 'Todas'
-}
-
 export const UserRole = t.enums.of(Object.values(UserRoles))
-export const OperatorFirebaseStatesEnum = t.enums.of(Object.values(OperatorFirebaseStates))
-export const OperatorFirebaseFeatures = t.enums.of(Object.values(OperatorFeatures))
 
 export const UserProfile = t.struct(
   {
@@ -33,7 +19,6 @@ export const UserProfile = t.struct(
     lastName: t.String,
     city: t.maybe(t.String),
     neighborhood: t.maybe(t.String),
-    state: t.maybe(OperatorFirebaseStatesEnum),
     queueId: t.maybe(t.String),
     email: t.maybe(t.String),
     language: t.maybe(t.String)
@@ -41,7 +26,6 @@ export const UserProfile = t.struct(
   {
     name: 'UserProfile',
     defaultProps: {
-      state: OperatorFirebaseStates.ENABLED,
       language: 'es'
     }
   }
@@ -98,7 +82,6 @@ export const User = t.struct<UserProps>(
     email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
-    features: t.list(OperatorFirebaseFeatures),
     serviceId: t.maybe(t.String),
     enable: t.Boolean,
     roles: t.list(UserRole),
