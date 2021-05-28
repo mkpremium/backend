@@ -13,7 +13,7 @@ export const UserRoles = {
 
 export const UserRole = t.enums.of(Object.values(UserRoles))
 
-export const UserProfile = t.struct(
+export const UserProfile = t.struct<UserProfileProps>(
   {
     firstName: t.String,
     lastName: t.String,

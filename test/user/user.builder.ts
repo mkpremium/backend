@@ -1,4 +1,4 @@
-import { User, UserProps } from '../../src/types/user'
+import { User, UserProfile, UserProfileProps, UserProps } from '../../src/types/user'
 
 const userPrototype: UserProps = {
   id: 'test-user-id',
@@ -15,5 +15,11 @@ const userPrototype: UserProps = {
 export const userBuilder = (overrides: Partial<UserProps> = {}) => ({
   build () {
     return User({ ...userPrototype, ...overrides })
+  }
+})
+
+export const userProfileBuilder = (overrides: Partial<UserProfileProps> = {}) => ({
+  build () {
+    return UserProfile({ ...userPrototype.profile, ...overrides })
   }
 })

@@ -57,7 +57,10 @@ export class ProposalsSenderService {
       subject: emailCopies[sender.profile.language].mailSubject,
       message: proposal.message,
       from: sender,
-      attachment: proposalPDF,
+      attachment: {
+        content: proposalPDF,
+        filename: 'propuesta.pdf'
+      },
     })
 
     await this.proposalsRepository.save(proposalSent(proposal))

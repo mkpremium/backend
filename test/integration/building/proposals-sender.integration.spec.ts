@@ -12,7 +12,7 @@ import { UserRepository } from '../../../src/user/repository/user.repository'
 import { UserProps } from '../../../src/types/user'
 import { userBuilder } from '../../user/user.builder'
 
-describe.skip('ProposalsSenderService - Integration', () => {
+describe('ProposalsSenderService - Integration', () => {
   let service!: ProposalsSenderService
   let addProposalForBuildingService!: AddProposalForBuildingService
   let mailerSpy
@@ -25,7 +25,7 @@ describe.skip('ProposalsSenderService - Integration', () => {
     mailerSpy = {
       sendMail: stub()
     }
-    container.register('mailer', asValue(mailerSpy))
+    container.register('emailTransport', asValue(mailerSpy))
 
     service = container.resolve('proposalsSenderService')
     addProposalForBuildingService = container.resolve('addProposalForBuildingService')
