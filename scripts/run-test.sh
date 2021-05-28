@@ -13,6 +13,7 @@ set -a && . "${PWD}/${test_dir}/.env"
 export NODE_ENV=test
 npx mocha --config "${PWD}/${test_dir}/.mocharc.js" \
   --retries 3 \
+  --check-leaks \
   --trace-warnings \
   -r ts-node/register \
   --extension js --extension ts \
