@@ -14,7 +14,7 @@ export class PdfProposalComposer {
     const address = building.address
     return createPdf(
       `${address.street} ${address.number}, ${address.city}`,
-      building.cadastre.reference,
+      building.cadastre ? building.cadastre.reference : 'XXXXXXXXXXXXX',
       proposalAmount,
       sender
     )
