@@ -24,18 +24,26 @@ export class ProposalsSenderService {
   async checkAndSendProposals () {
     const lastScheduledEventDateToInclude = moment().add(-3, 'days').startOf('day')
     const proposals = await this.proposalsRepository.pendingProposals()
+    const stats = {
+      pendingProposals: proposals.length,
+      success: 0,
+      errors: 0,
+    }
 
     for (let proposal of proposals) {
       try {
         await this.processProposal(proposal, lastScheduledEventDateToInclude)
+        stats.success++
       } catch (error) {
         this.logger.crit('pending proposal not sent', {
           errorMessage: error.message,
           stack: error.stack,
           proposalId: proposal.id,
         })
+        stats.errors++
       }
     }
+    return stats
   }
 
   private async processProposal (proposal: ProposalProps, lastScheduledEventDateToInclude: moment.Moment) {
