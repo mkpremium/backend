@@ -17,9 +17,8 @@
       "entryPoint": null,
       "portMappings": [],
       "command": [
-        "npx",
-        "ts-node",
-        "bin/proposals-sender.ts"
+        "node",
+        "bin/proposals-sender.js"
       ],
       "linuxParameters": null,
       "cpu": 0,
