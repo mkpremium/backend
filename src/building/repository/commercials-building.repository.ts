@@ -10,7 +10,11 @@ SELECT
     building.floorArea,
     building.location,
     building.cadastre.reference cadastreReference,
-    {"amount": building.recentProposal.proposal, "createdAt": building.recentProposal.createdAt} latestProposal,
+    {
+      "amount": proposal.proposal,
+      proposal.createdAt,
+      proposal.notificationStatus
+    } latestProposal,
     building.\`use\`,
     building.ownerId,
     building.negotiationStatus,
@@ -28,6 +32,8 @@ NEST ${bucketName} owners ON owners.status != "ERRONEO"
     AND owners.buildingId = building.id
     AND owners._documentType = 'owner'
 
+LEFT JOIN ${bucketName} proposal ON proposal._documentType = 'building-proposal'
+    AND proposal.id = building.recentProposal.id
 
 LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = building.id
     AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
