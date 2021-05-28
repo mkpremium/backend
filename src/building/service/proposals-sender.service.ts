@@ -22,7 +22,7 @@ export class ProposalsSenderService {
   }
 
   async checkAndSendProposals () {
-    const lastScheduledEventDateToInclude = moment().add(-3, 'days').startOf('day')
+    const lastScheduledEventDateToInclude = moment().add(-3, 'days')
     const proposals = await this.proposalsRepository.pendingProposals()
     const stats = {
       pendingProposals: proposals.length,
