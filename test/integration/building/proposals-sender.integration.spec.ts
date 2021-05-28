@@ -8,13 +8,17 @@ import { AddProposalForBuildingService } from '../../../src/building/service/add
 import { ownerBuilder } from '../../owner/owner.builder'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
+import { UserRepository } from '../../../src/user/repository/user.repository'
+import { OperatorProps } from '../../../src/types/operator'
+import { userBuilder } from '../../user/user.builder'
 
 describe.skip('ProposalsSenderService - Integration', () => {
   let service!: ProposalsSenderService
   let addProposalForBuildingService!: AddProposalForBuildingService
   let mailerSpy
-  const testBuilding = buildingBuilder().build()
+  const testBuilding = buildingBuilder({ cadastre: { reference: '123456789' } }).build()
   const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withEmailContact('test-email-id').build()
+  const testCaller: OperatorProps = userBuilder().build()
 
   beforeEach(async () => {
     const container = await createTestContainer()
@@ -28,6 +32,8 @@ describe.skip('ProposalsSenderService - Integration', () => {
 
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const ownersRepository = container.resolve('ownersRepository') as OwnerRepository
+    const usersRepository = container.resolve('usersRepository') as UserRepository
+    await usersRepository.save(testCaller)
     await ownersRepository.save(testOwner)
     await buildingsRepository.save(testBuilding)
   })
@@ -38,7 +44,7 @@ describe.skip('ProposalsSenderService - Integration', () => {
       amount: 100000,
       ownerId: testOwner.id,
       contactId: 'test-email-id',
-      createdBy: 'test-caller-id',
+      createdBy: testCaller.id,
     }
 
     return addProposalForBuildingService.add(testBuilding.id, testAddProposalCmd)

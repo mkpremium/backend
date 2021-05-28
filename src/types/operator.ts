@@ -82,7 +82,15 @@ export interface OperatorProfileProps {
   language: 'es' | 'pt';
 }
 
-export const Operator = t.struct(
+export interface OperatorProps {
+  id: string;
+  username: string;
+  password: string;
+  email: string;
+  profile: OperatorProfileProps;
+}
+
+export const Operator = t.struct<OperatorProps>(
   {
     id: t.maybe(t.String),
     username: t.String,

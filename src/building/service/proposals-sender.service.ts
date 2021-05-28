@@ -30,9 +30,9 @@ export class ProposalsSenderService {
         await this.processProposal(proposal, lastScheduledEventDateToInclude)
       } catch (error) {
         this.logger.crit('pending proposal not sent', {
-          error,
           errorMessage: error.message,
-          proposalId: proposal.id
+          stack: error.stack,
+          proposalId: proposal.id,
         })
       }
     }
