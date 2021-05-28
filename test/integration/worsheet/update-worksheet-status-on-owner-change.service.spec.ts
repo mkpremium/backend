@@ -29,12 +29,12 @@ describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
     eventBus = container.resolve('eventBus')
 
     await worksheetRepository.save(testWorksheet)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
   })
 
   it('sets worksheet to invalid when no owner has contact', () => {
     eventBus.publish(testEvent)
-    return new Promise(resolve => setTimeout(resolve, 1000))
+    return new Promise(resolve => setTimeout(resolve, 2000))
       .then(async () => {
         const updatedWorksheet = await worksheetRepository.get(testWorksheet.id)
 
