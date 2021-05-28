@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import { RestringedHourObject } from '../operator/restringed-hours/types'
+import { DateTimeString } from '../infrastructure/shared-types'
 
 export const UserRoles = {
   OPERATOR: 'OPERATOR',
@@ -38,7 +39,7 @@ UserProfile.prototype.fullName = function () {
 export const ProfitGoal = t.struct(
   {
     amount: t.Number,
-    updatedAt: t.Date
+    updatedAt: t.union([ t.Date, DateTimeString ])
   }
 )
 
@@ -98,7 +99,7 @@ export const User = t.struct<UserProps>(
       ownerId: t.String
     }))),
     awards: t.list(Award),
-    createdAt: t.Date,
+    createdAt: t.union([ t.Date, DateTimeString ]),
     disabledAt: t.maybe(t.Date),
     favoriteBuildings: t.maybe(t.list(t.String)),
     signatures: t.maybe(UserSignatures),
