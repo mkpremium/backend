@@ -3,6 +3,7 @@ import { OperatorProfileProps } from '../../types/operator'
 import PdfPrinter from 'pdfmake'
 import path from 'path'
 import { emailCopies } from './email-copies'
+import moment from 'moment'
 
 export class PdfProposalComposer {
   composeProposal (
@@ -10,8 +11,12 @@ export class PdfProposalComposer {
     proposalAmount: number,
     sender: OperatorProfileProps
   ): Promise<Buffer> {
+    const address = building.address
     return createPdf(
-      'Romo Rampa 295, TEST_PORTO', '123456789', 1000
+      `${address.street} ${address.number}, ${address.city}`,
+      building.cadastre.reference,
+      proposalAmount,
+      sender
     )
   }
 }
@@ -27,8 +32,16 @@ const printer = new PdfPrinter({
     bolditalics: path.join(__dirname, 'fonts/Roboto-MediumItalic.ttf')
   }
 })
-const createPdf = (address: string, cadastreReference: string, proposal: any): Promise<Buffer> => {
+
+const formatProposalAmount = (proposalAmount: number) => proposalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+const createPdf = (
+  address: string,
+  cadastreReference: string,
+  proposalAmount: number,
+  sender: OperatorProfileProps
+): Promise<Buffer> => {
   return new Promise(resolve => {
+    const lang = sender.language
     const pdf = printer.createPdfKitDocument({
       pageSize: 'A4',
       pageMargins: [ 40, 15, 40, 0 ], // [left, top, right, bottom]
@@ -39,43 +52,44 @@ const createPdf = (address: string, cadastreReference: string, proposal: any): P
           style: 'header'
         },
         {
-          text: 'FLIPPER CITY, 14/05/2021',
+          text: `${sender.city}, ${moment().format('DD/MM/YYYY')}`,
           style: 'dateText'
         },
         {
-          text: emailCopies['es']['bodyText1'],
+          text: emailCopies[lang]['bodyText1'],
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['bodyText2'].replace('%%address%%', address),
+          text: emailCopies[lang]['bodyText2'].replace('%%address%%', address),
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['bodyText3'],
+          text: emailCopies[lang]['bodyText3'],
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['bodyText4'].replace('%%address%%', address).replace('%%cadastre%%', cadastreReference),
+          text: emailCopies[lang]['bodyText4'].replace('%%address%%', address)
+            .replace('%%cadastre%%', cadastreReference),
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['bodyText5'],
+          text: emailCopies[lang]['bodyText5'],
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['offer'].replace('%%offer%%', '1.000'), // TODO format number
+          text: emailCopies[lang]['offer'].replace('%%offer%%', formatProposalAmount(proposalAmount)),
           style: 'offer'
         },
         {
-          text: emailCopies['es']['bodyText6'],
+          text: emailCopies[lang]['bodyText6'],
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['bodyText7'],
+          text: emailCopies[lang]['bodyText7'],
           style: 'bodyText'
         },
         {
-          text: emailCopies['es']['bodyText8'],
+          text: emailCopies[lang]['bodyText8'],
           style: 'bodyText'
         },
         {
@@ -83,11 +97,11 @@ const createPdf = (address: string, cadastreReference: string, proposal: any): P
           style: 'signImage'
         },
         {
-          text: 'Flipper-Name Flipper-Surname', // TODO inject flipper name
+          text: `${sender.firstName} ${sender.lastName}`,
           style: 'signText'
         },
         {
-          text: emailCopies['es']['footer'],
+          text: emailCopies[lang]['footer'],
           style: 'directorText'
         },
         {

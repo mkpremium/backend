@@ -1,7 +1,6 @@
 import { PdfProposalComposer } from '../../../src/building/service/pdf-proposal-composer'
 import { buildingBuilder } from '../building.builder'
 import { OperatorProfileProps } from '../../../src/types/operator'
-import * as fs from 'fs'
 
 describe('PdfProposalComposer', () => {
   const testBuilding = buildingBuilder({
@@ -16,6 +15,9 @@ describe('PdfProposalComposer', () => {
       fullAddress: undefined,
       neighborhood: undefined,
       province: undefined
+    },
+    cadastre: {
+      reference: '123456789',
     }
   }).build()
   const testFlipper: OperatorProfileProps = {
@@ -29,6 +31,6 @@ describe('PdfProposalComposer', () => {
     const composer = new PdfProposalComposer()
     const composedPdf = await composer.composeProposal(testBuilding, 1000, testFlipper)
 
-    fs.writeFileSync('/tmp/proposal.pdf', composedPdf)
+    // fs.writeFileSync('/tmp/proposal.pdf', composedPdf)
   })
 })
