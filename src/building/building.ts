@@ -2,6 +2,7 @@ import t, { Struct } from 'tcomb'
 import uuid from 'uuid/v4'
 import { Address, SimpleAddress, SimplePhoneNumber } from '../types/common'
 import { DateTimeString } from '../infrastructure/shared-types'
+import moment from 'moment'
 
 const buildingEntitiesDefaultStatus = 'SIN DATOS'
 const buildingEntitiesStatus = {
@@ -55,6 +56,7 @@ export interface ProposalProps {
   proposal: number;
   notificationEmail?: string;
   notificationStatus?: 'PENDING' | 'SENT';
+  notificationSentAt?: string | moment.Moment | undefined;
   message?: string;
 }
 
@@ -72,6 +74,7 @@ export const BuildingProposal = t.struct<ProposalProps>(
     state: t.enums.of(Object.values(BuildingProposalStatus)),
     message: t.maybe(t.String),
     notificationStatus: t.maybe(t.enums.of([ 'PENDING', 'SENT' ])),
+    notificationSentAt: t.maybe(t.union([ t.Date, DateTimeString ])),
     notificationEmail: t.maybe(t.String),
 
     _documentType: t.enums.of([ 'building-proposal' ])
@@ -96,6 +99,9 @@ export const BuildingProposal = t.struct<ProposalProps>(
 export const proposalSent = (proposal: ProposalProps) => BuildingProposal.update(proposal, {
   notificationStatus: {
     $set: 'SENT'
+  },
+  notificationSentAt: {
+    $set: new Date()
   }
 })
 
