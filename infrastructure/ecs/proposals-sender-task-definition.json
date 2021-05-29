@@ -37,7 +37,7 @@
         },
         {
           "name": "NODE_ENV",
-          "value": "production_v2"
+          "value": "production"
         },
         {
           "name": "SOCKET_ENABLED",
@@ -50,6 +50,22 @@
         {
           "name": "SOCKET_SERVER",
           "value": "http://websocket.local"
+        },
+        {
+          "name": "MAILER_HOST",
+          "value": "smtp.gmail.com"
+        },
+        {
+          "name": "MAILER_PORT",
+          "value": "465"
+        },
+        {
+          "name": "MAILER_SECURE",
+          "value": "true"
+        },
+        {
+          "name": "MAILER_USER",
+          "value": "compra@mkpremium.com"
         }
       ],
       "resourceRequirements": null,
@@ -61,6 +77,10 @@
         {
           "valueFrom": "backend.couchbase_pass",
           "name": "COUCHBASE_PASS"
+        },
+        {
+          "valueFrom": "backend.mailer.pass",
+          "name": "MAILER_PASS"
         }
       ],
       "dockerSecurityOptions": null,
