@@ -16,7 +16,7 @@ RUN ["npm", "run", "build"]
 COPY package.json build
 COPY package-lock.json build
 
-COPY fonts app/build
+RUN ["cp", "-r", "fonts", "build"]
 WORKDIR /app/build
 RUN ["npm", "install", "--production"]
 RUN ["mkdir", ".uploads"]
