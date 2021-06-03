@@ -19,7 +19,8 @@ export const WorkSheetStatus = {
   NO_SALE: 'NO_SALE',
   ALREADY_SOLD: 'YA_VENDIO',
   MEETING: 'MEETING',
-  PUBLIC: 'ENTE_PUBLICO'
+  PUBLIC: 'ENTE_PUBLICO',
+  TAKEN: 'TAKEN'
 }
 
 export const WorkSheetStatusEnum = t.enums.of(Object.values(WorkSheetStatus), 'WorkSheetStatus')
@@ -261,6 +262,7 @@ export const takeWorksheet = (queue, worksheet, byUserOfId) => {
       }
     }),
     Worksheet.update(worksheet, {
+      status: { $set: WorkSheetStatus.TAKEN },
       queueId: { $set: queue.id },
       viewedAt: { $set: utc().toDate() }
     })
