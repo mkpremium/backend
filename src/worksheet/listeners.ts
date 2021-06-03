@@ -4,7 +4,10 @@ import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { logger } from '../infrastructure/logger'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
-import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/update-building-negotiation-status.service'
+import {
+  BUILDING_NEGOTIATION_STATUS_CHANGED,
+  BuildingNegotiationStatusChanged
+} from '../building/service/update-building-negotiation-status.service'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { OwnerStatusChangedEvent } from '../owner/service/change-contact-status.service'
@@ -16,11 +19,14 @@ export function worksheetEventListeners (container: AwilixContainer) {
   const releaseUserOtherActiveWorksheetsInQueueService = container.resolve('releaseUserOtherActiveWorksheetsInQueueService') as ReleaseUserExtraOpenedWorksheetsInQueueService
   const updateWorksheetStatusOnOwnerChangeService = container.resolve('updateWorksheetStatusOnOwnerChangeService') as UpdateWorksheetStatusOnOwnerChangeService
 
-  eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({ buildingId, operatorId }) => {
-    logger.info('updating worksheet because building negotiation status changed', { buildingId, operatorId })
+  eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({
+                                                            buildingId,
+                                                            userId
+                                                          }: BuildingNegotiationStatusChanged) => {
+    logger.info('updating worksheet because building negotiation status changed', { buildingId, userId })
     try {
       const worksheet = await legacyWorksheetRepository.findWorksheetByBuilding(buildingId)
-      await legacyWorksheetRepository.updateStatus(worksheet.id, operatorId)
+      await legacyWorksheetRepository.updateStatus(worksheet.id, userId)
     } catch (error) {
       logger.crit('could not update worksheet on building status change', { error, errorMessage: error.message })
     }
