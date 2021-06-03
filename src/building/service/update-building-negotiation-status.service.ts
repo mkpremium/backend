@@ -1,5 +1,13 @@
 import { EventBus } from '../../infrastructure/event-bus'
 import { BuildingsRepository } from '../repository/buildings.repository'
+import { BuildingNegotiationStatus } from '../building'
+
+interface BuildingNegotiationStatusChanged {
+  name: 'building.negotiation-status-changed';
+  buildingId: string;
+  userId: string;
+  negotiationStatus: BuildingNegotiationStatus;
+}
 
 export class UpdateBuildingNegotiationStatusService {
   constructor (
@@ -21,7 +29,7 @@ export class UpdateBuildingNegotiationStatusService {
       buildingId,
       userId,
       negotiationStatus: status
-    })
+    } as BuildingNegotiationStatusChanged)
   }
 }
 

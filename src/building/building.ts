@@ -169,6 +169,15 @@ export interface BuildingAddressProps {
   neighborhood: string;
 }
 
+export type BuildingNegotiationStatus =
+  'PENDIENTE'
+  | 'PROPUESTA ENVIADA'
+  | 'COMPRADO'
+  | 'VENDIDO'
+  | 'NO VENDE'
+  | 'DESCARTADO'
+  | 'YA VENDIO'
+
 export interface BuildingProps {
   id: string;
   cadastre?: {
@@ -180,7 +189,7 @@ export interface BuildingProps {
     lng: number;
   };
   ownerId?: string;
-  negotiationStatus: 'PENDIENTE' | 'PROPUESTA ENVIADA' | 'COMPRADO' | 'VENDIDO' | 'NO VENDE' | 'DESCARTADO' | 'YA VENDIO';
+  negotiationStatus: BuildingNegotiationStatus;
   assignedAgentId?: string;
 }
 
