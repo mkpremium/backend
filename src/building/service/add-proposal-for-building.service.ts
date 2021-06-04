@@ -11,8 +11,8 @@ interface CreateProposalCommand {
   message?: string;
 }
 
-interface ProposalForBuildingAdded {
-  name: 'building.proposal_added';
+export interface ProposalForBuildingScheduled {
+  name: 'building.proposal_scheduled';
   createdBy: string;
   ownerId: string;
   buildingId: string
@@ -37,8 +37,8 @@ export class AddProposalForBuildingService {
       notificationEmail: contactOfId(owner, cmd.contactId).value,
     })
 
-    const event: ProposalForBuildingAdded = {
-      name: 'building.proposal_added',
+    const event: ProposalForBuildingScheduled = {
+      name: 'building.proposal_scheduled',
       buildingId: buildingId,
       createdBy: cmd.createdBy,
       ownerId: cmd.ownerId

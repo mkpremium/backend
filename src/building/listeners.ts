@@ -1,7 +1,7 @@
 import { AwilixContainer } from 'awilix'
 import { EventBus } from '../infrastructure/event-bus'
 
-export function buildingEventListeners(container: AwilixContainer) {
+export function buildingEventListeners (container: AwilixContainer) {
   const eventBus: EventBus = container.resolve('eventBus')
 
   eventBus.on('worksheet.made_available', container.resolve('worksheetMadeAvailableListener'))
@@ -11,4 +11,5 @@ export function buildingEventListeners(container: AwilixContainer) {
   eventBus.on('scheduled_events.call_scheduled', container.resolve('scheduledCallListener'))
   eventBus.on('offer-request.created', container.resolve('setFeaturedOwnerFromOfferRequestListener'))
   eventBus.on('offer-request.created', container.resolve('addNoteToBuilding'))
+  eventBus.on('building.proposal_scheduled', container.resolve('proposalScheduledListener'))
 }

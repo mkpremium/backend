@@ -60,7 +60,7 @@ describe('AddProposalForBuildingService', () => {
 
   it('publishes proposal added event', () => {
     expect(eventBusStub.publish).to.have.been.calledWith({
-      name: 'building.proposal_added',
+      name: 'building.proposal_scheduled',
       buildingId: testBuildingId,
       createdBy: testFlipperId,
       ownerId: testOwnerId

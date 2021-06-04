@@ -171,6 +171,7 @@ export interface BuildingAddressProps {
 
 export type BuildingNegotiationStatus =
   'PENDIENTE'
+  | 'PROPOSAL_SCHEDULED'
   | 'PROPUESTA ENVIADA'
   | 'COMPRADO'
   | 'VENDIDO'

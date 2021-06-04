@@ -9,6 +9,12 @@ export interface BuildingNegotiationStatusChanged {
   negotiationStatus: BuildingNegotiationStatus;
 }
 
+interface UpdateBuildingNegotiationStatusCommand {
+  status: BuildingNegotiationStatus;
+  userId: string;
+  sourceOwnerId: string;
+}
+
 export class UpdateBuildingNegotiationStatusService {
   constructor (
     private buildingsRepository: BuildingsRepository,
@@ -16,7 +22,11 @@ export class UpdateBuildingNegotiationStatusService {
   ) {
   }
 
-  async updateBuildingStatus (buildingId, { status, userId, sourceOwnerId }) {
+  async updateBuildingStatus (buildingId, {
+    status,
+    userId,
+    sourceOwnerId
+  }: UpdateBuildingNegotiationStatusCommand) {
     const building = await this.buildingsRepository.get(buildingId)
     let updatedBuilding = building.changeNegotiationStatus(status)
     if (sourceOwnerId) {

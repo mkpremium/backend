@@ -35,6 +35,7 @@ import { ProposalsSenderService } from './service/proposals-sender.service'
 import { ProposalsRepository } from './repository/proposals.repository'
 import { PdfProposalComposer } from './service/pdf-proposal-composer'
 import { createListBuildingsController } from './controller/list-buildings.controller'
+import { createProposalScheduledListener } from './event-listener/proposal-added.listener'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -74,6 +75,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
     addProposalController: asFunction(createAddProposalController).singleton(),
+    proposalScheduledListener: asFunction(createProposalScheduledListener).singleton(),
 
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
