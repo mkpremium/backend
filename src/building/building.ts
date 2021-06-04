@@ -146,6 +146,7 @@ export const BuildingMetadataPreview = t.struct({
 
 export const buildingNegotiationStatus = [
   'PENDIENTE',
+  'PROPOSAL_SCHEDULED',
   'PROPUESTA ENVIADA',
   'COMPRADO',
   'VENDIDO',
