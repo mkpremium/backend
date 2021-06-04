@@ -163,12 +163,12 @@ jobs:
           aws-region: eu-west-1
 
       - name: Render Amazon ECS task definition for proposals-sender container
-          id: proposals-sender-task-def
-          uses: aws-actions/amazon-ecs-render-task-definition@v1
-          with:
-            task-definition: infrastructure/ecs/proposals-sender-task-definition.json
-            container-name: proposals-sender
-            image: ${{ env.IMAGE_URL }}
+        id: proposals-sender-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: infrastructure/ecs/proposals-sender-task-definition.json
+          container-name: proposals-sender
+          image: ${{ env.IMAGE_URL }}
 
       - name: Deploy Amazon ECS proposals-sender task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
