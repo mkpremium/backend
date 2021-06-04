@@ -17,42 +17,53 @@ describe('AddProposalForBuildingService', () => {
   let service: AddProposalForBuildingService
   let legacyAddProposalServiceStub
   let ownersRepositoryStub
+  let eventBusStub
 
-  beforeEach(() => {
+  beforeEach(async () => {
     legacyAddProposalServiceStub = {
-      addProposal: stub()
+      addProposal: stub().resolves()
     }
     ownersRepositoryStub = {
-      get: stub()
+      get: stub().withArgs(testOwnerId).resolves(testOwner)
     }
-    ownersRepositoryStub.get.withArgs(testOwnerId).resolves(testOwner)
+    eventBusStub = {
+      publish: stub().resolves()
+    }
 
     service = new AddProposalForBuildingService(
       legacyAddProposalServiceStub,
-      ownersRepositoryStub
+      ownersRepositoryStub,
+      eventBusStub,
     )
-  })
 
-  it('adds proposal to building', () => {
-    legacyAddProposalServiceStub.addProposal.resolves()
-
-    return service.add(testBuildingId, {
+    await service.add(testBuildingId, {
       ownerId: testOwnerId,
       contactId: testContactId,
       amount: testProposalAmount,
       createdBy: testFlipperId,
       message: testEmailMessage,
-    }).then(() => {
-      expect(legacyAddProposalServiceStub.addProposal).to.have.been.calledWith(
-        testBuildingId, testFlipperId, {
-          state: 'pendiente',
-          ownerId: testOwnerId,
-          proposal: testProposalAmount,
-          notificationStatus: 'PENDING',
-          notificationEmail: testNotificationEmailAddress,
-          message: testEmailMessage,
-        }
-      )
+    })
+  })
+
+  it('adds proposal to building', () => {
+    expect(legacyAddProposalServiceStub.addProposal).to.have.been.calledWith(
+      testBuildingId, testFlipperId, {
+        state: 'pendiente',
+        ownerId: testOwnerId,
+        proposal: testProposalAmount,
+        notificationStatus: 'PENDING',
+        notificationEmail: testNotificationEmailAddress,
+        message: testEmailMessage,
+      }
+    )
+  })
+
+  it('publishes proposal added event', () => {
+    expect(eventBusStub.publish).to.have.been.calledWith({
+      name: 'building.proposal_added',
+      buildingId: testBuildingId,
+      createdBy: testFlipperId,
+      ownerId: testOwnerId
     })
   })
 })
