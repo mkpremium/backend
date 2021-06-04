@@ -15,9 +15,10 @@ describe('ProposalsSenderService', () => {
   let buildingsRepositoryStub
   let pdfProposalComposerStub
   let scheduledEventsRepositoryStub
+  let updateBuildingNegotiationStatusServiceStub
 
   const testProposal = proposalBuilder().build()
-  const testCaller = {
+  const testFlipper = {
     id: testProposal.createdBy,
     profile: {
       language: 'pt'
@@ -43,6 +44,9 @@ describe('ProposalsSenderService', () => {
     scheduledEventsRepositoryStub = {
       lastScheduledEventForBuilding: stub()
     }
+    updateBuildingNegotiationStatusServiceStub = {
+      updateBuildingStatus: stub().resolves(),
+    }
 
     buildingsRepositoryStub = {
       get: stub()
@@ -54,14 +58,15 @@ describe('ProposalsSenderService', () => {
       pdfProposalComposerStub,
       buildingsRepositoryStub,
       scheduledEventsRepositoryStub,
+      updateBuildingNegotiationStatusServiceStub,
       undefined
     )
 
-    usersRepositoryStub.get.withArgs(testCaller.id).resolves(testCaller)
+    usersRepositoryStub.get.withArgs(testFlipper.id).resolves(testFlipper)
     buildingsRepositoryStub.get.withArgs(testProposal.buildingId).resolves(testBuilding)
     proposalsRepositoryStub.pendingProposals.resolves([ testProposal ])
     emailSenderStub.sendMail.resolves()
-    pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal, testCaller.profile)
+    pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal, testFlipper.profile)
       .resolves(testProposalPdf)
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId).resolves(undefined)
   })
@@ -71,8 +76,8 @@ describe('ProposalsSenderService', () => {
 
     expect(emailSenderStub.sendMail).to.have.been.calledWith({
       to: testProposal.notificationEmail,
-      subject: emailCopies[testCaller.profile.language]['mailSubject'],
-      from: testCaller,
+      subject: emailCopies[testFlipper.profile.language]['mailSubject'],
+      from: testFlipper,
       message: testProposal.message,
       attachment: { content: testProposalPdf, filename: 'propuesta.pdf' },
     })
@@ -96,5 +101,18 @@ describe('ProposalsSenderService', () => {
     await service.checkAndSendProposals()
 
     expect(emailSenderStub.sendMail).to.not.have.been.called
+  })
+
+  it('updates building negotiation status', async () => {
+    await service.checkAndSendProposals()
+
+    expect(updateBuildingNegotiationStatusServiceStub.updateBuildingStatus).to.have.been.calledWith(
+      testBuilding.id,
+      {
+        status: 'PROPUESTA ENVIADA',
+        sourceOwnerId: testProposal.ownerId,
+        userId: testFlipper.id,
+      }
+    )
   })
 })

@@ -8,6 +8,7 @@ import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import moment from 'moment'
+import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
 
 export class ProposalsSenderService {
   constructor (
@@ -17,6 +18,7 @@ export class ProposalsSenderService {
     private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
     private scheduledEventsRepository: ScheduledEventsRepository,
+    private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private logger: Logger,
   ) {
   }
@@ -72,5 +74,13 @@ export class ProposalsSenderService {
     })
 
     await this.proposalsRepository.save(proposalSent(proposal))
+    await this.updateBuildingNegotiationStatusService.updateBuildingStatus(
+      proposal.buildingId,
+      {
+        status: 'PROPUESTA ENVIADA',
+        sourceOwnerId: proposal.ownerId,
+        userId: proposal.createdBy,
+      }
+    )
   }
 }
