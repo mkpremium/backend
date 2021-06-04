@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
 
 taskname=${1}
-taskrevision=${2}
-rulename=${3}
+rulename=${2}
+
+taskrevision=`aws ecs describe-task-definition --task-definition ${taskname} | egrep "revision" | tr "/" " " | awk '{print $2}' | tr -d ","`
 
 eventsrule=$(aws events list-targets-by-rule --rule "${rulename}")
 echo "eventsrule: ${eventsrule}"

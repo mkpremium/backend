@@ -93,8 +93,9 @@ jobs:
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
 
-  deploy:
-    name: Deploy
+
+  deploy-api:
+    name: Deploy API
     runs-on: ubuntu-latest
     needs: [ build, test ]
 
@@ -141,6 +142,44 @@ jobs:
           cluster: production
           wait-for-minutes: 5
 
+  deploy-scheduled-tasks:
+    name: Deploy scheduled tasks (freezer and proposals sender)
+    runs-on: ubuntu-latest
+
+    needs: [ build, test ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Render Amazon ECS task definition for proposals-sender container
+          id: proposals-sender-task-def
+          uses: aws-actions/amazon-ecs-render-task-definition@v1
+          with:
+            task-definition: infrastructure/ecs/proposals-sender-task-definition.json
+            container-name: proposals-sender
+            image: ${{ env.IMAGE_URL }}
+
+      - name: Deploy Amazon ECS proposals-sender task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.proposals-sender-task-def.outputs.task-definition }}
+          cluster: production
+          wait-for-minutes: 5
+
+      - name: Update proposals-sender schedule rule
+        run: ./scripts/deploy-scheduled-task.sh proposals-sender proposal-sender-cronjob
+
       - name: Render Amazon ECS task definition for cronjobs container
         id: cronjobs-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -156,18 +195,5 @@ jobs:
           cluster: production
           wait-for-minutes: 5
 
-      - name: Render Amazon ECS task definition for proposals-sender container
-        id: proposals-sender-task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: infrastructure/ecs/proposals-sender-task-definition.json
-          container-name: proposals-sender
-          image: ${{ env.IMAGE_URL }}
-
-      - name: Deploy Amazon ECS proposals-sender task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.proposals-sender-task-def.outputs.task-definition }}
-          cluster: production
-          wait-for-minutes: 5
-
+      - name: Update freezer cronjob schedule rule
+        run: ./scripts/deploy-scheduled-task.sh cronjobs freezer-cronjob
