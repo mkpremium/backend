@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 taskname=${1}
 rulename=${2}
 
