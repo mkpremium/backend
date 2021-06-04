@@ -2,7 +2,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { BuildingNegotiationStatus } from '../building'
 
-interface BuildingNegotiationStatusChanged {
+export interface BuildingNegotiationStatusChanged {
   name: 'building.negotiation-status-changed';
   buildingId: string;
   userId: string;
