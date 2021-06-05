@@ -135,19 +135,6 @@ export class OwnerRepository extends CouchbaseModel {
     return this.save(updatedOwner)
   }
 
-  async getContactPhoneNumber (ownerId, contactId) {
-    const owner = await this.findById(ownerId)
-    const { person } = owner
-
-    const ownerContactValue = person.findContactById(contactId)
-
-    if (!ownerContactValue) {
-      throw newHttpError(400, `El número de contacto para el owner ${ownerId} no existe`)
-    }
-
-    return ownerContactValue
-  }
-
   async ownerStats (args = {}) {
     const params = OwnerStatsParams(args)
     const bucket = this.getBucketName()

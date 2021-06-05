@@ -61,10 +61,6 @@
         {
           "valueFrom": "backend.couchbase_pass",
           "name": "COUCHBASE_PASS"
-        },
-        {
-          "valueFrom": "backend.numintect.api-license",
-          "name": "NUMINTEC_API_LICENSE"
         }
       ],
       "dockerSecurityOptions": null,

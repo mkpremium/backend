@@ -7,7 +7,6 @@ import { buildingEventListeners } from './building/listeners'
 import { buildingRoutes } from './building/routing'
 import cadastre from './cadastre'
 import { setupCallerRoutes } from './caller/init'
-import calls from './calls'
 
 import './db/legacy-connect-couchbase'
 import email from './email'
@@ -15,7 +14,7 @@ import { initFlipperModule } from './flipper/init'
 import history from './history'
 import { createDiContainer } from './infrastructure/dependencies'
 import appErrorHandler from './infrastructure/error-handler'
-import { initLogger, logger } from './infrastructure/logger'
+import { initLogger } from './infrastructure/logger'
 import metadata from './metadata'
 import notes from './notes'
 // modules
@@ -32,7 +31,6 @@ import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
 import { setupUserRoutes } from './user'
-import webhooks from './webhooks'
 import { worksheetEventListeners } from './worksheet/listeners'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
@@ -84,9 +82,7 @@ export const createApp = (): Promise<Express> => {
       setupStockRouter(app, diContainer)
 
       stats(app, diContainer)
-      webhooks(app)
       maintenanceMode(app)
-      calls(app)
       history(app)
       notes(app)
       metadata(app)
