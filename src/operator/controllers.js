@@ -2,7 +2,6 @@ import { wrap } from 'express-promise-wrap'
 import { OperatorRefreshTokenRepository, OperatorRepository } from './models'
 import { History } from '../history/models'
 import { canManageOperator } from '../lib/role-operators'
-import { Calls } from '../calls/models'
 import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import _get from 'lodash/get'
 
@@ -71,9 +70,7 @@ async function selfCallCenterWorkInProgress (req, res) {
   const repoWorksheetQueue = new LegacyWorksheetQueueRepository()
   const queueItem = await repoWorksheetQueue.findItemByOperator(queueId, operatorId)
 
-  const model = new Calls()
-  const activeCall = await model.findActiveCallByOperatorId(req.user.id)
-  res.json(Object.assign({}, req.user.operator, { activeCall, queueItem }))
+  res.json(Object.assign({}, req.user.operator, { activeCall: null, queueItem }))
 }
 
 export const loginController = wrap(login)
