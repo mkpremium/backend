@@ -35,6 +35,7 @@ import { worksheetEventListeners } from './worksheet/listeners'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
 import { EventBus } from './infrastructure/event-bus'
+import { callsRoutes } from './calls/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -71,6 +72,7 @@ export const createApp = (): Promise<Express> => {
       buildingEventListeners(diContainer)
       worksheetEventListeners(diContainer)
       buildingRoutes(diContainer, app)
+      callsRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
 
       setupScheduledEventsRoutes(app, diContainer)
