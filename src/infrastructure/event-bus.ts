@@ -13,7 +13,6 @@ export class EventBus {
 
   constructor (
     private logger: Logger,
-    private consistencyDelay: number
   ) {
     this.emitter.setMaxListeners(0)
     this.emitter.on('error', error => {
@@ -23,14 +22,12 @@ export class EventBus {
 
   publish<T extends { name: string }> (event: T): Promise<void> {
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        try {
-          this.emitter.emit(event.name, event)
-          return resolve()
-        } catch (error) {
-          return reject(error)
-        }
-      }, this.consistencyDelay)
+      try {
+        this.emitter.emit(event.name, event)
+        return resolve()
+      } catch (error) {
+        return reject(error)
+      }
     })
   }
 
