@@ -3,6 +3,11 @@ import { WorksheetNotFound, WorksheetRepository } from '../repository/worksheet.
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
 import { EventBus } from '../../infrastructure/event-bus'
 
+export interface InvalidWorksheetFound {
+  name: 'worksheet.invalid_worksheet_found';
+  worksheetId: string;
+}
+
 export class TakeNextWorksheetService {
   constructor (
     private takeWorksheetService: WorksheetQueueActionsService,
@@ -25,7 +30,7 @@ export class TakeNextWorksheetService {
         await this.eventBus.publish({
           name: 'worksheet.invalid_worksheet_found',
           worksheetId: error.worksheetId,
-        })
+        } as InvalidWorksheetFound)
         worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId, error.worksheetId)
       } else {
         throw error

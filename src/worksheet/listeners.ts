@@ -1,7 +1,6 @@
 import { AwilixContainer } from 'awilix'
 import { EventBus } from '../infrastructure/event-bus'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
-import { logger } from '../infrastructure/logger'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
 import {
@@ -11,13 +10,18 @@ import {
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { OwnerStatusChangedEvent } from '../owner/service/change-contact-status.service'
+import { InvalidWorksheetFound } from './service/take-next-worksheet.service'
+import { WorksheetRepository } from './repository/worksheet.repository'
+import { Logger } from 'winston'
 
 export function worksheetEventListeners (container: AwilixContainer) {
   const eventBus = container.resolve('eventBus') as EventBus
   const legacyWorksheetRepository = container.resolve('legacyWorksheetRepository') as LegacyWorksheetRepository
+  const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
   const worksheetQueueActionsService = container.resolve('worksheetQueueActionsService') as WorksheetQueueActionsService
   const releaseUserOtherActiveWorksheetsInQueueService = container.resolve('releaseUserOtherActiveWorksheetsInQueueService') as ReleaseUserExtraOpenedWorksheetsInQueueService
   const updateWorksheetStatusOnOwnerChangeService = container.resolve('updateWorksheetStatusOnOwnerChangeService') as UpdateWorksheetStatusOnOwnerChangeService
+  const logger = container.resolve('logger') as Logger
 
   eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({
                                                             buildingId,
@@ -44,6 +48,14 @@ export function worksheetEventListeners (container: AwilixContainer) {
 
   eventBus.on('worksheet.taken', async ({ queueId, by }) => {
     await releaseUserOtherActiveWorksheetsInQueueService.release(by, queueId)
+  })
+
+  eventBus.on('worksheet.invalid_worksheet_found', async ({ worksheetId }: InvalidWorksheetFound) => {
+    logger.error('Invalid worksheet found, updating status', { worksheetId })
+    const worksheet = await worksheetRepository.get(worksheetId)
+    const updatedWorksheet = worksheet.setStatus('INVALID')
+
+    await worksheetRepository.save(updatedWorksheet)
   })
 
   eventBus.on('owner.status_changed', (evt: OwnerStatusChangedEvent) => {
