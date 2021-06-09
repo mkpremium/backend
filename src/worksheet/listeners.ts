@@ -22,6 +22,7 @@ export function worksheetEventListeners (container: AwilixContainer) {
   const releaseUserOtherActiveWorksheetsInQueueService = container.resolve('releaseUserOtherActiveWorksheetsInQueueService') as ReleaseUserExtraOpenedWorksheetsInQueueService
   const updateWorksheetStatusOnOwnerChangeService = container.resolve('updateWorksheetStatusOnOwnerChangeService') as UpdateWorksheetStatusOnOwnerChangeService
   const logger = container.resolve('logger') as Logger
+  const consistencyDelay = container.resolve('consistencyDelay') as number
 
   eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, async ({
                                                             buildingId,
@@ -59,6 +60,7 @@ export function worksheetEventListeners (container: AwilixContainer) {
   })
 
   eventBus.on('owner.status_changed', (evt: OwnerStatusChangedEvent) => {
-    return updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt)
+    return new Promise(resolve => setTimeout(resolve, consistencyDelay))
+      .then(() => updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt))
   })
 }

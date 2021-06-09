@@ -21,6 +21,11 @@ describe('worksheetEventListeners', () => {
     }
     releaseUserOtherActiveWorksheetsInQueueServiceMock = { release: spy() }
     updateWorksheetStatusOnOwnerChangeSpy = { updateWorksheet: spy() }
+    const noopLogger = {
+      info: spy(),
+      error: spy(),
+      crit: spy(),
+    }
 
     const testContainer = createContainer()
     testContainer.register({
@@ -28,7 +33,10 @@ describe('worksheetEventListeners', () => {
       releaseUserOtherActiveWorksheetsInQueueService: asValue(releaseUserOtherActiveWorksheetsInQueueServiceMock),
       updateWorksheetStatusOnOwnerChangeService: asValue(updateWorksheetStatusOnOwnerChangeSpy),
       legacyWorksheetRepository: asValue(null),
-      worksheetQueueActionsService: asValue(null)
+      worksheetQueueActionsService: asValue(null),
+      worksheetRepository: asValue(null),
+      logger: asValue(noopLogger),
+      consistencyDelay: asValue(0),
     })
     worksheetEventListeners(testContainer)
   })
@@ -43,7 +51,7 @@ describe('worksheetEventListeners', () => {
       .calledWith(testWorksheetTakenEvent.by, testWorksheetTakenEvent.queueId)
   })
 
-  it('updates worksheet when owner contact status changes', () => {
+  it('updates worksheet when owner contact status changes', (done) => {
     const testOwner = ownerBuilder({
       id: 'test-changed-owner-id',
       buildingId: 'test-building-id'
@@ -58,7 +66,10 @@ describe('worksheetEventListeners', () => {
     }
     eventSubscribers['owner.status_changed'](testEvent)
 
-    expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
-      .to.have.been.calledWith(testEvent)
+    setTimeout(() => {
+      expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
+        .to.have.been.calledWith(testEvent)
+      done()
+    }, 0)
   })
 })
