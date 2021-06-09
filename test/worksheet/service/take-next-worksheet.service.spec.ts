@@ -2,6 +2,7 @@ import { TakeNextWorksheetService } from '../../../src/worksheet/service/take-ne
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import { Worksheet, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
+import { WorksheetNotFound } from '../../../src/worksheet/repository/worksheet.repository'
 
 const testUserId = 'test-user-id'
 describe('TakeNextWorksheetService', () => {
@@ -12,7 +13,7 @@ describe('TakeNextWorksheetService', () => {
       province: 'test province'
     }
   })
-  let service
+  let service: TakeNextWorksheetService
   let takeWorksheetServiceMock
   let worksheetsRepositoryMock
   let worksheetsQueueRepositoryMock
@@ -34,7 +35,7 @@ describe('TakeNextWorksheetService', () => {
 
   it('takes next worksheet from source', async () => {
     const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
-    worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source, testQueue.id)
+    worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source)
       .resolves(testNextWorksheet)
 
     await service.nextWorksheetInQueue(testQueue, testUserId)
@@ -50,6 +51,23 @@ describe('TakeNextWorksheetService', () => {
     await service.nextWorksheetInQueueOfId(testQueue.id, testUserId)
 
     expect(worksheetsRepositoryMock.nextAvailableWorksheetInSource).to.have.been.calledWith(testQueue.source)
+  })
+
+  it('gets another worksheet when next one is not found', async () => {
+    worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source)
+      .rejects(new WorksheetNotFound('worksheet-without-valid-owners-id'))
+    const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
+    worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source, 'worksheet-without-valid-owners-id')
+      .resolves(testNextWorksheet)
+
+    const actualWorksheet = await service.nextWorksheetInQueue(testQueue, testUserId)
+
+    expect(takeWorksheetServiceMock.takeWorksheetInQueue).to.have.been
+      .calledWith(testQueue.id, testNextWorksheet.id, testUserId)
+    expect(eventBusSpy.publish).to.have.been.calledWith({
+      name: 'worksheet.invalid_worksheet_found',
+      worksheetId: 'worksheet-without-valid-owners-id',
+    })
   })
 
   it('publishes event', async () => {

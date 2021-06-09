@@ -116,7 +116,7 @@ WHERE worksheet._documentType = 'worksheet' AND ${conditions.join(' AND ')}
 
 const worksheetByIdQuery = bucketName => worksheetForCallcenterViewQuery(bucketName, [ 'worksheet.id = $1' ])
 
-const nextWorksheetAvailableInSourceQuery = (bucketName, source, queueId) => {
+const nextWorksheetAvailableInSourceQuery = (bucketName, source, skipWorksheetId) => {
   const sourceMatchCondition = Object.keys(source).filter(k => !!source[ k ])
     .map(k => `worksheet.buildingAddress.${k} = "${source[ k ]}"`)
 
@@ -128,6 +128,7 @@ WHERE worksheet._documentType = 'worksheet'
   AND worksheet.status IN ['OPEN', 'LOOKING_MEETING']
   AND worksheet.queueId IS NULL
   AND ${sourceMatchCondition.join(' AND ')}
+  ${skipWorksheetId ? `worksheet.id != "${skipWorksheetId}"` : ''}
 ORDER BY worksheet.viewedAt LIMIT 1
 `
 }
@@ -139,7 +140,7 @@ LET buildingIds = ARRAY b.id FOR b IN (SELECT building.id FROM mkpremium buildin
 WHERE _documentType = 'worksheet' AND relatedBuildingIds[0] IN buildingIds
 `
 
-class WorksheetNotFound extends Error {
+export class WorksheetNotFound extends Error {
   constructor (worksheetId) {
     super('Worksheet not found')
     this.worksheetId = worksheetId
@@ -173,8 +174,8 @@ export class WorksheetRepository extends CouchbaseRepository {
     })
   }
 
-  nextAvailableWorksheetInSource (source, queueId) {
-    const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, queueId)
+  nextAvailableWorksheetInSource (source, skipWorksheetId) {
+    const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, skipWorksheetId)
     return this.couchbaseAdapter.queryAsync(q)
       .then(result => {
         if (result.length === 0) {

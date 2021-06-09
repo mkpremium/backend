@@ -1,5 +1,5 @@
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
-import { WorksheetRepository } from '../repository/worksheet.repository'
+import { WorksheetNotFound, WorksheetRepository } from '../repository/worksheet.repository'
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
 import { EventBus } from '../../infrastructure/event-bus'
 
@@ -17,13 +17,20 @@ export class TakeNextWorksheetService {
   }
 
   async nextWorksheetInQueue (queue, byUserOfId) {
-    const worksheetFromSource = await this.worksheetRepository.nextAvailableWorksheetInSource(queue.source, queue.id)
-      .catch(error => {
-        error.queueId = queue.id
-        error.byUserOfId = byUserOfId
-        error.context = 'taking next available worksheet in queue'
+    let worksheetFromSource
+    try {
+      worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId)
+    } catch (error) {
+      if (error instanceof WorksheetNotFound) {
+        await this.eventBus.publish({
+          name: 'worksheet.invalid_worksheet_found',
+          worksheetId: error.worksheetId,
+        })
+        worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId, error.worksheetId)
+      } else {
         throw error
-      })
+      }
+    }
 
     if (!worksheetFromSource) {
       return
@@ -37,5 +44,15 @@ export class TakeNextWorksheetService {
     })
 
     return nextWorksheet
+  }
+
+  private getNextWorksheet (queue, byUserOfId, skipWorksheetId?) {
+    return this.worksheetRepository.nextAvailableWorksheetInSource(queue.source, skipWorksheetId)
+      .catch(error => {
+        error.queueId = queue.id
+        error.byUserOfId = byUserOfId
+        error.context = 'taking next available worksheet in queue'
+        throw error
+      })
   }
 }
