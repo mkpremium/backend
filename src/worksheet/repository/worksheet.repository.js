@@ -128,7 +128,7 @@ WHERE worksheet._documentType = 'worksheet'
   AND worksheet.status IN ['OPEN', 'LOOKING_MEETING']
   AND worksheet.queueId IS NULL
   AND ${sourceMatchCondition.join(' AND ')}
-  ${skipWorksheetId ? `worksheet.id != "${skipWorksheetId}"` : ''}
+  ${skipWorksheetId ? `AND worksheet.id != "${skipWorksheetId}"` : ''}
 ORDER BY worksheet.viewedAt LIMIT 1
 `
 }
