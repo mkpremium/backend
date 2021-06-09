@@ -66,6 +66,10 @@
         {
           "name": "MAILER_USER",
           "value": "compra@mkpremium.com"
+        },
+        {
+          "name": "EVENTUAL_CONSISTENCY_DELAY",
+          "value": "500"
         }
       ],
       "resourceRequirements": null,

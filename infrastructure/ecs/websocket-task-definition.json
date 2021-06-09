@@ -48,6 +48,10 @@
         {
           "name": "DEBUG",
           "value": "OFF"
+        },
+        {
+          "name": "EVENTUAL_CONSISTENCY_DELAY",
+          "value": "500"
         }
       ],
       "resourceRequirements": null,
