@@ -9,8 +9,8 @@ import { UserRoles } from '../types/user'
 import { logger } from '../infrastructure/logger'
 
 export const jwt = (getToken) => {
-  const jwtInstance = jwtMiddleware({ ...jwtConfig, getToken, algorithms: [ 'HS256' ] })
-  const composedJwt = compose(jwtInstance, wrap(addUserInfo))
+  const jwtInstance: any = jwtMiddleware({ ...jwtConfig, getToken, algorithms: [ 'HS256' ] })
+  const composedJwt: any = compose(jwtInstance, wrap(addUserInfo))
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError
   composedJwt.unless = jwtInstance.unless
   return composedJwt

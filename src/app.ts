@@ -67,12 +67,12 @@ export const createApp = (): Promise<Express> => {
       app.locals.diContainer = diContainer
 
       operator(app) // start with login router
+      callsRoutes(diContainer, app)
 
       setupUserRoutes(app, diContainer)
       buildingEventListeners(diContainer)
       worksheetEventListeners(diContainer)
       buildingRoutes(diContainer, app)
-      callsRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
 
       setupScheduledEventsRoutes(app, diContainer)

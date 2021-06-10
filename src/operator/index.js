@@ -9,7 +9,8 @@ export default (app) => {
   const secured = jwt().unless({
     path: [
       '/operators/login',
-      '/operators/refresh-token'
+      '/operators/refresh-token',
+      '/calls/twilio/voice'
     ]
   })
 
