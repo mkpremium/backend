@@ -223,7 +223,7 @@ export abstract class CouchbaseModel {
     return fromJSON(dataPreSaved, this.Struct)
   }
 
-  private withRetry<T> (fn: () => Promise<T>): Promise<T> {
+  protected withRetry<T> (fn: () => Promise<T>): Promise<T> {
     return retry<T>(fn, {
       max_tries: 5,
       interval: 1000,

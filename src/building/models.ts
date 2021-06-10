@@ -8,15 +8,13 @@ import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import {
-  Building,
-  BuildingMetadataPreview,
-  BuildingProposal
-} from './building'
+import { Building, BuildingMetadataPreview, BuildingProposal } from './building'
 
 import { logger } from '../infrastructure/logger'
 import { MetadataRepository } from './repository/metadata.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { SearchQuery } from 'couchbase'
+import HighlightStyle = SearchQuery.HighlightStyle
 
 export class BuildingProposalRepository extends CouchbaseModel {
   protected Struct = BuildingProposal
@@ -148,18 +146,27 @@ export class LegacyBuildingRepository extends CouchbaseModel {
 
   async searchBuilding (query) {
     // TODO
-    return Promise.reject(new Error('Reimplement with new SDK'))
-    // const qs = this.getSearchBuilder(query)
-    // qs.highlight()
-    // qs.fields('*')
-    //
-    // return this.search(qs)
+    // return Promise.reject(new Error('Reimplement with new SDK'))
+    const qs = this.getSearchBuilder(query)
+    qs.highlight(HighlightStyle.DEFAULT)
+    qs.fields('*')
+
+    return this.search(qs)
   }
 
   async findById (id) {
     const qb = this.getQueryBuilder().where('t.`id` = ?', id)
     const results = await this.query(qb)
     return results && results.length && _.first(results)
+  }
+
+  private getSearchBuilder (queryString) {
+    const name = this.getType()
+    return SearchQuery.new(name, SearchQuery.queryString(queryString))
+  }
+
+  private async search (searchBuilder) {
+    return this.withRetry(() => this.couchbaseAdapter.queryAsync(searchBuilder))
   }
 }
 

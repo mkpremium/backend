@@ -5,6 +5,7 @@ import _find from 'lodash/find'
 import _get from 'lodash/get'
 import _head from 'lodash/head'
 import _isNil from 'lodash/isNil'
+import _map from 'lodash/map'
 import _some from 'lodash/some'
 import _uniq from 'lodash/uniq'
 import t from 'tcomb'
@@ -23,7 +24,7 @@ import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { Worksheet, WorkSheetStatus } from '../domain/worksheet'
-import { QueueRequestAction, WorksheetListQuery } from '../types'
+import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 
 const QueueRequestParamsBase = t.struct(
   {
@@ -368,19 +369,19 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
    */
   async searchWorksheets (query) {
     // TODO
-    return Promise.reject(new Error('Reimplement with new SDK'))
-    // let results = []
-    // const params = new WorksheetSearchQuery(query)
-    // const qs = this.getSearchBuilder(params.query)
-    // qs.limit(Number(params.limit))
-    //
-    // const searchResult = await this.search(qs)
-    // const worksheetIds = _map(searchResult, 'id')
-    //
-    // if (worksheetIds.length) {
-    //   results = await Promise.map(worksheetIds, (worksheetId) => this.findByIdWIthIncludes(worksheetId))
-    // }
-    // return fromJSON({ results }, WorksheetSearchResponse)
+    // return Promise.reject(new Error('Reimplement with new SDK'))
+    let results = []
+    const params = new WorksheetSearchQuery(query)
+    const qs = this.getSearchBuilder(params.query)
+    qs.limit(Number(params.limit))
+
+    const searchResult = await this.search(qs)
+    const worksheetIds = _map(searchResult, 'id')
+
+    if (worksheetIds.length) {
+      results = await Promise.map(worksheetIds, (worksheetId) => this.findByIdWIthIncludes(worksheetId))
+    }
+    return fromJSON({ results }, WorksheetSearchResponse)
   }
 
   /**
