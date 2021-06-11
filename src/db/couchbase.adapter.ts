@@ -44,7 +44,7 @@ export class CouchbaseAdapter {
     return fromJSON(dataWithId, structType)
   }
 
-  getEntity<T> (structType: t.Type<T> & RecordToDomain, entityId): Promise<T> {
+  getEntity<T> (structType: t.Type<T> & Partial<RecordToDomain>, entityId): Promise<T> {
     return this.withRetry(
       () => this.couchbaseBucket.getAsync(entityId)
         .catch(error => {

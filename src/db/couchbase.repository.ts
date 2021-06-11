@@ -27,5 +27,5 @@ export abstract class CouchbaseRepository<T> {
     return this.couchbaseAdapter.save(entityData, this.struct())
   }
 
-  protected abstract struct (): Struct<any> & RecordToDomain
+  protected abstract struct (): Struct<any> & Partial<RecordToDomain>
 }
