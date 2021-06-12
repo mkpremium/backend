@@ -120,6 +120,8 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
           to,
           machineDetection: 'Enable',
           asyncAmd: 'true',
+          asyncAmdStatusCallbackMethod: 'POST',
+          asyncAmdStatusCallback: `${publicUrl}/calls/twilio/${call.id}/machine-detection`,
           statusCallback: `${publicUrl}/calls/twilio/${call.id}/done`
         })
           .catch(error => {
@@ -181,6 +183,16 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
 
         res.send(twiml.toString())
       }),
+    machineDetectionController: asFunction(() => (req, res) => {
+      console.log('Machine detection result', req.body)
+      if (req.body.AnsweredBy !== 'human') {
+        const twiml = new VoiceResponse()
+        twiml.hangup()
+        res.send(twiml.toString())
+      } else {
+        res.sendStatus(200)
+      }
+    }),
 
     virtualCallsRepository: asClass(VirtualCallsRepository).classic().singleton(),
   })

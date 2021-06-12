@@ -10,6 +10,7 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
   router.post('/twilio/voice', wrap(container.resolve('outgoingCallWebhookController')))
   router.post('/twilio/:callId/gather', wrap(container.resolve('gatheredInputController')))
   router.post('/twilio/:callId/done', wrap(container.resolve('callDoneController')))
+  router.post('/twilio/:callId/machine-detection', wrap(container.resolve('machineDetectionController')))
 
   app.use('/calls', router)
 }

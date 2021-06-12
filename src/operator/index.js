@@ -12,7 +12,8 @@ export default (app) => {
       '/operators/refresh-token',
       '/calls/twilio/voice',
       /^calls\/twilio\/[0-9a-z]*\/gather$/,
-      /^calls\/twilio\/[0-9a-z]*\/done$/
+      /^calls\/twilio\/[0-9a-z]*\/done$/,
+      /^calls\/twilio\/[0-9a-z]*\/machine-detection$/
     ]
   })
 
