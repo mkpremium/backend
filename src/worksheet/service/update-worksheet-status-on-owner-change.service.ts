@@ -2,6 +2,7 @@ import { OwnerStatusChangedEvent } from '../../owner/service/change-contact-stat
 import { WorksheetRepository } from '../repository/worksheet.repository'
 import { OwnerRepository } from '../../owner/repository/owner.repository'
 import { some } from 'lodash'
+import { setStatus } from '../domain/worksheet'
 
 const discardedOwnerStatus = [ 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT' ]
 
@@ -19,7 +20,7 @@ export class UpdateWorksheetStatusOnOwnerChangeService {
     const worksheet = await this.worksheetRepository.ofBuildingId(evt.buildingId)
 
     if (discardedOwnerStatus.includes(evt.newStatus) && !areOtherNonDiscardedOwners) {
-      const updatedWorksheet = worksheet.setStatus('INVALID')
+      const updatedWorksheet = setStatus(worksheet, 'INVALID')
       return this.worksheetRepository.save(updatedWorksheet)
     }
   }

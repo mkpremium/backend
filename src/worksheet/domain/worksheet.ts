@@ -1,5 +1,3 @@
-import _filter from 'lodash/filter'
-import _find from 'lodash/find'
 import t from 'tcomb'
 import { Building } from '../../building/building'
 import { utc } from '../../lib/date'
@@ -32,8 +30,7 @@ export const WorkSheetCall = t.struct({
 export interface WorksheetProps {
   id: string;
   status: WorksheetStatusType;
-  relatedBuildingIds: [string];
-  setStatus (status: WorksheetStatusType): WorksheetProps
+  relatedBuildingIds: [ string ];
 }
 
 export const Worksheet = t.struct<WorksheetProps>({
@@ -92,8 +89,8 @@ export const Worksheet = t.struct<WorksheetProps>({
   }
 })
 
-Worksheet.prototype.setStatus = function (newStatus) {
-  return Worksheet.update(this, {
+export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatusType) {
+  return Worksheet.update(worksheet, {
     status: { $set: newStatus },
     statusChangedAt: { $set: utc().toDate() },
     inFreezer: { $set: newStatus === WorkSheetStatus.NO_SALE }
@@ -108,65 +105,11 @@ Worksheet.prototype.statusChanged = function () {
 }
 
 Worksheet.prototype.pullOutFreezer = function (newStatus) {
-  const updated = this.setStatus(newStatus)
+  const updated = setStatus(this, newStatus)
 
   return t.update(updated, {
     inFreezer: { $set: false },
     lastAddedMeeting: { $set: null }
-  })
-}
-
-Worksheet.prototype.makeAvailable = function () {
-  return t.update(
-    this.setStatus(WorkSheetStatus.AVAILABLE),
-    {
-      inFreezer: { $set: false },
-      queueId: { $set: null }
-    }
-  )
-}
-
-export const WorksheetQueueCount = WorksheetQueue.extend(
-  {
-    possibleNumberOfWorksheets: t.Number
-  }
-)
-
-/**
- * @param id
- * @returns {QueueItem}
- */
-WorksheetQueue.prototype.findItemById = function (id) {
-  return _find(this.worksheets, { id })
-}
-
-WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
-  return _find(this.worksheets, { worksheetId })
-}
-
-WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
-  return _find(this.worksheets, { operatorId, status: QueueStatus.OPENED })
-}
-
-WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
-  return _filter(this.worksheets, { operatorId, status: QueueStatus.SCHEDULED })
-}
-
-/**
- * @param {Worksheet} worksheet
- * @return {WorksheetQueue}
- */
-WorksheetQueue.prototype.addWorksheet = function (worksheet) {
-  return t.update(this, {
-    worksheets: {
-      $push: [
-        QueueItem({
-          worksheetId: worksheet.id,
-          status: QueueStatus.AVAILABLE,
-          addedAt: new Date()
-        })
-      ]
-    }
   })
 }
 
@@ -203,6 +146,7 @@ export const takeWorksheet = (queue, worksheet, byUserOfId) => {
     })
   ]
 }
+
 export type WorksheetStatusType = 'OPEN'
   | 'LOOKING_MEETING'
   | 'INVALID'

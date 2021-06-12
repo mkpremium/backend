@@ -2,6 +2,8 @@ import t from 'tcomb'
 import { QueueItem, QueueStatus } from '../models/queue-item'
 import _ from 'lodash'
 import _get from 'lodash/get'
+import _find from 'lodash/find'
+import _filter from 'lodash/filter'
 
 export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
@@ -53,6 +55,45 @@ export const WorksheetQueue = t.struct<WorksheetQueueProps>(
     }
   }
 )
+
+/**
+ * @param id
+ * @returns {QueueItem}
+ */
+WorksheetQueue.prototype.findItemById = function (id) {
+  return _find(this.worksheets, { id })
+}
+
+WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
+  return _find(this.worksheets, { worksheetId })
+}
+
+WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
+  return _find(this.worksheets, { operatorId, status: QueueStatus.OPENED })
+}
+
+WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
+  return _filter(this.worksheets, { operatorId, status: QueueStatus.SCHEDULED })
+}
+
+/**
+ * @param {Worksheet} worksheet
+ * @return {WorksheetQueue}
+ */
+WorksheetQueue.prototype.addWorksheet = function (worksheet) {
+  return t.update(this, {
+    worksheets: {
+      $push: [
+        QueueItem({
+          worksheetId: worksheet.id,
+          status: QueueStatus.AVAILABLE,
+          addedAt: new Date()
+        })
+      ]
+    }
+  })
+}
+
 const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser) => {
   const userOpenedWorksheets = queue.worksheets
     .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
@@ -83,3 +124,7 @@ export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId
     }
   })
 }
+
+export const WorksheetQueueCount = WorksheetQueue.extend({
+  possibleNumberOfWorksheets: t.Number
+})

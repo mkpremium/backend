@@ -23,7 +23,7 @@ import { ScheduledEventsRepository } from '../../scheduled-events/repository/sch
 import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
-import { Worksheet, WorkSheetStatus } from '../domain/worksheet'
+import { setStatus, Worksheet, WorkSheetStatus } from '../domain/worksheet'
 import { QueueRequestAction, WorksheetListQuery, WorksheetSearchQuery, WorksheetSearchResponse } from '../types'
 
 const QueueRequestParamsBase = t.struct(
@@ -212,7 +212,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     const worksheetData = await this.findByIdWIthIncludes(worksheetId)
     const worksheet = fromJSON(worksheetData, Worksheet)
     const newStatus = await this.calculateFixedStatus(worksheet)
-    const updatedWorksheet = worksheet.setStatus(newStatus)
+    const updatedWorksheet = setStatus(worksheet, newStatus)
     if (canRegisterVerified(worksheet, newStatus, operatorId)) {
       await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER)
     }

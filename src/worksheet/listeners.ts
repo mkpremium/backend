@@ -13,6 +13,7 @@ import { OwnerStatusChangedEvent } from '../owner/service/change-contact-status.
 import { InvalidWorksheetFound } from './service/take-next-worksheet.service'
 import { WorksheetRepository } from './repository/worksheet.repository'
 import { Logger } from 'winston'
+import { setStatus } from './domain/worksheet'
 
 export function worksheetEventListeners (container: AwilixContainer) {
   const eventBus = container.resolve('eventBus') as EventBus
@@ -54,7 +55,7 @@ export function worksheetEventListeners (container: AwilixContainer) {
   eventBus.on('worksheet.invalid_worksheet_found', async ({ worksheetId }: InvalidWorksheetFound) => {
     logger.error('Invalid worksheet found, updating status', { worksheetId })
     const worksheet = await worksheetRepository.get(worksheetId)
-    const updatedWorksheet = worksheet.setStatus('INVALID')
+    const updatedWorksheet = setStatus(worksheet, 'INVALID')
 
     await worksheetRepository.save(updatedWorksheet)
   })
