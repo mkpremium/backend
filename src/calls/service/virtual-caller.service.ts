@@ -2,6 +2,8 @@ import { VirtualCallsRepository } from '../virtual-calls.repository'
 import { Twilio } from 'twilio'
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
+import { ContactProps } from '../../owner/owner'
+import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 
 export class VirtualCallerService {
   constructor (
@@ -10,6 +12,10 @@ export class VirtualCallerService {
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: VoiceResponse.SayAttributes,
   ) {
+  }
+
+  call (address: WorksheetBuildingAddressProps, contact: ContactProps) {
+    return Promise.reject('Not implemented')
   }
 
   async callPoc (from: string, to: string) {

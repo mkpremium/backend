@@ -183,11 +183,12 @@ export type BuildingNegotiationStatus =
 
 export interface BuildingProps {
   id: string;
+  address: BuildingAddressProps;
+  floorArea: string | number;
   cadastre?: {
     reference: string;
   };
-  address: BuildingAddressProps;
-  location: {
+  location?: {
     lat: number;
     lng: number;
   };

@@ -252,9 +252,11 @@ export interface PersonProps {
 
 export type OwnerStatus = 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT'
 
+export type OwnerType = 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA'
+
 export interface OwnerProps {
   id: string;
-  type: 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA';
+  type: OwnerType;
   status: OwnerStatus;
   person: PersonProps;
   buildingId: string,

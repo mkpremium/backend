@@ -3,6 +3,7 @@ import { Building, BuildingProps } from '../../src/building/building'
 const buildingPrototype: BuildingProps = {
   negotiationStatus: undefined,
   id: 'test-building-id',
+  floorArea: 0,
   address: {
     type: 'CL',
     street: 'street, address',
@@ -19,7 +20,7 @@ const buildingPrototype: BuildingProps = {
   location: {
     lat: 0,
     lng: 0,
-  },
+  }
 }
 
 export const buildingBuilder = (overrides: Partial<BuildingProps> = {}) => {

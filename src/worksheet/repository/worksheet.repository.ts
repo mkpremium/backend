@@ -4,11 +4,11 @@ import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { EntityNotFound } from '../../db/errors'
 import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
-import { OwnerStatusEnum, OwnerTypeEnum } from '../../owner/owner'
+import { ContactProps, OwnerStatus, OwnerStatusEnum, OwnerType, OwnerTypeEnum } from '../../owner/owner'
 import { Worksheet, WorksheetProps, WorkSheetStatusEnum, WorksheetStatusType } from '../domain/worksheet'
 import { BuildingAddressProps, BuildingProps } from '../../building/building'
 
-type WorksheetBuildingAddressProps = Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> &
+export type WorksheetBuildingAddressProps = Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> &
   {
     postalCode: {
       number: number | string
@@ -17,25 +17,40 @@ type WorksheetBuildingAddressProps = Omit<BuildingAddressProps, 'fullAddress' | 
 
 type WorksheetBuildingProps = Omit<BuildingProps, 'cadastre' | 'address' | 'assignedAgentId' | 'ownerId'>
   & {
-  cadastreReference: string;
   address: WorksheetBuildingAddressProps;
-  latestProposal: {
-    amount: number;
-    createdAt: string;
-  },
   metadata: {
     previewUrl: string;
     id: string;
     mimeType: string;
   }[];
-  usage: string;
+  usage?: string;
+  cadastreReference?: string;
+  latestProposal?: {
+    amount: number;
+    createdAt: string;
+  },
+}
+
+interface WorksheetOwnerProps {
+  id: string;
+  name: string;
+  status: OwnerStatus;
+  person: {
+    contacts: ContactProps[]
+  },
+  featuredContact?: {
+    phoneId?: string;
+    emailId?: string;
+  },
+  type: OwnerType;
 }
 
 export interface WorksheetViewProps {
   id: string;
   status: WorksheetStatusType;
-  queueId: string;
   building: WorksheetBuildingProps;
+  relatedOwners: WorksheetOwnerProps[];
+  queueId?: string;
 }
 
 export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
@@ -65,27 +80,26 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
   })),
   use: t.maybe(t.String),
   usage: t.maybe(t.String),
-  location: t.struct({
+  location: t.maybe(t.struct({
     lng: t.maybe(t.Number),
     lat: t.maybe(t.Number)
-  }),
+  })),
   recentProposal: t.maybe(t.struct({
     createdAt: t.String,
-    proposal: t.Number
+    proposal: t.Number,
   })),
   cadastre: t.maybe(t.struct({
-    reference: t.String
+    reference: t.String,
   })),
   floorArea: t.Number,
   featuredOwnerId: t.maybe(t.String)
 })
 
-export const CallcenterView = t.struct({
+export const CallcenterView = t.struct<WorksheetViewProps>({
   id: t.String,
   status: WorkSheetStatusEnum,
   queueId: t.maybe(t.String),
   building: WorksheetBuilding,
-  relatedBuildings: t.list(WorksheetBuilding),
   relatedOwners: t.list(t.struct({
     id: t.String,
     name: t.String,
