@@ -12,7 +12,7 @@ export class VirtualCallerService {
   ) {
   }
 
-  async call (from: string, to: string) {
+  async callPoc (from: string, to: string) {
     const twiml = new VoiceResponse()
     const call = VirtualAgentCall({} as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
