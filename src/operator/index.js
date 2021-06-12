@@ -10,7 +10,7 @@ export default (app) => {
     path: [
       '/operators/login',
       '/operators/refresh-token',
-      '/calls/twilio/voice',
+      // '/calls/twilio/voice', // needed for calls from web (aka callcenter)
       /^calls\/twilio\/[0-9a-z]*\/gather$/,
       /^calls\/twilio\/[0-9a-z]*\/done$/,
       /^calls\/twilio\/[0-9a-z]*\/machine-detection$/
