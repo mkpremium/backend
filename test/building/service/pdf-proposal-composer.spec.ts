@@ -5,6 +5,7 @@ import { UserProfileProps } from '../../../src/types/user'
 describe('PdfProposalComposer', () => {
   const testBuilding = buildingBuilder({
     address: {
+      type: '',
       street: 'Romo Rampa',
       number: '295',
       city: 'TEST_PORTO',

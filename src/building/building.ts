@@ -168,6 +168,7 @@ export interface BuildingAddressProps {
   city: string;
   province: string;
   neighborhood: string;
+  type: string;
 }
 
 export type BuildingNegotiationStatus =
@@ -193,9 +194,10 @@ export interface BuildingProps {
   ownerId?: string;
   negotiationStatus: BuildingNegotiationStatus;
   assignedAgentId?: string;
+  use?: string;
 }
 
-export const Building = t.struct(
+export const Building = t.struct<BuildingProps>(
   {
     id: t.String,
     address: Address,
@@ -251,7 +253,7 @@ export const Building = t.struct(
       _documentType: 'building'
     }
   }
-) as Struct<BuildingProps>
+)
 
 Building.prototype.changeNegotiationStatus = function (newStatus) {
   return Building.update(this, {

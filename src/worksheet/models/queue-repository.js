@@ -9,13 +9,8 @@ import { logger } from '../../infrastructure/logger'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { ListQuery } from '../../types/params'
-import {
-  WorkSheetCall,
-  WorksheetQueue,
-  WorksheetQueueBody,
-  WorksheetQueueCount,
-  WorksheetQueueSource
-} from '../domain/worksheet'
+import { WorksheetQueue, WorksheetQueueBody, WorksheetQueueSource } from '../domain/queue'
+import { WorkSheetCall, WorksheetQueueCount } from '../domain/worksheet'
 import { QueueItem, QueueStatus } from './queue-item'
 import { LegacyWorksheetRepository } from './worksheet-repository'
 

@@ -1,4 +1,5 @@
-import { keepOnlyUserNewestOpenedWorksheets, WorkSheetStatus } from '../domain/worksheet'
+import { keepOnlyUserNewestOpenedWorksheets } from '../domain/queue'
+import { WorkSheetStatus } from '../domain/worksheet'
 
 /**
  * @property {WorksheetRepository} worksheetRepository

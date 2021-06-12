@@ -1,13 +1,44 @@
-import t from 'tcomb'
+import t, { Struct } from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { EntityNotFound } from '../../db/errors'
 import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { OwnerStatusEnum, OwnerTypeEnum } from '../../owner/owner'
-import { Worksheet, WorkSheetStatusEnum } from '../domain/worksheet'
+import { Worksheet, WorksheetProps, WorkSheetStatusEnum, WorksheetStatusType } from '../domain/worksheet'
+import { BuildingAddressProps, BuildingProps } from '../../building/building'
 
-export const WorksheetBuilding = t.struct({
+type WorksheetBuildingAddressProps = Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> &
+  {
+    postalCode: {
+      number: number | string
+    }
+  }
+
+type WorksheetBuildingProps = Omit<BuildingProps, 'cadastre' | 'address' | 'assignedAgentId' | 'ownerId'>
+  & {
+  cadastreReference: string;
+  address: WorksheetBuildingAddressProps;
+  latestProposal: {
+    amount: number;
+    createdAt: string;
+  },
+  metadata: {
+    previewUrl: string;
+    id: string;
+    mimeType: string;
+  }[];
+  usage: string;
+}
+
+export interface WorksheetViewProps {
+  id: string;
+  status: WorksheetStatusType;
+  queueId: string;
+  building: WorksheetBuildingProps;
+}
+
+export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
   id: t.String,
   negotiationStatus: t.String,
   latestProposal: t.maybe(t.struct({
@@ -133,22 +164,16 @@ ORDER BY worksheet.viewedAt LIMIT 1
 `
 }
 
-const alreadySoldBuildingWorksheetId = bucketName => `
-SELECT id
-FROM ${bucketName}
-LET buildingIds = ARRAY b.id FOR b IN (SELECT building.id FROM mkpremium building WHERE building._documentType = 'building' AND building.negotiationStatus = 'YA VENDIO') END
-WHERE _documentType = 'worksheet' AND relatedBuildingIds[0] IN buildingIds
-`
-
 export class WorksheetNotFound extends Error {
-  constructor (worksheetId) {
+  constructor (
+    readonly worksheetId,
+  ) {
     super('Worksheet not found')
-    this.worksheetId = worksheetId
   }
 }
 
-export class WorksheetRepository extends CouchbaseRepository {
-  getForCallcenterView (worksheetId) {
+export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
+  getForCallcenterView (worksheetId): Promise<WorksheetViewProps> {
     return this.couchbaseAdapter.queryAsync(
       worksheetByIdQuery(this.bucketName), [ worksheetId ]
     ).then(rows => {
@@ -174,7 +199,7 @@ export class WorksheetRepository extends CouchbaseRepository {
     })
   }
 
-  nextAvailableWorksheetInSource (source, skipWorksheetId) {
+  nextAvailableWorksheetInSource (source, skipWorksheetId): Promise<WorksheetViewProps> {
     const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, skipWorksheetId)
     return this.couchbaseAdapter.queryAsync(q)
       .then(result => {
@@ -185,18 +210,13 @@ export class WorksheetRepository extends CouchbaseRepository {
       })
   }
 
-  getAllWorksheetIdForAlreadySoldBuildings () {
-    return this.couchbaseAdapter.queryAsync(alreadySoldBuildingWorksheetId(this.bucketName))
-      .then(result => result.map(({ id }) => id))
-  }
-
-  ofBuildingId (buildingId) {
+  ofBuildingId (buildingId): Promise<WorksheetProps> {
     return this.couchbaseAdapter.queryAsync(`
-                SELECT worksheet.*
-                FROM ${this.bucketName} worksheet
-                WHERE worksheet._documentType = 'worksheet'
-                  AND worksheet.relatedBuildingIds[0] = $1
-      `, [ buildingId ])
+        SELECT worksheet.*
+        FROM ${this.bucketName} worksheet
+        WHERE worksheet._documentType = 'worksheet'
+          AND worksheet.relatedBuildingIds[0] = $1
+    `, [ buildingId ])
       .then(rows => {
         if (!rows || rows.length === 0) {
           throw new EntityNotFound(`worksheet.buildingId=${buildingId}`, this.struct())
@@ -206,7 +226,7 @@ export class WorksheetRepository extends CouchbaseRepository {
       })
   }
 
-  struct () {
+  struct (): Struct<WorksheetProps> {
     return Worksheet
   }
 

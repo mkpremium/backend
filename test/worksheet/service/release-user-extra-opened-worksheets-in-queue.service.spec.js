@@ -1,7 +1,8 @@
+import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from '../../../src/worksheet/service/release-user-extra-opened-worksheets-in-queue.service'
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
-import { WorksheetQueue, WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
+import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
 import moment from 'moment'
 import { QueueStatus } from '../../../src/worksheet/models/queue-item'
 

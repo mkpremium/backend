@@ -1,14 +1,16 @@
 import { TakeNextWorksheetService } from '../../../src/worksheet/service/take-next-worksheet.service'
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
-import { Worksheet, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
 import { WorksheetNotFound } from '../../../src/worksheet/repository/worksheet.repository'
+import { worksheetBuilder } from '../worksheet.builder'
+import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 
 const testUserId = 'test-user-id'
 describe('TakeNextWorksheetService', () => {
   const testQueue = WorksheetQueue({
     id: 'test-queue-id',
     name: 'test queue',
+    worksheets: [],
     source: {
       province: 'test province'
     }
@@ -34,7 +36,7 @@ describe('TakeNextWorksheetService', () => {
   })
 
   it('takes next worksheet from source', async () => {
-    const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
+    const testNextWorksheet = worksheetBuilder().build()
     worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source)
       .resolves(testNextWorksheet)
 
@@ -56,7 +58,7 @@ describe('TakeNextWorksheetService', () => {
   it('gets another worksheet when next one is not found', async () => {
     worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source)
       .rejects(new WorksheetNotFound('worksheet-without-valid-owners-id'))
-    const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
+    const testNextWorksheet = worksheetBuilder().build()
     worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source, 'worksheet-without-valid-owners-id')
       .resolves(testNextWorksheet)
 
@@ -71,7 +73,7 @@ describe('TakeNextWorksheetService', () => {
   })
 
   it('publishes event', async () => {
-    const testNextWorksheet = Worksheet({ id: 'test-next-worksheet-id' })
+    const testNextWorksheet = worksheetBuilder().build()
     worksheetsRepositoryMock.nextAvailableWorksheetInSource.resolves(testNextWorksheet)
 
     await service.nextWorksheetInQueue(testQueue, testUserId)

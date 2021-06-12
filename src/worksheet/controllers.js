@@ -5,9 +5,9 @@ import { History } from '../history/models'
 import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { UserRoles } from '../types/user'
+import { WorksheetQueueBody } from './domain/queue'
 import { LegacyWorksheetRepository, QueueRequestParams } from './models/worksheet-repository'
 import { QueueRequestAction } from './types'
-import { WorksheetQueueBody } from './domain/worksheet'
 
 async function worksheetList (req, res) {
   const repo = new LegacyWorksheetRepository()

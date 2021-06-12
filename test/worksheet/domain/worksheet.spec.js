@@ -1,4 +1,5 @@
-import { takeWorksheet, Worksheet, WorksheetQueue } from '../../../src/worksheet/domain/worksheet'
+import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
+import { takeWorksheet, Worksheet } from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
 import { QueueItem } from '../../../src/worksheet/models/queue-item'
 

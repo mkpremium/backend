@@ -1,7 +1,5 @@
 import _filter from 'lodash/filter'
 import _find from 'lodash/find'
-import _get from 'lodash/get'
-import _ from 'lodash'
 import t from 'tcomb'
 import { Building } from '../../building/building'
 import { utc } from '../../lib/date'
@@ -11,6 +9,7 @@ import { OwnerCompactView } from '../../owner/types'
 import { ScheduledEvent } from '../../scheduled-events/types'
 import { Address } from '../../types/common'
 import { QueueItem, QueueStatus } from '../models/queue-item'
+import { WorksheetQueue } from './queue'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -30,7 +29,14 @@ export const WorkSheetCall = t.struct({
   realizedAt: t.Date
 }, 'WorkSheetCall')
 
-export const Worksheet = t.struct({
+export interface WorksheetProps {
+  id: string;
+  status: WorksheetStatusType;
+  relatedBuildingIds: [string];
+  setStatus (status: WorksheetStatusType): WorksheetProps
+}
+
+export const Worksheet = t.struct<WorksheetProps>({
   id: t.maybe(t.String),
   worksheetIndex: t.maybe(t.Number),
   calls: t.list(WorkSheetCall),
@@ -120,45 +126,6 @@ Worksheet.prototype.makeAvailable = function () {
   )
 }
 
-export const WorksheetQueueSource = t.struct({
-  city: t.maybe(t.String),
-  province: t.maybe(t.String),
-  zone: t.maybe(t.String),
-  neighborhood: t.maybe(t.String)
-}, 'source')
-
-export const WorksheetQueueBody = t.struct(
-  {
-    name: t.String,
-    source: WorksheetQueueSource
-  }, {
-    name: 'WorksheetQueueBody',
-    defaultProps: {
-      source: {}
-    }
-  }
-)
-
-export const WorksheetQueue = t.struct(
-  {
-    id: t.maybe(t.String),
-    name: t.String,
-    source: WorksheetQueueSource,
-    worksheets: t.list(QueueItem),
-    worksheetIndex: t.maybe(t.Number),
-
-    _documentType: t.enums.of([ 'worksheet-queue' ])
-  },
-  {
-    name: 'WorksheetQueue',
-    defaultProps: {
-      worksheets: [],
-      source: {},
-      _documentType: 'worksheet-queue'
-    }
-  }
-)
-
 export const WorksheetQueueCount = WorksheetQueue.extend(
   {
     possibleNumberOfWorksheets: t.Number
@@ -183,38 +150,6 @@ WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
 
 WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
   return _filter(this.worksheets, { operatorId, status: QueueStatus.SCHEDULED })
-}
-
-WorksheetQueue.prototype.removeScheduledCall = function (scheduledCallId) {
-  const updatedWorksheets = this.worksheets.map(
-    w => _get(w, 'event.id') === scheduledCallId ? w.removeScheduledCall() : w
-  )
-  return t.update(this, {
-    worksheets: {
-      $set: updatedWorksheets
-    }
-  })
-}
-
-const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser) => {
-  const userOpenedWorksheets = queue.worksheets
-    .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
-
-  userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
-  return _.map(_.drop(userOpenedWorksheets, maxOpenedWorksheetsByUser), 'worksheetId')
-}
-
-export const keepOnlyUserNewestOpenedWorksheets = (queue, userId, maxOpenedWorksheetsByUser) => {
-  const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
-
-  return [
-    t.update(queue, {
-      worksheets: {
-        $set: queue.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
-      }
-    }),
-    worksheetIdToDrop
-  ]
 }
 
 /**
@@ -268,12 +203,11 @@ export const takeWorksheet = (queue, worksheet, byUserOfId) => {
     })
   ]
 }
-
-export class WorksheetAlreadyTaken extends Error {
-  constructor (worksheetId, assignedUserId, newUserId) {
-    super('Worksheet already taken by a different user')
-    this.worksheetId = worksheetId
-    this.assignedUserId = assignedUserId
-    this.newUserId = newUserId
-  }
-}
+export type WorksheetStatusType = 'OPEN'
+  | 'LOOKING_MEETING'
+  | 'INVALID'
+  | 'NO_SALE'
+  | 'YA_VENDIO'
+  | 'MEETING'
+  | 'ENTE_PUBLICO'
+  | 'TAKEN'

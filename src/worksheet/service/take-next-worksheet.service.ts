@@ -1,5 +1,5 @@
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
-import { WorksheetNotFound, WorksheetRepository } from '../repository/worksheet.repository'
+import { WorksheetNotFound, WorksheetRepository, WorksheetViewProps } from '../repository/worksheet.repository'
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
 import { EventBus } from '../../infrastructure/event-bus'
 
@@ -17,11 +17,11 @@ export class TakeNextWorksheetService {
   ) {
   }
 
-  nextWorksheetInQueueOfId (queueId, byUserOfId) {
+  nextWorksheetInQueueOfId (queueId, byUserOfId): Promise<WorksheetViewProps> {
     return this.worksheetQueueRepository.get(queueId).then(queue => this.nextWorksheetInQueue(queue, byUserOfId))
   }
 
-  async nextWorksheetInQueue (queue, byUserOfId) {
+  async nextWorksheetInQueue (queue, byUserOfId): Promise<WorksheetViewProps> {
     let worksheetFromSource
     try {
       worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId)
@@ -51,7 +51,7 @@ export class TakeNextWorksheetService {
     return nextWorksheet
   }
 
-  private getNextWorksheet (queue, byUserOfId, skipWorksheetId?) {
+  private getNextWorksheet (queue, byUserOfId, skipWorksheetId?): Promise<WorksheetViewProps> {
     return this.worksheetRepository.nextAvailableWorksheetInSource(queue.source, skipWorksheetId)
       .catch(error => {
         error.queueId = queue.id

@@ -2,6 +2,7 @@ import { takeWorksheet } from '../domain/worksheet'
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
 import { EventBus } from '../../infrastructure/event-bus'
 import { WorksheetRepository } from '../repository/worksheet.repository'
+import { removeScheduledCall } from '../domain/queue'
 
 export class WorksheetQueueActionsService {
   constructor (
@@ -31,7 +32,7 @@ export class WorksheetQueueActionsService {
           return
         }
 
-        return this.worksheetQueueRepository.save(queue.removeScheduledCall(scheduledCallId))
+        return this.worksheetQueueRepository.save(removeScheduledCall(queue, scheduledCallId))
       })
   }
 }

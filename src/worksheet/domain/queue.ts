@@ -1,0 +1,85 @@
+import t from 'tcomb'
+import { QueueItem, QueueStatus } from '../models/queue-item'
+import _ from 'lodash'
+import _get from 'lodash/get'
+
+export const WorksheetQueueSource = t.struct({
+  city: t.maybe(t.String),
+  province: t.maybe(t.String),
+  zone: t.maybe(t.String),
+  neighborhood: t.maybe(t.String)
+}, 'source')
+
+export const WorksheetQueueBody = t.struct(
+  {
+    name: t.String,
+    source: WorksheetQueueSource
+  }, {
+    name: 'WorksheetQueueBody',
+    defaultProps: {
+      source: {}
+    }
+  }
+)
+
+export interface WorksheetQueueProps {
+  worksheets: any[]; // queue items
+  id: string;
+  name: string;
+  source: {
+    city?: string;
+    province?: string;
+    zone?: string;
+    neighborhood?: string;
+  };
+}
+
+export const WorksheetQueue = t.struct<WorksheetQueueProps>(
+  {
+    id: t.maybe(t.String),
+    name: t.String,
+    source: WorksheetQueueSource,
+    worksheets: t.list(QueueItem),
+    worksheetIndex: t.maybe(t.Number),
+
+    _documentType: t.enums.of([ 'worksheet-queue' ])
+  },
+  {
+    name: 'WorksheetQueue',
+    defaultProps: {
+      worksheets: [],
+      source: {},
+      _documentType: 'worksheet-queue'
+    }
+  }
+)
+const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser) => {
+  const userOpenedWorksheets = queue.worksheets
+    .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
+
+  userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
+  return _.map(_.drop(userOpenedWorksheets, maxOpenedWorksheetsByUser), 'worksheetId')
+}
+export const keepOnlyUserNewestOpenedWorksheets = (queue, userId, maxOpenedWorksheetsByUser) => {
+  const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
+
+  return [
+    t.update(queue, {
+      worksheets: {
+        $set: queue.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
+      }
+    }),
+    worksheetIdToDrop
+  ]
+}
+
+export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId) {
+  const updatedWorksheets = queue.worksheets.map(
+    w => _get(w, 'event.id') === scheduledCallId ? w.removeScheduledCall() : w
+  )
+  return t.update(this, {
+    worksheets: {
+      $set: updatedWorksheets
+    }
+  })
+}

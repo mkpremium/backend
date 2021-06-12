@@ -1,27 +1,24 @@
-import { WorksheetQueue } from '../domain/worksheet'
+
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { WorksheetQueue, WorksheetQueueProps } from '../domain/queue'
 
 const queueWithScheduledCallOfIdQuery = bucketName => `
-select
-    id,
-    name,
-    source,
-    worksheets
-from ${bucketName}
-where _documentType = 'worksheet-queue' AND ANY w IN worksheets SATISFIES w.event.id = $1 END
+    SELECT id,
+           name,
+           source,
+           worksheets
+    FROM ${bucketName}
+    WHERE _documentType = 'worksheet-queue'
+        AND ANY w IN worksheets SATISFIES w.event.id = $1 END
 `
 
-export class WorksheetQueueRepository extends CouchbaseRepository {
+export class WorksheetQueueRepository extends CouchbaseRepository<WorksheetQueueProps> {
   struct () {
     return WorksheetQueue
   }
 
-  /**
-   * @param scheduledCallId
-   * @return {Promise<WorksheetQueue>}
-   */
-  async findQueueWithScheduledCallOfId (scheduledCallId) {
+  async findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps> {
     return this.couchbaseAdapter.queryAsync(
       queueWithScheduledCallOfIdQuery(this.bucketName), [ scheduledCallId ]
     ).then(rows => {
@@ -37,8 +34,7 @@ export class WorksheetQueueRepository extends CouchbaseRepository {
 }
 
 class ScheduledCallInMultipleQueues extends Error {
-  constructor (scheduledCallId) {
+  constructor (readonly scheduledCallId: string) {
     super('Scheduled called added to more than one queue')
-    this.scheduledCallId = scheduledCallId
   }
 }

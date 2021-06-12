@@ -233,7 +233,7 @@ export class WrongFeaturedContact extends Error {
   }
 }
 
-interface ContactProps {
+export interface ContactProps {
   id: string;
   type: 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB';
   value: string;
