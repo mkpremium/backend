@@ -36,14 +36,18 @@ export class VirtualCallerService {
 
     const contacts = cmd.contacts(worksheet)
     const lastContactPosition = contacts.findIndex(({ id }) => id === w.lastContactId)
-    await this.virtualCallerPhone.call(worksheet.building.address, contacts[ lastContactPosition + 1 ])
+    await this.virtualCallerPhone.call(
+      worksheet.building.address,
+      contacts[ lastContactPosition + 1 ],
+      worksheet.id,
+    )
   }
 
   private async startWithNextWorksheet (cmd: ProcessNextWorksheetCommand) {
     const worksheet = await this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId)
 
     const contacts = cmd.contacts(worksheet)
-    await this.virtualCallerPhone.call(worksheet.building.address, contacts[ 0 ])
+    await this.virtualCallerPhone.call(worksheet.building.address, contacts[ 0 ], worksheet.id)
 
     await this.virtualCallerWorksheetsRepository.save({
       worksheetId: worksheet.id,

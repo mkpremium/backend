@@ -14,7 +14,7 @@ export class VirtualCallerPhone {
   ) {
   }
 
-  call (address: WorksheetBuildingAddressProps, contact: ContactProps) {
+  call (address: WorksheetBuildingAddressProps, contact: ContactProps, worksheetId: string) {
     return Promise.reject('Not implemented')
   }
 

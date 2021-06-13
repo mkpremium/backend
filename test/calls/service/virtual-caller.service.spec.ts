@@ -77,7 +77,8 @@ describe('VirtualCallerService', () => {
 
     expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith(
       testWorksheet.building.address,
-      firstContact
+      firstContact,
+      testWorksheet.id,
     )
   })
 
@@ -91,7 +92,8 @@ describe('VirtualCallerService', () => {
 
     expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith(
       testWorksheet.building.address,
-      secondContact
+      secondContact,
+      testWorksheet.id,
     )
   })
 
