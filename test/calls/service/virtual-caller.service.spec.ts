@@ -4,6 +4,7 @@ import { ProcessNextWorksheetCommand, VirtualCallerService } from '../../../src/
 import { ContactProps } from '../../../src/owner/owner'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
+import { VirtualCallerWorksheetProps } from '../../../src/calls/repository/virtual-caller-worksheets.repository'
 
 const firstContact: ContactProps = {
   id: 'first-contact',
@@ -11,7 +12,7 @@ const firstContact: ContactProps = {
   value: '666666661',
   status: 'UNDEFINED',
 }
-const secondContact: ContactProps = {
+const lastContact: ContactProps = {
   id: 'second-contact',
   type: 'TELEFONO',
   value: '666666662',
@@ -20,10 +21,10 @@ const secondContact: ContactProps = {
 const testCmd: ProcessNextWorksheetCommand = {
   queueId: 'test-queue-id',
   callerId: 'test-caller-id',
-  contacts: () => [ firstContact, secondContact ],
+  contacts: () => [ firstContact, lastContact ],
 }
 const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
-const testInProgressWorksheet = {
+const testInProgressWorksheet: VirtualCallerWorksheetProps = {
   worksheetId: testWorksheet.id,
   lastContactId: firstContact.id,
   status: 'CALLING',
@@ -99,15 +100,31 @@ describe('VirtualCallerService', () => {
 
     expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith(
       testWorksheet.building.address,
-      secondContact,
+      lastContact,
       testWorksheet.id,
     )
     expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
       .calledOnceWith({
         worksheetId: testWorksheet.id,
-        lastContactId: secondContact.id,
+        lastContactId: lastContact.id,
         status: 'CALLING',
         callerId: testCmd.callerId,
       })
+  })
+
+  it('saves worksheet as done when there are no contacts left', async () => {
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
+      .resolves({ ...testInProgressWorksheet, lastContactId: lastContact.id })
+
+    await service.processNextWorksheet(testCmd)
+
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
+      .calledOnceWith({
+        worksheetId: testWorksheet.id,
+        lastContactId: lastContact.id,
+        status: 'DONE',
+        callerId: testCmd.callerId,
+      })
+
   })
 })

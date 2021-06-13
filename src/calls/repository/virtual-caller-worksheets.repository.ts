@@ -1,7 +1,7 @@
 export interface VirtualCallerWorksheetProps {
   worksheetId: string;
   callerId: string;
-  status: 'CALLING';
+  status: 'CALLING' | 'DONE';
   lastContactId?: string;
 }
 
