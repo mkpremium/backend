@@ -46,4 +46,8 @@ export class VirtualCallerWorksheetsRepository extends CouchbaseRepository<Virtu
   protected struct (): t.Struct<any> & Partial<RecordToDomain> {
     return VirtualCallerWorksheet
   }
+
+  async numberOfWorksheetsProcessedBy (callerId: string): Promise<number> {
+    return Promise.reject('Not implemented')
+  }
 }
