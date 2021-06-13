@@ -5,7 +5,7 @@ import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import twilio from 'twilio'
 import { VirtualCallsRepository } from './virtual-calls.repository'
 import { createCallDoneWebhookController } from './controller/call-done-webhook.controller'
-import { VirtualCallerService } from './service/virtual-caller.service'
+import { VirtualCallerPhone } from './service/virtual-caller-phone'
 import { createInputGatheredWebhookController } from './controller/input-gathered-webhook.controller'
 import { createMachineDetectionWebhookController } from './controller/machine-detection-webhook.controller'
 
@@ -39,7 +39,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
       ({ twilioCredentials }: { twilioCredentials: TwilioCredentials }) =>
         twilio(twilioCredentials.accountSid, twilioCredentials.accountAuthToken)
     ).singleton(),
-    virtualCaller: asClass(VirtualCallerService).classic().singleton(),
+    virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
 

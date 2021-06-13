@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
-import { CallerLoopService, StartLoopCommand } from '../../../src/calls/service/caller-loop.service'
+import { ProcessNextWorksheetCommand, VirtualCallerService } from '../../../src/calls/service/virtual-caller.service'
 import { ContactProps } from '../../../src/owner/owner'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 
-const testCmd: StartLoopCommand = {
+const testCmd: ProcessNextWorksheetCommand = {
   queueId: 'test-queue-id',
   callerId: 'test-caller-id',
   contacts: function* () {
@@ -13,27 +13,27 @@ const testCmd: StartLoopCommand = {
 }
 const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 
-describe('CallerLoopService', () => {
-  let service!: CallerLoopService
+describe('VirtualCallerService', () => {
+  let service!: VirtualCallerService
   let takeNextWorksheetServiceStub
-  let virtualCallerServiceStub
+  let virtualCallerPhoneStub
 
   beforeEach(() => {
     takeNextWorksheetServiceStub = {
       nextWorksheetInQueueOfId: stub().resolves(testWorksheet),
     }
-    virtualCallerServiceStub = {
+    virtualCallerPhoneStub = {
       call: stub().resolves(),
     }
 
-    service = new CallerLoopService(
+    service = new VirtualCallerService(
       takeNextWorksheetServiceStub,
-      virtualCallerServiceStub,
+      virtualCallerPhoneStub,
     )
   })
 
   it('takes next worksheet from queue', async () => {
-    await service.startLoop(testCmd)
+    await service.processNextWorksheet(testCmd)
 
     expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
       .calledWith(testCmd.queueId, testCmd.callerId)
@@ -53,7 +53,7 @@ describe('CallerLoopService', () => {
       status: 'UNDEFINED',
     }
 
-    await service.startLoop({
+    await service.processNextWorksheet({
       ...testCmd,
       contacts: function* () {
         yield firstContact
@@ -61,10 +61,10 @@ describe('CallerLoopService', () => {
       }
     })
 
-    expect(virtualCallerServiceStub.call).to.have.been.calledTwice
-    expect(virtualCallerServiceStub.call.firstCall.firstArg).to.be.equal(testWorksheet.building.address)
-    expect(virtualCallerServiceStub.call.firstCall.lastArg).to.be.equal(firstContact)
-    expect(virtualCallerServiceStub.call.secondCall.firstArg).to.be.equal(testWorksheet.building.address)
-    expect(virtualCallerServiceStub.call.secondCall.lastArg).to.be.equal(secondContact)
+    expect(virtualCallerPhoneStub.call).to.have.been.calledTwice
+    expect(virtualCallerPhoneStub.call.firstCall.firstArg).to.be.equal(testWorksheet.building.address)
+    expect(virtualCallerPhoneStub.call.firstCall.lastArg).to.be.equal(firstContact)
+    expect(virtualCallerPhoneStub.call.secondCall.firstArg).to.be.equal(testWorksheet.building.address)
+    expect(virtualCallerPhoneStub.call.secondCall.lastArg).to.be.equal(secondContact)
   })
 })

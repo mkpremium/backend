@@ -1,7 +1,7 @@
 import { initLogger } from '../src/infrastructure/logger'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { createDiContainer } from '../src/infrastructure/dependencies'
-import { VirtualCallerService } from '../src/calls/service/virtual-caller.service'
+import { VirtualCallerPhone } from '../src/calls/service/virtual-caller-phone'
 
 const logger = initLogger()
 logger.info('Starting virtual caller')
@@ -9,7 +9,7 @@ logger.info('Starting virtual caller')
 connectCouchbaseBucket()
   .then(bucketConnection => {
     const container = createDiContainer(bucketConnection)
-    const service = container.resolve<VirtualCallerService>('virtualCaller')
+    const service = container.resolve<VirtualCallerPhone>('virtualCaller')
 
     service.callPoc('+12393301250', '+56976675541')
       .catch(error => {
