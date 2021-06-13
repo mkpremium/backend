@@ -8,6 +8,7 @@ import { createCallDoneWebhookController } from './controller/call-done-webhook.
 import { VirtualCallerPhone } from './service/virtual-caller-phone'
 import { createInputGatheredWebhookController } from './controller/input-gathered-webhook.controller'
 import { createMachineDetectionWebhookController } from './controller/machine-detection-webhook.controller'
+import { VirtualCallerWorksheetsRepository } from './repository/virtual-caller-worksheets.repository'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -44,6 +45,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
 
     virtualCallsRepository: asClass(VirtualCallsRepository).classic().singleton(),
+    virtualCallerWorksheetsRepository: asClass(VirtualCallerWorksheetsRepository).classic().singleton(),
 
     // needed for calls from web (aka callcenter)
     // outgoingCallWebhookController: asFunction(({ logger }) => async (req, res) => {
