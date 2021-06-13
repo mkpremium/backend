@@ -8,13 +8,13 @@ import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 const firstContact: ContactProps = {
   id: 'first-contact',
   type: 'TELEFONO',
-  value: '666666666',
+  value: '666666661',
   status: 'UNDEFINED',
 }
 const secondContact: ContactProps = {
   id: 'second-contact',
   type: 'TELEFONO',
-  value: '666666667',
+  value: '666666662',
   status: 'UNDEFINED',
 }
 const testCmd: ProcessNextWorksheetCommand = {
@@ -60,6 +60,13 @@ describe('VirtualCallerService', () => {
     )
   })
 
+  it('takes next worksheet from queue when no worksheet is in progress', async () => {
+    await service.processNextWorksheet(testCmd)
+
+    expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
+      .calledWith(testCmd.queueId, testCmd.callerId)
+  })
+
   it('stores worksheet to process', async () => {
     await service.processNextWorksheet(testCmd)
 
@@ -102,12 +109,5 @@ describe('VirtualCallerService', () => {
         status: 'CALLING',
         callerId: testCmd.callerId,
       })
-  })
-
-  it('takes next worksheet from queue', async () => {
-    await service.processNextWorksheet(testCmd)
-
-    expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
-      .calledWith(testCmd.queueId, testCmd.callerId)
   })
 })
