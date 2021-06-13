@@ -26,7 +26,7 @@ const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 const testInProgressWorksheet = {
   worksheetId: testWorksheet.id,
   lastContactId: firstContact.id,
-  status: 'PROCESSING',
+  status: 'CALLING',
   callerId: testCmd.callerId,
 }
 
@@ -67,7 +67,7 @@ describe('VirtualCallerService', () => {
       .calledOnceWith({
         worksheetId: testWorksheet.id,
         lastContactId: firstContact.id,
-        status: 'PROCESSING',
+        status: 'CALLING',
         callerId: testCmd.callerId,
       })
   })
@@ -95,6 +95,13 @@ describe('VirtualCallerService', () => {
       secondContact,
       testWorksheet.id,
     )
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
+      .calledOnceWith({
+        worksheetId: testWorksheet.id,
+        lastContactId: secondContact.id,
+        status: 'CALLING',
+        callerId: testCmd.callerId,
+      })
   })
 
   it('takes next worksheet from queue', async () => {

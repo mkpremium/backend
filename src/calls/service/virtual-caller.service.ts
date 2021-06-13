@@ -5,7 +5,7 @@ import {
   VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
 } from '../repository/virtual-caller-worksheets.repository'
-import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
+import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 
 export interface ProcessNextWorksheetCommand {
   queueId: string;
@@ -36,24 +36,27 @@ export class VirtualCallerService {
 
     const contacts = cmd.contacts(worksheet)
     const lastContactPosition = contacts.findIndex(({ id }) => id === w.lastContactId)
-    await this.virtualCallerPhone.call(
-      worksheet.building.address,
-      contacts[ lastContactPosition + 1 ],
-      worksheet.id,
-    )
+    await this.callContact(worksheet, contacts[ lastContactPosition + 1 ], cmd)
   }
 
   private async startWithNextWorksheet (cmd: ProcessNextWorksheetCommand) {
     const worksheet = await this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId)
 
     const contacts = cmd.contacts(worksheet)
-    await this.virtualCallerPhone.call(worksheet.building.address, contacts[ 0 ], worksheet.id)
+    await this.callContact(worksheet, contacts[ 0 ], cmd)
+  }
 
+  private async callContact (
+    worksheet: WorksheetViewProps,
+    contactToCall: ContactProps,
+    cmd: ProcessNextWorksheetCommand,
+  ) {
+    await this.virtualCallerPhone.call(worksheet.building.address, contactToCall, worksheet.id)
     await this.virtualCallerWorksheetsRepository.save({
       worksheetId: worksheet.id,
       callerId: cmd.callerId,
-      lastContactId: contacts[ 0 ].id,
-      status: 'PROCESSING',
+      lastContactId: contactToCall.id,
+      status: 'CALLING',
     })
   }
 }
