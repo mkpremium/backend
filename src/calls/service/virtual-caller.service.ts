@@ -34,23 +34,22 @@ export class VirtualCallerService {
   private async continueWithWorksheet (cmd: ProcessNextWorksheetCommand, w: VirtualCallerWorksheetProps) {
     const worksheet = await this.worksheetRepository.getForCallcenterView(w.worksheetId)
 
-    const contacts = cmd.contacts(worksheet)
-    const lastContactPosition = contacts.findIndex(({ id }) => id === w.lastContactId)
-    await this.callContact(worksheet, contacts[ lastContactPosition + 1 ], cmd)
+    await this.callNextWorksheetContact(worksheet, cmd, w.lastContactId)
   }
 
   private async startWithNextWorksheet (cmd: ProcessNextWorksheetCommand) {
     const worksheet = await this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId)
 
-    const contacts = cmd.contacts(worksheet)
-    await this.callContact(worksheet, contacts[ 0 ], cmd)
+    await this.callNextWorksheetContact(worksheet, cmd)
   }
 
-  private async callContact (
+  private async callNextWorksheetContact (
     worksheet: WorksheetViewProps,
-    contactToCall: ContactProps,
     cmd: ProcessNextWorksheetCommand,
+    lastContactCalledId?: string,
   ) {
+    const contacts = cmd.contacts(worksheet)
+    const contactToCall = this.nextContactToCall(contacts, lastContactCalledId)
     await this.virtualCallerPhone.call(worksheet.building.address, contactToCall, worksheet.id)
     await this.virtualCallerWorksheetsRepository.save({
       worksheetId: worksheet.id,
@@ -58,5 +57,14 @@ export class VirtualCallerService {
       lastContactId: contactToCall.id,
       status: 'CALLING',
     })
+  }
+
+  private nextContactToCall (contacts: ContactProps[], lastCalledContactId: string | undefined) {
+    if (!lastCalledContactId) {
+      return contacts[ 0 ]
+    }
+    const lastContactPosition = contacts.findIndex(({ id }) => id === lastCalledContactId)
+
+    return contacts[ lastContactPosition + 1 ]
   }
 }
