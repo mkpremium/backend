@@ -1,4 +1,4 @@
-interface VirtualCallerWorksheetProps {
+export interface VirtualCallerWorksheetProps {
   worksheetId: string;
   callerId: string;
   status: 'PROCESSING';
@@ -7,6 +7,10 @@ interface VirtualCallerWorksheetProps {
 
 export class VirtualCallerWorksheetsRepository {
   save (worksheet: VirtualCallerWorksheetProps) {
+    return Promise.reject('Not implemented')
+  }
+
+  async inProgressWorksheetFor (callerId: string): Promise<VirtualCallerWorksheetProps> {
     return Promise.reject('Not implemented')
   }
 }
