@@ -41,14 +41,15 @@ export class VirtualCallerService {
 
   private async startWithNextWorksheet (cmd: ProcessNextWorksheetCommand) {
     const worksheet = await this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId)
-    await this.virtualCallerWorksheetsRepository.save({
-      worksheetId: worksheet.id,
-      callerId: cmd.callerId,
-      lastContactId: null,
-      status: 'PROCESSING',
-    })
 
     const contacts = cmd.contacts(worksheet)
     await this.virtualCallerPhone.call(worksheet.building.address, contacts[ 0 ])
+
+    await this.virtualCallerWorksheetsRepository.save({
+      worksheetId: worksheet.id,
+      callerId: cmd.callerId,
+      lastContactId: contacts[ 0 ].id,
+      status: 'PROCESSING',
+    })
   }
 }

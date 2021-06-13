@@ -66,7 +66,7 @@ describe('VirtualCallerService', () => {
     expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
       .calledOnceWith({
         worksheetId: testWorksheet.id,
-        lastContactId: null,
+        lastContactId: firstContact.id,
         status: 'PROCESSING',
         callerId: testCmd.callerId,
       })
