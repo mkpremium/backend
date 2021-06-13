@@ -1,11 +1,9 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
 import { VirtualCallerPhone } from './virtual-caller-phone'
-import {
-  VirtualCallerWorksheetProps,
-  VirtualCallerWorksheetsRepository
-} from '../repository/virtual-caller-worksheets.repository'
-import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
+import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
+import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
+import { EventBus } from '../../infrastructure/event-bus'
 
 export interface ProcessNextWorksheetCommand {
   queueId: string;
@@ -19,6 +17,7 @@ export class VirtualCallerService {
     private virtualCallerPhone: VirtualCallerPhone,
     private virtualCallerWorksheetsRepository: VirtualCallerWorksheetsRepository,
     private worksheetRepository: WorksheetRepository,
+    private eventBus: EventBus,
   ) {
   }
 
@@ -43,6 +42,10 @@ export class VirtualCallerService {
       await this.virtualCallerWorksheetsRepository.save({
         ...inProgressWorksheet,
         status: 'DONE',
+      })
+      await this.eventBus.publish({
+        name: 'virtual-caller.worksheet_done',
+        worksheetId: inProgressWorksheet.worksheetId,
       })
     }
   }

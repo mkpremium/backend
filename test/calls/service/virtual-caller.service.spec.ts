@@ -37,6 +37,7 @@ describe('VirtualCallerService', () => {
   let virtualCallerPhoneStub
   let virtualCallerWorksheetsRepositoryStub
   let worksheetRepositoryStub
+  let eventBusStub
 
   beforeEach(() => {
     takeNextWorksheetServiceStub = {
@@ -52,12 +53,16 @@ describe('VirtualCallerService', () => {
     worksheetRepositoryStub = {
       getForCallcenterView: stub()
     }
+    eventBusStub = {
+      publish: stub().resolves(),
+    }
 
     service = new VirtualCallerService(
       takeNextWorksheetServiceStub,
       virtualCallerPhoneStub,
       virtualCallerWorksheetsRepositoryStub,
       worksheetRepositoryStub,
+      eventBusStub,
     )
   })
 
@@ -125,6 +130,9 @@ describe('VirtualCallerService', () => {
         status: 'DONE',
         callerId: testCmd.callerId,
       })
-
+    expect(eventBusStub.publish).to.have.been.calledWith({
+      name: 'virtual-caller.worksheet_done',
+      worksheetId: testWorksheet.id,
+    })
   })
 })
