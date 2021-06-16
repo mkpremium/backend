@@ -2,8 +2,8 @@ import { VirtualCallsRepository } from '../virtual-calls.repository'
 import { Twilio } from 'twilio'
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
-import { ContactProps } from '../../owner/owner'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
+import { OwnerContact } from './virtual-caller.service'
 
 export class VirtualCallerPhone {
   constructor (
@@ -14,7 +14,7 @@ export class VirtualCallerPhone {
   ) {
   }
 
-  call (address: WorksheetBuildingAddressProps, contact: ContactProps, worksheetId: string) {
+  call (address: WorksheetBuildingAddressProps, contact: OwnerContact, worksheetId: string) {
     return Promise.reject('Not implemented')
   }
 

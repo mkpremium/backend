@@ -1,6 +1,7 @@
 import { VirtualCallerService } from './virtual-caller.service'
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
 import { Logger } from 'winston'
+import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 
 interface CheckCommand {
   callerId: string;
@@ -16,7 +17,7 @@ export class VirtualCallerSupervisorService {
   ) {
   }
 
-  static contactsOrderStrategy = () => []
+  static contactsOrderStrategy = (ws: Pick<WorksheetViewProps, 'relatedOwners'>) => []
 
   async check (cmd: CheckCommand) {
     const worksheetsProcessedByCaller = await this.virtualCallerWorksheetsRepository.numberOfWorksheetsProcessedBy(cmd.callerId)

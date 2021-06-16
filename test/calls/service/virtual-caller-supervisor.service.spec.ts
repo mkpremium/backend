@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { spy, stub } from 'sinon'
 import { VirtualCallerSupervisorService } from '../../../src/calls/service/virtual-caller-supervisor.service'
+import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 
 const testCmd = {
   callerId: 'test-caller-id',
@@ -52,5 +53,19 @@ describe('VirtualCallerSupervisorService', () => {
 
     expect(virtualCallerStub.processNextWorksheet).to.not.have.been.called
     expect(loggerSpy.info).to.have.been.called
+  })
+
+  describe.skip('contactsOrderStrategy', () => {
+    it('does not give duplicated numbers', () => {
+      // const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      //   relatedOwners: [
+      //     {
+      //       id: 'test-owner-id',
+      //       person: { contacts: [] }
+      //     },
+      //   ],
+      // }
+      // VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+    })
   })
 })

@@ -2,13 +2,15 @@ import { TakeNextWorksheetService } from '../../worksheet/service/take-next-work
 import { ContactProps } from '../../owner/owner'
 import { VirtualCallerPhone } from './virtual-caller-phone'
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
-import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
+import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { EventBus } from '../../infrastructure/event-bus'
+
+export type OwnerContact = ContactProps & { ownerId: string }
 
 export interface ProcessNextWorksheetCommand {
   queueId: string;
   callerId: string;
-  contacts: (worksheet: any) => ContactProps[];
+  contacts: (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => (OwnerContact)[];
 }
 
 export class VirtualCallerService {
@@ -50,7 +52,7 @@ export class VirtualCallerService {
     }
   }
 
-  private nextContactToCall (contacts: ContactProps[], lastCalledContactId: string | undefined): ContactProps | undefined {
+  private nextContactToCall (contacts: OwnerContact[], lastCalledContactId: string | undefined): OwnerContact | undefined {
     if (!lastCalledContactId) {
       return contacts[ 0 ]
     }

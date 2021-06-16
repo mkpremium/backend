@@ -1,19 +1,24 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
-import { ProcessNextWorksheetCommand, VirtualCallerService } from '../../../src/calls/service/virtual-caller.service'
-import { ContactProps } from '../../../src/owner/owner'
+import {
+  OwnerContact,
+  ProcessNextWorksheetCommand,
+  VirtualCallerService
+} from '../../../src/calls/service/virtual-caller.service'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 import { VirtualCallerWorksheetProps } from '../../../src/calls/repository/virtual-caller-worksheets.repository'
 
-const firstContact: ContactProps = {
+const firstContact: OwnerContact = {
   id: 'first-contact',
+  ownerId: 'test-owner-id',
   type: 'TELEFONO',
   value: '666666661',
-  status: 'UNDEFINED',
+  status: 'UNDEFINED'
 }
-const lastContact: ContactProps = {
+const lastContact: OwnerContact = {
   id: 'second-contact',
+  ownerId: 'test-owner-id',
   type: 'TELEFONO',
   value: '666666662',
   status: 'UNDEFINED',
