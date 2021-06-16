@@ -10,6 +10,10 @@ import { ScheduledEventsRepository } from '../../scheduled-events/repository/sch
 import moment from 'moment'
 import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
 
+function isFridayOrWeekend (lastScheduledEventDateToInclude: moment.Moment) {
+  return [ 5, 6, 7 ].includes(lastScheduledEventDateToInclude.isoWeekday())
+}
+
 export class ProposalsSenderService {
   constructor (
     private proposalsRepository: ProposalsRepository,
@@ -24,7 +28,11 @@ export class ProposalsSenderService {
   }
 
   async checkAndSendProposals () {
-    const lastScheduledEventDateToInclude = moment().add(-3, 'days')
+    let lastScheduledEventDateToInclude = moment().add(-3, 'days')
+    if (isFridayOrWeekend(lastScheduledEventDateToInclude)) {
+      lastScheduledEventDateToInclude = lastScheduledEventDateToInclude.isoWeekday(4)
+    }
+
     const proposals = await this.proposalsRepository.pendingProposals()
     const stats = {
       pendingProposals: proposals.length,

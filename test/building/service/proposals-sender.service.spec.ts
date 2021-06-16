@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { stub } from 'sinon'
+import sinon, { stub } from 'sinon'
 import { ProposalsSenderService } from '../../../src/building/service/proposals-sender.service'
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
@@ -101,6 +101,22 @@ describe('ProposalsSenderService', () => {
     await service.checkAndSendProposals()
 
     expect(emailSenderStub.sendMail).to.not.have.been.called
+  })
+
+  it('does not consider weekends for evaluation period', async () => {
+    const lastMonday = moment().startOf('isoWeek')
+    const testLastFridayMeeting = meetingBuilder({
+      eventDate: lastMonday.clone().add(-3, 'days').toDate(),
+      createdAt: moment().add(-7, 'day').toDate(),
+    }).build()
+    scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId)
+      .resolves(testLastFridayMeeting)
+    const clock = sinon.useFakeTimers(lastMonday.toDate())
+
+    await service.checkAndSendProposals()
+
+    expect(emailSenderStub.sendMail).to.not.have.been.called
+    clock.restore()
   })
 
   it('updates building negotiation status', async () => {
