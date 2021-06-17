@@ -68,6 +68,7 @@ describe('VirtualCallerService', () => {
       virtualCallerWorksheetsRepositoryStub,
       worksheetRepositoryStub,
       eventBusStub,
+      {} as any
     )
   })
 

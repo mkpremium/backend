@@ -4,6 +4,7 @@ import { VirtualCallerPhone } from './virtual-caller-phone'
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
 import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { EventBus } from '../../infrastructure/event-bus'
+import { Logger } from 'winston'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
@@ -20,6 +21,7 @@ export class VirtualCallerService {
     private virtualCallerWorksheetsRepository: VirtualCallerWorksheetsRepository,
     private worksheetRepository: WorksheetRepository,
     private eventBus: EventBus,
+    private logger: Logger,
   ) {
   }
 
@@ -34,6 +36,9 @@ export class VirtualCallerService {
 
     if (contactToCall) {
       await this.virtualCallerPhone.call(worksheet.building.address, contactToCall, worksheet.id)
+        .catch(error => {
+          this.logger.error('Call failed', { error: error.message, trace: error.trace })
+        })
       await this.virtualCallerWorksheetsRepository.save({
         worksheetId: worksheet.id,
         callerId: cmd.callerId,
