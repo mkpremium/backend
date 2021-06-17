@@ -110,11 +110,12 @@ describe('VirtualCallerService', () => {
 
     await service.processNextWorksheet(testCmd)
 
-    expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith(
-      testWorksheet.building.address,
-      lastContact,
-      testWorksheet.id,
-    )
+    expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith({
+      worksheetId: testWorksheet.id,
+      buildingId: testWorksheet.building.id,
+      address: testWorksheet.building.address,
+      contact: lastContact,
+    })
     expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
       .calledOnceWith({
         worksheetId: testWorksheet.id,
