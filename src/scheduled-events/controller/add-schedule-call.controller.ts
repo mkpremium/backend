@@ -1,32 +1,15 @@
 import { canScheduleCall } from '../../lib/role-operators'
-import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
-import { LegacyWorksheetQueueRepository } from '../../worksheet/models/queue-repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { ScheduleCallService } from '../service/schedule-call.service'
 
-interface CreateAddScheduledCallControllerDeps {
-  scheduledEventsRepository: ScheduledEventsRepository;
-  legacyWorksheetQueueRepository: LegacyWorksheetQueueRepository;
-  eventBus: EventBus;
-}
-export const createAddScheduledCallController = ({
-  scheduledEventsRepository,
-  legacyWorksheetQueueRepository,
-  eventBus
-}: CreateAddScheduledCallControllerDeps) => async (req, res) => {
-  canScheduleCall(req.user.operator, req.body.notifyTo)
+export const createAddScheduledCallController = ({ scheduleCall }: { scheduleCall: ScheduleCallService }) =>
+  async (req, res) => {
+    canScheduleCall(req.user.operator, req.body.notifyTo)
 
-  const scheduledEvent = await scheduledEventsRepository.addScheduleCallEvent(req.body, req.user.id)
+    const scheduledEvent = scheduleCall.scheduleCall({
+      event: req.body,
+      userId: req.user.id,
+      queueId: req.user.operator.profile.queueId,
+    })
 
-  const queue = await legacyWorksheetQueueRepository.findByIdOrThrow(req.user.operator.profile.queueId)
-  await legacyWorksheetQueueRepository.scheduleWorksheetInQueue(queue, scheduledEvent)
-
-  await eventBus.publish({
-    name: 'scheduled_events.call_scheduled',
-    userId: req.user.id,
-    ownerId: req.body.event.ownerId,
-    buildingId: req.body.event.buildingId,
-    note: req.body.note
-  })
-
-  res.status(201).json(scheduledEvent)
-}
+    res.status(201).json(scheduledEvent)
+  }

@@ -5,6 +5,7 @@ import jwt from '../middleware/jwt'
 import { setupEventListeners } from './event-listeners'
 import { ScheduledCallsRepository } from './repository/scheduled-calls.repository'
 import { asClass, asFunction } from 'awilix'
+import { ScheduleCallService } from './service/schedule-call.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledEventsRepository } from './repository/schedule-events.repository'
@@ -30,6 +31,7 @@ export const setupScheduledEventsDependencies = awilixContainer => {
     meetingsService: asClass(MeetingsService).singleton(),
 
     getUserMeetingsService: asClass(GetSelfMeetingsService).classic().singleton(),
+    scheduleCall: asClass(ScheduleCallService).classic().singleton(),
 
     addScheduledCallController: asFunction(createAddScheduledCallController).singleton(),
     addMeetingController: asFunction(createAddScheduledMeetingEventController).singleton(),
