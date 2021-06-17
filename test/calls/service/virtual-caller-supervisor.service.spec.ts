@@ -55,17 +55,43 @@ describe('VirtualCallerSupervisorService', () => {
     expect(loggerSpy.info).to.have.been.called
   })
 
-  describe.skip('contactsOrderStrategy', () => {
+  describe('contactsOrderStrategy', () => {
     it('does not give duplicated numbers', () => {
-      // const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
-      //   relatedOwners: [
-      //     {
-      //       id: 'test-owner-id',
-      //       person: { contacts: [] }
-      //     },
-      //   ],
-      // }
-      // VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-id',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+                {
+                  id: 'test-second-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          },
+        ],
+      }
+      const contacts = VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+
+      expect(contacts).to.be.eql([ {
+        ownerId: 'test-owner-id',
+        id: 'test-first-contact-id',
+        status: 'UNDEFINED',
+        type: 'TELEFONO',
+        value: '666666666',
+      } ])
     })
   })
 })
