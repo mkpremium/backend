@@ -1,24 +1,41 @@
 import { Logger } from 'winston'
 import { VirtualCallsRepository } from '../virtual-calls.repository'
+import { VirtualAgentCall } from '../virtual-agent-call'
+import { EventBus } from '../../infrastructure/event-bus'
 
 export const createCallDoneWebhookController = ({
                                                   logger,
-                                                  virtualCallsRepository
+                                                  virtualCallsRepository,
+                                                  eventBus,
                                                 }: {
   logger: Logger,
-  virtualCallsRepository: VirtualCallsRepository
-}) => async (req, res) => {
-  // TODO update call status.
-  // TODO publish event.
-  console.log('call done', req.body)
-  const { callId } = req.params
+  virtualCallsRepository: VirtualCallsRepository,
+  eventBus: EventBus,
+}) => {
+  return async (req, res) => {
+    const { callId } = req.params
+    virtualCallsRepository.get(callId)
+      .then(call => {
+        const updatedCall = VirtualAgentCall.update(call, {
+          status: {
+            $set: 'DONE'
+          },
+          doneAt: {
+            $set: new Date()
+          }
+        })
+        if (!updatedCall.ownerResponse) {
+          logger.info('Call finished without input gathered', { callId })
+        }
 
-
-  // const call = await virtualCallsRepository.get(callId)
-  // const updatedCall = VirtualAgentCall.update(call, {
-  //   status: ''
-  // })
-
-
-  res.sendStatus(200)
+        return Promise.all([
+          eventBus.publish({
+            name: 'virtual-caller.call_finished'
+          }),
+          virtualCallsRepository.save(updatedCall)
+        ])
+      })
+      .then(() => res.sendStatus(200))
+      .catch(error => logger.error('Saving call done', { error: error.message }))
+  }
 }
