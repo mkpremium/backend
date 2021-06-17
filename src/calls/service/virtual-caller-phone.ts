@@ -4,6 +4,7 @@ import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
+import { add } from 'winston'
 
 export class VirtualCallerPhone {
   constructor (
@@ -28,7 +29,7 @@ export class VirtualCallerPhone {
       'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
 
     twiml.gather({
-      action: `${this.publicUrl}/calls/twilio/${call.id}/gather`,
+      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?fromCity=${address.city}`,
       method: 'POST',
       language: 'es-ES',
       numDigits: 1,
