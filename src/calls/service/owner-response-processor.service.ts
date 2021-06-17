@@ -4,7 +4,7 @@ import { VirtualCallsRepository } from '../virtual-calls.repository'
 import { Logger } from 'winston'
 import { EventBus } from '../../infrastructure/event-bus'
 
-enum OwnerResponse {
+export enum OwnerResponse {
   SALE = '1',
   NO_SALE = '2',
   NOT_OWNER = '3',

@@ -8,6 +8,8 @@ export const createCallDoneWebhookController = ({
   logger: Logger,
   virtualCallsRepository: VirtualCallsRepository
 }) => async (req, res) => {
+  // TODO update call status.
+  // TODO publish event.
   console.log('call done', req.body)
   const { callId } = req.params
 
