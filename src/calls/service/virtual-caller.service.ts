@@ -35,10 +35,15 @@ export class VirtualCallerService {
     const contactToCall = this.nextContactToCall(cmd.contacts(worksheet), lastCalledWorksheetContactId)
 
     if (contactToCall) {
-      await this.virtualCallerPhone.call(worksheet.building.address, contactToCall, worksheet.id)
-        .catch(error => {
-          this.logger.error('Call failed', { error: error.message, trace: error.trace })
-        })
+      await this.virtualCallerPhone.call({
+        buildingId: worksheet.building.id,
+        worksheetId: worksheet.id,
+        address: worksheet.building.address,
+        contact: contactToCall,
+      }).catch(error => {
+        this.logger.error('Call failed', { error: error.message, trace: error.trace })
+      })
+
       await this.virtualCallerWorksheetsRepository.save({
         worksheetId: worksheet.id,
         callerId: cmd.callerId,

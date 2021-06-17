@@ -94,11 +94,12 @@ describe('VirtualCallerService', () => {
   it('calls first contact in worksheet', async () => {
     await service.processNextWorksheet(testCmd)
 
-    expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith(
-      testWorksheet.building.address,
-      firstContact,
-      testWorksheet.id,
-    )
+    expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith({
+      buildingId: testWorksheet.building.id,
+      worksheetId: testWorksheet.id,
+      address: testWorksheet.building.address,
+      contact: firstContact,
+    })
   })
 
   it('continues with in progress worksheet', async () => {

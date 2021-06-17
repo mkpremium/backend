@@ -12,16 +12,21 @@ connectCouchbaseBucket()
     const service = container.resolve<VirtualCallerPhone>('virtualCaller')
 
     service.call({
-      city: 'BARCELONA',
-      number: '2',
-      street: 'Eduard Blasco i Ejarque'
-    }, {
-      status: 'UNDEFINED',
-      id: 'test-contact-id',
-      type: 'TELEFONO',
-      ownerId: 'test-owner-id',
-      value: '+56976675541',
-    }, 'test-worksheet-id')
+      address: {
+        city: 'BARCELONA',
+        number: '2',
+        street: 'Eduard Blasco i Ejarque'
+      },
+      contact: {
+        status: 'UNDEFINED',
+        id: 'test-contact-id',
+        type: 'TELEFONO',
+        ownerId: 'test-owner-id',
+        value: '+56976675541',
+      },
+      worksheetId: 'test-worksheet-id',
+      buildingId: 'test-building-id',
+    })
       .catch(error => {
         logger.error('Error calling with virtual caller', {
           error: error.message,

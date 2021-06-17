@@ -2,6 +2,7 @@ import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall } from '../virtual-agent-call'
 import { VirtualCallsRepository } from '../virtual-calls.repository'
 import { Logger } from 'winston'
+import { EventBus } from '../../infrastructure/event-bus'
 
 enum States {
   SALE = '1',
@@ -9,24 +10,32 @@ enum States {
   NOT_OWNER = '3',
 }
 
+interface OwnerResponseProcessCommand {
+  callId: string;
+  buildingId: string;
+  ownerResponse: string;
+  fromCity: string;
+}
+
 export class OwnerResponseProcessorService {
   constructor (
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: VoiceResponse.SayAttributes,
+    private eventBus: EventBus,
     private logger: Logger,
   ) {
   }
 
-  process (callId: any, ownerResponse: string, fromCity: string): VoiceResponse {
-    this.updateCallStatus(callId, ownerResponse)
+  process (cmd: OwnerResponseProcessCommand): VoiceResponse {
+    this.saveOwnerResponse(cmd)
 
     const twiml = new VoiceResponse()
-    switch (ownerResponse) {
+    switch (cmd.ownerResponse) {
       case States.SALE:
         twiml.say(
           this.twilioSayAttributes,
           `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara el director ` +
-          `de ${fromCity} para hablar con usted sobre su propiedad.  Gracias y buenos dias.`
+          `de ${cmd.fromCity} para hablar con usted sobre su propiedad.  Gracias y buenos dias.`
         )
         break
       case States.NO_SALE:
@@ -51,13 +60,27 @@ export class OwnerResponseProcessorService {
     return twiml
   }
 
-  private updateCallStatus (callId: any, ownerResponse: string) {
+  private saveOwnerResponse (cmd: OwnerResponseProcessCommand) {
+    const { callId, ownerResponse, buildingId } = cmd
+
     this.logger.info('Response from owner gathered', { callId, ownerResponse })
+    this.eventBus.publish({
+      name: 'virtual-caller.input_gathered',
+      callId,
+      ownerResponse,
+      buildingId
+    }).catch(error => {
+      this.logger.error('Publishing input gathered event', { error: error.message, callId, ownerResponse })
+    })
+
     this.virtualCallsRepository.get(callId)
       .then(call => {
         const updatedCall = VirtualAgentCall.update(call, {
           status: {
             $set: 'INPUT_GATHERED'
+          },
+          ownerResponse: {
+            $set: ownerResponse,
           },
           gatheredAt: {
             $set: new Date()

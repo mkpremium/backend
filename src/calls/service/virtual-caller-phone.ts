@@ -7,6 +7,13 @@ import { OwnerContact } from './virtual-caller.service'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
+interface CallCommand {
+  buildingId: string;
+  address: AddressParam;
+  contact: OwnerContact;
+  worksheetId: string;
+}
+
 export class VirtualCallerPhone {
   constructor (
     private twilioClient: Twilio,
@@ -17,7 +24,8 @@ export class VirtualCallerPhone {
   ) {
   }
 
-  async call (address: AddressParam, contact: OwnerContact, worksheetId: string) {
+  async call (cmd: CallCommand) {
+    const { worksheetId, contact, address, buildingId } = cmd
     const twiml = new VoiceResponse()
     const call = VirtualAgentCall({
       worksheetId,
@@ -34,7 +42,7 @@ export class VirtualCallerPhone {
       'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
 
     twiml.gather({
-      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?fromCity=${address.city}`,
+      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?buildingId=${buildingId}&fromCity=${address.city}`,
       method: 'POST',
       language: 'es-ES',
       numDigits: 1,
