@@ -22,6 +22,7 @@ export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     error: t.maybe(t.String),
     ownerResponse: t.maybe(t.String),
     gatheredAt: t.maybe(t.Date),
+    _documentType: t.String,
   },
   {
     name: 'VirtualAgentCall',
