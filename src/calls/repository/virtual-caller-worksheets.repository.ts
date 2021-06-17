@@ -31,6 +31,14 @@ const inProgressWorksheetQuery = bucketName => `
       AND worksheet.callerId = $1
 `
 
+const numberOfWorksheetsProcessedByQuery = bucketName => `
+    SELECT COUNT(worksheet) as count
+    FROM ${bucketName} worksheet
+    WHERE worksheet._documentType = 'virtual-call-worksheet'
+      AND worksheet.callerId = $1
+
+`
+
 export class VirtualCallerWorksheetsRepository extends CouchbaseRepository<VirtualCallerWorksheetProps> {
   async inProgressWorksheetFor (callerId: string): Promise<VirtualCallerWorksheetProps> {
     return this.couchbaseAdapter.queryAsync(inProgressWorksheetQuery(this.bucketName), [ callerId ])
@@ -48,6 +56,7 @@ export class VirtualCallerWorksheetsRepository extends CouchbaseRepository<Virtu
   }
 
   async numberOfWorksheetsProcessedBy (callerId: string): Promise<number> {
-    return Promise.reject('Not implemented')
+    return this.couchbaseAdapter.queryAsync(numberOfWorksheetsProcessedByQuery(this.bucketName), [ callerId ])
+      .then(([ { count } ]) => count)
   }
 }
