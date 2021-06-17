@@ -11,6 +11,9 @@ import { createMachineDetectionWebhookController } from './controller/machine-de
 import { VirtualCallerWorksheetsRepository } from './repository/virtual-caller-worksheets.repository'
 import { OwnerResponseProcessorService } from './service/owner-response-processor.service'
 import { MachineDetectionResultProcessorService } from './service/machine-detection-result-processor.service'
+import { createInputGatheredListener } from './event-listener/input-gathered.listener'
+import { createWorksheetDoneListener } from './event-listener/worksheet-done.listener'
+import { createCallFinishListener } from './event-listener/call-finished.listener'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -48,6 +51,10 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     machineDetectionResultProcessor: asClass(MachineDetectionResultProcessorService).classic().singleton(),
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
+
+    virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).singleton(),
+    virtualCallerWorksheetDoneListener: asFunction(createWorksheetDoneListener).singleton(),
+    virtualCallerCallFinishedListener: asFunction(createCallFinishListener).singleton(),
 
     virtualCallsRepository: asClass(VirtualCallsRepository).classic().singleton(),
     virtualCallerWorksheetsRepository: asClass(VirtualCallerWorksheetsRepository).classic().singleton(),

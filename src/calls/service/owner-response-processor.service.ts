@@ -4,7 +4,7 @@ import { VirtualCallsRepository } from '../virtual-calls.repository'
 import { Logger } from 'winston'
 import { EventBus } from '../../infrastructure/event-bus'
 
-enum States {
+enum OwnerResponse {
   SALE = '1',
   NO_SALE = '2',
   NOT_OWNER = '3',
@@ -15,6 +15,13 @@ interface OwnerResponseProcessCommand {
   buildingId: string;
   ownerResponse: string;
   fromCity: string;
+}
+
+export interface InputGathered {
+  name: 'virtual-caller.input_gathered';
+  callId: string;
+  ownerResponse: OwnerResponse;
+  buildingId: string;
 }
 
 export class OwnerResponseProcessorService {
@@ -31,20 +38,20 @@ export class OwnerResponseProcessorService {
 
     const twiml = new VoiceResponse()
     switch (cmd.ownerResponse) {
-      case States.SALE:
+      case OwnerResponse.SALE:
         twiml.say(
           this.twilioSayAttributes,
           `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara el director ` +
           `de ${cmd.fromCity} para hablar con usted sobre su propiedad.  Gracias y buenos dias.`
         )
         break
-      case States.NO_SALE:
+      case OwnerResponse.NO_SALE:
         twiml.say(
           this.twilioSayAttributes,
           'Perfecto, tomamos nota de que no tiene intención de vender, disculpe las molestias, buenos dias.'
         )
         break
-      case States.NOT_OWNER:
+      case OwnerResponse.NOT_OWNER:
         twiml.say(
           this.twilioSayAttributes,
           'Gracias por su respuesta y perdón por las molestias.'
@@ -69,7 +76,7 @@ export class OwnerResponseProcessorService {
       callId,
       ownerResponse,
       buildingId
-    }).catch(error => {
+    } as InputGathered).catch(error => {
       this.logger.error('Publishing input gathered event', { error: error.message, callId, ownerResponse })
     })
 

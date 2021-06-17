@@ -14,6 +14,11 @@ export interface ProcessNextWorksheetCommand {
   contacts: (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => (OwnerContact)[];
 }
 
+export interface WorksheetDone {
+  name: 'virtual-caller.worksheet_done';
+  worksheetId: string;
+}
+
 export class VirtualCallerService {
   constructor (
     private takeNextWorksheetService: TakeNextWorksheetService,
@@ -58,7 +63,7 @@ export class VirtualCallerService {
       await this.eventBus.publish({
         name: 'virtual-caller.worksheet_done',
         worksheetId: inProgressWorksheet.worksheetId,
-      })
+      } as WorksheetDone)
     }
   }
 
