@@ -1,11 +1,11 @@
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
-import { MachineDetectionResponseProcessorService } from '../service/machine-detection-response-processor.service'
+import { MachineDetectionResultProcessorService } from '../service/machine-detection-result-processor.service'
 
-export const createMachineDetectionWebhookController = ({ machineDetectionResponseProcessor }: { machineDetectionResponseProcessor: MachineDetectionResponseProcessorService }) => async (req, res) => {
+export const createMachineDetectionWebhookController = ({ machineDetectionResultProcessor }: { machineDetectionResultProcessor: MachineDetectionResultProcessorService }) => async (req, res) => {
   const answeredBy = req.body.AnsweredBy
   const { callId } = req.params
 
-  return machineDetectionResponseProcessor.process(callId, answeredBy)
+  return machineDetectionResultProcessor.process(callId, answeredBy)
     .then(isHuman => {
       if (!isHuman) {
         const twiml = new VoiceResponse()
