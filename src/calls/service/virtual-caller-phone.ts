@@ -42,7 +42,7 @@ export class VirtualCallerPhone {
       'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
 
     twiml.gather({
-      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?buildingId=${buildingId}&fromCity=${address.city}`,
+      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?buildingId=${buildingId}&fromCity=${encodeURIComponent(address.city)}`,
       method: 'POST',
       language: 'es-ES',
       numDigits: 1,
