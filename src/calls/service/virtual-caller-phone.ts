@@ -11,11 +11,54 @@ export class VirtualCallerPhone {
     private publicUrl: string,
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: VoiceResponse.SayAttributes,
+    private virtualCallerPhoneNumber: string,
   ) {
   }
 
-  call (address: WorksheetBuildingAddressProps, contact: OwnerContact, worksheetId: string) {
-    return Promise.reject('Not implemented')
+  async call (address: WorksheetBuildingAddressProps, contact: OwnerContact, worksheetId: string) {
+    const twiml = new VoiceResponse()
+    const call = VirtualAgentCall({ worksheetId } as VirtualAgentCallProps)
+    await this.virtualCallsRepository.save(call)
+
+    twiml.pause({
+      length: 1,
+    })
+    const message = `Buenos dias, le contactamos por su propiedad ${address.street} ${address.number} de ${address.city}` +
+      ', nos dedicamos a la compra patrimonial de inmuebles, estaria usted interesado en vender?' +
+      'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
+
+    twiml.gather({
+      action: `${this.publicUrl}/calls/twilio/${call.id}/gather`,
+      method: 'POST',
+      language: 'es-ES',
+      numDigits: 1,
+    }).say(this.twilioSayAttributes,
+      message
+    )
+
+    return this.twilioClient.calls.create({
+      twiml: twiml.toString(),
+      callerId: this.virtualCallerPhoneNumber,
+      from: this.virtualCallerPhoneNumber,
+      to: contact.value,
+      machineDetection: 'Enable',
+      asyncAmd: 'true',
+      asyncAmdStatusCallbackMethod: 'POST',
+      asyncAmdStatusCallback: `${this.publicUrl}/calls/twilio/${call.id}/machine-detection`,
+      statusCallback: `${this.publicUrl}/calls/twilio/${call.id}/done`
+    })
+      .catch(error => {
+        const updatedCall = VirtualAgentCall.update(call, {
+          status: {
+            $set: 'FAILED'
+          },
+          error: {
+            $set: error.message
+          }
+        })
+        this.virtualCallsRepository.save(updatedCall)
+        throw error
+      })
   }
 
   async callPoc (from: string, to: string) {

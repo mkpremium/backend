@@ -40,6 +40,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
       ({ twilioCredentials }: { twilioCredentials: TwilioCredentials }) =>
         twilio(twilioCredentials.accountSid, twilioCredentials.accountAuthToken)
     ).singleton(),
+    virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
     virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
