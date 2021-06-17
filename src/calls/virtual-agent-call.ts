@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { DateTimeString } from '../infrastructure/shared-types'
 
 export interface VirtualAgentCallProps {
   id: string;
@@ -8,6 +9,7 @@ export interface VirtualAgentCallProps {
   ownerId: string;
   contactId: string;
   error?: string;
+  gatheredAt?: Date,
 }
 
 export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
@@ -17,6 +19,7 @@ export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     ownerId: t.String,
     contactId: t.String,
     error: t.maybe(t.String),
+    gatheredAt: t.maybe(t.Date),
   },
   {
     name: 'VirtualAgentCall',
