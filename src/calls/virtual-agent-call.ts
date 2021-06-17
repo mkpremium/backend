@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 
 export interface VirtualAgentCallProps {
   id: string;
-  status: 'CALLING' | 'INPUT_GATHERED' | 'FAILED';
+  status: 'CALLING' | 'INPUT_GATHERED' | 'FAILED' | 'DONE';
   worksheetId: string;
   ownerId: string;
   contactId: string;
@@ -12,7 +12,7 @@ export interface VirtualAgentCallProps {
 
 export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     id: t.String,
-    status: t.enums.of([ 'CALLING', 'INPUT_GATHERED', 'FAILED' ]),
+    status: t.enums.of([ 'CALLING', 'INPUT_GATHERED', 'FAILED', 'DONE' ]),
     worksheetId: t.String,
     ownerId: t.String,
     contactId: t.String,
