@@ -34,10 +34,8 @@ export class VirtualCallerPhone {
     } as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
 
-    twiml.pause({
-      length: 1,
-    })
-    const message = `Buenos dias, le contactamos por su propiedad ${address.street} ${address.number} de ${address.city}` +
+    twiml.pause({ length: 1 })
+    const message = `Buenos dias, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
       ', nos dedicamos a la compra patrimonial de inmuebles, estaria usted interesado en vender?' +
       'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
 
