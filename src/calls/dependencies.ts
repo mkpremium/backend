@@ -9,6 +9,7 @@ import { VirtualCallerPhone } from './service/virtual-caller-phone'
 import { createInputGatheredWebhookController } from './controller/input-gathered-webhook.controller'
 import { createMachineDetectionWebhookController } from './controller/machine-detection-webhook.controller'
 import { VirtualCallerWorksheetsRepository } from './repository/virtual-caller-worksheets.repository'
+import { OwnerResponseProcessorService } from './service/owner-response-processor.service'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -42,6 +43,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     ).singleton(),
     virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
     virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
+    ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
 
