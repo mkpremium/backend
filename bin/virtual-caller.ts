@@ -11,7 +11,17 @@ connectCouchbaseBucket()
     const container = createDiContainer(bucketConnection)
     const service = container.resolve<VirtualCallerPhone>('virtualCaller')
 
-    service.callPoc('+12393301250', '+56976675541')
+    service.call({
+      city: 'BARCELONA',
+      number: '2',
+      street: 'Eduard Blasco i Ejarque'
+    }, {
+      status: 'UNDEFINED',
+      id: 'test-contact-id',
+      type: 'TELEFONO',
+      ownerId: 'test-owner-id',
+      value: '+56976675541',
+    }, 'test-worksheet-id')
       .catch(error => {
         logger.error('Error calling with virtual caller', {
           error: error.message,

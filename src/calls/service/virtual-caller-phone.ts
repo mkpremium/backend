@@ -4,7 +4,8 @@ import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
-import { add } from 'winston'
+
+type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
 export class VirtualCallerPhone {
   constructor (
@@ -16,9 +17,13 @@ export class VirtualCallerPhone {
   ) {
   }
 
-  async call (address: WorksheetBuildingAddressProps, contact: OwnerContact, worksheetId: string) {
+  async call (address: AddressParam, contact: OwnerContact, worksheetId: string) {
     const twiml = new VoiceResponse()
-    const call = VirtualAgentCall({ worksheetId } as VirtualAgentCallProps)
+    const call = VirtualAgentCall({
+      worksheetId,
+      contactId: contact.id,
+      ownerId: contact.ownerId,
+    } as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
 
     twiml.pause({
@@ -33,9 +38,7 @@ export class VirtualCallerPhone {
       method: 'POST',
       language: 'es-ES',
       numDigits: 1,
-    }).say(this.twilioSayAttributes,
-      message
-    )
+    }).say(this.twilioSayAttributes, message)
 
     return this.twilioClient.calls.create({
       twiml: twiml.toString(),
@@ -62,7 +65,7 @@ export class VirtualCallerPhone {
       })
   }
 
-  async callPoc (from: string, to: string) {
+  private async callPoc (from: string, to: string) {
     const twiml = new VoiceResponse()
     const call = VirtualAgentCall({} as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
