@@ -17,7 +17,7 @@ export class OwnerResponseProcessorService {
   ) {
   }
 
-  async process (callId: any, ownerResponse: string, fromCity: string): Promise<VoiceResponse> {
+  process (callId: any, ownerResponse: string, fromCity: string): VoiceResponse {
     this.updateCallStatus(callId, ownerResponse)
 
     const twiml = new VoiceResponse()

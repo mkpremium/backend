@@ -5,8 +5,7 @@ export const createInputGatheredWebhookController = ({ ownerResponseProcessor }:
     const { callId } = req.params
     const ownerResponse = req.body.Digits
     const { fromCity } = req.query
-    return ownerResponseProcessor.process(callId, ownerResponse, fromCity)
-      .then((response) => {
-        res.send(response.toString())
-      })
+    const response = ownerResponseProcessor.process(callId, ownerResponse, fromCity)
+
+    res.send(response.toString())
   }
