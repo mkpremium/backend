@@ -39,8 +39,16 @@ export class VirtualCallerPhone {
       ', nos dedicamos a la compra patrimonial de inmuebles, estaria usted interesado en vender?' +
       'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
 
+    const gatherEndpointQueryParams = [
+      [ 'buildingId', buildingId ],
+      [ 'fromCity', encodeURIComponent(address.city) ],
+      [ 'worksheetId', worksheetId ],
+      [ 'contactId', contact.id ],
+      [ 'ownerId', contact.ownerId ],
+    ].map(([key, value]) => `${key}=${value}`).join('&')
+
     twiml.gather({
-      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?buildingId=${buildingId}&fromCity=${encodeURIComponent(address.city)}`,
+      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?${gatherEndpointQueryParams}`,
       method: 'POST',
       language: 'es-ES',
       numDigits: 1,

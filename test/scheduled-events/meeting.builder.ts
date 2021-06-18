@@ -12,7 +12,8 @@ const meetingPrototype: MeetingProps = {
     buildingId: 'test-meeting-building-id',
     ownerId: 'test-meeting-owner-id',
     contactId: 'test-meeting-contact-id',
-    inPerson: true
+    inPerson: true,
+    worksheetId: 'test-meeting-worksheet-id'
   },
   _documentType: 'scheduled-event',
 }

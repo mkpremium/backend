@@ -62,7 +62,8 @@ interface EventProps {
   ownerId: string;
   contactId: string;
   buildingId: string;
-  inPerson: boolean
+  worksheetId: string;
+  inPerson?: boolean
 }
 
 interface MeetingEventProps extends EventProps {

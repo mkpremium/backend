@@ -15,12 +15,18 @@ interface OwnerResponseProcessCommand {
   buildingId: string;
   ownerResponse: string;
   fromCity: string;
+  contactId: string;
+  ownerId: string;
+  worksheetId: string;
 }
 
 export interface InputGathered {
   name: 'virtual-caller.input_gathered';
   callId: string;
-  ownerResponse: OwnerResponse;
+  ownerId: string;
+  worksheetId: string;
+  contactId: string;
+  ownerResponse: OwnerResponse | string;
   buildingId: string;
 }
 
@@ -68,15 +74,20 @@ export class OwnerResponseProcessorService {
   }
 
   private saveOwnerResponse (cmd: OwnerResponseProcessCommand) {
-    const { callId, ownerResponse, buildingId } = cmd
+    const { callId, ownerResponse, buildingId, contactId, ownerId, worksheetId } = cmd
 
     this.logger.info('Response from owner gathered', { callId, ownerResponse })
-    this.eventBus.publish({
+    const inputGatheredEvent: InputGathered = {
       name: 'virtual-caller.input_gathered',
       callId,
       ownerResponse,
-      buildingId
-    } as InputGathered).catch(error => {
+      buildingId,
+      contactId,
+      ownerId,
+      worksheetId,
+    }
+
+    this.eventBus.publish(inputGatheredEvent).catch(error => {
       this.logger.error('Publishing input gathered event', { error: error.message, callId, ownerResponse })
     })
 

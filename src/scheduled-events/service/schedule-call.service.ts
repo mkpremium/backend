@@ -3,7 +3,7 @@ import { LegacyWorksheetQueueRepository } from '../../worksheet/models/queue-rep
 import { EventBus } from '../../infrastructure/event-bus'
 import { ScheduledEventProps } from '../types'
 
-interface ScheduleCallCommand {
+export interface ScheduleCallCommand {
   event: ScheduledEventProps & { note: string },
   userId: string,
   queueId: string
