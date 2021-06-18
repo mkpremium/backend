@@ -52,7 +52,11 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
 
-    virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).singleton(),
+    virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).inject(() => ({
+      assignedCallerIdForVirtualCalls: 'ba7966fc-f05d-48a2-bb49-e17a08a6a038',
+      virtualCallerQueueId: 'e1748e7d-8714-45c0-a831-c0f42d6d564f',
+      virtualCallerId: 'virtual-caller-barcelona-1',
+    })).singleton(),
     virtualCallerWorksheetDoneListener: asFunction(createWorksheetDoneListener).singleton(),
     virtualCallerCallFinishedListener: asFunction(createCallFinishListener).singleton(),
 
