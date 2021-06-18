@@ -1,9 +1,11 @@
 import { InputGathered, OwnerResponse } from '../service/owner-response-processor.service'
 import { ScheduleCallService } from '../../scheduled-events/service/schedule-call.service'
 import { ScheduledEventProps } from '../../scheduled-events/types'
+import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
 
 interface Deps {
   scheduleCall: ScheduleCallService;
+  updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService;
   assignedCallerIdForVirtualCalls: string;
   virtualCallerQueueId: string;
   virtualCallerId: string;
@@ -11,6 +13,7 @@ interface Deps {
 
 export const createInputGatheredListener = ({
                                               scheduleCall,
+                                              updateBuildingNegotiationStatusService,
                                               virtualCallerId,
                                               virtualCallerQueueId,
                                               assignedCallerIdForVirtualCalls,
@@ -36,7 +39,11 @@ export const createInputGatheredListener = ({
       })
       break
     case OwnerResponse.NO_SALE:
-      // TODO save no sale
+      await updateBuildingNegotiationStatusService.updateBuildingStatus(evt.buildingId, {
+        status: 'NO VENDE',
+        userId: virtualCallerId,
+        sourceOwnerId: evt.ownerId,
+      })
       break
     case OwnerResponse.NOT_OWNER:
       // TODO delete owner

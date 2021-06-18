@@ -6,6 +6,7 @@ import { expect } from 'chai'
 describe('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
   let scheduleCallServiceStub
+  let updateBuildingNegotiationStatusStub
   const testEvent: InputGathered = {
     name: 'virtual-caller.input_gathered',
     ownerResponse: OwnerResponse.SALE,
@@ -21,7 +22,10 @@ describe('input-gathered.listener', () => {
 
   beforeEach(() => {
     scheduleCallServiceStub = {
-      scheduleCall: stub().resolves(),
+      scheduleCall: stub(),
+    }
+    updateBuildingNegotiationStatusStub = {
+      updateBuildingStatus: stub(),
     }
 
     listener = createInputGatheredListener({
@@ -29,15 +33,16 @@ describe('input-gathered.listener', () => {
       assignedCallerIdForVirtualCalls: testAssignedCallerId,
       virtualCallerQueueId: testVirtualCallerQueueId,
       virtualCallerId: testVirtualCallerId,
+      updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
     })
   })
 
   it('schedules call when owner is open to sell', async () => {
-    await listener(testEvent)
+    scheduleCallServiceStub.scheduleCall.resolves()
+    await listener({ ...testEvent, ownerResponse: OwnerResponse.SALE })
 
     expect(scheduleCallServiceStub.scheduleCall).to.have.been.calledWith({
       userId: testVirtualCallerId,
-      queueId: testVirtualCallerQueueId,
       event: {
         createdBy: testVirtualCallerId,
         event: {
@@ -51,6 +56,20 @@ describe('input-gathered.listener', () => {
         type: 'CALLS',
         note: 'Creada por caller virtual',
       },
+      queueId: testVirtualCallerQueueId,
     })
+  })
+
+  it('save no sale on owner input', async () => {
+    updateBuildingNegotiationStatusStub.updateBuildingStatus.resolves()
+
+    await listener({ ...testEvent, ownerResponse: OwnerResponse.NO_SALE })
+
+    expect(updateBuildingNegotiationStatusStub.updateBuildingStatus).to.have.been
+      .calledWith(testEvent.buildingId, {
+        status: 'NO VENDE',
+        userId: testVirtualCallerId,
+        sourceOwnerId: testEvent.ownerId,
+      })
   })
 })
