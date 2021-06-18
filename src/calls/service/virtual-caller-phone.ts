@@ -58,7 +58,7 @@ export class VirtualCallerPhone {
       twiml: twiml.toString(),
       callerId: this.virtualCallerPhoneNumber,
       from: this.virtualCallerPhoneNumber,
-      to: contact.value,
+      to: '+34' + contact.value,
       machineDetection: 'Enable',
       asyncAmd: 'true',
       asyncAmdStatusCallbackMethod: 'POST',
