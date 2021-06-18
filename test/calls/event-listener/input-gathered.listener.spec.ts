@@ -39,6 +39,7 @@ describe('input-gathered.listener', () => {
       virtualCallerId: testVirtualCallerId,
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
       changeContactStatusService: changeContactStatusServiceStub,
+      logger: { info: () => undefined }
     })
   })
 

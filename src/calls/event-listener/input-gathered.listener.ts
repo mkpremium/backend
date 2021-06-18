@@ -3,11 +3,13 @@ import { ScheduleCallService } from '../../scheduled-events/service/schedule-cal
 import { ScheduledEventProps } from '../../scheduled-events/types'
 import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
 import { ChangeContactStatusService } from '../../owner/service/change-contact-status.service'
+import { Logger } from 'winston'
 
 interface Deps {
   scheduleCall: ScheduleCallService;
   updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService;
   changeContactStatusService: ChangeContactStatusService,
+  logger: Pick<Logger, 'info'>,
   assignedCallerIdForVirtualCalls: string;
   virtualCallerQueueId: string;
   virtualCallerId: string;
@@ -17,6 +19,7 @@ export const createInputGatheredListener = ({
                                               scheduleCall,
                                               updateBuildingNegotiationStatusService,
                                               changeContactStatusService,
+                                              logger,
                                               virtualCallerId,
                                               virtualCallerQueueId,
                                               assignedCallerIdForVirtualCalls,
@@ -55,6 +58,10 @@ export const createInputGatheredListener = ({
       )
       break
     default:
-    // TODO log warning message?
+      logger.info('Unknown owner input gathered', {
+        ownerId: evt.ownerId,
+        contactId: evt.contactId,
+        input: evt.ownerResponse
+      })
   }
 }
