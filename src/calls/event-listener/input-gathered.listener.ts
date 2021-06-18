@@ -2,10 +2,12 @@ import { InputGathered, OwnerResponse } from '../service/owner-response-processo
 import { ScheduleCallService } from '../../scheduled-events/service/schedule-call.service'
 import { ScheduledEventProps } from '../../scheduled-events/types'
 import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
+import { ChangeContactStatusService } from '../../owner/service/change-contact-status.service'
 
 interface Deps {
   scheduleCall: ScheduleCallService;
   updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService;
+  changeContactStatusService: ChangeContactStatusService,
   assignedCallerIdForVirtualCalls: string;
   virtualCallerQueueId: string;
   virtualCallerId: string;
@@ -14,6 +16,7 @@ interface Deps {
 export const createInputGatheredListener = ({
                                               scheduleCall,
                                               updateBuildingNegotiationStatusService,
+                                              changeContactStatusService,
                                               virtualCallerId,
                                               virtualCallerQueueId,
                                               assignedCallerIdForVirtualCalls,
@@ -46,7 +49,10 @@ export const createInputGatheredListener = ({
       })
       break
     case OwnerResponse.NOT_OWNER:
-      // TODO delete owner
+      await changeContactStatusService.change(
+        { ownerId: evt.ownerId, contactId: evt.contactId, status: 'BAD' },
+        { id: virtualCallerId }
+      )
       break
     default:
     // TODO log warning message?

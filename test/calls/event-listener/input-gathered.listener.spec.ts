@@ -7,6 +7,7 @@ describe('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
   let scheduleCallServiceStub
   let updateBuildingNegotiationStatusStub
+  let changeContactStatusServiceStub
   const testEvent: InputGathered = {
     name: 'virtual-caller.input_gathered',
     ownerResponse: OwnerResponse.SALE,
@@ -27,6 +28,9 @@ describe('input-gathered.listener', () => {
     updateBuildingNegotiationStatusStub = {
       updateBuildingStatus: stub(),
     }
+    changeContactStatusServiceStub = {
+      change: stub(),
+    }
 
     listener = createInputGatheredListener({
       scheduleCall: scheduleCallServiceStub,
@@ -34,6 +38,7 @@ describe('input-gathered.listener', () => {
       virtualCallerQueueId: testVirtualCallerQueueId,
       virtualCallerId: testVirtualCallerId,
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
+      changeContactStatusService: changeContactStatusServiceStub,
     })
   })
 
@@ -71,5 +76,16 @@ describe('input-gathered.listener', () => {
         userId: testVirtualCallerId,
         sourceOwnerId: testEvent.ownerId,
       })
+  })
+
+  it('discards contact when owner', async () => {
+    changeContactStatusServiceStub.change.resolves()
+
+    await listener({ ...testEvent, ownerResponse: OwnerResponse.NOT_OWNER })
+
+    expect(changeContactStatusServiceStub.change).to.have.been.calledWith(
+      { ownerId: testEvent.ownerId, contactId: testEvent.contactId, status: 'BAD' },
+      { id: testVirtualCallerId }
+    )
   })
 })
