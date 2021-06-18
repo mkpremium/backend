@@ -14,6 +14,8 @@ import { MachineDetectionResultProcessorService } from './service/machine-detect
 import { createInputGatheredListener } from './event-listener/input-gathered.listener'
 import { createWorksheetDoneListener } from './event-listener/worksheet-done.listener'
 import { createCallFinishListener } from './event-listener/call-finished.listener'
+import { createStartVirtualCallerController } from './controller/virtual-caller-start.controller'
+import { VirtualCallerSupervisorService } from './service/virtual-caller-supervisor.service'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -39,24 +41,26 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
       appSid: process.env.TWILIO_APP_SID,
       secret: process.env.TWILIO_TOKEN_SECRET,
     } as TwilioCredentials),
+    assignedCallerIdForVirtualCalls: asValue('ba7966fc-f05d-48a2-bb49-e17a08a6a038'),
+    virtualCallerQueueId: asValue('e1748e7d-8714-45c0-a831-c0f42d6d564f'),
+    virtualCallerId: asValue('virtual-caller-barcelona-1'),
 
     callDoneWebhook: asFunction(createCallDoneWebhookController),
     twilioClient: asFunction(
       ({ twilioCredentials }: { twilioCredentials: TwilioCredentials }) =>
         twilio(twilioCredentials.accountSid, twilioCredentials.accountAuthToken)
     ).singleton(),
+
     virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
     virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
+    virtualCallerSupervisor: asClass(VirtualCallerSupervisorService).classic().singleton(),
     ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),
     machineDetectionResultProcessor: asClass(MachineDetectionResultProcessorService).classic().singleton(),
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
-    machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController),
+    machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController).singleton(),
+    startVirtualCallerController: asFunction(createStartVirtualCallerController).singleton(),
 
-    virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).inject(() => ({
-      assignedCallerIdForVirtualCalls: 'ba7966fc-f05d-48a2-bb49-e17a08a6a038',
-      virtualCallerQueueId: 'e1748e7d-8714-45c0-a831-c0f42d6d564f',
-      virtualCallerId: 'virtual-caller-barcelona-1',
-    })).singleton(),
+    virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).singleton(),
     virtualCallerWorksheetDoneListener: asFunction(createWorksheetDoneListener).singleton(),
     virtualCallerCallFinishedListener: asFunction(createCallFinishListener).singleton(),
 
