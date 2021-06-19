@@ -82,8 +82,8 @@ describe('VirtualCallerService', () => {
   it('stores worksheet to process', async () => {
     await service.processNextWorksheet(testCmd)
 
-    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
-      .calledOnceWith({
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.calledOnce
+    expect(virtualCallerWorksheetsRepositoryStub.save.lastCall.firstArg).to.include({
         worksheetId: testWorksheet.id,
         lastContactId: firstContact.id,
         status: 'CALLING',
@@ -116,8 +116,8 @@ describe('VirtualCallerService', () => {
       address: testWorksheet.building.address,
       contact: lastContact,
     })
-    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
-      .calledOnceWith({
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.calledOnce
+    expect(virtualCallerWorksheetsRepositoryStub.save.lastCall.firstArg).to.include({
         worksheetId: testWorksheet.id,
         lastContactId: lastContact.id,
         status: 'CALLING',

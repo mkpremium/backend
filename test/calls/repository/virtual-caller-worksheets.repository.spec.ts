@@ -31,7 +31,7 @@ describe('VirtualCallerWorksheetsRepository', () => {
   it('saves and retrieves in progress worksheet', async () => {
     const retrievedWorksheet = await repository.inProgressWorksheetFor(testInProgressWorksheet.callerId)
 
-    expect(retrievedWorksheet).to.be.eql({ ...testInProgressWorksheet, _documentType: 'virtual-call-worksheet' })
+    expect(retrievedWorksheet).to.be.include({ ...testInProgressWorksheet, _documentType: 'virtual-call-worksheet' })
   })
 
   it('counts worksheets processed by virtual caller', async () => {
