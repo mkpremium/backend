@@ -16,6 +16,7 @@ import { createWorksheetDoneListener } from './event-listener/worksheet-done.lis
 import { createCallFinishedListener } from './event-listener/call-finished.listener'
 import { createStartVirtualCallerController } from './controller/virtual-caller-start.controller'
 import { VirtualCallerSupervisorService } from './service/virtual-caller-supervisor.service'
+import { VirtualCallerConfig } from './virtual-caller.config'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -31,6 +32,13 @@ const sayAttributes = {
 } as VoiceResponse.SayAttributes
 
 export const setupCallsDependencies = (container: AwilixContainer) => {
+  const config: VirtualCallerConfig = {
+    assignedCallerIdForVirtualCalls: 'ba7966fc-f05d-48a2-bb49-e17a08a6a038',
+    virtualCallerQueueId: 'e1748e7d-8714-45c0-a831-c0f42d6d564f',
+    virtualCallerId: 'virtual-caller-barcelona-1',
+    maxWorksheets: 1,
+  }
+
   container.register({
     publicUrl: asValue(process.env.PUBLIC_URL),
     twilioSayAttributes: asValue(sayAttributes),
@@ -41,9 +49,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
       appSid: process.env.TWILIO_APP_SID,
       secret: process.env.TWILIO_TOKEN_SECRET,
     } as TwilioCredentials),
-    assignedCallerIdForVirtualCalls: asValue('ba7966fc-f05d-48a2-bb49-e17a08a6a038'),
-    virtualCallerQueueId: asValue('e1748e7d-8714-45c0-a831-c0f42d6d564f'),
-    virtualCallerId: asValue('virtual-caller-barcelona-1'),
+    virtualCallerConfig: asValue(config),
 
     callDoneWebhook: asFunction(createCallDoneWebhookController),
     twilioClient: asFunction(
@@ -53,6 +59,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
 
     virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
     ownerTrialPhoneNumber: asValue(process.env.OWNER_TRIAL_PHONE_NUMBER || undefined),
+
     virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
     virtualCallerSupervisor: asClass(VirtualCallerSupervisorService).classic().singleton(),
     ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),

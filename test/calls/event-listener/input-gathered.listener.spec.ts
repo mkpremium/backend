@@ -34,9 +34,11 @@ describe('input-gathered.listener', () => {
 
     listener = createInputGatheredListener({
       scheduleCall: scheduleCallServiceStub,
-      assignedCallerIdForVirtualCalls: testAssignedCallerId,
-      virtualCallerQueueId: testVirtualCallerQueueId,
-      virtualCallerId: testVirtualCallerId,
+      virtualCallerConfig: {
+        assignedCallerIdForVirtualCalls: testAssignedCallerId,
+        virtualCallerQueueId: testVirtualCallerQueueId,
+        virtualCallerId: testVirtualCallerId,
+      },
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
       changeContactStatusService: changeContactStatusServiceStub,
       logger: { info: () => undefined }

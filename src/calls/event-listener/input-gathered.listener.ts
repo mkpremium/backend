@@ -4,15 +4,14 @@ import { ScheduledEventProps } from '../../scheduled-events/types'
 import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
 import { ChangeContactStatusService } from '../../owner/service/change-contact-status.service'
 import { Logger } from 'winston'
+import { VirtualCallerConfig } from '../virtual-caller.config'
 
 interface Deps {
   scheduleCall: ScheduleCallService;
   updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService;
-  changeContactStatusService: ChangeContactStatusService,
-  logger: Pick<Logger, 'info'>,
-  assignedCallerIdForVirtualCalls: string;
-  virtualCallerQueueId: string;
-  virtualCallerId: string;
+  changeContactStatusService: ChangeContactStatusService;
+  logger: Pick<Logger, 'info'>;
+  virtualCallerConfig: Omit<VirtualCallerConfig, 'maxWorksheets'>;
 }
 
 export const createInputGatheredListener = ({
@@ -20,19 +19,17 @@ export const createInputGatheredListener = ({
                                               updateBuildingNegotiationStatusService,
                                               changeContactStatusService,
                                               logger,
-                                              virtualCallerId,
-                                              virtualCallerQueueId,
-                                              assignedCallerIdForVirtualCalls,
+                                              virtualCallerConfig,
                                             }: Deps) => async (evt: InputGathered) => {
   switch (evt.ownerResponse) {
     case OwnerResponse.SALE:
       await scheduleCall.scheduleCall({
-        userId: virtualCallerId,
-        queueId: virtualCallerQueueId,
+        userId: virtualCallerConfig.virtualCallerId,
+        queueId: virtualCallerConfig.virtualCallerQueueId,
         event: {
-          createdBy: virtualCallerId,
+          createdBy: virtualCallerConfig.virtualCallerId,
           eventDate: new Date(),
-          notifyTo: assignedCallerIdForVirtualCalls,
+          notifyTo: virtualCallerConfig.assignedCallerIdForVirtualCalls,
           type: 'CALLS',
           note: 'Creada por caller virtual',
           event: {
@@ -47,14 +44,14 @@ export const createInputGatheredListener = ({
     case OwnerResponse.NO_SALE:
       await updateBuildingNegotiationStatusService.updateBuildingStatus(evt.buildingId, {
         status: 'NO VENDE',
-        userId: virtualCallerId,
+        userId: virtualCallerConfig.virtualCallerId,
         sourceOwnerId: evt.ownerId,
       })
       break
     case OwnerResponse.NOT_OWNER:
       await changeContactStatusService.change(
         { ownerId: evt.ownerId, contactId: evt.contactId, status: 'BAD' },
-        { id: virtualCallerId }
+        { id: virtualCallerConfig.virtualCallerId }
       )
       break
     default:
