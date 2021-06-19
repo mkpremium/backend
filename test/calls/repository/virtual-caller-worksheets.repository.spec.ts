@@ -7,10 +7,16 @@ import { expect } from 'chai'
 
 describe('VirtualCallerWorksheetsRepository', () => {
   let repository!: VirtualCallerWorksheetsRepository
-  const testWorksheet: VirtualCallerWorksheetProps = {
-    worksheetId: 'test-worksheet-id',
+  const testInProgressWorksheet: VirtualCallerWorksheetProps = {
+    worksheetId: 'test-in-proggres-worksheet-id',
     callerId: 'test-virtual-caller-id',
     status: 'CALLING',
+    lastContactId: null,
+  }
+  const testDoneWorksheet: VirtualCallerWorksheetProps = {
+    worksheetId: 'test-in-proggres-worksheet-id',
+    callerId: 'test-virtual-caller-id',
+    status: 'DONE',
     lastContactId: null,
   }
 
@@ -18,17 +24,18 @@ describe('VirtualCallerWorksheetsRepository', () => {
     const container = await createTestContainer()
     repository = container.resolve('virtualCallerWorksheetsRepository')
 
-    await repository.save(testWorksheet)
+    await repository.save(testInProgressWorksheet)
+    await repository.save(testDoneWorksheet)
   })
 
   it('saves and retrieves in progress worksheet', async () => {
-    const retrievedWorksheet = await repository.inProgressWorksheetFor(testWorksheet.callerId)
+    const retrievedWorksheet = await repository.inProgressWorksheetFor(testInProgressWorksheet.callerId)
 
-    expect(retrievedWorksheet).to.be.eql({ ...testWorksheet, _documentType: 'virtual-call-worksheet' })
+    expect(retrievedWorksheet).to.be.eql({ ...testInProgressWorksheet, _documentType: 'virtual-call-worksheet' })
   })
 
   it('counts worksheets processed by virtual caller', async () => {
-    const nbOfProcessedWorksheets = await repository.numberOfWorksheetsProcessedBy(testWorksheet.callerId)
+    const nbOfProcessedWorksheets = await repository.numberOfWorksheetsProcessedBy(testInProgressWorksheet.callerId)
 
     expect(nbOfProcessedWorksheets).to.be.equal(1)
   })

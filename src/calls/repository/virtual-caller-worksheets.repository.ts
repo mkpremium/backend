@@ -35,6 +35,7 @@ const numberOfWorksheetsProcessedByQuery = bucketName => `
     SELECT COUNT(worksheet) as count
     FROM ${bucketName} worksheet
     WHERE worksheet._documentType = 'virtual-call-worksheet'
+      AND worksheet.status = 'DONE'
       AND worksheet.callerId = $1
 
 `
