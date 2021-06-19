@@ -1,4 +1,4 @@
-import { VirtualCallsRepository } from '../virtual-calls.repository'
+import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Twilio } from 'twilio'
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'

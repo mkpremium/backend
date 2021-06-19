@@ -1,5 +1,5 @@
 import { Logger } from 'winston'
-import { VirtualCallsRepository } from '../virtual-calls.repository'
+import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { VirtualAgentCall } from '../virtual-agent-call'
 import { EventBus } from '../../infrastructure/event-bus'
 

@@ -1,6 +1,6 @@
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall } from '../virtual-agent-call'
-import { VirtualCallsRepository } from '../virtual-calls.repository'
+import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Logger } from 'winston'
 import { EventBus } from '../../infrastructure/event-bus'
 
