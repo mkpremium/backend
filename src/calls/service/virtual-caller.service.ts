@@ -50,6 +50,7 @@ export class VirtualCallerService {
         contact: contactToCall,
       }).catch(error => {
         this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace })
+        setTimeout(() => this.processNextWorksheet(cmd), 3000)
       })
 
       await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({

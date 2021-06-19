@@ -15,18 +15,13 @@ interface CallCommand {
 }
 
 class NumberAlreadyCalled implements Error {
-  readonly phoneNumber
-  readonly contactId
-  readonly ownerId
-  readonly worksheetId
   message = 'Phone number already called'
   name = 'NumberAlreadyCalled'
 
-  constructor ({ phoneNumber, contactId, ownerId, worksheetId }: VirtualAgentCallProps) {
-    this.phoneNumber = phoneNumber
-    this.contactId = contactId
-    this.ownerId = ownerId
-    this.worksheetId = worksheetId
+  constructor (
+    readonly previousCall: VirtualAgentCallProps,
+    readonly newContact: { contactId: string, ownerId: string }
+  ) {
   }
 }
 
@@ -47,7 +42,7 @@ export class VirtualCallerPhone {
     const to = this.ownerTrialPhoneNumber || '+34' + contact.value
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
     if (lastCallToNumber) {
-      throw new NumberAlreadyCalled(lastCallToNumber)
+      throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
     }
 
     const call = VirtualAgentCall({
