@@ -17,6 +17,7 @@ import { createCallFinishedListener } from './event-listener/call-finished.liste
 import { createStartVirtualCallerController } from './controller/virtual-caller-start.controller'
 import { VirtualCallerSupervisorService } from './service/virtual-caller-supervisor.service'
 import { VirtualCallerConfig } from './virtual-caller.config'
+import { VirtualCallerService } from './service/virtual-caller.service'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -60,7 +61,8 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
     ownerTrialPhoneNumber: asValue(process.env.OWNER_TRIAL_PHONE_NUMBER || undefined),
 
-    virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
+    virtualCaller: asClass(VirtualCallerService).classic().singleton(),
+    virtualCallerPhone: asClass(VirtualCallerPhone).classic().singleton(),
     virtualCallerSupervisor: asClass(VirtualCallerSupervisorService).classic().singleton(),
     ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),
     machineDetectionResultProcessor: asClass(MachineDetectionResultProcessorService).classic().singleton(),
