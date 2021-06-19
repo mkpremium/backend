@@ -131,13 +131,13 @@ describe('VirtualCallerService', () => {
 
     await service.processNextWorksheet(testCmd)
 
-    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been
-      .calledOnceWith({
-        worksheetId: testWorksheet.id,
-        lastContactId: lastContact.id,
-        status: 'DONE',
-        callerId: testCmd.callerId,
-      })
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.calledOnce
+    expect(virtualCallerWorksheetsRepositoryStub.save.lastCall.firstArg).to.include({
+      worksheetId: testWorksheet.id,
+      lastContactId: lastContact.id,
+      status: 'DONE',
+      callerId: testCmd.callerId,
+    })
     expect(eventBusStub.publish).to.have.been.calledWith({
       name: 'virtual-caller.worksheet_done',
       worksheetId: testWorksheet.id,
