@@ -26,7 +26,6 @@ import { setupScheduledEventsRoutes } from './scheduled-events'
 import stats from './stats'
 import { setupStockRouter } from './stock/stock-router'
 import preferences from './system-preferences'
-import maintenanceMode from './system-preferences/maintenance-mode-middleware'
 import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
@@ -86,7 +85,6 @@ export const createApp = (): Promise<Express> => {
       setupStockRouter(app, diContainer)
 
       stats(app, diContainer)
-      maintenanceMode(app)
       history(app)
       notes(app)
       metadata(app)
