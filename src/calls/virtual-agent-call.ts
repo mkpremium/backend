@@ -8,6 +8,7 @@ export interface VirtualAgentCallProps {
   worksheetId: string;
   ownerId: string;
   contactId: string;
+  phoneNumber: string;
   error?: string;
   ownerResponse?: string;
   gatheredAt?: Date,
@@ -19,6 +20,7 @@ export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     worksheetId: t.String,
     ownerId: t.String,
     contactId: t.String,
+    phoneNumber: t.String,
     error: t.maybe(t.String),
     ownerResponse: t.maybe(t.String),
     gatheredAt: t.maybe(t.Date),

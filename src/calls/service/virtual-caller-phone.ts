@@ -28,10 +28,12 @@ export class VirtualCallerPhone {
   async call (cmd: CallCommand) {
     const { worksheetId, contact, address, buildingId } = cmd
     const twiml = new VoiceResponse()
+    const to = this.ownerTrialPhoneNumber || '+34' + contact.value
     const call = VirtualAgentCall({
       worksheetId,
       contactId: contact.id,
       ownerId: contact.ownerId,
+      phoneNumber: to,
     } as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
 
@@ -59,7 +61,7 @@ export class VirtualCallerPhone {
       twiml: twiml.toString(),
       callerId: this.virtualCallerPhoneNumber,
       from: this.virtualCallerPhoneNumber,
-      to: this.ownerTrialPhoneNumber || '+34' + contact.value,
+      to: to,
       machineDetection: 'Enable',
       asyncAmd: 'true',
       asyncAmdStatusCallbackMethod: 'POST',
