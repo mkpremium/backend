@@ -1,26 +1,17 @@
 import { moveWorksheetOutOfFreezer } from '../src/business/worksheets/freezer'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { createDiContainer } from '../src/infrastructure/dependencies'
-import { logger } from '../src/infrastructure/logger'
-import { SystemPreferencesRepository } from '../src/system-preferences/models'
+import { initLogger } from '../src/infrastructure/logger'
 import '../src/types'
 
+const logger = initLogger()
 logger.info('starting freezer')
 
-SystemPreferencesRepository
-  .getPreferences()
-  .then(async (pref) => {
-    if (pref.freezer.enable) {
-      logger.info(`Executing freezer cron`)
-
-      connectCouchbaseBucket()
-        .then(async (couchbaseBucket) => {
-          const awilixContainer = createDiContainer(couchbaseBucket)
-          await moveWorksheetOutOfFreezer(false, 500, awilixContainer.resolve('buildingsRepository'))
-        })
-    } else {
-      logger.info(`Freeze called, nothing to do`)
-    }
+connectCouchbaseBucket()
+  .then(async (couchbaseBucket) => {
+    const diContainer = createDiContainer(couchbaseBucket)
+    await moveWorksheetOutOfFreezer(false, 500, diContainer.resolve('buildingsRepository'))
+    logger.info('freezer finished correctly')
     process.exit(0)
   })
   .catch(error => {
