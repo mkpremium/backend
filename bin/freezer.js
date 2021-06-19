@@ -10,7 +10,7 @@ logger.info('starting freezer')
 connectCouchbaseBucket()
   .then(async (couchbaseBucket) => {
     const diContainer = createDiContainer(couchbaseBucket)
-    await moveWorksheetOutOfFreezer(false, 500, diContainer.resolve('buildingsRepository'))
+    await moveWorksheetOutOfFreezer(500, diContainer.resolve('buildingsRepository'), parseInt(process.env.DAYS_IN_FREEZER) || 90)
     logger.info('freezer finished correctly')
     process.exit(0)
   })

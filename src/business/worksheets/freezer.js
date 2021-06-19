@@ -1,27 +1,23 @@
 import Promise from 'bluebird'
 import _ from 'lodash'
 import fromJSON from 'tcomb/lib/fromJSON'
+
+import { logger } from '../../infrastructure/logger'
 import { utc } from '../../lib/date'
-import { SystemPreferencesRepository } from '../../system-preferences/models'
 import { Worksheet, WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 
-import { logger } from '../../infrastructure/logger'
-
-let changeNothing
 let limit = 100
 
-export async function moveWorksheetOutOfFreezer (dryRun = false, argLimit = 100, buildingsRepository) {
-  changeNothing = dryRun
+export async function moveWorksheetOutOfFreezer (argLimit = 100, buildingsRepository, daysInFreezer) {
   limit = argLimit
-  const { freezer } = await SystemPreferencesRepository.getPreferences()
-  logger.info('starting to move worksheets from freezer settings', { freezer })
-  await moveNoSaleWorksheets(freezer, buildingsRepository)
-  await moveFreezerWorksheets(freezer, buildingsRepository)
+  logger.info('starting to move worksheets from freezer settings', { daysInFreezer })
+  await moveNoSaleWorksheets(daysInFreezer, buildingsRepository)
+  await moveFreezerWorksheets(daysInFreezer, buildingsRepository)
   logger.info('end of freezer process')
 }
 
-export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, buildingsRepository) {
+export async function moveFreezerWorksheets (daysInFreezer, buildingsRepository) {
   const maxDays = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
@@ -31,15 +27,11 @@ export async function moveFreezerWorksheets ({ daysInFreezer, provinces }, build
     .where(`status IN ${JSON.stringify([ WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING ])}`)
     .limit(limit)
 
-  if (provinces.length > 0) {
-    queryBuilder.where(`buildingAddress.province IN ${JSON.stringify(provinces)}`)
-  }
-
   const worksheets = await repository.query(queryBuilder)
   return pullOutFreezer(worksheets, buildingsRepository)
 }
 
-export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildingsRepository) {
+export async function moveNoSaleWorksheets (daysInFreezer, buildingsRepository) {
   const dateDaysAgo = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
@@ -48,27 +40,12 @@ export async function moveNoSaleWorksheets ({ daysInFreezer, provinces }, buildi
     .where('statusChangedAt <= ?', dateDaysAgo)
     .limit(limit)
 
-  if (provinces.length > 0) {
-    queryBuilder.where(`buildingAddress.province IN ${JSON.stringify(provinces)}`)
-  }
-
   const worksheets = await repository.query(queryBuilder)
   return pullOutFreezer(worksheets, buildingsRepository)
 }
 
 async function pullOutFreezer (worksheets, buildingsRepository) {
   if (!worksheets || worksheets.length === 0) {
-    return
-  }
-
-  if (changeNothing) {
-    worksheets.forEach(worksheet => {
-      logger.info(`[dry-run] moving out freezer worksheet`, {
-        statusChangedAt: worksheet.statusChangedAt,
-        id: worksheet.id,
-        status: worksheet.status
-      })
-    })
     return
   }
 

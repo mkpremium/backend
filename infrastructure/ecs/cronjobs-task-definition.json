@@ -54,6 +54,10 @@
         {
           "name": "EVENTUAL_CONSISTENCY_DELAY",
           "value": "500"
+        },
+        {
+          "name": "DAYS_IN_FREEZER",
+          "value": "90"
         }
       ],
       "resourceRequirements": null,
