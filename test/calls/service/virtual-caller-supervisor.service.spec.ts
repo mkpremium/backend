@@ -1,7 +1,8 @@
 import { expect } from 'chai'
-import { spy, stub } from 'sinon'
+import sinon, { SinonFakeTimers, spy, stub } from 'sinon'
 import { VirtualCallerSupervisorService } from '../../../src/calls/service/virtual-caller-supervisor.service'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
+import moment from 'moment-timezone'
 
 const testCmd = {
   callerId: 'test-caller-id',
@@ -14,6 +15,7 @@ describe('VirtualCallerSupervisorService', () => {
   let virtualCallerStub
   let virtualCallerWorksheetsRepositoryStub
   let loggerSpy
+  let clock: SinonFakeTimers
 
   beforeEach(() => {
     virtualCallerStub = {
@@ -31,7 +33,12 @@ describe('VirtualCallerSupervisorService', () => {
       virtualCallerWorksheetsRepositoryStub,
       loggerSpy,
     )
+
+    const lastMondayMorning = moment().startOf('isoWeek').hours(9).minutes(0)
+    clock = sinon.useFakeTimers(lastMondayMorning.toDate())
   })
+
+  afterEach(() => clock.restore())
 
   it('makes virtual caller process next worksheet', async () => {
     virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId).resolves(0)
@@ -48,6 +55,16 @@ describe('VirtualCallerSupervisorService', () => {
   it('does not invoke virtual caller when max worksheets have been processed', async () => {
     virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId)
       .resolves(testCmd.maxWorksheets)
+
+    await service.check(testCmd)
+
+    expect(virtualCallerStub.processNextWorksheet).to.not.have.been.called
+    expect(loggerSpy.info).to.have.been.called
+  })
+
+  it('does not invoke virtual caller outside scheduled hours', async () => {
+    clock.restore()
+    clock = sinon.useFakeTimers(moment().startOf('isoWeek').hours(20).minutes(1).toDate())
 
     await service.check(testCmd)
 

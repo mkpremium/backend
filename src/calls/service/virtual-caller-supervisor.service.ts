@@ -3,6 +3,7 @@ import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-
 import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { flatMap, sortBy, uniqBy } from 'lodash'
+import moment from 'moment-timezone'
 
 interface CheckCommand {
   callerId: string;
@@ -28,8 +29,12 @@ export class VirtualCallerSupervisorService {
     return sortBy(uniqBy(phoneContacts, 'value'), 'value')
   }
 
-  // TODO don't call during nights or weekends
   async check (cmd: CheckCommand) {
+    if (outOfWorkingHours()) {
+      this.logger.info('Outside of working hours, no call', cmd)
+      return
+    }
+
     const worksheetsProcessedByCaller = await this.virtualCallerWorksheetsRepository.numberOfWorksheetsProcessedBy(cmd.callerId)
     if (worksheetsProcessedByCaller >= cmd.maxWorksheets) {
       this.logger.info('All worksheets processed by virtual caller', cmd)
@@ -42,4 +47,12 @@ export class VirtualCallerSupervisorService {
       contacts: VirtualCallerSupervisorService.contactsOrderStrategy,
     })
   }
+
+}
+
+const SATURDAY = 6
+const SUNDAY = 7
+function outOfWorkingHours () {
+  const now = moment().tz('Europe/Madrid')
+  return now.hours() < 9 || now.hours() >= 20 || [SATURDAY, SUNDAY].includes(now.isoWeekday())
 }
