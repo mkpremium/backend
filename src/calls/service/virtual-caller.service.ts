@@ -1,7 +1,10 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
 import { VirtualCallerPhone } from './virtual-caller-phone'
-import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
+import {
+  VirtualCallerWorksheet,
+  VirtualCallerWorksheetsRepository
+} from '../repository/virtual-caller-worksheets.repository'
 import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { EventBus } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
@@ -49,17 +52,17 @@ export class VirtualCallerService {
         this.logger.error('Call failed', { error: error.message, trace: error.trace })
       })
 
-      await this.virtualCallerWorksheetsRepository.save({
+      await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
         worksheetId: worksheet.id,
         callerId: cmd.callerId,
         lastContactId: contactToCall.id,
         status: 'CALLING',
-      })
+      }))
     } else {
-      await this.virtualCallerWorksheetsRepository.save({
+      await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
         ...inProgressWorksheet,
         status: 'DONE',
-      })
+      }))
       await this.eventBus.publish({
         name: 'virtual-caller.worksheet_done',
         worksheetId: inProgressWorksheet.worksheetId,

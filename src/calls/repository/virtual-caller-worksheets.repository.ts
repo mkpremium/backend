@@ -2,6 +2,7 @@ import t from 'tcomb'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
+import uuid from 'uuid/v4'
 
 export interface VirtualCallerWorksheetProps {
   worksheetId: string;
@@ -10,7 +11,17 @@ export interface VirtualCallerWorksheetProps {
   lastContactId?: string;
 }
 
-const VirtualCallerWorksheet = t.struct<VirtualCallerWorksheetProps>({
+const Entity = t.struct({
+  id: t.String,
+}, {
+  defaultProps: {
+    get id () {
+      return uuid()
+    },
+  }
+})
+
+export const VirtualCallerWorksheet = Entity.extend<VirtualCallerWorksheetProps>({
   worksheetId: t.String,
   callerId: t.String,
   status: t.enums.of([ 'CALLING', 'DONE' ]),
