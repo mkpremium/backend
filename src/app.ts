@@ -25,7 +25,6 @@ import { setupScheduledEventsRoutes } from './scheduled-events'
 
 import stats from './stats'
 import { setupStockRouter } from './stock/stock-router'
-import preferences from './system-preferences'
 import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
@@ -91,7 +90,6 @@ export const createApp = (): Promise<Express> => {
       autocomplete(app)
       email(app)
       cadastre(app)
-      preferences(app)
 
       app.use(appErrorHandler)
       app.set('IS_READY', true)
