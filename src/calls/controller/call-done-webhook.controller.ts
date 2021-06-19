@@ -20,7 +20,7 @@ export const createCallDoneWebhookController = ({
   return async (req, res) => {
     const { callId } = req.params
     virtualCallsRepository.get(callId)
-      .then(call => {
+      .then(async call => {
         const updatedCall = VirtualAgentCall.update(call, {
           status: {
             $set: 'DONE'
@@ -33,13 +33,11 @@ export const createCallDoneWebhookController = ({
           logger.info('Call finished without input gathered', { callId })
         }
 
-        return Promise.all([
-          eventBus.publish({
-            name: 'virtual-caller.call_finished',
-            callId
-          } as CallDone),
-          virtualCallsRepository.save(updatedCall)
-        ])
+        await virtualCallsRepository.save(updatedCall)
+        await eventBus.publish({
+          name: 'virtual-caller.call_finished',
+          callId
+        } as CallDone)
       })
       .then(() => res.sendStatus(200))
       .catch(error => logger.error('Saving call done', { error: error.message }))
