@@ -21,6 +21,7 @@ export class VirtualCallerPhone {
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: VoiceResponse.SayAttributes,
     private virtualCallerPhoneNumber: string,
+    private ownerTrialPhoneNumber?: string,
   ) {
   }
 
@@ -58,7 +59,7 @@ export class VirtualCallerPhone {
       twiml: twiml.toString(),
       callerId: this.virtualCallerPhoneNumber,
       from: this.virtualCallerPhoneNumber,
-      to: '+34' + contact.value,
+      to: this.ownerTrialPhoneNumber || '+34' + contact.value,
       machineDetection: 'Enable',
       asyncAmd: 'true',
       asyncAmdStatusCallbackMethod: 'POST',

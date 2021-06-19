@@ -52,6 +52,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     ).singleton(),
 
     virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
+    ownerTrialPhoneNumber: asValue(process.env.OWNER_TRIAL_PHONE_NUMBER || undefined),
     virtualCaller: asClass(VirtualCallerPhone).classic().singleton(),
     virtualCallerSupervisor: asClass(VirtualCallerSupervisorService).classic().singleton(),
     ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),
