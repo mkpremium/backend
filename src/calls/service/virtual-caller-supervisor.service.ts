@@ -2,7 +2,7 @@ import { VirtualCallerService } from './virtual-caller.service'
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
 import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
-import { flatMap, uniqBy } from 'lodash'
+import { flatMap, sortBy, uniqBy } from 'lodash'
 
 interface CheckCommand {
   callerId: string;
@@ -25,7 +25,7 @@ export class VirtualCallerSupervisorService {
         .map(c => ({ ...c, ownerId: o.id }))
     })
 
-    return uniqBy(phoneContacts, 'value')
+    return sortBy(uniqBy(phoneContacts, 'value'), 'value')
   }
 
   // TODO don't call during nights or weekends

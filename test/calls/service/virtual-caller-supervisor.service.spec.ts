@@ -93,5 +93,65 @@ describe('VirtualCallerSupervisorService', () => {
         value: '666666666',
       } ])
     })
+
+    it('returns contacts in same order', () => {
+      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-id',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+                {
+                  id: 'test-second-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666667',
+                },
+              ]
+            }
+          },
+        ],
+      }
+      const testReverseOrderWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-id',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-second-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666667',
+                },
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          },
+        ]
+      }
+
+      const contactsInOrder = VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+      const contactsInReverseOrder = VirtualCallerSupervisorService.contactsOrderStrategy(testReverseOrderWorksheet)
+
+      expect(contactsInOrder).to.be.eql(contactsInReverseOrder)
+    })
   })
 })
