@@ -3,6 +3,11 @@ import { VirtualCallsRepository } from '../virtual-calls.repository'
 import { VirtualAgentCall } from '../virtual-agent-call'
 import { EventBus } from '../../infrastructure/event-bus'
 
+export interface CallDone {
+  name: 'virtual-caller.call_finished';
+  callId: string;
+}
+
 export const createCallDoneWebhookController = ({
                                                   logger,
                                                   virtualCallsRepository,
@@ -30,8 +35,9 @@ export const createCallDoneWebhookController = ({
 
         return Promise.all([
           eventBus.publish({
-            name: 'virtual-caller.call_finished'
-          }),
+            name: 'virtual-caller.call_finished',
+            callId
+          } as CallDone),
           virtualCallsRepository.save(updatedCall)
         ])
       })
