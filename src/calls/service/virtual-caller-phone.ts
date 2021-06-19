@@ -14,6 +14,22 @@ interface CallCommand {
   worksheetId: string;
 }
 
+class NumberAlreadyCalled implements Error {
+  readonly phoneNumber
+  readonly contactId
+  readonly ownerId
+  readonly worksheetId
+  message = 'Phone number already called'
+  name = 'NumberAlreadyCalled'
+
+  constructor ({ phoneNumber, contactId, ownerId, worksheetId }: VirtualAgentCallProps) {
+    this.phoneNumber = phoneNumber
+    this.contactId = contactId
+    this.ownerId = ownerId
+    this.worksheetId = worksheetId
+  }
+}
+
 export class VirtualCallerPhone {
   constructor (
     private twilioClient: Twilio,
@@ -29,6 +45,11 @@ export class VirtualCallerPhone {
     const { worksheetId, contact, address, buildingId } = cmd
     const twiml = new VoiceResponse()
     const to = this.ownerTrialPhoneNumber || '+34' + contact.value
+    const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
+    if (lastCallToNumber) {
+      throw new NumberAlreadyCalled(lastCallToNumber)
+    }
+
     const call = VirtualAgentCall({
       worksheetId,
       contactId: contact.id,
@@ -48,7 +69,7 @@ export class VirtualCallerPhone {
       [ 'worksheetId', worksheetId ],
       [ 'contactId', contact.id ],
       [ 'ownerId', contact.ownerId ],
-    ].map(([key, value]) => `${key}=${value}`).join('&')
+    ].map(([ key, value ]) => `${key}=${value}`).join('&')
 
     twiml.gather({
       action: `${this.publicUrl}/calls/twilio/${call.id}/gather?${gatherEndpointQueryParams}`,
