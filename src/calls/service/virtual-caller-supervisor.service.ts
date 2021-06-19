@@ -28,6 +28,7 @@ export class VirtualCallerSupervisorService {
     return uniqBy(phoneContacts, 'value')
   }
 
+  // TODO don't call during nights or weekends
   async check (cmd: CheckCommand) {
     const worksheetsProcessedByCaller = await this.virtualCallerWorksheetsRepository.numberOfWorksheetsProcessedBy(cmd.callerId)
     if (worksheetsProcessedByCaller >= cmd.maxWorksheets) {
