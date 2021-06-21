@@ -39,7 +39,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
   }
 
   container.register({
-    publicUrl: asValue(process.env.PUBLIC_URL),
+    publicUrl: asValue(process.env.PUBLIC_URL || 'https://api.mkpremium.net'),
     twilioSayAttributes: asValue(sayAttributes),
     twilioCredentials: asValue({
       accountSid: process.env.TWILIO_ACCOUNT_SID,
