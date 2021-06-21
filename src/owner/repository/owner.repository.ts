@@ -108,11 +108,16 @@ export class OwnerRepository extends CouchbaseRepository<OwnerProps> {
     ).then(result => fromJSON(result.map(rec => {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
       const building = rec.building
+      building.negotiationStatus = rec.negotiationStatus || 'PENDIENTE'
+      building.floorArea = parseInt(building.floorArea)
       if (building.recentProposal) {
         building.latestProposal = {
           amount: building.recentProposal.proposal,
           createdAt: building.recentProposal.createdAt
         }
+      }
+      if (building.address.postalCode && !building.address.postalCode.number) {
+        delete building.address.postalCode
       }
 
       return {

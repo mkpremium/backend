@@ -66,9 +66,9 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
     city: t.String,
     province: t.String,
     street: t.String,
-    postalCode: t.struct({
+    postalCode: t.maybe(t.struct({
       number: t.union([ t.String, t.Number ])
-    }),
+    })),
     neighborhood: t.maybe(t.String),
     type: t.maybe(t.String)
   }),
