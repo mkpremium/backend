@@ -70,6 +70,10 @@
         {
           "name": "EVENTUAL_CONSISTENCY_DELAY",
           "value": "500"
+        },
+        {
+          "name": "TWILIO_ACCOUNT_SID",
+          "value": "AC95e4259a869744c6a62258dd3950ee50"
         }
       ],
       "resourceRequirements": null,
@@ -85,6 +89,10 @@
         {
           "valueFrom": "backend.mailer.pass",
           "name": "MAILER_PASS"
+        },
+        {
+          "valueFrom": "backend.twilio_account_token",
+          "name": "TWILIO_ACCOUNT_TOKEN"
         }
       ],
       "dockerSecurityOptions": null,
