@@ -53,12 +53,19 @@ export class VirtualCallerService {
         setTimeout(() => this.processNextWorksheet(cmd), 3000)
       })
 
-      await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
-        worksheetId: worksheet.id,
-        callerId: cmd.callerId,
-        lastContactId: contactToCall.id,
-        status: 'CALLING',
-      }))
+      if (!inProgressWorksheet) {
+        await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
+          worksheetId: worksheet.id,
+          callerId: cmd.callerId,
+          lastContactId: contactToCall.id,
+          status: 'CALLING',
+        }))
+      } else {
+        await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
+          ...inProgressWorksheet,
+          lastContactId: contactToCall.id,
+        }))
+      }
     } else {
       await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
         ...inProgressWorksheet,
