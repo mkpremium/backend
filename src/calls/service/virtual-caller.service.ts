@@ -8,6 +8,7 @@ import {
 import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { EventBus } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
+import retry from 'bluebird-retry'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
@@ -37,7 +38,8 @@ export class VirtualCallerService {
     const inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
     const worksheet = inProgressWorksheet ?
       await this.worksheetRepository.getForCallcenterView(inProgressWorksheet.worksheetId) :
-      await this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId)
+      await retry<WorksheetViewProps>(
+        () => this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId))
 
     const lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
     const contactToCall = this.nextContactToCall(cmd.contacts(worksheet), lastCalledWorksheetContactId)
