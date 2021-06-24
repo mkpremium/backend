@@ -28,16 +28,6 @@ export const QueueItem = t.struct(
   }
 )
 
-QueueItem.prototype.canBeOpened = function (operatorId) {
-  if (operatorId && this.operatorId) {
-    return operatorId === this.operatorId
-  }
-  return [
-    QueueStatus.AVAILABLE,
-    QueueStatus.SCHEDULED
-  ]
-}
-
 QueueItem.prototype.take = function (operatorId = null) {
   return t.update(this, {
     status: { $set: QueueStatus.OPENED },
