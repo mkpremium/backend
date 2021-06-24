@@ -1,4 +1,6 @@
 import t from 'tcomb'
+import { DateTimeString } from '../../infrastructure/shared-types'
+import { ScheduledEventTypeEnum } from '../../scheduled-events/types'
 
 export const QueueStatus = {
   AVAILABLE: 'AVAILABLE',
@@ -14,7 +16,11 @@ export const QueueItem = t.struct(
     operatorId: t.maybe(t.String),
     status: WorkSheetQueueStatus,
     addedAt: t.Date,
-    event: t.maybe(t.Any)
+    event: t.maybe(t.struct({
+      id: t.String,
+      date: t.union([ t.Date, DateTimeString ]),
+      type: ScheduledEventTypeEnum
+    }))
   },
   {
     name: 'QueueItem',
@@ -31,7 +37,11 @@ QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   return t.update(this, {
     status: { $set: QueueStatus.SCHEDULED },
     operatorId: { $set: operatorId },
-    event: { $set: scheduledEvent }
+    event: { $set: {
+      id: scheduledEvent.id,
+      type: scheduledEvent.type,
+      eventDate: scheduledEvent.eventDate
+    } }
   })
 }
 
