@@ -52,7 +52,7 @@ export class VirtualCallerService {
         address: worksheet.building.address,
         contact: contactToCall,
       }).catch(error => {
-        this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace })
+        this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
         setTimeout(() => this.processNextWorksheet(cmd), 3000)
       })
 
