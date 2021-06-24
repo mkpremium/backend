@@ -94,14 +94,14 @@ WorksheetQueue.prototype.addWorksheet = function (worksheet) {
   })
 }
 
-const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser) => {
+const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser): string[] => {
   const userOpenedWorksheets = queue.worksheets
     .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
 
   userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
   return _.map(_.drop(userOpenedWorksheets, maxOpenedWorksheetsByUser), 'worksheetId')
 }
-export const keepOnlyUserNewestOpenedWorksheets = (queue, userId, maxOpenedWorksheetsByUser) => {
+export const keepOnlyUserNewestOpenedWorksheets: (queue, userId, maxOpenedWorksheetsByUser) => [ Object, string[] ] = (queue, userId, maxOpenedWorksheetsByUser) => {
   const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
 
   return [
