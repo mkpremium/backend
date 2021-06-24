@@ -103,7 +103,9 @@ describe('WorksheetQueueActionsService', () => {
           worksheetId: testWorksheetId,
           status: QueueStatus.SCHEDULED,
           event: {
-            id: testScheduledCallId
+            id: testScheduledCallId,
+            date: new Date(),
+            type: 'CALLS'
           }
         }
       ]
