@@ -195,16 +195,7 @@ export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
         throw new WorksheetNotFound(worksheetId)
       }
 
-      const record = rows[ 0 ]
-      if (record.building.recentProposal) {
-        record.building.latestProposal = {
-          amount: record.building.recentProposal.proposal,
-          createdAt: record.building.recentProposal.createdAt
-        }
-      }
-      if (record.building.postalCode && !record.building.postalCode.number) {
-        delete record.building.postalCode
-      }
+      const record = WorksheetRepository.prepareRowsForParsing(rows)
 
       try {
         return fromJSON(record, CallcenterView)
@@ -213,6 +204,20 @@ export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
         return record
       }
     })
+  }
+
+  static prepareRowsForParsing (rows) {
+    const record = rows[ 0 ]
+    if (record.building.recentProposal) {
+      record.building.latestProposal = {
+        amount: record.building.recentProposal.proposal,
+        createdAt: record.building.recentProposal.createdAt
+      }
+    }
+    if (record.building.address.postalCode && !record.building.address.postalCode.number) {
+      delete record.building.address.postalCode
+    }
+    return record
   }
 
   nextAvailableWorksheetInSource (source, skipWorksheetId): Promise<WorksheetViewProps> {
