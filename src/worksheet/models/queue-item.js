@@ -1,5 +1,4 @@
 import t from 'tcomb'
-import { newHttpError } from '../../lib/http-error'
 
 export const QueueStatus = {
   AVAILABLE: 'AVAILABLE',
@@ -28,24 +27,6 @@ export const QueueItem = t.struct(
   }
 )
 
-QueueItem.prototype.take = function (operatorId = null) {
-  return t.update(this, {
-    status: { $set: QueueStatus.OPENED },
-    operatorId: { $set: operatorId }
-  })
-}
-
-/**
- * @returns {QueueItem}
- */
-QueueItem.prototype.release = function () {
-  return t.update(this, {
-    status: { $set: QueueStatus.AVAILABLE },
-    operatorId: { $set: null },
-    event: { $set: null }
-  })
-}
-
 QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   return t.update(this, {
     status: { $set: QueueStatus.SCHEDULED },
@@ -61,15 +42,4 @@ QueueItem.prototype.removeScheduledCall = function () {
     status: { $set: this.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
     event: { $set: undefined }
   })
-}
-
-/**
- * @param operatorId
- * @returns {QueueItem}
- */
-QueueItem.prototype.releaseSchedule = function (operatorId) {
-  if (this.status === QueueStatus.SCHEDULED && this.operatorId === operatorId) {
-    return this.release()
-  }
-  throw newHttpError(400, 'No puede liberar este item')
 }
