@@ -41,6 +41,7 @@
     "nodemailer": "^6.6.1",
     "pdfmake": "^0.1.71",
     "socket.io": "^2.1.0",
+    "source-map-support": "^0.5.19",
     "squel": "^5.12.1",
     "tcomb": "^3.2.25",
     "tcomb-validation": "^3.4.1",

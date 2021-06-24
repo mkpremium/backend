@@ -18,6 +18,7 @@
       "portMappings": [],
       "command": [
         "node",
+        "-r", "source-map-support/register",
         "bin/freezer.js"
       ],
       "linuxParameters": null,

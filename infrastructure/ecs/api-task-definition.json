@@ -24,6 +24,7 @@
       ],
       "command": [
         "node",
+        "-r", "source-map-support/register",
         "bin/www.js"
       ],
       "linuxParameters": null,
