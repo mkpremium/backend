@@ -83,6 +83,8 @@ export class VirtualCallerService {
           if (!(error instanceof WorksheetNotFound)) {
             throw error
           }
+
+          this.logger.info('Worksheet not found, taking next', { worksheetId: inProgressWorksheet.worksheetId })
           this.saveDoneWorksheet(inProgressWorksheet)
             .catch(error => this.logger.error('Saving done worksheet', { error: error.message }))
 

@@ -36,7 +36,7 @@ const testInProgressWorksheet: VirtualCallerWorksheetProps = {
   callerId: testCmd.callerId,
 }
 
-describe.only('VirtualCallerService', () => {
+describe('VirtualCallerService', () => {
   let service!: VirtualCallerService
   let takeNextWorksheetServiceStub
   let virtualCallerPhoneStub
@@ -68,7 +68,10 @@ describe.only('VirtualCallerService', () => {
       virtualCallerWorksheetsRepositoryStub,
       worksheetRepositoryStub,
       eventBusStub,
-      {} as any
+      {
+        info: stub(),
+        error: stub()
+      } as any
     )
   })
 
