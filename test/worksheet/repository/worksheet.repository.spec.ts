@@ -21,7 +21,6 @@ describe('worksheet.repository', () => {
     const testBuilding = buildingBuilder({
       cadastre: {
         reference: 'test-cadastre-reference',
-        address: 'test cadastre address'
       },
       recentProposal: {
         id: 'test-proposal-id',

@@ -91,7 +91,7 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
   cadastre: t.maybe(t.struct({
     reference: t.String,
   })),
-  floorArea: t.Number,
+  floorArea: t.union([t.Number, t.String]),
   featuredOwnerId: t.maybe(t.String)
 })
 
@@ -125,7 +125,7 @@ SELECT
   worksheet.id id,
   worksheet.status status,
   worksheet.queueId queueId,
-  [{
+  {
       building.id,
       building.address,
       building.metadata,
@@ -135,10 +135,10 @@ SELECT
       building.recentProposal,
       building.cadastre,
       building.floorArea,
-      building.negotiationStatus,
+      "negotiationStatus": CASE WHEN building.negotiationStatus IS MISSING THEN "PENDIENTE" ELSE building.negotiationStatus END,
       "featuredOwnerId": building.ownerId,
       "cadastreReference": building.cadastre.reference
-  }] relatedBuildings,
+  } building,
   ARRAY {
     o.id,
     o.name,
@@ -196,13 +196,15 @@ export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
       }
 
       const record = rows[ 0 ]
-      if (record.relatedBuildings[ 0 ].recentProposal) {
-        record.relatedBuildings[ 0 ].latestProposal = {
-          amount: record.relatedBuildings[ 0 ].recentProposal.proposal,
-          createdAt: record.relatedBuildings[ 0 ].recentProposal.createdAt
+      if (record.building.recentProposal) {
+        record.building.latestProposal = {
+          amount: record.building.recentProposal.proposal,
+          createdAt: record.building.recentProposal.createdAt
         }
       }
-      record.building = record.relatedBuildings[ 0 ]
+      if (record.building.postalCode && !record.building.postalCode.number) {
+        delete record.building.postalCode
+      }
 
       try {
         return fromJSON(record, CallcenterView)
@@ -244,7 +246,7 @@ export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
     return Worksheet
   }
 
-  logWorksheetParsingError (worksheetId, error) {
+  private logWorksheetParsingError (worksheetId, error) {
     logger.error('parsing worksheet with CallcenterView', {
       worksheetId,
       errorMessage: error.message,

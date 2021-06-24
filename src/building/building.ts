@@ -196,6 +196,7 @@ export interface BuildingProps {
   negotiationStatus: BuildingNegotiationStatus;
   assignedAgentId?: string;
   use?: string;
+  recentProposal?: any
 }
 
 export const Building = t.struct<BuildingProps>(
