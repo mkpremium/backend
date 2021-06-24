@@ -118,7 +118,7 @@ export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId
   const updatedWorksheets = queue.worksheets.map(
     w => _get(w, 'event.id') === scheduledCallId ? w.removeScheduledCall() : w
   )
-  return t.update(this, {
+  return t.update(queue, {
     worksheets: {
       $set: updatedWorksheets
     }
