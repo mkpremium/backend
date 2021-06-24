@@ -11,7 +11,7 @@ import { updateList } from '../../lib/tcomb-utils'
 import { ListQuery } from '../../types/params'
 import { WorksheetQueue, WorksheetQueueBody, WorksheetQueueCount, WorksheetQueueSource } from '../domain/queue'
 import { WorkSheetCall } from '../domain/worksheet'
-import { QueueItem, QueueStatus } from './queue-item'
+import { QueueItem } from './queue-item'
 import { LegacyWorksheetRepository } from './worksheet-repository'
 
 const QueueItemExtraInfo = QueueItem.extend({
@@ -107,23 +107,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
 
   /**
    * @public
-   * @param {WorksheetQueue} queue
-   * @param {string} worksheetId
-   * @param {string} operatorId
-   * @returns {Promise<WorksheetQueue>}
-   */
-  async releaseWorksheetByIdInQueue (queue, worksheetId, operatorId) {
-    const item = queue.findItemByWorksheetId(worksheetId)
-
-    if (!item) {
-      return queue
-    }
-
-    return this.releaseItemInQueueAndSave(queue, item, operatorId)
-  }
-
-  /**
-   * @public
    * @param queueId
    * @param operatorId
    * @returns {Promise<null|*>}
@@ -202,51 +185,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder('delete')
     qb.where('id = ?', queue.id)
     await this.deleteQuery(qb)
-  }
-
-  /**
-   * @private
-   * @param {WorksheetQueue} queue
-   * @param {QueueItem} item
-   * @param {string} operatorId
-   * @returns {Promise<unknown>}
-   */
-  async releaseItemInQueueAndSave (queue, item, operatorId) {
-    if (!item.canBeReleased(operatorId)) {
-      throw newHttpError(409, `El ${item.id} (${item.status}) no puede ser liberado`)
-    }
-    logger.info('WorksheetQueueRepository#releaseWorksheetInQueue from queue', {
-      worksheetId: item.worksheetId,
-      queueId: queue.id
-    })
-    await this.worksheetRepository.updateStatus(item.worksheetId, operatorId)
-
-    if (item.status !== QueueStatus.SCHEDULED) {
-      const updatedQueue = this.removeWorksheetFromQueue(queue, item.worksheetId)
-      return this.save(updatedQueue)
-    }
-
-    return queue
-  }
-
-  /**
-   * @private
-   * @param queue
-   * @param worksheetId
-   * @returns {Promise<Object>}
-   */
-  async removeWorksheetFromQueue (queue, worksheetId) {
-    const worksheet = await this.worksheetRepository.findByIdOrThrow(worksheetId)
-    const haveEmptyQueueId = _.isNil(worksheet.queueId) || _.isEmpty(worksheet.queueId)
-    if (!haveEmptyQueueId && worksheet.queueId !== queue.id) {
-      throw newHttpError(409, `Worksheet ${worksheet.id} se encuentra en otra cola (${worksheet.queueId})`)
-    }
-
-    const updatedWorksheet = t.update(worksheet, { $remove: [ 'queueId' ] })
-    await this.worksheetRepository.save(updatedWorksheet)
-
-    const updatedWorksheetItems = queue.worksheets.filter(item => item.worksheetId !== worksheet.id)
-    return t.update(queue, { worksheets: { $set: updatedWorksheetItems } })
   }
 
   /**
