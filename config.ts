@@ -1,7 +1,6 @@
 import multer from 'multer'
 import nodemailer from 'nodemailer'
 import { join } from 'path'
-import { logger } from './src/infrastructure/logger'
 
 export const port = parseInt(process.env.APP_PORT || '9001')
 export const socket = {
