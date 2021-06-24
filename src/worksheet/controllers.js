@@ -6,8 +6,7 @@ import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { UserRoles } from '../types/user'
 import { WorksheetQueueBody } from './domain/queue'
-import { LegacyWorksheetRepository, QueueRequestParams } from './models/worksheet-repository'
-import { QueueRequestAction } from './types'
+import { LegacyWorksheetRepository } from './models/worksheet-repository'
 
 async function worksheetList (req, res) {
   const repo = new LegacyWorksheetRepository()
@@ -79,25 +78,11 @@ const queueList = worksheetQueueRepository => async (req, res) => {
 }
 
 /**
- * @param {LegacyWorksheetQueueRepository} worksheetQueueRepository
+ * @param {Logger} logger
  */
-const actionsOnWorksheetQueue = (worksheetQueueRepository) => async (req, res) => {
-  const queueId = req.params.id
-  const params = QueueRequestParams(req.body)
-  if (params.action !== QueueRequestAction.RELEASE) {
-    return res.status(400).send('Only release action is supportted')
-  }
-
-  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
-  canOperatorHandleQueue(req.user.operator, queueId)
-
-  const releasedWorksheet = await worksheetQueueRepository.releaseWorksheetByIdInQueue(queue, params.worksheetId, req.user.id)
-  await History.registerRelease({
-    contextModel: releasedWorksheet,
-    user: req.user
-  })
-
-  return res.status(204).send()
+const actionsOnWorksheetQueue = logger => async (req, res) => {
+  logger.error('Actions on worksheet queue endpoint hit', { headers: req.headers })
+  return res.status(400).send('Deprecated endpoint')
 }
 
 function operatorIdByPermissions (req) {
@@ -157,7 +142,7 @@ export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
 export const getQueueController = worksheetQueueRepository => wrap(getQueue(worksheetQueueRepository))
 export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
-export const actionsOnWorksheetQueueController = (worksheetQueueRepository, takeNextWorksheetService) => wrap(actionsOnWorksheetQueue(worksheetQueueRepository, takeNextWorksheetService))
+export const actionsOnWorksheetQueueController = logger => wrap(actionsOnWorksheetQueue(logger))
 export const queueTakenFindByOperatorController = worksheetQueueRepository => wrap(queueTakenFindByOperator(worksheetQueueRepository))
 export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
 export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))

@@ -31,7 +31,7 @@ export function worksheetRoutes (awilixContainer) {
 
   router.get('/queues/:id/taken', queueTakenFindByOperatorController(legacyWorksheetQueueRepository))
 
-  router.post('/queues/:id', actionsOnWorksheetQueueController(legacyWorksheetQueueRepository, awilixContainer.resolve('takeNextWorksheetService')))
+  router.post('/queues/:id', actionsOnWorksheetQueueController(awilixContainer.resolve('logger')))
 
   router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
     createTakeWorksheetIntoQueueController(awilixContainer.resolve('worksheetQueueActionsService'))
