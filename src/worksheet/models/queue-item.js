@@ -18,7 +18,7 @@ export const QueueItem = t.struct(
     addedAt: t.Date,
     event: t.maybe(t.struct({
       id: t.String,
-      date: t.union([ t.Date, DateTimeString ]),
+      eventDate: t.union([ t.Date, DateTimeString ]),
       type: ScheduledEventTypeEnum
     }))
   },

@@ -15,6 +15,8 @@ describe('LegacyWorksheetQueueRepository', () => {
     let testWorksheetQueue
     let testWorksheet
     const testCallToSchedule = {
+      id: 'test-scheduled-call-id',
+      type: 'CALLS',
       createdBy: 'test-user-id',
       notifyTo: 'test-user-id',
       event:
