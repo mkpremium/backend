@@ -27,6 +27,9 @@ FROM node:14
 RUN ["mkdir", "/app"]
 WORKDIR /app
 
+ARG app_version
+ENV app_version=$app_version
+
 COPY --from=0 /app/build .
 
 ENV PORT 9001

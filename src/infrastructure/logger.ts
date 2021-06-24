@@ -6,6 +6,9 @@ export const logger = createLogger({
   level,
   levels: winston.config.syslog.levels,
   format: winston.format.json(),
+  defaultMeta: {
+    version: process.env.app_version || 'local',
+  },
   transports: [
     new winston.transports.Console({
       format: winston.format.json()
