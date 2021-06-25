@@ -11,17 +11,8 @@ export interface VirtualCallerWorksheetProps {
   lastContactId?: string;
 }
 
-const Entity = t.struct({
+export const VirtualCallerWorksheet = t.struct<VirtualCallerWorksheetProps>({
   id: t.String,
-}, {
-  defaultProps: {
-    get id () {
-      return uuid()
-    },
-  }
-})
-
-export const VirtualCallerWorksheet = Entity.extend<VirtualCallerWorksheetProps>({
   worksheetId: t.String,
   callerId: t.String,
   status: t.enums.of([ 'CALLING', 'DONE' ]),
@@ -30,7 +21,10 @@ export const VirtualCallerWorksheet = Entity.extend<VirtualCallerWorksheetProps>
 }, {
   name: 'VirtualCallerWorksheet',
   defaultProps: {
-    _documentType: 'virtual-call-worksheet'
+    _documentType: 'virtual-call-worksheet',
+    get id () {
+      return uuid()
+    },
   }
 })
 
