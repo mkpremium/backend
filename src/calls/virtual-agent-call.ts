@@ -12,6 +12,7 @@ export interface VirtualAgentCallProps {
   error?: string;
   ownerResponse?: string;
   gatheredAt?: Date,
+  createdAt?: Date,
 }
 
 export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
@@ -24,6 +25,7 @@ export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     error: t.maybe(t.String),
     ownerResponse: t.maybe(t.String),
     gatheredAt: t.maybe(t.Date),
+    createdAt: t.maybe(t.Date),
     _documentType: t.String,
   },
   {

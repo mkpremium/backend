@@ -50,6 +50,7 @@ export class VirtualCallerPhone {
       contactId: contact.id,
       ownerId: contact.ownerId,
       phoneNumber: to,
+      createdAt: new Date(),
     } as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
 
