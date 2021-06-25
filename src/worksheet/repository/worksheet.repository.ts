@@ -91,7 +91,7 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
   cadastre: t.maybe(t.struct({
     reference: t.String,
   })),
-  floorArea: t.union([t.Number, t.String]),
+  floorArea: t.union([ t.Number, t.String ]),
   featuredOwnerId: t.maybe(t.String)
 })
 
@@ -190,20 +190,26 @@ export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
   getForCallcenterView (worksheetId): Promise<WorksheetViewProps> {
     return this.couchbaseAdapter.queryAsync(
       worksheetByIdQuery(this.bucketName), [ worksheetId ]
-    ).then(rows => {
-      if (rows.length === 0) {
-        throw new WorksheetNotFound(worksheetId)
-      }
+    )
+      .catch(error => {
+        error.worksheetId = worksheetId
+        error.context = 'Getting worksheet view'
+        throw error
+      })
+      .then(rows => {
+        if (rows.length === 0) {
+          throw new WorksheetNotFound(worksheetId)
+        }
 
-      const record = WorksheetRepository.prepareRowsForParsing(rows)
+        const record = WorksheetRepository.prepareRowsForParsing(rows)
 
-      try {
-        return fromJSON(record, CallcenterView)
-      } catch (error) {
-        this.logWorksheetParsingError(worksheetId, error)
-        return record
-      }
-    })
+        try {
+          return fromJSON(record, CallcenterView)
+        } catch (error) {
+          this.logWorksheetParsingError(worksheetId, error)
+          return record
+        }
+      })
   }
 
   static prepareRowsForParsing (rows) {

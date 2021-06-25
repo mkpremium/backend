@@ -56,7 +56,7 @@ export class TakeNextWorksheetService {
       .catch(error => {
         error.queueId = queue.id
         error.byUserOfId = byUserOfId
-        error.context = 'taking next available worksheet in queue'
+        error.context = (error.context || '') + ' taking next available worksheet in queue'
         throw error
       })
   }
