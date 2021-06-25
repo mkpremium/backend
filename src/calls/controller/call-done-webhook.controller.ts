@@ -1,11 +1,12 @@
 import { Logger } from 'winston'
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
-import { VirtualAgentCall } from '../virtual-agent-call'
+import { CallStatus, VirtualAgentCall } from '../virtual-agent-call'
 import { EventBus } from '../../infrastructure/event-bus'
 
 export interface CallDone {
   name: 'virtual-caller.call_finished';
   callId: string;
+  status: CallStatus;
 }
 
 export const createCallDoneWebhookController = ({
@@ -19,13 +20,20 @@ export const createCallDoneWebhookController = ({
 }) => {
   return async (req, res) => {
     const { callId } = req.params
+    const { CallStatus: twilioCallStatus } = req.body
     virtualCallsRepository.get(callId)
       .then(async call => {
+        let status = mapTwilioStatus(twilioCallStatus)
+        if (!status) {
+          logger.error('Call finished with unexpected status', { callId, status: twilioCallStatus })
+          status = 'DONE'
+        }
+
         const updatedCall = VirtualAgentCall.update(call, {
           status: {
-            $set: 'DONE'
+            $set: status
           },
-          doneAt: {
+          finishedAt: {
             $set: new Date()
           }
         })
@@ -36,10 +44,24 @@ export const createCallDoneWebhookController = ({
         await virtualCallsRepository.save(updatedCall)
         await eventBus.publish({
           name: 'virtual-caller.call_finished',
+          status,
           callId
         } as CallDone)
       })
       .then(() => res.sendStatus(200))
       .catch(error => logger.error('Saving call done', { error: error.message }))
+  }
+}
+
+function mapTwilioStatus (twilioCallStatus: 'completed' | 'failed' | 'no-answer' | 'busy'): CallStatus {
+  switch (twilioCallStatus) {
+    case 'completed':
+      return 'DONE'
+    case 'failed':
+      return 'FAILED'
+    case 'no-answer':
+      return 'NO_ANSWER'
+    case 'busy':
+      return 'BUSY'
   }
 }

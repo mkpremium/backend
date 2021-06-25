@@ -15,6 +15,10 @@ export const createCallFinishedListener = ({
                                              logger
                                            }: Deps) => async (evt: CallDone) => {
   logger.info('Call finished, checking for more work', { callId: evt.callId })
+  // Failed calls respond quickly, so wait to avoid multiple calls to same number.
+  if (evt.status === 'FAILED') {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }
 
   return virtualCallerSupervisor.check({
     callerId: virtualCallerConfig.virtualCallerId,

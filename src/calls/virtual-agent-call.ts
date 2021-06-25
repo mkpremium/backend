@@ -1,6 +1,5 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { DateTimeString } from '../infrastructure/shared-types'
 
 export interface VirtualAgentCallProps {
   id: string;
@@ -15,17 +14,20 @@ export interface VirtualAgentCallProps {
   createdAt?: Date,
 }
 
+
+export type CallStatus = 'CALLING' | 'INPUT_GATHERED' | 'FAILED' | 'DONE' | 'BUSY' | 'NO_ANSWER'
 export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     id: t.String,
-    status: t.enums.of([ 'CALLING', 'INPUT_GATHERED', 'FAILED', 'DONE' ]),
+    status: t.enums.of([ 'CALLING', 'INPUT_GATHERED', 'FAILED', 'DONE', 'BUSY', 'NO_ANSWER' ]),
     worksheetId: t.String,
     ownerId: t.String,
     contactId: t.String,
     phoneNumber: t.String,
     error: t.maybe(t.String),
     ownerResponse: t.maybe(t.String),
-    gatheredAt: t.maybe(t.Date),
     createdAt: t.maybe(t.Date),
+    gatheredAt: t.maybe(t.Date),
+    finishedAt: t.maybe(t.Date),
     _documentType: t.String,
   },
   {
