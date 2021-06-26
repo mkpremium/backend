@@ -38,11 +38,13 @@ export class VirtualCallerService {
   ) {
   }
 
-  async processNextWorksheet (cmd: ProcessNextWorksheetCommand) {
-    const inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
-    const worksheet = await this.getWorksheet(inProgressWorksheet, cmd)
+  async processNextWorksheet (cmd: ProcessNextWorksheetCommand, inProgressWorksheet?: VirtualCallerWorksheetProps, lastCalledWorksheetContactId?: string) {
+    if (!inProgressWorksheet) {
+      inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
+      lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
+    }
 
-    const lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
+    const worksheet = await this.getWorksheet(inProgressWorksheet, cmd)
     const contactToCall = this.nextContactToCall(cmd.contacts(worksheet), lastCalledWorksheetContactId)
 
     if (contactToCall) {
@@ -53,7 +55,7 @@ export class VirtualCallerService {
         contact: contactToCall,
       }).catch(error => {
         this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
-        setTimeout(() => this.processNextWorksheet(cmd), 3000)
+        return this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id)
       })
 
       if (!inProgressWorksheet) {
