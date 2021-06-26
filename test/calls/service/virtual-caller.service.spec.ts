@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { stub } from 'sinon'
+import sinon, { stub } from 'sinon'
 import {
   OwnerContact,
   ProcessNextWorksheetCommand,
@@ -149,13 +149,16 @@ describe('VirtualCallerService', () => {
   })
 
   it('marks worksheet as done when is not found', async () => {
+    const clock = sinon.useFakeTimers()
     virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
       .resolves(testInProgressWorksheet)
     worksheetRepositoryStub.getForCallcenterView.rejects(new WorksheetNotFound(testWorksheet.id))
 
-    await service.processNextWorksheet(testCmd)
+    service.processNextWorksheet(testCmd)
+    await clock.runAllAsync()
+    clock.restore()
 
-    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.calledTwice
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.called
     expect(virtualCallerWorksheetsRepositoryStub.save.firstCall.firstArg).to.include({
       status: 'DONE',
     })
