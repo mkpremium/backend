@@ -7,7 +7,7 @@ import { OwnerContact } from './virtual-caller.service'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
-interface CallCommand {
+export interface CallCommand {
   buildingId: string;
   address: AddressParam;
   contact: OwnerContact;
