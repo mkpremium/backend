@@ -14,7 +14,6 @@ export interface VirtualAgentCallProps {
   createdAt?: Date,
 }
 
-
 export type CallStatus = 'CALLING' | 'INPUT_GATHERED' | 'FAILED' | 'DONE' | 'BUSY' | 'NO_ANSWER'
 export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     id: t.String,
