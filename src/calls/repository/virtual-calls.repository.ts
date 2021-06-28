@@ -26,4 +26,11 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         return fromJSON(rows[ 0 ], this.struct())
       })
   }
+
+  async lockPhone (virtualCallerPhoneNumber: string) {
+  }
+
+  async unlockPhone (phoneNumber: string, lock: any) {
+    return undefined
+  }
 }

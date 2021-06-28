@@ -24,9 +24,9 @@ describe('VirtualCallerPhone', () => {
   let service: VirtualCallerPhone
   let twilioClientStub
   let virtualCallsRepositoryStub
-  let twilioSayAttributesTest
+  const twilioSayAttributesTest = {}
+  const testVirtualCallerPhoneNumber = '+34666666666'
 
-  let testVirtualCallerPhoneNumber
   beforeEach(() => {
     twilioClientStub = {
       calls: {
@@ -36,10 +36,10 @@ describe('VirtualCallerPhone', () => {
     virtualCallsRepositoryStub = {
       lastCallToNumber: stub().resolves(),
       save: stub().resolves(),
+      lockPhone: stub(),
+      unlockPhone: stub(),
     }
-    twilioSayAttributesTest = {}
 
-    testVirtualCallerPhoneNumber = {}
     service = new VirtualCallerPhone(
       twilioClientStub,
       testPublicUrl,
@@ -64,5 +64,16 @@ describe('VirtualCallerPhone', () => {
       asyncAmdStatusCallback: `${testPublicUrl}/calls/twilio/${savedCall.id}/machine-detection`,
       statusCallback: `${testPublicUrl}/calls/twilio/${savedCall.id}/done`
     })
+  })
+
+  it('acquires phone lock before calling and releases when call is done', async () => {
+    const testPhoneLock = 'test-cas-lock'
+    virtualCallsRepositoryStub.lockPhone.resolves(testPhoneLock)
+
+    await service.call(testCmd)
+
+    expect(virtualCallsRepositoryStub.lockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber)
+    expect(virtualCallsRepositoryStub.lockPhone).to.have.been.calledBefore(twilioClientStub.calls.create)
+    expect(virtualCallsRepositoryStub.unlockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber, testPhoneLock)
   })
 })
