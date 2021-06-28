@@ -15,7 +15,7 @@ echo "taskdefinitionarn: ${taskdefinitionarn}"
 
 eventsRole=$(aws events list-targets-by-rule --rule "${rulename}" | egrep "RoleArn" | tr "/" " " | awk '{print $2}' | tr -d '"')
 echo "eventsRole: ${eventsRole}"
-roleArn="${eventsRole}/ecs-events-role"
+roleArn="${eventsRole}/ecsEventsRole"
 echo "roleArn: ${roleArn}"
 
 newtaskdefinitionarn="${taskdefinitionarn}/${taskname}:${taskrevision}"
