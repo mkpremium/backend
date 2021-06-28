@@ -16,6 +16,7 @@ import { createStartVirtualCallerController } from './controller/virtual-caller-
 import { VirtualCallerSupervisorService } from './service/virtual-caller-supervisor.service'
 import { VirtualCallerConfig } from './virtual-caller.config'
 import { VirtualCallerService } from './service/virtual-caller.service'
+import RequestClient from 'twilio/lib/base/RequestClient'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -52,8 +53,14 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
 
     callDoneWebhook: asFunction(createCallDoneWebhookController),
     twilioClient: asFunction(
-      ({ twilioCredentials }: { twilioCredentials: TwilioCredentials }) =>
-        process.env.NODE_ENV === 'test' ? undefined : twilio(twilioCredentials.accountSid, twilioCredentials.accountAuthToken)
+      ({ twilioCredentials }: { twilioCredentials: TwilioCredentials }) => {
+        const twilioUrl = process.env.TWILIO_URL
+        const httpClient = twilioUrl ? new TwilioMockClient(twilioUrl, new RequestClient()) : new RequestClient()
+
+        return process.env.NODE_ENV === 'test' ?
+          undefined :
+          twilio(twilioCredentials.accountSid, twilioCredentials.accountAuthToken, { httpClient })
+      }
     ).singleton(),
 
     virtualCallerPhoneNumber: asValue(process.env.VIRTUAL_CALLER_PHONE_NUMBER),
@@ -111,4 +118,17 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     //   }
     // })),
   })
+}
+
+class TwilioMockClient {
+  constructor (
+    private mockUrl: string,
+    private twilioClient: RequestClient,
+  ) {
+  }
+
+  request (opts) {
+    opts.uri = opts.uri.replace(/^https\:\/\/.*?\.twilio\.com/, this.mockUrl)
+    return this.twilioClient.request(opts)
+  }
 }
