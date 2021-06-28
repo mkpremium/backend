@@ -38,13 +38,50 @@ export class VirtualCallerPhone {
 
   async call (cmd: CallCommand) {
     const { worksheetId, contact, address, buildingId } = cmd
-    const twiml = new VoiceResponse()
     const to = this.ownerTrialPhoneNumber || '+34' + contact.value
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
     if (lastCallToNumber) {
       throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
     }
+    const call = await this.saveCall(worksheetId, contact, to)
 
+    return this.doCall(address, buildingId, worksheetId, contact, call, to)
+  }
+
+  private doCall (
+    address: AddressParam,
+    buildingId: string,
+    worksheetId: string,
+    contact: OwnerContact,
+    call: VirtualAgentCallProps,
+    to: string
+  ) {
+    return this.twilioClient.calls.create({
+      twiml: this.createContactMessage(address, buildingId, worksheetId, contact, call.id).toString(),
+      callerId: this.virtualCallerPhoneNumber,
+      from: this.virtualCallerPhoneNumber,
+      to: to,
+      machineDetection: 'Enable',
+      asyncAmd: 'true',
+      asyncAmdStatusCallbackMethod: 'POST',
+      asyncAmdStatusCallback: `${this.publicUrl}/calls/twilio/${(call.id)}/machine-detection`,
+      statusCallback: `${this.publicUrl}/calls/twilio/${(call.id)}/done`
+    })
+      .catch(error => {
+        const updatedCall = VirtualAgentCall.update(call, {
+          status: {
+            $set: 'FAILED'
+          },
+          error: {
+            $set: error.message
+          }
+        })
+        this.virtualCallsRepository.save(updatedCall)
+        throw error
+      })
+  }
+
+  private async saveCall (worksheetId: string, contact: OwnerContact, to: string) {
     const call = VirtualAgentCall({
       worksheetId,
       contactId: contact.id,
@@ -54,6 +91,11 @@ export class VirtualCallerPhone {
     } as VirtualAgentCallProps)
     await this.virtualCallsRepository.save(call)
 
+    return call
+  }
+
+  private createContactMessage (address: AddressParam, buildingId: string, worksheetId: string, contact: OwnerContact, callId: string) {
+    const twiml = new VoiceResponse()
     twiml.pause({ length: 1 })
     const message = `Buenos dias, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
       ', nos dedicamos a la compra patrimonial de inmuebles, estaria usted interesado en vender?' +
@@ -68,35 +110,12 @@ export class VirtualCallerPhone {
     ].map(([ key, value ]) => `${key}=${value}`).join('&')
 
     twiml.gather({
-      action: `${this.publicUrl}/calls/twilio/${call.id}/gather?${gatherEndpointQueryParams}`,
+      action: `${this.publicUrl}/calls/twilio/${callId}/gather?${gatherEndpointQueryParams}`,
       method: 'POST',
       language: 'es-ES',
       numDigits: 1,
     }).say(this.twilioSayAttributes, message)
-
-    return this.twilioClient.calls.create({
-      twiml: twiml.toString(),
-      callerId: this.virtualCallerPhoneNumber,
-      from: this.virtualCallerPhoneNumber,
-      to: to,
-      machineDetection: 'Enable',
-      asyncAmd: 'true',
-      asyncAmdStatusCallbackMethod: 'POST',
-      asyncAmdStatusCallback: `${this.publicUrl}/calls/twilio/${call.id}/machine-detection`,
-      statusCallback: `${this.publicUrl}/calls/twilio/${call.id}/done`
-    })
-      .catch(error => {
-        const updatedCall = VirtualAgentCall.update(call, {
-          status: {
-            $set: 'FAILED'
-          },
-          error: {
-            $set: error.message
-          }
-        })
-        this.virtualCallsRepository.save(updatedCall)
-        throw error
-      })
+    return twiml
   }
 
   private async callPoc (from: string, to: string) {
