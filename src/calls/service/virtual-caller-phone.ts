@@ -4,6 +4,7 @@ import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
+import retry from 'bluebird-retry'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
@@ -37,7 +38,7 @@ export class VirtualCallerPhone {
   }
 
   async call (cmd: CallCommand) {
-    const phoneLock = await this.virtualCallsRepository.lockPhone(this.virtualCallerPhoneNumber)
+    const phoneLock = await this.getPhoneLock()
 
     const { worksheetId, contact, address, buildingId } = cmd
     const to = this.ownerTrialPhoneNumber || '+34' + contact.value
@@ -49,6 +50,13 @@ export class VirtualCallerPhone {
 
     return this.doCall(address, buildingId, worksheetId, contact, call, to)
       .then(() => this.virtualCallsRepository.unlockPhone(this.virtualCallerPhoneNumber, phoneLock))
+  }
+
+  private getPhoneLock () {
+    return retry<any>(
+      () => this.virtualCallsRepository.lockPhone(this.virtualCallerPhoneNumber),
+      { backoff: 2 }
+    )
   }
 
   private doCall (
