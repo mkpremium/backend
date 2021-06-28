@@ -53,26 +53,31 @@ export class VirtualCallerService {
         worksheetId: worksheet.id,
         address: worksheet.building.address,
         contact: contactToCall,
-      }).catch(error => {
-        this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
-        return this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id)
       })
-
-      if (!inProgressWorksheet) {
-        await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
-          worksheetId: worksheet.id,
-          callerId: cmd.callerId,
-          lastContactId: contactToCall.id,
-          status: 'CALLING',
-        }))
-      } else {
-        await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
-          ...inProgressWorksheet,
-          lastContactId: contactToCall.id,
-        }))
-      }
+        .then(() => this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id))
+        .catch(error => {
+          this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
+          return this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id)
+            .then(() => this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id))
+        })
     } else {
       await this.saveDoneWorksheet(inProgressWorksheet)
+    }
+  }
+
+  private async saveCalledContact (inProgressWorksheet: VirtualCallerWorksheetProps, worksheet: WorksheetViewProps, cmd: ProcessNextWorksheetCommand, contactId: string) {
+    if (!inProgressWorksheet) {
+      await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
+        worksheetId: worksheet.id,
+        callerId: cmd.callerId,
+        lastContactId: contactId,
+        status: 'CALLING',
+      }))
+    } else {
+      await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
+        ...inProgressWorksheet,
+        lastContactId: contactId,
+      }))
     }
   }
 
