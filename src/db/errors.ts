@@ -13,6 +13,12 @@ export class EntityNotFound extends Error {
   }
 }
 
+export class KeyNotFound extends Error {
+  constructor (readonly key: string) {
+    super(`Key not found ${key}`);
+  }
+}
+
 export class QueryError extends Error {
   constructor (
     readonly query: string,

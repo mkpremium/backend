@@ -3,6 +3,7 @@ import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { Struct } from 'tcomb'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { KeyNotFound } from '../../db/errors'
 
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
@@ -27,10 +28,21 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
       })
   }
 
-  async lockPhone (virtualCallerPhoneNumber: string) {
+  async lockPhone (phoneNumber: string) {
+    return this.couchbaseAdapter
+      .getAndLock(`phone_${phoneNumber}`)
+      .then(({ cas }) => cas)
+      .catch(error => {
+        if (error instanceof KeyNotFound) {
+          return this.couchbaseAdapter.upsert(`phone_${phoneNumber}`, { phoneNumber, createdAt: new Date() })
+            .then(() => this.lockPhone(phoneNumber))
+        }
+
+        throw error
+      })
   }
 
   async unlockPhone (phoneNumber: string, lock: any) {
-    return undefined
+    return this.couchbaseAdapter.unlock(`phone_${phoneNumber}`, lock)
   }
 }

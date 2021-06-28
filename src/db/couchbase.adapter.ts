@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
-import { EntityNotFound, QueryError } from './errors'
+import { EntityNotFound, KeyNotFound, QueryError } from './errors'
 import { validate } from 'tcomb-validation'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
@@ -11,9 +11,11 @@ import { promisifyAll } from 'bluebird'
 import Consistency = N1qlQuery.Consistency
 
 export type PromisifiedBucket = Bucket & {
-  queryAsync: (query: N1qlQuery, params?: { [param: string]: any } | any[]) => Promise<any[] | null>,
+  queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
   getAsync: (key: string) => Promise<{ value: any, cas: any }>
   upsertAsync: (key: string, value: any) => Promise<any>
+  getAndLockAsync: (key: string) => Promise<any>
+  unlockAsync: (key: string, cas: Bucket.CAS) => Promise<any>
   name: string
 }
 
@@ -74,6 +76,24 @@ export class CouchbaseAdapter {
         throw error
       }
     })
+  }
+
+  getAndLock (key: string) {
+    return this.couchbaseBucket.getAndLockAsync(key)
+      .catch(error => {
+        if (error.code === errors.keyNotFound) {
+          throw new KeyNotFound(key)
+        }
+        throw error
+      })
+  }
+
+  unlock (key: string, lock: any) {
+    return this.couchbaseBucket.unlockAsync(key, lock)
+  }
+
+  upsert (key: string, obj: object) {
+    return this.couchbaseBucket.upsertAsync(key, obj)
   }
 
   private throwCouchbaseError (error, query: string) {
