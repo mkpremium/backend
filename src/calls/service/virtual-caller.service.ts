@@ -45,7 +45,8 @@ export class VirtualCallerService {
     }
 
     const worksheet = await this.getWorksheet(inProgressWorksheet, cmd)
-    const contactToCall = this.nextContactToCall(cmd.contacts(worksheet), lastCalledWorksheetContactId)
+    const contacts = cmd.contacts(worksheet)
+    const contactToCall = this.nextContactToCall(contacts, lastCalledWorksheetContactId)
 
     if (contactToCall) {
       await this.virtualCallerPhone.call({
@@ -60,6 +61,12 @@ export class VirtualCallerService {
           return this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id)
             .then(() => this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id))
         })
+    } else if (contacts.length === 0) {
+      this.logger.info('No contacts found in worksheet', { worksheetId: worksheet.id })
+      await this.eventBus.publish({
+        name: 'virtual-caller.worksheet_done',
+        worksheetId: inProgressWorksheet.worksheetId,
+      } as WorksheetDone)
     } else {
       await this.saveDoneWorksheet(inProgressWorksheet)
     }
