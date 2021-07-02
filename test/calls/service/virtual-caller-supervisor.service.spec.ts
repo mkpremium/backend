@@ -16,6 +16,7 @@ describe('VirtualCallerSupervisorService', () => {
   let virtualCallerStub
   let virtualCallerWorksheetsRepositoryStub
   let loggerSpy
+  let eventBusStub
   let clock: SinonFakeTimers
 
   beforeEach(() => {
@@ -25,6 +26,9 @@ describe('VirtualCallerSupervisorService', () => {
     virtualCallerWorksheetsRepositoryStub = {
       numberOfWorksheetsProcessedBy: stub(),
     }
+    eventBusStub = {
+      publish: stub(),
+    }
     loggerSpy = {
       info: spy(),
     }
@@ -32,6 +36,7 @@ describe('VirtualCallerSupervisorService', () => {
     service = new VirtualCallerSupervisorService(
       virtualCallerStub,
       virtualCallerWorksheetsRepositoryStub,
+      eventBusStub,
       loggerSpy,
     )
 
@@ -78,6 +83,7 @@ describe('VirtualCallerSupervisorService', () => {
     beforeEach(async () => {
       virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId).resolves(0)
       await service.check(testCmd)
+      eventBusStub.publish.resolves()
 
       contactsOrderStrategy = virtualCallerStub.processNextWorksheet.lastCall.firstArg.contacts
     })
@@ -211,6 +217,42 @@ describe('VirtualCallerSupervisorService', () => {
       const contacts = contactsOrderStrategy(testWorksheet)
 
       expect(contacts).to.be.eql([])
+    })
+
+    it('publishes event on duplicated contacts in owner', () => {
+      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-id',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+                {
+                  id: 'test-second-contact-id',
+                  status: 'BAD',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          },
+        ],
+      }
+
+      contactsOrderStrategy(testWorksheet)
+
+      expect(eventBusStub.publish).to.have.been.calledWith({
+        name: 'virtual-caller.duplicated_contact_detected_in_owner',
+        ownerId: 'test-owner-id',
+      })
     })
   })
 })

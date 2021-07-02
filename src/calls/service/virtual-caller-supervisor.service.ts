@@ -4,6 +4,7 @@ import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { flatMap, groupBy, sortBy } from 'lodash'
 import moment from 'moment-timezone'
+import { EventBus } from '../../infrastructure/event-bus'
 
 interface CheckCommand {
   callerId: string;
@@ -15,6 +16,7 @@ export class VirtualCallerSupervisorService {
   constructor (
     private virtualCaller: VirtualCallerService,
     private virtualCallerWorksheetsRepository: VirtualCallerWorksheetsRepository,
+    private eventBus: EventBus,
     private logger: Logger,
   ) {
   }
@@ -44,6 +46,10 @@ export class VirtualCallerSupervisorService {
         flatMap(groupBy(o.person.contacts, 'value'), (contacts) => {
           if (contacts.length > 1) {
             this.logger.info('Duplicated contact in owner', { ownerId: o.id, contactId: contacts[ 0 ].id })
+            this.eventBus.publish({
+              name: 'virtual-caller.duplicated_contact_detected_in_owner',
+              ownerId: o.id,
+            }).catch(error => this.logger.error('Couldnt publish event', { error: error.message }))
           }
           if (contacts.find(c => c.status === 'BAD')) {
             return
