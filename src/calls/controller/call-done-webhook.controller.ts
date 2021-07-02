@@ -7,6 +7,9 @@ export interface CallDone {
   name: 'virtual-caller.call_finished';
   callId: string;
   status: CallStatus;
+  phoneNumber: string;
+  ownerId: string;
+  contactId: string;
 }
 
 export const createCallDoneWebhookController = ({
@@ -45,7 +48,10 @@ export const createCallDoneWebhookController = ({
         await eventBus.publish({
           name: 'virtual-caller.call_finished',
           status,
-          callId
+          callId,
+          phoneNumber: call.phoneNumber,
+          ownerId: call.ownerId,
+          contactId: call.contactId,
         } as CallDone)
       })
       .then(() => res.sendStatus(200))
