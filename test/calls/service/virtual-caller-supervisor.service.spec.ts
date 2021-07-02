@@ -46,10 +46,9 @@ describe('VirtualCallerSupervisorService', () => {
 
     await service.check(testCmd)
 
-    expect(virtualCallerStub.processNextWorksheet).to.have.been.calledOnceWith({
+    expect(virtualCallerStub.processNextWorksheet.lastCall.firstArg).to.include({
       callerId: testCmd.callerId,
       queueId: testCmd.queueId,
-      contacts: VirtualCallerSupervisorService.contactsOrderStrategy
     })
   })
 

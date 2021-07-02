@@ -1,4 +1,4 @@
-import { OwnerContact, VirtualCallerService } from './virtual-caller.service'
+import { ContactsOrderStrategy, OwnerContact, VirtualCallerService } from './virtual-caller.service'
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
 import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
@@ -19,24 +19,6 @@ export class VirtualCallerSupervisorService {
   ) {
   }
 
-  static contactsOrderStrategy = ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
-    return sortBy(flatMap(relatedOwners, o =>
-      flatMap(groupBy(o.person.contacts, 'value'), (contacts) => {
-        if (contacts.find(c => c.status === 'BAD')) {
-          return
-        }
-        let contact = contacts.find(c => c.status === 'GOOD')
-        if (!contact) {
-          contact = contacts[ 0 ]
-        }
-        return {
-          ...contact,
-          ownerId: o.id
-        }
-      })
-    ).filter(Boolean), 'value')
-  }
-
   async check (cmd: CheckCommand) {
     if (outOfWorkingHours()) {
       this.logger.info('Outside of working hours, no call', cmd)
@@ -52,10 +34,29 @@ export class VirtualCallerSupervisorService {
     await this.virtualCaller.processNextWorksheet({
       callerId: cmd.callerId,
       queueId: cmd.queueId,
-      contacts: VirtualCallerSupervisorService.contactsOrderStrategy,
+      contacts: this.contactsOrderStrategy(),
     })
   }
 
+  private contactsOrderStrategy (): ContactsOrderStrategy {
+    return ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
+      return sortBy(flatMap(relatedOwners, o =>
+        flatMap(groupBy(o.person.contacts, 'value'), (contacts) => {
+          if (contacts.find(c => c.status === 'BAD')) {
+            return
+          }
+          let contact = contacts.find(c => c.status === 'GOOD')
+          if (!contact) {
+            contact = contacts[ 0 ]
+          }
+          return {
+            ...contact,
+            ownerId: o.id
+          }
+        })
+      ).filter(Boolean), 'value')
+    }
+  }
 }
 
 const SATURDAY = 6
