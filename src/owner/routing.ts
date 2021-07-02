@@ -1,9 +1,11 @@
-import { Router } from 'express'
+import { Express, Router } from 'express'
+import { AwilixContainer } from 'awilix'
+import jwt from '../middleware/jwt'
 import { addOwnerContactController, listOwnerController, updateOwnerController } from './controllers'
 import { wrap } from 'express-promise-wrap'
-import { AwilixContainer } from 'awilix'
 
-export const ownersRouting = (container: AwilixContainer) => {
+export const setupOwnersRoutes = (app: Express, container: AwilixContainer) => {
+  const secured = jwt()
   const router = Router()
 
   router.put('/:id', updateOwnerController)
@@ -19,5 +21,5 @@ export const ownersRouting = (container: AwilixContainer) => {
 
   router.post('/search', wrap(container.resolve('searchOwnerController')))
 
-  return router
+  app.use('/owners', secured, router)
 }

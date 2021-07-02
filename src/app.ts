@@ -19,7 +19,6 @@ import metadata from './metadata'
 import notes from './notes'
 // modules
 import operator from './operator'
-import { setupOwnersRoutes } from './owner'
 import { init as initPropertyManager } from './property-manager'
 import { setupScheduledEventsRoutes } from './scheduled-events'
 
@@ -35,6 +34,7 @@ import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
 import { EventBus } from './infrastructure/event-bus'
 import { callsRoutes } from './calls/routing'
 import { callsEventListeners } from './calls/listeners'
+import { setupOwnersRoutes } from './owner/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
