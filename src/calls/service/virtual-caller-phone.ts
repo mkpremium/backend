@@ -49,7 +49,7 @@ export class VirtualCallerPhone {
     const call = await this.saveCall(worksheetId, contact, to)
 
     return this.doCall(address, buildingId, worksheetId, contact, call, to)
-      .then(() => this.virtualCallsRepository.unlockPhone(this.virtualCallerPhoneNumber, phoneLock))
+      .finally(() => this.virtualCallsRepository.unlockPhone(this.virtualCallerPhoneNumber, phoneLock))
   }
 
   private getPhoneLock () {
