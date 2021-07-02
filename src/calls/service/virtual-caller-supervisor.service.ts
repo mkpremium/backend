@@ -1,8 +1,8 @@
-import { VirtualCallerService } from './virtual-caller.service'
+import { OwnerContact, VirtualCallerService } from './virtual-caller.service'
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
 import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
-import { flatMap, sortBy, uniqBy } from 'lodash'
+import { flatMap, groupBy, sortBy } from 'lodash'
 import moment from 'moment-timezone'
 
 interface CheckCommand {
@@ -19,14 +19,22 @@ export class VirtualCallerSupervisorService {
   ) {
   }
 
-  static contactsOrderStrategy = ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>) => {
-    const phoneContacts = flatMap(relatedOwners, o => {
-      return o.person.contacts
-        .filter(({ type, status }) => [ 'TELEFONO', 'MOVIL' ].includes(type) && status !== 'BAD')
-        .map(c => ({ ...c, ownerId: o.id }))
-    })
-
-    return sortBy(uniqBy(phoneContacts, 'value'), 'value')
+  static contactsOrderStrategy = ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
+    return sortBy(flatMap(relatedOwners, o =>
+      flatMap(groupBy(o.person.contacts, 'value'), (contacts) => {
+        if (contacts.find(c => c.status === 'BAD')) {
+          return
+        }
+        let contact = contacts.find(c => c.status === 'GOOD')
+        if (!contact) {
+          contact = contacts[ 0 ]
+        }
+        return {
+          ...contact,
+          ownerId: o.id
+        }
+      })
+    ).filter(Boolean), 'value')
   }
 
   async check (cmd: CheckCommand) {
@@ -52,7 +60,8 @@ export class VirtualCallerSupervisorService {
 
 const SATURDAY = 6
 const SUNDAY = 7
+
 function outOfWorkingHours () {
   const now = moment().tz('Europe/Madrid')
-  return now.hours() < 9 || now.hours() >= 20 || [SATURDAY, SUNDAY].includes(now.isoWeekday())
+  return now.hours() < 9 || now.hours() >= 20 || [ SATURDAY, SUNDAY ].includes(now.isoWeekday())
 }

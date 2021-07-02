@@ -19,7 +19,7 @@ export type OwnerContact = ContactProps & { ownerId: string }
 export interface ProcessNextWorksheetCommand {
   queueId: string;
   callerId: string;
-  contacts: (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => (OwnerContact)[];
+  contacts: (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => OwnerContact[];
 }
 
 export interface WorksheetDone {

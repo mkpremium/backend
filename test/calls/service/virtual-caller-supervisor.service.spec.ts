@@ -170,5 +170,38 @@ describe('VirtualCallerSupervisorService', () => {
 
       expect(contactsInOrder).to.be.eql(contactsInReverseOrder)
     })
+
+    it('removes duplicated BAD contacts', () => {
+      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-id',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+                {
+                  id: 'test-second-contact-id',
+                  status: 'BAD',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          },
+        ],
+      }
+
+      const contacts = VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+
+      expect(contacts).to.be.eql([])
+    })
   })
 })
