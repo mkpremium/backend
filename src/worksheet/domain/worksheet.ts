@@ -2,7 +2,6 @@ import t from 'tcomb'
 import { Building } from '../../building/building'
 import { utc } from '../../lib/date'
 import { OwnerWithInclude } from '../../owner/owner'
-import { OwnerCompactView } from '../../owner/types'
 
 import { ScheduledEvent } from '../../scheduled-events/types'
 import { Address } from '../../types/common'
@@ -45,9 +44,6 @@ export const Worksheet = t.struct<WorksheetProps>({
   relatedBuildings: t.list(Building),
   relatedOwnerIds: t.list(t.String),
   relatedOwners: t.list(OwnerWithInclude),
-
-  // never store this
-  ownerContacts: t.list(OwnerCompactView),
 
   status: WorkSheetStatusEnum,
 

@@ -1,33 +1,7 @@
 /* eslint-disable max-len */
-import _flatten from 'lodash/flatten'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
-import { isTest } from '../../config'
 import { ListQuery } from '../types/params'
-import { TypedContactInfo } from './contact'
-import { OwnerConfirmed, OwnerStatusEnum, OwnerTypeEnum, OwnerWithInclude } from './owner'
-
-export const OwnerCompactView = t.struct(
-  {
-    id: t.String,
-    type: OwnerTypeEnum,
-    status: OwnerStatusEnum,
-    buildingId: isTest() ? t.maybe(t.String) : t.String,
-    confirmedByOperator: OwnerConfirmed,
-    person: t.struct({
-      name: t.String
-    }, 'person'),
-    contact: TypedContactInfo
-  },
-  {
-    name: 'OwnerView',
-    defaultProps: {
-      confirmedByOperator: {
-        value: false
-      }
-    }
-  }
-)
+import { OwnerWithInclude } from './owner'
 
 t.OwnerLitResponse = t.struct(
   {
@@ -51,21 +25,3 @@ export const OwnerListQuery = ListQuery.extend(
     }
   }
 )
-
-export function ownersContactViews (owners, worksheet) {
-  function mapOwner (owner) {
-    return ownerContactsView(owner, worksheet.relatedBuildings[0])
-  }
-
-  return _flatten(owners.map(mapOwner))
-}
-
-export function ownerContactsView (owner, building) {
-  return owner.person.contacts
-    .map((contact) => fromJSON(Object.assign({}, owner, {
-      person: owner.person,
-      contact
-    }), OwnerCompactView))
-}
-
-export default t

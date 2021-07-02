@@ -18,7 +18,6 @@ import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
 import { OwnerRepository } from '../../owner/models'
 import { OwnerStatus } from '../../owner/owner'
-import { ownersContactViews } from '../../owner/types'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import { ScheduledEventType } from '../../scheduled-events/types'
 import { OperatorStats } from '../../stats/models'
@@ -115,8 +114,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     const ownerRepo = new OwnerRepository()
     const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds)
     worksheet = t.update(worksheet, {
-      relatedOwners: { $set: relatedOwners },
-      ownerContacts: { $set: ownersContactViews(relatedOwners, worksheet) }
+      relatedOwners: { $set: relatedOwners }
     })
 
     return worksheet
