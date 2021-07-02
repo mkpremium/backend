@@ -42,6 +42,9 @@ export class VirtualCallerSupervisorService {
     return ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
       return sortBy(flatMap(relatedOwners, o =>
         flatMap(groupBy(o.person.contacts, 'value'), (contacts) => {
+          if (contacts.length > 1) {
+            this.logger.info('Duplicated contact in owner', { ownerId: o.id, contactId: contacts[ 0 ].id })
+          }
           if (contacts.find(c => c.status === 'BAD')) {
             return
           }
