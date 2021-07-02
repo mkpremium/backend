@@ -16,10 +16,12 @@ import retry from 'bluebird-retry'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
+export type ContactsOrderStrategy = (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => OwnerContact[]
+
 export interface ProcessNextWorksheetCommand {
   queueId: string;
   callerId: string;
-  contacts: (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => OwnerContact[];
+  contacts: ContactsOrderStrategy;
 }
 
 export interface WorksheetDone {

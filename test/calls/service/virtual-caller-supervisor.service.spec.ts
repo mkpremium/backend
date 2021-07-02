@@ -3,6 +3,7 @@ import sinon, { SinonFakeTimers, spy, stub } from 'sinon'
 import { VirtualCallerSupervisorService } from '../../../src/calls/service/virtual-caller-supervisor.service'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import moment from 'moment-timezone'
+import { ContactsOrderStrategy } from '../../../src/calls/service/virtual-caller.service'
 
 const testCmd = {
   callerId: 'test-caller-id',
@@ -73,6 +74,15 @@ describe('VirtualCallerSupervisorService', () => {
   })
 
   describe('contactsOrderStrategy', () => {
+    let contactsOrderStrategy: ContactsOrderStrategy
+
+    beforeEach(async () => {
+      virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId).resolves(0)
+      await service.check(testCmd)
+
+      contactsOrderStrategy = virtualCallerStub.processNextWorksheet.lastCall.firstArg.contacts
+    })
+
     it('does not give duplicated numbers', () => {
       const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
         relatedOwners: [
@@ -100,7 +110,7 @@ describe('VirtualCallerSupervisorService', () => {
           },
         ],
       }
-      const contacts = VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+      const contacts = contactsOrderStrategy(testWorksheet)
 
       expect(contacts).to.be.eql([ {
         ownerId: 'test-owner-id',
@@ -165,8 +175,8 @@ describe('VirtualCallerSupervisorService', () => {
         ]
       }
 
-      const contactsInOrder = VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
-      const contactsInReverseOrder = VirtualCallerSupervisorService.contactsOrderStrategy(testReverseOrderWorksheet)
+      const contactsInOrder = contactsOrderStrategy(testWorksheet)
+      const contactsInReverseOrder = contactsOrderStrategy(testReverseOrderWorksheet)
 
       expect(contactsInOrder).to.be.eql(contactsInReverseOrder)
     })
@@ -199,7 +209,7 @@ describe('VirtualCallerSupervisorService', () => {
         ],
       }
 
-      const contacts = VirtualCallerSupervisorService.contactsOrderStrategy(testWorksheet)
+      const contacts = contactsOrderStrategy(testWorksheet)
 
       expect(contacts).to.be.eql([])
     })
