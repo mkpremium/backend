@@ -3,7 +3,7 @@ import { History } from '../history/models'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { OwnerRepository } from './models'
 import { Owner } from './owner'
-import t from './types'
+import t from 'tcomb'
 
 async function updateOwner (req, res) {
   const id = req.params.id

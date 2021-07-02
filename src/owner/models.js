@@ -8,6 +8,7 @@ import { LegacyBuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
+import { ListQuery } from '../types/params'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { TypedContactInfo } from './contact'
 import {
@@ -16,10 +17,9 @@ import {
   Owner,
   OwnerBody,
   OwnerBusinessStatus,
-  OwnerStatus,
+  OwnerStatus, OwnerWithInclude,
   Person
 } from './owner'
-import { OwnerListQuery } from './types'
 
 function ownerIncludes (qb, includes) {
   if (includes.indexOf('building') !== -1) {
@@ -39,6 +39,29 @@ function mapOwnerIncludes (owner) {
     building: _head(owner.building || [])
   })
 }
+
+const OwnerListQuery = ListQuery.extend(
+  {
+    contactNumber: t.maybe(t.String)
+  },
+  {
+    name: 'OwnerListQuery',
+    defaultProps: {
+    }
+  }
+)
+
+const OwnerListingResponse = t.struct(
+  {
+    results: t.list(OwnerWithInclude)
+  },
+  {
+    name: 'OwnerLitResponse',
+    defaultProps: {
+      results: []
+    }
+  }
+)
 
 const OwnerStatsParams = t.struct({
   city: t.maybe(t.String)
@@ -209,7 +232,7 @@ GROUP BY negotiationStatus, assignedAgentId
       .where('ANY v IN person.contacts SATISFIES `v`.`value` = ? END', params.contactNumber)
     const results = await this.query(qb)
 
-    return fromJSON({ results }, t.OwnerLitResponse)
+    return fromJSON({ results }, OwnerListingResponse)
   }
 
   async findAllVerifiedOwnersByBuildingId (buildingId) {
