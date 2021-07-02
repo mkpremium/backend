@@ -118,7 +118,7 @@ export class VirtualCallerService {
 
   private nextContactToCall (contacts: OwnerContact[], lastCalledContactId: string | undefined): OwnerContact | undefined {
     if (!lastCalledContactId) {
-      return contacts[ 0 ]
+      return contacts.length > 0 ? contacts[ 0 ] : undefined
     }
     const lastContactPosition = contacts.findIndex(({ id }) => id === lastCalledContactId)
 
