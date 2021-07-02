@@ -104,24 +104,20 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     return worksheet
   }
 
-  async findByIdWIthIncludes (id, includes = [ 'relatedOwners', 'relatedBuildings' ]) {
+  async findByIdWIthIncludes (id) {
     let worksheet = await this.findByIdOrThrow(id)
-    if (includes.indexOf('relatedBuildings') !== -1 && worksheet.relatedBuildingIds.length > 0) {
-      const legacyBuildingRepository = new LegacyBuildingRepository()
-      const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`
-      const rbQb = await legacyBuildingRepository.getQueryBuilder().where(`id IN ${idsText}`)
-      const relatedBuildings = await legacyBuildingRepository.query(rbQb)
-      worksheet = t.update(worksheet, { relatedBuildings: { $set: relatedBuildings } })
-    }
+    const legacyBuildingRepository = new LegacyBuildingRepository()
+    const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`
+    const rbQb = await legacyBuildingRepository.getQueryBuilder().where(`id IN ${idsText}`)
+    const relatedBuildings = await legacyBuildingRepository.query(rbQb)
+    worksheet = t.update(worksheet, { relatedBuildings: { $set: relatedBuildings } })
 
-    if (includes.indexOf('relatedOwners') !== -1 && worksheet.relatedOwnerIds.length > 0) {
-      const ownerRepo = new OwnerRepository()
-      const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds)
-      worksheet = t.update(worksheet, {
-        relatedOwners: { $set: relatedOwners },
-        ownerContacts: { $set: ownersContactViews(relatedOwners, worksheet) }
-      })
-    }
+    const ownerRepo = new OwnerRepository()
+    const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds)
+    worksheet = t.update(worksheet, {
+      relatedOwners: { $set: relatedOwners },
+      ownerContacts: { $set: ownersContactViews(relatedOwners, worksheet) }
+    })
 
     return worksheet
   }
