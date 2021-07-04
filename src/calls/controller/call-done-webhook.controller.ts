@@ -5,6 +5,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 
 export interface CallDone {
   name: 'virtual-caller.call_finished';
+  callerId: string;
   callId: string;
   status: CallStatus;
   phoneNumber: string;
@@ -49,6 +50,7 @@ export const createCallDoneWebhookController = ({
           name: 'virtual-caller.call_finished',
           status,
           callId,
+          callerId: call.callerId,
           phoneNumber: call.phoneNumber,
           ownerId: call.ownerId,
           contactId: call.contactId,

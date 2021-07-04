@@ -17,6 +17,6 @@ export function createCallFinishedListener ({ changeContactStatusService }: Deps
       ownerId: evt.ownerId,
       contactId: evt.contactId,
       status: 'BAD',
-    }, {})
+    }, { id: evt.callerId })
   }
 }

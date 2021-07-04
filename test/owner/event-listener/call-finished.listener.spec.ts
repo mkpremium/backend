@@ -10,6 +10,7 @@ describe('call-finished.listener', () => {
   const testEvt: CallDone = {
     name: 'virtual-caller.call_finished',
     callId: 'test-call-id',
+    callerId: 'test-caller-id',
     contactId: 'test-contact-id',
     ownerId: 'test-owner-id',
     phoneNumber: '+34966666666',
@@ -34,7 +35,7 @@ describe('call-finished.listener', () => {
       ownerId: testEvt.ownerId,
       contactId: testEvt.contactId,
       status: 'BAD',
-    })
+    }, { id: testEvt.callerId })
   })
 
   it('discards Portuguese landline contact on failed call', async () => {
@@ -46,7 +47,7 @@ describe('call-finished.listener', () => {
       ownerId: testEvt.ownerId,
       contactId: testEvt.contactId,
       status: 'BAD',
-    })
+    }, { id: testEvt.callerId })
   })
 
   it('does nothing for not failed calls', async () => {
