@@ -6,6 +6,7 @@ const testPublicUrl = 'http://api.public.url'
 const testCmd: CallCommand = {
   buildingId: 'test-building-id',
   worksheetId: 'test-worksheet-id',
+  callerId: 'test-virtual-caller-id',
   contact: {
     id: 'test-contact-id',
     ownerId: 'test-owner-id',

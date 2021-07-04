@@ -52,6 +52,7 @@ export class VirtualCallerService {
 
     if (contactToCall) {
       await this.virtualCallerPhone.call({
+        callerId: cmd.callerId,
         buildingId: worksheet.building.id,
         worksheetId: worksheet.id,
         address: worksheet.building.address,

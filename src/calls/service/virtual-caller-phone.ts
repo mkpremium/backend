@@ -10,6 +10,7 @@ type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'c
 
 export interface CallCommand {
   buildingId: string;
+  callerId: string;
   address: AddressParam;
   contact: OwnerContact;
   worksheetId: string;
@@ -46,7 +47,7 @@ export class VirtualCallerPhone {
     if (lastCallToNumber) {
       throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
     }
-    const call = await this.saveCall(worksheetId, contact, to)
+    const call = await this.saveCall(cmd, to)
 
     return this.doCall(address, buildingId, worksheetId, contact, call, to)
       .finally(() => this.virtualCallsRepository.unlockPhone(this.virtualCallerPhoneNumber, phoneLock))
@@ -92,11 +93,12 @@ export class VirtualCallerPhone {
       })
   }
 
-  private async saveCall (worksheetId: string, contact: OwnerContact, to: string) {
+  private async saveCall (cmd: CallCommand, to: string) {
     const call = VirtualAgentCall({
-      worksheetId,
-      contactId: contact.id,
-      ownerId: contact.ownerId,
+      callerId: cmd.callerId,
+      worksheetId: cmd.worksheetId,
+      contactId: cmd.contact.id,
+      ownerId: cmd.contact.ownerId,
       phoneNumber: to,
       createdAt: new Date(),
     } as VirtualAgentCallProps)
