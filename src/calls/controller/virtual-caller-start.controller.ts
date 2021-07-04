@@ -14,6 +14,8 @@ export const createStartVirtualCallerController = ({
     callerId: virtualCallerConfig.virtualCallerId,
     queueId: virtualCallerConfig.virtualCallerQueueId,
     maxWorksheets: virtualCallerConfig.maxWorksheets,
+    lastWorksheetId: undefined,
+    lastOwnerResponse: undefined,
   }).then(() => {
     res.sendStatus(200)
   })

@@ -1,14 +1,19 @@
 import { expect } from 'chai'
 import sinon, { SinonFakeTimers, spy, stub } from 'sinon'
-import { VirtualCallerSupervisorService } from '../../../src/calls/service/virtual-caller-supervisor.service'
+import {
+  CheckCommand,
+  VirtualCallerSupervisorService
+} from '../../../src/calls/service/virtual-caller-supervisor.service'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import moment from 'moment-timezone'
 import { ContactsOrderStrategy } from '../../../src/calls/service/virtual-caller.service'
 
-const testCmd = {
+const testCmd: CheckCommand = {
   callerId: 'test-caller-id',
   queueId: 'test-queue-id',
   maxWorksheets: 100,
+  lastWorksheetId: undefined,
+  lastOwnerResponse: undefined,
 }
 
 describe('VirtualCallerSupervisorService', () => {

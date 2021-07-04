@@ -24,5 +24,7 @@ export const createCallFinishedListener = ({
     callerId: virtualCallerConfig.virtualCallerId,
     queueId: virtualCallerConfig.virtualCallerQueueId,
     maxWorksheets: virtualCallerConfig.maxWorksheets,
+    lastWorksheetId: evt.worksheetId,
+    lastOwnerResponse: evt.ownerResponse,
   })
 }

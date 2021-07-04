@@ -11,6 +11,8 @@ export interface CallDone {
   phoneNumber: string;
   ownerId: string;
   contactId: string;
+  worksheetId: string;
+  ownerResponse: string;
 }
 
 export const createCallDoneWebhookController = ({
@@ -54,6 +56,8 @@ export const createCallDoneWebhookController = ({
           phoneNumber: call.phoneNumber,
           ownerId: call.ownerId,
           contactId: call.contactId,
+          worksheetId: call.worksheetId,
+          ownerResponse: call.ownerResponse,
         } as CallDone)
       })
       .then(() => res.sendStatus(200))

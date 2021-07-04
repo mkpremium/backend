@@ -6,10 +6,12 @@ import { flatMap, groupBy, sortBy } from 'lodash'
 import moment from 'moment-timezone'
 import { EventBus } from '../../infrastructure/event-bus'
 
-interface CheckCommand {
+export interface CheckCommand {
   callerId: string;
   queueId: string;
   maxWorksheets?: number
+  lastWorksheetId: string;
+  lastOwnerResponse: string;
 }
 
 export class VirtualCallerSupervisorService {
@@ -36,6 +38,8 @@ export class VirtualCallerSupervisorService {
       callerId: cmd.callerId,
       queueId: cmd.queueId,
       contacts: this.contactsOrderStrategy(),
+      lastOwnerResponse: cmd.lastOwnerResponse,
+      lastWorksheetId: cmd.lastWorksheetId,
     })
   }
 

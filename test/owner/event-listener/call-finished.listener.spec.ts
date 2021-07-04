@@ -14,7 +14,9 @@ describe('call-finished.listener', () => {
     contactId: 'test-contact-id',
     ownerId: 'test-owner-id',
     phoneNumber: '+34966666666',
-    status: 'FAILED'
+    status: 'FAILED',
+    ownerResponse: undefined,
+    worksheetId: 'test-worksheet-id',
   }
 
   beforeEach(() => {

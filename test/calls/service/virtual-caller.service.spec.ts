@@ -8,6 +8,7 @@ import {
 import { WorksheetNotFound, WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 import { VirtualCallerWorksheetProps } from '../../../src/calls/repository/virtual-caller-worksheets.repository'
+import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 
 const firstContact: OwnerContact = {
   id: 'first-contact',
@@ -26,6 +27,8 @@ const lastContact: OwnerContact = {
 const testCmd: ProcessNextWorksheetCommand = {
   queueId: 'test-queue-id',
   callerId: 'test-caller-id',
+  lastWorksheetId: 'test-last-worksheet-id',
+  lastOwnerResponse: undefined,
   contacts: () => [ firstContact, lastContact ],
 }
 const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
@@ -156,7 +159,7 @@ describe('VirtualCallerService', () => {
       .resolves(testInProgressWorksheet)
     worksheetRepositoryStub.getForCallcenterView.rejects(new WorksheetNotFound(testWorksheet.id))
 
-    service.processNextWorksheet(testCmd)
+    await service.processNextWorksheet(testCmd)
     await clock.runAllAsync()
     clock.restore()
 
@@ -170,5 +173,27 @@ describe('VirtualCallerService', () => {
     })
     expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
       .calledWith(testCmd.queueId, testCmd.callerId)
+  })
+
+  it('saves worksheet as done when owner is interested on selling', async () => {
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
+      .resolves(testInProgressWorksheet)
+    worksheetRepositoryStub.getForCallcenterView.resolves(testWorksheet)
+
+    await service.processNextWorksheet({
+      ...testCmd,
+      lastWorksheetId: testInProgressWorksheet.worksheetId,
+      lastOwnerResponse: OwnerResponse.SALE,
+    })
+
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.calledOnce
+    expect(virtualCallerWorksheetsRepositoryStub.save.lastCall.firstArg).to.include({
+      ...testInProgressWorksheet,
+      status: 'DONE',
+    })
+    expect(eventBusStub.publish).to.have.been.calledWith({
+      name: 'virtual-caller.worksheet_done',
+      worksheetId: testWorksheet.id,
+    })
   })
 })

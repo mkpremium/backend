@@ -21,6 +21,8 @@ export const createWorksheetDoneListener = ({
     callerId: virtualCallerConfig.virtualCallerId,
     queueId: virtualCallerConfig.virtualCallerQueueId,
     maxWorksheets: virtualCallerConfig.maxWorksheets,
+    lastWorksheetId: undefined,
+    lastOwnerResponse: undefined,
   })
 }
 

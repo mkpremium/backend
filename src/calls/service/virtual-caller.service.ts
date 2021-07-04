@@ -13,6 +13,7 @@ import {
 import { EventBus } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 import retry from 'bluebird-retry'
+import { OwnerResponse } from './owner-response-processor.service'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
@@ -21,6 +22,8 @@ export type ContactsOrderStrategy = (worksheet: Pick<WorksheetViewProps, 'relate
 export interface ProcessNextWorksheetCommand {
   queueId: string;
   callerId: string;
+  lastWorksheetId: string;
+  lastOwnerResponse: string;
   contacts: ContactsOrderStrategy;
 }
 
@@ -44,6 +47,9 @@ export class VirtualCallerService {
     if (!inProgressWorksheet) {
       inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
       lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
+    }
+    if (inProgressWorksheet && inProgressWorksheet.worksheetId === cmd.lastWorksheetId && cmd.lastOwnerResponse === OwnerResponse.SALE) {
+      return this.saveDoneWorksheet(inProgressWorksheet)
     }
 
     const worksheet = await this.getWorksheet(inProgressWorksheet, cmd)
