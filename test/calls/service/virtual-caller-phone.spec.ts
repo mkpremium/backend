@@ -76,4 +76,10 @@ describe('VirtualCallerPhone', () => {
     expect(virtualCallsRepositoryStub.lockPhone).to.have.been.calledBefore(twilioClientStub.calls.create)
     expect(virtualCallsRepositoryStub.unlockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber, testPhoneLock)
   })
+
+  // 13223 Invalid phone number format
+  // 20003 Permission Denied
+  // 21211 Invalid 'To' Phone Number ex. 934122309/933478789
+  // 21215 Geo Permission configuration is not permitting call
+  // ETIMEDOUT
 })
