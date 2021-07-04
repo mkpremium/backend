@@ -7,6 +7,14 @@ import { ChangeContactStatusService } from '../../../src/owner/service/change-co
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
   let changeContactStatusServiceStub
+  const testEvt: CallDone = {
+    name: 'virtual-caller.call_finished',
+    callId: 'test-call-id',
+    contactId: 'test-contact-id',
+    ownerId: 'test-owner-id',
+    phoneNumber: '+34966666666',
+    status: 'FAILED'
+  }
 
   beforeEach(() => {
     changeContactStatusServiceStub = {
@@ -17,15 +25,7 @@ describe('call-finished.listener', () => {
     })
   })
 
-  it('discard Spanish landline contact on failed call', async () => {
-    const testEvt: CallDone = {
-      name: 'virtual-caller.call_finished',
-      callId: 'test-call-id',
-      contactId: 'test-contact-id',
-      ownerId: 'test-owner-id',
-      phoneNumber: '+34966666666',
-      status: 'FAILED'
-    }
+  it('discards Spanish landline contact on failed call', async () => {
     changeContactStatusServiceStub.change.resolves()
 
     await listener(testEvt)
@@ -33,7 +33,37 @@ describe('call-finished.listener', () => {
     expect(changeContactStatusServiceStub.change).to.have.been.calledWith({
       ownerId: testEvt.ownerId,
       contactId: testEvt.contactId,
-      status: 'BAD'
+      status: 'BAD',
     })
+  })
+
+  it('discards Portuguese landline contact on failed call', async () => {
+    changeContactStatusServiceStub.change.resolves()
+
+    await listener({ ...testEvt, phoneNumber: '+3512222222222' })
+
+    expect(changeContactStatusServiceStub.change).to.have.been.calledWith({
+      ownerId: testEvt.ownerId,
+      contactId: testEvt.contactId,
+      status: 'BAD',
+    })
+  })
+
+  it('does nothing for not failed calls', async () => {
+    await listener({ ...testEvt, status: 'DONE' })
+
+    expect(changeContactStatusServiceStub.change).to.not.have.been.called
+  })
+
+  it('does nothing for failed Spanish mobile calls', async () => {
+    await listener({ ...testEvt, phoneNumber: '+34666666666' })
+
+    expect(changeContactStatusServiceStub.change).to.not.have.been.called
+  })
+
+  it('does nothing for failed Portuguese mobile calls', async () => {
+    await listener({ ...testEvt, phoneNumber: '+351999999999' })
+
+    expect(changeContactStatusServiceStub.change).to.not.have.been.called
   })
 })
