@@ -9,7 +9,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 interface CheckCommand {
   callerId: string;
   queueId: string;
-  maxWorksheets: number
+  maxWorksheets?: number
 }
 
 export class VirtualCallerSupervisorService {
@@ -27,8 +27,7 @@ export class VirtualCallerSupervisorService {
       return
     }
 
-    const worksheetsProcessedByCaller = await this.virtualCallerWorksheetsRepository.numberOfWorksheetsProcessedBy(cmd.callerId)
-    if (worksheetsProcessedByCaller >= cmd.maxWorksheets) {
+    if (await this.hasReachWorksheetLimit(cmd.callerId, cmd.maxWorksheets)) {
       this.logger.info('All worksheets processed by virtual caller', cmd)
       return
     }
@@ -38,6 +37,14 @@ export class VirtualCallerSupervisorService {
       queueId: cmd.queueId,
       contacts: this.contactsOrderStrategy(),
     })
+  }
+
+  private async hasReachWorksheetLimit (callerId: string, maxWorksheets?: number) {
+    if (!maxWorksheets) {
+      return false
+    }
+
+    return await this.virtualCallerWorksheetsRepository.numberOfWorksheetsProcessedBy(callerId) >= maxWorksheets
   }
 
   private contactsOrderStrategy (): ContactsOrderStrategy {
