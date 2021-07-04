@@ -2,5 +2,5 @@ module.exports = {
   recursive: true,
   exit: true,
   require: 'test/setup.js',
-  timeout: 40000,
+  timeout: 60000,
 }

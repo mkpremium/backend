@@ -2,5 +2,5 @@ module.exports = {
   recursive: true,
   exit: true,
   require: 'test-e2e/setup.js',
-  timeout: 40000,
+  timeout: 60000,
 }
