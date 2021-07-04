@@ -64,13 +64,10 @@ export class VirtualCallerService {
           return this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id)
             .then(() => this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id))
         })
-    } else if (contacts.length === 0) {
-      this.logger.info('No contacts found in worksheet', { worksheetId: worksheet.id })
-      await this.eventBus.publish({
-        name: 'virtual-caller.worksheet_done',
-        worksheetId: inProgressWorksheet.worksheetId,
-      } as WorksheetDone)
     } else {
+      if (contacts.length === 0) {
+        this.logger.info('No contacts found in worksheet', { worksheetId: worksheet.id })
+      }
       await this.saveDoneWorksheet(inProgressWorksheet)
     }
   }

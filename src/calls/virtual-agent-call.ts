@@ -1,5 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
+import { OwnerResponse } from './service/owner-response-processor.service'
 
 export interface VirtualAgentCallProps {
   id: string;
@@ -10,7 +11,7 @@ export interface VirtualAgentCallProps {
   contactId: string;
   phoneNumber: string;
   error?: string;
-  ownerResponse?: string;
+  ownerResponse?: OwnerResponse;
   gatheredAt?: Date,
   createdAt?: Date,
 }
