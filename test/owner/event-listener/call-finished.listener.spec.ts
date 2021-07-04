@@ -4,7 +4,7 @@ import { CallDone } from '../../../src/calls/controller/call-done-webhook.contro
 import { createCallFinishedListener } from '../../../src/owner/event-listener/call-finished.listener'
 import { ChangeContactStatusService } from '../../../src/owner/service/change-contact-status.service'
 
-describe.only('call-finished.listener', () => {
+describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
   let changeContactStatusServiceStub
 
