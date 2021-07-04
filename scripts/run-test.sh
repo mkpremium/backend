@@ -17,4 +17,4 @@ npx mocha --config "${PWD}/${test_dir}/.mocharc.js" \
   --trace-warnings \
   -r ts-node/register \
   --extension js --extension ts \
-  "${TEST_ARGS[@]}" "${test_dir}/**/*.spec.[j|t]s"
+  -b "${TEST_ARGS[@]}" "${test_dir}/**/*.spec.[j|t]s"
