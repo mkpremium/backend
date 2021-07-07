@@ -25,7 +25,7 @@ export const createTestContainer = () => {
               reject(error)
               return
             }
-            return setTimeout(resolve, 500)
+            return setTimeout(resolve, 1000)
           })
         }),
         new Promise(async resolve => {
