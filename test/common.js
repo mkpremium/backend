@@ -1,6 +1,5 @@
-import retry from 'bluebird-retry'
 import request from 'supertest'
-import { DuplicatedEntity } from '../src/db/model'
+import uuid from 'uuid/v4'
 import { OperatorRepository } from '../src/operator/models'
 
 export const defaultPassword = 'Passw0rd'
@@ -49,16 +48,14 @@ export const buildUser = (operator = {}, prototype = defaultOperatorPrototype) =
 }
 
 export async function operatorCreateBusiness () {
-  return retry(() => createFullOperator(buildUser({
-    username: 'business',
+  const id = uuid()
+  return createFullOperator(buildUser({
+    id,
+    username: 'business' + id,
     roles: [
       'BUSINESS'
     ]
-  })),
-  {
-    predicate: error => error instanceof DuplicatedEntity
-  }
-  )
+  }))
 }
 
 export async function createAdminUser () {
