@@ -38,7 +38,7 @@ describe('ProposalsSenderService - Integration', () => {
     await buildingsRepository.save(testBuilding)
   })
 
-  it('sends emails older than 3 days', () => {
+  it('sends emails older than 3 days', async () => {
     mailerSpy.sendMail.resolves()
     const testAddProposalCmd = {
       amount: 100000,
@@ -47,10 +47,9 @@ describe('ProposalsSenderService - Integration', () => {
       createdBy: testCaller.id,
     }
 
-    return addProposalForBuildingService.add(testBuilding.id, testAddProposalCmd)
-      .then(() => service.checkAndSendProposals())
-      .then(() => {
-        expect(mailerSpy.sendMail).to.have.been.called
-      })
+    await addProposalForBuildingService.add(testBuilding.id, testAddProposalCmd)
+    await service.checkAndSendProposals()
+
+    expect(mailerSpy.sendMail).to.have.been.called
   })
 })

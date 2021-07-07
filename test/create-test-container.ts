@@ -13,12 +13,13 @@ export const createTestContainer = () => {
     }
     resolve(cachedBucket)
   })
+
   return bucketPromise
     .then((bucket: Bucket) => Promise.all([
         new Promise((resolve, reject) => {
-          console.time('flush')
+          console.time('deleteDocs')
           bucket.query(N1qlQuery.fromString('DELETE FROM mkpremium_test'), (error) => {
-            console.timeEnd('flush')
+            console.timeEnd('deleteDocs')
             if (error) {
               console.error('Error deleting documents', error)
               reject(error)
