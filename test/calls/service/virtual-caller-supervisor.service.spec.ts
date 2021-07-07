@@ -99,7 +99,7 @@ describe('VirtualCallerSupervisorService', () => {
       contactsOrderStrategy = virtualCallerStub.processNextWorksheet.lastCall.firstArg.contacts
     })
 
-    it('does not give duplicated numbers', () => {
+    it('does not give duplicated numbers within same owner', () => {
       const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
         relatedOwners: [
           {
@@ -130,6 +130,54 @@ describe('VirtualCallerSupervisorService', () => {
 
       expect(contacts).to.be.eql([ {
         ownerId: 'test-owner-id',
+        id: 'test-first-contact-id',
+        status: 'UNDEFINED',
+        type: 'TELEFONO',
+        value: '666666666',
+      } ])
+    })
+
+    it('does not give duplicated numbers across different owners', () => {
+      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-1',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          },
+          {
+            id: 'test-owner-2',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-first-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          },
+        ],
+      }
+      const contacts = contactsOrderStrategy(testWorksheet)
+
+      expect(contacts).to.be.eql([ {
+        ownerId: 'test-owner-1',
         id: 'test-first-contact-id',
         status: 'UNDEFINED',
         type: 'TELEFONO',

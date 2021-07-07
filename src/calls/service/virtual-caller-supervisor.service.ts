@@ -53,28 +53,28 @@ export class VirtualCallerSupervisorService {
 
   private contactsOrderStrategy (): ContactsOrderStrategy {
     return ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
-      return sortBy(flatMap(relatedOwners, o =>
-        flatMap(groupBy(o.person.contacts, 'value'), (contacts) => {
-          if (contacts.length > 1) {
-            this.logger.info('Duplicated contact in owner', { ownerId: o.id, contactId: contacts[ 0 ].id })
-            this.eventBus.publish({
-              name: 'virtual-caller.duplicated_contact_detected_in_owner',
-              ownerId: o.id,
-            }).catch(error => this.logger.error('Couldnt publish event', { error: error.message }))
-          }
-          if (contacts.find(c => c.status === 'BAD')) {
-            return
-          }
-          let contact = contacts.find(c => c.status === 'GOOD')
-          if (!contact) {
-            contact = contacts[ 0 ]
-          }
-          return {
-            ...contact,
-            ownerId: o.id
-          }
-        })
-      ).filter(Boolean), 'value')
+      const allContacts: OwnerContact[] = flatMap(relatedOwners, o => o.person.contacts.map(c => ({
+        ...c,
+        ownerId: o.id
+      })))
+      return flatMap(groupBy(allContacts, 'value'), samePhoneNumberContacts => {
+        if (samePhoneNumberContacts.length > 1) {
+          const firstContact = samePhoneNumberContacts[ 0 ]
+          this.logger.info('Duplicated contact in owner', { ownerId: firstContact.ownerId, contactId: firstContact.id })
+          this.eventBus.publish({
+            name: 'virtual-caller.duplicated_contact_detected_in_owner',
+            ownerId: firstContact.ownerId,
+          }).catch(error => this.logger.error('Couldnt publish event', { error: error.message }))
+        }
+        if (samePhoneNumberContacts.find(c => c.status === 'BAD')) {
+          return
+        }
+        let contact = samePhoneNumberContacts.find(c => c.status === 'GOOD')
+        if (!contact) {
+          contact = samePhoneNumberContacts[ 0 ]
+        }
+        return contact
+      })
     }
   }
 }
