@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import {
   associateBuildingWithOwner,
   createBuilding,
@@ -15,7 +15,7 @@ describe('Building owner contacts management', () => {
 
   beforeEach(async () => {
     app = await initApplication()
-    businessUser = await operatorCreateBusiness()
+    businessUser = await createFlipper()
     owner = await createOwner(app)
 
     // create worksheet to change status depending on owner status

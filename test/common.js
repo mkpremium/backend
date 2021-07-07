@@ -47,7 +47,7 @@ export const buildUser = (operator = {}, prototype = defaultOperatorPrototype) =
   }
 }
 
-export async function operatorCreateBusiness () {
+export async function createFlipper () {
   const id = uuid()
   return createFullOperator(buildUser({
     id,

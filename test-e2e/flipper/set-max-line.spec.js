@@ -1,12 +1,12 @@
 import { authenticatedGet, authenticatedPut, initApplication } from '../helper/rest-api-helper'
-import { createAdminUser, operatorCreateBusiness } from '../../test/common'
+import { createAdminUser, createFlipper } from '../../test/common'
 import { expect } from 'chai'
 
 describe('Flipper Max Line', () => {
   it('sets max line allow to flipper', async () => {
     const app = await initApplication()
 
-    const flipper = await operatorCreateBusiness()
+    const flipper = await createFlipper()
     const admin = await createAdminUser()
 
     const testMaxLine = 1000000

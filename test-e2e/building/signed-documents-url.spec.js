@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import { createBuilding } from '../helper/mother-of-objects'
 import { authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
@@ -8,7 +8,7 @@ describe('Sign building documents URL', () => {
 
   before(async () => {
     app = await initApplication()
-    businessUser = await operatorCreateBusiness()
+    businessUser = await createFlipper()
   })
 
   it('returns empty array for building without documents', async () => {

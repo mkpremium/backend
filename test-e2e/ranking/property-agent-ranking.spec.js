@@ -1,4 +1,4 @@
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 import { expect } from 'chai'
 
@@ -6,7 +6,7 @@ describe('Property manager profit ranking', () => {
   it('list property managers ranking with default profit goal', async () => {
     const app = await initApplication()
 
-    const businessUser = await operatorCreateBusiness()
+    const businessUser = await createFlipper()
 
     await authenticatedGet('/stock/ranking', businessUser, app)
       .then(response => {

@@ -1,4 +1,4 @@
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import { associateBuildingWithOwner, createBuilding, createOwner } from '../helper/mother-of-objects'
 import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 import { expect } from 'chai'
@@ -7,7 +7,7 @@ describe('Building featured owner', () => {
   it('sets featured owner for a building', async () => {
     const app = await initApplication()
 
-    const businessUser = await operatorCreateBusiness()
+    const businessUser = await createFlipper()
     const building = await createBuilding(app)
     const featuredOwner = await createOwner(app)
     await associateBuildingWithOwner(app, featuredOwner, building.id)

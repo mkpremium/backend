@@ -1,12 +1,12 @@
 import { expect } from 'chai'
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import { authenticatedDelete, authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
 describe('Property agent favourite buildings', () => {
   it('stores property agent favourite buildings', async () => {
     const app = await initApplication()
 
-    const businessUser = await operatorCreateBusiness()
+    const businessUser = await createFlipper()
 
     await authenticatedPost('/favorites', businessUser, app, {
       buildingId: 'building-id'

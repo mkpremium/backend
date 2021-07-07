@@ -1,5 +1,5 @@
 import { authenticatedGet, authenticatedPut, initApplication } from '../helper/rest-api-helper'
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import { createBuilding } from '../helper/mother-of-objects'
 import { expect } from 'chai'
 
@@ -8,7 +8,7 @@ describe('set building sale price', () => {
 
   before(async () => {
     app = await initApplication()
-    businessUser = await operatorCreateBusiness()
+    businessUser = await createFlipper()
   })
 
   it('sets building sale price', async () => {

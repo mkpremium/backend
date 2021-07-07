@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import {
   associateBuildingWithOwner,
   createBuilding,
@@ -17,7 +17,7 @@ describe('Users Meetings', () => {
 
   beforeEach(async () => {
     app = await initApplication()
-    businessUser = await operatorCreateBusiness()
+    businessUser = await createFlipper()
   })
 
   it(`exposes endpoint to get user's meetings`, async () => {

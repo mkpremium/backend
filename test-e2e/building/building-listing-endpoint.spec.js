@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { operatorCreateBusiness } from '../../test/common'
+import { createFlipper } from '../../test/common'
 import {
   closeBuildingStock,
   createBuilding,
@@ -19,7 +19,7 @@ describe('Building listing endpoint', () => {
 
   beforeEach(async () => {
     app = await initApplication()
-    businessUser = await operatorCreateBusiness()
+    businessUser = await createFlipper()
   })
 
   it('returns list of given building IDs', async () => {
