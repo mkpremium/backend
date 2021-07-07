@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import request from 'supertest'
 import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/application'
-import { defaultPassword, operatorCreate, operatorCreateBusiness, operatorLogin } from '../../common'
+import { defaultPassword, operatorCreate, createFlipper, operatorLogin } from '../../common'
 import { createTestApp } from '../../integration/create-test-app'
 
 describe('profit goals', () => {
@@ -13,7 +13,7 @@ describe('profit goals', () => {
   beforeEach(async () => {
     app = await createTestApp()
 
-    salesAgent = await operatorCreateBusiness()
+    salesAgent = await createFlipper()
   })
 
   describe('setProfitGoalToOperator', () => {

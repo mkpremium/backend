@@ -1,4 +1,4 @@
-import { operatorCreateBusiness } from '../common'
+import { createFlipper } from '../common'
 import moment from 'moment-timezone'
 import { expect } from 'chai'
 import { closeSellStock } from '../../src/stock/application'
@@ -19,7 +19,7 @@ describe('StockRepository', () => {
 
   describe('getTotalProfitInPeriodByPropertyManager', () => {
     it('returns total profit made by property owners', async () => {
-      const propertyManager = await operatorCreateBusiness()
+      const propertyManager = await createFlipper()
 
       const testBuilding = await LegacyBuildingRepository.createNewBuilding(buildingData)
       const buildingPurchaseAmount = 1000
