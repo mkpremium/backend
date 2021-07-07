@@ -35,26 +35,25 @@ describe('AddProposalForBuilding - Integration', () => {
     buildingsRepository = diContainer.resolve('buildingsRepository')
 
     legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
+  })
+
+  it('saves proposal for building', async () => {
     await ownersRepository.save(testOwner)
     await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
     await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
-  })
 
-  it('saves proposal for building', () => {
-    return legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
-      .then(proposals => {
-        expect(proposals).to.have.lengthOf(1)
-        expect(proposals[0]).to.be.deep.contains({
-          ownerId: testCmd.ownerId,
-          buildingId: testCmd.buildingId,
-          createdBy: testCmd.createdBy,
-          proposal: testCmd.amount,
-          message: testCmd.message,
-          notificationStatus: 'PENDING',
-          notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
-        })
-        expect(moment((proposals[0] as any).createdAt).isSame(moment(), 'day'))
-          .to.be.true
-      })
+    const proposals = await legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
+    expect(proposals).to.have.lengthOf(1)
+    expect(proposals[ 0 ]).to.be.deep.contains({
+      ownerId: testCmd.ownerId,
+      buildingId: testCmd.buildingId,
+      createdBy: testCmd.createdBy,
+      proposal: testCmd.amount,
+      message: testCmd.message,
+      notificationStatus: 'PENDING',
+      notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
+    })
+    expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
+      .to.be.true
   })
 })
