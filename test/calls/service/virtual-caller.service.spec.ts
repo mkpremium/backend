@@ -159,7 +159,7 @@ describe('VirtualCallerService', () => {
       .resolves(testInProgressWorksheet)
     worksheetRepositoryStub.getForCallcenterView.rejects(new WorksheetNotFound(testWorksheet.id))
 
-    await service.processNextWorksheet(testCmd)
+    service.processNextWorksheet(testCmd)
     await clock.runAllAsync()
     clock.restore()
 
