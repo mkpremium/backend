@@ -74,7 +74,7 @@ export class VirtualCallerSupervisorService {
           contact = samePhoneNumberContacts[ 0 ]
         }
         return contact
-      })
+      }).filter(Boolean)
     }
   }
 }
