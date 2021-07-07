@@ -57,7 +57,10 @@ export class VirtualCallerPhone {
     return retry<any>(
       () => this.virtualCallsRepository.lockPhone(this.virtualCallerPhoneNumber),
       { backoff: 2 }
-    )
+    ).catch(error => {
+      error.context = 'Locking phone'
+      throw error
+    })
   }
 
   private doCall (
