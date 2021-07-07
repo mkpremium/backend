@@ -1,7 +1,7 @@
 import { createDiContainer } from '../src/infrastructure/dependencies'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { AwilixContainer } from 'awilix'
-import { Bucket } from 'couchbase'
+import { Bucket, N1qlQuery } from 'couchbase'
 
 let cachedContainer: AwilixContainer
 let cachedBucket: Bucket
@@ -15,8 +15,17 @@ export const createTestContainer = () => {
   })
   return bucketPromise
     .then((bucket: Bucket) => Promise.all([
-        new Promise(resolve => {
-          bucket.manager().flush(() => setTimeout(resolve, 500))
+        new Promise((resolve, reject) => {
+          console.time('flush')
+          bucket.query(N1qlQuery.fromString('DELETE FROM mkpremium_test'), (error) => {
+            console.timeEnd('flush')
+            if (error) {
+              console.error('Error deleting documents', error)
+              reject(error)
+              return
+            }
+            return setTimeout(resolve, 500)
+          })
         }),
         new Promise(async resolve => {
           if (!cachedContainer) {
