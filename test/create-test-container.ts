@@ -7,6 +7,7 @@ let cachedContainer: AwilixContainer
 let cachedBucket: Bucket
 
 export const createTestContainer = () => {
+
   const bucketPromise = new Promise(async resolve => {
     if (!cachedBucket) {
       cachedBucket = await connectCouchbaseBucket()
@@ -16,18 +17,7 @@ export const createTestContainer = () => {
 
   return bucketPromise
     .then((bucket: Bucket) => Promise.all([
-        new Promise((resolve, reject) => {
-          console.time('deleteDocs')
-          bucket.query(N1qlQuery.fromString('DELETE FROM mkpremium_test'), (error) => {
-            console.timeEnd('deleteDocs')
-            if (error) {
-              console.error('Error deleting documents', error)
-              reject(error)
-              return
-            }
-            return setTimeout(resolve, 1000)
-          })
-        }),
+        flushBucket(bucket),
         new Promise(async resolve => {
           if (!cachedContainer) {
             cachedContainer = await createDiContainer(bucket)
@@ -37,4 +27,19 @@ export const createTestContainer = () => {
       ])
     )
     .then(([ _, container ]) => container as AwilixContainer)
+}
+
+export function flushBucket (bucket: Bucket) {
+  return new Promise((resolve, reject) => {
+    console.time('deleteDocs')
+    bucket.query(N1qlQuery.fromString('DELETE FROM mkpremium_test'), (error) => {
+      console.timeEnd('deleteDocs')
+      if (error) {
+        console.error('Error deleting documents', error)
+        reject(error)
+        return
+      }
+      return setTimeout(resolve, 1000)
+    })
+  })
 }
