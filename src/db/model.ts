@@ -149,7 +149,7 @@ export abstract class CouchbaseModel {
   }
 
   async unique (data, field) {
-    const value = data[field]
+    const value = data[ field ]
     const query = this.getQueryBuilder().where(`${field} = ?`, value).limit(1)
 
     const rows = await this.query(query)
@@ -158,12 +158,12 @@ export abstract class CouchbaseModel {
 
     if (rows && rows.length) {
       // we can safely omit data with the same id
-      if (data.id && data.id === rows[0].id) {
+      if (data.id && data.id === rows[ 0 ].id) {
         return
       }
 
-      const e = new Error(`Value ${data._documentType}.${field} (${value}) cannot be duplicated`)
-      e['code'] = 400
+      const e = new DuplicatedEntity(data._documentType, field, value)
+      e[ 'code' ] = 400
       throw e
     }
   }
@@ -233,5 +233,15 @@ export abstract class CouchbaseModel {
                     message,
                   }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
+  }
+}
+
+export class DuplicatedEntity extends Error {
+  constructor (
+    readonly documentType: string,
+    readonly field: string,
+    readonly value: string
+  ) {
+    super(`Value ${documentType}.${field} (${value}) cannot be duplicated`)
   }
 }
