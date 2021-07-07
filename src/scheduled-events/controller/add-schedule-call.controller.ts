@@ -5,7 +5,7 @@ export const createAddScheduledCallController = ({ scheduleCall }: { scheduleCal
   async (req, res) => {
     canScheduleCall(req.user.operator, req.body.notifyTo)
 
-    const scheduledEvent = scheduleCall.scheduleCall({
+    const scheduledEvent = await scheduleCall.scheduleCall({
       event: req.body,
       userId: req.user.id,
       queueId: req.user.operator.profile.queueId,
