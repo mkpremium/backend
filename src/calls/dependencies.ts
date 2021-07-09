@@ -37,7 +37,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     assignedCallerIdForVirtualCalls: 'ba7966fc-f05d-48a2-bb49-e17a08a6a038',
     virtualCallerQueueId: 'e1748e7d-8714-45c0-a831-c0f42d6d564f',
     virtualCallerId: 'virtual-caller-barcelona-1',
-    maxWorksheets: undefined,
+    maxWorksheets: 100,
   }
 
   container.register({
