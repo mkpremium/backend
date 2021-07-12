@@ -39,9 +39,8 @@ export class VirtualCallerPhone {
   }
 
   async call (cmd: CallCommand) {
-    const phoneLock = await this.getPhoneLock()
-
     const { worksheetId, contact, address, buildingId } = cmd
+
     const to = this.ownerTrialPhoneNumber || '+34' + contact.value
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
     if (lastCallToNumber) {
@@ -49,6 +48,7 @@ export class VirtualCallerPhone {
     }
     const call = await this.saveCall(cmd, to)
 
+    const phoneLock = await this.getPhoneLock()
     return this.doCall(address, buildingId, worksheetId, contact, call, to)
       .finally(() => this.virtualCallsRepository.unlockPhone(this.virtualCallerPhoneNumber, phoneLock))
   }
