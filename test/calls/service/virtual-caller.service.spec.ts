@@ -167,10 +167,6 @@ describe('VirtualCallerService', () => {
     expect(virtualCallerWorksheetsRepositoryStub.save.firstCall.firstArg).to.include({
       status: 'DONE',
     })
-    expect(eventBusStub.publish).to.have.been.calledWith({
-      name: 'virtual-caller.worksheet_done',
-      worksheetId: testWorksheet.id,
-    })
     expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
       .calledWith(testCmd.queueId, testCmd.callerId)
   })

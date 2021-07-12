@@ -49,7 +49,7 @@ export class VirtualCallerService {
       lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
     }
     if (inProgressWorksheet && inProgressWorksheet.worksheetId === cmd.lastWorksheetId && cmd.lastOwnerResponse === OwnerResponse.SALE) {
-      return this.saveDoneWorksheet(inProgressWorksheet)
+      return this.saveAndPublishDoneWorksheet(inProgressWorksheet)
     }
 
     const worksheet = await this.getWorksheet(inProgressWorksheet, cmd)
@@ -74,7 +74,7 @@ export class VirtualCallerService {
       if (contacts.length === 0) {
         this.logger.info('No contacts found in worksheet', { worksheetId: worksheet.id })
       }
-      await this.saveDoneWorksheet(inProgressWorksheet)
+      await this.saveAndPublishDoneWorksheet(inProgressWorksheet)
     }
   }
 
@@ -131,14 +131,18 @@ export class VirtualCallerService {
     return lastContactPosition + 1 < contacts.length ? contacts[ lastContactPosition + 1 ] : undefined
   }
 
+  private async saveAndPublishDoneWorksheet (inProgressWorksheet: VirtualCallerWorksheetProps) {
+    await this.saveDoneWorksheet(inProgressWorksheet)
+    await this.eventBus.publish({
+      name: 'virtual-caller.worksheet_done',
+      worksheetId: inProgressWorksheet.worksheetId,
+    } as WorksheetDone)
+  }
+
   private async saveDoneWorksheet (inProgressWorksheet: VirtualCallerWorksheetProps) {
     await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
       ...inProgressWorksheet,
       status: 'DONE',
     }))
-    await this.eventBus.publish({
-      name: 'virtual-caller.worksheet_done',
-      worksheetId: inProgressWorksheet.worksheetId,
-    } as WorksheetDone)
   }
 }
