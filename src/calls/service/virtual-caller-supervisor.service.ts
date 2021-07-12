@@ -53,10 +53,12 @@ export class VirtualCallerSupervisorService {
 
   private contactsOrderStrategy (): ContactsOrderStrategy {
     return ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
-      const allContacts: OwnerContact[] = flatMap(relatedOwners, o => o.person.contacts.map(c => ({
-        ...c,
-        ownerId: o.id
-      })))
+      const allContacts: OwnerContact[] = flatMap(relatedOwners, o => o.person.contacts
+        .filter(({type}) => ['TELEFONO', 'MOVIL'].includes(type))
+        .map(c => ({
+          ...c,
+          ownerId: o.id
+        })))
       return flatMap(groupBy(allContacts, 'value'), samePhoneNumberContacts => {
         if (samePhoneNumberContacts.length > 1) {
           const firstContact = samePhoneNumberContacts[ 0 ]
