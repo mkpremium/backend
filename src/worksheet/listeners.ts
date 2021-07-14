@@ -53,7 +53,7 @@ export function worksheetEventListeners (container: AwilixContainer) {
   })
 
   eventBus.on('worksheet.invalid_worksheet_found', async ({ worksheetId }: InvalidWorksheetFound) => {
-    logger.error('Invalid worksheet found, updating status', { worksheetId })
+    logger.info('Invalid worksheet found, updating status', { worksheetId })
     const worksheet = await worksheetRepository.get(worksheetId)
     const updatedWorksheet = setStatus(worksheet, 'INVALID')
 
