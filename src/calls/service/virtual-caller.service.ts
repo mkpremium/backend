@@ -1,6 +1,6 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
-import { VirtualCallerPhone } from './virtual-caller-phone'
+import { NumberAlreadyCalled, VirtualCallerPhone } from './virtual-caller-phone'
 import {
   VirtualCallerWorksheet, VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
@@ -66,7 +66,11 @@ export class VirtualCallerService {
       })
         .then(() => this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id))
         .catch(error => {
-          this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
+          if (error instanceof NumberAlreadyCalled) {
+            this.logger.info('Number already called, skipping call', { contactToCall })
+          } else {
+            this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
+          }
           return this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id)
             .then(() => this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id))
         })

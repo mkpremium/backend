@@ -16,7 +16,7 @@ export interface CallCommand {
   worksheetId: string;
 }
 
-class NumberAlreadyCalled implements Error {
+export class NumberAlreadyCalled implements Error {
   message = 'Phone number already called'
   name = 'NumberAlreadyCalled'
 
