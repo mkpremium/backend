@@ -5,29 +5,28 @@ import { EntityNotFound, KeyNotFound, QueryError } from './errors'
 import { validate } from 'tcomb-validation'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
-import { Bucket, errors as couchbaseErrors, errors, N1qlQuery } from 'couchbase'
+import {
+  Bucket,
+  Cluster,
+  DocumentNotFoundError,
+  GetResult,
+  QueryScanConsistency,
+  TemporaryFailureError,
+} from 'couchbase'
 import { CouchbaseRecordToDomain, RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
-import { promisifyAll } from 'bluebird'
-import Consistency = N1qlQuery.Consistency
-
-export type PromisifiedBucket = Bucket & {
-  queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
-  getAsync: (key: string) => Promise<{ value: any, cas: any }>
-  upsertAsync: (key: string, value: any) => Promise<any>
-  getAndLockAsync: (key: string) => Promise<any>
-  unlockAsync: (key: string, cas: Bucket.CAS) => Promise<any>
-  name: string
-}
 
 export class CouchbaseAdapter {
-  private couchbaseBucket: PromisifiedBucket
-
-  constructor (couchbaseBucket: Bucket) {
-    this.couchbaseBucket = promisifyAll(couchbaseBucket) as PromisifiedBucket
+  constructor (
+    private couchbaseBucket: Bucket,
+  ) {
   }
 
   get bucketName (): string {
     return this.couchbaseBucket.name
+  }
+
+  get couchbaseCluster (): Cluster {
+    return this.couchbaseBucket.cluster
   }
 
   async save<T extends { _documentType: string, id?: string }> (data: T, structType: t.Type<T>) {
@@ -40,7 +39,7 @@ export class CouchbaseAdapter {
     }
 
     await this.withRetry(() =>
-      this.couchbaseBucket.upsertAsync(dataWithId.id, dataWithId)
+      this.upsert(dataWithId.id, dataWithId)
     )
 
     return fromJSON(dataWithId, structType)
@@ -48,9 +47,9 @@ export class CouchbaseAdapter {
 
   getEntity<T> (structType: t.Type<T> & Partial<RecordToDomain>, entityId): Promise<T> {
     return this.withRetry(
-      () => this.couchbaseBucket.getAsync(entityId)
+      () => this.get(entityId)
         .catch(error => {
-          if (error.code === errors.keyNotFound) {
+          if (error instanceof DocumentNotFoundError) {
             throw new EntityNotFound(entityId, structType)
           }
           throw error
@@ -66,22 +65,30 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync (query: string, params?): Promise<any> {
-    return this.withRetry(() =>
-      this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
-    ).catch(error => {
-      if (error.code) {
-        this.throwCouchbaseError(error, query)
-      } else {
-        throw error
-      }
-    })
+  get (documentKey): Promise<GetResult> {
+    return this.couchbaseBucket.defaultCollection().get(documentKey)
   }
 
-  getAndLock (key: string) {
-    return this.couchbaseBucket.getAndLockAsync(key)
+  queryAsync (query: string, params?): Promise<any> {
+    return this.withRetry(() =>
+      this.couchbaseCluster.query(query, {
+        parameters: params,
+        scanConsistency: QueryScanConsistency.RequestPlus,
+      })
+    ).then(result => result.rows)
       .catch(error => {
-        if (error.code === errors.keyNotFound) {
+        if (error.code) {
+          this.throwCouchbaseError(error, query)
+        } else {
+          throw error
+        }
+      })
+  }
+
+  getAndLock (key: string, secondsToLock = 10) {
+    return this.couchbaseBucket.defaultCollection().getAndLock(key, secondsToLock)
+      .catch(error => {
+        if (error instanceof DocumentNotFoundError) {
           throw new KeyNotFound(key)
         }
         throw error
@@ -89,11 +96,11 @@ export class CouchbaseAdapter {
   }
 
   unlock (key: string, lock: any) {
-    return this.couchbaseBucket.unlockAsync(key, lock)
+    return this.couchbaseBucket.defaultCollection().unlock(key, lock)
   }
 
   upsert (key: string, obj: object) {
-    return this.couchbaseBucket.upsertAsync(key, obj)
+    return this.couchbaseBucket.defaultCollection().upsert(key, obj)
   }
 
   private throwCouchbaseError (error, query: string) {
@@ -109,10 +116,7 @@ export class CouchbaseAdapter {
       max_tries: 5,
       interval: 1000,
       backoff: 1.5,
-      predicate: ({
-                    code,
-                    message,
-                  }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
+      predicate: error => error instanceof TemporaryFailureError
     })
   }
 }
