@@ -1,4 +1,7 @@
-on: push
+on:
+  push:
+    branches:
+      - main
 
 name: Deploy to Amazon ECS
 
@@ -92,7 +95,6 @@ jobs:
 
 
   deploy-api:
-    if: ${{ github.ref == 'refs/heads/main' }}
     name: Deploy API
     runs-on: ubuntu-latest
     needs: [ build, test ]
@@ -141,7 +143,6 @@ jobs:
           wait-for-minutes: 5
 
   deploy-scheduled-tasks:
-    if: ${{ github.ref == 'refs/heads/main' }}
     name: Deploy scheduled tasks (freezer and proposals sender)
     runs-on: ubuntu-latest
 
