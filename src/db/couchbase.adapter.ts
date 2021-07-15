@@ -10,6 +10,7 @@ import {
   Cluster,
   DocumentNotFoundError,
   GetResult,
+  InternalServerFailureError,
   QueryScanConsistency,
   TemporaryFailureError,
 } from 'couchbase'
@@ -116,7 +117,11 @@ export class CouchbaseAdapter {
       max_tries: 5,
       interval: 1000,
       backoff: 1.5,
-      predicate: error => error instanceof TemporaryFailureError
+      predicate: error => error instanceof TemporaryFailureError || this.isFlushBucketError(error)
     })
+  }
+
+  private isFlushBucketError (error: InternalServerFailureError) {
+    return error instanceof InternalServerFailureError && error.cause && (error.cause as any).code === 205
   }
 }
