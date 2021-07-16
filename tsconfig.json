@@ -5,7 +5,6 @@
     "target": "es6",
     "esModuleInterop": true,
     "module": "CommonJS",
-    "sourceMap": true,
-    "skipLibCheck": true,
+    "sourceMap": true
   }
 }
