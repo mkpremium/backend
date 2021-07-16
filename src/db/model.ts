@@ -10,7 +10,7 @@ import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
-import { Bucket, DocumentNotFoundError, InternalServerFailureError, TemporaryFailureError } from 'couchbase'
+import { Bucket, DocumentNotFoundError, TemporaryFailureError } from 'couchbase'
 import { CouchbaseAdapter } from './couchbase.adapter'
 
 /**
@@ -119,8 +119,18 @@ export abstract class CouchbaseModel {
   async query (queryBuilder = this.getQueryBuilder()) {
     const queryParam = queryBuilder.toParam()
 
-    return await this.withRetry(() =>
-      this.couchbaseAdapter.queryAsync(queryParam.text, queryParam.values))
+    try {
+      const query = queryParam.text
+
+
+      const result = await this.withRetry(() => this.couchbaseAdapter.queryAsync(query, queryParam.values))
+      logger.debug('model#query', { queryParam, result })
+
+      return result
+    } catch (error) {
+      logger.error('model#query', { queryParam, error })
+      throw error
+    }
   }
 
   async unique (data, field) {
@@ -190,12 +200,8 @@ export abstract class CouchbaseModel {
       max_tries: 5,
       interval: 1000,
       backoff: 1.5,
-      predicate: error => error instanceof TemporaryFailureError || this.isFlushBucketError(error),
+      predicate: error => error instanceof TemporaryFailureError,
     })
-  }
-
-  private isFlushBucketError (error: InternalServerFailureError) {
-    return error instanceof InternalServerFailureError && error.cause && (error.cause as any).code === 205
   }
 }
 
