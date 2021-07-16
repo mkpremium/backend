@@ -1,28 +1,27 @@
-import retry from 'bluebird-retry'
-import { Bucket, Cluster, connect } from 'couchbase'
-import _ from 'lodash'
-import { exec } from 'child_process'
+const Promise = require('bluebird')
+const retry = require('bluebird-retry')
+const couchbase = require('couchbase')
+const _ = require('lodash')
+const { exec } = require('child_process')
 
 const ONE_MINUTE = 60000
-module.exports = async (bucketName = 'mkpremium_test') => {
+module.exports = (bucketName = 'mkpremium_test') => {
   const config = {
     connString: 'couchbase://127.0.0.1?detailed_errcodes=1&operation_timeout=180.0',
     username: 'couchbase',
     password: 'couchbase',
   }
 
-  const cluster = await connect(config.connString, {
-    username: config.username,
-    password: config.password,
-  })
+  const cluster = Promise.promisifyAll(new couchbase.Cluster(config.connString))
 
-  const clusterManager = cluster.buckets()
+  cluster.authenticate(config.username, config.password)
+  const clusterManager = Promise.promisifyAll(cluster.manager())
 
-  const createBucket = () => clusterManager.createBucket({
-    name: bucketName,
-    flushEnabled: true,
+  const createBucket = () => clusterManager.createBucketAsync(bucketName, {
+    flushEnabled: 1,
     ramQuotaMB: 256,
-  } as any).catch(error => {
+    authType: 'none'
+  }).catch(error => {
     if (error.statusCode === 400 && _.get(error, 'response.errors.name') === 'Bucket with given name already exists') {
       console.warn('Guessing error means that bucket already exists', {
         error,
@@ -35,22 +34,39 @@ module.exports = async (bucketName = 'mkpremium_test') => {
 
   let bucketConnection
   const getBucketConnection = () => {
-    bucketConnection = cluster.bucket(bucketName)
-    return Promise.resolve([ bucketConnection, cluster ])
+    if (bucketConnection) {
+      if (bucketConnection.connected) {
+        return Promise.resolve(bucketConnection)
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      bucketConnection = cluster.openBucket(bucketName, (error) => {
+        if (error) {
+          console.error('Error opening bucket', {
+            error, bucket: JSON.stringify(bucketConnection),
+          })
+          reject(error)
+        } else {
+          resolve(bucketConnection)
+        }
+      })
+    })
   }
 
   console.info(`Initializating bucket with name ${bucketName}`)
   const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\'` grep -rq "The following buckets became ready on node" /opt/couchbase/var/lib/couchbase/logs/info.log'
 
   return retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
-    .then(() => {
+    .then((bucketSource) => {
+      console.info('Waiting for bucket to be ready', { bucketSource })
       return retry(() => {
         return new Promise((resolve, reject) => {
           const child = exec(isBucketReadyCommand, (error) => {
             if (error || child.exitCode !== 0) {
               reject(error || child.exitCode)
             } else {
-              resolve(undefined)
+              resolve()
             }
           })
         })
@@ -60,14 +76,13 @@ module.exports = async (bucketName = 'mkpremium_test') => {
       })
     })
     .then(() => {
-      let bucket: Bucket
-      let cluster: Cluster
+      let bucket, bucketManager
       return retry(() => getBucketConnection()
-          .then(([ bkt, cls ]) => {
-            bucket = bkt
-            cluster = cls
+          .then(conn => {
+            bucket = conn
+            bucketManager = Promise.promisifyAll(bucket.manager())
             console.log('Trying to create primary index')
-            return cluster.queryIndexes().createPrimaryIndex(bucketName, { ignoreIfExists: true })
+            return bucketManager.createPrimaryIndexAsync({ name: `${bucketName}_primary`, ignoreIfExists: true })
               .catch(error => {
                 console.error('Error on primary index creation attempt', { error })
                 throw error
@@ -76,6 +91,7 @@ module.exports = async (bucketName = 'mkpremium_test') => {
         {
           interval: ONE_MINUTE / 4,
           timeout: 2 * ONE_MINUTE,
+          predicate: error => error.code !== couchbase.errors.authError
         }
       )
         .catch(error => {
@@ -84,8 +100,7 @@ module.exports = async (bucketName = 'mkpremium_test') => {
         })
         .then(() => {
           console.info('Creating application indexes')
-          return cluster.queryIndexes().createIndex(
-            bucketName,
+          return bucketManager.createIndexAsync(
             `${bucketName}_document-type`,
             [ '_documentType' ],
             {
