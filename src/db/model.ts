@@ -10,17 +10,22 @@ import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
-import { Bucket, DocumentNotFoundError, TemporaryFailureError } from 'couchbase'
-import { CouchbaseAdapter } from './couchbase.adapter'
+import { Bucket, N1qlQuery, errors as couchbaseErrors } from 'couchbase'
+import { promisifyAll } from 'bluebird'
+import Consistency = N1qlQuery.Consistency
+import { CouchbaseAdapter, PromisifiedBucket } from './couchbase.adapter'
 
 /**
  * @deprecated use CouchbaseRepository instead.
  */
 export abstract class CouchbaseModel {
   protected abstract Struct: TcombStruct<any>
+  /** @deprecated use couchbaseAdapter instead **/
+  private static bucket: PromisifiedBucket
   private static couchbaseAdapter: CouchbaseAdapter
 
   static setCouchbaseBucket (bucket: Bucket, couchbaseAdapter: CouchbaseAdapter) {
+    CouchbaseModel.bucket = promisifyAll(bucket) as PromisifiedBucket
     CouchbaseModel.couchbaseAdapter = couchbaseAdapter
   }
 
@@ -109,7 +114,15 @@ export abstract class CouchbaseModel {
   }
 
   async queryRaw (query: string) {
-    return this.couchbaseAdapter.queryAsync(query)
+    try {
+      const result = await this.withRetry(() => CouchbaseModel.bucket.queryAsync(N1qlQuery.fromString(query)))
+      logger.debug('model#queryRaw', { query, result })
+
+      return result
+    } catch (error) {
+      logger.error('model#queryRaw', { query, error })
+      throw error
+    }
   }
 
   getBucketName () {
@@ -122,8 +135,10 @@ export abstract class CouchbaseModel {
     try {
       const query = queryParam.text
 
-
-      const result = await this.withRetry(() => this.couchbaseAdapter.queryAsync(query, queryParam.values))
+      const result = await this.withRetry(() => CouchbaseModel.bucket.queryAsync(
+        N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS),
+        queryParam.values
+      ))
       logger.debug('model#query', { queryParam, result })
 
       return result
@@ -157,19 +172,29 @@ export abstract class CouchbaseModel {
     if (_.isEmpty(id)) {
       throw new Error('id should be defined')
     }
-    const result = await this.couchbaseAdapter.get(id)
-      .catch(error => {
-        if (error instanceof DocumentNotFoundError) {
-          return null
-        }
-        throw error
+    try {
+      logger.debug('findById', {
+        documentType: this.getDocumentType(),
+        id
       })
+      const result = await this.withRetry(() => CouchbaseModel.bucket.getAsync(id))
 
-    if (result) {
-      return fromJSON(result.content, this.Struct)
+      if (result) {
+        return fromJSON(result.value, this.Struct)
+      }
+
+      return null
+    } catch (e) {
+      if (e.code === 13) {
+        return null
+      } else {
+        throw e
+      }
     }
+  }
 
-    return null
+  private getDocumentType () {
+    return (this._getMeta().defaultProps as any)._documentType
   }
 
   async preSave (data) {
@@ -191,7 +216,10 @@ export abstract class CouchbaseModel {
       throw new WrongStructRecord(this.getType(), validationResult.errors, data)
     }
 
-    await this.couchbaseAdapter.upsert(dataPreSaved.id, dataPreSaved)
+    await this.withRetry(
+      () => CouchbaseModel.bucket.upsertAsync(dataPreSaved.id, dataPreSaved)
+    )
+
     return fromJSON(dataPreSaved, this.Struct)
   }
 
@@ -200,7 +228,10 @@ export abstract class CouchbaseModel {
       max_tries: 5,
       interval: 1000,
       backoff: 1.5,
-      predicate: error => error instanceof TemporaryFailureError,
+      predicate: ({
+                    code,
+                    message,
+                  }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }
