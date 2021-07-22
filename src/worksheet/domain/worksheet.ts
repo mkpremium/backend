@@ -109,7 +109,7 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
-export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string): [WorksheetQueueProps, WorksheetProps] => {
+export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string): [ WorksheetQueueProps, WorksheetProps ] => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
     return [
@@ -143,9 +143,12 @@ export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetPr
   ]
 }
 
+const takenWorksheetStatuses = [ WorkSheetStatus.TAKEN, WorkSheetStatus.DEFAULT ]
 export function releaseWorksheet (worksheet: WorksheetProps) {
   const worksheetWithoutQueue = Worksheet.update(worksheet, { queueId: { $set: null } })
-  return setStatus(worksheetWithoutQueue, WorkSheetStatus.AVAILABLE as 'LOOKING_MEETING')
+  return takenWorksheetStatuses.includes(worksheetWithoutQueue.status) ?
+    setStatus(worksheetWithoutQueue, WorkSheetStatus.AVAILABLE as 'LOOKING_MEETING') :
+    worksheetWithoutQueue
 }
 
 export type WorksheetStatusType = 'OPEN'
