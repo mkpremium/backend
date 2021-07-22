@@ -19,10 +19,10 @@ describe('WorksheetQueue', () => {
 
     it('does not add an existing worksheet', () => {
       const testQueue = worksheetQueueBuilder({
-        worksheets: [ QueueItem({
+        worksheets: [ {
           worksheetId: testWorksheet.id,
           operatorId: 'test-user-id'
-        }) ]
+        } ]
       }).build()
 
       const [ queueWithWorksheet ] = takeWorksheet(testQueue, testWorksheet, 'test-user-id')
