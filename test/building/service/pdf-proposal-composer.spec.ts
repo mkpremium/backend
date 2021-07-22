@@ -1,6 +1,7 @@
 import { PdfProposalComposer } from '../../../src/building/service/pdf-proposal-composer'
 import { buildingBuilder } from '../building.builder'
 import { UserProfileProps } from '../../../src/types/user'
+import { userProfileBuilder } from '../../user/user.builder'
 
 describe('PdfProposalComposer', () => {
   const testBuilding = buildingBuilder({
@@ -21,12 +22,12 @@ describe('PdfProposalComposer', () => {
       reference: '123456789',
     }
   }).build()
-  const testFlipper: UserProfileProps = {
+  const testFlipper: UserProfileProps = userProfileBuilder({
     firstName: 'Flipper-Name',
     lastName: 'Flipper-Surname',
     city: 'FLIPPER CITY',
     language: 'es',
-  }
+  }).build()
 
   it('composes PDF file', async () => {
     const composer = new PdfProposalComposer()
