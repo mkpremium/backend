@@ -5,6 +5,7 @@ import { expect } from 'chai'
 import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
 import moment from 'moment'
 import { QueueStatus } from '../../../src/worksheet/models/queue-item'
+import { worksheetBuilder } from '../worksheet.builder'
 
 describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
   const testUserId = 'user-id'
@@ -19,6 +20,8 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
       save: spy()
     }
     worksheetRepositoryMock = {
+      get: stub(),
+      save: stub(),
       patch: spy()
     }
     service = new ReleaseUserExtraOpenedWorksheetsInQueueService(
@@ -30,6 +33,7 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
 
   it('releases oldest extra worksheet taken by user', async () => {
     const testQueue = WorksheetQueue({
+      id: 'test-queue-id',
       source: {},
       name: 'test-worksheet-queue',
       worksheets: [
@@ -54,6 +58,9 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
       ]
     })
     worksheetQueueRepositoryMock.get.withArgs(testQueueId).resolves(testQueue)
+    const testOpenedWorksheet = worksheetBuilder({id: '3-hours-ago-worksheet'}).build()
+    worksheetRepositoryMock.get.withArgs('3-hours-ago-worksheet').resolves(testOpenedWorksheet)
+    worksheetRepositoryMock.save.resolves()
 
     await service.release(testUserId, testQueueId)
 
@@ -61,9 +68,12 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
     expect(savedQueue.worksheets).to.have.lengthOf(2)
     expect(savedQueue.worksheets.find(w => w.id === '3-hours-ago-worksheet')).to.be.undefined
 
-    expect(worksheetRepositoryMock.patch).to.have.been
-      .calledWithMatch('3-hours-ago-worksheet',
-        patch => patch.status.$set === WorkSheetStatus.AVAILABLE && patch.queueId.$set === null && new Date().valueOf() - patch.statusChangedAt.$set.valueOf() < 100
+    expect(worksheetRepositoryMock.save).to.have.been
+      .calledWithMatch(
+        ws => ws.id === '3-hours-ago-worksheet' &&
+          ws.status === WorkSheetStatus.AVAILABLE &&
+          ws.queueId === null &&
+          (new Date().valueOf() - ws.statusChangedAt.valueOf() < 100)
       )
   })
 })

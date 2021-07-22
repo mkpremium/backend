@@ -1,5 +1,5 @@
 import { keepOnlyUserNewestOpenedWorksheets } from '../domain/queue'
-import { WorkSheetStatus } from '../domain/worksheet'
+import { releaseWorksheet } from '../domain/worksheet'
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
 import { WorksheetRepository } from '../repository/worksheet.repository'
 
@@ -23,11 +23,11 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
 
     await this.worksheetQueueRepository.save(queueWithMaxWorksheetForUser)
     await Promise.all(releasedWorksheetIds.map(
-      worksheetId => this.worksheetRepository.patch(worksheetId, {
-        status: { $set: WorkSheetStatus.AVAILABLE },
-        queueId: { $set: null },
-        statusChangedAt: { $set: new Date() }
-      })
+      async worksheetId => {
+        const worksheet = await this.worksheetRepository.get(worksheetId)
+        const releasedWorksheet = releaseWorksheet(worksheet)
+        await this.worksheetRepository.save(releasedWorksheet)
+      }
     ))
   }
 }

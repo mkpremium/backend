@@ -143,6 +143,11 @@ export const takeWorksheet = (queue, worksheet, byUserOfId) => {
   ]
 }
 
+export function releaseWorksheet (worksheet: WorksheetProps) {
+  const worksheetWithoutQueue = Worksheet.update(worksheet, { queueId: { $set: null } })
+  return setStatus(worksheetWithoutQueue, WorkSheetStatus.AVAILABLE as 'LOOKING_MEETING')
+}
+
 export type WorksheetStatusType = 'OPEN'
   | 'LOOKING_MEETING'
   | 'INVALID'
