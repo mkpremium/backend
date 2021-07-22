@@ -115,9 +115,7 @@ export class VirtualCallerPhone {
     twiml.pause({ length: 1 })
     const message = `Buenos dias, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
       ', nos dedicamos a la compra patrimonial de inmuebles, estaria usted interesado en vender?' +
-      'Si quiere usted vender marque el 1. Repito. Si quiere usted vender marque el 1.' +
-      'Si no quiere usted vender marque el 2. Repito. Si no quiere usted vender marque el 2.' +
-      'Y si no es usted el propietario marque el 3. Repito. Si no es usted el propietario marque el 3.'
+      'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
 
     const gatherEndpointQueryParams = [
       [ 'buildingId', buildingId ],
