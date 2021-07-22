@@ -109,12 +109,12 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
-export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string) => {
+export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string): [WorksheetQueueProps, WorksheetProps] => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
     return [
       queue,
-      t.update(worksheet, {
+      Worksheet.update(worksheet, {
         operatorId: { $set: byUserOfId },
         queueId: { $set: queue.id },
         viewedAt: { $set: utc().toDate() }
