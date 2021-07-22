@@ -1,15 +1,16 @@
 import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
-import { takeWorksheet, Worksheet } from '../../../src/worksheet/domain/worksheet'
+import { takeWorksheet } from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
 import { QueueItem } from '../../../src/worksheet/models/queue-item'
+import { worksheetBuilder } from '../worksheet.builder'
+import { worksheetQueueBuilder } from '../worksheet-queue.builder'
+
+const testWorksheet = worksheetBuilder().build()
 
 describe('WorksheetQueue', () => {
   describe('takeWorksheet', () => {
     it('adds worksheet to its list', () => {
-      const testWorksheet = Worksheet({ id: 'test-worksheet-id' })
-      const testQueue = WorksheetQueue({
-        name: 'test queue'
-      })
+      const testQueue = worksheetQueueBuilder().build()
 
       const [ queueWithWorksheet ] = takeWorksheet(testQueue, testWorksheet, 'test-user-id')
 
@@ -17,14 +18,12 @@ describe('WorksheetQueue', () => {
     })
 
     it('does not add an existing worksheet', () => {
-      const testWorksheet = Worksheet({ id: 'test-worksheet-id' })
-      const testQueue = WorksheetQueue({
-        name: 'test queue',
+      const testQueue = worksheetQueueBuilder({
         worksheets: [ QueueItem({
           worksheetId: testWorksheet.id,
           operatorId: 'test-user-id'
         }) ]
-      })
+      }).build()
 
       const [ queueWithWorksheet ] = takeWorksheet(testQueue, testWorksheet, 'test-user-id')
 

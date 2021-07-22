@@ -6,7 +6,7 @@ import { OwnerWithInclude } from '../../owner/owner'
 import { ScheduledEvent } from '../../scheduled-events/types'
 import { Address } from '../../types/common'
 import { QueueItem, QueueStatus } from '../models/queue-item'
-import { WorksheetQueue } from './queue'
+import { WorksheetQueue, WorksheetQueueProps } from './queue'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -109,7 +109,7 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
   })
 }
 
-export const takeWorksheet = (queue, worksheet, byUserOfId) => {
+export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string) => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
     return [
