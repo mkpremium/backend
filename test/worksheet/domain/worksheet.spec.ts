@@ -1,7 +1,7 @@
 import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 import { takeWorksheet } from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
-import { QueueItem } from '../../../src/worksheet/models/queue-item'
+import { QueueItem, removeScheduledCallFromItem } from '../../../src/worksheet/models/queue-item'
 import { worksheetBuilder } from '../worksheet.builder'
 import { worksheetQueueBuilder } from '../worksheet-queue.builder'
 
@@ -36,7 +36,7 @@ describe('QueueItem', () => {
   describe('removeScheduledCall', () => {
     it('fails when there is no scheduled call', () => {
       const testQueueItem = QueueItem({ worksheetId: 'test-worksheet-id' })
-      expect(() => testQueueItem.removeScheduledCall()).to.throw(/worksheet is not scheduled/)
+      expect(() => removeScheduledCallFromItem(testQueueItem)).to.throw(/worksheet is not scheduled/)
     })
   })
 })

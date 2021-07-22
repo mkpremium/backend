@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { QueueItem, QueueStatus } from '../models/queue-item'
+import { QueueItem, QueueStatus, removeScheduledCallFromItem } from '../models/queue-item'
 import _ from 'lodash'
 import _get from 'lodash/get'
 import _find from 'lodash/find'
@@ -116,7 +116,7 @@ export const keepOnlyUserNewestOpenedWorksheets: (queue, userId, maxOpenedWorksh
 
 export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId) {
   const updatedWorksheets = queue.worksheets.map(
-    w => _get(w, 'event.id') === scheduledCallId ? w.removeScheduledCall() : w
+    w => _get(w, 'event.id') === scheduledCallId ? removeScheduledCallFromItem(w) : w
   )
   return t.update(queue, {
     worksheets: {

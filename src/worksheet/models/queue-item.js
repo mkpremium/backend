@@ -37,19 +37,21 @@ QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
   return t.update(this, {
     status: { $set: QueueStatus.SCHEDULED },
     operatorId: { $set: operatorId },
-    event: { $set: {
-      id: scheduledEvent.id,
-      type: scheduledEvent.type,
-      eventDate: scheduledEvent.eventDate
-    } }
+    event: {
+      $set: {
+        id: scheduledEvent.id,
+        type: scheduledEvent.type,
+        eventDate: scheduledEvent.eventDate
+      }
+    }
   })
 }
 
-QueueItem.prototype.removeScheduledCall = function () {
-  t.assert(this.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
+export function removeScheduledCallFromItem (queueItem) {
+  t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
 
-  return t.update(this, {
-    status: { $set: this.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
+  return QueueItem.update(queueItem, {
+    status: { $set: queueItem.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
     event: { $set: undefined }
   })
 }
