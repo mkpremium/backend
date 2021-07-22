@@ -2,7 +2,6 @@ import { User, UserProfile, UserProfileProps, UserProps } from '../../src/types/
 
 const userPrototype: UserProps = {
   id: 'test-user-id',
-  email: 'user@email.test',
   username: 'test-user',
   password: 'test-user-password',
   profile: {
@@ -10,6 +9,7 @@ const userPrototype: UserProps = {
     lastName: 'User-Surname',
     city: 'User CITY',
     language: 'es',
+    email: 'user@email.test',
   }
 }
 export const userBuilder = (overrides: Partial<UserProps> = {}) => ({

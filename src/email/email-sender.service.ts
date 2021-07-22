@@ -19,7 +19,7 @@ export class EmailSenderService {
     return this.emailTransport.sendMail({
       to: email.to,
       bcc: 'daniel.leiva@mkpremium.com',
-      replyTo: `${senderFullName}<${email.from.email}>`,
+      replyTo: `${senderFullName}<${email.from.profile.email}>`,
       from: `${senderFullName}<${this.mailerUsername}>`,
       subject: email.subject,
       html: email.message,

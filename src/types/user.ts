@@ -64,6 +64,7 @@ export interface UserProfileProps {
   firstName: string;
   lastName: string;
   city: string;
+  email: string;
   language: 'es' | 'pt';
 }
 
@@ -71,7 +72,6 @@ export interface UserProps {
   id: string;
   username: string;
   password: string;
-  email: string;
   profile: UserProfileProps;
 }
 
@@ -80,7 +80,6 @@ export const User = t.struct<UserProps>(
     id: t.maybe(t.String),
     username: t.String,
     password: t.String,
-    email: t.maybe(t.String),
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
     serviceId: t.maybe(t.String),

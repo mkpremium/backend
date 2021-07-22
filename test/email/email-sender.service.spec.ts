@@ -18,10 +18,10 @@ describe('EmailSenderService', () => {
   it('sends email', async () => {
     const testEmail = {
       from: userBuilder({
-        email: 'flipper@test.email',
         profile: userProfileBuilder({
           firstName: 'Flipper-Name',
-          lastName: 'Flipper-Surname'
+          lastName: 'Flipper-Surname',
+          email: 'flipper@test.email',
         }).build()
       }).build(),
       to: 'owner@test.email',
