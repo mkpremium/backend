@@ -13,7 +13,8 @@ SELECT
     {
       "amount": proposal.proposal,
       proposal.createdAt,
-      proposal.notificationStatus
+      proposal.notificationStatus,
+      proposal.notificationSentAt
     } latestProposal,
     building.\`use\`,
     building.ownerId,
