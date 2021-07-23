@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { CommercialsBuildingRepository } from '../../src/building/repository/commercials-building.repository'
+import { CommercialsBuildingRepository } from '../../../src/building/repository/commercials-building.repository'
 
 describe('CommercialsBuildingRepository', () => {
   describe('mapToPropertyAgentBuildingView', () => {
