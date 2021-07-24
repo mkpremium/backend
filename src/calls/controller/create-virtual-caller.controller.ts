@@ -5,9 +5,20 @@ interface Deps {
   createVirtualCallerService: CreateVirtualCallerService
 }
 
-export function createCreateVirtualCallerController({}: Deps): RequestHandler {
-  return async function(req, res) {
-    res.sendStatus(501)
-    return Promise.reject('Not implemented')
+export function createCreateVirtualCallerController ({ createVirtualCallerService }: Deps): RequestHandler {
+  return async function (req, res) {
+    const {
+      assignCallsTo,
+      name,
+      phoneNumber,
+      queueId
+    } = req.body
+
+    return createVirtualCallerService.createVirtualCaller({
+      assignCallsTo,
+      name,
+      phoneNumber,
+      queueId
+    }).then((vc) => res.json(vc))
   }
 }

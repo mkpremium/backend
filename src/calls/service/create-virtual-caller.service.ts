@@ -17,14 +17,17 @@ export class CreateVirtualCallerService {
   async createVirtualCaller (cmd: CreateVirtualCallerCommand) {
     const inferredLocalization = CreateVirtualCallerService.inferLocalization(cmd.phoneNumber)
 
-    await this.virtualCallersRepository.save(VirtualCaller({
+    const virtualCaller = VirtualCaller({
       assignCallsTo: cmd.assignCallsTo,
       isEnabled: true,
       name: cmd.name,
       phoneNumber: cmd.phoneNumber,
       queueId: cmd.queueId,
       ...inferredLocalization,
-    }))
+    })
+    await this.virtualCallersRepository.save(virtualCaller)
+
+    return virtualCaller
   }
 
   private static inferLocalization (phoneNumber: string): Pick<VirtualCallerProps, 'language' | 'timezone'> {
