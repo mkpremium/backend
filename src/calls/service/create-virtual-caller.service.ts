@@ -19,8 +19,10 @@ export class CreateVirtualCallerService {
   }
 
   async createVirtualCaller (cmd: CreateVirtualCallerCommand) {
-    await this.worksheetQueueRepository.get(cmd.queueId)
-    await this.usersRepository.get(cmd.assignCallsTo)
+    await Promise.all([
+      this.worksheetQueueRepository.get(cmd.queueId),
+      this.usersRepository.get(cmd.assignCallsTo),
+    ])
 
     const inferredLocalization = CreateVirtualCallerService.inferLocalization(cmd.phoneNumber)
 
