@@ -7,9 +7,10 @@ export class EntityNotFound extends Error {
     readonly entityId: string,
     structType: t.Type<any>
   ) {
-    super('Entity not found')
+    super()
     this.entityId = entityId
     this.structType = structType.meta.name
+    this.message = `${this.structType} ${entityId} not found`
   }
 }
 

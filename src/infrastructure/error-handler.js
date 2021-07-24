@@ -10,7 +10,7 @@ export function appErrorHandler (error, req, res, next) {
   }
 
   if (error instanceof EntityNotFound) {
-    res.status(404).json()
+    res.status(404).json(error)
     return
   }
 
