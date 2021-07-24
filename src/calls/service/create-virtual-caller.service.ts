@@ -1,5 +1,7 @@
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 import { VirtualCaller, VirtualCallerProps } from '../domain/virtual-caller'
+import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
+import { UserRepository } from '../../user/repository/user.repository'
 
 type CreateVirtualCallerCommand = {
   phoneNumber: string,
@@ -10,11 +12,16 @@ type CreateVirtualCallerCommand = {
 
 export class CreateVirtualCallerService {
   constructor (
-    private virtualCallersRepository: VirtualCallersRepository
+    private virtualCallersRepository: VirtualCallersRepository,
+    private worksheetQueueRepository: WorksheetQueueRepository,
+    private usersRepository: UserRepository,
   ) {
   }
 
   async createVirtualCaller (cmd: CreateVirtualCallerCommand) {
+    await this.worksheetQueueRepository.get(cmd.queueId)
+    await this.usersRepository.get(cmd.assignCallsTo)
+
     const inferredLocalization = CreateVirtualCallerService.inferLocalization(cmd.phoneNumber)
 
     const virtualCaller = VirtualCaller({
