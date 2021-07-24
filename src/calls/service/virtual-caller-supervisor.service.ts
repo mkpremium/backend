@@ -2,7 +2,7 @@ import { ContactsOrderStrategy, OwnerContact, VirtualCallerService } from './vir
 import { VirtualCallerWorksheetsRepository } from '../repository/virtual-caller-worksheets.repository'
 import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
-import { flatMap, groupBy, sortBy } from 'lodash'
+import { flatMap, groupBy } from 'lodash'
 import moment from 'moment-timezone'
 import { EventBus } from '../../infrastructure/event-bus'
 
