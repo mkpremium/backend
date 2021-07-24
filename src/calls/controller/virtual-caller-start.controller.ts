@@ -1,33 +1,27 @@
 import { VirtualCallerSupervisorService } from '../service/virtual-caller-supervisor.service'
 import { VirtualCallerConfig } from '../virtual-caller.config'
-import { VirtualCaller } from '../domain/virtual-caller'
+import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 
 interface Deps {
-  virtualCallerSupervisor: VirtualCallerSupervisorService;
-  virtualCallerConfig: VirtualCallerConfig;
+  virtualCallerSupervisor: VirtualCallerSupervisorService
+  virtualCallersRepository: VirtualCallersRepository
+  virtualCallerConfig: VirtualCallerConfig
   virtualCallerPhoneNumber: string
 }
 
 export const createStartVirtualCallerController = ({
                                                      virtualCallerSupervisor,
-                                                     virtualCallerConfig,
-                                                     virtualCallerPhoneNumber,
+                                                     virtualCallersRepository,
                                                    }: Deps) => async (req, res) => {
-  return virtualCallerSupervisor.check({
-    caller: VirtualCaller({
-      assignCallsTo: virtualCallerConfig.assignedCallerIdForVirtualCalls,
-      id: virtualCallerConfig.virtualCallerId,
-      isEnabled: true,
-      language: 'spanish',
-      name: virtualCallerConfig.virtualCallerId,
-      phoneNumber: virtualCallerPhoneNumber,
-      queueId: virtualCallerConfig.virtualCallerQueueId,
-      timezone: 'Europe/Madrid'
-    }),
-    maxWorksheets: virtualCallerConfig.maxWorksheets,
-    lastWorksheetId: undefined,
-    lastOwnerResponse: undefined,
-  }).then(() => {
-    res.sendStatus(200)
-  })
+
+  const enabledCallers = await virtualCallersRepository.enabledCallers()
+
+  return Promise.all(enabledCallers.map(caller => {
+      return virtualCallerSupervisor.check({
+        caller,
+        lastWorksheetId: undefined,
+        lastOwnerResponse: undefined,
+      })
+    })
+  ).then(() => res.json())
 }
