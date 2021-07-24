@@ -153,6 +153,7 @@ describe('VirtualCallerService', () => {
     })
     expect(eventBusStub.publish).to.have.been.calledWith({
       name: 'virtual-caller.worksheet_done',
+      callerId: testCmd.caller.id,
       worksheetId: testWorksheet.id,
     })
   })
@@ -193,6 +194,7 @@ describe('VirtualCallerService', () => {
     })
     expect(eventBusStub.publish).to.have.been.calledWith({
       name: 'virtual-caller.worksheet_done',
+      callerId: testCmd.caller.id,
       worksheetId: testWorksheet.id,
     })
   })
