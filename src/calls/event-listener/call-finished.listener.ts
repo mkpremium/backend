@@ -2,6 +2,7 @@ import { VirtualCallerSupervisorService } from '../service/virtual-caller-superv
 import { VirtualCallerConfig } from '../virtual-caller.config'
 import { Logger } from 'winston'
 import { CallDone } from '../controller/call-done-webhook.controller'
+import { VirtualCaller } from '../domain/virtual-caller'
 
 interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService;
@@ -23,7 +24,7 @@ export const createCallFinishedListener = ({
   await waitPromise
 
   return virtualCallerSupervisor.check({
-    caller: {
+    caller: VirtualCaller({
       assignCallsTo: virtualCallerConfig.assignedCallerIdForVirtualCalls,
       id: virtualCallerConfig.virtualCallerId,
       isEnabled: true,
@@ -32,7 +33,7 @@ export const createCallFinishedListener = ({
       phoneNumber: virtualCallerPhoneNumber,
       queueId: virtualCallerConfig.virtualCallerQueueId,
       timezone: 'Europe/Madrid'
-    },
+    }),
     maxWorksheets: virtualCallerConfig.maxWorksheets,
     lastWorksheetId: evt.worksheetId,
     lastOwnerResponse: evt.ownerResponse,

@@ -2,6 +2,7 @@ import { WorksheetDone } from '../service/virtual-caller.service'
 import { VirtualCallerSupervisorService } from '../service/virtual-caller-supervisor.service'
 import { VirtualCallerConfig } from '../virtual-caller.config'
 import { Logger } from 'winston'
+import { VirtualCaller } from '../domain/virtual-caller'
 
 interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService;
@@ -20,7 +21,7 @@ export const createWorksheetDoneListener = ({
   logger.info('Worksheet done, checking for more work', { worksheetId: evt.worksheetId })
 
   return virtualCallerSupervisor.check({
-    caller: {
+    caller: VirtualCaller({
       assignCallsTo: virtualCallerConfig.assignedCallerIdForVirtualCalls,
       id: virtualCallerConfig.virtualCallerId,
       isEnabled: true,
@@ -29,7 +30,7 @@ export const createWorksheetDoneListener = ({
       phoneNumber: virtualCallerPhoneNumber,
       queueId: virtualCallerConfig.virtualCallerQueueId,
       timezone: 'Europe/Madrid'
-    },
+    }),
     maxWorksheets: virtualCallerConfig.maxWorksheets,
     lastWorksheetId: undefined,
     lastOwnerResponse: undefined,
