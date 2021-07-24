@@ -20,6 +20,7 @@ import RequestClient from 'twilio/lib/base/RequestClient'
 import { createTodayStatsController } from './controller/today-stats.controller'
 import { VirtualCallersRepository } from './repository/virtual-callers.repository'
 import { CreateVirtualCallerService } from './service/create-virtual-caller.service'
+import { createCreateVirtualCallerController } from './controller/create-virtual-caller.controller'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -79,6 +80,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController).singleton(),
     startVirtualCallerController: asFunction(createStartVirtualCallerController).singleton(),
     virtualCallerTodayStatsController: asFunction(createTodayStatsController).singleton(),
+    createVirtualCallerController: asFunction(createCreateVirtualCallerController).singleton(),
 
     virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).singleton(),
     virtualCallerWorksheetDoneListener: asFunction(createWorksheetDoneListener).singleton(),
