@@ -5,13 +5,13 @@ import { WorksheetViewProps } from '../../worksheet/repository/worksheet.reposit
 import { flatMap, groupBy } from 'lodash'
 import moment from 'moment-timezone'
 import { EventBus } from '../../infrastructure/event-bus'
+import { VirtualCallerProps } from '../domain/virtual-caller'
 
 export interface CheckCommand {
-  callerId: string;
-  queueId: string;
+  caller: VirtualCallerProps
   maxWorksheets?: number
-  lastWorksheetId: string;
-  lastOwnerResponse: string;
+  lastWorksheetId: string
+  lastOwnerResponse: string
 }
 
 export class VirtualCallerSupervisorService {
@@ -29,14 +29,13 @@ export class VirtualCallerSupervisorService {
       return
     }
 
-    if (await this.hasReachWorksheetLimit(cmd.callerId, cmd.maxWorksheets)) {
+    if (await this.hasReachWorksheetLimit(cmd.caller.id, cmd.maxWorksheets)) {
       this.logger.info('All worksheets processed by virtual caller', cmd)
       return
     }
 
     await this.virtualCaller.processNextWorksheet({
-      callerId: cmd.callerId,
-      queueId: cmd.queueId,
+      caller: cmd.caller,
       contacts: this.contactsOrderStrategy(),
       lastOwnerResponse: cmd.lastOwnerResponse,
       lastWorksheetId: cmd.lastWorksheetId,
@@ -54,7 +53,7 @@ export class VirtualCallerSupervisorService {
   private contactsOrderStrategy (): ContactsOrderStrategy {
     return ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
       const allContacts: OwnerContact[] = flatMap(relatedOwners, o => o.person.contacts
-        .filter(({type}) => ['TELEFONO', 'MOVIL'].includes(type))
+        .filter(({ type }) => [ 'TELEFONO', 'MOVIL' ].includes(type))
         .map(c => ({
           ...c,
           ownerId: o.id

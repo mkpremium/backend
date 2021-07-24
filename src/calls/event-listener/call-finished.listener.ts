@@ -7,12 +7,14 @@ interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService;
   virtualCallerConfig: VirtualCallerConfig;
   logger: Logger;
+  virtualCallerPhoneNumber: string
 }
 
 export const createCallFinishedListener = ({
                                              virtualCallerSupervisor,
                                              virtualCallerConfig,
-                                             logger
+                                             logger,
+                                             virtualCallerPhoneNumber,
                                            }: Deps) => async (evt: CallDone) => {
   logger.info('Call finished, checking for more work', { callId: evt.callId })
   // Failed calls respond quickly, so wait to avoid multiple calls to same number.
@@ -21,8 +23,16 @@ export const createCallFinishedListener = ({
   await waitPromise
 
   return virtualCallerSupervisor.check({
-    callerId: virtualCallerConfig.virtualCallerId,
-    queueId: virtualCallerConfig.virtualCallerQueueId,
+    caller: {
+      assignCallsTo: virtualCallerConfig.assignedCallerIdForVirtualCalls,
+      id: virtualCallerConfig.virtualCallerId,
+      isEnabled: true,
+      language: 'spanish',
+      name: virtualCallerConfig.virtualCallerId,
+      phoneNumber: virtualCallerPhoneNumber,
+      queueId: virtualCallerConfig.virtualCallerQueueId,
+      timezone: 'Europe/Madrid'
+    },
     maxWorksheets: virtualCallerConfig.maxWorksheets,
     lastWorksheetId: evt.worksheetId,
     lastOwnerResponse: evt.ownerResponse,

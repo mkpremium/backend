@@ -4,15 +4,25 @@ import { VirtualCallerConfig } from '../virtual-caller.config'
 interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService;
   virtualCallerConfig: VirtualCallerConfig;
+  virtualCallerPhoneNumber: string
 }
 
 export const createStartVirtualCallerController = ({
                                                      virtualCallerSupervisor,
-                                                     virtualCallerConfig
+                                                     virtualCallerConfig,
+                                                     virtualCallerPhoneNumber,
                                                    }: Deps) => async (req, res) => {
   return virtualCallerSupervisor.check({
-    callerId: virtualCallerConfig.virtualCallerId,
-    queueId: virtualCallerConfig.virtualCallerQueueId,
+    caller: {
+      assignCallsTo: virtualCallerConfig.assignedCallerIdForVirtualCalls,
+      id: virtualCallerConfig.virtualCallerId,
+      isEnabled: true,
+      language: 'spanish',
+      name: virtualCallerConfig.virtualCallerId,
+      phoneNumber: virtualCallerPhoneNumber,
+      queueId: virtualCallerConfig.virtualCallerQueueId,
+      timezone: 'Europe/Madrid'
+    },
     maxWorksheets: virtualCallerConfig.maxWorksheets,
     lastWorksheetId: undefined,
     lastOwnerResponse: undefined,

@@ -9,6 +9,7 @@ import { WorksheetNotFound, WorksheetViewProps } from '../../../src/worksheet/re
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 import { VirtualCallerWorksheetProps } from '../../../src/calls/repository/virtual-caller-worksheets.repository'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
+import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 const firstContact: OwnerContact = {
   id: 'first-contact',
@@ -25,8 +26,11 @@ const lastContact: OwnerContact = {
   status: 'UNDEFINED',
 }
 const testCmd: ProcessNextWorksheetCommand = {
-  queueId: 'test-queue-id',
-  callerId: 'test-caller-id',
+  caller: virtualCallerBuilder({
+    id: 'test-caller-id',
+    queueId: 'test-queue-id',
+    phoneNumber: '+34666666666',
+  }).build(),
   lastWorksheetId: 'test-last-worksheet-id',
   lastOwnerResponse: undefined,
   contacts: () => [ firstContact, lastContact ],
@@ -36,7 +40,7 @@ const testInProgressWorksheet: VirtualCallerWorksheetProps = {
   worksheetId: testWorksheet.id,
   lastContactId: firstContact.id,
   status: 'CALLING',
-  callerId: testCmd.callerId,
+  callerId: testCmd.caller.id,
 }
 
 describe('VirtualCallerService', () => {
@@ -82,7 +86,7 @@ describe('VirtualCallerService', () => {
     await service.processNextWorksheet(testCmd)
 
     expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
-      .calledWith(testCmd.queueId, testCmd.callerId)
+      .calledWith(testCmd.caller.queueId, testCmd.caller.id)
   })
 
   it('stores worksheet to process', async () => {
@@ -93,7 +97,7 @@ describe('VirtualCallerService', () => {
       worksheetId: testWorksheet.id,
       lastContactId: firstContact.id,
       status: 'CALLING',
-      callerId: testCmd.callerId,
+      callerId: testCmd.caller.id,
     })
   })
 
@@ -101,7 +105,7 @@ describe('VirtualCallerService', () => {
     await service.processNextWorksheet(testCmd)
 
     expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith({
-      callerId: testCmd.callerId,
+      callerId: testCmd.caller.id,
       buildingId: testWorksheet.building.id,
       worksheetId: testWorksheet.id,
       address: testWorksheet.building.address,
@@ -110,7 +114,7 @@ describe('VirtualCallerService', () => {
   })
 
   it('continues with in progress worksheet', async () => {
-    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
     worksheetRepositoryStub.getForCallcenterView.withArgs(testInProgressWorksheet.worksheetId)
       .resolves(testWorksheet)
@@ -118,7 +122,7 @@ describe('VirtualCallerService', () => {
     await service.processNextWorksheet(testCmd)
 
     expect(virtualCallerPhoneStub.call).to.have.been.calledOnceWith({
-      callerId: testCmd.callerId,
+      callerId: testCmd.caller.id,
       worksheetId: testWorksheet.id,
       buildingId: testWorksheet.building.id,
       address: testWorksheet.building.address,
@@ -129,12 +133,12 @@ describe('VirtualCallerService', () => {
       worksheetId: testWorksheet.id,
       lastContactId: lastContact.id,
       status: 'CALLING',
-      callerId: testCmd.callerId,
+      callerId: testCmd.caller.id,
     })
   })
 
   it('saves worksheet as done when there are no contacts left', async () => {
-    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves({ ...testInProgressWorksheet, lastContactId: lastContact.id })
     worksheetRepositoryStub.getForCallcenterView.resolves(testWorksheet)
 
@@ -145,7 +149,7 @@ describe('VirtualCallerService', () => {
       worksheetId: testWorksheet.id,
       lastContactId: lastContact.id,
       status: 'DONE',
-      callerId: testCmd.callerId,
+      callerId: testCmd.caller.id,
     })
     expect(eventBusStub.publish).to.have.been.calledWith({
       name: 'virtual-caller.worksheet_done',
@@ -155,7 +159,7 @@ describe('VirtualCallerService', () => {
 
   it('marks worksheet as done when is not found', async () => {
     const clock = sinon.useFakeTimers()
-    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
     worksheetRepositoryStub.getForCallcenterView.rejects(new WorksheetNotFound(testWorksheet.id))
 
@@ -168,11 +172,11 @@ describe('VirtualCallerService', () => {
       status: 'DONE',
     })
     expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
-      .calledWith(testCmd.queueId, testCmd.callerId)
+      .calledWith(testCmd.caller.queueId, testCmd.caller.id)
   })
 
   it('saves worksheet as done when owner is interested on selling', async () => {
-    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.callerId)
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
     worksheetRepositoryStub.getForCallcenterView.resolves(testWorksheet)
 

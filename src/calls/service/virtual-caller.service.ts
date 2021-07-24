@@ -14,14 +14,14 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 import retry from 'bluebird-retry'
 import { OwnerResponse } from './owner-response-processor.service'
+import { VirtualCallerProps } from '../domain/virtual-caller'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
 export type ContactsOrderStrategy = (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => OwnerContact[]
 
 export interface ProcessNextWorksheetCommand {
-  queueId: string;
-  callerId: string;
+  caller: VirtualCallerProps;
   lastWorksheetId: string;
   lastOwnerResponse: string;
   contacts: ContactsOrderStrategy;
@@ -51,7 +51,7 @@ export class VirtualCallerService {
   async processNextWorksheet (cmd: ProcessNextWorksheetCommand, rec?: RecursiveCall) {
     let { inProgressWorksheet, lastCalledWorksheetContactId } = rec || {}
     if (!inProgressWorksheet) {
-      inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
+      inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.caller.id)
       lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
     }
     if (inProgressWorksheet && inProgressWorksheet.worksheetId === cmd.lastWorksheetId && cmd.lastOwnerResponse === OwnerResponse.SALE) {
@@ -64,7 +64,7 @@ export class VirtualCallerService {
 
     if (contactToCall) {
       await this.virtualCallerPhone.call({
-        callerId: cmd.callerId,
+        callerId: cmd.caller.id,
         buildingId: worksheet.building.id,
         worksheetId: worksheet.id,
         address: worksheet.building.address,
@@ -89,7 +89,7 @@ export class VirtualCallerService {
       }
       await this.saveAndPublishDoneWorksheet(inProgressWorksheet || VirtualCallerWorksheet({
         worksheetId: worksheet.id,
-        callerId: cmd.callerId,
+        callerId: cmd.caller.id,
         status: 'DONE',
       }))
     }
@@ -99,7 +99,7 @@ export class VirtualCallerService {
     if (!inProgressWorksheet) {
       await this.virtualCallerWorksheetsRepository.save(VirtualCallerWorksheet({
         worksheetId: worksheet.id,
-        callerId: cmd.callerId,
+        callerId: cmd.caller.id,
         lastContactId: contactId,
         status: 'CALLING',
       }))
@@ -136,7 +136,7 @@ export class VirtualCallerService {
 
   private async takeNextWorksheet (cmd: ProcessNextWorksheetCommand) {
     return retry<WorksheetViewProps>(
-      () => this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.queueId, cmd.callerId))
+      () => this.takeNextWorksheetService.nextWorksheetInQueueOfId(cmd.caller.queueId, cmd.caller.id))
   }
 
   private nextContactToCall (contacts: OwnerContact[], lastCalledContactId: string | undefined): OwnerContact | undefined {

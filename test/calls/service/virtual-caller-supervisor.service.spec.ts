@@ -7,10 +7,10 @@ import {
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import moment from 'moment-timezone'
 import { ContactsOrderStrategy } from '../../../src/calls/service/virtual-caller.service'
+import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 const testCmd: CheckCommand = {
-  callerId: 'test-caller-id',
-  queueId: 'test-queue-id',
+  caller: virtualCallerBuilder({ id: 'test-caller-id', queueId: 'test-queue-id' }).build(),
   maxWorksheets: 100,
   lastWorksheetId: undefined,
   lastOwnerResponse: undefined,
@@ -52,13 +52,12 @@ describe('VirtualCallerSupervisorService', () => {
   afterEach(() => clock.restore())
 
   it('makes virtual caller process next worksheet', async () => {
-    virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId).resolves(0)
+    virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.caller.queueId).resolves(0)
 
     await service.check(testCmd)
 
     expect(virtualCallerStub.processNextWorksheet.lastCall.firstArg).to.include({
-      callerId: testCmd.callerId,
-      queueId: testCmd.queueId,
+      caller: testCmd.caller,
     })
   })
 
@@ -69,7 +68,7 @@ describe('VirtualCallerSupervisorService', () => {
   })
 
   it('does not invoke virtual caller when max worksheets have been processed', async () => {
-    virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId)
+    virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.caller.id)
       .resolves(testCmd.maxWorksheets)
 
     await service.check(testCmd)
@@ -92,7 +91,7 @@ describe('VirtualCallerSupervisorService', () => {
     let contactsOrderStrategy: ContactsOrderStrategy
 
     beforeEach(async () => {
-      virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.callerId).resolves(0)
+      virtualCallerWorksheetsRepositoryStub.numberOfWorksheetsProcessedBy.withArgs(testCmd.caller.id).resolves(0)
       await service.check(testCmd)
       eventBusStub.publish.resolves()
 
