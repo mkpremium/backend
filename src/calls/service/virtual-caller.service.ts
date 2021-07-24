@@ -48,10 +48,8 @@ export class VirtualCallerService {
   ) {
   }
 
-  async processNextWorksheet (cmd: ProcessNextWorksheetCommand, {
-    inProgressWorksheet,
-    lastCalledWorksheetContactId
-  }: RecursiveCall = undefined) {
+  async processNextWorksheet (cmd: ProcessNextWorksheetCommand, rec?: RecursiveCall) {
+    let { inProgressWorksheet, lastCalledWorksheetContactId } = rec || {}
     if (!inProgressWorksheet) {
       inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
       lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
