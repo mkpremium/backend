@@ -7,4 +7,8 @@ export class VirtualCallersRepository extends CouchbaseRepository<VirtualCallerP
   protected struct (): Struct<any> & Partial<RecordToDomain> {
     return VirtualCaller
   }
+
+  enabledCallers (): Promise<VirtualCallerProps[]> {
+    return Promise.reject('Not implemented')
+  }
 }
