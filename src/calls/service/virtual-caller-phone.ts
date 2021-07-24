@@ -5,12 +5,13 @@ import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
 import retry from 'bluebird-retry'
+import { VirtualCallerProps } from '../domain/virtual-caller'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
 export interface CallCommand {
   buildingId: string;
-  callerId: string;
+  caller: VirtualCallerProps
   address: AddressParam;
   contact: OwnerContact;
   worksheetId: string;
@@ -98,7 +99,7 @@ export class VirtualCallerPhone {
 
   private async saveCall (cmd: CallCommand, to: string) {
     const call = VirtualAgentCall({
-      callerId: cmd.callerId,
+      callerId: cmd.caller.id,
       worksheetId: cmd.worksheetId,
       contactId: cmd.contact.id,
       ownerId: cmd.contact.ownerId,

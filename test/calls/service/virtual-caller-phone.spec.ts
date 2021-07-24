@@ -1,12 +1,13 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
 import { CallCommand, VirtualCallerPhone } from '../../../src/calls/service/virtual-caller-phone'
+import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 const testPublicUrl = 'http://api.public.url'
 const testCmd: CallCommand = {
   buildingId: 'test-building-id',
   worksheetId: 'test-worksheet-id',
-  callerId: 'test-virtual-caller-id',
+  caller: virtualCallerBuilder({id: 'test-virtual-caller-id'}).build(),
   contact: {
     id: 'test-contact-id',
     ownerId: 'test-owner-id',
