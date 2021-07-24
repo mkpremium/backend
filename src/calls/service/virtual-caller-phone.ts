@@ -5,7 +5,7 @@ import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
 import retry from 'bluebird-retry'
-import { VirtualCallerProps } from '../domain/virtual-caller'
+import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
@@ -28,6 +28,11 @@ export class NumberAlreadyCalled implements Error {
   }
 }
 
+const prefixByTimezone: Record<Timezone, string> = {
+  'Europe/Madrid': '+34',
+  'Europe/Lisbon': '+351',
+}
+
 export class VirtualCallerPhone {
   constructor (
     private twilioClient: Twilio,
@@ -41,7 +46,7 @@ export class VirtualCallerPhone {
   async call (cmd: CallCommand) {
     const { worksheetId, contact, address, buildingId } = cmd
 
-    const to = this.ownerTrialPhoneNumber || '+34' + contact.value
+    const to = this.ownerTrialPhoneNumber || prefixByTimezone[cmd.caller.timezone] + contact.value
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
     if (lastCallToNumber) {
       throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })

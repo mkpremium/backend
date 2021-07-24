@@ -81,6 +81,14 @@ describe('VirtualCallerPhone', () => {
     expect(virtualCallsRepositoryStub.unlockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber, testPhoneLock)
   })
 
+  it('calculates prefix based on caller timezone', async () => {
+    await service.call({ ...testCmd, caller: virtualCallerBuilder({timezone: 'Europe/Madrid'}).build() })
+    expect(twilioClientStub.calls.create.lastCall.firstArg.to).to.match(/^\+34/)
+
+    await service.call({ ...testCmd, caller: virtualCallerBuilder({timezone: 'Europe/Lisbon'}).build() })
+    expect(twilioClientStub.calls.create.lastCall.firstArg.to).to.match(/^\+351/)
+  })
+
   // 13223 Invalid phone number format
   // 20003 Permission Denied
   // 21211 Invalid 'To' Phone Number ex. 934122309/933478789
