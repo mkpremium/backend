@@ -4,10 +4,14 @@ import { CallCommand, VirtualCallerPhone } from '../../../src/calls/service/virt
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 const testPublicUrl = 'http://api.public.url'
+const testVirtualCallerPhoneNumber = '+34666666667'
 const testCmd: CallCommand = {
   buildingId: 'test-building-id',
   worksheetId: 'test-worksheet-id',
-  caller: virtualCallerBuilder({id: 'test-virtual-caller-id'}).build(),
+  caller: virtualCallerBuilder({
+    id: 'test-virtual-caller-id',
+    phoneNumber: testVirtualCallerPhoneNumber,
+  }).build(),
   contact: {
     id: 'test-contact-id',
     ownerId: 'test-owner-id',
@@ -27,7 +31,6 @@ describe('VirtualCallerPhone', () => {
   let twilioClientStub
   let virtualCallsRepositoryStub
   const twilioSayAttributesTest = {}
-  const testVirtualCallerPhoneNumber = '+34666666666'
 
   beforeEach(() => {
     twilioClientStub = {
@@ -47,7 +50,6 @@ describe('VirtualCallerPhone', () => {
       testPublicUrl,
       virtualCallsRepositoryStub,
       twilioSayAttributesTest,
-      testVirtualCallerPhoneNumber,
     )
   })
 
