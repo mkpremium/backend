@@ -27,6 +27,11 @@ export interface ProcessNextWorksheetCommand {
   contacts: ContactsOrderStrategy;
 }
 
+interface RecursiveCall {
+  inProgressWorksheet: VirtualCallerWorksheetProps,
+  lastCalledWorksheetContactId: string
+}
+
 export interface WorksheetDone {
   name: 'virtual-caller.worksheet_done';
   worksheetId: string;
@@ -43,7 +48,10 @@ export class VirtualCallerService {
   ) {
   }
 
-  async processNextWorksheet (cmd: ProcessNextWorksheetCommand, inProgressWorksheet?: VirtualCallerWorksheetProps, lastCalledWorksheetContactId?: string) {
+  async processNextWorksheet (cmd: ProcessNextWorksheetCommand, {
+    inProgressWorksheet,
+    lastCalledWorksheetContactId
+  }: RecursiveCall = undefined) {
     if (!inProgressWorksheet) {
       inProgressWorksheet = await this.virtualCallerWorksheetsRepository.inProgressWorksheetFor(cmd.callerId)
       lastCalledWorksheetContactId = inProgressWorksheet ? inProgressWorksheet.lastContactId : undefined
@@ -72,7 +80,10 @@ export class VirtualCallerService {
             this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
           }
           return this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id)
-            .then(() => this.processNextWorksheet(cmd, inProgressWorksheet, contactToCall.id))
+            .then(() => this.processNextWorksheet(cmd, {
+              inProgressWorksheet,
+              lastCalledWorksheetContactId: contactToCall.id
+            }))
         })
     } else {
       if (contacts.length === 0) {
