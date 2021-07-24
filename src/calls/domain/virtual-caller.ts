@@ -1,6 +1,8 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 
+export type Timezone = 'Europe/Madrid' | 'Europe/Lisbon'
+
 export interface VirtualCallerProps {
   id?: string;
   queueId: string;
@@ -8,7 +10,7 @@ export interface VirtualCallerProps {
   assignCallsTo: string;
   phoneNumber: string;
   language: 'spanish' | 'portuguese';
-  timezone: 'Europe/Madrid' | 'Europe/Lisbon';
+  timezone: Timezone;
   isEnabled: boolean;
 }
 
