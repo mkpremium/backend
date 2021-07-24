@@ -34,7 +34,6 @@ export class VirtualCallerPhone {
     private publicUrl: string,
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: VoiceResponse.SayAttributes,
-    private virtualCallerPhoneNumber: string,
     private ownerTrialPhoneNumber?: string,
   ) {
   }
@@ -49,14 +48,14 @@ export class VirtualCallerPhone {
     }
     const call = await this.saveCall(cmd, to)
 
-    const phoneLock = await this.getPhoneLock()
-    return this.doCall(address, buildingId, worksheetId, contact, call, to)
-      .finally(() => this.virtualCallsRepository.unlockPhone(this.virtualCallerPhoneNumber, phoneLock))
+    const phoneLock = await this.getPhoneLock(cmd.caller.phoneNumber)
+    return this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to)
+      .finally(() => this.virtualCallsRepository.unlockPhone(cmd.caller.phoneNumber, phoneLock))
   }
 
-  private getPhoneLock () {
+  private getPhoneLock (phoneNumber: string) {
     return retry<any>(
-      () => this.virtualCallsRepository.lockPhone(this.virtualCallerPhoneNumber),
+      () => this.virtualCallsRepository.lockPhone(phoneNumber),
       { backoff: 2 }
     ).catch(error => {
       error.context = 'Locking phone'
@@ -70,12 +69,13 @@ export class VirtualCallerPhone {
     worksheetId: string,
     contact: OwnerContact,
     call: VirtualAgentCallProps,
+    from: string,
     to: string
   ) {
     return this.twilioClient.calls.create({
       twiml: this.createContactMessage(address, buildingId, worksheetId, contact, call.id).toString(),
-      callerId: this.virtualCallerPhoneNumber,
-      from: this.virtualCallerPhoneNumber,
+      callerId: from,
+      from: from,
       to: to,
       machineDetection: 'Enable',
       asyncAmd: 'true',
