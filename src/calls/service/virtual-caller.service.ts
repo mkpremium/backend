@@ -33,8 +33,9 @@ interface RecursiveCall {
 }
 
 export interface WorksheetDone {
-  name: 'virtual-caller.worksheet_done';
-  worksheetId: string;
+  name: 'virtual-caller.worksheet_done'
+  callerId: string
+  worksheetId: string
 }
 
 export class VirtualCallerService {
@@ -152,6 +153,7 @@ export class VirtualCallerService {
     await this.saveDoneWorksheet(inProgressWorksheet)
     await this.eventBus.publish({
       name: 'virtual-caller.worksheet_done',
+      callerId: inProgressWorksheet.callerId,
       worksheetId: inProgressWorksheet.worksheetId,
     } as WorksheetDone)
   }
