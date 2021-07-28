@@ -1,32 +1,21 @@
 import { createDiContainer } from '../src/infrastructure/dependencies'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
-import { AwilixContainer } from 'awilix'
 import { Bucket, N1qlQuery } from 'couchbase'
 
-let cachedContainer: AwilixContainer
 let cachedBucket: Bucket
 
-export const createTestContainer = () => {
-
-  const bucketPromise = new Promise(async resolve => {
+export async function createTestContainer() {
+  const bucketPromise: Promise<Bucket> = new Promise(async resolve => {
     if (!cachedBucket) {
       cachedBucket = await connectCouchbaseBucket()
     }
     resolve(cachedBucket)
   })
 
-  return bucketPromise
-    .then((bucket: Bucket) => Promise.all([
-        flushBucket(bucket),
-        new Promise(async resolve => {
-          if (!cachedContainer) {
-            cachedContainer = await createDiContainer(bucket)
-          }
-          resolve(cachedContainer)
-        })
-      ])
-    )
-    .then(([ _, container ]) => container as AwilixContainer)
+  const bucket = await bucketPromise
+  await flushBucket(bucket)
+
+  return createDiContainer(bucket)
 }
 
 export function flushBucket (bucket: Bucket) {
@@ -39,7 +28,7 @@ export function flushBucket (bucket: Bucket) {
         reject(error)
         return
       }
-      return setTimeout(resolve, 1000)
+      setTimeout(resolve, 1000)
     })
   })
 }
