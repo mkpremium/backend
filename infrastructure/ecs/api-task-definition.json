@@ -85,10 +85,6 @@
         {
           "name": "TWILIO_ACCOUNT_SID",
           "value": "AC95e4259a869744c6a62258dd3950ee50"
-        },
-        {
-          "name": "VIRTUAL_CALLER_PHONE_NUMBER",
-          "value": "+34670447454"
         }
       ],
       "resourceRequirements": null,
