@@ -11,23 +11,24 @@ export enum OwnerResponse {
 }
 
 interface OwnerResponseProcessCommand {
-  callId: string;
-  buildingId: string;
-  ownerResponse: string;
-  fromCity: string;
-  contactId: string;
-  ownerId: string;
-  worksheetId: string;
+  callId: string
+  buildingId: string
+  ownerResponse: string
+  fromCity: string
+  contactId: string
+  ownerId: string
+  worksheetId: string
 }
 
 export interface InputGathered {
-  name: 'virtual-caller.input_gathered';
-  callId: string;
-  ownerId: string;
-  worksheetId: string;
-  contactId: string;
-  ownerResponse: OwnerResponse | string;
-  buildingId: string;
+  name: 'virtual-caller.input_gathered'
+  callId: string
+  callerId: string
+  ownerId: string
+  worksheetId: string
+  contactId: string
+  ownerResponse: OwnerResponse | string
+  buildingId: string
 }
 
 export class OwnerResponseProcessorService {
@@ -40,7 +41,9 @@ export class OwnerResponseProcessorService {
   }
 
   process (cmd: OwnerResponseProcessCommand): VoiceResponse {
-    this.saveOwnerResponse(cmd)
+    this.saveOwnerResponse(cmd).catch(error => {
+      this.logger.error('Saving owner response', { cmd, errorMessage: error.message })
+    })
 
     const twiml = new VoiceResponse()
     switch (cmd.ownerResponse) {
@@ -73,12 +76,31 @@ export class OwnerResponseProcessorService {
     return twiml
   }
 
-  private saveOwnerResponse (cmd: OwnerResponseProcessCommand) {
+  private async saveOwnerResponse (cmd: OwnerResponseProcessCommand) {
     const { callId, ownerResponse, buildingId, contactId, ownerId, worksheetId } = cmd
-
     this.logger.info('Response from owner gathered', { callId, ownerResponse })
+
+    const call = await this.virtualCallsRepository.get(callId)
+    const updatedCall = VirtualAgentCall.update(call, {
+      status: {
+        $set: 'INPUT_GATHERED'
+      },
+      ownerResponse: {
+        $set: ownerResponse,
+      },
+      gatheredAt: {
+        $set: new Date()
+      }
+    })
+
+    this.virtualCallsRepository.save(updatedCall)
+      .catch(error => {
+        this.logger.error('Saving owner response', { callId, ownerResponse, error: error.message })
+      })
+
     const inputGatheredEvent: InputGathered = {
       name: 'virtual-caller.input_gathered',
+      callerId: call.callerId,
       callId,
       ownerResponse,
       buildingId,
@@ -90,28 +112,5 @@ export class OwnerResponseProcessorService {
     this.eventBus.publish(inputGatheredEvent).catch(error => {
       this.logger.error('Publishing input gathered event', { error: error.message, callId, ownerResponse })
     })
-
-    this.virtualCallsRepository.get(callId)
-      .then(call => {
-        const updatedCall = VirtualAgentCall.update(call, {
-          status: {
-            $set: 'INPUT_GATHERED'
-          },
-          ownerResponse: {
-            $set: ownerResponse,
-          },
-          gatheredAt: {
-            $set: new Date()
-          }
-        })
-
-        this.virtualCallsRepository.save(updatedCall)
-          .catch(error => {
-            this.logger.error('Saving owner response', { callId, ownerResponse, error: error.message })
-          })
-      })
-      .catch(error => {
-        this.logger.error('Getting call', { callId, ownerResponse, error: error.message })
-      })
   }
 }

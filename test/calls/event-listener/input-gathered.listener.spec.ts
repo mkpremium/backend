@@ -2,24 +2,33 @@ import { InputGathered, OwnerResponse } from '../../../src/calls/service/owner-r
 import { createInputGatheredListener } from '../../../src/calls/event-listener/input-gathered.listener'
 import { stub } from 'sinon'
 import { expect } from 'chai'
+import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 describe('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
   let scheduleCallServiceStub
   let updateBuildingNegotiationStatusStub
   let changeContactStatusServiceStub
+  let virtualCallersRepositoryStub
+
+  const testAssignedCallerId = 'test-caller-id'
+  const testVirtualCallerId = 'test-virtual-caller-id'
+  const testVirtualCallerQueueId = 'test-queue-id'
   const testEvent: InputGathered = {
     name: 'virtual-caller.input_gathered',
     ownerResponse: OwnerResponse.SALE,
     buildingId: 'test-building-id',
     callId: 'test-call-id',
+    callerId: testVirtualCallerId,
     contactId: 'test-contact-id',
     ownerId: 'test-owner-id',
     worksheetId: 'test-worksheet-id',
   }
-  const testAssignedCallerId = 'test-caller-id'
-  const testVirtualCallerId = 'test-virtual-caller-id'
-  const testVirtualCallerQueueId = 'test-queue-id'
+  const testVirtualCaller = virtualCallerBuilder({
+    id: testVirtualCallerId,
+    assignCallsTo: testAssignedCallerId,
+    queueId: testVirtualCallerQueueId
+  }).build()
 
   beforeEach(() => {
     scheduleCallServiceStub = {
@@ -31,14 +40,14 @@ describe('input-gathered.listener', () => {
     changeContactStatusServiceStub = {
       change: stub(),
     }
+    virtualCallersRepositoryStub = {
+      get: stub(),
+    }
+    virtualCallersRepositoryStub.get.withArgs(testEvent.callerId).resolves(testVirtualCaller)
 
     listener = createInputGatheredListener({
       scheduleCall: scheduleCallServiceStub,
-      virtualCallerConfig: {
-        assignedCallerIdForVirtualCalls: testAssignedCallerId,
-        virtualCallerQueueId: testVirtualCallerQueueId,
-        virtualCallerId: testVirtualCallerId,
-      },
+      virtualCallersRepository: virtualCallersRepositoryStub,
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
       changeContactStatusService: changeContactStatusServiceStub,
       logger: { info: () => undefined }
