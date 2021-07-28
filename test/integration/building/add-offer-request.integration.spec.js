@@ -1,5 +1,6 @@
 import { Promise } from 'bluebird'
 import { expect } from 'chai'
+import { buildingEventListeners } from '../../../src/building/listeners'
 import { buildingBuilder } from '../../building/building.builder'
 import { createTestContainer } from '../../create-test-container'
 import { ownerBuilder } from '../../owner/owner.builder'
@@ -29,6 +30,7 @@ describe('AddOfferRequest', () => {
 
   before(async () => {
     const diContainer = await createTestContainer()
+    buildingEventListeners(diContainer)
     addOfferRequestService = diContainer.resolve('addOfferRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
