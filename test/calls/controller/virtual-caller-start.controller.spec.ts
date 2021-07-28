@@ -18,7 +18,6 @@ describe('virtual-caller-start.controller', () => {
     }
 
     controller = createStartVirtualCallerController({
-      virtualCallerConfig: undefined, virtualCallerPhoneNumber: '',
       virtualCallerSupervisor: virtualCallerSupervisorStub,
       virtualCallersRepository: virtualCallersRepositoryStub,
     })
