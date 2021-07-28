@@ -1,9 +1,9 @@
-import { buildingBuilder } from '../../building/building.builder'
-import { worksheetBuilder } from '../../worksheet/worksheet.builder'
-import { createTestApp } from '../create-test-app'
-import { expect } from 'chai'
-import { ownerBuilder } from '../../owner/owner.builder'
 import { Promise } from 'bluebird'
+import { expect } from 'chai'
+import { buildingBuilder } from '../../building/building.builder'
+import { createTestContainer } from '../../create-test-container'
+import { ownerBuilder } from '../../owner/owner.builder'
+import { worksheetBuilder } from '../../worksheet/worksheet.builder'
 
 async function delayForConsistency () {
   await Promise.delay(500)
@@ -28,7 +28,7 @@ describe('AddOfferRequest', () => {
   let worksheetRepository
 
   before(async () => {
-    const { locals: { diContainer } } = await createTestApp()
+    const diContainer = await createTestContainer()
     addOfferRequestService = diContainer.resolve('addOfferRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
