@@ -82,6 +82,7 @@ describe('VirtualCallerSupervisorService', () => {
   })
 
   it('does not invoke virtual caller outside scheduled hours', async () => {
+    clock.restore()
     clock = sinon.useFakeTimers(moment().startOf('isoWeek').hours(20).minutes(1).toDate())
 
     await service.check(testCmd)
