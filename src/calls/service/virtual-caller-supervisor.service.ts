@@ -24,6 +24,11 @@ export class VirtualCallerSupervisorService {
   }
 
   async check (cmd: CheckCommand) {
+    if (!cmd.caller.isEnabled) {
+      this.logger.info('Caller is disabled', { caller: cmd.caller })
+      return
+    }
+
     if (outOfWorkingHours()) {
       this.logger.info('Outside of working hours, no call', cmd)
       return

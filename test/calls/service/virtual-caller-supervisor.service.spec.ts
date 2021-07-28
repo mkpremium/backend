@@ -10,7 +10,11 @@ import { ContactsOrderStrategy } from '../../../src/calls/service/virtual-caller
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 const testCmd: CheckCommand = {
-  caller: virtualCallerBuilder({ id: 'test-caller-id', queueId: 'test-queue-id' }).build(),
+  caller: virtualCallerBuilder({
+    id: 'test-caller-id',
+    queueId: 'test-queue-id',
+    isEnabled: true,
+  }).build(),
   maxWorksheets: 100,
   lastWorksheetId: undefined,
   lastOwnerResponse: undefined,
@@ -78,10 +82,16 @@ describe('VirtualCallerSupervisorService', () => {
   })
 
   it('does not invoke virtual caller outside scheduled hours', async () => {
-    clock.restore()
     clock = sinon.useFakeTimers(moment().startOf('isoWeek').hours(20).minutes(1).toDate())
 
     await service.check(testCmd)
+
+    expect(virtualCallerStub.processNextWorksheet).to.not.have.been.called
+    expect(loggerSpy.info).to.have.been.called
+  })
+
+  it('does not invoke disabled virtual caller', async () => {
+    await service.check({ ...testCmd, caller: { ...testCmd.caller, isEnabled: false } })
 
     expect(virtualCallerStub.processNextWorksheet).to.not.have.been.called
     expect(loggerSpy.info).to.have.been.called
