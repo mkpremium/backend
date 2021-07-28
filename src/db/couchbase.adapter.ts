@@ -71,7 +71,7 @@ export class CouchbaseAdapter {
       this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
     ).catch(error => {
       if (error.code) {
-        this.throwCouchbaseError(error, query)
+        throw new QueryError(query, error.code, error.message)
       } else {
         throw error
       }
@@ -94,14 +94,6 @@ export class CouchbaseAdapter {
 
   upsert (key: string, obj: object) {
     return this.couchbaseBucket.upsertAsync(key, obj)
-  }
-
-  private throwCouchbaseError (error, query: string) {
-    if (error.code) {
-      throw new QueryError(query, error.code, error.message)
-    } else {
-      throw error
-    }
   }
 
   private withRetry<T> (fn: () => Promise<T>): Promise<T> {

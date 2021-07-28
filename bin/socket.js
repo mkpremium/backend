@@ -5,7 +5,6 @@ import { Server } from 'http'
 
 import { socket as socketConfig } from '../config'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
-import '../src/db/legacy-connect-couchbase'
 import { logger } from '../src/infrastructure/logger'
 import socket from '../src/socket'
 

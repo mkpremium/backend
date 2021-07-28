@@ -8,7 +8,6 @@ import { buildingRoutes } from './building/routing'
 import cadastre from './cadastre'
 import { setupCallerRoutes } from './caller/init'
 
-import './db/legacy-connect-couchbase'
 import email from './email'
 import { initFlipperModule } from './flipper/init'
 import history from './history'

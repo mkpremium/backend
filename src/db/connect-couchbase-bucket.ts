@@ -2,6 +2,9 @@ import { Bucket, Cluster } from 'couchbase'
 import { CouchbaseModel } from './model'
 import retry from 'bluebird-retry'
 import { CouchbaseAdapter } from './couchbase.adapter'
+// legacy types and SQL lybrary.
+import '../lib/squel/let'
+import '../types'
 
 const config = {
   uri: process.env.COUCHBASE_URI || 'couchbase://127.0.0.1?detailed_errcodes=1',
