@@ -19,7 +19,7 @@ module.exports = (bucketName = 'mkpremium_test') => {
 
   const createBucket = () => clusterManager.createBucketAsync(bucketName, {
     flushEnabled: 1,
-    ramQuotaMB: 256,
+    ramQuotaMB: 1024,
     authType: 'none'
   }).catch(error => {
     if (error.statusCode === 400 && _.get(error, 'response.errors.name') === 'Bucket with given name already exists') {
