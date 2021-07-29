@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../src/infrastructure/o11y/honeycomb'
 
 import http from 'http'
 import { logger } from '../src/infrastructure/logger'

@@ -9,6 +9,7 @@ import { Bucket, errors as couchbaseErrors, errors, N1qlQuery } from 'couchbase'
 import { CouchbaseRecordToDomain, RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 import { promisifyAll } from 'bluebird'
 import Consistency = N1qlQuery.Consistency
+import honeycomb from 'honeycomb-beeline'
 
 export type PromisifiedBucket = Bucket & {
   queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
@@ -39,8 +40,7 @@ export class CouchbaseAdapter {
       throw new WrongStructRecord(data._documentType, validationResult.errors, data)
     }
 
-    await this.withRetry(() =>
-      this.couchbaseBucket.upsertAsync(dataWithId.id, dataWithId)
+    await this.withRetry(() => this.upsert(dataWithId.id, dataWithId)
     )
 
     return fromJSON(dataWithId, structType)
@@ -48,27 +48,36 @@ export class CouchbaseAdapter {
 
   getEntity<T> (structType: t.Type<T> & Partial<RecordToDomain>, entityId): Promise<T> {
     return this.withRetry(
-      () => this.couchbaseBucket.getAsync(entityId)
-        .catch(error => {
-          if (error.code === errors.keyNotFound) {
-            throw new EntityNotFound(entityId, structType)
-          }
-          throw error
-        })
-        .then(result => {
-          const parsedRecord = fromJSON(result.value, structType)
-          if (CouchbaseRecordToDomain.is(parsedRecord)) {
-            return (parsedRecord as unknown as RecordToDomain).couchbaseToDomain()
-          }
+      () => {
+        const beeline = honeycomb()
+        const span = beeline.startSpan({ name: 'couchbase_get' })
+        return this.couchbaseBucket.getAsync(entityId)
+          .finally(() => beeline.finishSpan(span))
+          .catch(error => {
+            if (error.code === errors.keyNotFound) {
+              throw new EntityNotFound(entityId, structType)
+            }
+            throw error
+          })
+          .then(result => {
+            const parsedRecord = fromJSON(result.value, structType)
+            if (CouchbaseRecordToDomain.is(parsedRecord)) {
+              return (parsedRecord as unknown as RecordToDomain).couchbaseToDomain()
+            }
 
-          return parsedRecord
-        })
+            return parsedRecord
+          })
+      }
     )
   }
 
   queryAsync (query: string, params?): Promise<any> {
-    return this.withRetry(() =>
-      this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
+    return this.withRetry(() => {
+        const beeline = honeycomb()
+        const span = beeline.startSpan({ name: 'couchbase_query' })
+        return this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
+          .finally(() => beeline.finishSpan(span))
+      }
     ).catch(error => {
       if (error.code) {
         throw new QueryError(query, error.code, error.message)
@@ -93,7 +102,11 @@ export class CouchbaseAdapter {
   }
 
   upsert (key: string, obj: object) {
+    const beeline = honeycomb()
+    const span = beeline.startSpan({ name: 'couchbase_upsert' })
+
     return this.couchbaseBucket.upsertAsync(key, obj)
+      .finally(() => beeline.finishSpan(span))
   }
 
   private withRetry<T> (fn: () => Promise<T>): Promise<T> {

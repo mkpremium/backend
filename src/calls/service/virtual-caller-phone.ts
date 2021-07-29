@@ -6,6 +6,7 @@ import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksh
 import { OwnerContact } from './virtual-caller.service'
 import retry from 'bluebird-retry'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
+import honeycomb from 'honeycomb-beeline'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
@@ -77,6 +78,9 @@ export class VirtualCallerPhone {
     from: string,
     to: string
   ) {
+    const beeline = honeycomb()
+    const callSpan = beeline.startSpan({ name: 'twilio_create_call' })
+
     return this.twilioClient.calls.create({
       twiml: this.createContactMessage(address, buildingId, worksheetId, contact, call.id).toString(),
       callerId: from,
@@ -100,6 +104,7 @@ export class VirtualCallerPhone {
         this.virtualCallsRepository.save(updatedCall)
         throw error
       })
+      .finally(() => beeline.finishSpan(callSpan))
   }
 
   private async saveCall (cmd: CallCommand, to: string) {

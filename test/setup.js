@@ -1,3 +1,6 @@
+import honeycomb from 'honeycomb-beeline'
+honeycomb()
+
 require('../src/types')
 
 const chai = require('chai')
