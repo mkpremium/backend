@@ -130,7 +130,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
 
   async findWorksheetByBuilding (buildingId) {
     const qb = this.getQueryBuilder()
-      .where('ANY v IN t.`relatedBuildingIds` SATISFIES v = ? END', buildingId)
+      .where('t.`relatedBuildingIds`[0] = ?', buildingId)
 
     const results = await this.query(qb)
 
