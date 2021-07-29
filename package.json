@@ -28,7 +28,7 @@
     "express-jwt-permissions": "^1.1.0",
     "express-promise-wrap": "^0.2.2",
     "faker": "^5.1.0",
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^10.0.0",
     "honeycomb-beeline": "^2.7.4",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.15",
