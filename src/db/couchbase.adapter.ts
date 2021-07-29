@@ -50,7 +50,7 @@ export class CouchbaseAdapter {
     return this.withRetry(
       () => {
         const beeline = honeycomb()
-        const span = beeline.startSpan({ name: 'couchbase_get' })
+        const span = beeline.startSpan({ name: 'couchbase_get', key: entityId })
         return this.couchbaseBucket.getAsync(entityId)
           .finally(() => beeline.finishSpan(span))
           .catch(error => {
@@ -103,7 +103,7 @@ export class CouchbaseAdapter {
 
   upsert (key: string, obj: object) {
     const beeline = honeycomb()
-    const span = beeline.startSpan({ name: 'couchbase_upsert' })
+    const span = beeline.startSpan({ name: 'couchbase_upsert', key })
 
     return this.couchbaseBucket.upsertAsync(key, obj)
       .finally(() => beeline.finishSpan(span))
