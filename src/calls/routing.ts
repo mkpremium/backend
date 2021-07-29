@@ -1,6 +1,7 @@
 import { Express, Router } from 'express'
 import { AwilixContainer } from 'awilix'
 import { wrap } from 'express-promise-wrap'
+import jwt from '../middleware/jwt'
 
 export const callsRoutes = (container: AwilixContainer, app: Express) => {
   const router = Router()
@@ -16,5 +17,5 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
   router.post('/virtual-caller/today', wrap(container.resolve('virtualCallerTodayStatsController')))
   router.post('/virtual-callers', wrap(container.resolve('createVirtualCallerController')))
 
-  app.use('/calls', router)
+  app.use('/calls', jwt(), router)
 }
