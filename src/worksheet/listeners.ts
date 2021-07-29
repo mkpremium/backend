@@ -34,7 +34,7 @@ export function worksheetEventListeners (container: AwilixContainer) {
       const worksheet = await legacyWorksheetRepository.findWorksheetByBuilding(buildingId)
       await legacyWorksheetRepository.updateStatus(worksheet.id, userId)
     } catch (error) {
-      logger.crit('could not update worksheet on building status change', { error, errorMessage: error.message })
+      logger.crit('could not update worksheet on building status change', { error, errorMessage: error.message, buildingId })
     }
   })
 
