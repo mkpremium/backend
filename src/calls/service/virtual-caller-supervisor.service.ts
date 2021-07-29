@@ -5,7 +5,7 @@ import { WorksheetViewProps } from '../../worksheet/repository/worksheet.reposit
 import { flatMap, groupBy } from 'lodash'
 import moment from 'moment-timezone'
 import { EventBus } from '../../infrastructure/event-bus'
-import { VirtualCallerProps } from '../domain/virtual-caller'
+import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 
 export interface CheckCommand {
   caller: VirtualCallerProps
@@ -29,7 +29,7 @@ export class VirtualCallerSupervisorService {
       return
     }
 
-    if (outOfWorkingHours()) {
+    if (outOfWorkingHours(cmd.caller.timezone)) {
       this.logger.info('Outside of working hours, no call', cmd)
       return
     }
@@ -88,7 +88,7 @@ export class VirtualCallerSupervisorService {
 const SATURDAY = 6
 const SUNDAY = 7
 
-function outOfWorkingHours () {
-  const now = moment().tz('Europe/Madrid')
+function outOfWorkingHours (timezone: Timezone) {
+  const now = moment().tz(timezone)
   return now.hours() < 9 || now.hours() >= 20 || [ SATURDAY, SUNDAY ].includes(now.isoWeekday())
 }
