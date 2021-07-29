@@ -32,7 +32,7 @@
     "honeycomb-beeline": "^2.7.4",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.15",
-    "mime-types": "^2.1.19",
+    "mime-types": "^2.1.32",
     "moment-range": "^4.0.1",
     "moment-timezone": "^0.5.16",
     "morgan": "^1.9.1",
