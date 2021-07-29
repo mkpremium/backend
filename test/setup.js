@@ -1,5 +1,4 @@
-import honeycomb from 'honeycomb-beeline'
-honeycomb()
+require('honeycomb-beeline')({ disableInstrumentation: true })
 
 require('../src/types')
 
