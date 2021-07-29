@@ -94,6 +94,10 @@
         {
           "valueFrom": "backend.twilio_account_token",
           "name": "TWILIO_ACCOUNT_TOKEN"
+        },
+        {
+          "valueFrom": "backend.honeycomb_write_key",
+          "name": "HONEYCOMB_WRITE_KEY"
         }
       ],
       "dockerSecurityOptions": null,
