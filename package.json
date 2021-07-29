@@ -12,7 +12,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "awilix": "^4.3.1",
+    "awilix": "^4.3.4",
     "aws-sdk": "^2.955.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
