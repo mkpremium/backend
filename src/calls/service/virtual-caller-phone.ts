@@ -29,7 +29,7 @@ export class NumberAlreadyCalled implements Error {
   }
 }
 
-const localizationByTimezone: Record<Timezone, { prefix: string; language: SayLanguage }> = {
+const localizationByTimezone: Record<Timezone, { prefix: string; language: CallLanguage }> = {
   'Europe/Madrid': {
     language: 'es-ES',
     prefix: '+34',
@@ -39,6 +39,8 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: SayLa
     prefix: '+351',
   },
 }
+
+type CallLanguage = 'es-ES' | 'pt-PT'
 
 export class VirtualCallerPhone {
   constructor (
@@ -84,7 +86,7 @@ export class VirtualCallerPhone {
     call: VirtualAgentCallProps,
     from: string,
     to: string,
-    language: VoiceResponse.SayLanguage
+    language: CallLanguage
   ) {
     const beeline = honeycomb()
     const callSpan = beeline.startSpan({ name: 'twilio_create_call' })
@@ -129,12 +131,17 @@ export class VirtualCallerPhone {
     return call
   }
 
-  private createContactMessage (address: AddressParam, buildingId: string, worksheetId: string, contact: OwnerContact, callId: string, language: VoiceResponse.SayLanguage) {
+  private createContactMessage (
+    address: AddressParam,
+    buildingId: string,
+    worksheetId: string,
+    contact: OwnerContact,
+    callId: string,
+    language: CallLanguage
+  ) {
     const twiml = new VoiceResponse()
     twiml.pause({ length: 1 })
-    const message = `Buenos dias, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
-      ', nos dedicamos a la compra patrimonial de inmuebles, estaria usted interesado en vender?' +
-      'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
+    const message = this.composeMessage(address, language)
 
     const gatherEndpointQueryParams = [
       [ 'buildingId', buildingId ],
@@ -149,7 +156,21 @@ export class VirtualCallerPhone {
       method: 'POST',
       language: language as GatherLanguage,
       numDigits: 1,
-    }).say(this.twilioSayAttributes[language], message)
+    }).say(this.twilioSayAttributes[ language ], message)
     return twiml
+  }
+
+  private composeMessage (address: AddressParam, language: CallLanguage) {
+    if (language === 'es-ES') {
+      return `Buenos días, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
+        ', nos dedicamos a la compra patrimonial de inmuebles, ¿estaría usted interesado en vender?' +
+        'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
+    } else if (language === 'pt-PT') {
+      return `Bom dia, entramos em contato com você sobre a sua propiedade de ${address.street} ${address.number} de ${address.city}.` +
+        'Estamos empenhados em comprar ativos imobiliários, você estaria interessado em vender? ' +
+        'Se você quer vender, marque 1, se não quiser vender, marque 2, e se você não for o dono, marque 3.'
+    } else {
+      throw new Error(`Unsupported language ${language}`)
+    }
   }
 }

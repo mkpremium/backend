@@ -98,16 +98,18 @@ describe('VirtualCallerPhone', () => {
     expect(twilioClientStub.calls.create.lastCall.firstArg.to).to.match(/^\+351/)
   })
 
-  it('calls with Spanish Twilio says attributes for Europe/Madrid timezone', async () => {
+  it('calls using Spanish for Europe/Madrid timezone', async () => {
     await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Madrid' }).build() })
 
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Buenos días')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('es-ES')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['es-ES'].voice}"`)
   })
 
-  it('calls with Portuguese Twilio says attributes for Europe/Lisbon timezone', async () => {
+  it('calls using Portuguese for Europe/Lisbon timezone', async () => {
     await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Lisbon' }).build() })
 
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Bom dia')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('language="pt-PT"')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['pt-PT'].voice}"`)
   })
