@@ -28,6 +28,10 @@ export class ProposalsSenderService {
   }
 
   async checkAndSendProposals () {
+    if (isOutsideWorkingHours()) {
+      this.logger.info('Outside working hours, not sending email')
+      return
+    }
     let lastScheduledEventDateToInclude = moment().add(-3, 'days')
     if (isFridayOrWeekend(lastScheduledEventDateToInclude)) {
       lastScheduledEventDateToInclude = lastScheduledEventDateToInclude.isoWeekday(4)
@@ -91,4 +95,9 @@ export class ProposalsSenderService {
       }
     )
   }
+}
+
+function isOutsideWorkingHours () {
+  const now = moment().tz('Europe/Madrid')
+  return now.hours() < 9 || now.hours() >= 20 || [ 6, 7 ].includes(now.isoWeekday())
 }

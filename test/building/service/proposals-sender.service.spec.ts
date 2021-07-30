@@ -4,7 +4,7 @@ import { ProposalsSenderService } from '../../../src/building/service/proposals-
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
 import { proposalBuilder } from '../proposal.builder'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { meetingBuilder } from '../../scheduled-events/meeting.builder'
 
 describe('ProposalsSenderService', () => {
@@ -59,7 +59,7 @@ describe('ProposalsSenderService', () => {
       buildingsRepositoryStub,
       scheduledEventsRepositoryStub,
       updateBuildingNegotiationStatusServiceStub,
-      undefined
+      { info: () => undefined } as any
     )
 
     usersRepositoryStub.get.withArgs(testFlipper.id).resolves(testFlipper)
@@ -76,7 +76,7 @@ describe('ProposalsSenderService', () => {
 
     expect(emailSenderStub.sendMail).to.have.been.calledWith({
       to: testProposal.notificationEmail,
-      subject: emailCopies[testFlipper.profile.language]['mailSubject'],
+      subject: emailCopies[ testFlipper.profile.language ][ 'mailSubject' ],
       from: testFlipper,
       message: testProposal.message,
       attachment: { content: testProposalPdf, filename: 'propuesta.pdf' },
@@ -130,5 +130,20 @@ describe('ProposalsSenderService', () => {
         userId: testFlipper.id,
       }
     )
+  })
+
+  it('does not send emails outside working hours', async () => {
+    const clock = sinon.useFakeTimers(moment().tz('Europe/Madrid').isoWeekday('6').toDate())
+
+    await service.checkAndSendProposals()
+    clock.restore()
+
+    expect(emailSenderStub.sendMail).to.not.have.been.calledWith({
+      to: testProposal.notificationEmail,
+      subject: emailCopies[ testFlipper.profile.language ][ 'mailSubject' ],
+      from: testFlipper,
+      message: testProposal.message,
+      attachment: { content: testProposalPdf, filename: 'propuesta.pdf' },
+    })
   })
 })
