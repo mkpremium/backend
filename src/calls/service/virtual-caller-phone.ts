@@ -1,12 +1,13 @@
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Twilio } from 'twilio'
-import VoiceResponse, { GatherLanguage, SayLanguage } from 'twilio/lib/twiml/VoiceResponse'
+import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
 import retry from 'bluebird-retry'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 import honeycomb from 'honeycomb-beeline'
+import { CallLanguage, TwilioSayAttributes } from './call-attributes'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
@@ -40,14 +41,12 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
   },
 }
 
-type CallLanguage = 'es-ES' | 'pt-PT'
-
 export class VirtualCallerPhone {
   constructor (
     private twilioClient: Twilio,
     private publicUrl: string,
     private virtualCallsRepository: VirtualCallsRepository,
-    private twilioSayAttributes: Record<'es-ES' | 'pt-PT', VoiceResponse.SayAttributes>,
+    private twilioSayAttributes: TwilioSayAttributes,
     private ownerTrialPhoneNumber?: string,
   ) {
   }
@@ -149,6 +148,7 @@ export class VirtualCallerPhone {
       [ 'worksheetId', worksheetId ],
       [ 'contactId', contact.id ],
       [ 'ownerId', contact.ownerId ],
+      [ 'language', language ],
     ].map(([ key, value ]) => `${key}=${value}`).join('&')
 
     twiml.gather({

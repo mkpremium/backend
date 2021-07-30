@@ -4,7 +4,7 @@ export const createInputGatheredWebhookController = ({ ownerResponseProcessor }:
   async (req, res) => {
     const { callId } = req.params
     const ownerResponse = req.body.Digits
-    const { fromCity, buildingId, contactId, ownerId, worksheetId } = req.query
+    const { fromCity, buildingId, contactId, ownerId, worksheetId, language } = req.query
     const response = ownerResponseProcessor.process({
         callId,
         ownerResponse,
@@ -13,6 +13,7 @@ export const createInputGatheredWebhookController = ({ ownerResponseProcessor }:
         contactId,
         ownerId,
         worksheetId,
+        language,
     })
 
     res.send(response.toString())

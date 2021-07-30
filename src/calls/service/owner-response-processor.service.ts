@@ -3,6 +3,7 @@ import { VirtualAgentCall } from '../virtual-agent-call'
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Logger } from 'winston'
 import { EventBus } from '../../infrastructure/event-bus'
+import { CallLanguage, TwilioSayAttributes } from './call-attributes'
 
 export enum OwnerResponse {
   SALE = '1',
@@ -31,44 +32,52 @@ export interface InputGathered {
   buildingId: string
 }
 
+interface ProcessOwnerResponseCommand {
+  callId: string
+  contactId: string
+  worksheetId: string
+  ownerResponse: string
+  language: CallLanguage
+  ownerId: string
+  fromCity: string
+  buildingId: string
+}
+
 export class OwnerResponseProcessorService {
   constructor (
     private virtualCallsRepository: VirtualCallsRepository,
-    private twilioSayAttributes: VoiceResponse.SayAttributes,
+    private twilioSayAttributes: TwilioSayAttributes,
     private eventBus: EventBus,
     private logger: Logger,
   ) {
   }
 
-  process (cmd: OwnerResponseProcessCommand): VoiceResponse {
+  process (cmd: ProcessOwnerResponseCommand): VoiceResponse {
     this.saveOwnerResponse(cmd).catch(error => {
       this.logger.error('Saving owner response', { cmd, errorMessage: error.message })
     })
 
     const twiml = new VoiceResponse()
+    const sayAttribute = this.twilioSayAttributes[ cmd.language ]
     switch (cmd.ownerResponse) {
       case OwnerResponse.SALE:
-        twiml.say(
-          this.twilioSayAttributes,
+        twiml.say(sayAttribute,
           `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara el director ` +
           `de ${cmd.fromCity} para hablar con usted sobre su propiedad.  Gracias y buenos dias.`
         )
         break
       case OwnerResponse.NO_SALE:
-        twiml.say(
-          this.twilioSayAttributes,
+        twiml.say(sayAttribute,
           'Perfecto, tomamos nota de que no tiene intención de vender, disculpe las molestias, buenos dias.'
         )
         break
       case OwnerResponse.NOT_OWNER:
-        twiml.say(
-          this.twilioSayAttributes,
+        twiml.say(sayAttribute,
           'Gracias por su respuesta y perdón por las molestias.'
         )
         break
       default:
-        twiml.say(
-          this.twilioSayAttributes,
+        twiml.say(sayAttribute,
           'Ha seleccionado una opción no valida, gracias por su respuesta y perdón por las molestias.'
         )
     }
