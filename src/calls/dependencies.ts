@@ -30,9 +30,15 @@ export interface TwilioCredentials {
 }
 
 const sayAttributes = {
-  language: 'es-ES' as 'es-ES',
-  voice: 'Polly.Enrique',
-} as VoiceResponse.SayAttributes
+  'es-ES': {
+    language: 'es-ES' as 'es-ES',
+    voice: 'Polly.Enrique' as 'Polly.Enrique',
+  },
+  'pt-PT': {
+    language: 'pt-PT' as 'pt-PT',
+    voice: 'Polly.Cristiano' as 'Polly.Cristiano',
+  }
+}
 
 export const setupCallsDependencies = (container: AwilixContainer) => {
   container.register({
