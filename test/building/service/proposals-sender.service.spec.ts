@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import sinon, { stub } from 'sinon'
+import sinon, { SinonFakeTimers, stub } from 'sinon'
 import { ProposalsSenderService } from '../../../src/building/service/proposals-sender.service'
 import { emailCopies } from '../../../src/building/service/email-copies'
 import { buildingBuilder } from '../building.builder'
@@ -16,6 +16,7 @@ describe('ProposalsSenderService', () => {
   let pdfProposalComposerStub
   let scheduledEventsRepositoryStub
   let updateBuildingNegotiationStatusServiceStub
+  let clock: SinonFakeTimers
 
   const testProposal = proposalBuilder().build()
   const testFlipper = {
@@ -47,6 +48,8 @@ describe('ProposalsSenderService', () => {
     updateBuildingNegotiationStatusServiceStub = {
       updateBuildingStatus: stub().resolves(),
     }
+    const lastMondayMorning = moment().tz('Europe/Madrid').startOf('isoWeek').hours(9).minutes(0)
+    clock = sinon.useFakeTimers(lastMondayMorning.toDate())
 
     buildingsRepositoryStub = {
       get: stub()
@@ -70,6 +73,8 @@ describe('ProposalsSenderService', () => {
       .resolves(testProposalPdf)
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId).resolves(undefined)
   })
+
+  afterEach(() => clock.restore())
 
   it('sends email for pending proposal', async () => {
     await service.checkAndSendProposals()
@@ -133,10 +138,10 @@ describe('ProposalsSenderService', () => {
   })
 
   it('does not send emails outside working hours', async () => {
-    const clock = sinon.useFakeTimers(moment().tz('Europe/Madrid').isoWeekday('6').toDate())
+    clock.restore()
+    clock = sinon.useFakeTimers(moment().tz('Europe/Madrid').isoWeekday('6').toDate())
 
     await service.checkAndSendProposals()
-    clock.restore()
 
     expect(emailSenderStub.sendMail).to.not.have.been.calledWith({
       to: testProposal.notificationEmail,
