@@ -1,6 +1,6 @@
 import { ProposalsSenderService } from '../../../src/building/service/proposals-sender.service'
 import { createTestContainer } from '../../create-test-container'
-import { stub } from 'sinon'
+import sinon, { SinonFakeTimers, stub } from 'sinon'
 import { asValue } from 'awilix'
 import { expect } from 'chai'
 import { buildingBuilder } from '../../building/building.builder'
@@ -11,11 +11,13 @@ import { BuildingsRepository } from '../../../src/building/repository/buildings.
 import { UserRepository } from '../../../src/user/repository/user.repository'
 import { UserProps } from '../../../src/types/user'
 import { userBuilder } from '../../user/user.builder'
+import moment from 'moment-timezone'
 
 describe('ProposalsSenderService - Integration', () => {
   let service!: ProposalsSenderService
   let addProposalForBuildingService!: AddProposalForBuildingService
   let mailerSpy
+  let clock: SinonFakeTimers
   const testBuilding = buildingBuilder({ cadastre: { reference: '123456789' } }).build()
   const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withEmailContact('test-email-id').build()
   const testCaller: UserProps = userBuilder().build()
@@ -25,6 +27,8 @@ describe('ProposalsSenderService - Integration', () => {
     mailerSpy = {
       sendMail: stub()
     }
+    const lastMondayMorning = moment().startOf('isoWeek').hours(9).minutes(0)
+    clock = sinon.useFakeTimers(lastMondayMorning.toDate())
     container.register('emailTransport', asValue(mailerSpy))
 
     service = container.resolve('proposalsSenderService')
@@ -37,6 +41,8 @@ describe('ProposalsSenderService - Integration', () => {
     await ownersRepository.save(testOwner)
     await buildingsRepository.save(testBuilding)
   })
+
+  afterEach(() => clock.restore())
 
   it('sends emails older than 3 days', async () => {
     mailerSpy.sendMail.resolves()
