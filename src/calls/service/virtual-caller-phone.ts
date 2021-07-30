@@ -1,6 +1,6 @@
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Twilio } from 'twilio'
-import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
+import VoiceResponse, { GatherLanguage, SayLanguage } from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
 import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
@@ -29,9 +29,15 @@ export class NumberAlreadyCalled implements Error {
   }
 }
 
-const prefixByTimezone: Record<Timezone, string> = {
-  'Europe/Madrid': '+34',
-  'Europe/Lisbon': '+351',
+const localizationByTimezone: Record<Timezone, { prefix: string; language: SayLanguage }> = {
+  'Europe/Madrid': {
+    language: 'es-ES',
+    prefix: '+34',
+  },
+  'Europe/Lisbon': {
+    language: 'pt-PT',
+    prefix: '+351',
+  },
 }
 
 export class VirtualCallerPhone {
@@ -39,7 +45,7 @@ export class VirtualCallerPhone {
     private twilioClient: Twilio,
     private publicUrl: string,
     private virtualCallsRepository: VirtualCallsRepository,
-    private twilioSayAttributes: VoiceResponse.SayAttributes,
+    private twilioSayAttributes: Record<'es-ES' | 'pt-PT', VoiceResponse.SayAttributes>,
     private ownerTrialPhoneNumber?: string,
   ) {
   }
@@ -47,7 +53,8 @@ export class VirtualCallerPhone {
   async call (cmd: CallCommand) {
     const { worksheetId, contact, address, buildingId } = cmd
 
-    const to = this.ownerTrialPhoneNumber || prefixByTimezone[cmd.caller.timezone] + contact.value
+    const localization = localizationByTimezone[ cmd.caller.timezone ]
+    const to = this.ownerTrialPhoneNumber || localization.prefix + contact.value
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
     if (lastCallToNumber) {
       throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
@@ -55,7 +62,7 @@ export class VirtualCallerPhone {
     const call = await this.saveCall(cmd, to)
 
     const phoneLock = await this.getPhoneLock(cmd.caller.phoneNumber)
-    return this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to)
+    return this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language)
       .finally(() => this.virtualCallsRepository.unlockPhone(cmd.caller.phoneNumber, phoneLock))
   }
 
@@ -76,13 +83,14 @@ export class VirtualCallerPhone {
     contact: OwnerContact,
     call: VirtualAgentCallProps,
     from: string,
-    to: string
+    to: string,
+    language: VoiceResponse.SayLanguage
   ) {
     const beeline = honeycomb()
     const callSpan = beeline.startSpan({ name: 'twilio_create_call' })
 
     return this.twilioClient.calls.create({
-      twiml: this.createContactMessage(address, buildingId, worksheetId, contact, call.id).toString(),
+      twiml: this.createContactMessage(address, buildingId, worksheetId, contact, call.id, language).toString(),
       callerId: from,
       from: from,
       to: to,
@@ -121,7 +129,7 @@ export class VirtualCallerPhone {
     return call
   }
 
-  private createContactMessage (address: AddressParam, buildingId: string, worksheetId: string, contact: OwnerContact, callId: string) {
+  private createContactMessage (address: AddressParam, buildingId: string, worksheetId: string, contact: OwnerContact, callId: string, language: VoiceResponse.SayLanguage) {
     const twiml = new VoiceResponse()
     twiml.pause({ length: 1 })
     const message = `Buenos dias, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
@@ -139,9 +147,9 @@ export class VirtualCallerPhone {
     twiml.gather({
       action: `${this.publicUrl}/calls/twilio/${callId}/gather?${gatherEndpointQueryParams}`,
       method: 'POST',
-      language: 'es-ES',
+      language: language as GatherLanguage,
       numDigits: 1,
-    }).say(this.twilioSayAttributes, message)
+    }).say(this.twilioSayAttributes[language], message)
     return twiml
   }
 }

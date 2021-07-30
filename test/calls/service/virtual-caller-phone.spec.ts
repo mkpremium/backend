@@ -30,7 +30,16 @@ describe('VirtualCallerPhone', () => {
   let service: VirtualCallerPhone
   let twilioClientStub
   let virtualCallsRepositoryStub
-  const twilioSayAttributesTest = {}
+  const twilioSayAttributesTest = {
+    'es-ES': {
+      language: 'es-ES' as 'es-ES',
+      voice: 'Polly.Conchita' as 'Polly.Conchita',
+    },
+    'pt-PT': {
+      language: 'pt-PT' as 'pt-PT',
+      voice: 'Polly.Cristiano' as 'Polly.Cristiano',
+    }
+  }
 
   beforeEach(() => {
     twilioClientStub = {
@@ -82,11 +91,25 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('calculates prefix based on caller timezone', async () => {
-    await service.call({ ...testCmd, caller: virtualCallerBuilder({timezone: 'Europe/Madrid'}).build() })
+    await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Madrid' }).build() })
     expect(twilioClientStub.calls.create.lastCall.firstArg.to).to.match(/^\+34/)
 
-    await service.call({ ...testCmd, caller: virtualCallerBuilder({timezone: 'Europe/Lisbon'}).build() })
+    await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Lisbon' }).build() })
     expect(twilioClientStub.calls.create.lastCall.firstArg.to).to.match(/^\+351/)
+  })
+
+  it('calls with Spanish Twilio says attributes for Europe/Madrid timezone', async () => {
+    await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Madrid' }).build() })
+
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('es-ES')
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['es-ES'].voice}"`)
+  })
+
+  it('calls with Portuguese Twilio says attributes for Europe/Lisbon timezone', async () => {
+    await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Lisbon' }).build() })
+
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('language="pt-PT"')
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['pt-PT'].voice}"`)
   })
 
   // 13223 Invalid phone number format
