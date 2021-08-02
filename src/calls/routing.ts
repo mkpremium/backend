@@ -17,5 +17,14 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
   router.post('/virtual-caller/today', wrap(container.resolve('virtualCallerTodayStatsController')))
   router.post('/virtual-callers', wrap(container.resolve('createVirtualCallerController')))
 
-  app.use('/calls', jwt(), router)
+  const secured = jwt().unless({
+    path: [
+      // '/calls/twilio/voice', // needed for calls from web (aka callcenter)
+      /^\/calls\/twilio\/[0-9a-z]+\/gather$/,
+      /^\/calls\/twilio\/[0-9a-z]+\/done/,
+      /^\/calls\/twilio\/[0-9a-z]+\/machine-detection$/
+    ]
+  })
+
+  app.use('/calls', secured, router)
 }
