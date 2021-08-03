@@ -58,31 +58,39 @@ export class OwnerResponseProcessorService {
     })
 
     const twiml = new VoiceResponse()
+    const copies: Record<OwnerResponse | 'Invalid', Record<CallLanguage, string>> = {
+      [ OwnerResponse.SALE ]: {
+        'es-ES': `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara ` +
+          `el directorde %%CITY%% para hablar con usted sobre su propiedad.  Gracias y buenos dias.`,
+        'pt-PT': `Perfeito, notamos que pretende vender e no prazo máximo de 24 horas o diretor da %%CITY%% entrará ` +
+          `em contato para falar sobre o seu imóvel. Obrigado e bom dia.`
+      },
+      [ OwnerResponse.NO_SALE ]: {
+        'es-ES': 'Gracias por su respuesta y perdón por las molestias.',
+        'pt-PT': 'Perfeito, notamos que não pretende vender, desculpe o transtorno, bom dia.'
+      },
+      [ OwnerResponse.NOT_OWNER ]: {
+        'es-ES': 'Gracias por su respuesta y perdón por las molestias.',
+        'pt-PT': 'Obrigado pela sua resposta e desculpe o transtorno.'
+      },
+      'Invalid': {
+        'es-ES': 'Ha seleccionado una opción no valida, gracias por su respuesta y perdón por las molestias.',
+        'pt-PT': 'Você selecionou uma opção inválida, obrigado por sua resposta e desculpe pelo transtorno.'
+      }
+    }
+
     const sayAttribute = this.twilioSayAttributes[ cmd.language ]
-    switch (cmd.ownerResponse) {
-      case OwnerResponse.SALE:
-        twiml.say(sayAttribute,
-          `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara el director ` +
-          `de ${cmd.fromCity} para hablar con usted sobre su propiedad.  Gracias y buenos dias.`
-        )
-        break
-      case OwnerResponse.NO_SALE:
-        twiml.say(sayAttribute,
-          'Perfecto, tomamos nota de que no tiene intención de vender, disculpe las molestias, buenos dias.'
-        )
-        break
-      case OwnerResponse.NOT_OWNER:
-        twiml.say(sayAttribute,
-          'Gracias por su respuesta y perdón por las molestias.'
-        )
-        break
-      default:
-        twiml.say(sayAttribute,
-          'Ha seleccionado una opción no valida, gracias por su respuesta y perdón por las molestias.'
-        )
+    if (OwnerResponseProcessorService.validOptionResponse(cmd.ownerResponse)) {
+      twiml.say(sayAttribute, copies[ cmd.ownerResponse as OwnerResponse ][ cmd.language ].replace('%%CITY%%', cmd.fromCity))
+    } else {
+      twiml.say(sayAttribute, copies[ 'Invalid' ][ cmd.language ])
     }
 
     return twiml
+  }
+
+  private static validOptionResponse (ownerResponse: string) {
+    return [ OwnerResponse.SALE, OwnerResponse.NO_SALE, OwnerResponse.NOT_OWNER ].includes(ownerResponse as OwnerResponse)
   }
 
   private async saveOwnerResponse (cmd: OwnerResponseProcessCommand) {
