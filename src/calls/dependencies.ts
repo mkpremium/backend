@@ -1,5 +1,4 @@
 import { asClass, asFunction, asValue, AwilixContainer } from 'awilix'
-import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import twilio from 'twilio'
 import { VirtualCallsRepository } from './repository/virtual-calls.repository'
 import { createCallDoneWebhookController } from './controller/call-done-webhook.controller'

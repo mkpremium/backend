@@ -61,7 +61,10 @@ export const createCallDoneWebhookController = ({
         } as CallDone)
       })
       .then(() => res.sendStatus(200))
-      .catch(error => logger.error('Saving call done', { error: error.message }))
+      .catch(error => {
+        logger.error('Saving call done', { error: error.message })
+        res.status(500).json({ error: error.message })
+      })
   }
 }
 
