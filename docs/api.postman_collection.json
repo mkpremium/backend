@@ -7,314 +7,81 @@
 	},
 	"item": [
 		{
-			"name": "test-harness",
-			"item": [
-				{
-					"name": "Create Test Building",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{apiUrl}}/test-harness/create-building",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"test-harness",
-								"create-building"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create test Owner",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"buildingId\": \"4bae3ae9-319c-4dd7-a993-8bdc6b54650c\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{apiUrl}}/test-harness/create-owner",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"test-harness",
-								"create-owner"
-							]
-						},
-						"description": "Create owner associated with buildingId"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Worksheets",
-			"item": [
-				{
-					"name": "Create Queue",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"test-queue\",\n\t\"source\": {\n\t\t\"city\": \"TEST_PORTO\"\n\t}\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{apiUrl}}/worksheets/queues",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"worksheets",
-								"queues"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Take worksheet (new)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/worksheets/queues/queue-id/worksheets/worksheet-id",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"worksheets",
-								"queues",
-								"queue-id",
-								"worksheets",
-								"worksheet-id"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Take next worksheet in queue",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"action\": \"NEXT\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{apiUrl}}/worksheets/queues/queue-id",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"worksheets",
-								"queues",
-								"queue-id"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List queues",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/worksheets/queues?limit=100",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"worksheets",
-								"queues"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "100"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Make already sold buildings available in callcenter.",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/worksheets/republish-already-sold",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"worksheets",
-								"republish-already-sold"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Scheduled Events",
-			"item": [
-				{
-					"name": "Get Scheduled Calls",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/scheduled-events/calls",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"scheduled-events",
-								"calls"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete scheduled event",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/scheduled-events/:eventId",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"scheduled-events",
-								":eventId"
-							],
-							"variable": [
-								{
-									"key": "eventId",
-									"value": "123"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Scheduled Events for a Week",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/scheduled-events/week?week=52&year=2020",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"scheduled-events",
-								"week"
-							],
-							"query": [
-								{
-									"key": "week",
-									"value": "52"
-								},
-								{
-									"key": "year",
-									"value": "2020"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create meeting",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"createdBy\": \"caller-id\",\n    \"notifyTo\": \"flipper-id\",\n    \"event\": {\n        \"buildingId\": \"\",\n        \"inPerson\": true,\n        \"contactId\": \"\",\n        \"eventAddress\": \"\",\n        \"ownerId\": null,\n        \"worksheetId\": null\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{apiUrl}}/scheduled-events/meeting",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"scheduled-events",
-								"meeting"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "Buildings",
 			"item": [
+				{
+					"name": "Building",
+					"item": [
+						{
+							"name": "Create evaluation request",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n      \"ownerId\": \"cca574a9-a681-459e-9381-bcd7a38e67c7\",\n      \"destinationContactId\": \"72e8bef8-6233-4ef2-836d-dff3e3c781ec\",\n      \"reporterContactId\": \"72e8bef8-6233-4ef2-836d-dff3e3c781ec\",\n      \"flipperId\": \"56ecc194-b998-43b5-a118-62e40b69aa84\",\n      \"callerId\": \"27e2c4d8-ba75-476e-bbbd-70372b3dee9b\",\n      \"worksheetId\": \"04e1b9ea-d4b5-4b3e-b3cd-6a3cb40b2764\",\n      \"note\": \"El propieatario nos ha contactado por email.\"\n    }\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{apiUrl}}/building/:buildingId/offer-requests",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"building",
+										":buildingId",
+										"offer-requests"
+									],
+									"variable": [
+										{
+											"key": "buildingId",
+											"value": "d8185d2d-1a56-475c-a4a3-333768c3a922"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add proposal",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"ownerId\": \"7dd27eb3-1e67-4465-980d-368a48951d78\",\n        \"amount\": 100000,\n        \"contactId\": \"6a66bc94-fc9a-4dac-90bf-3f06ecc0b6c7\",\n        \"message\": \"test message kasdasd asdasd adasdas\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{apiUrl}}/building/:buildingId/proposals",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"building",
+										":buildingId",
+										"proposals"
+									],
+									"variable": [
+										{
+											"key": "buildingId",
+											"value": "eb8b8ec4-0b94-48ba-a3b4-5714387a8759"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
 				{
 					"name": "Get buildings by ID",
 					"request": {
@@ -379,7 +146,8 @@
 							"variable": [
 								{
 									"key": "buildingId",
-									"value": "5dfe105f-29ce-4e7f-9ae0-9cc3a3af6534"
+									"value": "5dfe105f-29ce-4e7f-9ae0-9cc3a3af6534",
+									"type": "string"
 								}
 							]
 						}
@@ -413,45 +181,8 @@
 							"variable": [
 								{
 									"key": "buildingId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"item": [
-				{
-					"name": "Update user (permissions)",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"profile\": {\n        \"queueId\": \"d76e72bd-c27b-43b0-98c2-fa23e891fab9\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{apiUrl}}/operators/:userId",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"operators",
-								":userId"
-							],
-							"variable": [
-								{
-									"key": "userId",
-									"value": "cdb5df5f-e5ab-4101-8d7f-ee83f80c598f"
+									"value": "",
+									"type": "string"
 								}
 							]
 						}
@@ -459,71 +190,24 @@
 					"response": []
 				},
 				{
-					"name": "List all users",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/operators",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"operators"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Owners",
-			"item": [
-				{
-					"name": "Search by phone number",
+					"name": "Set building featured owner",
 					"request": {
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"phoneNumber\": \"969174517\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{apiUrl}}/owners/search",
+							"raw": "{{apiUrl}}/buildings/:buildingId/set-featured-owner",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
-								"owners",
-								"search"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search by phone number (old)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/owners?contactNumber=969174517",
-							"host": [
-								"{{apiUrl}}"
+								"buildings",
+								":buildingId",
+								"set-featured-owner"
 							],
-							"path": [
-								"owners"
-							],
-							"query": [
+							"variable": [
 								{
-									"key": "contactNumber",
-									"value": "969174517"
+									"key": "buildingId",
+									"value": "123"
 								}
 							]
 						}
@@ -680,6 +364,123 @@
 			]
 		},
 		{
+			"name": "Calls",
+			"item": [
+				{
+					"name": "Generate Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/calls/token",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Virtual Agent",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/calls/virtual-caller/start",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"virtual-caller",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Twilio Done Webhook",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/calls/twilio/:callId/done",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"twilio",
+								":callId",
+								"done"
+							],
+							"variable": [
+								{
+									"key": "callId",
+									"value": "1234"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Today stats",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/calls/virtual-caller/today",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"virtual-caller",
+								"today"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Virtual Caller",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assignCallsTo\": \"56ecc194-b998-43b5-a118-62e40b69aa84\",\n    \"name\": \"virtual-caller-barcelona-2\",\n    \"phoneNumber\": \"+34670447454\",\n    \"queueId\": \"e1748e7d-8714-45c0-a831-c0f42d6d564f\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/calls/virtual-callers",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"virtual-callers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Flipper",
 			"item": [
 				{
@@ -700,7 +501,43 @@
 							"variable": [
 								{
 									"key": "flipperId",
-									"value": "183d8c24-98a5-4f0b-bcd0-b14f2ffca457"
+									"value": "183d8c24-98a5-4f0b-bcd0-b14f2ffca457",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set max allowed line",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maxLine\": 1000000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/flipper/:flipperId/max-line",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"flipper",
+								":flipperId",
+								"max-line"
+							],
+							"variable": [
+								{
+									"key": "flipperId",
+									"value": "",
+									"type": "string"
 								}
 							]
 						}
@@ -710,47 +547,92 @@
 			]
 		},
 		{
-			"name": "Stats",
+			"name": "Owners",
 			"item": [
 				{
-					"name": "All",
+					"name": "Search by phone number",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phoneNumber\": \"969174517\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{apiUrl}}/stats",
+							"raw": "{{apiUrl}}/owners/search",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
-								"stats"
+								"owners",
+								"search"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Performance",
+					"name": "Search by phone number (old)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/stats/performance?view=day&dateBetween=2021/1/14,2021/1/21",
+							"raw": "{{apiUrl}}/owners?contactNumber=969174517",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
-								"stats",
-								"performance"
+								"owners"
 							],
 							"query": [
 								{
-									"key": "view",
-									"value": "day"
+									"key": "contactNumber",
+									"value": "969174517"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change contact status",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"BAD\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/owners/:ownerId/contacts/:contactId/status",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"owners",
+								":ownerId",
+								"contacts",
+								":contactId",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "ownerId",
+									"value": "062fa78e-9355-485e-8c56-9841a120a2bf"
 								},
 								{
-									"key": "dateBetween",
-									"value": "2021/1/14,2021/1/21"
+									"key": "contactId",
+									"value": "34299c9b-910b-48ca-a945-a3265dc74e98"
 								}
 							]
 						}
@@ -760,57 +642,524 @@
 			]
 		},
 		{
-			"name": "Login",
-			"event": [
+			"name": "Scheduled Events",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"ValidResponse\", function() {",
-							"    pm.response.to.have.status(200);",
-							"    pm.response.to.have.jsonBody(\"token\");",
-							"})",
-							"",
-							"const responseData = pm.response.json();",
-							"",
-							"pm.collectionVariables.set(\"accessToken\", responseData.token);",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"test\",\n    \"password\": \"testtest\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"name": "Get Scheduled Calls",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/calls",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"calls"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{apiUrl}}/operators/login",
-					"host": [
-						"{{apiUrl}}"
-					],
-					"path": [
-						"operators",
-						"login"
-					]
+				{
+					"name": "Delete scheduled event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/:eventId",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								":eventId"
+							],
+							"variable": [
+								{
+									"key": "eventId",
+									"value": "123",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Scheduled Events for a Week",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/week?week=52&year=2020",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"week"
+							],
+							"query": [
+								{
+									"key": "week",
+									"value": "52"
+								},
+								{
+									"key": "year",
+									"value": "2020"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"createdBy\": \"caller-id\",\n    \"notifyTo\": \"flipper-id\",\n    \"event\": {\n        \"buildingId\": \"\",\n        \"inPerson\": true,\n        \"contactId\": \"\",\n        \"eventAddress\": \"\",\n        \"ownerId\": null,\n        \"worksheetId\": null\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/meeting",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"meeting"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule a Call",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"createdBy\": \"virtual-caller-barcelona-2\",\n    \"notifyTo\": \"56ecc194-b998-43b5-a118-62e40b69aa84\",\n    \"event\": {\n      \"buildingId\": \"5dac3bb9-da06-4a0f-bce7-5959eeaf2edf\",\n      \"contactId\": \"1b405614-adb7-4a16-91c6-d29875d600b8\",\n      \"ownerId\": \"11763028-a142-4011-b89c-e24d3920d6b9\",\n      \"worksheetId\": \"24b9f6ec-8513-40ef-ae5a-93ee39eafae6\"\n    },\n    \"eventDate\": \"2021-07-16T05:55:00.000Z\",\n    \"note\": \"Recuperado de un error del virtual caller.(Invalid value null supplied to /event/owner/building/recentProposal/ownerId: String)\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/scheduled-events/call",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"scheduled-events",
+								"call"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Stats",
+					"item": [
+						{
+							"name": "All",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{apiUrl}}/stats",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"stats"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Performance",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{apiUrl}}/stats/performance?view=day&dateBetween=2021/1/14,2021/1/21",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"stats",
+										"performance"
+									],
+									"query": [
+										{
+											"key": "view",
+											"value": "day"
+										},
+										{
+											"key": "dateBetween",
+											"value": "2021/1/14,2021/1/21"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update user (permissions)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roles\": [\"BUSINESS\", \"OPERATOR\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/operators/:userId",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"operators",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "cdb5df5f-e5ab-4101-8d7f-ee83f80c598f",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/operators",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"operators"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"ValidResponse\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.jsonBody(\"token\");",
+									"})",
+									"",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"accessToken\", responseData.token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/operators/login",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"operators",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"aaa\",\n    \"password\": \"1aaaaaaa\",\n    \"email\": \"\",\n    \"roles\": [\"OPERATOR\", \"BUSINESS\", \"ADMIN\"],\n    \"profile\": {\n        \"firstName\": \"\",\n        \"lastName\": \"\"       \n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/operators/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"operators",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Worksheets",
+			"item": [
+				{
+					"name": "Create Queue",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"test-queue\",\n\t\"source\": {\n\t\t\"city\": \"TEST_PORTO\"\n\t}\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Take worksheet (new)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues/queue-id/worksheets/worksheet-id",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues",
+								"queue-id",
+								"worksheets",
+								"worksheet-id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Take next worksheet in queue",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"action\": \"NEXT\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues/queue-id",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues",
+								"queue-id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List queues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/queues?limit=100",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"queues"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Make already sold buildings available in callcenter.",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/worksheets/republish-already-sold",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"worksheets",
+								"republish-already-sold"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "test-harness",
+			"item": [
+				{
+					"name": "Create Test Building",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/test-harness/create-building",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"test-harness",
+								"create-building"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create test Owner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"buildingId\": \"4bae3ae9-319c-4dd7-a993-8bdc6b54650c\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/test-harness/create-owner",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"test-harness",
+								"create-owner"
+							]
+						},
+						"description": "Create owner associated with buildingId"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
