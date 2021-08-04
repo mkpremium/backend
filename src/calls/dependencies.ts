@@ -21,6 +21,7 @@ import { CreateVirtualCallerService } from './service/create-virtual-caller.serv
 import { createCreateVirtualCallerController } from './controller/create-virtual-caller.controller'
 import { createListVirtualCallersController } from './controller/list-virtual-callers.controller'
 import { createPatchVirtualCallerController } from './controller/patch-virtual-caller.controller'
+import { PatchVirtualCallerService } from './service/patch-virtual-caller.service'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -70,6 +71,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCaller: asClass(VirtualCallerService).classic().singleton(),
     virtualCallerPhone: asClass(VirtualCallerPhone).classic().singleton(),
     createVirtualCallerService: asClass(CreateVirtualCallerService).classic().singleton(),
+    patchVirtualCallerService: asClass(PatchVirtualCallerService).classic().singleton(),
     virtualCallerSupervisor: asClass(VirtualCallerSupervisorService).classic().singleton(),
     ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),
     machineDetectionResultProcessor: asClass(MachineDetectionResultProcessorService).classic().singleton(),
