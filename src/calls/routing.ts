@@ -18,6 +18,7 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
 
   // VirtualCaller CRUD
   router.get('/virtual-callers', wrap(container.resolve('listVirtualCallersController')))
+  router.patch('/virtual-callers/:callerId', wrap(container.resolve('patchVirtualCallerController')))
   router.post('/virtual-callers', wrap(container.resolve('createVirtualCallerController')))
 
   const secured = jwt().unless({
