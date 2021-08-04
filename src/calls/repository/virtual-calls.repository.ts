@@ -16,7 +16,9 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
+          AND status IN [ 'CALLING', 'INPUT_GATHERED', 'DONE' ]
           AND phoneNumber = $1
+        ORDER BY createdAt DESC
         LIMIT 1
     `
     return this.couchbaseAdapter.queryAsync(query, [ phoneNumber ])

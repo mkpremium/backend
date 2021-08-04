@@ -64,6 +64,9 @@ CREATE INDEX TMP_none_documentType on mkpremium(`_documentType`) where (`_docume
 CREATE INDEX worksheetIndex on mkpremium(`worksheetIndex`,`_documentType`) where (`_documentType` = "worksheet")
 CREATE INDEX owner_id on mkpremium(`_documentType`,`id`) where (`_documentType` = "owner")
 CREATE INDEX person_migration_related on mkpremium(`_documentType`,`_relatedTo`) where (`_documentType` = "person")
+CREATE INDEX last_call_to_number
+ON mkpremium(status, phoneNumber)
+WHERE _documentType = 'virtual-agent-call' AND status IN [ 'CALLING', 'INPUT_GATHERED', 'DONE' ]
 
 
 BUILD INDEX mkpremium(
@@ -104,5 +107,6 @@ owner_to_building,
 worksheet_building,
 verified_owner_good_contact,
 user_scheduled_calls,
-virtual_call_created_at
+virtual_call_created_at,
+last_call_to_number
 )
