@@ -20,4 +20,12 @@ export class VirtualCallersRepository extends CouchbaseRepository<VirtualCallerP
     return this.couchbaseAdapter.queryAsync(enabledCallersQuery(this.bucketName))
       .then(rows => fromJSON(rows, t.list(VirtualCaller)))
   }
+
+  async all () {
+    return this.couchbaseAdapter.queryAsync(`
+        SELECT caller.*
+        FROM ${this.bucketName} caller
+        WHERE _documentType = 'virtual-caller'
+    `)
+  }
 }
