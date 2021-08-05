@@ -1,5 +1,6 @@
 import { wrap } from 'express-promise-wrap'
 import jwt, { permissions } from '../middleware/jwt'
+import { OperatorRepository } from '../operator/models'
 import { createBuildingFactory, CreateBuildingRequest } from './create-building'
 import { CreateOwnerCmd, createOwnerFactory } from './create-owner'
 import { createBuildingWorksheetFactory } from './create-worksheet'
@@ -38,4 +39,17 @@ export function createTestHarness (app, awilixContainer) {
       }
     )
   )
+
+  app.post(
+    '/test-harness/impersonate',
+    secured,
+    permissions.admin,
+    wrap(async (req, res) => {
+      const repo = new OperatorRepository()
+      const { userId } = req.query
+      const user = await repo.findByIdOrThrow(userId)
+      const response = await repo.createAuthenticatedResponse(user)
+
+      res.json(response)
+    }))
 }
