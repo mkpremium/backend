@@ -3,7 +3,7 @@ import { stub } from 'sinon'
 import { PatchVirtualCallerService } from '../../../src/calls/service/patch-virtual-caller.service'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 
-describe.only('PatchVirtualCallerService', () => {
+describe('PatchVirtualCallerService', () => {
   let service: PatchVirtualCallerService
   let virtualCallersRepositoryStub
 

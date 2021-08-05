@@ -2,7 +2,6 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { setVirtualCallerAssignCallsTo, setVirtualCallerIsEnabled, VirtualCallerProps } from '../domain/virtual-caller'
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
-import { VirtualCallerService } from './virtual-caller.service'
 
 export interface PatchVirtualCallerProps {
   virtualCallerId: string
