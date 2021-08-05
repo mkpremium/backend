@@ -38,7 +38,7 @@ function defaultCounters () {
   return mappedCounters
 }
 
-class Operator extends CouchbaseModel {
+export class OperatorRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = OperatorType
@@ -66,7 +66,7 @@ class Operator extends CouchbaseModel {
   async preSave (data) {
     await this.unique(data, 'username')
 
-    const password = await Operator.hashPassword(data.password)
+    const password = await OperatorRepository.hashPassword(data.password)
     return t.update(data, {
       password: {
         $set: password
@@ -119,9 +119,7 @@ class Operator extends CouchbaseModel {
       operator: tokenPayload.operator
     })
   }
-}
 
-export class OperatorRepository extends Operator {
   async findByIdOrThrow (operatorId) {
     const operator = await this.findById(operatorId)
     if (!operator) {
