@@ -43,6 +43,29 @@ interface ProcessOwnerResponseCommand {
   buildingId: string
 }
 
+const copies: Record<OwnerResponse | 'Invalid', Record<CallLanguage, string>> = {
+  [ OwnerResponse.SALE ]: {
+    'es-ES': `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara ` +
+      `el directorde %%CITY%% para hablar con usted sobre su propiedad.  Gracias y buenos dias.`,
+    'pt-PT': `Perfeito, notamos que pretende vender e no prazo máximo de 24 horas o diretor da %%CITY%% entrará ` +
+      `em contato para falar sobre o seu imóvel. Obrigado e bom dia.`
+  },
+  [ OwnerResponse.NO_SALE ]: {
+    'es-ES': 'Gracias por su respuesta y perdón por las molestias.',
+    'pt-PT': 'Perfeito, notamos que não pretende vender, desculpe o transtorno, bom dia.'
+  },
+  [ OwnerResponse.NOT_OWNER ]: {
+    'es-ES': 'Gracias por su respuesta y perdón por las molestias.',
+    'pt-PT': 'Obrigado pela sua resposta e desculpe o transtorno.'
+  },
+  'Invalid': {
+    'es-ES': 'Disculpe, esa opción no es correcta. Si desea vender marque 1, si no desea vender marque 2 y ' +
+      'si no es el propietario marque 3.',
+    'pt-PT': 'Com licença, essa opção não é correta. Se você quer vender, marque 1, se não quiser vender, marque 2, ' +
+      'e se você não for o dono, marque 3.'
+  }
+}
+
 export class OwnerResponseProcessorService {
   constructor (
     private virtualCallsRepository: VirtualCallsRepository,
@@ -58,26 +81,6 @@ export class OwnerResponseProcessorService {
     })
 
     const twiml = new VoiceResponse()
-    const copies: Record<OwnerResponse | 'Invalid', Record<CallLanguage, string>> = {
-      [ OwnerResponse.SALE ]: {
-        'es-ES': `Perfecto, tomamos nota de que tiene intención de vender y en un plazo maximo de 24h le contactara ` +
-          `el directorde %%CITY%% para hablar con usted sobre su propiedad.  Gracias y buenos dias.`,
-        'pt-PT': `Perfeito, notamos que pretende vender e no prazo máximo de 24 horas o diretor da %%CITY%% entrará ` +
-          `em contato para falar sobre o seu imóvel. Obrigado e bom dia.`
-      },
-      [ OwnerResponse.NO_SALE ]: {
-        'es-ES': 'Gracias por su respuesta y perdón por las molestias.',
-        'pt-PT': 'Perfeito, notamos que não pretende vender, desculpe o transtorno, bom dia.'
-      },
-      [ OwnerResponse.NOT_OWNER ]: {
-        'es-ES': 'Gracias por su respuesta y perdón por las molestias.',
-        'pt-PT': 'Obrigado pela sua resposta e desculpe o transtorno.'
-      },
-      'Invalid': {
-        'es-ES': 'Ha seleccionado una opción no valida, gracias por su respuesta y perdón por las molestias.',
-        'pt-PT': 'Você selecionou uma opção inválida, obrigado por sua resposta e desculpe pelo transtorno.'
-      }
-    }
 
     const sayAttribute = this.twilioSayAttributes[ cmd.language ]
     if (OwnerResponseProcessorService.validOptionResponse(cmd.ownerResponse)) {
