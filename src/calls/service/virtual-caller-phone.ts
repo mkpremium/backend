@@ -140,7 +140,7 @@ export class VirtualCallerPhone {
   ) {
     const twiml = new VoiceResponse()
     twiml.pause({ length: 1 })
-    const message = this.composeMessage(address, language)
+    const message = VirtualCallerPhone.composeMessage(address, language)
 
     const gatherEndpointQueryParams = [
       [ 'buildingId', buildingId ],
@@ -160,13 +160,14 @@ export class VirtualCallerPhone {
     return twiml
   }
 
-  private composeMessage (address: AddressParam, language: CallLanguage) {
+  private static composeMessage (address: AddressParam, language: CallLanguage) {
+    const fullAddress = `${address.street} ${address.number}`
     if (language === 'es-ES') {
-      return `Buenos días, le contactamos por su propiedad de ${address.street} ${address.number} de ${address.city}` +
+      return `${fullAddress}. Buenos días, le contactamos por su propiedad de ${fullAddress} de ${address.city}` +
         ', nos dedicamos a la compra patrimonial de inmuebles, ¿estaría usted interesado en vender?' +
         'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
     } else if (language === 'pt-PT') {
-      return `Bom dia, entramos em contato com você sobre a sua propiedade de ${address.street} ${address.number} de ${address.city}.` +
+      return `${fullAddress}. Bom dia, entramos em contato com você sobre a sua propiedade de ${fullAddress} de ${address.city}.` +
         'Estamos empenhados em comprar ativos imobiliários, você estaria interessado em vender? ' +
         'Se você quer vender, marque 1, se não quiser vender, marque 2, e se você não for o dono, marque 3.'
     } else {
