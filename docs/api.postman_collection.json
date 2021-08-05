@@ -412,7 +412,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/calls/twilio/:callId/done",
+							"raw": "{{apiUrl}}/calls/twilio/:callId/machine-detection",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -420,12 +420,12 @@
 								"calls",
 								"twilio",
 								":callId",
-								"done"
+								"machine-detection"
 							],
 							"variable": [
 								{
 									"key": "callId",
-									"value": "1234"
+									"value": "1234-567a-bcde-f"
 								}
 							]
 						}
@@ -475,6 +475,67 @@
 								"virtual-callers"
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Virtual Callers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assignCallsTo\": \"56ecc194-b998-43b5-a118-62e40b69aa84\",\n    \"name\": \"virtual-caller-barcelona-2\",\n    \"phoneNumber\": \"+34670447454\",\n    \"queueId\": \"e1748e7d-8714-45c0-a831-c0f42d6d564f\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/calls/virtual-callers",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"virtual-callers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch Virtual Callers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assignCallsTo\": \"human-caller-id\",\n    \"isEnabled\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/calls/virtual-callers",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"calls",
+								"virtual-callers"
+							]
+						},
+						"description": "Para cambiar el usuario asignado al virtual caller, incluir en la llamada sólo la propiedad `assignCallsTo`.\n```json\n{\n    \"assignCallsTo\": \"id-usuario\"\n}\n```\n\nPara activar o desactivar un caller, incluir en la llamada sólo la propiedad `isEnabled` (true = activado, false = desactivado).\n```json\n{\n    \"isEnabled\": true\n}\n```\n\nEn caso de querer cambiar el usuario asignado y activar/desactivar caller, incluir ambos parámetros en la llamada\n```json\n{\n    \"assignCallsTo\": \"id-usuario\",\n    \"isEnabled\": true\n}\n```"
 					},
 					"response": []
 				}
@@ -908,7 +969,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1153,6 +1214,66 @@
 							"path": [
 								"test-harness",
 								"create-owner"
+							]
+						},
+						"description": "Create owner associated with buildingId"
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonate user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"ValidResponse\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.jsonBody(\"token\");",
+									"})",
+									"",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"accessToken\", responseData.token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/test-harness/impersonate?userId=56ecc194-b998-43b5-a118-62e40b69aa84",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"test-harness",
+								"impersonate"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "56ecc194-b998-43b5-a118-62e40b69aa84"
+								}
 							]
 						},
 						"description": "Create owner associated with buildingId"
