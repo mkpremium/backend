@@ -1,6 +1,8 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { VirtualCallerProps } from '../domain/virtual-caller'
+import { setVirtualCallerAssignCallsTo, setVirtualCallerIsEnabled, VirtualCallerProps } from '../domain/virtual-caller'
+import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
+import { VirtualCallerService } from './virtual-caller.service'
 
 export interface PatchVirtualCallerProps {
   virtualCallerId: string
@@ -8,14 +10,33 @@ export interface PatchVirtualCallerProps {
   assignCallsTo?: string
 }
 
-export const PatchVirtualCallerCommand = t.struct<PatchVirtualCallerProps>({
-  virtualCallerId: t.String,
-  isEnabled: t.maybe(t.Boolean),
-  assignCallsTo: t.maybe(t.String)
-})
+export const PatchVirtualCallerCommand = t.refinement(
+  t.struct<PatchVirtualCallerProps>({
+    virtualCallerId: t.String,
+    isEnabled: t.maybe(t.Boolean),
+    assignCallsTo: t.maybe(t.String),
+  }),
+  cmd => cmd.assignCallsTo !== null || cmd.isEnabled !== null
+)
 
 export class PatchVirtualCallerService {
-  async patch (cmd: PatchVirtualCallerProps) {
+  constructor (
+    private virtualCallersRepository: VirtualCallersRepository,
+  ) {
+  }
+
+  async patch (cmd: PatchVirtualCallerProps): Promise<VirtualCallerProps> {
     const validatedCmd = fromJSON(cmd, PatchVirtualCallerCommand)
+
+    let virtualCaller = await this.virtualCallersRepository.get(validatedCmd.virtualCallerId)
+
+    if (validatedCmd.isEnabled !== null) {
+      virtualCaller = setVirtualCallerIsEnabled(virtualCaller, validatedCmd.isEnabled)
+    }
+    if (validatedCmd.assignCallsTo) {
+      virtualCaller = setVirtualCallerAssignCallsTo(virtualCaller, validatedCmd.assignCallsTo)
+    }
+
+    return virtualCaller
   }
 }

@@ -37,3 +37,19 @@ export const VirtualCaller = t.struct<VirtualCallerProps>({
     _documentType: 'virtual-caller'
   }
 })
+
+export function setVirtualCallerIsEnabled (caller: VirtualCallerProps, isEnabled: boolean) {
+  return VirtualCaller.update(caller, {
+    isEnabled: {
+      $set: isEnabled
+    }
+  })
+}
+
+export function setVirtualCallerAssignCallsTo (caller: VirtualCallerProps, assignCallsTo: string) {
+  return VirtualCaller.update(caller, {
+    assignCallsTo: {
+      $set: assignCallsTo
+    }
+  })
+}
