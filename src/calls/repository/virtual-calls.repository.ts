@@ -16,8 +16,6 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
-          AND status IN [ 'CALLING', 'INPUT_GATHERED', 'DONE' ]
-          AND DATE_DIFF_STR(NOW_UTC(), \`call\`.createdAt, 'day') > 0
           AND phoneNumber = $1
         ORDER BY createdAt DESC
         LIMIT 1
