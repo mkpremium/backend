@@ -4,7 +4,7 @@ import { OwnerResponse } from './service/owner-response-processor.service'
 
 export interface VirtualAgentCallProps {
   id: string;
-  status: 'CALLING' | 'INPUT_GATHERED' | 'FAILED' | 'DONE';
+  status: CallStatus;
   worksheetId: string;
   callerId: string;
   ownerId: string;

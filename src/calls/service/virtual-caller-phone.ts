@@ -8,6 +8,8 @@ import retry from 'bluebird-retry'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 import honeycomb from 'honeycomb-beeline'
 import { CallLanguage, TwilioSayAttributes } from './call-attributes'
+import moment from 'moment'
+import { ContactProps } from '../../owner/owner'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
@@ -56,15 +58,23 @@ export class VirtualCallerPhone {
 
     const localization = localizationByTimezone[ cmd.caller.timezone ]
     const to = this.ownerTrialPhoneNumber || localization.prefix + contact.value
-    const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
-    if (lastCallToNumber) {
-      throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
-    }
+    await this.assertPhoneNotCalledYet(to, cmd, contact)
     const call = await this.saveCall(cmd, to)
 
     const phoneLock = await this.getPhoneLock(cmd.caller.phoneNumber)
     return this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language)
       .finally(() => this.virtualCallsRepository.unlockPhone(cmd.caller.phoneNumber, phoneLock))
+  }
+
+  private async assertPhoneNotCalledYet (to: string, cmd: CallCommand, contact: ContactProps & { ownerId: string }) {
+    const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
+    if (!lastCallToNumber || ['FAILED', 'BUSY', 'NO_ANSWER'].includes(lastCallToNumber.status)) {
+      return
+    }
+
+    if (lastCallToNumber.ownerResponse || moment(lastCallToNumber.createdAt).isSame(moment(), 'day')) {
+      throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
+    }
   }
 
   private getPhoneLock (phoneNumber: string) {

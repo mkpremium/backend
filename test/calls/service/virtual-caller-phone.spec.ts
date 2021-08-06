@@ -2,6 +2,9 @@ import { expect } from 'chai'
 import { stub } from 'sinon'
 import { CallCommand, VirtualCallerPhone } from '../../../src/calls/service/virtual-caller-phone'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
+import { VirtualAgentCall } from '../../../src/calls/virtual-agent-call'
+import moment from 'moment'
+import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 
 const testPublicUrl = 'http://api.public.url'
 const testVirtualCallerPhoneNumber = '+34666666667'
@@ -112,6 +115,71 @@ describe('VirtualCallerPhone', () => {
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Bom dia')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('language="pt-PT"')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['pt-PT'].voice}"`)
+  })
+
+  it('does not call when phone number is already called today', async () => {
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+      id: '',
+      callerId: '',
+      createdAt: new Date(),
+      contactId: '',
+      ownerId: '',
+      phoneNumber: '',
+      status: undefined,
+      worksheetId: '',
+    }))
+
+    await expect(service.call(testCmd)).to.be.rejected
+  })
+
+  it('calls to phone number when it was called some previous day without a response', async () => {
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+      id: '',
+      callerId: '',
+      createdAt: moment().add(-1, 'day').toDate(),
+      contactId: '',
+      ownerId: '',
+      phoneNumber: '',
+      status: undefined,
+      worksheetId: '',
+    }))
+
+    await service.call(testCmd)
+
+    expect(twilioClientStub.calls.create).to.have.been.called
+  })
+
+  it('does not call to phone number when it was called some previous day with a response', async () => {
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+      createdAt: moment().add(-1, 'day').toDate(),
+      ownerResponse: OwnerResponse.SALE,
+      id: '',
+      callerId: '',
+      contactId: '',
+      ownerId: '',
+      phoneNumber: '',
+      status: undefined,
+      worksheetId: '',
+    }))
+
+    await expect(service.call(testCmd)).to.be.rejected
+  })
+
+  it('calls to phone number previous call failed', async () => {
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+      createdAt: new Date(),
+      status: 'FAILED',
+      id: '',
+      callerId: '',
+      contactId: '',
+      ownerId: '',
+      phoneNumber: '',
+      worksheetId: '',
+    }))
+
+    await service.call(testCmd)
+
+    expect(twilioClientStub.calls.create).to.have.been.called
   })
 
   // 13223 Invalid phone number format
