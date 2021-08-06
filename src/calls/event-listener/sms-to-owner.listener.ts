@@ -9,7 +9,7 @@ const mobilePhoneRegexp = /\+346|\+3519/
 
 export const createSmsToOwnerListener = ({ smsMessageSender }: Deps) => {
   return async (evt: CallDone) => {
-    if (!mobilePhoneRegexp.test(evt.phoneNumber)) {
+    if (evt.ownerResponse || !mobilePhoneRegexp.test(evt.phoneNumber)) {
       return
     }
 
