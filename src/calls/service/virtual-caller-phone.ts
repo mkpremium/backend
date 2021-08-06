@@ -43,6 +43,8 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
   },
 }
 
+const FREEZER_LENGTH_MONTHS = 3
+
 export class VirtualCallerPhone {
   constructor (
     private twilioClient: Twilio,
@@ -68,13 +70,21 @@ export class VirtualCallerPhone {
 
   private async assertPhoneNotCalledYet (to: string, cmd: CallCommand, contact: ContactProps & { ownerId: string }) {
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
-    if (!lastCallToNumber || ['FAILED', 'BUSY', 'NO_ANSWER'].includes(lastCallToNumber.status)) {
+    if (!lastCallToNumber || VirtualCallerPhone.ownerUnreached(lastCallToNumber) || VirtualCallerPhone.fromFreezer(lastCallToNumber)) {
       return
     }
 
     if (lastCallToNumber.ownerResponse || moment(lastCallToNumber.createdAt).isSame(moment(), 'day')) {
       throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
     }
+  }
+
+  private static ownerUnreached (lastCallToNumber: VirtualAgentCallProps) {
+    return [ 'FAILED', 'BUSY', 'NO_ANSWER' ].includes(lastCallToNumber.status)
+  }
+
+  private static fromFreezer (lastCallToNumber: VirtualAgentCallProps) {
+    return moment(lastCallToNumber.createdAt).isBefore(moment().add(-FREEZER_LENGTH_MONTHS, 'months'))
   }
 
   private getPhoneLock (phoneNumber: string) {
