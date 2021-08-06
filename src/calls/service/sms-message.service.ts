@@ -1,4 +1,13 @@
+interface SendMessageToUnreachedOwner {
+  to: string
+  callId: string
+  callerId: string
+  contactId: string
+  ownerId: string
+  worksheetId: string
+}
+
 export class SmsMessageSender {
-  async sendMessage (cmd: {}) {
+  async sendMessageToUnreachedOwner (cmd: SendMessageToUnreachedOwner) {
   }
 }

@@ -13,6 +13,13 @@ export const createSmsToOwnerListener = ({ smsMessageSender }: Deps) => {
       return
     }
 
-    await smsMessageSender.sendMessage(evt)
+    await smsMessageSender.sendMessageToUnreachedOwner({
+      to: evt.phoneNumber,
+      callId: evt.callId,
+      callerId: evt.callerId,
+      contactId: evt.contactId,
+      ownerId: evt.ownerId,
+      worksheetId: evt.worksheetId,
+    })
   }
 }
