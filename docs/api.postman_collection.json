@@ -1334,6 +1334,14 @@
 		{
 			"key": "accessToken",
 			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
 		}
 	]
 }
