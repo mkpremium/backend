@@ -2,9 +2,9 @@ import { expect } from 'chai'
 import { stub } from 'sinon'
 import { CallCommand, VirtualCallerPhone } from '../../../src/calls/service/virtual-caller-phone'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
-import { VirtualAgentCall } from '../../../src/calls/virtual-agent-call'
 import moment from 'moment'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
+import { callBuilder } from '../call.builder'
 
 const testPublicUrl = 'http://api.public.url'
 const testVirtualCallerPhoneNumber = '+34666666667'
@@ -106,7 +106,7 @@ describe('VirtualCallerPhone', () => {
 
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Buenos días')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('es-ES')
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['es-ES'].voice}"`)
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest[ 'es-ES' ].voice}"`)
   })
 
   it('calls using Portuguese for Europe/Lisbon timezone', async () => {
@@ -114,35 +114,20 @@ describe('VirtualCallerPhone', () => {
 
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Bom dia')
     expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('language="pt-PT"')
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest['pt-PT'].voice}"`)
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest[ 'pt-PT' ].voice}"`)
   })
 
   it('does not call when phone number is already called today', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
-      id: '',
-      callerId: '',
-      createdAt: new Date(),
-      contactId: '',
-      ownerId: '',
-      phoneNumber: '',
-      status: undefined,
-      worksheetId: '',
-    }))
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({ createdAt: new Date(), status: 'DONE' }).build())
 
     await expect(service.call(testCmd)).to.be.rejected
   })
 
   it('calls to phone number when it was called some previous day without a response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
-      id: '',
-      callerId: '',
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
       createdAt: moment().add(-1, 'day').toDate(),
-      contactId: '',
-      ownerId: '',
-      phoneNumber: '',
-      status: undefined,
-      worksheetId: '',
-    }))
+      ownerResponse: undefined
+    }).build())
 
     await service.call(testCmd)
 
@@ -150,32 +135,20 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('does not call to phone number when it was called some previous day with a response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
+      status: 'DONE',
       createdAt: moment().add(-1, 'day').toDate(),
       ownerResponse: OwnerResponse.SALE,
-      id: '',
-      callerId: '',
-      contactId: '',
-      ownerId: '',
-      phoneNumber: '',
-      status: undefined,
-      worksheetId: '',
-    }))
+    }).build())
 
     await expect(service.call(testCmd)).to.be.rejected
   })
 
   it('calls to phone number previous call failed', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
       createdAt: new Date(),
       status: 'FAILED',
-      id: '',
-      callerId: '',
-      contactId: '',
-      ownerId: '',
-      phoneNumber: '',
-      worksheetId: '',
-    }))
+    }).build())
 
     await service.call(testCmd)
 
@@ -183,17 +156,10 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('calls to phone number when it was called three or more months ago, even with response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(VirtualAgentCall({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
       createdAt: moment().add(-3, 'months').toDate(),
       ownerResponse: OwnerResponse.SALE,
-      id: '',
-      callerId: '',
-      contactId: '',
-      ownerId: '',
-      phoneNumber: '',
-      status: undefined,
-      worksheetId: '',
-    }))
+    }).build())
 
     await service.call(testCmd)
 
