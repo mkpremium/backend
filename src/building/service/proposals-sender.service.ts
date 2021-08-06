@@ -38,16 +38,25 @@ export class ProposalsSenderService {
     }
 
     const proposals = await this.proposalsRepository.pendingProposals()
+    this.logger.info('Pending proposals to process', { proposals: proposals.map(p => p.id) })
+
     const stats = {
       pendingProposals: proposals.length,
+      sent: [],
+      skipped: [],
       success: 0,
       errors: 0,
     }
 
     for (let proposal of proposals) {
       try {
-        await this.processProposal(proposal, lastScheduledEventDateToInclude)
+        const wasSent = await this.processProposal(proposal, lastScheduledEventDateToInclude)
         stats.success++
+        if (wasSent) {
+          stats.sent.push(proposal.id)
+        } else {
+          stats.skipped.push(proposal.id)
+        }
       } catch (error) {
         this.logger.crit('pending proposal not sent', {
           errorMessage: error.message,
@@ -60,14 +69,14 @@ export class ProposalsSenderService {
     return stats
   }
 
-  private async processProposal (proposal: ProposalProps, lastScheduledEventDateToInclude: moment.Moment) {
+  private async processProposal (proposal: ProposalProps, lastScheduledEventDateToInclude: moment.Moment): Promise<boolean> {
     const [ building, sender, lastScheduledEvent ] = await Promise.all([
       this.buildingsRepository.get(proposal.buildingId),
       this.usersRepository.get(proposal.createdBy),
       this.scheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
     ])
     if (lastScheduledEvent && moment(lastScheduledEvent.eventDate).isAfter(lastScheduledEventDateToInclude)) {
-      return
+      return false
     }
 
     const proposalPDF = await this.pdfProposalComposer.composeProposal(
@@ -76,7 +85,7 @@ export class ProposalsSenderService {
 
     await this.emailSender.sendMail({
       to: proposal.notificationEmail,
-      subject: emailCopies[sender.profile.language].mailSubject,
+      subject: emailCopies[ sender.profile.language ].mailSubject,
       message: proposal.message,
       from: sender,
       attachment: {
@@ -94,6 +103,8 @@ export class ProposalsSenderService {
         userId: proposal.createdBy,
       }
     )
+
+    return true
   }
 }
 
