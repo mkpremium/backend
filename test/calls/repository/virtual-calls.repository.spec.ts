@@ -19,6 +19,6 @@ describe('VirtualCallsRepository', () => {
     await repository.unlockPhone(testPhoneNumber, lock.cas)
 
     await expect(repository.lockPhone(testPhoneNumber)
-      .then(lock => repository.unlockPhone(testPhoneNumber, lock))).to.be.fulfilled
+      .then(lock => repository.unlockPhone(testPhoneNumber, lock.cas))).to.be.fulfilled
   })
 })
