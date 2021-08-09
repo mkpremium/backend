@@ -105,7 +105,7 @@ export class CouchbaseAdapter {
     const beeline = honeycomb()
     const span = beeline.startSpan({ name: 'couchbase_upsert', key })
 
-    return this.couchbaseBucket.upsertAsync(key, obj, cas ? { cas } : undefined)
+    return (cas ? this.couchbaseBucket.upsertAsync(key, obj, { cas }) : this.couchbaseBucket.upsertAsync(key, obj))
       .finally(() => beeline.finishSpan(span))
   }
 
