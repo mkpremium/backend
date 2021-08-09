@@ -14,7 +14,7 @@ import honeycomb from 'honeycomb-beeline'
 export type PromisifiedBucket = Bucket & {
   queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
   getAsync: (key: string) => Promise<{ value: any, cas: any }>
-  upsertAsync: (key: string, value: any) => Promise<any>
+  upsertAsync: (key: string, value: any, opts?: { cas: Bucket.CAS }) => Promise<any>
   getAndLockAsync: (key: string) => Promise<any>
   unlockAsync: (key: string, cas: Bucket.CAS) => Promise<any>
   name: string
@@ -31,7 +31,7 @@ export class CouchbaseAdapter {
     return this.couchbaseBucket.name
   }
 
-  async save<T extends { _documentType: string, id?: string }> (data: T, structType: t.Type<T>) {
+  async save<T extends { _documentType: string, id?: string }> (data: T, structType: t.Type<T>, cas?: any) {
     const struct = fromJSON(data, structType)
     const dataWithId: any = t.update(struct, { id: { $set: data.id || uuid() } })
 
@@ -40,7 +40,7 @@ export class CouchbaseAdapter {
       throw new WrongStructRecord(data._documentType, validationResult.errors, data)
     }
 
-    await this.withRetry(() => this.upsert(dataWithId.id, dataWithId)
+    await this.withRetry(() => this.upsert(dataWithId.id, dataWithId, cas)
     )
 
     return fromJSON(dataWithId, structType)
@@ -101,11 +101,11 @@ export class CouchbaseAdapter {
     return this.couchbaseBucket.unlockAsync(key, lock)
   }
 
-  upsert (key: string, obj: object) {
+  upsert (key: string, obj: object, cas?: any) {
     const beeline = honeycomb()
     const span = beeline.startSpan({ name: 'couchbase_upsert', key })
 
-    return this.couchbaseBucket.upsertAsync(key, obj)
+    return this.couchbaseBucket.upsertAsync(key, obj, cas ? { cas } : undefined)
       .finally(() => beeline.finishSpan(span))
   }
 

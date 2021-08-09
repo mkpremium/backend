@@ -1,10 +1,20 @@
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
-import { Struct } from 'tcomb'
+import t, { Struct } from 'tcomb'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { KeyNotFound } from '../../db/errors'
 import { OwnerResponse } from '../service/owner-response-processor.service'
+
+const LockedPhoneValue = t.struct<{ _documentType: string, status: 'AVAILABLE' | 'BUSY' }>({
+  status: t.maybe(t.enums.of([ 'AVAILABLE', 'BUSY' ])),
+  _documentType: t.String
+})
+
+export interface LockedPhone {
+  value: { status?: 'AVAILABLE' | 'BUSY' },
+  cas: any
+}
 
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
@@ -18,7 +28,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         WHERE _documentType = 'virtual-agent-call'
           AND phoneNumber = $1
         ORDER BY createdAt DESC
-        LIMIT 1
+            LIMIT 1
     `
     return this.couchbaseAdapter.queryAsync(query, [ phoneNumber ])
       .then(rows => {
@@ -30,10 +40,13 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
       })
   }
 
-  async lockPhone (phoneNumber: string) {
+  async unlockPhone (phoneNumber: string, lock: any) {
+    return this.couchbaseAdapter.unlock(`phone_${phoneNumber}`, lock)
+  }
+
+  async lockPhone (phoneNumber: string): Promise<LockedPhone> {
     return this.couchbaseAdapter
       .getAndLock(`phone_${phoneNumber}`)
-      .then(({ cas }) => cas)
       .catch(error => {
         if (error instanceof KeyNotFound) {
           return this.couchbaseAdapter.upsert(`phone_${phoneNumber}`, { phoneNumber, createdAt: new Date() })
@@ -44,8 +57,11 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
       })
   }
 
-  async unlockPhone (phoneNumber: string, lock: any) {
-    return this.couchbaseAdapter.unlock(`phone_${phoneNumber}`, lock)
+  savePhoneLock (lockedPhone: LockedPhone) {
+    return this.couchbaseAdapter.save(
+      { ...lockedPhone.value, _documentType: 'phone-lock' },
+      LockedPhoneValue,
+    )
   }
 
   async callsInRange (since: Date, until: Date) {
@@ -91,7 +107,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
             }
           }
         })
-        response['total'] = total
+        response[ 'total' ] = total
 
         return response
       })
