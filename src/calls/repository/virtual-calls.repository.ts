@@ -61,6 +61,14 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
     return this.couchbaseAdapter.save(
       { ...lockedPhone.value, _documentType: 'phone-lock' },
       LockedPhoneValue,
+      lockedPhone.cas
+    )
+  }
+
+  savePhoneStatus (phoneNumber: string, status: 'BUSY' | 'AVAILABLE') {
+    return this.couchbaseAdapter.save(
+      { status, _documentType: 'phone-lock' },
+      LockedPhoneValue
     )
   }
 
