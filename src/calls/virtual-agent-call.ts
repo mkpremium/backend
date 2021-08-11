@@ -14,6 +14,7 @@ export interface VirtualAgentCallProps {
   ownerResponse?: OwnerResponse;
   gatheredAt?: Date,
   createdAt?: Date,
+  finishedAt?: Date,
 }
 
 export type CallStatus = 'CALLING' | 'INPUT_GATHERED' | 'FAILED' | 'DONE' | 'BUSY' | 'NO_ANSWER'
