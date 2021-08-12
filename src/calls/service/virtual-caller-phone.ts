@@ -70,8 +70,16 @@ export class VirtualCallerPhone {
 
     return this.assertPhoneNotCalledYet(to, contact)
       .then(() => this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language))
-      .catch(error => {
-        this.virtualCallerPhonesRepository.unlockPhone(cmd.caller.phoneNumber, lockedPhone.cas)
+      .catch(async error => {
+        await this.virtualCallerPhonesRepository.unlockPhone(cmd.caller.phoneNumber, lockedPhone.cas)
+        await this.virtualCallsRepository.save(VirtualAgentCall.update(call, {
+          status: {
+            $set: 'FAILED',
+          },
+          error: {
+            $set: error.message
+          }
+        }))
         throw error
       })
       .then(() => this.virtualCallerPhonesRepository.saveWithLock({
