@@ -65,11 +65,11 @@ export class VirtualCallerPhone {
 
     const localization = localizationByTimezone[ cmd.caller.timezone ]
     const to = this.ownerTrialPhoneNumber || localization.prefix + contact.value
-    await this.assertPhoneNotCalledYet(to, contact)
     const call = await this.saveCall(cmd, to)
-
     const lockedPhone = await this.getPhoneLock(cmd.caller.phoneNumber)
-    return this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language)
+
+    return this.assertPhoneNotCalledYet(to, contact)
+      .then(() => this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language))
       .catch(error => {
         this.virtualCallerPhonesRepository.unlockPhone(cmd.caller.phoneNumber, lockedPhone.cas)
         throw error
