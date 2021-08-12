@@ -65,8 +65,8 @@ export class VirtualCallerPhone {
 
     const localization = localizationByTimezone[ cmd.caller.timezone ]
     const to = this.ownerTrialPhoneNumber || localization.prefix + contact.value
-    const call = await this.saveCall(cmd, to)
     const lockedPhone = await this.getPhoneLock(cmd.caller.phoneNumber)
+    const call = this.createCall(cmd, to)
 
     return this.assertPhoneNotCalledYet(to, contact)
       .then(() => this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language))
@@ -82,10 +82,13 @@ export class VirtualCallerPhone {
         }))
         throw error
       })
-      .then(() => this.virtualCallerPhonesRepository.saveWithLock({
-        cas: lockedPhone.cas,
-        phone: phoneBusy(lockedPhone.phone)
-      }))
+      .then(async () => {
+        await this.saveCall(call)
+        return this.virtualCallerPhonesRepository.saveWithLock({
+          cas: lockedPhone.cas,
+          phone: phoneBusy(lockedPhone.phone)
+        })
+      })
   }
 
   private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }) {
@@ -166,8 +169,12 @@ export class VirtualCallerPhone {
       .finally(() => beeline.finishSpan(callSpan))
   }
 
-  private async saveCall (cmd: CallCommand, to: string) {
-    const call = VirtualAgentCall({
+  private async saveCall (call) {
+    await this.virtualCallsRepository.save(call)
+  }
+
+  private createCall (cmd: CallCommand, to: string) {
+    return VirtualAgentCall({
       callerId: cmd.caller.id,
       worksheetId: cmd.worksheetId,
       contactId: cmd.contact.id,
@@ -175,9 +182,6 @@ export class VirtualCallerPhone {
       phoneNumber: to,
       createdAt: new Date(),
     } as VirtualAgentCallProps)
-    await this.virtualCallsRepository.save(call)
-
-    return call
   }
 
   private createContactMessage (
