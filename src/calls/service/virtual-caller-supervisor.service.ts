@@ -47,7 +47,7 @@ export class VirtualCallerSupervisorService {
     })
   }
 
-  private async hasReachWorksheetLimit (callerId: string, maxWorksheets?: number) {
+  private async hasReachWorksheetLimit (callerId: string, maxWorksheets: number = 10) {
     if (!maxWorksheets) {
       return false
     }
