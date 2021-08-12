@@ -36,6 +36,8 @@ export class PatchVirtualCallerService {
       virtualCaller = setVirtualCallerAssignCallsTo(virtualCaller, validatedCmd.assignCallsTo)
     }
 
+    await this.virtualCallersRepository.save(virtualCaller)
+
     return virtualCaller
   }
 }

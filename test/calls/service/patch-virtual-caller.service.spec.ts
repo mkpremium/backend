@@ -30,6 +30,7 @@ describe('PatchVirtualCallerService', () => {
     const updatedVirtualCaller = await service.patch({ ...testCmd, isEnabled: false })
 
     expect(updatedVirtualCaller.isEnabled).to.be.false
+    expect(virtualCallersRepositoryStub.save).to.have.been.called
   })
 
   it('changes virtual caller assignCallsTo prop', async () => {
@@ -39,5 +40,6 @@ describe('PatchVirtualCallerService', () => {
     const updatedVirtualCaller = await service.patch({ ...testCmd, assignCallsTo: 'new-assignee' })
 
     expect(updatedVirtualCaller.assignCallsTo).to.be.eql('new-assignee')
+    expect(virtualCallersRepositoryStub.save).to.have.been.called
   })
 })
