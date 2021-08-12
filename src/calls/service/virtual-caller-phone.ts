@@ -62,7 +62,7 @@ export class VirtualCallerPhone {
 
     const localization = localizationByTimezone[ cmd.caller.timezone ]
     const to = this.ownerTrialPhoneNumber || localization.prefix + contact.value
-    await this.assertPhoneNotCalledYet(to, cmd, contact)
+    await this.assertPhoneNotCalledYet(to, contact)
     const call = await this.saveCall(cmd, to)
 
     const phoneLock = await this.getPhoneLock(cmd.caller.phoneNumber)
@@ -74,14 +74,14 @@ export class VirtualCallerPhone {
       .then(() => this.virtualCallsRepository.savePhoneLock({ cas: phoneLock.cas, value: { status: 'BUSY' } }))
   }
 
-  private async assertPhoneNotCalledYet (to: string, cmd: CallCommand, contact: ContactProps & { ownerId: string }) {
+  private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }) {
     const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
     if (!lastCallToNumber || VirtualCallerPhone.ownerUnreached(lastCallToNumber) || VirtualCallerPhone.fromFreezer(lastCallToNumber)) {
       return
     }
 
     if (lastCallToNumber.ownerResponse || moment(lastCallToNumber.createdAt).isSame(moment(), 'day')) {
-      throw new NumberAlreadyCalled(lastCallToNumber, { contactId: cmd.contact.id, ownerId: contact.ownerId })
+      throw new NumberAlreadyCalled(lastCallToNumber, { contactId: contact.id, ownerId: contact.ownerId })
     }
   }
 
