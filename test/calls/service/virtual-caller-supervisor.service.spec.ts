@@ -20,7 +20,7 @@ const testCmd: CheckCommand = {
   lastOwnerResponse: undefined,
 }
 
-describe.only('VirtualCallerSupervisorService', () => {
+describe('VirtualCallerSupervisorService', () => {
   let service!: VirtualCallerSupervisorService
   let virtualCallerStub
   let virtualCallerWorksheetsRepositoryStub
