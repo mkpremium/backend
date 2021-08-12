@@ -3,12 +3,13 @@ import { stub } from 'sinon'
 import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
 import { createCallFinishedListener } from '../../../src/calls/event-listener/call-finished.listener'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
+import { CallerPhone } from '../../../src/calls/domain/caller.phone'
 
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
   let virtualCallersRepositoryStub
   let virtualCallerSupervisorStub
-  let virtualCallsRepositoryStub
+  let virtualCallerPhonesRepositoryStub
 
   const testCallerPhoneNumber = '+34666666666'
   const testVirtualCaller = virtualCallerBuilder({ phoneNumber: testCallerPhoneNumber }).build()
@@ -23,6 +24,14 @@ describe('call-finished.listener', () => {
     phoneNumber: '',
     worksheetId: ''
   }
+  const testBusyLockedPhone = {
+    phone: CallerPhone({
+      id: `phone_${testCallerPhoneNumber}`,
+      status: 'BUSY'
+    } as any),
+    cas: 'test-cas-lock'
+  }
+
 
   beforeEach(() => {
     virtualCallersRepositoryStub = {
@@ -31,24 +40,28 @@ describe('call-finished.listener', () => {
     virtualCallerSupervisorStub = {
       check: stub().resolves(),
     }
-    virtualCallsRepositoryStub = {
-      savePhoneStatus: stub().resolves(),
+    virtualCallerPhonesRepositoryStub = {
+      lockPhone: stub().resolves(testBusyLockedPhone),
+      saveWithLock: stub(),
     }
 
     listener = createCallFinishedListener({
       logger: { info: () => undefined },
       virtualCallerSupervisor: virtualCallerSupervisorStub,
       virtualCallersRepository: virtualCallersRepositoryStub,
-      virtualCallsRepository: virtualCallsRepositoryStub
+      virtualCallerPhonesRepository: virtualCallerPhonesRepositoryStub
     })
 
     virtualCallersRepositoryStub.get.withArgs(testVirtualCaller.id).resolves(testVirtualCaller)
   })
 
-  it('updates phone lock status', async () => {
+  it('makes phone available', async () => {
     await listener(testEvt)
 
-    expect(virtualCallsRepositoryStub.savePhoneStatus).to.have.been.calledWith(testCallerPhoneNumber, 'AVAILABLE')
+    expect(virtualCallerPhonesRepositoryStub.saveWithLock)
+      .to.have.been.called
+    expect(virtualCallerPhonesRepositoryStub.saveWithLock.lastCall.firstArg.phone.status)
+      .to.be.equal('AVAILABLE')
   })
 
   it('notifies supervisor with virtual caller', async () => {

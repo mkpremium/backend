@@ -102,6 +102,8 @@ describe('VirtualCallerPhone', () => {
     expect(virtualCallerPhonesRepositoryStub.lockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber)
     expect(virtualCallerPhonesRepositoryStub.lockPhone).to.have.been.calledBefore(twilioClientStub.calls.create)
     expect(virtualCallerPhonesRepositoryStub.saveWithLock).to.have.been.called
+    expect(virtualCallerPhonesRepositoryStub.saveWithLock.lastCall.firstArg.phone.status)
+      .to.be.equal('BUSY')
   })
 
   it('throws error when phone is busy', async () => {

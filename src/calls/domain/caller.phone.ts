@@ -29,3 +29,11 @@ export function phoneBusy(phone: CallerPhoneProps): CallerPhoneProps {
     }
   })
 }
+
+export function phoneAvailable(phone: CallerPhoneProps): CallerPhoneProps {
+  return CallerPhone.update(phone as any, {
+    status: {
+      $set: 'AVAILABLE'
+    }
+  })
+}

@@ -2,12 +2,13 @@ import { VirtualCallerSupervisorService } from '../service/virtual-caller-superv
 import { Logger } from 'winston'
 import { CallDone } from '../controller/call-done-webhook.controller'
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
-import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
+import { VirtualCallerPhonesRepository } from '../repository/virtual-caller-phones.repository'
+import { phoneAvailable } from '../domain/caller.phone'
 
 interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService
   virtualCallersRepository: VirtualCallersRepository
-  virtualCallsRepository: VirtualCallsRepository
+  virtualCallerPhonesRepository: VirtualCallerPhonesRepository
   logger: Pick<Logger, 'info'>
 }
 
@@ -15,7 +16,7 @@ export const createCallFinishedListener = ({
                                              virtualCallerSupervisor,
                                              logger,
                                              virtualCallersRepository,
-                                             virtualCallsRepository,
+                                             virtualCallerPhonesRepository,
                                            }: Deps) => async (evt: CallDone) => {
   logger.info('Call finished, checking for more work', { callId: evt.callId })
   // Failed calls respond quickly, so wait to avoid multiple calls to same number.
@@ -25,7 +26,8 @@ export const createCallFinishedListener = ({
 
   const virtualCaller = await virtualCallersRepository.get(evt.callerId)
 
-  // await virtualCallsRepository.savePhoneStatus(virtualCaller.phoneNumber, 'AVAILABLE')
+  const lockedPhone = await virtualCallerPhonesRepository.lockPhone(virtualCaller.phoneNumber)
+  await virtualCallerPhonesRepository.saveWithLock({ cas: lockedPhone.cas, phone: phoneAvailable(lockedPhone.phone) })
 
   return virtualCallerSupervisor.check({
     caller: virtualCaller,
