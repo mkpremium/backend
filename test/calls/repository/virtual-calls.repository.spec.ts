@@ -5,20 +5,11 @@ import { createTestContainer } from '../../create-test-container'
 describe('VirtualCallsRepository', () => {
   let repository: VirtualCallsRepository
 
-  const testPhoneNumber = '+34666666666'
-
   beforeEach(async () => {
     repository = (await createTestContainer()).resolve('virtualCallsRepository')
   })
 
-  it('creates lock object for phone number', async () => {
-    const lock = await repository.lockPhone(testPhoneNumber)
-
-    await expect(repository.lockPhone(testPhoneNumber)).to.be.rejected
-
-    await repository.unlockPhone(testPhoneNumber, lock.cas)
-
-    await expect(repository.lockPhone(testPhoneNumber)
-      .then(lock => repository.unlockPhone(testPhoneNumber, lock.cas))).to.be.fulfilled
+  it('works', async () => {
+    expect(repository).to.be.ok
   })
 })

@@ -1,4 +1,4 @@
-import { LockedPhone, VirtualCallsRepository } from '../repository/virtual-calls.repository'
+import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Twilio } from 'twilio'
 import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
@@ -11,6 +11,8 @@ import { CallLanguage, TwilioSayAttributes } from './call-attributes'
 import moment from 'moment'
 import { ContactProps } from '../../owner/owner'
 import { Logger } from 'winston'
+import { LockedPhone, VirtualCallerPhonesRepository } from '../repository/virtual-caller-phones.repository'
+import { phoneBusy } from '../domain/caller.phone'
 
 type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
 
@@ -52,6 +54,7 @@ export class VirtualCallerPhone {
     private publicUrl: string,
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: TwilioSayAttributes,
+    private virtualCallerPhonesRepository: VirtualCallerPhonesRepository,
     private logger: Logger,
     private ownerTrialPhoneNumber?: string,
   ) {
@@ -65,13 +68,16 @@ export class VirtualCallerPhone {
     await this.assertPhoneNotCalledYet(to, contact)
     const call = await this.saveCall(cmd, to)
 
-    const phoneLock = await this.getPhoneLock(cmd.caller.phoneNumber)
+    const lockedPhone = await this.getPhoneLock(cmd.caller.phoneNumber)
     return this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language)
       .catch(error => {
-        this.virtualCallsRepository.unlockPhone(cmd.caller.phoneNumber, phoneLock.cas)
+        this.virtualCallerPhonesRepository.unlockPhone(cmd.caller.phoneNumber, lockedPhone.cas)
         throw error
       })
-      .then(() => this.virtualCallsRepository.savePhoneLock({ cas: phoneLock.cas, value: { status: 'BUSY' } }))
+      .then(() => this.virtualCallerPhonesRepository.saveWithLock({
+        cas: lockedPhone.cas,
+        phone: phoneBusy(lockedPhone.phone)
+      }))
   }
 
   private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }) {
@@ -94,12 +100,12 @@ export class VirtualCallerPhone {
   }
 
   private getPhoneLock (phoneNumber: string): Promise<LockedPhone> {
-    return retry<any>(
-      () => this.virtualCallsRepository.lockPhone(phoneNumber),
+    return retry<LockedPhone>(
+      () => this.virtualCallerPhonesRepository.lockPhone(phoneNumber),
       { backoff: 2 }
     ).then((lockedPhone) => {
-      if (lockedPhone.value.status === 'BUSY') {
-        this.virtualCallsRepository.unlockPhone(phoneNumber, lockedPhone.cas)
+      if (lockedPhone.phone.status === 'BUSY') {
+        this.virtualCallerPhonesRepository.unlockPhone(phoneNumber, lockedPhone.cas)
           .catch(error => this.logger.error(`Couldn't unlock phone`, {
             errorMessage: error.message,
             phoneNumber,

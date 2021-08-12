@@ -1,39 +1,18 @@
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import t, { Struct } from 'tcomb'
+import { Struct } from 'tcomb'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import { KeyNotFound } from '../../db/errors'
 import fromJSON from 'tcomb/lib/fromJSON'
-
-interface VirtualCallerPhoneProps {
-  id: string,
-  status: 'AVAILABLE' | 'BUSY'
-  createdAt: Date
-}
-
-const VirtualCallerPhone = t.struct<VirtualCallerPhoneProps & { _documentType: string }>({
-  id: t.refinement(t.String, id => id.startsWith('phone_')),
-  status: t.maybe(t.enums.of([ 'AVAILABLE', 'BUSY' ])),
-  createdAt: t.Date,
-  _documentType: t.refinement(t.String, dt => dt === 'virtual-caller-phone')
-}, {
-  name: 'VirtualCallerPhone',
-  defaultProps: {
-    _documentType: 'virtual-caller-phone',
-    status: 'AVAILABLE',
-    get createdAt () {
-      return new Date()
-    }
-  }
-})
+import { CallerPhone, CallerPhoneProps } from '../domain/caller.phone'
 
 export interface LockedPhone {
-  phone: VirtualCallerPhoneProps,
+  phone: CallerPhoneProps,
   cas: any
 }
 
-export class VirtualCallerPhonesRepository extends CouchbaseRepository<VirtualCallerPhoneProps> {
+export class VirtualCallerPhonesRepository extends CouchbaseRepository<CallerPhoneProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
-    return VirtualCallerPhone
+    return CallerPhone
   }
 
   async lockPhone (phoneNumber: string): Promise<LockedPhone> {
@@ -41,11 +20,11 @@ export class VirtualCallerPhonesRepository extends CouchbaseRepository<VirtualCa
     return this.couchbaseAdapter
       .getAndLock(id)
       .then(({ cas, value }) => ({
-        cas, phone: fromJSON<VirtualCallerPhoneProps>(value as any, VirtualCallerPhone)
+        cas, phone: fromJSON<CallerPhoneProps>(value as any, CallerPhone)
       }))
       .catch(error => {
         if (error instanceof KeyNotFound) {
-          return this.couchbaseAdapter.upsert(id, VirtualCallerPhone({ id } as any))
+          return this.couchbaseAdapter.upsert(id, CallerPhone({ id } as any))
             .then(() => this.lockPhone(phoneNumber))
         }
 
@@ -59,8 +38,8 @@ export class VirtualCallerPhonesRepository extends CouchbaseRepository<VirtualCa
 
   async saveWithLock (lockedPhone: LockedPhone) {
     return this.couchbaseAdapter.save(
-      VirtualCallerPhone(lockedPhone.phone as any),
-      VirtualCallerPhone,
+      CallerPhone(lockedPhone.phone as CallerPhoneProps & { _documentType: string }),
+      CallerPhone,
       lockedPhone.cas
     )
   }

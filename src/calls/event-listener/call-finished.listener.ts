@@ -25,7 +25,7 @@ export const createCallFinishedListener = ({
 
   const virtualCaller = await virtualCallersRepository.get(evt.callerId)
 
-  await virtualCallsRepository.savePhoneStatus(virtualCaller.phoneNumber, 'AVAILABLE')
+  // await virtualCallsRepository.savePhoneStatus(virtualCaller.phoneNumber, 'AVAILABLE')
 
   return virtualCallerSupervisor.check({
     caller: virtualCaller,

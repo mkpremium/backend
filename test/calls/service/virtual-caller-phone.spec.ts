@@ -5,6 +5,7 @@ import { virtualCallerBuilder } from '../virtual-caller.builder'
 import moment from 'moment'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 import { callBuilder } from '../call.builder'
+import { CallerPhone } from '../../../src/calls/domain/caller.phone'
 
 const testPublicUrl = 'http://api.public.url'
 const testVirtualCallerPhoneNumber = '+34666666667'
@@ -33,6 +34,7 @@ describe('VirtualCallerPhone', () => {
   let service: VirtualCallerPhone
   let twilioClientStub
   let virtualCallsRepositoryStub
+  let virtualCallerPhonesRepositoryStub
   const twilioSayAttributesTest = {
     'es-ES': {
       language: 'es-ES' as 'es-ES',
@@ -43,7 +45,13 @@ describe('VirtualCallerPhone', () => {
       voice: 'Polly.Cristiano' as 'Polly.Cristiano',
     }
   }
-  const testAvailableLockedPhone = { value: { status: 'AVAILABLE' }, cas: 'test-cas-lock' }
+  const testAvailableLockedPhone = {
+    phone: CallerPhone({
+      id: `phone_${testVirtualCallerPhoneNumber}`,
+      status: 'AVAILABLE'
+    } as any),
+    cas: 'test-cas-lock'
+  }
 
   beforeEach(() => {
     twilioClientStub = {
@@ -54,9 +62,11 @@ describe('VirtualCallerPhone', () => {
     virtualCallsRepositoryStub = {
       lastCallToNumber: stub().resolves(),
       save: stub().resolves(),
+    }
+    virtualCallerPhonesRepositoryStub = {
       lockPhone: stub().resolves(testAvailableLockedPhone),
       unlockPhone: stub(),
-      savePhoneLock: stub(),
+      saveWithLock: stub(),
     }
 
     service = new VirtualCallerPhone(
@@ -64,6 +74,7 @@ describe('VirtualCallerPhone', () => {
       testPublicUrl,
       virtualCallsRepositoryStub,
       twilioSayAttributesTest,
+      virtualCallerPhonesRepositoryStub,
       { error: () => undefined } as any,
     )
   })
@@ -88,16 +99,13 @@ describe('VirtualCallerPhone', () => {
   it('acquires phone lock before calling and releases when call is done', async () => {
     await service.call(testCmd)
 
-    expect(virtualCallsRepositoryStub.lockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber)
-    expect(virtualCallsRepositoryStub.lockPhone).to.have.been.calledBefore(twilioClientStub.calls.create)
-    expect(virtualCallsRepositoryStub.savePhoneLock).to.have.been.calledWith({
-      cas: testAvailableLockedPhone.cas,
-      value: { status: 'BUSY' }
-    })
+    expect(virtualCallerPhonesRepositoryStub.lockPhone).to.have.been.calledWith(testVirtualCallerPhoneNumber)
+    expect(virtualCallerPhonesRepositoryStub.lockPhone).to.have.been.calledBefore(twilioClientStub.calls.create)
+    expect(virtualCallerPhonesRepositoryStub.saveWithLock).to.have.been.called
   })
 
   it('throws error when phone is busy', async () => {
-    virtualCallsRepositoryStub.lockPhone.resolves({ ...testAvailableLockedPhone, value: { status: 'BUSY' } })
+    virtualCallerPhonesRepositoryStub.lockPhone.resolves({ ...testAvailableLockedPhone, phone: { status: 'BUSY' } })
 
     await expect(service.call(testCmd)).to.be.rejected
   })
