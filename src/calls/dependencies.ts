@@ -22,6 +22,7 @@ import { createCreateVirtualCallerController } from './controller/create-virtual
 import { createListVirtualCallersController } from './controller/list-virtual-callers.controller'
 import { createPatchVirtualCallerController } from './controller/patch-virtual-caller.controller'
 import { PatchVirtualCallerService } from './service/patch-virtual-caller.service'
+import { VirtualCallerPhonesRepository } from './repository/virtual-caller-phones.repository'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -91,6 +92,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCallsRepository: asClass(VirtualCallsRepository).classic().singleton(),
     virtualCallerWorksheetsRepository: asClass(VirtualCallerWorksheetsRepository).classic().singleton(),
     virtualCallersRepository: asClass(VirtualCallersRepository).classic().singleton(),
+    virtualCallerPhonesRepository: asClass(VirtualCallerPhonesRepository).classic().singleton(),
 
     // needed for calls from web (aka callcenter)
     // outgoingCallWebhookController: asFunction(({ logger }) => async (req, res) => {
