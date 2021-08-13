@@ -60,7 +60,7 @@ describe('VirtualCallerPhone', () => {
       }
     }
     virtualCallsRepositoryStub = {
-      lastCallToNumber: stub().resolves(),
+      previousCallsToNumber: stub().resolves(),
       save: stub().resolves(),
     }
     virtualCallerPhonesRepositoryStub = {
@@ -137,7 +137,7 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('does not call when phone number is already called today', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       createdAt: new Date(),
       status: 'DONE'
     }).build() ])
@@ -146,7 +146,7 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('calls to phone number when it was called some previous day without a response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       createdAt: moment().add(-1, 'day').toDate(),
       ownerResponse: undefined
     }).build() ])
@@ -157,7 +157,7 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('does not call to phone number when it was called some previous day with a response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       status: 'DONE',
       createdAt: moment().add(-1, 'day').toDate(),
       ownerResponse: OwnerResponse.SALE,
@@ -167,7 +167,7 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('calls to phone number previous call failed', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       createdAt: new Date(),
       status: 'FAILED',
     }).build() ])
@@ -178,7 +178,7 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('calls to phone number when it was called three or more months ago, even with response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       createdAt: moment().add(-3, 'months').toDate(),
       ownerResponse: OwnerResponse.SALE,
     }).build() ])

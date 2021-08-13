@@ -10,7 +10,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
     return VirtualAgentCall
   }
 
-  async lastCallToNumber (phoneNumber: string): Promise<VirtualAgentCallProps[] | undefined> {
+  async previousCallsToNumber (phoneNumber: string): Promise<VirtualAgentCallProps[] | undefined> {
     const query = `
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`

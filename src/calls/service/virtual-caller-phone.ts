@@ -93,7 +93,7 @@ export class VirtualCallerPhone {
   }
 
   private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }) {
-    const callsToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
+    const callsToNumber = await this.virtualCallsRepository.previousCallsToNumber(to)
     if (!callsToNumber) {
       return
     }
