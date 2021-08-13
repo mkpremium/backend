@@ -1,6 +1,6 @@
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
-import { Struct } from 'tcomb'
+import t, { Struct } from 'tcomb'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { OwnerResponse } from '../service/owner-response-processor.service'
@@ -10,14 +10,12 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
     return VirtualAgentCall
   }
 
-  async lastCallToNumber (phoneNumber: string): Promise<VirtualAgentCallProps | undefined> {
+  async lastCallToNumber (phoneNumber: string): Promise<VirtualAgentCallProps[] | undefined> {
     const query = `
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
           AND phoneNumber = $1
-        ORDER BY createdAt DESC
-            LIMIT 1
     `
     return this.couchbaseAdapter.queryAsync(query, [ phoneNumber ])
       .then(rows => {
@@ -25,7 +23,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
           return
         }
 
-        return fromJSON(rows[ 0 ], this.struct())
+        return fromJSON(rows, t.list(this.struct()))
       })
   }
 

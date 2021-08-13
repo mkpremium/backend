@@ -137,16 +137,19 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('does not call when phone number is already called today', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({ createdAt: new Date(), status: 'DONE' }).build())
+    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
+      createdAt: new Date(),
+      status: 'DONE'
+    }).build() ])
 
     await expect(service.call(testCmd)).to.be.rejected
   })
 
   it('calls to phone number when it was called some previous day without a response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
       createdAt: moment().add(-1, 'day').toDate(),
       ownerResponse: undefined
-    }).build())
+    }).build() ])
 
     await service.call(testCmd)
 
@@ -154,20 +157,20 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('does not call to phone number when it was called some previous day with a response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
       status: 'DONE',
       createdAt: moment().add(-1, 'day').toDate(),
       ownerResponse: OwnerResponse.SALE,
-    }).build())
+    }).build() ])
 
     await expect(service.call(testCmd)).to.be.rejected
   })
 
   it('calls to phone number previous call failed', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
       createdAt: new Date(),
       status: 'FAILED',
-    }).build())
+    }).build() ])
 
     await service.call(testCmd)
 
@@ -175,10 +178,10 @@ describe('VirtualCallerPhone', () => {
   })
 
   it('calls to phone number when it was called three or more months ago, even with response', async () => {
-    virtualCallsRepositoryStub.lastCallToNumber.resolves(callBuilder({
+    virtualCallsRepositoryStub.lastCallToNumber.resolves([ callBuilder({
       createdAt: moment().add(-3, 'months').toDate(),
       ownerResponse: OwnerResponse.SALE,
-    }).build())
+    }).build() ])
 
     await service.call(testCmd)
 

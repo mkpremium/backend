@@ -93,14 +93,19 @@ export class VirtualCallerPhone {
   }
 
   private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }) {
-    const lastCallToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
-    if (!lastCallToNumber || VirtualCallerPhone.ownerUnreached(lastCallToNumber) || VirtualCallerPhone.fromFreezer(lastCallToNumber)) {
+    const callsToNumber = await this.virtualCallsRepository.lastCallToNumber(to)
+    if (!callsToNumber) {
       return
     }
+    callsToNumber.forEach(call => {
+      if (VirtualCallerPhone.ownerUnreached(call) || VirtualCallerPhone.fromFreezer(call)) {
+        return
+      }
 
-    if (lastCallToNumber.ownerResponse || moment(lastCallToNumber.createdAt).isSame(moment(), 'day')) {
-      throw new NumberAlreadyCalled(lastCallToNumber, { contactId: contact.id, ownerId: contact.ownerId })
-    }
+      if (call.ownerResponse || moment(call.createdAt).isSame(moment(), 'day')) {
+        throw new NumberAlreadyCalled(call, { contactId: contact.id, ownerId: contact.ownerId })
+      }
+    })
   }
 
   private static ownerUnreached (lastCallToNumber: VirtualAgentCallProps) {
