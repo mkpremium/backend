@@ -510,15 +510,12 @@
 				},
 				{
 					"name": "Patch Virtual Callers",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"assignCallsTo\": \"human-caller-id\",\n    \"isEnabled\": true\n}",
+							"raw": "{\n    \"isEnabled\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -526,13 +523,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{apiUrl}}/calls/virtual-callers",
+							"raw": "{{apiUrl}}/calls/virtual-callers/:callerId",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"calls",
-								"virtual-callers"
+								"virtual-callers",
+								":callerId"
+							],
+							"variable": [
+								{
+									"key": "callerId",
+									"value": ""
+								}
 							]
 						},
 						"description": "Para cambiar el usuario asignado al virtual caller, incluir en la llamada sólo la propiedad `assignCallsTo`.\n```json\n{\n    \"assignCallsTo\": \"id-usuario\"\n}\n```\n\nPara activar o desactivar un caller, incluir en la llamada sólo la propiedad `isEnabled` (true = activado, false = desactivado).\n```json\n{\n    \"isEnabled\": true\n}\n```\n\nEn caso de querer cambiar el usuario asignado y activar/desactivar caller, incluir ambos parámetros en la llamada\n```json\n{\n    \"assignCallsTo\": \"id-usuario\",\n    \"isEnabled\": true\n}\n```"
