@@ -1,6 +1,6 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
-import { NumberAlreadyCalled, VirtualCallerPhone } from './virtual-caller-phone'
+import { lockingPhoneErrorContext, NumberAlreadyCalled, VirtualCallerPhone } from './virtual-caller-phone'
 import {
   VirtualCallerWorksheet, VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
@@ -73,6 +73,10 @@ export class VirtualCallerService {
       })
         .then(() => this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id))
         .catch(error => {
+          if (error.context === lockingPhoneErrorContext) {
+            this.logger.error('Error getting lock', { ...error, error: error.message })
+            return
+          }
           if (error instanceof NumberAlreadyCalled) {
             this.logger.info('Number already called, skipping call', { contactToCall })
           } else {

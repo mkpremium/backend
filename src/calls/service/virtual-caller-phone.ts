@@ -47,6 +47,7 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
 }
 
 const FREEZER_LENGTH_MONTHS = 3
+export const lockingPhoneErrorContext = 'Locking phone'
 
 export class VirtualCallerPhone {
   constructor (
@@ -125,7 +126,7 @@ export class VirtualCallerPhone {
       }
       return lockedPhone
     }).catch(error => {
-      error.context = 'Locking phone'
+      error.context = lockingPhoneErrorContext
       throw error
     })
   }
