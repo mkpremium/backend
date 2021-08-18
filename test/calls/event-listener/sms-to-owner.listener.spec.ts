@@ -79,4 +79,20 @@ describe('sms-to-owner.listener', () => {
 
     expect(smsMessageSenderStub.sendMessageToUnreachedOwner).to.not.have.been.called
   })
+
+  it('does not send messages for failed calls', async () => {
+    await listener({
+      name: 'virtual-caller.call_finished',
+      phoneNumber: '+34666666666',
+      callId: '',
+      callerId: '',
+      contactId: '',
+      ownerId: '',
+      ownerResponse: undefined,
+      status: 'FAILED',
+      worksheetId: ''
+    })
+
+    expect(smsMessageSenderStub.sendMessageToUnreachedOwner).to.not.have.been.called
+  })
 })
