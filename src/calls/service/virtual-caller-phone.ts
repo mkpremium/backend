@@ -73,14 +73,16 @@ export class VirtualCallerPhone {
       .then(() => this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language))
       .catch(async error => {
         await this.virtualCallerPhonesRepository.unlockPhone(cmd.caller.phoneNumber, lockedPhone.cas)
-        await this.virtualCallsRepository.save(VirtualAgentCall.update(call, {
-          status: {
-            $set: 'FAILED',
-          },
-          error: {
-            $set: error.message
-          }
-        }))
+        if (!(error instanceof NumberAlreadyCalled)) {
+          await this.virtualCallsRepository.save(VirtualAgentCall.update(call, {
+            status: {
+              $set: 'FAILED',
+            },
+            error: {
+              $set: error.message
+            }
+          }))
+        }
         throw error
       })
       .then(async () => {
