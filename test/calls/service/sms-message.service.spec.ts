@@ -22,9 +22,11 @@ describe('SmsMessageSender', () => {
   const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 
   beforeEach(() => {
-    twilioClientStub = { messages: {
+    twilioClientStub = {
+      messages: {
         create: stub().resolves(),
-      } }
+      }
+    }
     worksheetRepositoryStub = {
       getForCallcenterView: stub().resolves(testWorksheet)
     }
@@ -49,27 +51,48 @@ describe('SmsMessageSender', () => {
   })
 
   ;[
-    [spanishNumber, 'Spanish'],
-    [portugueseNumber, 'Portuguese'],
-  ].forEach(([to, lang]) => {
-    it(`includes address and city in message when it fits in SMS message limit(${lang})`, async () => {
-      worksheetRepositoryStub.getForCallcenterView.resolves({
-        ...testWorksheet,
-        building: {
-          ...testWorksheet.building,
-          address: {
-            ...testWorksheet.building.address,
-            city: 'city',
-            street: 'street',
-            number: 1
-          }
+    [ spanishNumber, 'Spanish' ],
+    [ portugueseNumber, 'Portuguese' ],
+  ].forEach(([ to, lang ]) => it(`includes address and city in message when it fits in SMS message limit(${lang})`, async () => {
+    worksheetRepositoryStub.getForCallcenterView.resolves({
+      ...testWorksheet,
+      building: {
+        ...testWorksheet.building,
+        address: {
+          ...testWorksheet.building.address,
+          city: 'city',
+          street: 'street',
+          number: 1
         }
-      })
-
-      await service.sendMessageToUnreachedOwner({ ...testCmd, to })
-
-      expect(twilioClientStub.messages.create).to.have.been
-        .calledWithMatch(({ body }) => body.includes('street 1 de city'))
+      }
     })
-  })
+
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to })
+
+    expect(twilioClientStub.messages.create).to.have.been
+      .calledWithMatch(({ body }) => body.includes('street 1 de city') && body.length < 160)
+  }))
+
+  ;[
+    [ spanishNumber, 'Spanish' ],
+    [ portugueseNumber, 'Portuguese' ],
+  ].forEach(([ to, lang ]) => it(`keeps message under SMS limit(${lang})`, async () => {
+    worksheetRepositoryStub.getForCallcenterView.resolves({
+      ...testWorksheet,
+      building: {
+        ...testWorksheet.building,
+        address: {
+          ...testWorksheet.building.address,
+          city: 'veeeeeeeeeeeeeeeeeeeeeeeeeeery long city name',
+          street: 'veeeeeeeeeeeeeeeeeeeeeeeeeery long street name',
+          number: 1
+        }
+      }
+    })
+
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to })
+
+    expect(twilioClientStub.messages.create).to.have.been
+      .calledWithMatch(({ body }) => body.length < 160)
+  }))
 })
