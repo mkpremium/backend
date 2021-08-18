@@ -69,7 +69,7 @@ export class VirtualCallerPhone {
     const lockedPhone = await this.getPhoneLock(cmd.caller.phoneNumber)
     const call = this.createCall(cmd, to)
 
-    return this.assertPhoneNotCalledYet(to, contact)
+    return this.assertPhoneNotCalledYet(to, contact, cmd.worksheetId)
       .then(() => this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language))
       .catch(async error => {
         await this.virtualCallerPhonesRepository.unlockPhone(cmd.caller.phoneNumber, lockedPhone.cas)
@@ -94,7 +94,7 @@ export class VirtualCallerPhone {
       })
   }
 
-  private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }) {
+  private async assertPhoneNotCalledYet (to: string, contact: ContactProps & { ownerId: string }, worksheetId: string) {
     const callsToNumber = await this.virtualCallsRepository.previousCallsToNumber(to)
     if (!callsToNumber) {
       return
@@ -104,7 +104,7 @@ export class VirtualCallerPhone {
         return
       }
 
-      if (call.ownerResponse || moment(call.createdAt).isSame(moment(), 'day')) {
+      if ((call.worksheetId === worksheetId && call.ownerResponse) || moment(call.createdAt).isSame(moment(), 'day')) {
         throw new NumberAlreadyCalled(call, { contactId: contact.id, ownerId: contact.ownerId })
       }
     })

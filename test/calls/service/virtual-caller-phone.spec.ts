@@ -139,7 +139,8 @@ describe('VirtualCallerPhone', () => {
   it('does not call when phone number is already called today', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       createdAt: new Date(),
-      status: 'DONE'
+      status: 'DONE',
+      worksheetId: 'any-worksheet',
     }).build() ])
 
     await expect(service.call(testCmd)).to.be.rejected
@@ -164,6 +165,19 @@ describe('VirtualCallerPhone', () => {
     }).build() ])
 
     await expect(service.call(testCmd)).to.be.rejected
+  })
+
+  it('calls to phone number even if it was called some date before with a response but for a different worksheet', async () => {
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
+      status: 'DONE',
+      createdAt: moment().add(-1, 'day').toDate(),
+      ownerResponse: OwnerResponse.NO_SALE,
+      worksheetId: 'a-different-worksheet',
+    }).build() ])
+
+    await service.call(testCmd)
+
+    expect(twilioClientStub.calls.create).to.have.been.called
   })
 
   it('calls to phone number previous call failed', async () => {
