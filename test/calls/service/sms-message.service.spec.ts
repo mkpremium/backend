@@ -8,7 +8,6 @@ describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
   let worksheetRepositoryStub
-  let testPublicUrl = 'https://api.mkpremium.net'
   const testCmd = {
     to: '',
     callId: '',
@@ -34,7 +33,6 @@ describe('SmsMessageSender', () => {
     service = new SmsMessageSender(
       twilioClientStub,
       worksheetRepositoryStub,
-      testPublicUrl
     )
   })
 

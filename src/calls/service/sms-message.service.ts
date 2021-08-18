@@ -17,7 +17,6 @@ export class SmsMessageSender {
   constructor (
     private twilioClient: Twilio,
     private worksheetRepository: WorksheetRepository,
-    private publicUrl: string,
   ) {
   }
 
