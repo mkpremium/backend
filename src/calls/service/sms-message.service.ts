@@ -1,5 +1,6 @@
 import { Twilio } from 'twilio'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
+import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 
 interface SendMessageToUnreachedOwner {
   to: string
@@ -25,7 +26,7 @@ export class SmsMessageSender {
     const messageWithAddress = await this.composeMessageWithAddress(lang, cmd.worksheetId)
     await this.twilioClient.messages.create({
       body: messageWithAddress.length < MAX_SMS_LENGTH ? messageWithAddress : SmsMessageSender.messageWithoutAddress(lang),
-      from: '',
+      from: '+351965965374',
       to: cmd.to,
     })
   }
