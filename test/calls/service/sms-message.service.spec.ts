@@ -1,10 +1,13 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
 import { SmsMessageSender } from '../../../src/calls/service/sms-message.service'
+import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
+import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 
 describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
+  let worksheetRepositoryStub
   let testPublicUrl = 'https://api.mkpremium.net'
   const testCmd = {
     to: '',
@@ -14,28 +17,59 @@ describe('SmsMessageSender', () => {
     ownerId: '',
     worksheetId: '',
   }
+  const spanishNumber = '+34666666666'
+  const portugueseNumber = '+351999999999'
+  const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 
   beforeEach(() => {
-    twilioClientStub = {
-      messages: {
+    twilioClientStub = { messages: {
         create: stub().resolves(),
-      }
+      } }
+    worksheetRepositoryStub = {
+      getForCallcenterView: stub().resolves(testWorksheet)
     }
+
     service = new SmsMessageSender(
       twilioClientStub,
+      worksheetRepositoryStub,
       testPublicUrl
     )
   })
 
   it('sends Spanish message to Spain numbers', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: '+34666666666' })
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })
 
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Hola,'))
   })
 
   it('sends Portuguese message to Portugal numbers', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: '+351999999999' })
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to: portugueseNumber })
 
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Olá,'))
+  })
+
+  ;[
+    [spanishNumber, 'Spanish'],
+    [portugueseNumber, 'Portuguese'],
+  ].forEach(([to, lang]) => {
+    it(`includes address and city in message when it fits in SMS message limit(${lang})`, async () => {
+      worksheetRepositoryStub.getForCallcenterView.resolves({
+        ...testWorksheet,
+        building: {
+          ...testWorksheet.building,
+          address: {
+            ...testWorksheet.building.address,
+            city: 'city',
+            street: 'street',
+            number: 1
+          }
+        }
+      })
+
+      await service.sendMessageToUnreachedOwner({ ...testCmd, to })
+
+      expect(twilioClientStub.messages.create).to.have.been
+        .calledWithMatch(({ body }) => body.includes('street 1 de city'))
+    })
   })
 })
