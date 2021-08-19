@@ -24,6 +24,7 @@ import { createPatchVirtualCallerController } from './controller/patch-virtual-c
 import { PatchVirtualCallerService } from './service/patch-virtual-caller.service'
 import { VirtualCallerPhonesRepository } from './repository/virtual-caller-phones.repository'
 import { twilioSMSWebhookController } from './controller/twilio-sms-webhook.controller'
+import { SmsMessagesRepository } from './repository/sms-messages.repository'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -95,6 +96,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCallerWorksheetsRepository: asClass(VirtualCallerWorksheetsRepository).classic().singleton(),
     virtualCallersRepository: asClass(VirtualCallersRepository).classic().singleton(),
     virtualCallerPhonesRepository: asClass(VirtualCallerPhonesRepository).classic().singleton(),
+    smsMessagesRepository: asClass(SmsMessagesRepository).classic().singleton(),
 
     // needed for calls from web (aka callcenter)
     // outgoingCallWebhookController: asFunction(({ logger }) => async (req, res) => {
