@@ -3,18 +3,11 @@ import { SmsMessagesRepository, SmsOutgoingMessage } from '../../../src/calls/re
 import { createTestContainer } from '../../create-test-container'
 import { isRight } from 'fp-ts/These'
 import { Right } from 'fp-ts/Either'
+import { outgoingSmsBuilder } from '../outgoing-sms.builder'
 
 describe('SmsMessagesRepository', () => {
   let repository: SmsMessagesRepository
-  const testSms: SmsOutgoingMessage = {
-    id: 'test-outgoing-sms-id',
-    callerId: 'test-caller-id',
-    contactId: 'test-contact-id',
-    createdAt: new Date(),
-    ownerId: 'test-owner-id',
-    worksheetId: 'test-worksheet-id',
-  }
-
+  const testSms: SmsOutgoingMessage = outgoingSmsBuilder()()
   beforeEach(async () => {
     const container = await createTestContainer()
     repository = container.resolve('smsMessagesRepository')

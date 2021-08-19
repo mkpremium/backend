@@ -1,22 +1,25 @@
 import * as t from 'io-ts'
 import { Errors } from 'io-ts'
-import { DateFromISOString } from 'io-ts-types'
+import { DateFromISOString, NonEmptyString } from 'io-ts-types'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { TaskEither } from 'fp-ts/TaskEither'
 import { taskEither } from 'fp-ts'
 import { isRight } from 'fp-ts/Either'
 
-const SmsOutgoingMessageCodec = t.type({
-  id: t.string,
-  createdAt: DateFromISOString,
-  callerId: t.string,
-  contactId: t.string,
-  ownerId: t.string,
-  worksheetId: t.string,
-  direction: t.literal('outgoing'),
-  _documentType: t.literal('owner-outgoing-sms'),
-})
-
+export const SmsOutgoingMessageCodec = t.intersection([
+  t.type({
+    id: NonEmptyString,
+    createdAt: DateFromISOString,
+    callerId: NonEmptyString,
+    contactId: NonEmptyString,
+    ownerId: NonEmptyString,
+    worksheetId: NonEmptyString,
+  }),
+  t.partial({
+    direction: t.literal('outgoing'),
+    _documentType: t.literal('owner-outgoing-sms'),
+  })
+])
 export type SmsOutgoingMessage = Omit<t.TypeOf<typeof SmsOutgoingMessageCodec>, '_documentType' | 'direction'>
 
 export class SmsMessagesRepository {
