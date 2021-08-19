@@ -1,10 +1,7 @@
-import MessagingResponse from 'twilio/lib/twiml/MessagingResponse'
-import { Task } from 'fp-ts/Task'
+import { SmsWebhookProcessor } from '../service/sms-webhook.processor'
 
 interface Deps {
-  smsWebhookProcessor: {
-    process: (cmd: any) => Task<MessagingResponse>
-  }
+  smsWebhookProcessor: SmsWebhookProcessor
 }
 
 export function twilioSMSWebhookController ({ smsWebhookProcessor }: Deps) {

@@ -25,6 +25,7 @@ import { PatchVirtualCallerService } from './service/patch-virtual-caller.servic
 import { VirtualCallerPhonesRepository } from './repository/virtual-caller-phones.repository'
 import { twilioSMSWebhookController } from './controller/twilio-sms-webhook.controller'
 import { SmsMessagesRepository } from './repository/sms-messages.repository'
+import { SmsWebhookProcessor } from './service/sms-webhook.processor'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -78,6 +79,8 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCallerSupervisor: asClass(VirtualCallerSupervisorService).classic().singleton(),
     ownerResponseProcessor: asClass(OwnerResponseProcessorService).classic().singleton(),
     machineDetectionResultProcessor: asClass(MachineDetectionResultProcessorService).classic().singleton(),
+    smsWebhookProcessor: asClass(SmsWebhookProcessor).classic().singleton(),
+
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController).singleton(),
     startVirtualCallerController: asFunction(createStartVirtualCallerController).singleton(),
