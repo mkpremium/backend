@@ -323,5 +323,38 @@ describe('VirtualCallerSupervisorService', () => {
         ownerId: 'test-owner-id',
       })
     })
+
+    it('starts with validated contacts', () => {
+      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+        relatedOwners: [
+          {
+            id: 'test-owner-id',
+            name: '',
+            status: undefined,
+            type: undefined,
+            person: {
+              contacts: [
+                {
+                  id: 'test-undefined-contact-id',
+                  status: 'UNDEFINED',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+                {
+                  id: 'test-good-contact-id',
+                  status: 'GOOD',
+                  type: 'TELEFONO',
+                  value: '666666667',
+                },
+              ]
+            }
+          },
+        ],
+      }
+
+      const orderedContacts = contactsOrderStrategy(testWorksheet)
+
+      expect(orderedContacts[0].id).to.be.equal('test-good-contact-id')
+    })
   })
 })

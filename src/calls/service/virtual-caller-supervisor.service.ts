@@ -6,6 +6,8 @@ import { flatMap, groupBy } from 'lodash'
 import moment from 'moment-timezone'
 import { EventBus } from '../../infrastructure/event-bus'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
+import { array, ord } from 'fp-ts'
+import { Ord } from 'fp-ts/boolean'
 
 export interface CheckCommand {
   caller: VirtualCallerProps
@@ -13,6 +15,8 @@ export interface CheckCommand {
   lastWorksheetId: string
   lastOwnerResponse: string
 }
+
+const validatedFirst = ord.contramap((c: OwnerContact) => c.status !== 'GOOD')(Ord)
 
 export class VirtualCallerSupervisorService {
   constructor (
@@ -63,25 +67,30 @@ export class VirtualCallerSupervisorService {
           ...c,
           ownerId: o.id
         })))
-      return flatMap(groupBy(allContacts, 'value'), samePhoneNumberContacts => {
-        if (samePhoneNumberContacts.length > 1) {
-          const firstContact = samePhoneNumberContacts[ 0 ]
-          this.logger.info('Duplicated contact in owner', { ownerId: firstContact.ownerId, contactId: firstContact.id })
-          this.eventBus.publish({
-            name: 'virtual-caller.duplicated_contact_detected_in_owner',
-            ownerId: firstContact.ownerId,
-          }).catch(error => this.logger.error('Couldnt publish event', { error: error.message }))
-        }
-        if (samePhoneNumberContacts.find(c => c.status === 'BAD')) {
-          return
-        }
-        let contact = samePhoneNumberContacts.find(c => c.status === 'GOOD')
-        if (!contact) {
-          contact = samePhoneNumberContacts[ 0 ]
-        }
-        return contact
-      }).filter(Boolean)
+
+      return array.sort(validatedFirst)(this.uniqueNumbers(allContacts))
     }
+  }
+
+  private uniqueNumbers (allContacts: OwnerContact[]) {
+    return flatMap(groupBy(allContacts, 'value'), samePhoneNumberContacts => {
+      if (samePhoneNumberContacts.length > 1) {
+        const firstContact = samePhoneNumberContacts[ 0 ]
+        this.logger.info('Duplicated contact in owner', { ownerId: firstContact.ownerId, contactId: firstContact.id })
+        this.eventBus.publish({
+          name: 'virtual-caller.duplicated_contact_detected_in_owner',
+          ownerId: firstContact.ownerId,
+        }).catch(error => this.logger.error('Couldnt publish event', { error: error.message }))
+      }
+      if (samePhoneNumberContacts.find(c => c.status === 'BAD')) {
+        return
+      }
+      let contact = samePhoneNumberContacts.find(c => c.status === 'GOOD')
+      if (!contact) {
+        contact = samePhoneNumberContacts[ 0 ]
+      }
+      return contact
+    }).filter(Boolean)
   }
 }
 
