@@ -3,22 +3,22 @@ import { stub } from 'sinon'
 import { SmsMessageSender } from '../../../src/calls/service/sms-message.service'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
+import { taskEither } from 'fp-ts'
 
 describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
   let worksheetRepositoryStub
   let smsMessagesRepositoryStub
-  const testCmd = {
-    to: '',
-    callId: '',
-    callerId: '',
-    contactId: '',
-    ownerId: '',
-    worksheetId: '',
-  }
   const spanishNumber = '+34666666666'
   const portugueseNumber = '+351999999999'
+  const testCmd = {
+    to: spanishNumber,
+    callerId: 'test-caller-id',
+    contactId: 'test-contact-id',
+    ownerId: 'test-owner-id',
+    worksheetId: 'test-worksheet-id',
+  }
   const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 
   beforeEach(() => {
@@ -29,6 +29,9 @@ describe('SmsMessageSender', () => {
     }
     worksheetRepositoryStub = {
       getForCallcenterView: stub().resolves(testWorksheet)
+    }
+    smsMessagesRepositoryStub = {
+      addOutgoing: stub().returns(taskEither.of(undefined))
     }
 
     service = new SmsMessageSender(
@@ -50,11 +53,11 @@ describe('SmsMessageSender', () => {
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Olá,'))
   })
 
-  // it('saves SMS', async () => {
-  //   await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })
-  //
-  //   expect(smsMessagesRepositoryStub.addOutgoing).to.have.been.called
-  // })
+  it('saves SMS', async () => {
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })()
+
+    expect(smsMessagesRepositoryStub.addOutgoing).to.have.been.called
+  })
 
   ;[
     [ spanishNumber, 'Spanish' ],

@@ -2,19 +2,21 @@ import { Twilio } from 'twilio'
 import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { SmsMessagesRepository } from '../repository/sms-messages.repository'
 import { chain, map, TaskEither } from 'fp-ts/TaskEither'
-import { Errors } from 'io-ts'
+import { Errors, type, TypeOf } from 'io-ts'
 import { taskEither } from 'fp-ts'
 import { pipe } from 'fp-ts/function'
+import uuid from 'uuid/v4'
+import { NonEmptyString } from 'io-ts-types'
+import { isRight } from 'fp-ts/Either'
 
-interface SendMessageToUnreachedOwner {
-  to: string
-  callId: string
-  callerId: string
-  contactId: string
-  ownerId: string
-  worksheetId: string
-}
-
+const SendMessageToUnreachedOwnerCodec = type({
+  to: NonEmptyString,
+  callerId: NonEmptyString,
+  contactId: NonEmptyString,
+  ownerId: NonEmptyString,
+  worksheetId: NonEmptyString,
+})
+type SendMessageToUnreachedOwner = TypeOf<typeof SendMessageToUnreachedOwnerCodec>
 const MAX_SMS_LENGTH = 160
 
 export class SmsMessageSender {
@@ -25,7 +27,13 @@ export class SmsMessageSender {
   ) {
   }
 
-  sendMessageToUnreachedOwner (cmd: SendMessageToUnreachedOwner): TaskEither<Errors | Error, void> {
+  sendMessageToUnreachedOwner (input: unknown): TaskEither<Errors | Error, void> {
+    const decodedInput = SendMessageToUnreachedOwnerCodec.decode(input)
+    if (!isRight(decodedInput)) {
+      return taskEither.left(decodedInput.left)
+    }
+
+    const cmd = decodedInput.right
     const lang = cmd.to.startsWith('+351') ? 'PT' : 'ES'
     return pipe(
       this.composeMessageWithAddress(lang, cmd.worksheetId),
@@ -41,7 +49,12 @@ export class SmsMessageSender {
           }).then(),
           reason => reason instanceof Error ? reason : new Error(String(reason))
         ),
-      )
+      ),
+      chain(() => this.smsMessagesRepository.addOutgoing({
+        id: uuid(),
+        createdAt: new Date(),
+        ...cmd,
+      }))
     )
   }
 
