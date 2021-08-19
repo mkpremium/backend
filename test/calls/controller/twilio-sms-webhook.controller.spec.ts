@@ -1,21 +1,34 @@
 import { expect } from 'chai'
 import { RequestHandler } from 'express'
+import { stub } from 'sinon'
 import { twilioSMSWebhookController } from '../../../src/calls/controller/twilio-sms-webhook.controller'
+import { task } from 'fp-ts'
 
 describe('twilio-sms-webhook.controller', () => {
   let controller: RequestHandler
-  // let requestStub
-  // let responseStub
+  let smsWebhookProcessorStub
+  let requestStub
+  let responseStub
+  const testResponseMessage = 'test response message'
+  const testTwimlResponse = { toString: () => testResponseMessage }
 
   beforeEach(() => {
-    controller = twilioSMSWebhookController()
+    responseStub = {
+      sendStatus: stub(),
+      send: stub(),
+    }
+    smsWebhookProcessorStub = {
+      process: stub().returns(task.of(testTwimlResponse)),
+    }
+
+    controller = twilioSMSWebhookController({
+      smsWebhookProcessor: smsWebhookProcessorStub,
+    })
   })
 
-  it('works', () => {
-    expect(controller).to.be.ok
-  })
+  it('replies with processor response', async () => {
+    await controller(requestStub, responseStub, undefined)
 
-  // it('replies with processor response', () => {
-  //   controller(requestStub, responseStub, undefined)
-  // })
+    expect(responseStub.send).to.be.calledWith(testResponseMessage)
+  })
 })

@@ -15,6 +15,7 @@ export const createSmsToOwnerListener = ({ smsMessageSender }: Deps) => {
       return
     }
 
+    // TODO anything missing?
     await smsMessageSender.sendMessageToUnreachedOwner(createCommand(evt))()
   }
 }
