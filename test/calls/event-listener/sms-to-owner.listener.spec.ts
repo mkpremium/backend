@@ -3,6 +3,7 @@ import { stub } from 'sinon'
 import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
 import { createSmsToOwnerListener } from '../../../src/calls/event-listener/sms-to-owner.listener'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
+import { taskEither } from 'fp-ts'
 
 describe('sms-to-owner.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
@@ -22,7 +23,7 @@ describe('sms-to-owner.listener', () => {
 
   beforeEach(() => {
     smsMessageSenderStub = {
-      sendMessageToUnreachedOwner: stub(),
+      sendMessageToUnreachedOwner: stub().returns(taskEither.of(undefined)),
     }
     listener = createSmsToOwnerListener({
       smsMessageSender: smsMessageSenderStub,

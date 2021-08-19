@@ -20,6 +20,6 @@ export const createSmsToOwnerListener = ({ smsMessageSender }: Deps) => {
       contactId: evt.contactId,
       ownerId: evt.ownerId,
       worksheetId: evt.worksheetId,
-    })
+    })()
   }
 }

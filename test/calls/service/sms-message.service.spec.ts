@@ -8,6 +8,7 @@ describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
   let worksheetRepositoryStub
+  let smsMessagesRepositoryStub
   const testCmd = {
     to: '',
     callId: '',
@@ -33,20 +34,27 @@ describe('SmsMessageSender', () => {
     service = new SmsMessageSender(
       twilioClientStub,
       worksheetRepositoryStub,
+      smsMessagesRepositoryStub,
     )
   })
 
   it('sends Spanish message to Spain numbers', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })()
 
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Hola,'))
   })
 
   it('sends Portuguese message to Portugal numbers', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: portugueseNumber })
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to: portugueseNumber })()
 
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Olá,'))
   })
+
+  // it('saves SMS', async () => {
+  //   await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })
+  //
+  //   expect(smsMessagesRepositoryStub.addOutgoing).to.have.been.called
+  // })
 
   ;[
     [ spanishNumber, 'Spanish' ],
@@ -65,7 +73,7 @@ describe('SmsMessageSender', () => {
       }
     })
 
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to })
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to })()
 
     expect(twilioClientStub.messages.create).to.have.been
       .calledWithMatch(({ body }) => body.includes('street 1 de city') && body.length < 160)
@@ -88,7 +96,7 @@ describe('SmsMessageSender', () => {
       }
     })
 
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to })
+    await service.sendMessageToUnreachedOwner({ ...testCmd, to })()
 
     expect(twilioClientStub.messages.create).to.have.been
       .calledWithMatch(({ body }) => body.length < 160)
