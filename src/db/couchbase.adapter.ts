@@ -15,6 +15,7 @@ export type PromisifiedBucket = Bucket & {
   queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
   getAsync: (key: string) => Promise<{ value: any, cas: any }>
   upsertAsync: (key: string, value: any, opts?: { cas: Bucket.CAS }) => Promise<any>
+  insertAsync(key: string, value: any): Promise<void>;
   getAndLockAsync: (key: string) => Promise<any>
   unlockAsync: (key: string, cas: Bucket.CAS) => Promise<any>
   name: string
@@ -107,6 +108,14 @@ export class CouchbaseAdapter {
 
     return (cas ? this.couchbaseBucket.upsertAsync(key, obj, { cas }) : this.couchbaseBucket.upsertAsync(key, obj))
       .finally(() => beeline.finishSpan(span))
+  }
+
+  insert (id: string, value: any) {
+    return this.couchbaseBucket.insertAsync(id, value)
+  }
+
+  get (id: string) {
+    return this.couchbaseBucket.getAsync(id)
   }
 
   private withRetry<T> (fn: () => Promise<T>): Promise<T> {

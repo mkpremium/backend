@@ -1,20 +1,23 @@
 import * as t from 'io-ts'
-import { date, NonEmptyString } from 'io-ts-types'
+import { Errors } from 'io-ts'
+import { DateFromISOString } from 'io-ts-types'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { TaskEither } from 'fp-ts/TaskEither'
-import { Errors } from 'io-ts'
-import { task, taskEither } from 'fp-ts'
+import { taskEither } from 'fp-ts'
+import { isRight } from 'fp-ts/Either'
 
-const SMSMessageCodec = t.type({
-  id: NonEmptyString,
-  createdAt: date,
-  callerId: NonEmptyString,
-  contactId: NonEmptyString,
-  ownerId: NonEmptyString,
-  worksheetId: NonEmptyString,
+const SmsOutgoingMessageCodec = t.type({
+  id: t.string,
+  createdAt: DateFromISOString,
+  callerId: t.string,
+  contactId: t.string,
+  ownerId: t.string,
+  worksheetId: t.string,
+  direction: t.literal('outgoing'),
+  _documentType: t.literal('owner-outgoing-sms'),
 })
 
-export type SMSMessage = t.TypeOf<typeof SMSMessageCodec>
+export type SmsOutgoingMessage = Omit<t.TypeOf<typeof SmsOutgoingMessageCodec>, '_documentType' | 'direction'>
 
 export class SmsMessagesRepository {
   constructor (
@@ -22,7 +25,30 @@ export class SmsMessagesRepository {
   ) {
   }
 
-  add(sms: SMSMessage): TaskEither<Errors | Error, void> {
-    return taskEither.left(new Error('Not implemented'))
+  addOutgoing (sms: SmsOutgoingMessage): TaskEither<Errors | Error, void> {
+    const encodedSms = SmsOutgoingMessageCodec.encode({
+      ...sms,
+      direction: 'outgoing',
+      _documentType: 'owner-outgoing-sms',
+    })
+
+    return taskEither.tryCatch(
+      () => this.couchbaseAdapter.insert(encodedSms.id, encodedSms),
+      reason => new Error(String(reason)),
+    )
+  }
+
+  getOutgoingSms (id: string): TaskEither<Errors | Error, SmsOutgoingMessage> {
+    return taskEither.tryCatch(
+      () => this.couchbaseAdapter.get(id)
+        .then(({ value: sms }) => {
+          const decodedSms = SmsOutgoingMessageCodec.decode(sms)
+          if (!isRight(decodedSms)) {
+            return Promise.reject(decodedSms.left)
+          }
+          return decodedSms.right
+        }),
+      reason => reason instanceof Error ? reason : new Error(String(reason))
+    )
   }
 }
