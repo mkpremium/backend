@@ -13,8 +13,13 @@ describe('twilio-sms-webhook.controller', () => {
   const testTwimlResponse = { toString: () => testResponseMessage }
 
   beforeEach(() => {
+    requestStub = {
+      body: {
+        Body: 'owner incoming message',
+        From: '+34666666666',
+      }
+    }
     responseStub = {
-      sendStatus: stub(),
       send: stub(),
     }
     smsWebhookProcessorStub = {
