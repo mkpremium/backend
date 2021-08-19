@@ -14,6 +14,7 @@ export const SmsOutgoingMessageCodec = t.intersection([
     contactId: NonEmptyString,
     ownerId: NonEmptyString,
     worksheetId: NonEmptyString,
+    to: NonEmptyString,
   }),
   t.partial({
     direction: t.literal('outgoing'),

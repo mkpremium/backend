@@ -9,6 +9,7 @@ const prototype = {
   createdAt: new Date().toISOString(),
   ownerId: 'test-owner-id',
   worksheetId: 'test-worksheet-id',
+  to: '+34666666666',
 }
 
 export function outgoingSmsBuilder(overrides = {}) {

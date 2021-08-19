@@ -1,6 +1,5 @@
 import { Twilio } from 'twilio'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
-import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 
 interface SendMessageToUnreachedOwner {
   to: string
