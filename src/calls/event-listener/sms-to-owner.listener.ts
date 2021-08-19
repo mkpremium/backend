@@ -1,5 +1,7 @@
 import { CallDone } from '../controller/call-done-webhook.controller'
-import { SmsMessageSender } from '../service/sms-message.service'
+import { SendMessageToUnreachedOwnerCodec, SmsMessageSender } from '../service/sms-message.service'
+import { isRight } from 'fp-ts/Either'
+import { PathReporter } from 'io-ts/PathReporter'
 
 interface Deps {
   smsMessageSender: SmsMessageSender
@@ -13,13 +15,21 @@ export const createSmsToOwnerListener = ({ smsMessageSender }: Deps) => {
       return
     }
 
-    await smsMessageSender.sendMessageToUnreachedOwner({
-      to: evt.phoneNumber,
-      callId: evt.callId,
-      callerId: evt.callerId,
-      contactId: evt.contactId,
-      ownerId: evt.ownerId,
-      worksheetId: evt.worksheetId,
-    })()
+    await smsMessageSender.sendMessageToUnreachedOwner(createCommand(evt))()
   }
+}
+
+function createCommand (evt: CallDone) {
+  const decoded = SendMessageToUnreachedOwnerCodec.decode({
+    to: evt.phoneNumber,
+    callerId: evt.callerId,
+    contactId: evt.contactId,
+    ownerId: evt.ownerId,
+    worksheetId: evt.worksheetId,
+  })
+  if (!isRight(decoded)) {
+    throw new Error(PathReporter.report(decoded).join('\n'))
+  }
+
+  return decoded.right
 }

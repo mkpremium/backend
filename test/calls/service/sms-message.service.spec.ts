@@ -1,9 +1,11 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
-import { SmsMessageSender } from '../../../src/calls/service/sms-message.service'
+import { SendMessageToUnreachedOwnerCodec, SmsMessageSender } from '../../../src/calls/service/sms-message.service'
 import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 import { taskEither } from 'fp-ts'
+import { isRight } from 'fp-ts/Either'
+import { PathReporter } from 'io-ts/PathReporter'
 
 describe('SmsMessageSender', () => {
   let service: SmsMessageSender
@@ -12,13 +14,6 @@ describe('SmsMessageSender', () => {
   let smsMessagesRepositoryStub
   const spanishNumber = '+34666666666'
   const portugueseNumber = '+351999999999'
-  const testCmd = {
-    to: spanishNumber,
-    callerId: 'test-caller-id',
-    contactId: 'test-contact-id',
-    ownerId: 'test-owner-id',
-    worksheetId: 'test-worksheet-id',
-  }
   const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 
   beforeEach(() => {
@@ -42,19 +37,19 @@ describe('SmsMessageSender', () => {
   })
 
   it('sends Spanish message to Spain numbers', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })()
+    await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder({ to: spanishNumber })())()
 
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Hola,'))
   })
 
   it('sends Portuguese message to Portugal numbers', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: portugueseNumber })()
+    await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder({ to: portugueseNumber })())()
 
     expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Olá,'))
   })
 
   it('saves SMS', async () => {
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to: spanishNumber })()
+    await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder()())()
 
     expect(smsMessagesRepositoryStub.addOutgoing).to.have.been.called
   })
@@ -76,7 +71,7 @@ describe('SmsMessageSender', () => {
       }
     })
 
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to })()
+    await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder({ to })())()
 
     expect(twilioClientStub.messages.create).to.have.been
       .calledWithMatch(({ body }) => body.includes('street 1 de city') && body.length < 160)
@@ -99,9 +94,28 @@ describe('SmsMessageSender', () => {
       }
     })
 
-    await service.sendMessageToUnreachedOwner({ ...testCmd, to })()
+    await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder({ to })())()
 
     expect(twilioClientStub.messages.create).to.have.been
       .calledWithMatch(({ body }) => body.length < 160)
   }))
 })
+
+function sendMessageToUnreachedOwnerBuilder (overrides = {}) {
+  return function () {
+    const decodedCmd = SendMessageToUnreachedOwnerCodec.decode({
+        to: '+349999999',
+        callerId: 'test-caller-id',
+        contactId: 'test-contact-id',
+        ownerId: 'test-owner-id',
+        worksheetId: 'test-worksheet-id',
+        ...overrides,
+      }
+    )
+    if (!isRight(decodedCmd)) {
+      throw new Error(PathReporter.report(decodedCmd).join('\n'))
+    }
+
+    return decodedCmd.right
+  }
+}

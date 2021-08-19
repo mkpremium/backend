@@ -38,7 +38,6 @@ describe('sms-to-owner.listener', () => {
 
     expect(smsMessageSenderStub.sendMessageToUnreachedOwner).to.have.been.calledWith({
       to: phoneNumber,
-      callId: testEvt.callId,
       callerId: testEvt.callerId,
       contactId: testEvt.contactId,
       ownerId: testEvt.ownerId,
@@ -51,15 +50,8 @@ describe('sms-to-owner.listener', () => {
     [ '+35122222', 'Portugal' ],
   ].forEach(([ phoneNumber, country ]) => it(`does not send SMS to landline numbers (${country})`, async () => {
     await listener({
-      name: 'virtual-caller.call_finished',
+      ...testEvt,
       phoneNumber,
-      callId: '',
-      callerId: '',
-      contactId: '',
-      ownerId: '',
-      ownerResponse: '',
-      status: undefined,
-      worksheetId: ''
     })
 
     expect(smsMessageSenderStub.sendMessageToUnreachedOwner).to.not.have.been.called
@@ -67,15 +59,8 @@ describe('sms-to-owner.listener', () => {
 
   it('does not send messages when owner has replied', async () => {
     await listener({
-      name: 'virtual-caller.call_finished',
-      phoneNumber: '+34666666666',
-      callId: '',
-      callerId: '',
-      contactId: '',
-      ownerId: '',
+      ...testEvt,
       ownerResponse: OwnerResponse.NO_SALE,
-      status: undefined,
-      worksheetId: ''
     })
 
     expect(smsMessageSenderStub.sendMessageToUnreachedOwner).to.not.have.been.called
@@ -83,15 +68,8 @@ describe('sms-to-owner.listener', () => {
 
   it('does not send messages for failed calls', async () => {
     await listener({
-      name: 'virtual-caller.call_finished',
-      phoneNumber: '+34666666666',
-      callId: '',
-      callerId: '',
-      contactId: '',
-      ownerId: '',
-      ownerResponse: undefined,
+      ...testEvt,
       status: 'FAILED',
-      worksheetId: ''
     })
 
     expect(smsMessageSenderStub.sendMessageToUnreachedOwner).to.not.have.been.called
