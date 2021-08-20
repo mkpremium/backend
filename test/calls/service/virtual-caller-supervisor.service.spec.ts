@@ -357,7 +357,7 @@ describe('VirtualCallerSupervisorService', () => {
                   id: 'test-featured-owner-contact-id',
                   status: 'GOOD',
                   type: 'TELEFONO',
-                  value: '666666667',
+                  value: '666666666',
                 },
               ]
             }

@@ -72,11 +72,11 @@ export class VirtualCallerSupervisorService {
         }
         return c.status === 'GOOD' ? 2 : 3
       })(Ord)
-      return array.sort(contactsOrder)(this.uniqueNumbers(allContacts))
+      return array.sort(contactsOrder)(this.uniqueNumbers(allContacts, featuredOwnerId))
     }
   }
 
-  private uniqueNumbers (allContacts: OwnerContact[]) {
+  private uniqueNumbers (allContacts: OwnerContact[], featuredOwnerId: string) {
     return flatMap(groupBy(allContacts, 'value'), samePhoneNumberContacts => {
       if (samePhoneNumberContacts.length > 1) {
         const firstContact = samePhoneNumberContacts[ 0 ]
@@ -89,7 +89,8 @@ export class VirtualCallerSupervisorService {
       if (samePhoneNumberContacts.find(c => c.status === 'BAD')) {
         return
       }
-      let contact = samePhoneNumberContacts.find(c => c.status === 'GOOD')
+      const featuredOwnerContact = samePhoneNumberContacts.find(ca => ca.ownerId === featuredOwnerId)
+      let contact = featuredOwnerContact || samePhoneNumberContacts.find(c => c.status === 'GOOD')
       if (!contact) {
         contact = samePhoneNumberContacts[ 0 ]
       }
