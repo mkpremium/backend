@@ -1,4 +1,4 @@
-import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
+import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall } from '../virtual-agent-call'
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Logger } from 'winston'
@@ -72,21 +72,35 @@ export class OwnerResponseProcessorService {
     private twilioSayAttributes: TwilioSayAttributes,
     private eventBus: EventBus,
     private logger: Logger,
+    private publicUrl: string,
   ) {
   }
 
   process (cmd: ProcessOwnerResponseCommand): VoiceResponse {
-    this.saveOwnerResponse(cmd).catch(error => {
-      this.logger.error('Saving owner response', { cmd, errorMessage: error.message })
-    })
-
     const twiml = new VoiceResponse()
 
     const sayAttribute = this.twilioSayAttributes[ cmd.language ]
     if (OwnerResponseProcessorService.validOptionResponse(cmd.ownerResponse)) {
+      this.saveOwnerResponse(cmd).catch(error => {
+        this.logger.error('Saving owner response', { cmd, errorMessage: error.message })
+      })
       twiml.say(sayAttribute, copies[ cmd.ownerResponse as OwnerResponse ][ cmd.language ].replace('%%CITY%%', cmd.fromCity))
     } else {
-      twiml.say(sayAttribute, copies[ 'Invalid' ][ cmd.language ])
+      const gatherEndpointQueryParams = [
+        [ 'buildingId', cmd.buildingId ],
+        [ 'fromCity', encodeURIComponent(cmd.fromCity) ],
+        [ 'worksheetId', cmd.worksheetId ],
+        [ 'contactId', cmd.contactId ],
+        [ 'ownerId', cmd.ownerId ],
+        [ 'language', cmd.language ],
+      ].map(([ key, value ]) => `${key}=${value}`).join('&')
+
+      twiml.gather({
+        action: `${this.publicUrl}/calls/twilio/${cmd.callId}/gather?${gatherEndpointQueryParams}`,
+        method: 'POST',
+        language: cmd.language as GatherLanguage,
+        numDigits: 1,
+      }).say(sayAttribute, copies[ 'Invalid' ][ cmd.language ])
     }
 
     return twiml
