@@ -29,9 +29,10 @@ type WorksheetBuildingProps = Omit<BuildingProps, 'cadastre' | 'address' | 'assi
     amount: number;
     createdAt: string;
   },
+  featuredOwnerId?: string
 }
 
-interface WorksheetOwnerProps {
+export interface WorksheetOwnerProps {
   id: string;
   name: string;
   status: OwnerStatus;

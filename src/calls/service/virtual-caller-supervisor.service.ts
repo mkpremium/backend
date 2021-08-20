@@ -7,7 +7,7 @@ import moment from 'moment-timezone'
 import { EventBus } from '../../infrastructure/event-bus'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 import { array, ord } from 'fp-ts'
-import { Ord } from 'fp-ts/boolean'
+import { Ord } from 'fp-ts/number'
 
 export interface CheckCommand {
   caller: VirtualCallerProps
@@ -15,8 +15,6 @@ export interface CheckCommand {
   lastWorksheetId: string
   lastOwnerResponse: string
 }
-
-const validatedFirst = ord.contramap((c: OwnerContact) => c.status !== 'GOOD')(Ord)
 
 export class VirtualCallerSupervisorService {
   constructor (
@@ -60,7 +58,7 @@ export class VirtualCallerSupervisorService {
   }
 
   private contactsOrderStrategy (): ContactsOrderStrategy {
-    return ({ relatedOwners }: Pick<WorksheetViewProps, 'relatedOwners'>): OwnerContact[] => {
+    return ({ relatedOwners, building: { featuredOwnerId } }: WorksheetViewProps): OwnerContact[] => {
       const allContacts: OwnerContact[] = flatMap(relatedOwners, o => o.person.contacts
         .filter(({ type }) => [ 'TELEFONO', 'MOVIL' ].includes(type))
         .map(c => ({
@@ -68,7 +66,13 @@ export class VirtualCallerSupervisorService {
           ownerId: o.id
         })))
 
-      return array.sort(validatedFirst)(this.uniqueNumbers(allContacts))
+      const contactsOrder = ord.contramap((c: OwnerContact) => {
+        if (c.ownerId === featuredOwnerId) {
+          return 1
+        }
+        return c.status === 'GOOD' ? 2 : 3
+      })(Ord)
+      return array.sort(contactsOrder)(this.uniqueNumbers(allContacts))
     }
   }
 

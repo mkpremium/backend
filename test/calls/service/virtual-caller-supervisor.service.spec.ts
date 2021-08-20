@@ -4,10 +4,12 @@ import {
   CheckCommand,
   VirtualCallerSupervisorService
 } from '../../../src/calls/service/virtual-caller-supervisor.service'
-import { WorksheetViewProps } from '../../../src/worksheet/repository/worksheet.repository'
 import moment from 'moment-timezone'
 import { ContactsOrderStrategy } from '../../../src/calls/service/virtual-caller.service'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
+import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
+import { relatedOwnerBuilder } from '../../worksheet/related-owner.builder'
+import { CallcenterView, WorksheetBuilding } from '../../../src/worksheet/repository/worksheet.repository'
 
 const testCmd: CheckCommand = {
   caller: virtualCallerBuilder({
@@ -110,13 +112,10 @@ describe('VirtualCallerSupervisorService', () => {
     })
 
     it('does not give duplicated numbers within same owner', () => {
-      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      const testWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
+          relatedOwnerBuilder({
             id: 'test-owner-id',
-            name: '',
-            status: undefined,
-            type: undefined,
             person: {
               contacts: [
                 {
@@ -133,9 +132,9 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ],
-      }
+      }).build()
       const contacts = contactsOrderStrategy(testWorksheet)
 
       expect(contacts).to.be.eql([ {
@@ -148,13 +147,10 @@ describe('VirtualCallerSupervisorService', () => {
     })
 
     it('does not give duplicated numbers across different owners', () => {
-      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      const testWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
+          relatedOwnerBuilder({
             id: 'test-owner-1',
-            name: '',
-            status: undefined,
-            type: undefined,
             person: {
               contacts: [
                 {
@@ -165,12 +161,9 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
-          {
+          })(),
+          relatedOwnerBuilder({
             id: 'test-owner-2',
-            name: '',
-            status: undefined,
-            type: undefined,
             person: {
               contacts: [
                 {
@@ -181,9 +174,9 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ],
-      }
+      }).build()
       const contacts = contactsOrderStrategy(testWorksheet)
 
       expect(contacts).to.be.eql([ {
@@ -196,13 +189,10 @@ describe('VirtualCallerSupervisorService', () => {
     })
 
     it('returns contacts in same order', () => {
-      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      const testWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
+          relatedOwnerBuilder({
             id: 'test-owner-id',
-            name: '',
-            status: undefined,
-            type: undefined,
             person: {
               contacts: [
                 {
@@ -219,16 +209,13 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ],
-      }
-      const testReverseOrderWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      }).build()
+      const testReverseOrderWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
+          relatedOwnerBuilder({
             id: 'test-owner-id',
-            name: '',
-            status: undefined,
-            type: undefined,
             person: {
               contacts: [
                 {
@@ -245,9 +232,9 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ]
-      }
+      }).build()
 
       const contactsInOrder = contactsOrderStrategy(testWorksheet)
       const contactsInReverseOrder = contactsOrderStrategy(testReverseOrderWorksheet)
@@ -256,13 +243,9 @@ describe('VirtualCallerSupervisorService', () => {
     })
 
     it('removes duplicated BAD contacts', () => {
-      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      const testWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
-            id: 'test-owner-id',
-            name: '',
-            status: undefined,
-            type: undefined,
+          relatedOwnerBuilder({
             person: {
               contacts: [
                 {
@@ -279,9 +262,9 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ],
-      }
+      }).build()
 
       const contacts = contactsOrderStrategy(testWorksheet)
 
@@ -289,13 +272,10 @@ describe('VirtualCallerSupervisorService', () => {
     })
 
     it('publishes event on duplicated contacts in owner', () => {
-      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      const testWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
+          relatedOwnerBuilder({
             id: 'test-owner-id',
-            name: '',
-            status: undefined,
-            type: undefined,
             person: {
               contacts: [
                 {
@@ -312,9 +292,9 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ],
-      }
+      }).build()
 
       contactsOrderStrategy(testWorksheet)
 
@@ -325,13 +305,9 @@ describe('VirtualCallerSupervisorService', () => {
     })
 
     it('starts with validated contacts', () => {
-      const testWorksheet: Pick<WorksheetViewProps, 'relatedOwners'> = {
+      const testWorksheet = worksheetViewBuilder({
         relatedOwners: [
-          {
-            id: 'test-owner-id',
-            name: '',
-            status: undefined,
-            type: undefined,
+          relatedOwnerBuilder({
             person: {
               contacts: [
                 {
@@ -348,13 +324,59 @@ describe('VirtualCallerSupervisorService', () => {
                 },
               ]
             }
-          },
+          })(),
         ],
-      }
+      }).build()
 
       const orderedContacts = contactsOrderStrategy(testWorksheet)
 
-      expect(orderedContacts[0].id).to.be.equal('test-good-contact-id')
+      expect(orderedContacts[ 0 ].id).to.be.equal('test-good-contact-id')
+    })
+
+    it('starts with featured owner', () => {
+      const worksheetView = worksheetViewBuilder({
+        relatedOwners: [
+          relatedOwnerBuilder({
+            id: 'test-non-featured-owner-id',
+            person: {
+              contacts: [
+                {
+                  id: 'test-non-featured-contact-id',
+                  status: 'GOOD',
+                  type: 'TELEFONO',
+                  value: '666666666',
+                },
+              ]
+            }
+          })(),
+          relatedOwnerBuilder({
+            id: 'test-featured-owner-id',
+            person: {
+              contacts: [
+                {
+                  id: 'test-featured-owner-contact-id',
+                  status: 'GOOD',
+                  type: 'TELEFONO',
+                  value: '666666667',
+                },
+              ]
+            }
+          })(),
+        ],
+      }).build()
+      const testWorksheet = CallcenterView.update(worksheetView, {
+        building: {
+          $set: WorksheetBuilding.update(worksheetView.building, {
+            featuredOwnerId: {
+              $set: 'test-featured-owner-id'
+            }
+          })
+        }
+      })
+
+      const orderedContacts = contactsOrderStrategy(testWorksheet)
+
+      expect(orderedContacts[ 0 ].id).to.be.equal('test-featured-owner-contact-id')
     })
   })
 })

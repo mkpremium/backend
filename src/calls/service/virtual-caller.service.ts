@@ -18,7 +18,7 @@ import { VirtualCallerProps } from '../domain/virtual-caller'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
-export type ContactsOrderStrategy = (worksheet: Pick<WorksheetViewProps, 'relatedOwners'>) => OwnerContact[]
+export type ContactsOrderStrategy = (worksheet: WorksheetViewProps) => OwnerContact[]
 
 export interface ProcessNextWorksheetCommand {
   caller: VirtualCallerProps;
