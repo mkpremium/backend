@@ -9,6 +9,7 @@ describe('twilio-sms-webhook.controller', () => {
   let smsWebhookProcessorStub
   let requestStub
   let responseStub
+  let loggerStub
   const testResponseMessage = 'test response message'
   const testTwimlResponse = { toString: () => testResponseMessage }
 
@@ -26,9 +27,13 @@ describe('twilio-sms-webhook.controller', () => {
     smsWebhookProcessorStub = {
       process: stub().returns(taskEither.of(testTwimlResponse)),
     }
+    loggerStub = {
+      error: stub(),
+    }
 
     controller = twilioSMSWebhookController({
       smsWebhookProcessor: smsWebhookProcessorStub,
+      logger: loggerStub,
     })
   })
 
@@ -44,5 +49,6 @@ describe('twilio-sms-webhook.controller', () => {
     await controller(requestStub, responseStub, undefined)
 
     expect(responseStub.sendStatus).to.have.been.calledWith(500)
+    expect(loggerStub.error).to.have.been.called
   })
 })
