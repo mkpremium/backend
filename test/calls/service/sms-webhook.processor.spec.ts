@@ -1,5 +1,7 @@
 import { expect } from 'chai'
 import { SmsWebhookProcessor } from '../../../src/calls/service/sms-webhook.processor'
+import { isRight, Right } from 'fp-ts/Either'
+import MessagingResponse from 'twilio/lib/twiml/MessagingResponse'
 
 describe('SmsWebhookProcessor', () => {
   let service: SmsWebhookProcessor
@@ -18,6 +20,8 @@ describe('SmsWebhookProcessor', () => {
         message: 'test message'
       })()
 
-      expect(message.toString()).to.contain(expectedMessageFragment)
+      expect(isRight(message)).to.be.true
+      expect((message as Right<MessagingResponse>).right.toString())
+        .to.contain(expectedMessageFragment)
     }))
 })

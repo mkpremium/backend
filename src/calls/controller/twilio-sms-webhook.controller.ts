@@ -1,4 +1,5 @@
 import { SmsWebhookProcessor } from '../service/sms-webhook.processor'
+import { isRight } from 'fp-ts/Either'
 
 interface Deps {
   smsWebhookProcessor: SmsWebhookProcessor
@@ -11,6 +12,11 @@ export function twilioSMSWebhookController ({ smsWebhookProcessor }: Deps) {
       fromNumber: From,
       message: Body,
     })()
-    res.send(response.toString())
+
+    if (isRight(response)) {
+      res.send(response.right.toString())
+    } else {
+      res.sendStatus(500)
+    }
   }
 }

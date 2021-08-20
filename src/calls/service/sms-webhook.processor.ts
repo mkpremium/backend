@@ -1,6 +1,7 @@
 import { Task } from 'fp-ts/Task'
 import MessagingResponse from 'twilio/lib/twiml/MessagingResponse'
-import { task } from 'fp-ts'
+import { task, taskEither } from 'fp-ts'
+import { TaskEither } from 'fp-ts/TaskEither'
 
 interface ProcessSmsWebhookCommand {
   fromNumber: string
@@ -8,7 +9,7 @@ interface ProcessSmsWebhookCommand {
 }
 
 export class SmsWebhookProcessor {
-  process (cmd: ProcessSmsWebhookCommand): Task<MessagingResponse> {
+  process (cmd: ProcessSmsWebhookCommand): TaskEither<Error, MessagingResponse> {
     const lang = cmd.fromNumber.startsWith('+351') ? 'PT' : 'ES'
     const response = new MessagingResponse()
     response.message(
@@ -17,6 +18,6 @@ export class SmsWebhookProcessor {
         'Perfecto! En los siguientes días el director de "ciudad" lo contactará para hablar de su propiedad.'
     )
 
-    return task.of(response)
+    return taskEither.of(response)
   }
 }
