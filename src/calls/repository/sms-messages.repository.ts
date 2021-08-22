@@ -55,4 +55,8 @@ export class SmsMessagesRepository {
       reason => reason instanceof Error ? reason : new Error(String(reason))
     )
   }
+
+  lastSentTo (phoneNumber: string): TaskEither<Error, SmsOutgoingMessage | undefined> {
+    throw new Error('not implemented')
+  }
 }

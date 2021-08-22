@@ -1,6 +1,6 @@
 import { CallcenterView, WorksheetViewProps } from '../../src/worksheet/repository/worksheet.repository'
 
-const worksheetViewPrototype: WorksheetViewProps = {
+export const worksheetViewPrototype: WorksheetViewProps = {
   id: 'test-worksheet-id',
   status: 'OPEN',
   building: {
@@ -41,5 +41,13 @@ const worksheetViewPrototype: WorksheetViewProps = {
 export const worksheetViewBuilder = (overrides: Partial<WorksheetViewProps> = {}) => ({
   build () {
     return CallcenterView({ ...worksheetViewPrototype, ...overrides })
+  },
+  withCity (city: string) {
+    if (!overrides.building) {
+      overrides.building = { ...worksheetViewPrototype.building }
+    }
+    overrides.building.address.city = city
+
+    return worksheetViewBuilder(overrides)
   }
 })
