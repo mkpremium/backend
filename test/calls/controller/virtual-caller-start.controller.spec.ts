@@ -28,6 +28,7 @@ describe('virtual-caller-start.controller', () => {
       virtualCallerBuilder({ id: 'caller-1' }).build(),
       virtualCallerBuilder({ id: 'caller-2' }).build(),
     ])
+    virtualCallerSupervisorStub.check.resolves()
 
     await controller(undefined, { json: stub() } as any, undefined)
 
