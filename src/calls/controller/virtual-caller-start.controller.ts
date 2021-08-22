@@ -18,6 +18,8 @@ export const createStartVirtualCallerController = ({
         lastWorksheetId: undefined,
         lastOwnerResponse: undefined,
       })
+        .then(() => `${caller.id} => success`)
+        .catch(error => `${caller.id} => failed (${error.message})`)
     })
-  ).then(() => res.json())
+  ).then(result => res.json(result))
 }
