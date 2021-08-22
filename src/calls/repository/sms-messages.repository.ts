@@ -57,6 +57,26 @@ export class SmsMessagesRepository {
   }
 
   lastSentTo (phoneNumber: string): TaskEither<Error, SmsOutgoingMessage | undefined> {
-    throw new Error('not implemented')
+    return taskEither.tryCatch(
+      () => this.couchbaseAdapter.queryAsync(`
+          SELECT sms.*
+          FROM ${this.couchbaseAdapter.bucketName} sms
+          WHERE _documentType = 'owner-outgoing-sms'
+            AND to = $1
+          ORDER BY createdAt DESC
+              LIMIT 1`, [ phoneNumber ]
+      ).then(result => {
+        if (!result || result.length === 0) {
+          return
+        }
+
+        const decodedMessage = SmsOutgoingMessageCodec.decode(result[ 0 ].sms)
+        if (!isRight(decodedMessage)) {
+          throw new Error(`Wrong SMS found in DB: phoneNumber=${phoneNumber}`)
+        }
+        return decodedMessage.right
+      }),
+      reason => new Error(String(reason))
+    )
   }
 }
