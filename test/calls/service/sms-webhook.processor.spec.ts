@@ -11,6 +11,8 @@ describe('SmsWebhookProcessor', () => {
   let service: SmsWebhookProcessor
   let worksheetRepositoryStub
   let smsMessagesRepositoryStub
+  let eventBusStub
+  let loggerStub
   const spanishNumber = '+34666666666'
   const portugueseNumber = '+351999999999'
   const testBuildingCity = 'TEST CITY'
@@ -23,9 +25,18 @@ describe('SmsWebhookProcessor', () => {
     smsMessagesRepositoryStub = {
       lastSentTo: stub().returns(taskEither.of(outgoingSmsBuilder({})()))
     }
+    eventBusStub = {
+      publish: stub().resolves()
+    }
+    loggerStub = {
+      error: stub()
+    }
+
     service = new SmsWebhookProcessor(
       worksheetRepositoryStub,
       smsMessagesRepositoryStub,
+      eventBusStub,
+      loggerStub,
     )
   })
 
@@ -52,5 +63,18 @@ describe('SmsWebhookProcessor', () => {
 
     expect((message as Right<MessagingResponse>).right.toString())
       .to.contain(testBuildingCity)
+  })
+
+  it('publishes event', async () => {
+    await service.process({
+      fromNumber: spanishNumber,
+      message: 'test message'
+    })()
+
+    expect(eventBusStub.publish).to.have.been.called
+    expect(eventBusStub.publish.lastCall.firstArg).to.include({
+      name: 'virtual-caller.sms-received',
+      message: 'test message',
+    })
   })
 })
