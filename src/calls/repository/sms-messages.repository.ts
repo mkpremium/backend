@@ -62,7 +62,7 @@ export class SmsMessagesRepository {
           SELECT sms.*
           FROM ${this.couchbaseAdapter.bucketName} sms
           WHERE _documentType = 'owner-outgoing-sms'
-            AND to = $1
+            AND \`to\` = $1
           ORDER BY createdAt DESC
               LIMIT 1`, [ phoneNumber ]
       ).then(result => {
@@ -70,7 +70,7 @@ export class SmsMessagesRepository {
           return
         }
 
-        const decodedMessage = SmsOutgoingMessageCodec.decode(result[ 0 ].sms)
+        const decodedMessage = SmsOutgoingMessageCodec.decode(result[ 0 ])
         if (!isRight(decodedMessage)) {
           throw new Error(`Wrong SMS found in DB: phoneNumber=${phoneNumber}`)
         }

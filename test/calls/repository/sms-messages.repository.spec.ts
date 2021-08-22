@@ -30,6 +30,7 @@ describe('SmsMessagesRepository', () => {
 
     const lastMessage = await repository.lastSentTo(testPhone)()
 
+    expect(isRight(lastMessage)).to.be.true
     expect((lastMessage as Right<SmsOutgoingMessage>).right.id)
       .to.be.equal('second-message')
   })
