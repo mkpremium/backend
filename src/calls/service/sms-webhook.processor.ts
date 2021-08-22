@@ -7,11 +7,6 @@ import { pipe } from 'fp-ts/function'
 import { EventBus } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 
-interface ProcessSmsWebhookCommand {
-  fromNumber: string
-  message: string
-}
-
 export class SmsWebhookProcessor {
   constructor (
     private worksheetRepository: WorksheetRepository,
@@ -26,18 +21,20 @@ export class SmsWebhookProcessor {
       this.smsMessagesRepository.lastSentTo(cmd.fromNumber),
       taskEither.chain(this.getWorksheet()),
       taskEither.map(this.composeMessage(cmd.fromNumber)),
-      taskEither.map(([ response, ws ]: [ MessagingResponse, WorksheetViewProps ]) => {
+      taskEither.map(([ lastSms, ws, response ]: [ SmsOutgoingMessage, WorksheetViewProps, MessagingResponse ]) => {
         this.eventBus.publish({
           name: 'virtual-caller.sms-received',
           message: cmd.message,
-        }).catch(error => this.logger.error(`Couldn't publish message`, { error: error.message }))
+          buildingId: ws.building.id,
+          ownerId: lastSms.ownerId,
+        } as SmsReceived).catch(error => this.logger.error(`Couldn't publish message`, { error: error.message }))
         return response
       })
     )
   }
 
   private composeMessage (fromNumber: string) {
-    return (ws: WorksheetViewProps) => {
+    return ([ lastSms, ws ]: [ SmsOutgoingMessage, WorksheetViewProps ]) => {
       const response = new MessagingResponse()
       const lang = fromNumber.startsWith('+351') ? 'PT' : 'ES'
       response.message(
@@ -46,7 +43,7 @@ export class SmsWebhookProcessor {
             'Perfecto! En los siguientes días el director de %%CITY%% lo contactará para hablar de su propiedad.'
         ).replace('%%CITY%%', ws.building.address.city))
 
-      return [ response, ws ]
+      return [ lastSms, ws, response ]
     }
   }
 
@@ -56,9 +53,21 @@ export class SmsWebhookProcessor {
         return taskEither.left(new Error('No message sent to number'))
       }
       return taskEither.tryCatch(
-        () => this.worksheetRepository.getForCallcenterView(lastSms.worksheetId),
+        () => this.worksheetRepository.getForCallcenterView(lastSms.worksheetId).then(ws => [ lastSms, ws ]),
         reason => new Error(String(reason))
       )
     }
   }
+}
+
+interface ProcessSmsWebhookCommand {
+  fromNumber: string
+  message: string
+}
+
+export interface SmsReceived {
+  name: 'virtual-caller.sms-received'
+  message: string
+  buildingId: string
+  ownerId: string
 }

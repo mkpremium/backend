@@ -12,4 +12,5 @@ export function buildingEventListeners (container: AwilixContainer) {
   eventBus.on('offer-request.created', container.resolve('setFeaturedOwnerFromOfferRequestListener'))
   eventBus.on('offer-request.created', container.resolve('addNoteToBuilding'))
   eventBus.on('building.proposal_scheduled', container.resolve('proposalScheduledListener'))
+  eventBus.on('virtual-caller.sms-received', container.resolve('addSmsNoteListener'))
 }
