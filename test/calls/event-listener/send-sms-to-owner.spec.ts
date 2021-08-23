@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
 import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
-import { createSmsToOwnerListener } from '../../../src/calls/event-listener/sms-to-owner.listener'
+import { sendSmsToOwner } from '../../../src/calls/event-listener/send-sms-to-owner'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 import { taskEither } from 'fp-ts'
 
@@ -25,7 +25,7 @@ describe('sms-to-owner.listener', () => {
     smsMessageSenderStub = {
       sendMessageToUnreachedOwner: stub().returns(taskEither.of(undefined)),
     }
-    listener = createSmsToOwnerListener({
+    listener = sendSmsToOwner({
       smsMessageSender: smsMessageSenderStub,
     })
   });

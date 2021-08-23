@@ -26,6 +26,7 @@ import { VirtualCallerPhonesRepository } from './repository/virtual-caller-phone
 import { twilioSMSWebhookController } from './controller/twilio-sms-webhook.controller'
 import { SmsMessagesRepository } from './repository/sms-messages.repository'
 import { SmsWebhookProcessor } from './service/sms-webhook.processor'
+import { sendSmsToOwner } from './event-listener/send-sms-to-owner'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -94,6 +95,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).singleton(),
     virtualCallerWorksheetDoneListener: asFunction(createWorksheetDoneListener).singleton(),
     continueVirtualCallerLoop: asFunction(continueVirtualCallerLoop).singleton(),
+    sendSmsToOwner: asFunction(sendSmsToOwner).singleton(),
 
     virtualCallsRepository: asClass(VirtualCallsRepository).classic().singleton(),
     virtualCallerWorksheetsRepository: asClass(VirtualCallerWorksheetsRepository).classic().singleton(),
