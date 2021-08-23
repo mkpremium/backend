@@ -32,6 +32,6 @@ describe('addSmsNoteListener', () => {
     expect(savedNote.note).to.include(testSmsReceivedEvent.message)
     expect(savedNote.note).to.include('SMS')
     expect(savedNote.createdBy).to.be.equal(testSmsReceivedEvent.ownerId)
-    expect(savedNote.buildingId).to.be.equal(testSmsReceivedEvent.buildingId)
+    expect(savedNote.context.buildingId).to.be.equal(testSmsReceivedEvent.buildingId)
   })
 })

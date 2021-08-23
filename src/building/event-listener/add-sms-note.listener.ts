@@ -6,7 +6,9 @@ export function addSmsNoteListener ({ buildingNotesRepository }: { buildingNotes
     await buildingNotesRepository.save({
       note: `${evt.message}[SMS del propietario]`,
       createdBy: evt.ownerId,
-      buildingId: evt.buildingId,
+      context: {
+        buildingId: evt.buildingId,
+      },
     })
   }
 }
