@@ -24,9 +24,12 @@ export class SmsWebhookProcessor {
       taskEither.map(([ lastSms, ws, response ]: [ SmsOutgoingMessage, WorksheetViewProps, MessagingResponse ]) => {
         this.eventBus.publish({
           name: 'virtual-caller.sms-received',
+          callerId: lastSms.callerId,
           message: cmd.message,
           buildingId: ws.building.id,
+          worksheetId: ws.id,
           ownerId: lastSms.ownerId,
+          contactId: lastSms.contactId,
         } as SmsReceived).catch(error => this.logger.error(`Couldn't publish message`, { error: error.message }))
         return response
       })
@@ -67,7 +70,10 @@ interface ProcessSmsWebhookCommand {
 
 export interface SmsReceived {
   name: 'virtual-caller.sms-received'
+  callerId: string
   message: string
   buildingId: string
+  worksheetId: string
   ownerId: string
+  contactId: string
 }

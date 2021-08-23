@@ -10,14 +10,7 @@ import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import {
-  Event,
-  MeetingProps,
-  OfferRequestProps,
-  ScheduledEvent,
-  ScheduledEventProps,
-  ScheduledEventType
-} from '../types'
+import { Event, ScheduledEvent, ScheduledEventProps, ScheduledEventType } from '../types'
 
 const UpdateScheduledEvent = t.struct({
   eventDate: t.maybe(t.Date),

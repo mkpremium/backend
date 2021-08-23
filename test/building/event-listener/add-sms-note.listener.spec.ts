@@ -20,7 +20,10 @@ describe('addSmsNoteListener', () => {
       name: 'virtual-caller.sms-received',
       buildingId: 'test-building-id',
       message: 'test message',
-      ownerId: 'test-owner-id'
+      ownerId: 'test-owner-id',
+      callerId: '',
+      contactId: '',
+      worksheetId: '',
     }
     await listener(testSmsReceivedEvent)
 
