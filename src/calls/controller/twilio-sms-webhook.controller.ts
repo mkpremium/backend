@@ -19,7 +19,7 @@ export function twilioSMSWebhookController ({ smsWebhookProcessor, logger }: Dep
     if (isRight(response)) {
       res.send(response.right.toString())
     } else {
-      logger.error('SMS process failed', { error: response.left.message, ...cmd })
+      logger.error('SMS process failed', { error: response.left.message, From, Body, SmsMessageSid })
       res.sendStatus(500)
     }
   }
