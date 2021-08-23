@@ -19,7 +19,6 @@ import notes from './notes'
 // modules
 import operator from './operator'
 import { init as initPropertyManager } from './property-manager'
-import { setupScheduledEventsRoutes } from './scheduled-events'
 
 import stats from './stats'
 import { setupStockRouter } from './stock/stock-router'
@@ -35,6 +34,8 @@ import { callsRoutes } from './calls/routing'
 import { callsEventListeners } from './calls/listeners'
 import { setupOwnersRoutes } from './owner/routing'
 import { ownerEventListeners } from './owner/listeners'
+import { scheduledEventsRoutes } from './scheduled-events/routing'
+import { setupEventListeners } from './scheduled-events/event-listeners'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -72,11 +73,13 @@ export const createApp = (): Promise<Express> => {
       buildingEventListeners(diContainer)
       ownerEventListeners(diContainer)
       callsEventListeners(diContainer)
+      setupEventListeners(diContainer)
       worksheetEventListeners(diContainer)
+
       buildingRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
+      scheduledEventsRoutes(diContainer, app)
 
-      setupScheduledEventsRoutes(app, diContainer)
       worksheetsRoutes(app, diContainer)
       createTestHarness(app, diContainer)
       initPropertyManager(app, diContainer)

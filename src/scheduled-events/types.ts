@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import { OwnerWithInclude } from '../owner/owner'
 import { DateTimeString } from '../infrastructure/shared-types'
-import exp from 'constants'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -55,8 +54,6 @@ export const ScheduledEvent = t.struct<ScheduledEventProps>(
     }
   }
 )
-
-export default t
 
 interface EventProps {
   ownerId: string;

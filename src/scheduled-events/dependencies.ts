@@ -1,27 +1,21 @@
-import { createScheduleEventsRoutes } from './routes'
-
-import './types'
-import jwt from '../middleware/jwt'
-import { setupEventListeners } from './event-listeners'
-import { ScheduledCallsRepository } from './repository/scheduled-calls.repository'
-import { asClass, asFunction } from 'awilix'
-import { ScheduleCallService } from './service/schedule-call.service'
-import { ScheduledCallsService } from './service/scheduled-calls.service'
-import { CreateMeetingService } from './service/create-meeting.service'
-import { ScheduledEventsRepository } from './repository/schedule-events.repository'
-import { MeetingsService } from './service/meetings.service'
+import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { MeetingsRepository } from './repository/meetings.repository'
+import { CreateMeetingService } from './service/create-meeting.service'
+import { ScheduledCallsService } from './service/scheduled-calls.service'
+import { ScheduledCallsRepository } from './repository/scheduled-calls.repository'
+import { ScheduledEventsRepository } from './repository/schedule-events.repository'
+import { SelfMeetingsRepository } from './repository/self-meetings.repository'
+import { MeetingsService } from './service/meetings.service'
+import { GetSelfMeetingsService } from './service/get-self-meetings.service'
+import { ScheduleCallService } from './service/schedule-call.service'
 import { createAddScheduledCallController } from './controller/add-schedule-call.controller'
 import { createAddScheduledMeetingEventController } from './controller/add-meeting.controller'
 import { createGetUserScheduledCallsController } from './controller/get-user-scheduled-calls.controller'
 import { createDeleteScheduledEventController } from './controller/delete-scheduled-event.controller'
-import { wrap } from 'express-promise-wrap'
 import { selfMeetingsController } from './controller/get-self-meetings.controller'
-import { GetSelfMeetingsService } from './service/get-self-meetings.service'
-import { SelfMeetingsRepository } from './repository/self-meetings.repository'
 
-export const setupScheduledEventsDependencies = awilixContainer => {
-  awilixContainer.register({
+export function setupScheduledEventsDependencies (container: AwilixContainer) {
+  container.register({
     meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
@@ -38,19 +32,5 @@ export const setupScheduledEventsDependencies = awilixContainer => {
     getUserScheduledCallsController: asFunction(createGetUserScheduledCallsController).singleton(),
     deleteScheduledEventController: asFunction(createDeleteScheduledEventController).singleton(),
     selfMeetingsController: asFunction(selfMeetingsController).singleton()
-  })
-}
-
-/**
- * @param {AwilixContainer} awilixContainer
- */
-export const setupScheduledEventsRoutes = (app, awilixContainer) => {
-  const secured = jwt()
-
-  app.use('/scheduled-events', secured, createScheduleEventsRoutes(awilixContainer))
-  app.get('/me/meetings', secured, wrap(awilixContainer.resolve('selfMeetingsController')))
-
-  setupEventListeners(awilixContainer.resolve('eventBus'), {
-    scheduledCallRepository: awilixContainer.resolve('scheduledCallsRepository')
   })
 }

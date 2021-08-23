@@ -2,7 +2,6 @@ import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { EventBus } from './event-bus'
 import { asClass, asFunction, asValue, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
-import { setupScheduledEventsDependencies } from '../scheduled-events'
 import { setupCallerDependencies } from '../caller/init'
 import { setupUserDependencies } from '../user'
 import { setupStockDependencies } from '../stock/stock-di'
@@ -13,6 +12,7 @@ import { setupWorksheetDependencies } from '../worksheet/dependencies'
 import { setupEmailDependencies } from '../email/dependencies'
 import { setupCallsDependencies } from '../calls/dependencies'
 import { setupOwnerDependencies } from '../owner/dependencies'
+import { setupScheduledEventsDependencies } from '../scheduled-events/dependencies'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
