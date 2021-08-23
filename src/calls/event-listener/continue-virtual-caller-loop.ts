@@ -12,7 +12,7 @@ interface Deps {
   logger: Pick<Logger, 'info'>
 }
 
-export const createCallFinishedListener = ({
+export const continueVirtualCallerLoop = ({
                                              virtualCallerSupervisor,
                                              logger,
                                              virtualCallersRepository,

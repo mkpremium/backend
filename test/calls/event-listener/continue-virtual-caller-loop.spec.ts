@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
 import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
-import { createCallFinishedListener } from '../../../src/calls/event-listener/call-finished.listener'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 import { CallerPhone } from '../../../src/calls/domain/caller.phone'
+import { continueVirtualCallerLoop } from '../../../src/calls/event-listener/continue-virtual-caller-loop'
 
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
@@ -45,7 +45,7 @@ describe('call-finished.listener', () => {
       saveWithLock: stub(),
     }
 
-    listener = createCallFinishedListener({
+    listener = continueVirtualCallerLoop({
       logger: { info: () => undefined },
       virtualCallerSupervisor: virtualCallerSupervisorStub,
       virtualCallersRepository: virtualCallersRepositoryStub,

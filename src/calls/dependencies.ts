@@ -10,7 +10,7 @@ import { OwnerResponseProcessorService } from './service/owner-response-processo
 import { MachineDetectionResultProcessorService } from './service/machine-detection-result-processor.service'
 import { createInputGatheredListener } from './event-listener/input-gathered.listener'
 import { createWorksheetDoneListener } from './event-listener/worksheet-done.listener'
-import { createCallFinishedListener } from './event-listener/call-finished.listener'
+import { continueVirtualCallerLoop } from './event-listener/continue-virtual-caller-loop'
 import { createStartVirtualCallerController } from './controller/virtual-caller-start.controller'
 import { VirtualCallerSupervisorService } from './service/virtual-caller-supervisor.service'
 import { VirtualCallerService } from './service/virtual-caller.service'
@@ -93,7 +93,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
 
     virtualCallerInputGatheredListener: asFunction(createInputGatheredListener).singleton(),
     virtualCallerWorksheetDoneListener: asFunction(createWorksheetDoneListener).singleton(),
-    virtualCallerCallFinishedListener: asFunction(createCallFinishedListener).singleton(),
+    continueVirtualCallerLoop: asFunction(continueVirtualCallerLoop).singleton(),
 
     virtualCallsRepository: asClass(VirtualCallsRepository).classic().singleton(),
     virtualCallerWorksheetsRepository: asClass(VirtualCallerWorksheetsRepository).classic().singleton(),
