@@ -15,6 +15,8 @@ export function scheduledCallFromOwnerMessage ({ scheduledCallsRepository, virtu
       type: 'CALLS',
       createdBy: evt.callerId,
       notifyTo: virtualCaller.assignCallsTo,
+      eventDate: new Date(),
+      createdAt: new Date(),
       event: {
         buildingId: evt.buildingId,
         worksheetId: evt.worksheetId,
