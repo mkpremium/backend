@@ -18,4 +18,6 @@ export function setupEventListeners (container: AwilixContainer) {
     }
     return scheduledCallRepository.removeScheduledCallsForBuilding(buildingId)
   })
+
+  eventBus.on('virtual-caller.sms-received', container.resolve('scheduledCallFromOwnerMessage'))
 }

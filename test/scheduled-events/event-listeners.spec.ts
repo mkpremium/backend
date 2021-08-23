@@ -3,7 +3,7 @@ import { InMemorySyncEventBus } from '../../src/infrastructure/event-bus/in-memo
 import { spy } from 'sinon'
 import { expect } from 'chai'
 import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../../src/building/service/update-building-negotiation-status.service'
-import { createContainer } from 'awilix'
+import { asValue, createContainer } from 'awilix'
 
 describe('scheduled-events.setupEventListeners', () => {
   let eventBus
@@ -15,7 +15,11 @@ describe('scheduled-events.setupEventListeners', () => {
       removeScheduledCallsForBuilding: spy()
     }
     const container = createContainer()
-    container.register({ eventBus, scheduledCallRepository: scheduledCallRepositoryMock })
+    container.register({
+      eventBus: asValue(eventBus),
+      scheduledCallsRepository: asValue(scheduledCallRepositoryMock),
+      scheduledCallFromOwnerMessage: asValue(undefined),
+    })
     setupEventListeners(container)
   })
 
