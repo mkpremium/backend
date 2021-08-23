@@ -15,8 +15,10 @@ export const sendSmsToOwner = ({ smsMessageSender }: Deps) => {
       return
     }
 
-    // TODO anything missing?
-    await smsMessageSender.sendMessageToUnreachedOwner(createCommand(evt))()
+    const result = await smsMessageSender.sendMessageToUnreachedOwner(createCommand(evt))()
+    if (!isRight(result)) {
+      throw result.left
+    }
   }
 }
 

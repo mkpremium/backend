@@ -26,7 +26,7 @@ export class SmsMessageSender {
   ) {
   }
 
-  sendMessageToUnreachedOwner (cmd: SendMessageToUnreachedOwner): TaskEither<Errors | Error, void> {
+  sendMessageToUnreachedOwner (cmd: SendMessageToUnreachedOwner): TaskEither<Error, void> {
     const lang = cmd.to.startsWith('+351') ? 'PT' : 'ES'
     return pipe(
       this.composeMessageWithAddress(lang, cmd.worksheetId),

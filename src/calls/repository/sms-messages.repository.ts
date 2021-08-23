@@ -29,7 +29,7 @@ export class SmsMessagesRepository {
   ) {
   }
 
-  addOutgoing (sms: SmsOutgoingMessage): TaskEither<Errors | Error, void> {
+  addOutgoing (sms: SmsOutgoingMessage): TaskEither<Error, void> {
     const encodedSms = SmsOutgoingMessageCodec.encode({
       ...sms,
       direction: 'outgoing',
