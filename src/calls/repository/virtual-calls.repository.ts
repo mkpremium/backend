@@ -32,7 +32,8 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         SELECT ownerResponse, count(*) as count
         FROM ${this.bucketName}
         WHERE _documentType = 'virtual-agent-call'
-          and createdAt BETWEEN $1
+          AND status != 'FAILED'
+          AND createdAt BETWEEN $1
           AND $2
         GROUP BY ownerResponse
     `
