@@ -4,7 +4,8 @@ import t, { Struct } from 'tcomb'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { OwnerResponse } from '../service/owner-response-processor.service'
-import { groupBy, NonEmptyArray } from 'fp-ts/NonEmptyArray'
+import { groupBy } from 'fp-ts/NonEmptyArray'
+import { TaskEither } from 'fp-ts/TaskEither'
 
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
@@ -51,6 +52,10 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
 
         return parseStats(rows)
       })
+  }
+
+  lastCallTo (from: string): TaskEither<Error, VirtualAgentCallProps | undefined>  {
+    throw new Error('Not implemented')
   }
 }
 

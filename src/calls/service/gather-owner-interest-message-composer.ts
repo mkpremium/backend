@@ -1,13 +1,15 @@
 import { FullAddress } from './full-address'
-import { OwnerContact } from './virtual-caller.service'
 import { CallLanguage, TwilioSayAttributes } from './call-attributes'
 import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
 
-export  interface GatherInterestMessageComposeCommand {
+export interface GatherInterestMessageComposeCommand {
   readonly address: FullAddress
   readonly buildingId: string
   readonly worksheetId: string
-  readonly contact: OwnerContact
+  readonly contact: {
+    id: string
+    ownerId: string
+  }
   readonly callId: string
   readonly language: CallLanguage
 }

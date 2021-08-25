@@ -24,9 +24,6 @@ const testComposeCmd: GatherInterestMessageComposeCommand = {
   contact: {
     id: 'test-contact-id',
     ownerId: 'test-owner-id',
-    status: undefined,
-    type: undefined,
-    value: '666666666',
   },
   address: {
     city: 'Test City',
