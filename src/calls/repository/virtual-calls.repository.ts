@@ -4,6 +4,7 @@ import t, { Struct } from 'tcomb'
 import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { OwnerResponse } from '../service/owner-response-processor.service'
+import { groupBy, NonEmptyArray } from 'fp-ts/NonEmptyArray'
 
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
@@ -29,13 +30,17 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
 
   async callsInRange (since: Date, until: Date) {
     const query = `
-        SELECT ownerResponse, count(*) as count
-        FROM ${this.bucketName}
-        WHERE _documentType = 'virtual-agent-call'
-          AND status != 'FAILED'
-          AND createdAt BETWEEN $1
+        SELECT worksheet.buildingAddress.city,
+               \`call\`.ownerResponse,
+               count(*) as count
+        FROM ${this.bucketName} \`call\`
+            JOIN mkpremium worksheet
+        ON worksheet._documentType = 'worksheet' AND meta(worksheet).id = \`call\`.worksheetId
+        WHERE \`call\`._documentType = 'virtual-agent-call'
+          AND \`call\`.createdAt BETWEEN $1
           AND $2
-        GROUP BY ownerResponse
+          AND \`call\`.status != 'FAILED'
+        GROUP BY worksheet.buildingAddress.city, \`call\`.ownerResponse
     `
 
     return this.couchbaseAdapter.queryAsync(query, [ since, until ])
@@ -44,36 +49,52 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
           return
         }
 
-        const response = {}
-        let total = 0
+        return parseStats(rows)
+      })
+  }
+}
 
-        rows.map(({ count, ownerResponse }) => {
-          total += count
+export function parseStats (rows: { city: string, count: number, ownerResponse: string | null }[]) {
+  const countersByCity = groupBy(({ city }) => city)(rows)
+
+  return Object.keys(countersByCity).reduce(
+    (acc, city) => {
+      const cityCounters = countersByCity[city]
+      acc[city] = cityCounters.reduce(
+        (acc, { ownerResponse, count }) => {
           switch (ownerResponse) {
             case OwnerResponse.SALE: {
-              response[ 'vende' ] = count
+              acc[ 'vende' ] = count
               break
             }
             case OwnerResponse.NO_SALE: {
-              response[ 'no_vende' ] = count
+              acc[ 'no_vende' ] = count
               break
             }
             case OwnerResponse.NOT_OWNER: {
-              response[ 'no_propietario' ] = count
+              acc[ 'no_propietario' ] = count
               break
             }
             case null: {
-              response[ 'sin_respuesta' ] = count
+              acc[ 'sin_respuesta' ] = count
               break
             }
             default: {
-              response[ 'otro' ] = (response[ 'otro' ] || 0) + count
+              acc[ 'otro' ] = (acc[ 'otro' ] || 0) + count
             }
           }
-        })
-        response[ 'total' ] = total
-
-        return response
-      })
-  }
+          return acc
+        }, {
+          'vende': 0,
+          'no_vende': 0,
+          'no_propietario': 0,
+          'sin_respuesta': 0,
+          'otro': 0,
+          total: cityCounters.reduce((acc, { count }) => acc + count, 0)
+        }
+      )
+      return acc
+    },
+    {}
+  )
 }
