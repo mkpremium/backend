@@ -5,7 +5,8 @@ import { RecordToDomain } from '../../infrastructure/couchbase/record-to-domain'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { OwnerResponse } from '../service/owner-response-processor.service'
 import { groupBy } from 'fp-ts/NonEmptyArray'
-import { TaskEither } from 'fp-ts/TaskEither'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
 
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
@@ -54,8 +55,27 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
       })
   }
 
-  lastCallTo (from: string): TaskEither<Error, VirtualAgentCallProps | undefined>  {
-    throw new Error('Not implemented')
+  lastCallTo (phoneNumber: string): TE.TaskEither<Error, VirtualAgentCallProps | undefined> {
+    const query = `
+        SELECT \`call\`.*
+        FROM ${this.bucketName} \`call\`
+        WHERE _documentType = 'virtual-agent-call'
+          AND phoneNumber = $1
+        ORDER BY createdAt DESC
+        LIMIT 1
+    `
+    return pipe(
+      TE.tryCatch(
+        () => this.couchbaseAdapter.queryAsync(query, [ phoneNumber ]),
+        reason => reason as Error
+      ),
+      TE.map(lastCallRow => {
+        if (!lastCallRow || lastCallRow.length === 0) {
+          return
+        }
+        return fromJSON(lastCallRow[ 0 ], this.struct())
+      })
+    )
   }
 }
 
@@ -64,8 +84,8 @@ export function parseStats (rows: { city: string, count: number, ownerResponse: 
 
   return Object.keys(countersByCity).reduce(
     (acc, city) => {
-      const cityCounters = countersByCity[city]
-      acc[city] = cityCounters.reduce(
+      const cityCounters = countersByCity[ city ]
+      acc[ city ] = cityCounters.reduce(
         (acc, { ownerResponse, count }) => {
           switch (ownerResponse) {
             case OwnerResponse.SALE: {
