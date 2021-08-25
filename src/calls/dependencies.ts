@@ -29,6 +29,7 @@ import { SmsWebhookProcessor } from './service/sms-webhook.processor'
 import { sendSmsToOwner } from './event-listener/send-sms-to-owner'
 import { SmsMessageSender } from './service/sms-message.service'
 import { twilioIncomingCallController } from './controller/twilio-incoming-call.controller'
+import { IncomingCallProcessor } from './service/incoming-call.processor'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -84,6 +85,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     machineDetectionResultProcessor: asClass(MachineDetectionResultProcessorService).classic().singleton(),
     smsWebhookProcessor: asClass(SmsWebhookProcessor).classic().singleton(),
     smsMessageSender: asClass(SmsMessageSender).classic().singleton(),
+    incomingCallProcessor: asClass(IncomingCallProcessor).classic().singleton(),
 
     inputGatheredWebhookController: asFunction(createInputGatheredWebhookController).singleton(),
     machineDetectionWebhookController: asFunction(createMachineDetectionWebhookController).singleton(),
