@@ -14,6 +14,7 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
   router.post('/twilio/:callId/done', wrap(container.resolve('callDoneWebhook')))
   router.post('/twilio/:callId/machine-detection', wrap(container.resolve('machineDetectionWebhookController')))
   router.post('/twilio/sms', wrap(container.resolve('twilioSMSWebhookController')))
+  router.post('/twilio/incoming', wrap(container.resolve('twilioIncomingCallController')))
   router.post('/virtual-caller/start', wrap(container.resolve('startVirtualCallerController')))
   router.post('/virtual-caller/today', wrap(container.resolve('virtualCallerTodayStatsController')))
 
