@@ -201,7 +201,7 @@ export class VirtualCallerPhone {
     language: CallLanguage
   ) {
     const twiml = new VoiceResponse()
-    twiml.pause({ length: 1 })
+    twiml.pause({ length: 2 })
     const message = VirtualCallerPhone.composeMessage(address, language)
 
     const gatherEndpointQueryParams = [
