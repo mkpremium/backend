@@ -1,6 +1,6 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
-import { lockingPhoneErrorContext, NumberAlreadyCalled, VirtualCallerPhone } from './virtual-caller-phone'
+import { lockingPhoneErrorContext, VirtualCallerPhone } from './virtual-caller-phone'
 import {
   VirtualCallerWorksheet, VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
@@ -15,6 +15,7 @@ import { Logger } from 'winston'
 import retry from 'bluebird-retry'
 import { OwnerResponse } from './owner-response-processor.service'
 import { VirtualCallerProps } from '../domain/virtual-caller'
+import { NumberAlreadyCalled } from './number-already-called'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 

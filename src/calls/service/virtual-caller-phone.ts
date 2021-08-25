@@ -1,8 +1,6 @@
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Twilio } from 'twilio'
-import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall, VirtualAgentCallProps } from '../virtual-agent-call'
-import { WorksheetBuildingAddressProps } from '../../worksheet/repository/worksheet.repository'
 import { OwnerContact } from './virtual-caller.service'
 import retry from 'bluebird-retry'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
@@ -13,26 +11,16 @@ import { ContactProps } from '../../owner/owner'
 import { Logger } from 'winston'
 import { LockedPhone, VirtualCallerPhonesRepository } from '../repository/virtual-caller-phones.repository'
 import { phoneBusy } from '../domain/caller.phone'
-
-type AddressParam = Pick<WorksheetBuildingAddressProps, 'street' | 'number' | 'city'>
+import { FullAddress } from './full-address'
+import { NumberAlreadyCalled } from './number-already-called'
+import { GatherOwnerInterestMessageComposer } from './gather-owner-interest-message-composer'
 
 export interface CallCommand {
   buildingId: string;
   caller: VirtualCallerProps
-  address: AddressParam;
+  address: FullAddress;
   contact: OwnerContact;
   worksheetId: string;
-}
-
-export class NumberAlreadyCalled implements Error {
-  message = 'Phone number already called'
-  name = 'NumberAlreadyCalled'
-
-  constructor (
-    readonly previousCall: VirtualAgentCallProps,
-    readonly newContact: { contactId: string, ownerId: string }
-  ) {
-  }
 }
 
 const localizationByTimezone: Record<Timezone, { prefix: string; language: CallLanguage }> = {
@@ -54,8 +42,8 @@ export class VirtualCallerPhone {
     private twilioClient: Twilio,
     private publicUrl: string,
     private virtualCallsRepository: VirtualCallsRepository,
-    private twilioSayAttributes: TwilioSayAttributes,
     private virtualCallerPhonesRepository: VirtualCallerPhonesRepository,
+    private gatherOwnerInterestMessageComposer: GatherOwnerInterestMessageComposer,
     private logger: Logger,
     private ownerTrialPhoneNumber?: string,
   ) {
@@ -67,7 +55,7 @@ export class VirtualCallerPhone {
     const localization = localizationByTimezone[ cmd.caller.timezone ]
     const to = this.ownerTrialPhoneNumber || localization.prefix + contact.value
     const lockedPhone = await this.getPhoneLock(cmd.caller.phoneNumber)
-    const call = this.createCall(cmd, to)
+    const call = VirtualCallerPhone.createCall(cmd, to)
 
     return this.assertPhoneNotCalledYet(to, contact, cmd.worksheetId)
       .then(() => this.doCall(address, buildingId, worksheetId, contact, call, cmd.caller.phoneNumber, to, localization.language))
@@ -139,20 +127,27 @@ export class VirtualCallerPhone {
   }
 
   private doCall (
-    address: AddressParam,
+    address: FullAddress,
     buildingId: string,
     worksheetId: string,
     contact: OwnerContact,
     call: VirtualAgentCallProps,
     from: string,
     to: string,
-    language: CallLanguage
+    language: CallLanguage,
   ) {
     const beeline = honeycomb()
     const callSpan = beeline.startSpan({ name: 'twilio_create_call' })
 
     return this.twilioClient.calls.create({
-      twiml: this.createContactMessage(address, buildingId, worksheetId, contact, call.id, language).toString(),
+      twiml: this.gatherOwnerInterestMessageComposer.compose({
+        address,
+        buildingId,
+        worksheetId,
+        contact,
+        callId: call.id,
+        language
+      }).toString(),
       callerId: from,
       from: from,
       to: to,
@@ -181,7 +176,7 @@ export class VirtualCallerPhone {
     await this.virtualCallsRepository.save(call)
   }
 
-  private createCall (cmd: CallCommand, to: string) {
+  private static createCall (cmd: CallCommand, to: string) {
     return VirtualAgentCall({
       callerId: cmd.caller.id,
       worksheetId: cmd.worksheetId,
@@ -190,50 +185,5 @@ export class VirtualCallerPhone {
       phoneNumber: to,
       createdAt: new Date(),
     } as VirtualAgentCallProps)
-  }
-
-  private createContactMessage (
-    address: AddressParam,
-    buildingId: string,
-    worksheetId: string,
-    contact: OwnerContact,
-    callId: string,
-    language: CallLanguage
-  ) {
-    const twiml = new VoiceResponse()
-    twiml.pause({ length: 2 })
-    const message = VirtualCallerPhone.composeMessage(address, language)
-
-    const gatherEndpointQueryParams = [
-      [ 'buildingId', buildingId ],
-      [ 'fromCity', encodeURIComponent(address.city) ],
-      [ 'worksheetId', worksheetId ],
-      [ 'contactId', contact.id ],
-      [ 'ownerId', contact.ownerId ],
-      [ 'language', language ],
-    ].map(([ key, value ]) => `${key}=${value}`).join('&')
-
-    twiml.gather({
-      action: `${this.publicUrl}/calls/twilio/${callId}/gather?${gatherEndpointQueryParams}`,
-      method: 'POST',
-      language: language as GatherLanguage,
-      numDigits: 1,
-    }).say(this.twilioSayAttributes[ language ], message)
-    return twiml
-  }
-
-  private static composeMessage (address: AddressParam, language: CallLanguage) {
-    const fullAddress = `${address.street} ${address.number}`
-    if (language === 'es-ES') {
-      return `${fullAddress}. Buenos días, le contactamos por su propiedad de ${fullAddress} de ${address.city}` +
-        ', nos dedicamos a la compra patrimonial de inmuebles, ¿estaría usted interesado en vender?' +
-        'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
-    } else if (language === 'pt-PT') {
-      return `${fullAddress}. Bom dia, entramos em contato com você sobre a sua propiedade de ${fullAddress} de ${address.city}.` +
-        'Estamos empenhados em comprar ativos imobiliários, você estaria interessado em vender? ' +
-        'Se você quer vender, marque 1, se não quiser vender, marque 2, e se você não for o dono, marque 3.'
-    } else {
-      throw new Error(`Unsupported language ${language}`)
-    }
   }
 }

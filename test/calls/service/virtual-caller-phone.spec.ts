@@ -29,22 +29,14 @@ const testCmd: CallCommand = {
     number: 0,
   },
 }
+const testComposedMessage = 'test gatger owner interest composed message'
 
 describe('VirtualCallerPhone', () => {
   let service: VirtualCallerPhone
   let twilioClientStub
   let virtualCallsRepositoryStub
   let virtualCallerPhonesRepositoryStub
-  const twilioSayAttributesTest = {
-    'es-ES': {
-      language: 'es-ES' as 'es-ES',
-      voice: 'Polly.Conchita' as 'Polly.Conchita',
-    },
-    'pt-PT': {
-      language: 'pt-PT' as 'pt-PT',
-      voice: 'Polly.Cristiano' as 'Polly.Cristiano',
-    }
-  }
+  let gatherOwnerInterestMessageComposerStub
   const testAvailableLockedPhone = {
     phone: CallerPhone({
       id: `phone_${testVirtualCallerPhoneNumber}`,
@@ -68,13 +60,16 @@ describe('VirtualCallerPhone', () => {
       unlockPhone: stub(),
       saveWithLock: stub(),
     }
+    gatherOwnerInterestMessageComposerStub = {
+      compose: stub().returns({ toString: () =>  testComposedMessage}),
+    }
 
     service = new VirtualCallerPhone(
       twilioClientStub,
       testPublicUrl,
       virtualCallsRepositoryStub,
-      twilioSayAttributesTest,
       virtualCallerPhonesRepositoryStub,
+      gatherOwnerInterestMessageComposerStub,
       { error: () => undefined } as any,
     )
   })
@@ -87,6 +82,7 @@ describe('VirtualCallerPhone', () => {
     expect(twilioClientStub.calls.create.lastCall.firstArg).to.include({
       callerId: testVirtualCallerPhoneNumber,
       from: testVirtualCallerPhoneNumber,
+      // TODO body
       to: '+34' + testCmd.contact.value,
       machineDetection: 'Enable',
       asyncAmd: 'true',
@@ -123,17 +119,15 @@ describe('VirtualCallerPhone', () => {
   it('calls using Spanish for Europe/Madrid timezone', async () => {
     await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Madrid' }).build() })
 
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Buenos días')
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('es-ES')
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest[ 'es-ES' ].voice}"`)
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.be.equal(testComposedMessage)
+    expect(gatherOwnerInterestMessageComposerStub.compose.lastCall.firstArg).to.include({ language: 'es-ES' })
   })
 
   it('calls using Portuguese for Europe/Lisbon timezone', async () => {
     await service.call({ ...testCmd, caller: virtualCallerBuilder({ timezone: 'Europe/Lisbon' }).build() })
 
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('Bom dia')
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include('language="pt-PT"')
-    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.include(`voice="${twilioSayAttributesTest[ 'pt-PT' ].voice}"`)
+    expect(twilioClientStub.calls.create.lastCall.firstArg.twiml).to.be.equal(testComposedMessage)
+    expect(gatherOwnerInterestMessageComposerStub.compose.lastCall.firstArg).to.include({ language: 'pt-PT' })
   })
 
   it('does not call when phone number is already called today', async () => {
