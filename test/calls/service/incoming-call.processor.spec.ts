@@ -13,7 +13,7 @@ const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
 const testCall = {
   worksheetId: 'test-worksheet-id'
 }
-describe('IncomingCallProcessor', () => {
+describe.only('IncomingCallProcessor', () => {
   let processor: IncomingCallProcessor
   let virtualCallsRepositoryStub
   let gatherOwnerInterestMessageComposerStub

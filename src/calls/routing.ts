@@ -29,7 +29,8 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
       /^\/calls\/twilio\/[0-9a-z-]+\/gather$/,
       /^\/calls\/twilio\/[0-9a-z-]+\/done/,
       /^\/calls\/twilio\/[0-9a-z-]+\/machine-detection$/,
-      /^\/calls\/twilio\/sms$/
+      /^\/calls\/twilio\/sms$/,
+      /^\/twilio\/incoming$/,
     ]
   })
 
