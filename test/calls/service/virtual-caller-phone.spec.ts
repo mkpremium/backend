@@ -6,6 +6,7 @@ import moment from 'moment'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 import { callBuilder } from '../call.builder'
 import { CallerPhone } from '../../../src/calls/domain/caller.phone'
+import { PHONE_DOES_NOT_EXIST } from '../../../src/calls/service/call-finished.processor'
 
 const testPublicUrl = 'http://api.public.url'
 const testVirtualCallerPhoneNumber = '+34666666667'
@@ -156,6 +157,16 @@ describe('VirtualCallerPhone', () => {
       status: 'DONE',
       createdAt: moment().add(-1, 'day').toDate(),
       ownerResponse: OwnerResponse.SALE,
+    }).build() ])
+
+    await expect(service.call(testCmd)).to.be.rejected
+  })
+
+  it('does not call to phone number that does not exist', async () => {
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
+      status: 'FAILED',
+      createdAt: moment().add(-1, 'day').toDate(),
+      error: PHONE_DOES_NOT_EXIST,
     }).build() ])
 
     await expect(service.call(testCmd)).to.be.rejected

@@ -14,6 +14,7 @@ import { phoneBusy } from '../domain/caller.phone'
 import { FullAddress } from './full-address'
 import { NumberAlreadyCalled } from './number-already-called'
 import { GatherOwnerInterestMessageComposer } from './gather-owner-interest-message-composer'
+import { PHONE_DOES_NOT_EXIST } from './call-finished.processor'
 
 export interface CallCommand {
   buildingId: string;
@@ -36,6 +37,15 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
 
 const FREEZER_LENGTH_MONTHS = 3
 export const lockingPhoneErrorContext = 'Locking phone'
+
+class NumberDoesNotExist extends Error {
+  constructor (
+    readonly ownerId: string,
+    readonly contactId: string
+  ) {
+    super(`Number does not exist (ownerId=${ownerId} contactId${contactId})`)
+  }
+}
 
 export class VirtualCallerPhone {
   constructor (
@@ -88,6 +98,9 @@ export class VirtualCallerPhone {
       return
     }
     callsToNumber.forEach(call => {
+      if (call.error === PHONE_DOES_NOT_EXIST) {
+        throw new NumberDoesNotExist(contact.ownerId, contact.id)
+      }
       if (VirtualCallerPhone.ownerUnreached(call) || VirtualCallerPhone.fromFreezer(call)) {
         return
       }
