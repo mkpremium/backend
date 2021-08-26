@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { stub } from 'sinon'
 import { createCallFinishedListener } from '../../../src/owner/event-listener/call-finished.listener'
 import { ChangeContactStatusService } from '../../../src/owner/service/change-contact-status.service'
-import { CallDone } from '../../../src/calls/service/call-finished.processor'
+import { CallDone, PHONE_DOES_NOT_EXIST } from '../../../src/calls/service/call-finished.processor'
 
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
@@ -68,5 +68,17 @@ describe('call-finished.listener', () => {
     await listener({ ...testEvt, phoneNumber: '+351999999999' })
 
     expect(changeContactStatusServiceStub.change).to.not.have.been.called
+  })
+
+  it('discards contact on call to non existing phone', async () => {
+    changeContactStatusServiceStub.change.resolves()
+
+    await listener({ ...testEvt, phoneNumber: '+34666666666', error: PHONE_DOES_NOT_EXIST })
+
+    expect(changeContactStatusServiceStub.change).to.have.been.calledWith({
+      ownerId: testEvt.ownerId,
+      contactId: testEvt.contactId,
+      status: 'BAD',
+    }, { id: testEvt.callerId })
   })
 })

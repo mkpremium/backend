@@ -28,7 +28,7 @@ interface ProcessCallFinishedCommand {
   }
 }
 
-const PHONE_DOES_NOT_EXIST = 'phone does not exist'
+export const PHONE_DOES_NOT_EXIST = 'phone does not exist'
 
 export class CallFinishedProcessor {
   constructor (
