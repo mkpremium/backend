@@ -8,8 +8,8 @@ import { apply } from 'fp-ts'
 
 export const createTodayStatsController = ({ virtualCallsRepository }: { virtualCallsRepository: VirtualCallsRepository }): RequestHandler =>
   async (req, res) => {
-    const since = moment().startOf('day').toDate()
-    const until = moment().endOf('day').toDate()
+    const since = req.query.since as string || moment().format('YYYY-MM-DD')
+    const until = req.query.until as string || moment().add(1, 'day').format('YYYY-MM-DD')
 
     await pipe(
       apply.sequenceT(TE.ApplyPar)(
@@ -22,7 +22,6 @@ export const createTodayStatsController = ({ virtualCallsRepository }: { virtual
           res.json(JSON.stringify(error))
         },
         ([ calls, worksheets ]) => {
-          console.log({calls, worksheets})
           const callsAndWorksheetsByProvince = Object.keys(calls).reduce((acc, province) => ({
               ...acc,
               [ province ]: { ...calls[ province ], fichas: worksheets[ province ] }

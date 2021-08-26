@@ -39,7 +39,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
       })
   }
 
-  callsByProvinceBetween (since: Date, until: Date): TE.TaskEither<Error, Record<string, CallsByProvince>> {
+  callsByProvinceBetween (since: string, until: string): TE.TaskEither<Error, Record<string, CallsByProvince>> {
     const query = `
         SELECT worksheet.buildingAddress.province,
                \`call\`.ownerResponse,
@@ -66,7 +66,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
     )
   }
 
-  worksheetsByProvinceBetween (since: Date, until: Date): TE.TaskEither<Error, Record<string, number>> {
+  worksheetsByProvinceBetween (since: string, until: string): TE.TaskEither<Error, Record<string, number>> {
     const query = `
         SELECT worksheet.buildingAddress.province,
                count(DISTINCT \`call\`.worksheetId) as count
