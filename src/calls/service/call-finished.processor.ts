@@ -15,12 +15,20 @@ export interface CallDone {
   contactId: string;
   worksheetId: string;
   ownerResponse: string;
+  error?: string;
 }
 
 interface ProcessCallFinishedCommand {
   callId: string
   twilioCallStatus: 'completed' | 'failed' | 'no-answer' | 'busy'
+  error: {
+    twilioErrorMessage: string
+    sipResponseCode: string
+    errorCode: string
+  }
 }
+
+const PHONE_DOES_NOT_EXIST = 'phone does not exist'
 
 export class CallFinishedProcessor {
   constructor (
@@ -31,7 +39,7 @@ export class CallFinishedProcessor {
   }
 
   process (cmd: ProcessCallFinishedCommand): TaskEither<Error, void> {
-    const { callId, twilioCallStatus } = cmd
+    const { callId, twilioCallStatus, error } = cmd
     return taskEither.tryCatch(
       () => this.virtualCallsRepository.get(callId)
         .then(async call => {
@@ -47,6 +55,12 @@ export class CallFinishedProcessor {
             },
             finishedAt: {
               $set: new Date()
+            },
+            error: {
+              $set: status === 'FAILED' && error.sipResponseCode === '404' ? PHONE_DOES_NOT_EXIST : undefined
+            },
+            errorContext: {
+              $set: status === 'FAILED' ? error : undefined
             }
           })
 
@@ -61,6 +75,7 @@ export class CallFinishedProcessor {
             contactId: call.contactId,
             worksheetId: call.worksheetId,
             ownerResponse: call.ownerResponse,
+            error: updatedCall.error,
           } as CallDone)
         }),
       reason => reason instanceof Error ? reason : new Error(String(reason))

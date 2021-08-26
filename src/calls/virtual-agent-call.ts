@@ -27,6 +27,7 @@ export const VirtualAgentCall = t.struct<VirtualAgentCallProps>({
     phoneNumber: t.String,
     callerId: t.String,
     error: t.maybe(t.String),
+    errorContext: t.maybe(t.Any),
     ownerResponse: t.maybe(t.String),
     createdAt: t.maybe(t.Date),
     gatheredAt: t.maybe(t.Date),
