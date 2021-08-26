@@ -15,6 +15,7 @@ export const callFinishedWebhookController = ({
       ErrorMessage: twilioErrorMessage,
       SipResponseCode: sipResponseCode,
       ErrorCode: errorCode,
+      CallSid,
     } = req.body
     callFinishedProcessor.process({
       callId, twilioCallStatus, error: {
@@ -25,7 +26,7 @@ export const callFinishedWebhookController = ({
     })()
       .then(() => res.sendStatus(200))
       .catch(error => {
-        logger.error('Saving call done', { error: error.message })
+        logger.error('Saving call done', { error: error.message, CallSid })
         res.status(500).json({ error: error.message })
       })
   }
