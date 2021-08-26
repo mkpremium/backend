@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { parseStats, VirtualCallsRepository } from '../../../src/calls/repository/virtual-calls.repository'
+import { parseCallsByProvince, VirtualCallsRepository } from '../../../src/calls/repository/virtual-calls.repository'
 import { createTestContainer } from '../../create-test-container'
 import { callBuilder } from '../call.builder'
 import * as TE from 'fp-ts/TaskEither'
@@ -57,7 +57,7 @@ describe('stats parsing', () => {
       }
     ]
 
-    const result = parseStats(example)
+    const result = parseCallsByProvince(example)
 
     expect(result).to.deep.equal({
       BARCELONA: {

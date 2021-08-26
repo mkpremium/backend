@@ -8,6 +8,15 @@ import { groupBy } from 'fp-ts/NonEmptyArray'
 import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
 
+type CallsByProvince = {
+  no_vende: number
+  no_propietario: number
+  vende: number
+  sin_respuesta: number
+  otro: number
+  total: number
+}
+
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
     return VirtualAgentCall
@@ -30,7 +39,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
       })
   }
 
-  async callsInRange (since: Date, until: Date) {
+  callsByProvinceBetween (since: Date, until: Date): TE.TaskEither<Error, Record<string, CallsByProvince>> {
     const query = `
         SELECT worksheet.buildingAddress.province,
                \`call\`.ownerResponse,
@@ -39,20 +48,48 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
             JOIN mkpremium worksheet
         ON worksheet._documentType = 'worksheet' AND meta(worksheet).id = \`call\`.worksheetId
         WHERE \`call\`._documentType = 'virtual-agent-call'
-          AND \`call\`.createdAt BETWEEN $1
-          AND $2
+          AND \`call\`.createdAt BETWEEN $1 AND $2
           AND \`call\`.status != 'FAILED'
         GROUP BY worksheet.buildingAddress.province, \`call\`.ownerResponse
     `
 
-    return this.couchbaseAdapter.queryAsync(query, [ since, until ])
-      .then(rows => {
-        if (!rows || rows.length === 0) {
-          return
-        }
+    return TE.tryCatch(
+      () => this.couchbaseAdapter.queryAsync(query, [ since, until ])
+        .then(rows => {
+          if (!rows || rows.length === 0) {
+            return {}
+          }
 
-        return parseStats(rows)
-      })
+          return parseCallsByProvince(rows)
+        }),
+      reason => reason instanceof Error ? reason : new Error(String(reason))
+    )
+  }
+
+  worksheetsByProvinceBetween (since: Date, until: Date): TE.TaskEither<Error, Record<string, number>> {
+    const query = `
+        SELECT worksheet.buildingAddress.province,
+               count(DISTINCT \`call\`.worksheetId) as count
+        FROM ${this.bucketName} \`call\`
+            JOIN mkpremium worksheet
+        ON worksheet._documentType = 'worksheet' AND meta(worksheet).id = \`call\`.worksheetId
+        WHERE \`call\`._documentType = 'virtual-agent-call'
+          AND \`call\`.createdAt BETWEEN $1 AND $2
+          AND \`call\`.status != 'FAILED'
+        GROUP BY worksheet.buildingAddress.province
+    `
+
+    return TE.tryCatch(
+      () => this.couchbaseAdapter.queryAsync(query, [ since, until ])
+        .then(rows => {
+          if (!rows || rows.length === 0) {
+            return {}
+          }
+
+          return rows.reduce((acc, { province, count }) => ({ ...acc, [ province ]: count }), {})
+        }),
+      reason => reason instanceof Error ? reason : new Error(String(reason))
+    )
   }
 
   lastCallTo (phoneNumber: string): TE.TaskEither<Error, VirtualAgentCallProps | undefined> {
@@ -62,7 +99,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         WHERE _documentType = 'virtual-agent-call'
           AND phoneNumber = $1
         ORDER BY createdAt DESC
-        LIMIT 1
+            LIMIT 1
     `
     return pipe(
       TE.tryCatch(
@@ -79,7 +116,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
   }
 }
 
-export function parseStats (rows: { province: string, count: number, ownerResponse: string | null }[]) {
+export function parseCallsByProvince (rows: { province: string, count: number, ownerResponse: string | null }[]) {
   const countersByProvince = groupBy(({ province }) => province)(rows)
 
   return Object.keys(countersByProvince).reduce(
