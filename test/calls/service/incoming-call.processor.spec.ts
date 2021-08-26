@@ -39,7 +39,7 @@ describe('IncomingCallProcessor', () => {
     )
   })
 
-  it('hang ups when calling from number that we did not call', async () => {
+  it('rejects calls from number that we did not call', async () => {
     virtualCallsRepositoryStub.lastCallTo.returns(taskEither.of(undefined))
 
     await pipe(
@@ -47,7 +47,7 @@ describe('IncomingCallProcessor', () => {
       TE.orElse(error => expect.fail(error.message)),
       TE.map(
         message => {
-          expect(message.toString()).to.include('Hangup')
+          expect(message.toString()).to.include('Reject')
         }
       )
     )()

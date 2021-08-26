@@ -29,7 +29,7 @@ export class IncomingCallProcessor {
       }),
       TE.map((pair: [ VirtualAgentCallProps, WorksheetViewProps ] | undefined) => {
         if (pair === undefined) {
-          return IncomingCallProcessor.hangUp()
+          return IncomingCallProcessor.rejectCall()
         }
 
         const [ lastCall, ws ] = pair
@@ -48,9 +48,9 @@ export class IncomingCallProcessor {
     )
   }
 
-  private static hangUp () {
+  private static rejectCall () {
     const response = new VoiceResponse()
-    response.hangup()
+    response.reject()
     return response
   }
 }
