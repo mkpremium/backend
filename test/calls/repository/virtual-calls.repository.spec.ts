@@ -31,32 +31,27 @@ describe('stats parsing', () => {
   it('parses stats from DB', () => {
     const example = [
       {
-        'city': 'BARCELONA',
+        'province': 'BARCELONA',
         'count': 2,
         'ownerResponse': '1'
       },
       {
-        'city': 'BARCELONA',
+        'province': 'BARCELONA',
         'count': 9,
         'ownerResponse': '3'
       },
       {
-        'city': 'L\'HOSPITALET DE LLOBREGAT',
-        'count': 2,
-        'ownerResponse': null
-      },
-      {
-        'city': 'BARCELONA',
+        'province': 'BARCELONA',
         'count': 1367,
         'ownerResponse': null
       },
       {
-        'city': 'BARCELONA',
+        'province': 'BARCELONA',
         'count': 12,
         'ownerResponse': '2'
       },
       {
-        'city': 'Porto',
+        'province': 'Porto',
         'count': 6,
         'ownerResponse': null
       }
@@ -72,14 +67,6 @@ describe('stats parsing', () => {
         sin_respuesta: 1367,
         otro: 0,
         total: 1390,
-      },
-      'L\'HOSPITALET DE LLOBREGAT': {
-        no_vende: 0,
-        no_propietario: 0,
-        vende: 0,
-        sin_respuesta: 2,
-        otro: 0,
-        total: 2,
       },
       'Porto': {
         no_vende: 0,

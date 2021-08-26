@@ -32,7 +32,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
 
   async callsInRange (since: Date, until: Date) {
     const query = `
-        SELECT worksheet.buildingAddress.city,
+        SELECT worksheet.buildingAddress.province,
                \`call\`.ownerResponse,
                count(*) as count
         FROM ${this.bucketName} \`call\`
@@ -42,7 +42,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
           AND \`call\`.createdAt BETWEEN $1
           AND $2
           AND \`call\`.status != 'FAILED'
-        GROUP BY worksheet.buildingAddress.city, \`call\`.ownerResponse
+        GROUP BY worksheet.buildingAddress.province, \`call\`.ownerResponse
     `
 
     return this.couchbaseAdapter.queryAsync(query, [ since, until ])
@@ -79,13 +79,13 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
   }
 }
 
-export function parseStats (rows: { city: string, count: number, ownerResponse: string | null }[]) {
-  const countersByCity = groupBy(({ city }) => city)(rows)
+export function parseStats (rows: { province: string, count: number, ownerResponse: string | null }[]) {
+  const countersByProvince = groupBy(({ province }) => province)(rows)
 
-  return Object.keys(countersByCity).reduce(
-    (acc, city) => {
-      const cityCounters = countersByCity[ city ]
-      acc[ city ] = cityCounters.reduce(
+  return Object.keys(countersByProvince).reduce(
+    (acc, province) => {
+      const provinceCounters = countersByProvince[ province ]
+      acc[ province ] = provinceCounters.reduce(
         (acc, { ownerResponse, count }) => {
           switch (ownerResponse) {
             case OwnerResponse.SALE: {
@@ -115,7 +115,7 @@ export function parseStats (rows: { city: string, count: number, ownerResponse: 
           'no_propietario': 0,
           'sin_respuesta': 0,
           'otro': 0,
-          total: cityCounters.reduce((acc, { count }) => acc + count, 0)
+          total: provinceCounters.reduce((acc, { count }) => acc + count, 0)
         }
       )
       return acc
