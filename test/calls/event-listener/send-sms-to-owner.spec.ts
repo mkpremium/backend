@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
-import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
 import { sendSmsToOwner } from '../../../src/calls/event-listener/send-sms-to-owner'
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 import { taskEither } from 'fp-ts'
+import { CallDone } from '../../../src/calls/service/call-finished.processor'
 
 describe('sms-to-owner.listener', () => {
   let listener: (evt: CallDone) => Promise<void>

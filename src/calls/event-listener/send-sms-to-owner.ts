@@ -1,7 +1,7 @@
-import { CallDone } from '../controller/call-done-webhook.controller'
 import { SendMessageToUnreachedOwnerCodec, SmsMessageSender } from '../service/sms-message.service'
 import { isRight } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
+import { CallDone } from '../service/call-finished.processor'
 
 interface Deps {
   smsMessageSender: SmsMessageSender

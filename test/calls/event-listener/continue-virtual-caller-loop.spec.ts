@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
-import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 import { CallerPhone } from '../../../src/calls/domain/caller.phone'
 import { continueVirtualCallerLoop } from '../../../src/calls/event-listener/continue-virtual-caller-loop'
+import { CallDone } from '../../../src/calls/service/call-finished.processor'
 
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>

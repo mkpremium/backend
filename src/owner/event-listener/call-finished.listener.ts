@@ -1,5 +1,5 @@
-import { CallDone } from '../../calls/controller/call-done-webhook.controller'
 import { ChangeContactStatusService } from '../service/change-contact-status.service'
+import { CallDone } from '../../calls/service/call-finished.processor'
 
 interface Deps {
   changeContactStatusService: ChangeContactStatusService

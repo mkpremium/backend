@@ -1,9 +1,9 @@
 import { VirtualCallerSupervisorService } from '../service/virtual-caller-supervisor.service'
 import { Logger } from 'winston'
-import { CallDone } from '../controller/call-done-webhook.controller'
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 import { VirtualCallerPhonesRepository } from '../repository/virtual-caller-phones.repository'
 import { phoneAvailable } from '../domain/caller.phone'
+import { CallDone } from '../service/call-finished.processor'
 
 interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService

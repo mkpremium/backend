@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
-import { CallDone } from '../../../src/calls/controller/call-done-webhook.controller'
 import { createCallFinishedListener } from '../../../src/owner/event-listener/call-finished.listener'
 import { ChangeContactStatusService } from '../../../src/owner/service/change-contact-status.service'
+import { CallDone } from '../../../src/calls/service/call-finished.processor'
 
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
