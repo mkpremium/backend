@@ -1,7 +1,7 @@
 import { Logger } from 'winston'
 import { CallFinishedProcessor } from '../service/call-finished.processor'
 
-export const createCallDoneWebhookController = ({
+export const callFinishedWebhookController = ({
                                                   logger,
                                                   callFinishedProcessor,
                                                 }: {

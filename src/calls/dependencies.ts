@@ -1,7 +1,7 @@
 import { asClass, asFunction, asValue, AwilixContainer } from 'awilix'
 import twilio from 'twilio'
 import { VirtualCallsRepository } from './repository/virtual-calls.repository'
-import { createCallDoneWebhookController } from './controller/call-done-webhook.controller'
+import { callFinishedWebhookController } from './controller/call-finished-webhook.controller'
 import { VirtualCallerPhone } from './service/virtual-caller-phone'
 import { createInputGatheredWebhookController } from './controller/input-gathered-webhook.controller'
 import { createMachineDetectionWebhookController } from './controller/machine-detection-webhook.controller'
@@ -64,7 +64,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
       secret: process.env.TWILIO_TOKEN_SECRET,
     } as TwilioCredentials),
 
-    callDoneWebhook: asFunction(createCallDoneWebhookController),
+    callFinishedWebhookController: asFunction(callFinishedWebhookController),
     twilioClient: asFunction(
       ({ twilioCredentials }: { twilioCredentials: TwilioCredentials }) => {
         const twilioUrl = process.env.TWILIO_URL
