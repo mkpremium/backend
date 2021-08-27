@@ -99,10 +99,9 @@ export class VirtualCallerSupervisorService {
   }
 }
 
-const SATURDAY = 6
 const SUNDAY = 7
 
 function outOfWorkingHours (timezone: Timezone) {
   const now = moment().tz(timezone)
-  return now.hours() < 9 || now.hours() >= 20 || [ SATURDAY, SUNDAY ].includes(now.isoWeekday())
+  return now.hours() < 9 || now.hours() >= 20 || [ SUNDAY ].includes(now.isoWeekday())
 }
