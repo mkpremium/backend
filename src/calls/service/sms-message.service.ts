@@ -8,6 +8,7 @@ import { pipe } from 'fp-ts/function'
 import uuid from 'uuid/v4'
 import { NonEmptyString } from 'io-ts-types'
 import moment from 'moment'
+import { BuildingOwnerPhonesRepository, LockedOwnerPhone } from '../repository/building-owner-phones.repository'
 
 export const SendMessageToUnreachedOwnerCodec = type({
   to: NonEmptyString,
@@ -18,21 +19,6 @@ export const SendMessageToUnreachedOwnerCodec = type({
 })
 export type SendMessageToUnreachedOwner = TypeOf<typeof SendMessageToUnreachedOwnerCodec>
 const MAX_SMS_LENGTH = 160
-
-interface BuildingOwnerPhone {
-  lastSmsSentAt: Date
-  lastSmsSentId: string
-}
-
-interface LockedOwnerPhone {
-  ownerPhone: BuildingOwnerPhone
-  cas: any
-}
-
-interface BuildingOwnerPhonesRepository {
-  getByPhoneNumberAndLock (to: string): TaskEither<Error, LockedOwnerPhone>
-  save(ownerPhone: BuildingOwnerPhone, cas: any): TaskEither<Error, void>
-}
 
 export class SmsMessageSender {
   constructor (

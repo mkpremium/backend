@@ -32,6 +32,7 @@ import { twilioIncomingCallController } from './controller/twilio-incoming-call.
 import { IncomingCallProcessor } from './service/incoming-call.processor'
 import { GatherOwnerInterestMessageComposer } from './service/gather-owner-interest-message-composer'
 import { CallFinishedProcessor } from './service/call-finished.processor'
+import { BuildingOwnerPhonesRepository } from './repository/building-owner-phones.repository'
 
 export interface TwilioCredentials {
   apiKey: string;
@@ -112,6 +113,7 @@ export const setupCallsDependencies = (container: AwilixContainer) => {
     virtualCallersRepository: asClass(VirtualCallersRepository).classic().singleton(),
     virtualCallerPhonesRepository: asClass(VirtualCallerPhonesRepository).classic().singleton(),
     smsMessagesRepository: asClass(SmsMessagesRepository).classic().singleton(),
+    buildingOwnerPhonesRepository: asClass(BuildingOwnerPhonesRepository).classic().singleton(),
 
     // needed for calls from web (aka callcenter)
     // outgoingCallWebhookController: asFunction(({ logger }) => async (req, res) => {
