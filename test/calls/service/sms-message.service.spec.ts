@@ -6,12 +6,14 @@ import { worksheetViewBuilder } from '../../worksheet/worksheet-view.builder'
 import { taskEither } from 'fp-ts'
 import { isRight } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
+import moment from 'moment'
 
 describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
   let worksheetRepositoryStub
   let smsMessagesRepositoryStub
+  let buildingOwnerPhonesRepositoryStub
   const spanishNumber = '+34666666666'
   const portugueseNumber = '+351999999999'
   const testWorksheet: WorksheetViewProps = worksheetViewBuilder().build()
@@ -28,11 +30,18 @@ describe('SmsMessageSender', () => {
     smsMessagesRepositoryStub = {
       addOutgoing: stub().returns(taskEither.of(undefined))
     }
+    buildingOwnerPhonesRepositoryStub = {
+      getByPhoneNumberAndLock: stub().returns(taskEither.of({
+        ownerPhone: testPreviousDayMessageToPhone,
+        cas: testCas
+      }))
+    }
 
     service = new SmsMessageSender(
       twilioClientStub,
       worksheetRepositoryStub,
       smsMessagesRepositoryStub,
+      buildingOwnerPhonesRepositoryStub,
     )
   })
 
@@ -99,6 +108,29 @@ describe('SmsMessageSender', () => {
     expect(twilioClientStub.messages.create).to.have.been
       .calledWithMatch(({ body }) => body.length < 160)
   }))
+
+  it('does not send more than one message daily to owner', async () => {
+    buildingOwnerPhonesRepositoryStub.getByPhoneNumberAndLock.returns(taskEither.of({
+      ownerPhone: {
+        lastSmsSentAt: new Date(),
+      },
+      cas: testCas,
+    }))
+
+    const result = await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder()())()
+
+    expect(isRight(result)).to.be.false
+    expect(smsMessagesRepositoryStub.addOutgoing).to.not.have.been.called
+    expect(twilioClientStub.messages.create).to.not.have.been.called
+  })
+
+  it('does send message when last message is from a previous day', async () => {
+    const result = await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder()())()
+
+    expect(isRight(result)).to.be.true
+    expect(smsMessagesRepositoryStub.addOutgoing).to.have.been.called
+    expect(twilioClientStub.messages.create).to.have.been.called
+  })
 })
 
 function sendMessageToUnreachedOwnerBuilder (overrides = {}) {
