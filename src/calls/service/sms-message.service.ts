@@ -4,7 +4,7 @@ import { SmsMessagesRepository } from '../repository/sms-messages.repository'
 import { chain, map, TaskEither } from 'fp-ts/TaskEither'
 import { type, TypeOf } from 'io-ts'
 import { taskEither } from 'fp-ts'
-import { constVoid, pipe } from 'fp-ts/function'
+import { pipe } from 'fp-ts/function'
 import uuid from 'uuid/v4'
 import { NonEmptyString } from 'io-ts-types'
 import moment from 'moment'
@@ -20,11 +20,18 @@ export type SendMessageToUnreachedOwner = TypeOf<typeof SendMessageToUnreachedOw
 const MAX_SMS_LENGTH = 160
 
 interface BuildingOwnerPhone {
-  lastSmsSentAt: Date,
+  lastSmsSentAt: Date
+  lastSmsSentId: string
+}
+
+interface LockedOwnerPhone {
+  ownerPhone: BuildingOwnerPhone
+  cas: any
 }
 
 interface BuildingOwnerPhonesRepository {
-  getByPhoneNumberAndLock (to: string): TaskEither<Error, { ownerPhone: BuildingOwnerPhone, cas: any }>
+  getByPhoneNumberAndLock (to: string): TaskEither<Error, LockedOwnerPhone>
+  save(ownerPhone: BuildingOwnerPhone, cas: any): TaskEither<Error, void>
 }
 
 export class SmsMessageSender {
@@ -38,9 +45,14 @@ export class SmsMessageSender {
 
   sendMessageToUnreachedOwner (cmd: SendMessageToUnreachedOwner): TaskEither<Error, void> {
     const lang = cmd.to.startsWith('+351') ? 'PT' : 'ES'
+    let lockedOwnerPhone: LockedOwnerPhone
+    const smsId = uuid()
     return pipe(
       this.assertNoSmsSentTodayToPhoneNumber(cmd.to),
-      chain(() => this.composeMessageWithAddress(lang, cmd.worksheetId)),
+      chain((lop) => {
+        lockedOwnerPhone = lop
+        return this.composeMessageWithAddress(lang, cmd.worksheetId)
+      }),
       map<string, string>(messageWithAddress =>
         messageWithAddress.length < MAX_SMS_LENGTH ? messageWithAddress : SmsMessageSender.messageWithoutAddress(lang)
       ),
@@ -54,11 +66,16 @@ export class SmsMessageSender {
           reason => reason instanceof Error ? reason : new Error(String(reason))
         ),
       ),
+      chain(() => this.buildingOwnerPhonesRepository.save({
+        ...lockedOwnerPhone.ownerPhone,
+        lastSmsSentAt: new Date(),
+        lastSmsSentId: smsId,
+      }, lockedOwnerPhone.cas)),
       chain(() => this.smsMessagesRepository.addOutgoing({
-        id: uuid(),
+        id: smsId,
         createdAt: new Date(),
         ...cmd,
-      }))
+      })),
     )
   }
 
@@ -84,15 +101,15 @@ export class SmsMessageSender {
       'Hola, le he llamado por su propiedad. Si le interesa vender por favor llame a este mismo número. Gracias.'
   }
 
-  private assertNoSmsSentTodayToPhoneNumber (to: string): TaskEither<Error, void> {
+  private assertNoSmsSentTodayToPhoneNumber (to: string): TaskEither<SmsAlreadySentToday | Error, LockedOwnerPhone> {
     return pipe(
       this.buildingOwnerPhonesRepository.getByPhoneNumberAndLock(to),
-      chain(({ ownerPhone }) => {
+      chain(({ ownerPhone, cas }) => {
         const today = moment()
-        if (ownerPhone && moment(ownerPhone.lastSmsSentAt).isSame(today, 'day')) {
+        if (moment(ownerPhone.lastSmsSentAt).isSame(today, 'day')) {
           return taskEither.left(new SmsAlreadySentToday(to))
         }
-        return taskEither.of(constVoid())
+        return taskEither.of({ ownerPhone, cas })
       })
     )
   }

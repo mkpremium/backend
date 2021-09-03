@@ -7,7 +7,12 @@ import { taskEither } from 'fp-ts'
 import { isRight } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
 import moment from 'moment'
+import { constVoid } from 'fp-ts/function'
 
+const testPreviousDayMessageToPhone = {
+  lastSmsSentAt: moment().add(-1, 'day').toDate(),
+}
+const testCas = 'test-cas'
 describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
@@ -34,7 +39,8 @@ describe('SmsMessageSender', () => {
       getByPhoneNumberAndLock: stub().returns(taskEither.of({
         ownerPhone: testPreviousDayMessageToPhone,
         cas: testCas
-      }))
+      })),
+      save: stub().returns(taskEither.of(constVoid())),
     }
 
     service = new SmsMessageSender(
@@ -130,6 +136,17 @@ describe('SmsMessageSender', () => {
     expect(isRight(result)).to.be.true
     expect(smsMessagesRepositoryStub.addOutgoing).to.have.been.called
     expect(twilioClientStub.messages.create).to.have.been.called
+  })
+
+  it('updates owner phone with last SMS sent timestamp', async () => {
+    const before = new Date()
+    await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder()())()
+
+    expect(buildingOwnerPhonesRepositoryStub.save).to.have.been.calledOnce
+    expect(buildingOwnerPhonesRepositoryStub.save.lastCall.firstArg.lastSmsSentAt)
+      .to.be.within(before, new Date())
+    expect(buildingOwnerPhonesRepositoryStub.save.lastCall.lastArg)
+      .to.be.equal(testCas)
   })
 })
 
