@@ -8,6 +8,7 @@ import * as t from 'io-ts'
 import { DateFromISOString } from 'io-ts-types'
 import { isRight } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
+import { KeyNotFound } from '../../db/errors'
 
 export interface LockedOwnerPhone {
   ownerPhone: BuildingOwnerPhone
@@ -37,7 +38,16 @@ export class BuildingOwnerPhonesRepository {
     const id = BuildingOwnerPhonesRepository.ownerPhoneId(phoneNumber)
 
     return pipe(
-      fromPromise(this.couchbaseAdapter.getAndLock(id)),
+      this.getAndLockPhoneNumber(id),
+      taskEither.orElse(error => {
+        if (!(error instanceof KeyNotFound)) {
+          return taskEither.left(error)
+        }
+        return pipe(
+          this.add(phoneNumber),
+          taskEither.chain(() => this.getAndLockPhoneNumber(id))
+        )
+      }),
       taskEither.chain(({ cas, value }) => {
         const decodedOwnerPhone = BuildingOwnerPhoneCodec.decode(value)
         if (!isRight(decodedOwnerPhone)) {
@@ -47,6 +57,10 @@ export class BuildingOwnerPhonesRepository {
         return taskEither.of({ cas, ownerPhone: decodedOwnerPhone.right })
       })
     )
+  }
+
+  private getAndLockPhoneNumber (id: string) {
+    return fromPromise(this.couchbaseAdapter.getAndLock(id))
   }
 
   save (ownerPhone: BuildingOwnerPhone, cas: any): TaskEither<Error, void> {
