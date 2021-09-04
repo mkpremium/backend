@@ -1,4 +1,9 @@
 export interface BuildingOwnerPhone {
-  lastSmsSentAt: Date
-  lastSmsSentId: string
+  id: string
+  updatedAt: Date
+  createdAt: Date
+  phoneNumber: string
+
+  lastSmsSentAt?: Date
+  lastSmsSentId?: string
 }

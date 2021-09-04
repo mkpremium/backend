@@ -88,7 +88,7 @@ export class CouchbaseAdapter {
     })
   }
 
-  getAndLock (key: string) {
+  getAndLock (key: string): Promise<{ cas: any, value: any }> {
     return this.couchbaseBucket.getAndLockAsync(key)
       .catch(error => {
         if (error.code === errors.keyNotFound) {
