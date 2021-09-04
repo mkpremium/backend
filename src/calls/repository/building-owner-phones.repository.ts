@@ -21,6 +21,7 @@ const BuildingOwnerPhoneCodec = t.intersection([
     createdAt: DateFromISOString,
     updatedAt: DateFromISOString,
     phoneNumber: t.string,
+    _documentType: t.literal('building-owner-phone'),
   }),
   t.partial({
     lastSmsSentAt: DateFromISOString,
@@ -72,11 +73,12 @@ export class BuildingOwnerPhonesRepository {
   add (ownerPhoneNumber: string): TaskEither<Error, BuildingOwnerPhone> {
     const id = BuildingOwnerPhonesRepository.ownerPhoneId(ownerPhoneNumber)
 
-    const ownerPhone: BuildingOwnerPhone = {
+    const ownerPhone: t.TypeOf<typeof BuildingOwnerPhoneCodec> = {
       id,
       phoneNumber: ownerPhoneNumber,
       createdAt: new Date(),
       updatedAt: new Date(),
+      _documentType: 'building-owner-phone',
     }
 
     return fromPromise(
