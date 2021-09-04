@@ -63,8 +63,10 @@ export class BuildingOwnerPhonesRepository {
     return fromPromise(this.couchbaseAdapter.getAndLock(id))
   }
 
-  save (ownerPhone: BuildingOwnerPhone, cas: any): TaskEither<Error, void> {
-    throw new Error('not implemented')
+  save (ownerPhone: BuildingOwnerPhone, cas?: any): TaskEither<Error, void> {
+    return pipe(
+      fromPromise(this.couchbaseAdapter.upsert(ownerPhone.id, { ...ownerPhone, updatedAt: new Date() }, cas))
+    )
   }
 
   add (ownerPhoneNumber: string): TaskEither<Error, BuildingOwnerPhone> {

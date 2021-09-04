@@ -17,6 +17,7 @@ describe('BuildingOwnerPhonesRepository', () => {
     const container = await createTestContainer()
     repository = container.resolve('buildingOwnerPhonesRepository')
     couchbaseAdapter = container.resolve('couchbaseAdapter')
+    lastCas = undefined
   })
 
   afterEach(async () => {
@@ -52,6 +53,32 @@ describe('BuildingOwnerPhonesRepository', () => {
         lastCas = result.cas
       }),
       taskEither.orLeft(expect.fail),
+    )()
+  })
+
+  it('saves changed building owner phone', () => {
+    const testLastSmsSentId = 'test-last-sms-sent-id'
+    let before
+
+    return pipe(
+      repository.add(testPhoneNumber),
+      taskEither.chain((createdOwnerPhone) => {
+        before = new Date()
+        return repository.save({
+          ...createdOwnerPhone,
+          lastSmsSentId: testLastSmsSentId,
+          lastSmsSentAt: new Date(),
+        })
+      }),
+      taskEither.chain(() => repository.getByPhoneNumberAndLock(testPhoneNumber)),
+      taskEither.map(({ cas, ownerPhone }) => {
+        lastCas = cas
+        expect(ownerPhone.id).to.be.equal(expectedId)
+        expect(ownerPhone.lastSmsSentId).to.be.equal(testLastSmsSentId)
+        expect(ownerPhone.lastSmsSentAt).to.be.instanceOf(Date)
+        expect(ownerPhone.updatedAt).to.be.within(before, new Date())
+      }),
+      taskEither.orLeft(expect.fail)
     )()
   })
 })
