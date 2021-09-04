@@ -1,4 +1,4 @@
-import { BuildingOwnerPhone } from '../domain/building-owner.phone'
+import { BuildingOwnerPhone } from '../domain/building-owner-phone'
 import { TaskEither } from 'fp-ts/TaskEither'
 
 export interface LockedOwnerPhone {
