@@ -13,7 +13,7 @@ const testPreviousWeekMessageToPhone = {
   lastSmsSentAt: moment().add(-1, 'week').toDate(),
 }
 const testCas = 'test-cas'
-describe.only('SmsMessageSender', () => {
+describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
   let worksheetRepositoryStub
