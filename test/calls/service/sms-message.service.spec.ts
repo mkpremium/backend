@@ -9,11 +9,11 @@ import { PathReporter } from 'io-ts/PathReporter'
 import moment from 'moment'
 import { constVoid } from 'fp-ts/function'
 
-const testPreviousDayMessageToPhone = {
-  lastSmsSentAt: moment().add(-1, 'day').toDate(),
+const testPreviousWeekMessageToPhone = {
+  lastSmsSentAt: moment().add(-1, 'week').toDate(),
 }
 const testCas = 'test-cas'
-describe('SmsMessageSender', () => {
+describe.only('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
   let worksheetRepositoryStub
@@ -37,7 +37,7 @@ describe('SmsMessageSender', () => {
     }
     buildingOwnerPhonesRepositoryStub = {
       getByPhoneNumberAndLock: stub().returns(taskEither.of({
-        ownerPhone: testPreviousDayMessageToPhone,
+        ownerPhone: testPreviousWeekMessageToPhone,
         cas: testCas
       })),
       save: stub().returns(taskEither.of(constVoid())),
@@ -115,10 +115,10 @@ describe('SmsMessageSender', () => {
       .calledWithMatch(({ body }) => body.length < 160)
   }))
 
-  it('does not send more than one message daily to owner', async () => {
+  it('does not send more than one message weekly to owner', async () => {
     buildingOwnerPhonesRepositoryStub.getByPhoneNumberAndLock.returns(taskEither.of({
       ownerPhone: {
-        lastSmsSentAt: new Date(),
+        lastSmsSentAt: moment().add(-6, 'days'),
       },
       cas: testCas,
     }))
@@ -130,7 +130,7 @@ describe('SmsMessageSender', () => {
     expect(twilioClientStub.messages.create).to.not.have.been.called
   })
 
-  it('does send message when last message is from a previous day', async () => {
+  it('does send message when last message is from a previous week', async () => {
     const result = await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder()())()
 
     expect(isRight(result)).to.be.true

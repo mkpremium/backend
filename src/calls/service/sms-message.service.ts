@@ -87,13 +87,13 @@ export class SmsMessageSender {
       'Hola, le he llamado por su propiedad. Si le interesa vender por favor llame a este mismo número. Gracias.'
   }
 
-  private assertNoSmsSentTodayToPhoneNumber (to: string): TaskEither<SmsAlreadySentToday | Error, LockedOwnerPhone> {
+  private assertNoSmsSentTodayToPhoneNumber (to: string): TaskEither<WeeklySmsAlreadySent | Error, LockedOwnerPhone> {
     return pipe(
       this.buildingOwnerPhonesRepository.getByPhoneNumberAndLock(to),
       chain(({ ownerPhone, cas }) => {
-        const today = moment()
-        if (moment(ownerPhone.lastSmsSentAt).isSame(today, 'day')) {
-          return taskEither.left(new SmsAlreadySentToday(to))
+        const previousWeek = moment().add(-1, 'week')
+        if (moment(ownerPhone.lastSmsSentAt).isAfter(previousWeek, 'day')) {
+          return taskEither.left(new WeeklySmsAlreadySent(to))
         }
         return taskEither.of({ ownerPhone, cas })
       })
@@ -101,7 +101,7 @@ export class SmsMessageSender {
   }
 }
 
-class SmsAlreadySentToday extends Error {
+class WeeklySmsAlreadySent extends Error {
   constructor (readonly to: string) {
     super('SMS to unreached owner already sent today')
   }
