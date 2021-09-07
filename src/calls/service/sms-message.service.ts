@@ -92,7 +92,7 @@ export class SmsMessageSender {
       this.buildingOwnerPhonesRepository.getByPhoneNumberAndLock(to),
       chain(({ ownerPhone, cas }) => {
         const previousWeek = moment().add(-1, 'week')
-        if (moment(ownerPhone.lastSmsSentAt).isAfter(previousWeek, 'day')) {
+        if (ownerPhone.lastSmsSentAt && moment(ownerPhone.lastSmsSentAt).isAfter(previousWeek, 'day')) {
           return taskEither.left(new WeeklySmsAlreadySent(to))
         }
         return taskEither.of({ ownerPhone, cas })
