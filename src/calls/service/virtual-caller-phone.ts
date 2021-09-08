@@ -112,7 +112,7 @@ export class VirtualCallerPhone {
   }
 
   private static ownerUnreached (lastCallToNumber: VirtualAgentCallProps) {
-    return [ 'FAILED', 'BUSY', 'NO_ANSWER' ].includes(lastCallToNumber.status)
+    return [ 'FAILED', 'NO_ANSWER' ].includes(lastCallToNumber.status)
   }
 
   private static fromFreezer (lastCallToNumber: VirtualAgentCallProps) {

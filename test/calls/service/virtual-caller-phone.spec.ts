@@ -162,6 +162,15 @@ describe('VirtualCallerPhone', () => {
     await expect(service.call(testCmd)).to.be.rejected
   })
 
+  it('does not call to phone number when it was called today but was busy', async () => {
+    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
+      status: 'BUSY',
+      createdAt: moment().toDate(),
+    }).build() ])
+
+    await expect(service.call(testCmd)).to.be.rejected
+  })
+
   it('does not call to phone number that does not exist', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       status: 'FAILED',
