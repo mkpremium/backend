@@ -10,7 +10,7 @@ import moment from 'moment'
 import { constVoid } from 'fp-ts/function'
 
 const testPreviousWeekMessageToPhone = {
-  lastSmsSentAt: moment().add(-1, 'week').toDate(),
+  lastSmsSentAt: moment().add(-1, 'month').add(-1, 'day').toDate(),
 }
 const testCas = 'test-cas'
 describe('SmsMessageSender', () => {
@@ -115,10 +115,10 @@ describe('SmsMessageSender', () => {
       .calledWithMatch(({ body }) => body.length < 160)
   }))
 
-  it('does not send more than one message weekly to owner', async () => {
+  it('does not send more than one message monthly to owner', async () => {
     buildingOwnerPhonesRepositoryStub.getByPhoneNumberAndLock.returns(taskEither.of({
       ownerPhone: {
-        lastSmsSentAt: moment().add(-6, 'days'),
+        lastSmsSentAt: moment().add(-1, 'month'),
       },
       cas: testCas,
     }))
@@ -130,7 +130,7 @@ describe('SmsMessageSender', () => {
     expect(twilioClientStub.messages.create).to.not.have.been.called
   })
 
-  it('does send message when last message is from a previous week', async () => {
+  it('does send message when last message is from a previous month', async () => {
     const result = await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder()())()
 
     expect(isRight(result)).to.be.true

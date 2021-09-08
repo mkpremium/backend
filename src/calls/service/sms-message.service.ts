@@ -34,7 +34,7 @@ export class SmsMessageSender {
     let lockedOwnerPhone: LockedOwnerPhone
     const smsId = uuid()
     return pipe(
-      this.assertNoSmsSentTodayToPhoneNumber(cmd.to),
+      this.assertNoSmsSentCurrentMonthToPhoneNumber(cmd.to),
       chain((lop) => {
         lockedOwnerPhone = lop
         return this.composeMessageWithAddress(lang, cmd.worksheetId)
@@ -87,12 +87,12 @@ export class SmsMessageSender {
       'Hola, le he llamado por su propiedad. Si le interesa vender por favor llame a este mismo número. Gracias.'
   }
 
-  private assertNoSmsSentTodayToPhoneNumber (to: string): TaskEither<WeeklySmsAlreadySent | Error, LockedOwnerPhone> {
+  private assertNoSmsSentCurrentMonthToPhoneNumber (to: string): TaskEither<WeeklySmsAlreadySent | Error, LockedOwnerPhone> {
     return pipe(
       this.buildingOwnerPhonesRepository.getByPhoneNumberAndLock(to),
       chain(({ ownerPhone, cas }) => {
-        const previousWeek = moment().add(-1, 'week')
-        if (ownerPhone.lastSmsSentAt && moment(ownerPhone.lastSmsSentAt).isAfter(previousWeek, 'day')) {
+        const previousWeek = moment().add(-1, 'month')
+        if (ownerPhone.lastSmsSentAt && moment(ownerPhone.lastSmsSentAt).isSameOrAfter(previousWeek, 'day')) {
           return taskEither.left(new WeeklySmsAlreadySent(to))
         }
         return taskEither.of({ ownerPhone, cas })
