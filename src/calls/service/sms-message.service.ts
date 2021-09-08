@@ -74,7 +74,7 @@ export class SmsMessageSender {
       map(worksheet => {
         const { street, number, city } = worksheet.building.address
         const message = lang === 'PT' ?
-          'Olá, eu chamei você para o seu imóvel do %%address%%. Se você está interessado em vender, ligue para este mesmo número. Obrigado.' :
+          'Ola, eu chamei voce para o seu imovel do %%address%%. Se voce esta interessado em vender, ligue para este mesmo numero. Obrigado.' :
           'Hola, le he llamado por su propiedad de la %%address%%. Si le interesa vender por favor llame a este mismo numero. Gracias.'
 
         return message.replace('%%address%%', `${street} ${number} de ${city}`)
@@ -83,7 +83,7 @@ export class SmsMessageSender {
 
   private static messageWithoutAddress (lang: string): string {
     return lang === 'PT' ?
-      'Olá, eu liguei para você sobre sua propriedade. Se você está interessado em vender, ligue para este mesmo número. Obrigado.' :
+      'Ola, eu liguei para voce sobre sua propriedade. Se voce esta interessado em vender, ligue para este mesmo numero. Obrigado.' :
       'Hola, le he llamado por su propiedad. Si le interesa vender por favor llame a este mismo numero. Gracias.'
   }
 

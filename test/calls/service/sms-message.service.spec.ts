@@ -60,7 +60,7 @@ describe('SmsMessageSender', () => {
   it('sends Portuguese message to Portugal numbers', async () => {
     await service.sendMessageToUnreachedOwner(sendMessageToUnreachedOwnerBuilder({ to: portugueseNumber })())()
 
-    expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Olá,'))
+    expect(twilioClientStub.messages.create).to.have.been.calledWithMatch(({ body }) => body.startsWith('Ola'))
   })
 
   it('saves SMS', async () => {
