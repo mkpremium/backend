@@ -15,6 +15,7 @@ import { createDeleteScheduledEventController } from './controller/delete-schedu
 import { selfMeetingsController } from './controller/get-self-meetings.controller'
 import { scheduledCallFromOwnerMessage } from './listeners/scheduled-call-from-owner-message'
 import { removeCallsOnNewMeeting } from './listeners/remove-calls-on-new-meeting'
+import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled-calls-on-owner-refusal'
 
 export function setupScheduledEventsDependencies (container: AwilixContainer) {
   container.register({
@@ -37,5 +38,6 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
 
     scheduledCallFromOwnerMessage: asFunction(scheduledCallFromOwnerMessage).singleton(),
     removeCallsOnNewMeeting: asFunction(removeCallsOnNewMeeting).singleton(),
+    removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
   })
 }
