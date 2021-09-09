@@ -5,9 +5,15 @@ import { UpdateBuildingNegotiationStatusService } from '../../building/service/u
 import { ChangeContactStatusService } from '../../owner/service/change-contact-status.service'
 import { Logger } from 'winston'
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
+import { ScheduledCallsRepository } from '../../scheduled-events/repository/scheduled-calls.repository'
+import { constVoid, pipe } from 'fp-ts/function'
+import * as TE from 'fp-ts/TaskEither'
+import { fromPromise } from '../../infrastructure/fp-utils'
+import { isRight } from 'fp-ts/Either'
 
 interface Deps {
   scheduleCall: ScheduleCallService
+  scheduledCallsRepository: ScheduledCallsRepository
   updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService
   changeContactStatusService: ChangeContactStatusService
   logger: Pick<Logger, 'info'>
@@ -16,6 +22,7 @@ interface Deps {
 
 export const createInputGatheredListener = ({
                                               scheduleCall,
+                                              scheduledCallsRepository,
                                               updateBuildingNegotiationStatusService,
                                               changeContactStatusService,
                                               logger,
@@ -24,23 +31,34 @@ export const createInputGatheredListener = ({
   switch (evt.ownerResponse) {
     case OwnerResponse.SALE:
       const virtualCaller = await virtualCallersRepository.get(evt.callerId)
-      await scheduleCall.scheduleCall({
-        userId: evt.callerId,
-        queueId: virtualCaller.queueId,
-        event: {
-          createdBy: evt.callerId,
-          eventDate: new Date(),
-          notifyTo: virtualCaller.assignCallsTo,
-          type: 'CALLS',
-          note: 'Creada por caller virtual',
-          event: {
-            buildingId: evt.buildingId,
-            contactId: evt.contactId,
-            worksheetId: evt.worksheetId,
-            ownerId: evt.ownerId,
+      const result = await pipe(
+        scheduledCallsRepository.forBuilding(evt.buildingId),
+        TE.chain(scheduledCall => {
+          if (scheduledCall) {
+            return TE.of(constVoid())
           }
-        } as ScheduledEventProps & { note: string }
-      })
+          return fromPromise(scheduleCall.scheduleCall({
+            userId: evt.callerId,
+            queueId: virtualCaller.queueId,
+            event: {
+              createdBy: evt.callerId,
+              eventDate: new Date(),
+              notifyTo: virtualCaller.assignCallsTo,
+              type: 'CALLS',
+              note: 'Creada por caller virtual',
+              event: {
+                buildingId: evt.buildingId,
+                contactId: evt.contactId,
+                worksheetId: evt.worksheetId,
+                ownerId: evt.ownerId,
+              }
+            } as ScheduledEventProps & { note: string }
+          }))
+        })
+      )()
+      if (!isRight(result)) {
+        throw result.left
+      }
       break
     case OwnerResponse.NO_SALE:
       await updateBuildingNegotiationStatusService.updateBuildingStatus(evt.buildingId, {

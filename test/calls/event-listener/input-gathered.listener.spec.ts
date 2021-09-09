@@ -3,6 +3,7 @@ import { createInputGatheredListener } from '../../../src/calls/event-listener/i
 import { stub } from 'sinon'
 import { expect } from 'chai'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
+import * as TE from 'fp-ts/TaskEither'
 
 describe('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
@@ -10,6 +11,7 @@ describe('input-gathered.listener', () => {
   let updateBuildingNegotiationStatusStub
   let changeContactStatusServiceStub
   let virtualCallersRepositoryStub
+  let scheduledCallsRepositoryStub
 
   const testAssignedCallerId = 'test-caller-id'
   const testVirtualCallerId = 'test-virtual-caller-id'
@@ -44,13 +46,18 @@ describe('input-gathered.listener', () => {
       get: stub(),
     }
     virtualCallersRepositoryStub.get.withArgs(testEvent.callerId).resolves(testVirtualCaller)
+    scheduledCallsRepositoryStub = {
+      forBuilding: stub()
+    }
+    scheduledCallsRepositoryStub.forBuilding.returns(TE.of(undefined))
 
     listener = createInputGatheredListener({
       scheduleCall: scheduleCallServiceStub,
       virtualCallersRepository: virtualCallersRepositoryStub,
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
       changeContactStatusService: changeContactStatusServiceStub,
-      logger: { info: () => undefined }
+      logger: { info: () => undefined },
+      scheduledCallsRepository: scheduledCallsRepositoryStub,
     })
   })
 
@@ -75,6 +82,14 @@ describe('input-gathered.listener', () => {
       },
       queueId: testVirtualCallerQueueId,
     })
+  })
+
+  it('does not schedules call when there is a call scheduled for building already', async () => {
+    scheduleCallServiceStub.scheduleCall.resolves()
+    scheduledCallsRepositoryStub.forBuilding.returns(TE.of('scheduled-call-id'))
+    await listener({ ...testEvent, ownerResponse: OwnerResponse.SALE })
+
+    expect(scheduleCallServiceStub.scheduleCall).to.not.have.been.called
   })
 
   it('save no sale on owner input', async () => {
