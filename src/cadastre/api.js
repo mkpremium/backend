@@ -41,7 +41,7 @@ export class CadastreApi {
         NombreVia: ''
       })
 
-    return items.map(street => Object.assign({}, street, { typeName: streetTypes[street.type] } || []))
+    return items.map(street => Object.assign({}, street, { typeName: streetTypes[ street.type ] } || []))
   }
 
   async fetchBuildingByAddress (address) {
@@ -57,7 +57,7 @@ export class CadastreApi {
       Puerta: ''
     }
     const xml = await this.fetchXml(keys.BUILDING_BY_ADDRESS, params)
-    const fetchedData = transform(xml, templates[keys.BUILDING_BY_ADDRESS])
+    const fetchedData = transform(xml, templates[ keys.BUILDING_BY_ADDRESS ])
 
     return CadastreApi.parseBuilding(fetchedData)
   }
@@ -73,7 +73,7 @@ export class CadastreApi {
     }
 
     const xml = await this.fetchXml(keys.BUILDING_BY_CADASTRE, params, 'post', options)
-    const fetchedData = transform(xml, templates[keys.BUILDING_BY_CADASTRE])
+    const fetchedData = transform(xml, templates[ keys.BUILDING_BY_CADASTRE ])
 
     return CadastreApi.parseBuilding(fetchedData)
   }
@@ -87,7 +87,7 @@ export class CadastreApi {
     }
 
     const xml = await this.fetchXml(keys.LOCATION_BY_CADASTRE, params)
-    const result = transform(xml, templates[keys.LOCATION_BY_CADASTRE])
+    const result = transform(xml, templates[ keys.LOCATION_BY_CADASTRE ])
 
     if (result.error) {
       throw newHttpError(500, 'Catastro api: ' + result.error)
@@ -100,7 +100,7 @@ export class CadastreApi {
    * @private
    */
   static parseXmlItems (xml, templateKey) {
-    const { items, error } = transform(xml, templates[templateKey])
+    const { items, error } = transform(xml, templates[ templateKey ])
 
     if (error) {
       throw newHttpError(500, 'Catastro api: ' + error)
@@ -152,26 +152,22 @@ export class CadastreApi {
   async fetchXml (key, params, method = 'get', options = {}) {
     let xml
 
-    if (this.fakeData[key]) {
-      xml = this.fakeData[key]
+    if (this.fakeData[ key ]) {
+      xml = this.fakeData[ key ]
     } else {
-      try {
-        await Promise.delay(cadastrewaitTimeMS)
-        logger.debug('CadastreApi#fetchXml', { params, url: urls[key] })
-        switch (method) {
-          case 'get': {
-            const responseGet = await this.client.get(urls[key], { params })
-            xml = responseGet.data
-            break
-          }
-          case 'post': {
-            const responsePost = await this.client.post(urls[key], params, options)
-            xml = responsePost.data
-            break
-          }
+      await Promise.delay(cadastrewaitTimeMS)
+      logger.debug('CadastreApi#fetchXml', { params, url: urls[ key ] })
+      switch (method) {
+        case 'get': {
+          const responseGet = await this.client.get(urls[ key ], { params })
+          xml = responseGet.data
+          break
         }
-      } catch (e) {
-        throw new Error('Cannot fetch cadastre data: ' + e.response.data)
+        case 'post': {
+          const responsePost = await this.client.post(urls[ key ], params, options)
+          xml = responsePost.data
+          break
+        }
       }
     }
 
