@@ -4,13 +4,13 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
 import { buildRangeFromWeek, utc } from '../../lib/date'
 import { newHttpError } from '../../lib/http-error'
-import { addBetweenQueryToBuilder, addMinuteBetweenQueryToBuilder } from '../../lib/query/helpers'
+import { addBetweenQueryToBuilder } from '../../lib/query/helpers'
 import { OwnerRepository } from '../../owner/models'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import { Event, ScheduledEvent, ScheduledEventProps, ScheduledEventType } from '../types'
+import { Event, ScheduledEvent, ScheduledEventProps } from '../types'
 
 const UpdateScheduledEvent = t.struct({
   eventDate: t.maybe(t.Date),
@@ -27,18 +27,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     }
 
     return scheduledEvent
-  }
-
-  async findMeetingInRange (notifyTo, start, end, scheduleId) {
-    const qb = this.getQueryBuilder()
-    const eventDate = [ start, end ].join(',')
-    addMinuteBetweenQueryToBuilder(qb, 'eventDate', eventDate)
-    qb.where('type = ?', ScheduledEventType.MEETINGS)
-    qb.where('notifyTo = ?', notifyTo)
-    if (scheduleId) {
-      qb.where('id != ?', scheduleId)
-    }
-    return this.query(qb)
   }
 
   async addScheduledMeetingEvent (data: ScheduledEventProps, createdBy: string) {
