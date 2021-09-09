@@ -3,7 +3,9 @@ import { InMemorySyncEventBus } from '../../src/infrastructure/event-bus/in-memo
 import { spy } from 'sinon'
 import { expect } from 'chai'
 import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../../src/building/service/update-building-negotiation-status.service'
-import { asValue, createContainer } from 'awilix'
+import { asFunction, asValue, createContainer } from 'awilix'
+import { removeCallsOnNewMeetingOrOfferRequest } from '../../src/scheduled-events/listeners/remove-calls-on-new-meeting-or-offer-request'
+import { removeScheduledCallsOnOwnerRefusal } from '../../src/scheduled-events/listeners/remove-scheduled-calls-on-owner-refusal'
 
 describe('scheduled-events.setupEventListeners', () => {
   let eventBus
@@ -19,6 +21,8 @@ describe('scheduled-events.setupEventListeners', () => {
       eventBus: asValue(eventBus),
       scheduledCallsRepository: asValue(scheduledCallRepositoryMock),
       scheduledCallFromOwnerMessage: asValue(undefined),
+      removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
+      removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
     })
     setupEventListeners(container)
   })
