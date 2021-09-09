@@ -4,6 +4,16 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { BuildingsRepository } from '../../building/repository/buildings.repository'
 
+export interface MeetingCreated {
+  name: 'meeting.created'
+  meetingId: string
+  userId: string
+  ownerId: string
+  contactId: string
+  buildingId: string
+  note: string
+}
+
 export class CreateMeetingService {
   constructor (
     private scheduledEventsRepository: ScheduledEventsRepository,
@@ -26,7 +36,7 @@ export class CreateMeetingService {
       contactId: createdMeeting.event.contactId,
       buildingId: createdMeeting.event.buildingId,
       note: requestBody.note
-    })
+    } as MeetingCreated)
 
     return createdMeeting
   }

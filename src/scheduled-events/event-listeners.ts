@@ -8,9 +8,7 @@ const buildingStatusesThatCancelScheduledCalls = [ 'NO VENDE', 'DESCARTADO' ]
 export function setupEventListeners (container: AwilixContainer) {
   const eventBus = container.resolve('eventBus') as EventBus
   const scheduledCallRepository = container.resolve('scheduledCallsRepository') as ScheduledCallsRepository
-  eventBus.on('meeting.created', ({ buildingId }) => {
-    return scheduledCallRepository.removeScheduledCallsForBuilding(buildingId)
-  })
+  eventBus.on('meeting.created', container.resolve('removeCallsOnNewMeeting'))
 
   eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, ({ buildingId, negotiationStatus }) => {
     if (!buildingStatusesThatCancelScheduledCalls.includes(negotiationStatus)) {
