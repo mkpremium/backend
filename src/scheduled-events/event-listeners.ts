@@ -4,7 +4,8 @@ import { EventBus } from '../infrastructure/event-bus'
 
 export function setupEventListeners (container: AwilixContainer) {
   const eventBus = container.resolve('eventBus') as EventBus
-  eventBus.on('meeting.created', container.resolve('removeCallsOnNewMeeting'))
+
+  eventBus.on('meeting.created', container.resolve('removeCallsOnNewMeetingOrOfferRequest'))
 
   eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, container.resolve('removeScheduledCallsOnOwnerRefusal'))
 

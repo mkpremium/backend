@@ -16,6 +16,14 @@ const AddOfferRequestCommand = t.struct({
   note: t.String
 })
 
+export interface OfferRequestCreated {
+  name: 'offer-request.created'
+  note: string
+  userId: string
+  buildingId: string
+  request: any
+}
+
 export class AddOfferRequestService {
   constructor (
     private offerRequestsRepository: OfferRequestsRepository,
@@ -36,7 +44,7 @@ export class AddOfferRequestService {
       userId: addRequestCommand.callerId,
       buildingId: addRequestCommand.buildingId,
       request: offerRequest
-    })
+    } as OfferRequestCreated)
   }
 
   assertValidCommand (command) {
