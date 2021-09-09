@@ -20,6 +20,7 @@ export class CreateMeetingService {
     await this.buildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
     await this.eventBus.publish({
       name: 'meeting.created',
+      meetingId: createdMeeting.id,
       userId: createdMeeting.notifyTo,
       ownerId: createdMeeting.event.ownerId,
       contactId: createdMeeting.event.contactId,
