@@ -194,15 +194,13 @@ describe('VirtualCallerPhone', () => {
     expect(twilioClientStub.calls.create).to.have.been.called
   })
 
-  it('calls to phone number previous call failed', async () => {
+  it('does not call to phone number with a previous failed call today', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       createdAt: new Date(),
       status: 'FAILED',
     }).build() ])
 
-    await service.call(testCmd)
-
-    expect(twilioClientStub.calls.create).to.have.been.called
+    await expect(service.call(testCmd)).to.be.rejected
   })
 
   it('calls to phone number when it was called three or more months ago, even with response', async () => {

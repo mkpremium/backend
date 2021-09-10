@@ -5,7 +5,7 @@ import { OwnerContact } from './virtual-caller.service'
 import retry from 'bluebird-retry'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 import honeycomb from 'honeycomb-beeline'
-import { CallLanguage, TwilioSayAttributes } from './call-attributes'
+import { CallLanguage } from './call-attributes'
 import moment from 'moment'
 import { ContactProps } from '../../owner/owner'
 import { Logger } from 'winston'
@@ -101,7 +101,7 @@ export class VirtualCallerPhone {
       if (call.error === PHONE_DOES_NOT_EXIST) {
         throw new NumberDoesNotExist(contact.ownerId, contact.id)
       }
-      if (VirtualCallerPhone.ownerUnreached(call) || VirtualCallerPhone.fromFreezer(call)) {
+      if (VirtualCallerPhone.fromFreezer(call)) {
         return
       }
 
@@ -110,11 +110,6 @@ export class VirtualCallerPhone {
       }
     })
   }
-
-  private static ownerUnreached (lastCallToNumber: VirtualAgentCallProps) {
-    return [ 'FAILED' ].includes(lastCallToNumber.status)
-  }
-
   private static fromFreezer (lastCallToNumber: VirtualAgentCallProps) {
     return moment(lastCallToNumber.createdAt).isBefore(moment().add(-FREEZER_LENGTH_MONTHS, 'months'))
   }
