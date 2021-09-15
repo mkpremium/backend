@@ -48,6 +48,7 @@ export class GatherOwnerInterestMessageComposer {
       method: 'POST',
       language: language as GatherLanguage,
       numDigits: 1,
+      timeout: 10,
     }).say(this.twilioSayAttributes[ language ], message)
 
     return twiml

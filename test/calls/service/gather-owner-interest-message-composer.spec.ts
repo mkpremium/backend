@@ -3,7 +3,6 @@ import {
   GatherOwnerInterestMessageComposer
 } from '../../../src/calls/service/gather-owner-interest-message-composer'
 import { expect } from 'chai'
-import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 const twilioSayAttributesTest = {
   'es-ES': {
