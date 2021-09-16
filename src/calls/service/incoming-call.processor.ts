@@ -36,9 +36,9 @@ export class IncomingCallProcessor {
         return this.gatherOwnerInterestMessageComposer.compose({
           address: ws.building.address,
           buildingId: ws.building.id,
-          callId: lastCall.id, // TODO is this OK?
+          callId: lastCall.id,
           contact: {
-            id: lastCall.id,
+            id: lastCall.contactId,
             ownerId: lastCall.ownerId,
           },
           language: cmd.from.startsWith('+351') ? 'pt-PT' : 'es-ES',
