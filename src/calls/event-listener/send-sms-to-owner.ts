@@ -1,15 +1,21 @@
-import { SendMessageToUnreachedOwnerCodec, SmsMessageSender } from '../service/sms-message.service'
+import {
+  MonthlySmsAlreadySent,
+  SendMessageToUnreachedOwnerCodec,
+  SmsMessageSender
+} from '../service/sms-message.service'
 import { isRight } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
 import { CallDone } from '../service/call-finished.processor'
+import { Logger } from '../../infrastructure/logger'
 
 interface Deps {
   smsMessageSender: SmsMessageSender
+  logger: Logger
 }
 
 const mobilePhoneRegexp = /\+346|\+3519/
 
-export const sendSmsToOwner = ({ smsMessageSender }: Deps) => {
+export const sendSmsToOwner = ({ smsMessageSender, logger }: Deps) => {
   return async (evt: CallDone) => {
     if (evt.ownerResponse || evt.status === 'FAILED' || !mobilePhoneRegexp.test(evt.phoneNumber)) {
       return
@@ -17,7 +23,11 @@ export const sendSmsToOwner = ({ smsMessageSender }: Deps) => {
 
     const result = await smsMessageSender.sendMessageToUnreachedOwner(createCommand(evt))()
     if (!isRight(result)) {
-      throw result.left
+      if (result.left instanceof MonthlySmsAlreadySent) {
+        logger.info('Monthly SMS already sent', { phoneNumber: result.left.to })
+      } else {
+        throw result.left
+      }
     }
   }
 }

@@ -1,6 +1,8 @@
-import winston, { createLogger } from 'winston'
+import winston, { createLogger, Logger as WinstonLogger } from 'winston'
 
 const level = process.env.DEBUG === 'ON' ? 'debug' : 'info'
+
+export type Logger = Pick<WinstonLogger, 'info' | 'warn' | 'error' | 'crit'>
 
 export const logger = createLogger({
   level,

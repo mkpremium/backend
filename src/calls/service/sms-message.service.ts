@@ -87,13 +87,13 @@ export class SmsMessageSender {
       'Hola, le he llamado por su propiedad. Si le interesa vender por favor llame a este mismo numero. Gracias.'
   }
 
-  private assertNoSmsSentCurrentMonthToPhoneNumber (to: string): TaskEither<WeeklySmsAlreadySent | Error, LockedOwnerPhone> {
+  private assertNoSmsSentCurrentMonthToPhoneNumber (to: string): TaskEither<MonthlySmsAlreadySent | Error, LockedOwnerPhone> {
     return pipe(
       this.buildingOwnerPhonesRepository.getByPhoneNumberAndLock(to),
       chain(({ ownerPhone, cas }) => {
         const previousWeek = moment().add(-1, 'month')
         if (ownerPhone.lastSmsSentAt && moment(ownerPhone.lastSmsSentAt).isSameOrAfter(previousWeek, 'day')) {
-          return taskEither.left(new WeeklySmsAlreadySent(to))
+          return taskEither.left(new MonthlySmsAlreadySent(to))
         }
         return taskEither.of({ ownerPhone, cas })
       })
@@ -101,8 +101,8 @@ export class SmsMessageSender {
   }
 }
 
-class WeeklySmsAlreadySent extends Error {
+export class MonthlySmsAlreadySent extends Error {
   constructor (readonly to: string) {
-    super('SMS to unreached owner already sent today')
+    super('SMS to unreached owner already sent this month')
   }
 }

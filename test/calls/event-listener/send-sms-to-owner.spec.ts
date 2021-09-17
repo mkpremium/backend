@@ -4,6 +4,7 @@ import { sendSmsToOwner } from '../../../src/calls/event-listener/send-sms-to-ow
 import { OwnerResponse } from '../../../src/calls/service/owner-response-processor.service'
 import { taskEither } from 'fp-ts'
 import { CallDone } from '../../../src/calls/service/call-finished.processor'
+import { createLoggerMock } from '../../infrastructure/logger.spec'
 
 describe('sms-to-owner.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
@@ -27,6 +28,7 @@ describe('sms-to-owner.listener', () => {
     }
     listener = sendSmsToOwner({
       smsMessageSender: smsMessageSenderStub,
+      logger: createLoggerMock(),
     })
   });
 
