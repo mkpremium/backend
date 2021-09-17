@@ -43,7 +43,7 @@ JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksh
 
 LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event'
     AND lastEvent.id = worksheet.lastAddedMeeting.id
-LEFT JOIN ${bucketName} lastEventFlipper ON  lastEventFlipper._documentType = 'operator'
+LEFT JOIN ${bucketName} lastEventFlipper ON
     (lastEvent IS NOT NULL AND lastEvent IS NOT MISSING)
     AND lastEventFlipper._documentType = 'operator'
     AND lastEventFlipper.id = lastEvent.notifyTo
