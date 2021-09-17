@@ -9,12 +9,12 @@ import { WorksheetBuilding } from '../../worksheet/repository/worksheet.reposito
 
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
-owner.id,
+meta(owner).id,
 owner.name,
 owner.buildingId,
 owner.person.contacts,
 {
-    building.id,
+    meta(building).id,
     building.address,
     building.metadata,
     building.\`use\`,
@@ -26,7 +26,7 @@ owner.person.contacts,
     "featuredOwnerId": building.ownerId
 } as building,
 building.negotiationStatus,
-worksheet.id worksheetId,
+meta(worksheet).id worksheetId,
 {
     lastEvent.eventDate,
     "inPerson": lastEvent.event.inPerson,
@@ -37,19 +37,19 @@ ARRAY {"at": sc.eventDate} FOR sc IN  scheduledCalls END as scheduledCalls
 
 FROM ${bucketName} owner
 JOIN ${bucketName} building ON building._documentType = 'building'
-  AND building.id = owner.buildingId
+  AND meta(building).id = owner.buildingId
   AND (building.negotiationStatus IS MISSING OR building.negotiationStatus != 'DESCARTADO')
-JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
+JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = meta(building).id
 
 LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event'
-    AND lastEvent.id = worksheet.lastAddedMeeting.id
+    AND meta(lastEvent).id = worksheet.lastAddedMeeting.id
 LEFT JOIN ${bucketName} lastEventFlipper ON
     (lastEvent IS NOT NULL AND lastEvent IS NOT MISSING)
     AND lastEventFlipper._documentType = 'operator'
-    AND lastEventFlipper.id = lastEvent.notifyTo
+    AND meta(lastEventFlipper).id = lastEvent.notifyTo
 LEFT NEST ${bucketName} scheduledCalls ON scheduledCalls._documentType = 'scheduled-event'
     AND scheduledCalls.type = 'CALLS'
-    AND scheduledCalls.event.ownerId = owner.id
+    AND scheduledCalls.event.ownerId = meta(owner).id
 
 WHERE owner._documentType = 'owner'
 AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 AND c.status != 'BAD' END
