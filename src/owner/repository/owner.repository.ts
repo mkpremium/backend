@@ -105,34 +105,7 @@ export class OwnerRepository extends CouchbaseRepository<OwnerProps> {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),
       [ phoneNumber ]
-    ).then(result => fromJSON(result.map(rec => {
-      const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
-      const building = rec.building
-      building.negotiationStatus = rec.negotiationStatus || 'PENDIENTE'
-      building.floorArea = parseInt(building.floorArea)
-      if (building.recentProposal) {
-        building.latestProposal = {
-          amount: building.recentProposal.proposal,
-          createdAt: building.recentProposal.createdAt
-        }
-      }
-      if (building.address.postalCode && !building.address.postalCode.number) {
-        delete building.address.postalCode
-      }
-
-      return {
-        ...rec,
-        building,
-        negotiationStatus: rec.negotiationStatus || 'PENDIENTE',
-        lastEvent: rec.lastEvent.eventDate !== undefined ? {
-          eventDate: rec.lastEvent.eventDate,
-          type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
-          ownerId: rec.lastEvent.ownerId,
-          flipperName: rec.lastEvent.flipperName
-        } : undefined,
-        matchingContactId: rec.contacts[ matchingContactIdx ].id
-      }
-    }), t.list(FoundOwner)))
+    ).then(parseFoundPhones(phoneNumber))
   }
 
   async buildingOwners (buildingId): Promise<OwnerProps[]> {
@@ -156,5 +129,38 @@ export class OwnerRepository extends CouchbaseRepository<OwnerProps> {
 
   struct () {
     return Owner as any
+  }
+}
+
+export function parseFoundPhones (phoneNumber) {
+  return function (result) {
+    return fromJSON(result.map(rec => {
+      const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)
+      const building = rec.building
+      building.negotiationStatus = rec.negotiationStatus || 'PENDIENTE'
+      building.floorArea = !isNaN(parseInt(building.floorArea)) ? parseInt(building.floorArea) : undefined
+      if (building.recentProposal) {
+        building.latestProposal = {
+          amount: building.recentProposal.proposal,
+          createdAt: building.recentProposal.createdAt
+        }
+      }
+      if (building.address.postalCode && !building.address.postalCode.number) {
+        delete building.address.postalCode
+      }
+
+      return {
+        ...rec,
+        building,
+        negotiationStatus: rec.negotiationStatus || 'PENDIENTE',
+        lastEvent: rec.lastEvent.eventDate !== undefined ? {
+          eventDate: rec.lastEvent.eventDate,
+          type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
+          ownerId: rec.lastEvent.ownerId,
+          flipperName: rec.lastEvent.flipperName
+        } : undefined,
+        matchingContactId: rec.contacts[ matchingContactIdx ].id
+      }
+    }), t.list(FoundOwner))
   }
 }

@@ -92,7 +92,7 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
   cadastre: t.maybe(t.struct({
     reference: t.String,
   })),
-  floorArea: t.union([ t.Number, t.String ]),
+  floorArea: t.maybe(t.union([ t.Number, t.String ])),
   featuredOwnerId: t.maybe(t.String)
 })
 
