@@ -1,6 +1,6 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
-import { lockingPhoneErrorContext, VirtualCallerPhone } from './virtual-caller-phone'
+import { lockingPhoneErrorContext, NumberDoesNotExist, VirtualCallerPhone } from './virtual-caller-phone'
 import {
   VirtualCallerWorksheet, VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
@@ -80,6 +80,8 @@ export class VirtualCallerService {
           }
           if (error instanceof NumberAlreadyCalled) {
             this.logger.info('Number already called, skipping call', { contactToCall })
+          } else if (error instanceof NumberDoesNotExist) {
+            this.logger.info('Number does not exist, skipping call', { contactToCall })
           } else {
             this.logger.error('Call failed', { ...error, error: error.message, trace: error.trace, contactToCall })
           }

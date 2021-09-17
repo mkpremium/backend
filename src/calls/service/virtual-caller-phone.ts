@@ -38,7 +38,7 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
 const FREEZER_LENGTH_MONTHS = 3
 export const lockingPhoneErrorContext = 'Locking phone'
 
-class NumberDoesNotExist extends Error {
+export class NumberDoesNotExist extends Error {
   constructor (
     readonly ownerId: string,
     readonly contactId: string
