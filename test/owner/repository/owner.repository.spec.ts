@@ -5,7 +5,7 @@ import { worksheetBuilder } from '../../worksheet/worksheet.builder'
 import { createTestContainer } from '../../create-test-container'
 import { validate } from 'tcomb-validation'
 import { WorksheetBuilding } from '../../../src/worksheet/repository/worksheet.repository'
-import { Promise } from 'bluebird'
+import { Promise as BluebirdPromise } from 'bluebird'
 
 describe('OwnerRepository', () => {
   let repository
@@ -21,12 +21,11 @@ describe('OwnerRepository', () => {
   })
 
   it('finds owner by its phone contact', async function () {
-    this.retries = 2
     const testBuilding = buildingBuilder().build()
     const testWorksheet = worksheetBuilder({ relatedBuildingIds: [ testBuilding.id ] }).build()
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withPhoneContact().build()
 
-    return Promise.all([
+    return BluebirdPromise.all([
       repository.save(testOwner),
       buildingsRepository.save(testBuilding),
       worksheetsRepository.save(testWorksheet)
