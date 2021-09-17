@@ -36,12 +36,17 @@ worksheet.id worksheetId,
 ARRAY {"at": sc.eventDate} FOR sc IN  scheduledCalls END as scheduledCalls
 
 FROM ${bucketName} owner
-JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = owner.buildingId
+JOIN ${bucketName} building ON building._documentType = 'building'
+  AND building.id = owner.buildingId
   AND (building.negotiationStatus IS MISSING OR building.negotiationStatus != 'DESCARTADO')
 JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.relatedBuildingIds[0] = building.id
 
-LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event' AND lastEvent.id = worksheet.lastAddedMeeting.id
-LEFT JOIN ${bucketName} lastEventFlipper ON  lastEventFlipper._documentType = 'operator' and lastEventFlipper.id = lastEvent.notifyTo
+LEFT JOIN ${bucketName} lastEvent ON lastEvent._documentType = 'scheduled-event'
+    AND lastEvent.id = worksheet.lastAddedMeeting.id
+LEFT JOIN ${bucketName} lastEventFlipper ON  lastEventFlipper._documentType = 'operator'
+    (lastEvent IS NOT NULL AND lastEvent IS NOT MISSING)
+    AND lastEventFlipper._documentType = 'operator'
+    AND lastEventFlipper.id = lastEvent.notifyTo
 LEFT NEST ${bucketName} scheduledCalls ON scheduledCalls._documentType = 'scheduled-event'
     AND scheduledCalls.type = 'CALLS'
     AND scheduledCalls.event.ownerId = owner.id
