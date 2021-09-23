@@ -1,9 +1,10 @@
 import { wrap } from 'express-promise-wrap'
-import { OperatorRefreshTokenRepository, OperatorRepository } from './models'
+import { OperatorRepository } from './models'
 import { History } from '../history/models'
 import { canManageOperator } from '../lib/role-operators'
 import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import _get from 'lodash/get'
+import { OperatorRefreshTokenRepository } from './operatorRefreshTokenRepository'
 
 async function login (req, res) {
   const repo = new OperatorRepository()
