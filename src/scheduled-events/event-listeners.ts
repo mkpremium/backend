@@ -10,4 +10,6 @@ export function setupEventListeners (container: AwilixContainer) {
   eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, container.resolve('removeScheduledCallsOnOwnerRefusal'))
 
   eventBus.on('virtual-caller.sms-received', container.resolve('scheduledCallFromOwnerMessage'))
+
+  eventBus.on('owner.contact_status_changed', container.resolve('removeScheduledCallOnDiscardedContact'))
 }

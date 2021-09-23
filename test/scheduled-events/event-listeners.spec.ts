@@ -6,6 +6,7 @@ import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../../src/building/service/
 import { asFunction, asValue, createContainer } from 'awilix'
 import { removeCallsOnNewMeetingOrOfferRequest } from '../../src/scheduled-events/listeners/remove-calls-on-new-meeting-or-offer-request'
 import { removeScheduledCallsOnOwnerRefusal } from '../../src/scheduled-events/listeners/remove-scheduled-calls-on-owner-refusal'
+import { removeScheduledCallOnDiscardedContact } from '../../src/scheduled-events/listeners/remove-scheduled-call-on-discarded-contact'
 
 describe('scheduled-events.setupEventListeners', () => {
   let eventBus
@@ -23,6 +24,7 @@ describe('scheduled-events.setupEventListeners', () => {
       scheduledCallFromOwnerMessage: asValue(undefined),
       removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
       removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
+      removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
     })
     setupEventListeners(container)
   })

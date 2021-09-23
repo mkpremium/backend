@@ -19,6 +19,14 @@ export class ScheduledCallsRepository extends CouchbaseRepository<ScheduledEvent
     )
   }
 
+  removeScheduledCallsForContact (contactId: string) {
+    return this.couchbaseAdapter.queryAsync(
+      `DELETE FROM ${this.bucketName} WHERE _documentType = 'scheduled-event'
+        AND type = 'CALLS' AND event.contactId = $1`,
+      [ contactId ]
+    )
+  }
+
   forBuilding (buildingId: string): TE.TaskEither<Error, string | undefined>{
     return pipe(
       fromPromise(this.couchbaseAdapter.queryAsync(
