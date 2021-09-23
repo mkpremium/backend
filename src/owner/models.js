@@ -12,7 +12,6 @@ import { ListQuery } from '../types/params'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { TypedContactInfo } from './contact'
 import {
-  changeContactStatus,
   FeaturedContact,
   Owner,
   OwnerBody,
@@ -96,13 +95,6 @@ export class OwnerRepository extends CouchbaseModel {
     const result = await this.query(qb)
 
     return result.map(mapOwnerIncludes)
-  }
-
-  async changeContactStatus (ownerId, contactId, newStatus) {
-    const owner = await this.findByIdOrThrow(ownerId)
-    const updatedOwner = changeContactStatus(owner, contactId, newStatus)
-
-    return this.save(updatedOwner)
   }
 
   async createOwnerAndPerson (body) {
