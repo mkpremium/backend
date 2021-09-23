@@ -11,6 +11,7 @@ export const CallerPhone = t.struct<CallerPhoneProps & { _documentType: string }
   id: t.refinement(t.String, id => id.startsWith('phone_')),
   status: t.maybe(t.enums.of([ 'AVAILABLE', 'BUSY' ])),
   createdAt: t.Date,
+  lastLockAcquiredAt: t.maybe(t.Date),
   _documentType: t.refinement(t.String, dt => dt === 'virtual-caller-phone')
 }, {
   name: 'CallerPhone',

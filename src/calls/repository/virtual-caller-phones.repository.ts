@@ -20,7 +20,7 @@ export class VirtualCallerPhonesRepository extends CouchbaseRepository<CallerPho
     return this.couchbaseAdapter
       .getAndLock(id)
       .then(({ cas, value }) => ({
-        cas, phone: fromJSON<CallerPhoneProps>(value as any, CallerPhone)
+        cas, phone: fromJSON<CallerPhoneProps>({ ...value, lastLockAcquiredAt: new Date() }, CallerPhone)
       }))
       .catch(error => {
         if (error instanceof KeyNotFound) {
