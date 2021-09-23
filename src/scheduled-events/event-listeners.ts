@@ -6,6 +6,7 @@ export function setupEventListeners (container: AwilixContainer) {
   const eventBus = container.resolve('eventBus') as EventBus
 
   eventBus.on('meeting.created', container.resolve('removeCallsOnNewMeetingOrOfferRequest'))
+  eventBus.on('offer-request.created', container.resolve('removeCallsOnNewMeetingOrOfferRequest'))
 
   eventBus.on(BUILDING_NEGOTIATION_STATUS_CHANGED, container.resolve('removeScheduledCallsOnOwnerRefusal'))
 
