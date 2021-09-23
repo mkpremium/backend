@@ -1,4 +1,4 @@
-import { setupEventListeners } from '../../src/scheduled-events/event-listeners'
+import { scheduledEventsEventListeners } from '../../src/scheduled-events/event-listeners'
 import { InMemorySyncEventBus } from '../../src/infrastructure/event-bus/in-memory-sync-event-bus'
 import { spy } from 'sinon'
 import { expect } from 'chai'
@@ -26,7 +26,7 @@ describe('scheduled-events.setupEventListeners', () => {
       removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
       removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
     })
-    setupEventListeners(container)
+    scheduledEventsEventListeners(container)
   })
 
   it('deletes scheduled calls when a visit is scheduled for the building', () => {
