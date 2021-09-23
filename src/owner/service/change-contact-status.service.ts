@@ -11,6 +11,12 @@ export interface OwnerStatusChangedEvent {
   newStatus: OwnerStatus;
 }
 
+export interface OwnerContactStatusChanged {
+  name: 'owner.contact_status_changed'
+  ownerId: string
+  contactId: string
+  newContactStatus: 'GOOD' | 'BAD' | 'UNDEFINED'
+}
 export class ChangeContactStatusService {
   constructor (
     private ownersRepository: OwnerRepository,
@@ -26,6 +32,12 @@ export class ChangeContactStatusService {
     const updatedOwner = await this.ownersRepository.save(changeContactStatus(owner, contactId, status)) as OwnerProps
 
     await this.historyRepository.register({ type: 'UPDATE', contextModel, user })
+    await this.eventBus.publish({
+      name: 'owner.contact_status_changed',
+      ownerId,
+      contactId,
+      newContactStatus: status,
+    } as OwnerContactStatusChanged)
 
     if (owner.status !== updatedOwner.status) {
       const event: OwnerStatusChangedEvent = {
