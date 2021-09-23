@@ -30,7 +30,7 @@ const testCmd: CallCommand = {
     number: 0,
   },
 }
-const testComposedMessage = 'test gatger owner interest composed message'
+const testComposedMessage = 'test owner interest gathering composed message'
 
 describe('VirtualCallerPhone', () => {
   let service: VirtualCallerPhone
@@ -62,7 +62,7 @@ describe('VirtualCallerPhone', () => {
       saveWithLock: stub(),
     }
     gatherOwnerInterestMessageComposerStub = {
-      compose: stub().returns({ toString: () =>  testComposedMessage}),
+      compose: stub().returns({ toString: () => testComposedMessage }),
     }
 
     service = new VirtualCallerPhone(
@@ -93,6 +93,12 @@ describe('VirtualCallerPhone', () => {
     })
   })
 
+  it('throws error when phone is busy', async () => {
+    virtualCallerPhonesRepositoryStub.lockPhone.resolves({ ...testAvailableLockedPhone, phone: { status: 'BUSY' } })
+
+    await expect(service.call(testCmd)).to.be.rejected
+  })
+
   it('acquires phone lock before calling and releases when call is done', async () => {
     await service.call(testCmd)
 
@@ -103,10 +109,16 @@ describe('VirtualCallerPhone', () => {
       .to.be.equal('BUSY')
   })
 
-  it('throws error when phone is busy', async () => {
-    virtualCallerPhonesRepositoryStub.lockPhone.resolves({ ...testAvailableLockedPhone, phone: { status: 'BUSY' } })
+  it('holds lock when phone is busy but taken more than two minutes before', async () => {
+    virtualCallerPhonesRepositoryStub.lockPhone.resolves({
+      ...testAvailableLockedPhone, phone: {
+        ...testAvailableLockedPhone.phone,
+        status: 'BUSY',
+        lastLockAcquiredAt: moment().add(-2, 'minutes')
+      }
+    })
 
-    await expect(service.call(testCmd)).to.be.rejected
+    await expect(service.call(testCmd)).to.be.fulfilled
   })
 
   it('calculates prefix based on caller timezone', async () => {

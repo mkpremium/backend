@@ -4,6 +4,7 @@ export interface CallerPhoneProps {
   id: string,
   status: 'AVAILABLE' | 'BUSY'
   createdAt: Date
+  lastLockAcquiredAt: Date | undefined
 }
 
 export const CallerPhone = t.struct<CallerPhoneProps & { _documentType: string }>({

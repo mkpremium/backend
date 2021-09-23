@@ -110,6 +110,7 @@ export class VirtualCallerPhone {
       }
     })
   }
+
   private static fromFreezer (lastCallToNumber: VirtualAgentCallProps) {
     return moment(lastCallToNumber.createdAt).isBefore(moment().add(-FREEZER_LENGTH_MONTHS, 'months'))
   }
@@ -118,16 +119,18 @@ export class VirtualCallerPhone {
     return retry<LockedPhone>(
       () => this.virtualCallerPhonesRepository.lockPhone(phoneNumber),
       { backoff: 2 }
-    ).then((lockedPhone) => {
-      if (lockedPhone.phone.status === 'BUSY') {
-        this.virtualCallerPhonesRepository.unlockPhone(phoneNumber, lockedPhone.cas)
+    ).then(({ phone, cas }) => {
+      const twoMinutesAgo = moment().add(-2, 'minutes')
+      const lastLockAfterTimeout = phone.lastLockAcquiredAt && twoMinutesAgo.isSameOrBefore(phone.lastLockAcquiredAt)
+      if (phone.status === 'BUSY' && lastLockAfterTimeout) {
+        this.virtualCallerPhonesRepository.unlockPhone(phoneNumber, cas)
           .catch(error => this.logger.error(`Couldn't unlock phone`, {
             errorMessage: error.message,
             phoneNumber,
           }))
         throw new Error(`Virtual caller phone is busy (${phoneNumber})`)
       }
-      return lockedPhone
+      return {phone, cas}
     }).catch(error => {
       error.context = lockingPhoneErrorContext
       throw error
