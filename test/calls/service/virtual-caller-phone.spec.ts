@@ -109,12 +109,12 @@ describe('VirtualCallerPhone', () => {
       .to.be.equal('BUSY')
   })
 
-  it('holds lock when phone is busy but taken more than two minutes before', async () => {
+  it('holds lock when phone is busy but taken more than five minutes before', async () => {
     virtualCallerPhonesRepositoryStub.lockPhone.resolves({
       ...testAvailableLockedPhone, phone: {
         ...testAvailableLockedPhone.phone,
         status: 'BUSY',
-        lastLockAcquiredAt: moment().add(-2, 'minutes')
+        lastLockAcquiredAt: moment().add(-5, 'minutes').toDate()
       }
     })
 

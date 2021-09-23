@@ -120,8 +120,8 @@ export class VirtualCallerPhone {
       () => this.virtualCallerPhonesRepository.lockPhone(phoneNumber),
       { backoff: 2 }
     ).then(({ phone, cas }) => {
-      const twoMinutesAgo = moment().add(-2, 'minutes')
-      const lastLockAfterTimeout = phone.lastLockAcquiredAt && twoMinutesAgo.isSameOrBefore(phone.lastLockAcquiredAt)
+      const lockTimeout = moment().add(-5, 'minutes')
+      const lastLockAfterTimeout = phone.lastLockAcquiredAt && moment(phone.lastLockAcquiredAt).isAfter(lockTimeout)
       if (phone.status === 'BUSY' && lastLockAfterTimeout) {
         this.virtualCallerPhonesRepository.unlockPhone(phoneNumber, cas)
           .catch(error => this.logger.error(`Couldn't unlock phone`, {
