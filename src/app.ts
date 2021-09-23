@@ -36,6 +36,7 @@ import { setupOwnersRoutes } from './owner/routing'
 import { ownerEventListeners } from './owner/listeners'
 import { scheduledEventsRoutes } from './scheduled-events/routing'
 import { scheduledEventsEventListeners } from './scheduled-events/event-listeners'
+import { operatorEventListeners } from './operator/listeners'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -75,6 +76,7 @@ export const createApp = (): Promise<Express> => {
       callsEventListeners(diContainer)
       scheduledEventsEventListeners(diContainer)
       worksheetEventListeners(diContainer)
+      operatorEventListeners(diContainer.resolve('eventBus'), diContainer)
 
       buildingRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
