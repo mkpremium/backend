@@ -3,5 +3,8 @@ import { UsersRepository } from '../users.repository'
 
 export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRepository: UsersRepository }) {
   return function (evt: BuildingNegotiationStatusChanged) {
+    if (evt.negotiationStatus !== 'NO VENDE') {
+      return
+    }
   }
 }
