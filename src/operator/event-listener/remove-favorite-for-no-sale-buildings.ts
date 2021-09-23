@@ -1,6 +1,7 @@
 import { BuildingNegotiationStatusChanged } from '../../building/service/update-building-negotiation-status.service'
+import { UsersRepository } from '../users.repository'
 
-export function removeFavoriteForNoSaleBuildings() {
-  return function(evt: BuildingNegotiationStatusChanged) {
+export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRepository: UsersRepository }) {
+  return function (evt: BuildingNegotiationStatusChanged) {
   }
 }
