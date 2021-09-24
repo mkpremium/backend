@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import { createTestContainer } from '../create-test-container'
-import { UsersRepository } from '../../src/operator/users.repository'
-import { userBuilder } from '../user/user.builder'
+import { createTestContainer } from '../../create-test-container'
+import { userBuilder } from '../user.builder'
 import { pipe } from 'fp-ts/function'
 import { map } from 'fp-ts/TaskEither'
-import { orFail } from '../helpers'
+import { orFail } from '../../helpers'
+import { UsersRepository } from '../../../src/user/repository/users.repository'
 
 describe('UsersRepository', () => {
   let repository: UsersRepository

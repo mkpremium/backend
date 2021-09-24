@@ -1,10 +1,9 @@
 import { BuildingNegotiationStatusChanged } from '../../building/service/update-building-negotiation-status.service'
-import { UsersRepository } from '../users.repository'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import { apply } from 'fp-ts'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import { User, UserProps } from '../../types/user'
+import { UsersRepository } from '../../user/repository/users.repository'
 
 export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRepository: UsersRepository }) {
   return async function (evt: BuildingNegotiationStatusChanged) {

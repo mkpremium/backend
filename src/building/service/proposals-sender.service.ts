@@ -3,7 +3,7 @@ import { ProposalProps, proposalSent } from '../building'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { ProposalsRepository } from '../repository/proposals.repository'
 import { EmailSenderService } from '../../email/email-sender.service'
-import { UserRepository } from '../../user/repository/user.repository'
+import { UsersRepository } from '../../user/repository/users.repository'
 import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
@@ -18,7 +18,7 @@ export class ProposalsSenderService {
   constructor (
     private proposalsRepository: ProposalsRepository,
     private emailSender: EmailSenderService,
-    private usersRepository: UserRepository,
+    private usersRepository: UsersRepository,
     private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
     private scheduledEventsRepository: ScheduledEventsRepository,

@@ -1,14 +1,14 @@
 import jwt from '../middleware/jwt'
 import { userRoutes } from './routes'
 import { asClass } from 'awilix'
-import { UserRepository } from './repository/user.repository'
+import { UsersRepository } from './repository/users.repository'
 import { AddFavoriteBuildingService } from './service/add-favorite-building.service'
 import { DeleteFavoriteBuildingService } from './service/delete-favorite-building.service'
 import { UserBlockedAvailabilityService } from './service/user-blocked-availability.service'
 
 export const setupUserDependencies = awilixContainer => {
   awilixContainer.register({
-    usersRepository: asClass(UserRepository).classic(),
+    usersRepository: asClass(UsersRepository).classic(),
     addFavoriteBuildingService: asClass(AddFavoriteBuildingService).classic(),
     deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic(),
     userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService)

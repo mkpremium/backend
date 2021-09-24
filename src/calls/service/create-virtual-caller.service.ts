@@ -1,7 +1,7 @@
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 import { VirtualCaller, VirtualCallerProps } from '../domain/virtual-caller'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
-import { UserRepository } from '../../user/repository/user.repository'
+import { UsersRepository } from '../../user/repository/users.repository'
 
 type CreateVirtualCallerCommand = {
   phoneNumber: string,
@@ -14,7 +14,7 @@ export class CreateVirtualCallerService {
   constructor (
     private virtualCallersRepository: VirtualCallersRepository,
     private worksheetQueueRepository: WorksheetQueueRepository,
-    private usersRepository: UserRepository,
+    private usersRepository: UsersRepository,
   ) {
   }
 
