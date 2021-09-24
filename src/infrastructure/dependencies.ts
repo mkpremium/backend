@@ -13,7 +13,6 @@ import { setupEmailDependencies } from '../email/dependencies'
 import { setupCallsDependencies } from '../calls/dependencies'
 import { setupOwnerDependencies } from '../owner/dependencies'
 import { setupScheduledEventsDependencies } from '../scheduled-events/dependencies'
-import { setupOperatorDependencies } from '../operator/dependencies'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -37,7 +36,6 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
   setupHistoryDependencies(container)
   setupEmailDependencies(container)
   setupCallsDependencies(container)
-  setupOperatorDependencies(container)
 
   return container
 }

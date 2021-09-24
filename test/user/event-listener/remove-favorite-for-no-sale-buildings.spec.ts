@@ -1,8 +1,8 @@
 import { stub } from 'sinon'
-import { BuildingNegotiationStatusChanged } from '../../src/building/service/update-building-negotiation-status.service'
-import { removeFavoriteForNoSaleBuildings } from '../../src/operator/event-listener/remove-favorite-for-no-sale-buildings'
+import { BuildingNegotiationStatusChanged } from '../../../src/building/service/update-building-negotiation-status.service'
+import { removeFavoriteForNoSaleBuildings } from '../../../src/user/event-listener/remove-favorite-for-no-sale-buildings'
 import * as TE from 'fp-ts/TaskEither'
-import { userBuilder } from '../user/user.builder'
+import { userBuilder } from '../user.builder'
 import { expect } from 'chai'
 
 describe('removeFavoriteForNoSaleBuildings', () => {

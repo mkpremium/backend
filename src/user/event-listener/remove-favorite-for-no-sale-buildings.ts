@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import { User, UserProps } from '../../types/user'
-import { UsersRepository } from '../../user/repository/users.repository'
+import { UsersRepository } from '../repository/users.repository'
 
 export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRepository: UsersRepository }) {
   return async function (evt: BuildingNegotiationStatusChanged) {
