@@ -73,6 +73,7 @@ export interface UserProps {
   username: string;
   password: string;
   profile: UserProfileProps;
+  favoriteBuildings?: string[]
 }
 
 export const User = t.struct<UserProps>(
