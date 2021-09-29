@@ -9,10 +9,10 @@ import { UserBlockedAvailabilityService } from './service/user-blocked-availabil
 
 export const setupUserDependencies = awilixContainer => {
   awilixContainer.register({
-    usersRepository: asClass(UsersRepository).classic(),
-    addFavoriteBuildingService: asClass(AddFavoriteBuildingService).classic(),
-    deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic(),
-    userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService),
+    usersRepository: asClass(UsersRepository).classic().singleton(),
+    addFavoriteBuildingService: asClass(AddFavoriteBuildingService).classic().singleton(),
+    deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic().singleton(),
+    userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService).singleton(),
     removeFavoriteForNoSaleBuildings: asFunction(removeFavoriteForNoSaleBuildings).singleton()
   })
 }
