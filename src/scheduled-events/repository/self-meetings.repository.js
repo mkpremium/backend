@@ -11,9 +11,9 @@ building.metadata,
 owner.name as contactName,
 owner.person.contacts
 FROM ${bucketName} meeting
-LEFT JOIN ${bucketName} building ON building.id = meeting.event.buildingId AND building._documentType = 'building'
+LEFT JOIN ${bucketName} building ON met(building).id = meeting.event.buildingId AND building._documentType = 'building'
 
-LEFT JOIN ${bucketName} owner ON owner.id = meeting.event.owner.id AND owner._documentType = 'owner'
+LEFT JOIN ${bucketName} owner ON meta(owner).id = meeting.event.owner.id AND owner._documentType = 'owner'
 
 WHERE meeting._documentType = 'scheduled-event'
       AND meeting.type = 'MEETINGS'

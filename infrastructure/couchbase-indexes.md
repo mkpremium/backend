@@ -47,6 +47,7 @@ CREATE INDEX worksheet_building on mkpremium((`relatedBuildingIds`[0]),`id`) whe
 CREATE INDEX verified_owner_good_contact on mkpremium(`_documentType`,`buildingId`,`status`) where (((`_documentType` = "owner") and (`status` = "VERIFICADO")) and any `c` in (`person`.`contacts`) satisfies ((`c`.`status`) = "GOOD") end) WITH {"defer_build": true}
 CREATE INDEX user_scheduled_calls on mkpremium(`notifyTo`) where ((`_documentType` = "scheduled-event") and (`type` = "CALLS")) WITH {"defer_build": true}
 CREATE INDEX virtual_call_created_at on mkpremium(`createdAt`) where (`_documentType` = "virtual-agent-call") WITH {"defer_build": true}
+CREATE INDEX user_meetings ON mkpremium(notifyTo) WHERE _documentType = 'scheduled-event' AND type = 'MEETINGS' WITH {"defer_build": true}
 ```
 
 
@@ -108,5 +109,6 @@ worksheet_building,
 verified_owner_good_contact,
 user_scheduled_calls,
 virtual_call_created_at,
-last_call_to_number
+last_call_to_number,
+user_meetings
 )
