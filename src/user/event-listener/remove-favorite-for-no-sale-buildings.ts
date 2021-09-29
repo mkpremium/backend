@@ -6,7 +6,7 @@ import { User, UserProps } from '../../types/user'
 import { UsersRepository } from '../repository/users.repository'
 
 export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRepository: UsersRepository }) {
-  return async function (evt: BuildingNegotiationStatusChanged) {
+  return async function removeFavorite(evt: BuildingNegotiationStatusChanged) {
     if (evt.negotiationStatus !== 'NO VENDE') {
       return
     }
@@ -14,7 +14,7 @@ export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRe
       usersRepository.withFavoriteBuilding(evt.buildingId),
       TE.chain((user) => {
         if (!user) {
-          return
+          return TE.of(undefined)
         }
         const updatedUser = removeFavoriteBuilding(user, evt.buildingId)
         return fromPromise(usersRepository.save(updatedUser))
