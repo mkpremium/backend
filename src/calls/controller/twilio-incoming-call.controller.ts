@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express'
 import { IncomingCallProcessor } from '../service/incoming-call.processor'
-import { isRight } from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import { Logger } from 'winston'
 import { pipe } from 'fp-ts/lib/function'
