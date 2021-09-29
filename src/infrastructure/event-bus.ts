@@ -38,18 +38,19 @@ export class EventBus {
         try {
           subscriber(event)
             .catch(error => {
-              this.logSubscriberError(event, eventName, error)
+              this.logSubscriberError(event, eventName, error, subscriber)
             })
         } catch (error) {
-          this.logSubscriberError(event, eventName, error)
+          this.logSubscriberError(event, eventName, error, subscriber)
         }
       })
   }
 
-  private logSubscriberError (event, eventName, error) {
+  private logSubscriberError (event, eventName, error, subscriber) {
     this.logger.crit('error processing event', {
       event,
       eventName,
+      subscriber: subscriber.name || subscriber.toString(),
       error: {
         message: error.message ? error.message : error.toString(),
         stack: error.stack ? error.stack : undefined
