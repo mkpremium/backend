@@ -49,7 +49,7 @@ LEFT JOIN ${bucketName} lastEventFlipper ON
     AND meta(lastEventFlipper).id = lastEvent.notifyTo
 LEFT NEST ${bucketName} scheduledCalls ON scheduledCalls._documentType = 'scheduled-event'
     AND scheduledCalls.type = 'CALLS'
-    AND scheduledCalls.event.ownerId = meta(owner).id
+    AND scheduledCalls.event.buildingId = meta(building).id
 
 WHERE owner._documentType = 'owner'
 AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 AND c.status != 'BAD' END
