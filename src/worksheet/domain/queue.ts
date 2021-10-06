@@ -56,14 +56,6 @@ export const WorksheetQueue = t.struct<WorksheetQueueProps>(
   }
 )
 
-/**
- * @param id
- * @returns {QueueItem}
- */
-WorksheetQueue.prototype.findItemById = function (id) {
-  return _find(this.worksheets, { id })
-}
-
 WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
   return _find(this.worksheets, { worksheetId })
 }
