@@ -2,6 +2,7 @@ import { ScheduledEventsRepository } from '../repository/schedule-events.reposit
 import { LegacyWorksheetQueueRepository } from '../../worksheet/models/queue-repository'
 import { EventBus } from '../../infrastructure/event-bus'
 import { ScheduledEventProps } from '../types'
+import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 
 export interface ScheduleCallCommand {
   event: ScheduledEventProps & { note: string },
@@ -13,11 +14,14 @@ export class ScheduleCallService {
   constructor (
     private scheduledEventsRepository: ScheduledEventsRepository,
     private legacyWorksheetQueueRepository: LegacyWorksheetQueueRepository,
+    private worksheetRepository: WorksheetRepository,
     private eventBus: EventBus,
   ) {
   }
 
   async scheduleCall (cmd: ScheduleCallCommand) {
+    const worksheet = await this.worksheetRepository.ofBuildingId(cmd.event.event.buildingId)
+    cmd.event.event.worksheetId = worksheet.id
     const scheduledEvent = await this.scheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)
 
     const queue = await this.legacyWorksheetQueueRepository.findByIdOrThrow(cmd.queueId)
