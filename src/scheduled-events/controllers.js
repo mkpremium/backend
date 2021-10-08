@@ -18,7 +18,7 @@ async function findByIdScheduledEvent (req, res) {
 async function updateScheduledEvent (req, res) {
   const id = req.params.id
   const repo = new ScheduledEventsRepository()
-  await repo.update(id, req.body)
+  await repo.update(id, { ...req.body, createdBy: req.user.id })
   res.status(204).send()
 }
 

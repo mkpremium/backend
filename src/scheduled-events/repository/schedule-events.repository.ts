@@ -14,7 +14,8 @@ import { Event, ScheduledEvent, ScheduledEventProps } from '../types'
 
 const UpdateScheduledEvent = t.struct({
   eventDate: t.maybe(t.Date),
-  event: t.maybe(Event)
+  event: t.maybe(Event),
+  createdBy: t.String,
 }, 'UpdateScheduledEvent')
 
 export class ScheduledEventsRepository extends CouchbaseModel {
@@ -67,7 +68,8 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     const updatedScheduledEventData = t.update(scheduledEvent, {
       $merge: {
         eventDate: data.eventDate,
-        event: updatedEvent
+        createdBy: data.createdBy,
+        event: updatedEvent,
       }
     })
 
