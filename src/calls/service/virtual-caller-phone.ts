@@ -130,6 +130,8 @@ export class VirtualCallerPhone {
           }))
         throw new Error(`Virtual caller phone is busy (${phoneNumber})`)
       }
+
+      phone.lastLockAcquiredAt = new Date()
       return {phone, cas}
     }).catch(error => {
       error.context = lockingPhoneErrorContext

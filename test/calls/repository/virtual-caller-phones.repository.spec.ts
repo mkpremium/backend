@@ -17,11 +17,8 @@ describe('VirtualCallerPhonesRepository', () => {
   })
 
   it('locks and unlocks virtual caller phone', async () => {
-    const before = new Date()
     const lockedPhone = await repository.lockPhone(testPhoneNumber)
-    const after = new Date()
 
-    await expect(lockedPhone.phone.lastLockAcquiredAt).to.be.within(before, after)
     await expect(repository.lockPhone(testPhoneNumber)).to.be.rejected
 
     await expect(repository.unlockPhone(testPhoneNumber, lockedPhone.cas)).to.be.fulfilled
