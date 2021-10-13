@@ -26,7 +26,7 @@ export class ChangeContactStatusService {
   }
 
   async change ({ ownerId, contactId, status }, user): Promise<OwnerProps> {
-    const contextModel = { _documentType: 'owner-contact', contactId }
+    const contextModel = { _documentType: 'owner-contact', modelId: contactId }
 
     const owner = await this.ownersRepository.get(ownerId) as OwnerProps
     const updatedOwner = await this.ownersRepository.save(changeContactStatus(owner, contactId, status)) as OwnerProps
