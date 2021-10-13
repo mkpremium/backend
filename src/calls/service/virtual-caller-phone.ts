@@ -10,7 +10,7 @@ import moment from 'moment'
 import { ContactProps } from '../../owner/owner'
 import { Logger } from 'winston'
 import { LockedPhone, VirtualCallerPhonesRepository } from '../repository/virtual-caller-phones.repository'
-import { phoneBusy } from '../domain/caller.phone'
+import { CallerPhone, phoneBusy } from '../domain/caller.phone'
 import { FullAddress } from './full-address'
 import { NumberAlreadyCalled } from './number-already-called'
 import { GatherOwnerInterestMessageComposer } from './gather-owner-interest-message-composer'
@@ -131,8 +131,13 @@ export class VirtualCallerPhone {
         throw new Error(`Virtual caller phone is busy (${phoneNumber})`)
       }
 
-      phone.lastLockAcquiredAt = new Date()
-      return {phone, cas}
+      return {
+        phone: CallerPhone.update(phone as any, {
+          lastLockAcquiredAt: {
+            $set: new Date()
+          }
+        }), cas
+      }
     }).catch(error => {
       error.context = lockingPhoneErrorContext
       throw error
