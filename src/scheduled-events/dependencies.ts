@@ -17,6 +17,7 @@ import { scheduledCallFromOwnerMessage } from './listeners/scheduled-call-from-o
 import { removeCallsOnNewMeetingOrOfferRequest } from './listeners/remove-calls-on-new-meeting-or-offer-request'
 import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled-calls-on-owner-refusal'
 import { removeScheduledCallOnDiscardedContact } from './listeners/remove-scheduled-call-on-discarded-contact'
+import { updateScheduledCallController } from './controller/update-schedule-call.controller'
 
 export function setupScheduledEventsDependencies (container: AwilixContainer) {
   container.register({
@@ -32,6 +33,7 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
     scheduleCall: asClass(ScheduleCallService).classic().singleton(),
 
     addScheduledCallController: asFunction(createAddScheduledCallController).singleton(),
+    updateScheduledCallController: asFunction(updateScheduledCallController).singleton(),
     addMeetingController: asFunction(createAddScheduledMeetingEventController).singleton(),
     getUserScheduledCallsController: asFunction(createGetUserScheduledCallsController).singleton(),
     deleteScheduledEventController: asFunction(createDeleteScheduledEventController).singleton(),
