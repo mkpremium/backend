@@ -5,9 +5,18 @@ import { ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 
 export interface ScheduleCallCommand {
-  event: ScheduledEventProps & { note: string },
-  userId: string,
+  event: ScheduledEventProps & { note: string }
+  userId: string
   queueId: string
+}
+
+export interface CallScheduled {
+  name: 'scheduled_events.call_scheduled'
+  userId: string
+  ownerId: string
+  contactId: string
+  buildingId: string
+  note: string
 }
 
 export class ScheduleCallService {
@@ -31,9 +40,10 @@ export class ScheduleCallService {
       name: 'scheduled_events.call_scheduled',
       userId: cmd.userId,
       ownerId: cmd.event.event.ownerId,
+      contactId: cmd.event.event.contactId,
       buildingId: cmd.event.event.buildingId,
       note: cmd.event.note
-    })
+    } as CallScheduled)
 
     return scheduledEvent
   }
