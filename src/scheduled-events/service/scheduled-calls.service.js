@@ -58,9 +58,12 @@ se.eventDate,
 {owner.id, owner.featuredContact, owner.person} owner
 
 FROM ${bucketName} se
-JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet' AND worksheet.id = se.event.worksheetId
-JOIN ${bucketName} building ON building._documentType = 'building' AND building.id = worksheet.relatedBuildingIds[0]
-JOIN ${bucketName} owner ON owner._documentType = 'owner' AND owner.id = se.event.ownerId
+JOIN ${bucketName} worksheet ON worksheet._documentType = 'worksheet'
+    AND meta(worksheet).id = se.event.worksheetId
+JOIN ${bucketName} building ON building._documentType = 'building'
+    AND meta(building).id = worksheet.relatedBuildingIds[0]
+JOIN ${bucketName} owner ON owner._documentType = 'owner'
+    AND meta(owner).id = se.event.ownerId
 
 WHERE se._documentType = 'scheduled-event' AND se.type = 'CALLS'
 AND se.notifyTo = $1
