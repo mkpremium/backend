@@ -1,7 +1,7 @@
 import { stub } from 'sinon'
 import { expect } from 'chai'
 import { RequestHandler } from '../../../src/infrastructure/request-handler'
-import { listLeadsController } from '../../../src/calls/controller/list-leads.controller'
+import { listLeadsController } from '../../../src/flipper/controller/list-leads.controller'
 
 describe('listLeadsController', () => {
   let controller: RequestHandler
