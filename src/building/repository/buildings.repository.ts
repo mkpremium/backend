@@ -1,5 +1,5 @@
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { Building } from '../building'
+import { Building, BuildingProps } from '../building'
 
 const setBuildingFeaturedOwner = bucketName => `
 UPDATE ${bucketName} building
@@ -19,7 +19,7 @@ UNSET building.assignedAgentId, building.negotiationStatus, building.lead
 WHERE building._documentType = 'building' AND building.id IN $1
 `
 
-export class BuildingsRepository extends CouchbaseRepository {
+export class BuildingsRepository extends CouchbaseRepository<BuildingProps> {
   async setBuildingFeaturedOwner (buildingId, ownerId) {
     await this.couchbaseAdapter.queryAsync(
       setBuildingFeaturedOwner(this.bucketName),

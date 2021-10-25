@@ -1,6 +1,6 @@
 import { EventBus } from '../../infrastructure/event-bus'
 import { BuildingsRepository } from '../repository/buildings.repository'
-import { BuildingNegotiationStatus } from '../building'
+import { BuildingNegotiationStatus, changeNegotiationStatus, withFeaturedOwner } from '../building'
 
 export interface BuildingNegotiationStatusChanged {
   name: 'building.negotiation-status-changed';
@@ -27,10 +27,12 @@ export class UpdateBuildingNegotiationStatusService {
     userId,
     sourceOwnerId
   }: UpdateBuildingNegotiationStatusCommand) {
-    const building = await this.buildingsRepository.get(buildingId)
-    let updatedBuilding = building.changeNegotiationStatus(status)
+    let updatedBuilding = changeNegotiationStatus(
+      await this.buildingsRepository.get(buildingId),
+      status
+    )
     if (sourceOwnerId) {
-      updatedBuilding = updatedBuilding.withFeaturedOwner(sourceOwnerId)
+      updatedBuilding = withFeaturedOwner(updatedBuilding, sourceOwnerId)
     }
 
     await this.buildingsRepository.save(updatedBuilding)

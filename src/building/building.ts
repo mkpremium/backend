@@ -271,24 +271,24 @@ export const Building = t.struct<BuildingProps>(
   }
 )
 
-Building.prototype.changeNegotiationStatus = function (newStatus) {
-  return Building.update(this, {
+export function changeNegotiationStatus(building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
+  return Building.update(building, {
     negotiationStatus: {
       $set: newStatus
     }
   })
 }
 
-Building.prototype.withTotalExpensesAmount = function (totalAmount) {
-  return Building.update(this, {
+export function withTotalExpensesAmount(building: BuildingProps, totalAmount: number): BuildingProps {
+  return Building.update(building, {
     totalExpensesAmount: {
       $set: totalAmount
     }
   })
 }
 
-Building.prototype.withFeaturedOwner = function (ownerId) {
-  return Building.update(this, {
+export function withFeaturedOwner(building: BuildingProps, ownerId: string): BuildingProps {
+  return Building.update(building, {
     ownerId: {
       $set: ownerId
     }
