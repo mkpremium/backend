@@ -145,6 +145,7 @@ export const BuildingMetadataPreview = t.struct({
 })
 
 export const buildingNegotiationStatus = [
+  'LEAD',
   'PENDIENTE',
   'PROPOSAL_SCHEDULED',
   'PROPUESTA ENVIADA',
@@ -152,7 +153,7 @@ export const buildingNegotiationStatus = [
   'VENDIDO',
   'NO VENDE',
   'DESCARTADO',
-  'YA VENDIO'
+  'YA VENDIO',
 ]
 
 export const NegotiationStatus = t.enums.of(buildingNegotiationStatus)
@@ -172,7 +173,8 @@ export interface BuildingAddressProps {
 }
 
 export type BuildingNegotiationStatus =
-  'PENDIENTE'
+  'LEAD'
+  | 'PENDIENTE'
   | 'PROPOSAL_SCHEDULED'
   | 'PROPUESTA ENVIADA'
   | 'COMPRADO'
