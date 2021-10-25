@@ -9,7 +9,6 @@ import cadastre from './cadastre'
 import { setupCallerRoutes } from './caller/init'
 
 import email from './email'
-import { initFlipperModule } from './flipper/init'
 import history from './history'
 import { createDiContainer } from './infrastructure/dependencies'
 import appErrorHandler from './infrastructure/error-handler'
@@ -37,6 +36,7 @@ import { ownerEventListeners } from './owner/listeners'
 import { scheduledEventsRoutes } from './scheduled-events/routing'
 import { scheduledEventsEventListeners } from './scheduled-events/event-listeners'
 import { userEventListeners } from './user/listeners'
+import { flipperRoutes } from './flipper/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -85,8 +85,8 @@ export const createApp = (): Promise<Express> => {
       worksheetsRoutes(app, diContainer)
       createTestHarness(app, diContainer)
       initPropertyManager(app, diContainer)
-      initFlipperModule(app, diContainer)
       setupCallerRoutes(app, diContainer)
+      flipperRoutes(app, diContainer)
       setupStockRouter(app, diContainer)
 
       stats(app, diContainer)
