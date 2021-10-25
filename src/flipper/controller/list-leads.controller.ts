@@ -16,8 +16,12 @@ export function listLeadsController ({ flipperLeadsService, logger }: Deps): Req
       flipperLeadsService.leadsFor({ flipperId }),
       TE.match(
         error => {
-          res.status(500).json({ message: error.message })
-          logger.error('Twilio call processo failed', {
+          res.status(500).json({
+            error: {
+              message: error.message
+            }
+          })
+          logger.error('Could not list flipper leads', {
             flipperId,
             error: { message: error.message, stack: error.stack }
           })
