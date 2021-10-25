@@ -1,6 +1,7 @@
 import * as TE from 'fp-ts/TaskEither'
 
 export interface LeadsForCommand {
+  flipperId: string,
 }
 
 interface Lead {
