@@ -1,15 +1,18 @@
 import t from 'tcomb'
-import { NegotiationStatus } from '../../building/building'
+import { BuildingProps, NegotiationStatus } from '../../building/building'
 import { TypedContactInfo } from '../../owner/contact'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
+import { CouchbaseAdapter } from '../../db/couchbase.adapter'
+import { ContactProps } from '../../owner/owner'
 
 export class ScheduledCallsService {
-  constructor (couchbaseAdapter) {
-    this.couchbaseAdapter = couchbaseAdapter
+  constructor (
+    private couchbaseAdapter: CouchbaseAdapter,
+  ) {
   }
 
-  scheduledCallsFor (userId) {
+  scheduledCallsFor (userId): Promise<ScheduledCallProps[]> {
     return this.couchbaseAdapter.queryAsync(
       scheduledCallsForQuery(this.couchbaseAdapter.bucketName),
       [ userId ]
@@ -68,6 +71,23 @@ JOIN ${bucketName} owner ON owner._documentType = 'owner'
 WHERE se._documentType = 'scheduled-event' AND se.type = 'CALLS'
 AND se.notifyTo = $1
 `
+
+interface ScheduledCallProps {
+  createdBy: string
+  eventDate: Date
+  event: {
+    worksheetId: string
+    contactId: string
+    owner: {
+      id: string
+      building: BuildingProps
+      person: {
+        name: string,
+        contacts: ContactProps[]
+      }
+    }
+  }
+}
 
 const ScheduledCallsView = t.struct({
   id: t.String,

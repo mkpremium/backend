@@ -241,11 +241,10 @@ export interface ContactProps {
 }
 
 export interface PersonProps {
-  id: string;
   name: string;
-  firstName: string,
-  firstSurname: string,
-  secondSurname: string,
+  firstName?: string,
+  firstSurname?: string,
+  secondSurname?: string,
 
   contacts: ContactProps[],
 }
