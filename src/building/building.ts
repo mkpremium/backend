@@ -196,6 +196,12 @@ export interface BuildingProps {
   };
   ownerId?: string;
   negotiationStatus: BuildingNegotiationStatus;
+  lead?: {
+    worksheetId: string
+    ownerId: string
+    contactId: string
+    capturedAt: Date
+  }
   assignedAgentId?: string;
   use?: string;
   recentProposal?: any
@@ -223,6 +229,12 @@ export const Building = t.struct<BuildingProps>(
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),
     negotiationStatus: NegotiationStatus,
+    lead: t.maybe(t.struct({
+      worksheetId: t.String,
+      ownerId: t.String,
+      contactId: t.String,
+      capturedAt: t.union([ t.Date, DateTimeString ])
+    })),
     assignedAgentId: t.maybe(t.String),
     salePrice: t.maybe(t.Number),
     totalExpensesAmount: t.maybe(t.Number),

@@ -15,7 +15,7 @@ WHERE building._documentType = 'building' AND building.id = $1
 
 const pullBuildingOutOfFreezerQuery = bucketName => `
 UPDATE ${bucketName} building
-UNSET building.assignedAgentId, building.negotiationStatus
+UNSET building.assignedAgentId, building.negotiationStatus, building.lead
 WHERE building._documentType = 'building' AND building.id IN $1
 `
 
