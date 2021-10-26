@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import moment from 'moment'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
-import { BuildingAddressProps, BuildingProps } from '../building'
+import { BuildingAddressProps, BuildingNegotiationStatus, BuildingProps } from '../building'
 import { ContactProps } from '../../owner/owner'
+import * as TE from 'fp-ts/TaskEither'
 
 const listBuildingsByIdQuery = bucketName => `
 SELECT
@@ -69,7 +70,7 @@ interface StockTransaction {
   transactionDate: Date | string
 }
 
-interface BuildingReadModel extends Omit<BuildingProps, 'address'> {
+export interface BuildingReadModel extends Omit<BuildingProps, 'address'> {
   readonly address: Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> & {
     postalCode: {
       number: number | string
@@ -141,6 +142,10 @@ export class BuildingsReadRepository {
       listProposalsForBuildingIdQuery(this.couchbaseAdapter.bucketName),
       [ buildingId ]
     )
+  }
+
+  assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]> {
+    throw new Error('not implemented')
   }
 
   private allAssignedBuildingsId (agentId): Promise<string[]> {
