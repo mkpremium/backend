@@ -56,7 +56,8 @@ se.eventDate,
     building.recentProposal,
     building.\`use\`,
     building.metadata,
-    building.cadastre
+    building.cadastre,
+    building.lead
 } building,
 {owner.id, owner.featuredContact, owner.person} owner
 
