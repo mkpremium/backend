@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import moment from 'moment'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
+import { BuildingAddressProps, BuildingProps } from '../building'
+import { ContactProps } from '../../owner/owner'
 
 const listBuildingsByIdQuery = bucketName => `
 SELECT
@@ -43,39 +45,93 @@ AND building.id IN $1
 `
 
 const listProposalsForBuildingIdQuery = bucketName => `
-SELECT
-id,
-proposal,
-createdAt,
-updatedAt,
-aspiration
-FROM ${bucketName}
-WHERE _documentType = 'building-proposal'
-AND buildingId = $1
+    SELECT id,
+           proposal,
+           createdAt,
+           updatedAt,
+           aspiration
+    FROM ${bucketName}
+    WHERE _documentType = 'building-proposal'
+      AND buildingId = $1
 `
 
 const assignedBuildingsIdForAgentQuery = bucketName => `
-SELECT
-    id buildingId
-FROM ${bucketName}
-WHERE _documentType = 'building'
-    AND assignedAgentId = $1
+    SELECT id buildingId
+    FROM ${bucketName}
+    WHERE _documentType = 'building'
+      AND assignedAgentId = $1
 `
 
+interface StockTransaction {
+  reservationAmount: number
+  reservationDate: Date | string
+  transactionAmount: number
+  transactionDate: Date | string
+}
+
+interface BuildingView extends Omit<BuildingProps, 'address'> {
+  readonly address: Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> & {
+    postalCode: {
+      number: number | string
+    }
+  }
+  readonly cadastreReference?: string
+  readonly geolocation?: {
+    latitude?: number
+    longitude?: number
+  }
+  readonly metadata: {
+    id: string
+    mimeType: string
+    thumbnailUrl: string
+  }[]
+  readonly stock: {
+    purchase: StockTransaction
+    sell: StockTransaction
+    close: {
+      transactionDate: Date | string
+      gain: number
+    }
+  }
+  readonly owner?: {
+    id: string
+    firstName: string
+    name: string
+    contacts: ContactProps[],
+    featuredContact?: {
+      phoneId?: string;
+      emailId?: string;
+    }
+  }
+  readonly latestProposal?: {
+    amount: number
+    createdAt: Date | string
+    notificationStatus?: 'PENDING' | 'SENT'
+    notificationSentAt?: Date | string
+  }
+  readonly usage?: string
+  readonly lastMeeting?: {
+    dateMeeting: Date | string
+    inPerson: boolean
+  }
+  readonly salePrice?: number
+  readonly totalExpensesAmount?: number
+}
+
 export class CommercialsBuildingRepository {
-  constructor(
+  constructor (
     private couchbaseAdapter: CouchbaseAdapter
   ) {
   }
 
-  listById (ids) {
+  listById (ids): Promise<BuildingView[]> {
     return this.couchbaseAdapter.queryAsync(
       listBuildingsByIdQuery(this.couchbaseAdapter.bucketName),
       [ ids ]
     ).then(CommercialsBuildingRepository.mapToPropertyAgentBuildingView)
   }
 
-  listAssignedToPropertyAgentOfId (agentId) {
+  listAssignedToPropertyAgentOfId (agentId): Promise<BuildingView[]> {
     return this.allAssignedBuildingsId(agentId)
       .then(buildingsId => this.listById(buildingsId))
   }
@@ -87,25 +143,25 @@ export class CommercialsBuildingRepository {
     )
   }
 
-  allAssignedBuildingsId (agentId) {
+  private allAssignedBuildingsId (agentId): Promise<string[]> {
     return this.couchbaseAdapter
       .queryAsync(assignedBuildingsIdForAgentQuery(this.couchbaseAdapter.bucketName), [ agentId ])
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 
-  static mapToPropertyAgentBuildingView (buildings) {
+  static mapToPropertyAgentBuildingView (buildings): BuildingView[] {
     return buildings.map(
       ({
-        id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
-        ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount
-      }) => {
+         id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
+         ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount
+       }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
         const featuredOwner = CommercialsBuildingRepository.getOwner(ownerId, lastMeeting, owners)
         const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
-        return ({
+        return {
           id,
           metadata: metadata.map(({ id, mimeType, previewUrl }) => ({
             id,
@@ -163,7 +219,7 @@ export class CommercialsBuildingRepository {
           }) || undefined,
           salePrice: salePrice || undefined,
           totalExpensesAmount: totalExpensesAmount || undefined
-        })
+        } as BuildingView
       }
     )
   }
