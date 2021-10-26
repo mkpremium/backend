@@ -9,6 +9,7 @@ export interface RecordLeadCommand {
   worksheetId: string
   ownerId: string
   contactId: string
+  toFlipperId: string
 }
 
 export class LeadRecorderService {
@@ -26,11 +27,12 @@ export class LeadRecorderService {
             return TE.of(constVoid)
           }
 
-          return fromPromise(this.buildingsRepository.save(withCapturedLead(building, {
+          const lead = withCapturedLead(building, cmd.toFlipperId, {
             ownerId: cmd.ownerId,
             contactId: cmd.contactId,
             worksheetId: cmd.worksheetId,
-          })))
+          })
+          return fromPromise(this.buildingsRepository.save(lead))
         }
       )
     )

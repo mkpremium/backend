@@ -13,7 +13,8 @@ describe('LeadRecorderService', () => {
     buildingId: 'test-building-id',
     contactId: 'test-contact-id',
     ownerId: 'test-owner-id',
-    worksheetId: 'test-worksheet-id'
+    worksheetId: 'test-worksheet-id',
+    toFlipperId: 'test-flipper-id',
   }
 
   beforeEach(() => {

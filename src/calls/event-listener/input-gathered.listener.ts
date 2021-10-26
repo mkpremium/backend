@@ -5,12 +5,14 @@ import { Logger } from 'winston'
 import { pipe } from 'fp-ts/function'
 import { isRight } from 'fp-ts/Either'
 import { LeadRecorderService } from '../../building/service/lead-recorder.service'
+import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 
 interface Deps {
   leadRecorder: LeadRecorderService
   updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService
   changeContactStatusService: ChangeContactStatusService
   logger: Pick<Logger, 'info'>
+  virtualCallersRepository: VirtualCallersRepository
 }
 
 export const createInputGatheredListener = ({
@@ -18,15 +20,19 @@ export const createInputGatheredListener = ({
                                               updateBuildingNegotiationStatusService,
                                               changeContactStatusService,
                                               logger,
+                                              virtualCallersRepository,
                                             }: Deps) => async (evt: InputGathered) => {
   switch (evt.ownerResponse) {
     case OwnerResponse.SALE:
+      const virtualCaller = await virtualCallersRepository.get(evt.callerId)
+
       const result = await pipe(
         leadRecorder.recordLead({
           buildingId: evt.buildingId,
           worksheetId: evt.worksheetId,
           ownerId: evt.ownerId,
           contactId: evt.contactId,
+          toFlipperId: virtualCaller.assignCallsTo,
         })
       )()
       if (!isRight(result)) {

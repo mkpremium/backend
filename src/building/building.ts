@@ -297,10 +297,17 @@ export function withFeaturedOwner (building: BuildingProps, ownerId: string): Bu
   })
 }
 
-export function withCapturedLead (building: BuildingProps, lead: Omit<Lead, 'capturedAt'>): BuildingProps {
+export function withCapturedLead (
+  building: BuildingProps,
+  assignToFlipperId: string,
+  lead: Omit<Lead, 'capturedAt'>
+): BuildingProps {
   return Building.update(building, {
+    assignedFlipperId: {
+      $set: assignToFlipperId,
+    },
     lead: {
       $set: { ...lead, capturedAt: new Date() },
-    }
+    },
   })
 }

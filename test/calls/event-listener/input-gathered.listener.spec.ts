@@ -4,10 +4,12 @@ import { stub } from 'sinon'
 import { expect } from 'chai'
 import * as TE from 'fp-ts/TaskEither'
 import { constVoid } from 'fp-ts/function'
+import { virtualCallerBuilder } from '../virtual-caller.builder'
 
 describe('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
   let leadRecorderServiceStub
+  let virtualCallersRepositoryStub
   let updateBuildingNegotiationStatusStub
   let changeContactStatusServiceStub
 
@@ -24,8 +26,17 @@ describe('input-gathered.listener', () => {
     ownerId: 'test-owner-id',
     worksheetId: 'test-worksheet-id',
   }
+  const testVirtualCaller = virtualCallerBuilder({
+    id: testVirtualCallerId,
+    assignCallsTo: testAssignedCallerId,
+    queueId: testVirtualCallerQueueId
+  }).build()
 
   beforeEach(() => {
+    virtualCallersRepositoryStub = {
+      get: stub(),
+    }
+    virtualCallersRepositoryStub.get.withArgs(testEvent.callerId).resolves(testVirtualCaller)
     leadRecorderServiceStub = {
       recordLead: stub(),
     }
@@ -38,6 +49,7 @@ describe('input-gathered.listener', () => {
 
     listener = createInputGatheredListener({
       leadRecorder: leadRecorderServiceStub,
+      virtualCallersRepository: virtualCallersRepositoryStub,
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
       changeContactStatusService: changeContactStatusServiceStub,
       logger: { info: () => undefined },
@@ -54,6 +66,7 @@ describe('input-gathered.listener', () => {
       contactId: testEvent.contactId,
       worksheetId: testEvent.worksheetId,
       ownerId: testEvent.ownerId,
+      toFlipperId: testVirtualCaller.assignCallsTo,
     })
   })
 
