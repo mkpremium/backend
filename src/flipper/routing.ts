@@ -10,7 +10,6 @@ export function flipperRoutes (app, container) {
 function createRouter (container) {
   const router = Router()
   router.get('/:flipperId/blocked-availability', wrap(container.resolve('flipperBlockedAvailabilityController')))
-  router.get('/:flipperId/leads', wrap(container.resolve('listLeadsController')))
   router.put('/:flipperId/max-line', permissions.admin, wrap(container.resolve('setFlipperMaxLineController')))
 
   return router
