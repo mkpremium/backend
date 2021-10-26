@@ -37,6 +37,7 @@ import { PdfProposalComposer } from './service/pdf-proposal-composer'
 import { createListBuildingsController } from './controller/list-buildings.controller'
 import { createProposalScheduledListener } from './event-listener/proposal-added.listener'
 import { addSmsNoteListener } from './event-listener/add-sms-note.listener'
+import { LeadRecorderService } from './service/lead-recorder.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -58,6 +59,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
     buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
+    leadRecorder: asClass(LeadRecorderService).singleton().classic(),
 
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
