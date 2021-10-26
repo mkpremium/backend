@@ -21,7 +21,7 @@ describe('OfferRequestsRepository', () => {
     ownersRepository = container.resolve('ownersRepository')
     worksheetRepository = container.resolve('worksheetRepository')
     repository = container.resolve('offerRequestsRepository')
-    flipperNegotiationsRepository = container.resolve('commercialsBuildingRepository')
+    flipperNegotiationsRepository = container.resolve('buildingsReadRepository')
   })
 
   it('adds offer request to flipper negotiations', () => {

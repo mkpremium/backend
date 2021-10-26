@@ -12,7 +12,7 @@ import { metadataS3Config } from '../../config'
 import { BuildingsRepository } from './repository/buildings.repository'
 import { LegacyBuildingRepository } from './models'
 import { MetadataRepository } from './repository/metadata.repository'
-import { CommercialsBuildingRepository } from './repository/commercials-building.repository'
+import { BuildingsReadRepository } from './repository/buildings-read.repository'
 import { AdminBuildingRepository } from './repository/admin-building.repository'
 import { BuildingDocumentsRepository } from './repository/building-documents.repository'
 import { BuildingNotesRepository } from './repository/building-notes.repository'
@@ -62,7 +62,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     legacyMetadataRepository: asClass(MetadataRepository).singleton(),
-    commercialsBuildingRepository: asClass(CommercialsBuildingRepository).classic().singleton(),
+    buildingsReadRepository: asClass(BuildingsReadRepository).classic().singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),

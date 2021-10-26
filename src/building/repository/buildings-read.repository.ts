@@ -69,7 +69,7 @@ interface StockTransaction {
   transactionDate: Date | string
 }
 
-interface BuildingView extends Omit<BuildingProps, 'address'> {
+interface BuildingReadModel extends Omit<BuildingProps, 'address'> {
   readonly address: Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> & {
     postalCode: {
       number: number | string
@@ -118,20 +118,20 @@ interface BuildingView extends Omit<BuildingProps, 'address'> {
   readonly totalExpensesAmount?: number
 }
 
-export class CommercialsBuildingRepository {
+export class BuildingsReadRepository {
   constructor (
     private couchbaseAdapter: CouchbaseAdapter
   ) {
   }
 
-  listById (ids): Promise<BuildingView[]> {
+  listById (ids): Promise<BuildingReadModel[]> {
     return this.couchbaseAdapter.queryAsync(
       listBuildingsByIdQuery(this.couchbaseAdapter.bucketName),
       [ ids ]
-    ).then(CommercialsBuildingRepository.mapToPropertyAgentBuildingView)
+    ).then(BuildingsReadRepository.mapToPropertyAgentBuildingView)
   }
 
-  listAssignedToPropertyAgentOfId (agentId): Promise<BuildingView[]> {
+  listAssignedToPropertyAgentOfId (agentId): Promise<BuildingReadModel[]> {
     return this.allAssignedBuildingsId(agentId)
       .then(buildingsId => this.listById(buildingsId))
   }
@@ -149,7 +149,7 @@ export class CommercialsBuildingRepository {
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 
-  static mapToPropertyAgentBuildingView (buildings): BuildingView[] {
+  static mapToPropertyAgentBuildingView (buildings): BuildingReadModel[] {
     return buildings.map(
       ({
          id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
@@ -158,7 +158,7 @@ export class CommercialsBuildingRepository {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-        const featuredOwner = CommercialsBuildingRepository.getOwner(ownerId, lastMeeting, owners)
+        const featuredOwner = BuildingsReadRepository.getOwner(ownerId, lastMeeting, owners)
         const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
         return {
@@ -219,7 +219,7 @@ export class CommercialsBuildingRepository {
           }) || undefined,
           salePrice: salePrice || undefined,
           totalExpensesAmount: totalExpensesAmount || undefined
-        } as BuildingView
+        } as BuildingReadModel
       }
     )
   }
@@ -232,7 +232,7 @@ export class CommercialsBuildingRepository {
     const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
 
     return this.ownerOfId(validatedOwners, featuredOwnerId) ||
-      CommercialsBuildingRepository.ownerOfId(validatedOwners, lastMeetingOwnerId) || validatedOwners[ 0 ]
+      BuildingsReadRepository.ownerOfId(validatedOwners, lastMeetingOwnerId) || validatedOwners[ 0 ]
   }
 
   static ownerOfId (validatedOwners, ownerId) {

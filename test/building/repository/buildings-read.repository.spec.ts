@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import { CommercialsBuildingRepository } from '../../../src/building/repository/commercials-building.repository'
+import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
 
-describe('CommercialsBuildingRepository', () => {
+describe('BuildingsReadRepository', () => {
   describe('mapToPropertyAgentBuildingView', () => {
     it('parses featured owner', () => {
-      const result = CommercialsBuildingRepository.mapToPropertyAgentBuildingView([
+      const result = BuildingsReadRepository.mapToPropertyAgentBuildingView([
         {
           address: {
             city: 'BARCELONA',
@@ -119,7 +119,7 @@ describe('CommercialsBuildingRepository', () => {
   })
 
   it('parses owner contacts', () => {
-    const result = CommercialsBuildingRepository.mapToPropertyAgentBuildingView([
+    const result = BuildingsReadRepository.mapToPropertyAgentBuildingView([
       {
         address: {
           city: 'MADRID',
@@ -210,12 +210,12 @@ describe('getOwner', () => {
   const testMeeting = {}
 
   it('returns nothing when no owners are provided', () => {
-    expect(CommercialsBuildingRepository.getOwner(testFeaturedOwnerId, testMeeting, undefined))
+    expect(BuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, undefined))
       .to.be.undefined
   })
 
   it('returns nothing when there is no owner with some contact validated', () => {
-    expect(CommercialsBuildingRepository.getOwner(testFeaturedOwnerId, testMeeting, [ {
+    expect(BuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, [ {
       contacts: []
     }])).to.be.undefined
   })
