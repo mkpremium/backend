@@ -34,4 +34,18 @@ describe('LeadRecorderService', () => {
       orFail(),
     )()
   })
+
+  it('does not record lead for building with existing lead', () => {
+    buildingsRepositoryStub.get.resolves(buildingBuilder({
+      lead: { capturedAt: new Date(), contactId: '', ownerId: '', worksheetId: '' }
+    }).build())
+
+    return pipe(
+      service.recordLead(testCmd),
+      map(() => {
+        expect(buildingsRepositoryStub.save).to.not.have.been.called
+      }),
+      orFail(),
+    )()
+  })
 })

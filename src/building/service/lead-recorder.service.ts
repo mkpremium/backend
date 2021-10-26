@@ -1,5 +1,5 @@
 import { BuildingsRepository } from '../repository/buildings.repository'
-import { pipe } from 'fp-ts/function'
+import { constVoid, pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import * as TE from 'fp-ts/TaskEither'
 import { withCapturedLead } from '../building'
@@ -21,11 +21,17 @@ export class LeadRecorderService {
     return pipe(
       fromPromise(this.buildingsRepository.get(cmd.buildingId)),
       TE.chain(
-        building => fromPromise(this.buildingsRepository.save(withCapturedLead(building, {
-          ownerId: cmd.ownerId,
-          contactId: cmd.contactId,
-          worksheetId: cmd.worksheetId,
-        })))
+        building => {
+          if (building.lead) {
+            return TE.of(constVoid)
+          }
+
+          return fromPromise(this.buildingsRepository.save(withCapturedLead(building, {
+            ownerId: cmd.ownerId,
+            contactId: cmd.contactId,
+            worksheetId: cmd.worksheetId,
+          })))
+        }
       )
     )
   }

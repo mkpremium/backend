@@ -2,16 +2,14 @@ import { InputGathered, OwnerResponse } from '../../../src/calls/service/owner-r
 import { createInputGatheredListener } from '../../../src/calls/event-listener/input-gathered.listener'
 import { stub } from 'sinon'
 import { expect } from 'chai'
-import { virtualCallerBuilder } from '../virtual-caller.builder'
 import * as TE from 'fp-ts/TaskEither'
+import { constVoid } from 'fp-ts/function'
 
 describe('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
-  let scheduleCallServiceStub
+  let leadRecorderServiceStub
   let updateBuildingNegotiationStatusStub
   let changeContactStatusServiceStub
-  let virtualCallersRepositoryStub
-  let scheduledCallsRepositoryStub
 
   const testAssignedCallerId = 'test-caller-id'
   const testVirtualCallerId = 'test-virtual-caller-id'
@@ -26,15 +24,10 @@ describe('input-gathered.listener', () => {
     ownerId: 'test-owner-id',
     worksheetId: 'test-worksheet-id',
   }
-  const testVirtualCaller = virtualCallerBuilder({
-    id: testVirtualCallerId,
-    assignCallsTo: testAssignedCallerId,
-    queueId: testVirtualCallerQueueId
-  }).build()
 
   beforeEach(() => {
-    scheduleCallServiceStub = {
-      scheduleCall: stub(),
+    leadRecorderServiceStub = {
+      recordLead: stub(),
     }
     updateBuildingNegotiationStatusStub = {
       updateBuildingStatus: stub(),
@@ -42,54 +35,26 @@ describe('input-gathered.listener', () => {
     changeContactStatusServiceStub = {
       change: stub(),
     }
-    virtualCallersRepositoryStub = {
-      get: stub(),
-    }
-    virtualCallersRepositoryStub.get.withArgs(testEvent.callerId).resolves(testVirtualCaller)
-    scheduledCallsRepositoryStub = {
-      forBuilding: stub()
-    }
-    scheduledCallsRepositoryStub.forBuilding.returns(TE.of(undefined))
 
     listener = createInputGatheredListener({
-      scheduleCall: scheduleCallServiceStub,
-      virtualCallersRepository: virtualCallersRepositoryStub,
+      leadRecorder: leadRecorderServiceStub,
       updateBuildingNegotiationStatusService: updateBuildingNegotiationStatusStub,
       changeContactStatusService: changeContactStatusServiceStub,
       logger: { info: () => undefined },
-      scheduledCallsRepository: scheduledCallsRepositoryStub,
     })
   })
 
-  it('schedules call when owner is open to sell', async () => {
-    scheduleCallServiceStub.scheduleCall.resolves()
+  it('records lead when owner is open to sell', async () => {
+    leadRecorderServiceStub.recordLead.returns(TE.of(constVoid))
+
     await listener({ ...testEvent, ownerResponse: OwnerResponse.SALE })
 
-    expect(scheduleCallServiceStub.scheduleCall).to.have.been.calledWith({
-      userId: testVirtualCallerId,
-      event: {
-        createdBy: testVirtualCallerId,
-        event: {
-          buildingId: testEvent.buildingId,
-          contactId: testEvent.contactId,
-          worksheetId: testEvent.worksheetId,
-          ownerId: testEvent.ownerId,
-        },
-        eventDate: new Date(),
-        notifyTo: testAssignedCallerId,
-        type: 'CALLS',
-        note: 'Creada por caller virtual',
-      },
-      queueId: testVirtualCallerQueueId,
+    expect(leadRecorderServiceStub.recordLead).to.have.been.calledWith({
+      buildingId: testEvent.buildingId,
+      contactId: testEvent.contactId,
+      worksheetId: testEvent.worksheetId,
+      ownerId: testEvent.ownerId,
     })
-  })
-
-  it('does not schedules call when there is a call scheduled for building already', async () => {
-    scheduleCallServiceStub.scheduleCall.resolves()
-    scheduledCallsRepositoryStub.forBuilding.returns(TE.of('scheduled-call-id'))
-    await listener({ ...testEvent, ownerResponse: OwnerResponse.SALE })
-
-    expect(scheduleCallServiceStub.scheduleCall).to.not.have.been.called
   })
 
   it('save no sale on owner input', async () => {
