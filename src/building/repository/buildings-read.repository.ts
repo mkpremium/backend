@@ -4,6 +4,8 @@ import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { BuildingAddressProps, BuildingNegotiationStatus, BuildingProps } from '../building'
 import { ContactProps } from '../../owner/owner'
 import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
+import { fromPromise } from '../../infrastructure/fp-utils'
 
 const listBuildingsByIdQuery = bucketName => `
 SELECT
@@ -24,6 +26,7 @@ SELECT
     building.negotiationStatus,
     building.salePrice,
     building.totalExpensesAmount,
+    building.lead,
 
     stock[0] stock,
 
@@ -145,7 +148,17 @@ export class BuildingsReadRepository {
   }
 
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]> {
-    throw new Error('not implemented')
+    const query = `
+        SELECT id
+        FROM ${this.couchbaseAdapter.bucketName}
+        WHERE _documentType = 'building'
+          AND assignedAgentId = $1
+          AND negotiationStatus = $2
+    `
+    return pipe(
+      fromPromise(this.couchbaseAdapter.queryAsync(query, [ flipperId, status ])),
+      TE.chain(ids => fromPromise(this.listById(ids.map(({ id }) => id))))
+    )
   }
 
   private allAssignedBuildingsId (agentId): Promise<string[]> {
@@ -158,7 +171,8 @@ export class BuildingsReadRepository {
     return buildings.map(
       ({
          id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
-         ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount
+         ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount,
+        lead
        }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
@@ -223,7 +237,8 @@ export class BuildingsReadRepository {
             inPerson: lastMeeting.inPerson
           }) || undefined,
           salePrice: salePrice || undefined,
-          totalExpensesAmount: totalExpensesAmount || undefined
+          totalExpensesAmount: totalExpensesAmount || undefined,
+          lead,
         } as BuildingReadModel
       }
     )

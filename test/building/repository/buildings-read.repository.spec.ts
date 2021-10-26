@@ -1,7 +1,52 @@
 import { expect } from 'chai'
 import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
+import { createTestContainer } from '../../create-test-container'
+import { buildingBuilder } from '../building.builder'
+import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
+import { pipe } from 'fp-ts/function'
+import { map } from 'fp-ts/TaskEither'
+import { orFail } from '../../helpers'
+import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
+import { ownerBuilder } from '../../owner/owner.builder'
 
 describe('BuildingsReadRepository', () => {
+  it('gets flipper leads', async () => {
+    const container = await createTestContainer()
+    const readRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
+    const writeRepository = container.resolve('buildingsRepository') as BuildingsRepository
+    const ownersRepository = container.resolve('ownersRepository') as OwnerRepository
+
+    const leadBuilding = buildingBuilder({
+      id: 'test-lead-building',
+      negotiationStatus: 'LEAD',
+      assignedAgentId: 'test-flipper-id',
+      lead: {
+        capturedAt: new Date(),
+        ownerId: 'test-owner-id',
+        contactId: 'test-contact-id',
+        worksheetId: 'test-worksheet-id',
+      }
+    }).build()
+    const ownerLeadBuilding = ownerBuilder({buildingId: leadBuilding.id, id: 'test-lead-owner'}).build()
+    const otherBuilding = buildingBuilder({ id: 'other-building', assignedAgentId: 'test-flipper-id' }).build()
+    const ownerOtherBuilding = ownerBuilder({buildingId: otherBuilding.id, id: 'test-other-owner'}).build()
+
+    await writeRepository.save(leadBuilding)
+    await ownersRepository.save(ownerLeadBuilding)
+    await writeRepository.save(otherBuilding)
+    await ownersRepository.save(ownerOtherBuilding)
+
+    return pipe(
+      readRepository.assignedToFlipperAndWithStatus('test-flipper-id', 'LEAD'),
+      map(buildings => {
+        expect(buildings).to.have.lengthOf(1)
+        expect(buildings[0].id).to.eql('test-lead-building')
+        expect(buildings[0].lead).to.be.ok
+      }),
+      orFail()
+    )()
+  })
+
   describe('mapToPropertyAgentBuildingView', () => {
     it('parses featured owner', () => {
       const result = BuildingsReadRepository.mapToPropertyAgentBuildingView([
@@ -217,6 +262,6 @@ describe('getOwner', () => {
   it('returns nothing when there is no owner with some contact validated', () => {
     expect(BuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, [ {
       contacts: []
-    }])).to.be.undefined
+    } ])).to.be.undefined
   })
 })
