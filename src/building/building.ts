@@ -183,6 +183,13 @@ export type BuildingNegotiationStatus =
   | 'DESCARTADO'
   | 'YA VENDIO'
 
+interface Lead {
+  worksheetId: string
+  ownerId: string
+  contactId: string
+  capturedAt: Date
+}
+
 export interface BuildingProps {
   id: string;
   address: BuildingAddressProps;
@@ -196,12 +203,7 @@ export interface BuildingProps {
   };
   ownerId?: string;
   negotiationStatus: BuildingNegotiationStatus;
-  lead?: {
-    worksheetId: string
-    ownerId: string
-    contactId: string
-    capturedAt: Date
-  }
+  lead?: Lead
   assignedAgentId?: string;
   use?: string;
   recentProposal?: any
@@ -271,7 +273,7 @@ export const Building = t.struct<BuildingProps>(
   }
 )
 
-export function changeNegotiationStatus(building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
+export function changeNegotiationStatus (building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
   return Building.update(building, {
     negotiationStatus: {
       $set: newStatus
@@ -279,7 +281,7 @@ export function changeNegotiationStatus(building: BuildingProps, newStatus: Buil
   })
 }
 
-export function withTotalExpensesAmount(building: BuildingProps, totalAmount: number): BuildingProps {
+export function withTotalExpensesAmount (building: BuildingProps, totalAmount: number): BuildingProps {
   return Building.update(building, {
     totalExpensesAmount: {
       $set: totalAmount
@@ -287,10 +289,18 @@ export function withTotalExpensesAmount(building: BuildingProps, totalAmount: nu
   })
 }
 
-export function withFeaturedOwner(building: BuildingProps, ownerId: string): BuildingProps {
+export function withFeaturedOwner (building: BuildingProps, ownerId: string): BuildingProps {
   return Building.update(building, {
     ownerId: {
       $set: ownerId
+    }
+  })
+}
+
+export function withCapturedLead (building: BuildingProps, lead: Omit<Lead, 'capturedAt'>): BuildingProps {
+  return Building.update(building, {
+    lead: {
+      $set: { ...lead, capturedAt: new Date() },
     }
   })
 }
