@@ -154,7 +154,8 @@ describe('Building listing endpoint', () => {
             lastMeeting: {
               dateMeeting: moment(building1LastMeeting.eventDate).format(),
               inPerson: true
-            }
+            },
+            lead: null
           },
           {
             id: building2.id,
@@ -179,7 +180,8 @@ describe('Building listing endpoint', () => {
               firstName: 'Owner First Name',
               id: building2.ownerId,
               name: 'Owner Name'
-            }
+            },
+            lead: null
           }
         ])
       })
