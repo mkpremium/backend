@@ -7,7 +7,4 @@
     "module": "CommonJS",
     "sourceMap": true
   },
-  "exclude": [
-    "scripts/**/*.ts"
-  ]
 }
