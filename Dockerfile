@@ -1,14 +1,14 @@
 # Build container
 FROM node:14
 
-RUN ["npm", "install", "-g", "npm"]
+RUN ["npm", "install", "-g", "npm", "--silent"]
 
 RUN ["mkdir", "/app"]
 WORKDIR /app
 
 COPY package-lock.json .
 COPY package.json .
-RUN ["npm", "install"]
+RUN ["npm", "install", "--silent"]
 
 COPY . .
 
@@ -18,7 +18,7 @@ COPY package-lock.json build
 
 RUN ["cp", "-r", "fonts", "build"]
 WORKDIR /app/build
-RUN ["npm", "install", "--production"]
+RUN ["npm", "install", "--production", "--silent"]
 RUN ["mkdir", ".uploads"]
 
 # Run container
