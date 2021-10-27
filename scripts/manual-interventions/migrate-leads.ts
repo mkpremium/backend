@@ -2,7 +2,9 @@ import { BuildingsRepository } from '../../src/building/repository/buildings.rep
 import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
 import { withCapturedLead } from '../../src/building/building'
+import { initLogger } from '../../src/infrastructure/logger'
 
+const logger = initLogger()
 export function migrate (dry = false) {
   return connectCouchbaseBucket()
     .then(bucket => {
@@ -14,7 +16,7 @@ export function migrate (dry = false) {
     })
     .then(async ({ buildingsRepository, couchbaseAdapter }) => {
       const leads = await leadsToMigrate(couchbaseAdapter)
-      console.info('leads to migrate', leads)
+      logger.info('leads to migrate', leads)
       if (dry) {
         return
       }
@@ -51,10 +53,15 @@ export function migrate (dry = false) {
 if (process.env.AUTO_INVOKE) {
   migrate(process.env.DRY === 'true')
     .then((counter) => {
-      console.info('Done!', counter)
+      logger.info(`Done!`, {
+        success: counter.success.length,
+        failures: counter.failures.length,
+        skipped: counter.skipped.length,
+      })
+      logger.info(counter)
       process.exit(0)
     }).catch(error => {
-    console.error(error)
+    logger.error(error)
     process.exit(1)
   })
 }
@@ -70,7 +77,7 @@ function leadsToMigrate (couchbaseAdapter: CouchbaseAdapter): Promise<{
   worksheetId: string
 }[]> {
   const query = `
-      SELECT id        scheduledCallId,
+      SELECT id scheduledCallId,
              eventDate capturedAt,
              notiftyTo assignTo,
              event.buildingId,
