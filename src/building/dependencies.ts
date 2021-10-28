@@ -23,7 +23,7 @@ import { createAddNegotiationProposalController } from './controllers'
 import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
 import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
 import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
-import { createSetFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
+import { setFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
 import { AddOfferRequestService } from './service/add-offer-request.service'
 import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
@@ -81,7 +81,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     addSmsNoteListener: asFunction(addSmsNoteListener).singleton(),
 
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
-    setFeaturedOwnerAndContactFromMeeting: asFunction(createSetFeaturedOwnerAndContactFromMeetingListener).singleton(),
+    setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton(),
 
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),

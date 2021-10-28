@@ -1,6 +1,6 @@
 import { LeadRecorderService, RecordLeadCommand } from '../../../src/building/service/lead-recorder.service'
 import { expect } from 'chai'
-import { stub } from 'sinon'
+import sinon, { stub } from 'sinon'
 import { pipe } from 'fp-ts/function'
 import { map } from 'fp-ts/TaskEither'
 import { orFail } from '../../helpers'
@@ -9,6 +9,7 @@ import { buildingBuilder } from '../building.builder'
 describe('LeadRecorderService', () => {
   let service: LeadRecorderService
   let buildingsRepositoryStub
+  let eventBusStub
   const testCmd: RecordLeadCommand = {
     buildingId: 'test-building-id',
     contactId: 'test-contact-id',
@@ -22,8 +23,11 @@ describe('LeadRecorderService', () => {
       get: stub().resolves(buildingBuilder().build()),
       save: stub().resolves()
     }
+    eventBusStub = {
+      publish: stub().resolves()
+    }
 
-    service = new LeadRecorderService(buildingsRepositoryStub)
+    service = new LeadRecorderService(buildingsRepositoryStub, eventBusStub)
   })
 
   it('saves building with lead', () => {
@@ -31,6 +35,21 @@ describe('LeadRecorderService', () => {
       service.recordLead(testCmd),
       map(() => {
         expect(buildingsRepositoryStub.save).to.have.been.calledWithMatch(b => !!b.lead)
+      }),
+      orFail(),
+    )()
+  })
+
+  it('publishes event', () => {
+    return pipe(
+      service.recordLead(testCmd),
+      map(() => {
+        expect(eventBusStub.publish).to.have.been.calledWith(sinon.match({
+          name: 'building.lead_captured',
+          buildingId: testCmd.buildingId,
+          ownerId: testCmd.ownerId,
+          contactId: testCmd.contactId,
+        }))
       }),
       orFail(),
     )()

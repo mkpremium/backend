@@ -9,6 +9,7 @@ export function buildingEventListeners (container: AwilixContainer) {
   eventBus.on('scheduled_events.call_scheduled', container.resolve('addNoteToBuilding'))
   eventBus.on('scheduled_events.call_updated', container.resolve('addNoteToBuilding'))
   eventBus.on('meeting.created', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
+  eventBus.on('building.lead_captured', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('scheduled_events.call_scheduled', container.resolve('scheduledCallListener'))
   eventBus.on('offer-request.created', container.resolve('setFeaturedOwnerFromOfferRequestListener'))
   eventBus.on('offer-request.created', container.resolve('addNoteToBuilding'))

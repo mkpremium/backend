@@ -1,4 +1,4 @@
-import { createSetFeaturedOwnerAndContactFromMeetingListener } from '../../../src/building/event-listener/set-featured-owner-and-contact-from-meeting.listener'
+import { setFeaturedOwnerAndContactFromMeetingListener } from '../../../src/building/event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { expect } from 'chai'
 import { stub } from 'sinon'
 
@@ -18,7 +18,7 @@ describe('set-featured-owner-and-contact-from-meeting.listener', () => {
     setOwnerFeaturedContactServiceStub = {
       setFeaturedContact: stub().resolves()
     }
-    listener = createSetFeaturedOwnerAndContactFromMeetingListener({
+    listener = setFeaturedOwnerAndContactFromMeetingListener({
       featuredOwnerService: featuredOwnerServiceStub,
       setOwnerFeaturedContactService: setOwnerFeaturedContactServiceStub
     })
