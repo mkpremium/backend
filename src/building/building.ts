@@ -306,7 +306,7 @@ export function withCapturedLead (
     negotiationStatus: {
       $set: 'LEAD',
     },
-    assignedFlipperId: {
+    assignedAgentId: {
       $set: assignToFlipperId,
     },
     lead: {
