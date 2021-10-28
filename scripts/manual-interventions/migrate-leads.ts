@@ -1,7 +1,7 @@
 import { BuildingsRepository } from '../../src/building/repository/buildings.repository'
 import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
-import { Building, withCapturedLead } from '../../src/building/building'
+import { withCapturedLead } from '../../src/building/building'
 import { initLogger } from '../../src/infrastructure/logger'
 
 const logger = initLogger()
@@ -34,18 +34,11 @@ export function migrate (dry = false) {
             process.stdout.write('-')
             continue
           }
-          const lead = Building.update(withCapturedLead(building, notifyTo, {
+          await buildingsRepository.save(withCapturedLead(building, notifyTo, {
             ownerId,
             contactId,
             worksheetId,
-          }), {
-            lead: {
-              $merge: {
-                capturedAt: eventDate,
-              }
-            }
-          })
-          await buildingsRepository.save(lead)
+          }, eventDate))
           counter.success.push(scheduledCallId)
           process.stdout.write('.')
         } catch (error) {

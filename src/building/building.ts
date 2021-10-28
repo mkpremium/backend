@@ -300,7 +300,8 @@ export function withFeaturedOwner (building: BuildingProps, ownerId: string): Bu
 export function withCapturedLead (
   building: BuildingProps,
   assignToFlipperId: string,
-  lead: Omit<Lead, 'capturedAt'>
+  lead: Omit<Lead, 'capturedAt'>,
+  capturedAt?: Date | string,
 ): BuildingProps {
   return Building.update(building, {
     negotiationStatus: {
@@ -310,7 +311,7 @@ export function withCapturedLead (
       $set: assignToFlipperId,
     },
     lead: {
-      $set: { ...lead, capturedAt: new Date() },
+      $set: { ...lead, capturedAt: capturedAt || new Date() },
     },
   })
 }
