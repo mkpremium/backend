@@ -1,10 +1,11 @@
 import { BuildingsRepository } from '../../src/building/repository/buildings.repository'
 import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
-import { withCapturedLead } from '../../src/building/building'
+import { Building, withCapturedLead } from '../../src/building/building'
 import { initLogger } from '../../src/infrastructure/logger'
 
 const logger = initLogger()
+
 export function migrate (dry = false) {
   return connectCouchbaseBucket()
     .then(bucket => {
@@ -25,7 +26,7 @@ export function migrate (dry = false) {
         failures: [],
         skipped: [],
       }
-      for (const { buildingId, contactId, notifyTo, ownerId, worksheetId, scheduledCallId } of leads) {
+      for (const { buildingId, contactId, notifyTo, ownerId, worksheetId, scheduledCallId, eventDate } of leads) {
         try {
           const building = await buildingsRepository.get(buildingId)
           if (building.negotiationStatus && building.negotiationStatus !== 'PENDIENTE') {
@@ -33,11 +34,18 @@ export function migrate (dry = false) {
             process.stdout.write('-')
             continue
           }
-          await buildingsRepository.save(withCapturedLead(building, notifyTo, {
+          const lead = Building.update(withCapturedLead(building, notifyTo, {
             ownerId,
             contactId,
             worksheetId,
-          }))
+          }), {
+            lead: {
+              $merge: {
+                capturedAt: eventDate,
+              }
+            }
+          })
+          await buildingsRepository.save(lead)
           counter.success.push(scheduledCallId)
           process.stdout.write('.')
         } catch (error) {
@@ -77,7 +85,7 @@ function leadsToMigrate (couchbaseAdapter: CouchbaseAdapter): Promise<{
   worksheetId: string
 }[]> {
   const query = `
-      SELECT id scheduledCallId,
+      SELECT id        scheduledCallId,
              eventDate capturedAt,
              notiftyTo assignTo,
              event.buildingId,
