@@ -303,6 +303,9 @@ export function withCapturedLead (
   lead: Omit<Lead, 'capturedAt'>
 ): BuildingProps {
   return Building.update(building, {
+    negotiationStatus: {
+      $set: 'LEAD',
+    },
     assignedFlipperId: {
       $set: assignToFlipperId,
     },
