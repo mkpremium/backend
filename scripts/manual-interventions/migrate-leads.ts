@@ -26,7 +26,7 @@ export function migrate (dry = false) {
         failures: [],
         skipped: [],
       }
-      for (const { buildingId, contactId, notifyTo, ownerId, worksheetId, scheduledCallId, eventDate } of leads) {
+      for (const { buildingId, contactId, notifyTo, ownerId, worksheetId, scheduledCallId, capturedAt } of leads) {
         try {
           const building = await buildingsRepository.get(buildingId)
           if (building.negotiationStatus && building.negotiationStatus !== 'PENDIENTE') {
@@ -38,7 +38,7 @@ export function migrate (dry = false) {
             ownerId,
             contactId,
             worksheetId,
-          }, eventDate))
+          }, capturedAt))
           counter.success.push(scheduledCallId)
           process.stdout.write('.')
         } catch (error) {
@@ -73,18 +73,19 @@ function leadsToMigrate (couchbaseAdapter: CouchbaseAdapter): Promise<{
   createdBy: string
   contactId: string
   ownerId: string
-  eventDate: string
+  capturedAt: string
   notifyTo: string
   worksheetId: string
 }[]> {
   const query = `
-      SELECT id        scheduledCallId,
+      SELECT id scheduledCallId,
              eventDate capturedAt,
              notiftyTo assignTo,
              event.buildingId,
              event.contactId,
              event.ownerId,
-             event.worksheetId
+             event.worksheetId,
+             notifyTo
       FROM mkpremium
       WHERE _documentType = 'scheduled-event'
         AND type = 'CALLS'
