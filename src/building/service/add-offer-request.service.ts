@@ -1,9 +1,9 @@
 import t from 'tcomb'
 import { validate } from 'tcomb-validation'
 import { InvalidCommand } from '../../infrastructure/invalid-command.error'
+import { OfferRequestsRepository } from '../repository/offer-requests.repository'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { EventBus } from '../../infrastructure/event-bus'
-import { requestOfferByFlipper } from '../building'
 
 const AddOfferRequestCommand = t.struct({
   ownerId: t.String,
@@ -26,6 +26,7 @@ export interface OfferRequestCreated {
 
 export class AddOfferRequestService {
   constructor (
+    private offerRequestsRepository: OfferRequestsRepository,
     private buildingsRepository: BuildingsRepository,
     private eventBus: EventBus
   ) {
@@ -34,19 +35,15 @@ export class AddOfferRequestService {
   async addOfferRequest (addRequestCommand) {
     this.assertValidCommand(addRequestCommand)
 
-    await this.buildingsRepository.save(
-      requestOfferByFlipper(
-        await this.buildingsRepository.get(addRequestCommand.buildingId),
-        addRequestCommand.flipperId
-      )
-    )
+    const offerRequest = await this.offerRequestsRepository.add(addRequestCommand)
+    await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
     await this.eventBus.publish({
       name: 'offer-request.created',
       note: addRequestCommand.note,
       userId: addRequestCommand.callerId,
       buildingId: addRequestCommand.buildingId,
-      request: addRequestCommand
+      request: offerRequest
     } as OfferRequestCreated)
   }
 

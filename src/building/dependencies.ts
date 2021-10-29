@@ -25,6 +25,7 @@ import { createScheduledCallListener } from './event-listener/call-scheduled.lis
 import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
 import { setFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { createWorksheetMadeAvailableListener } from './event-listener/worksheet-made-available.listener'
+import { OfferRequestsRepository } from './repository/offer-requests.repository'
 import { AddOfferRequestService } from './service/add-offer-request.service'
 import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
 import { createAddOfferRequestController } from './controller/add-offer-request.controller'
@@ -84,6 +85,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),
     worksheetMadeAvailableListener: asFunction(createWorksheetMadeAvailableListener).singleton(),
 
+    offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController)

@@ -315,17 +315,3 @@ export function withCapturedLead (
     },
   })
 }
-
-export function requestOfferByFlipper (
-  building: BuildingProps,
-  flipperId: string,
-): BuildingProps {
-  return Building.update(building, {
-    assignedAgentId: {
-      $set: flipperId
-    },
-    negotiationStatus: {
-      $set: 'PENDIENTE'
-    },
-  })
-}
