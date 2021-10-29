@@ -183,7 +183,7 @@ export type BuildingNegotiationStatus =
   | 'DESCARTADO'
   | 'YA VENDIO'
 
-interface Lead {
+export interface Lead {
   worksheetId: string
   ownerId: string
   contactId: string
