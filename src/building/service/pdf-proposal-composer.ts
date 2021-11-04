@@ -11,9 +11,9 @@ export class PdfProposalComposer {
     proposalAmount: number,
     sender: UserProfileProps
   ): Promise<Buffer> {
-    const address = building.address
+    const { city, number, street, type } = building.address
     return createPdf(
-      `${abbrevationTranslations[ address.type ] || address.type} ${address.street} ${address.number}, ${address.city}`,
+      `${abbrevationTranslations[ type ] || type} ${street} ${number}, ${city}`,
       building.cadastre ? building.cadastre.reference : 'XXXXXXXXXXXXX',
       proposalAmount,
       sender
