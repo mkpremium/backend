@@ -1,6 +1,7 @@
 import { FullAddress } from './full-address'
 import { CallLanguage, TwilioSayAttributes } from './call-attributes'
 import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
+import { abbrevationTranslations } from '../../building/service/abbrevation-translations'
 
 export interface GatherInterestMessageComposeCommand {
   readonly address: FullAddress
@@ -54,14 +55,17 @@ export class GatherOwnerInterestMessageComposer {
     return twiml
   }
 
-  private static composeMessage (address: FullAddress, language: 'es-ES' | 'pt-PT') {
-    const fullAddress = `${address.street} ${address.number}`
+  private static composeMessage ({ city, number, street, type }: FullAddress, language: 'es-ES' | 'pt-PT') {
+    let fullAddress = `${street} ${number} de ${city}`
     if (language === 'es-ES') {
-      return `${fullAddress}. Buenos días, le contactamos por su propiedad de ${fullAddress} de ${address.city}` +
+      if (abbrevationTranslations[type]) {
+        fullAddress = `${abbrevationTranslations[type]} ${fullAddress}`
+      }
+      return `${fullAddress}. Buenos días, le contactamos por su propiedad de ${fullAddress}` +
         ', nos dedicamos a la compra patrimonial de inmuebles, ¿estaría usted interesado en vender?' +
         'Si desea vender marque 1, si no desea vender marque 2 y si no es el propietario marque 3.'
     } else if (language === 'pt-PT') {
-      return `${fullAddress}. Bom dia, entramos em contato com você sobre a sua propiedade de ${fullAddress} de ${address.city}.` +
+      return `${fullAddress}. Bom dia, entramos em contato com você sobre a sua propiedade de ${fullAddress}.` +
         'Estamos empenhados em comprar ativos imobiliários, você estaria interessado em vender? ' +
         'Se você quer vender, marque 1, se não quiser vender, marque 2, e se você não for o dono, marque 3.'
     } else {
