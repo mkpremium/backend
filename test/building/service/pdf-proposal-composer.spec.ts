@@ -2,11 +2,12 @@ import { PdfProposalComposer } from '../../../src/building/service/pdf-proposal-
 import { buildingBuilder } from '../building.builder'
 import { UserProfileProps } from '../../../src/types/user'
 import { userProfileBuilder } from '../../user/user.builder'
+// import * as fs from 'fs'
 
 describe('PdfProposalComposer', () => {
   const testBuilding = buildingBuilder({
     address: {
-      type: '',
+      type: 'GL',
       street: 'Romo Rampa',
       number: '295',
       city: 'TEST_PORTO',

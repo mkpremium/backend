@@ -13,7 +13,7 @@ export class PdfProposalComposer {
   ): Promise<Buffer> {
     const address = building.address
     return createPdf(
-      `${address.street} ${address.number}, ${address.city}`,
+      `${abbrevationTranslations[ address.type ] || address.type} ${address.street} ${address.number}, ${address.city}`,
       building.cadastre ? building.cadastre.reference : 'XXXXXXXXXXXXX',
       proposalAmount,
       sender
@@ -56,40 +56,40 @@ const createPdf = (
           style: 'dateText'
         },
         {
-          text: emailCopies[lang]['bodyText1'],
+          text: emailCopies[ lang ][ 'bodyText1' ],
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['bodyText2'].replace('%%address%%', address),
+          text: emailCopies[ lang ][ 'bodyText2' ].replace('%%address%%', address),
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['bodyText3'],
+          text: emailCopies[ lang ][ 'bodyText3' ],
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['bodyText4'].replace('%%address%%', address)
+          text: emailCopies[ lang ][ 'bodyText4' ].replace('%%address%%', address)
             .replace('%%cadastre%%', cadastreReference),
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['bodyText5'],
+          text: emailCopies[ lang ][ 'bodyText5' ],
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['offer'].replace('%%offer%%', formatProposalAmount(proposalAmount)),
+          text: emailCopies[ lang ][ 'offer' ].replace('%%offer%%', formatProposalAmount(proposalAmount)),
           style: 'offer'
         },
         {
-          text: emailCopies[lang]['bodyText6'],
+          text: emailCopies[ lang ][ 'bodyText6' ],
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['bodyText7'],
+          text: emailCopies[ lang ][ 'bodyText7' ],
           style: 'bodyText'
         },
         {
-          text: emailCopies[lang]['bodyText8'],
+          text: emailCopies[ lang ][ 'bodyText8' ],
           style: 'bodyText'
         },
         {
@@ -101,7 +101,7 @@ const createPdf = (
           style: 'signText'
         },
         {
-          text: emailCopies[lang]['footer'],
+          text: emailCopies[ lang ][ 'footer' ],
           style: 'directorText'
         },
         {
@@ -156,4 +156,82 @@ const createPdf = (
 
     pdf.end()
   })
+}
+
+const abbrevationTranslations = {
+  'AG': 'AGREGADO',
+  'JR': 'JARDINES',
+  'AL': 'ALDEA',
+  'LD': 'LADO',
+  'AR': 'AREA',
+  'LG': 'LUGAR',
+  'AU': 'AUTOPISTA',
+  'MC': 'MERCADO',
+  'AV': 'AVENIDA',
+  'ML': 'MUELLE',
+  'AY': 'ARROYO',
+  'MN': 'MUNICIPIO',
+  'BJ': 'BAJADA',
+  'MS': 'MASIAS',
+  'BO': 'BARRIO',
+  'MT': 'MONTE',
+  'BR': 'BARRANCO',
+  'MZ': 'MANZANA',
+  'CA': 'CAÑADA',
+  'PB': 'POBLADO',
+  'CG': 'COLEGIO',
+  'PD': 'PARTIDA',
+  'CH': 'CHALET',
+  'PJ': 'PASAJE',
+  'CI': 'CINTURON',
+  'PL': 'POLIGONO',
+  'CJ': 'CALLEJON',
+  'PM': 'PARAMO',
+  'CL': 'CALLE',
+  'PQ': 'PARROQUIA',
+  'CM': 'CAMINO',
+  'PR': 'PROLONGACION',
+  'CN': 'COLONIA',
+  'PS': 'PASEO',
+  'CO': 'CONCEJO',
+  'PT': 'PUENTE',
+  'CP': 'CAMPO',
+  'PZ': 'PLAZA',
+  'CR': 'CARRETERA',
+  'QT': 'QUINTA',
+  'CS': 'CASERIO',
+  'RB': 'RAMBLA',
+  'CT': 'CUESTA',
+  'RC': 'RINCON',
+  'CU': 'CONJUNTO',
+  'RD': 'RONDA DE DETRAS',
+  'RM': 'RAMAL',
+  'DP': 'DIPUTACION',
+  'RP': 'RAMPA',
+  'DS': 'DISEMINADOS',
+  'RR': 'RIERA',
+  'ED': 'EDIFICIOS',
+  'RU': 'RUA',
+  'EM': 'EXTRAMUROS',
+  'SA': 'SALIDA',
+  'EN': 'ENTRADA',
+  'SD': 'SENDA',
+  'ER': 'EXTRARRADIO',
+  'SL': 'SOLAR',
+  'ES': 'ESCALINATA',
+  'SN': 'SALON',
+  'EX': 'EXPLANADA',
+  'SU': 'SUBIDA',
+  'FC': 'FERROCARRIL',
+  'TN': 'TERRENOS',
+  'FN': 'FINCA',
+  'TO': 'TORRENTE',
+  'GL': 'GLORIETA',
+  'TR': 'TRAVESIA',
+  'GR': 'GRUPO',
+  'UR': 'URBANIZACION',
+  'GV': 'GRAN VIA',
+  'VR': 'VEREDA',
+  'HT': 'HUERTO',
+  'CY': 'CALEYA'
 }
