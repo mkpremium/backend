@@ -97,6 +97,7 @@ export class VirtualCallerPhone {
     if (!callsToNumber) {
       return
     }
+    const momentThreshold = moment().add(-3, 'days')
     callsToNumber.forEach(call => {
       if (call.error === PHONE_DOES_NOT_EXIST) {
         throw new NumberDoesNotExist(contact.ownerId, contact.id)
@@ -105,7 +106,7 @@ export class VirtualCallerPhone {
         return
       }
 
-      if ((call.worksheetId === worksheetId && call.ownerResponse) || moment(call.createdAt).isSame(moment(), 'day')) {
+      if ((call.worksheetId === worksheetId && call.ownerResponse) || moment(call.createdAt).isAfter(momentThreshold)) {
         throw new NumberAlreadyCalled(call, { contactId: contact.id, ownerId: contact.ownerId })
       }
     })

@@ -144,9 +144,9 @@ describe('VirtualCallerPhone', () => {
     expect(gatherOwnerInterestMessageComposerStub.compose.lastCall.firstArg).to.include({ language: 'pt-PT' })
   })
 
-  it('does not call when phone number is already called today', async () => {
+  it('does not call when phone number is already called in the last 3 days', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
-      createdAt: new Date(),
+      createdAt: moment().add(-3, 'days').add(1, 'minute').toDate(),
       status: 'DONE',
       worksheetId: 'any-worksheet',
     }).build() ])
@@ -156,7 +156,7 @@ describe('VirtualCallerPhone', () => {
 
   it('calls to phone number when it was called some previous day without a response', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
-      createdAt: moment().add(-1, 'day').toDate(),
+      createdAt: moment().add(-4, 'day').toDate(),
       ownerResponse: undefined
     }).build() ])
 
@@ -168,17 +168,8 @@ describe('VirtualCallerPhone', () => {
   it('does not call to phone number when it was called some previous day with a response', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       status: 'DONE',
-      createdAt: moment().add(-1, 'day').toDate(),
+      createdAt: moment().add(-4, 'day').toDate(),
       ownerResponse: OwnerResponse.SALE,
-    }).build() ])
-
-    await expect(service.call(testCmd)).to.be.rejected
-  })
-
-  it('does not call to phone number when it was called today but was busy', async () => {
-    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
-      status: 'BUSY',
-      createdAt: moment().toDate(),
     }).build() ])
 
     await expect(service.call(testCmd)).to.be.rejected
@@ -187,7 +178,7 @@ describe('VirtualCallerPhone', () => {
   it('does not call to phone number that does not exist', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       status: 'FAILED',
-      createdAt: moment().add(-1, 'day').toDate(),
+      createdAt: moment().add(-4, 'day').toDate(),
       error: PHONE_DOES_NOT_EXIST,
     }).build() ])
 
@@ -197,7 +188,7 @@ describe('VirtualCallerPhone', () => {
   it('calls to phone number even if it was called some date before with a response but for a different worksheet', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
       status: 'DONE',
-      createdAt: moment().add(-1, 'day').toDate(),
+      createdAt: moment().add(-4, 'day').toDate(),
       ownerResponse: OwnerResponse.NO_SALE,
       worksheetId: 'a-different-worksheet',
     }).build() ])
@@ -205,15 +196,6 @@ describe('VirtualCallerPhone', () => {
     await service.call(testCmd)
 
     expect(twilioClientStub.calls.create).to.have.been.called
-  })
-
-  it('does not call to phone number with a previous failed call today', async () => {
-    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
-      createdAt: new Date(),
-      status: 'FAILED',
-    }).build() ])
-
-    await expect(service.call(testCmd)).to.be.rejected
   })
 
   it('calls to phone number when it was called three or more months ago, even with response', async () => {
