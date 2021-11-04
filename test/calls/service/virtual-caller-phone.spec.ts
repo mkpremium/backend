@@ -25,6 +25,7 @@ const testCmd: CallCommand = {
     value: '666666666',
   },
   address: {
+    type: 'CL',
     city: 'Test City',
     street: 'Test Street',
     number: 0,
