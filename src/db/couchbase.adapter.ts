@@ -122,7 +122,8 @@ export class CouchbaseAdapter {
       predicate: ({
                     code,
                     message,
-                  }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
+                    isOperational,
+                  }) => isOperational || code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }
