@@ -15,7 +15,7 @@ export type PromisifiedBucket = Bucket & {
   queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
   getAsync: (key: string) => Promise<{ value: any, cas: any }>
   upsertAsync: (key: string, value: any, opts?: { cas: Bucket.CAS }) => Promise<any>
-  insertAsync(key: string, value: any): Promise<void>;
+  insertAsync (key: string, value: any): Promise<void>;
   getAndLockAsync: (key: string) => Promise<any>
   unlockAsync: (key: string, cas: Bucket.CAS) => Promise<any>
   name: string
@@ -80,11 +80,7 @@ export class CouchbaseAdapter {
           .finally(() => beeline.finishSpan(span))
       }
     ).catch(error => {
-      if (error.code) {
-        throw new QueryError(query, error.code, error.message)
-      } else {
-        throw error
-      }
+      throw new QueryError(query, error.message, error.code)
     })
   }
 

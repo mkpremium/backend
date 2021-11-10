@@ -23,8 +23,8 @@ export class KeyNotFound extends Error {
 export class QueryError extends Error {
   constructor (
     readonly query: string,
-    readonly code: string,
-    readonly name: string
+    readonly name: string,
+    readonly code?: string
   ) {
     super('Query error')
   }
