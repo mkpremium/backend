@@ -38,6 +38,12 @@ describe('getOwnerController', () => {
 
     await controller(testReq, testRes)
 
-    expect(testRes.json).to.have.been.calledWith(testOwner)
+    expect(testRes.json).to.have.been.called
+    expect(testRes.json.lastCall.args[ 0 ]).to.include.all.keys(
+      'id',
+      'name',
+      'contacts',
+      'featuredContact',
+    )
   })
 })

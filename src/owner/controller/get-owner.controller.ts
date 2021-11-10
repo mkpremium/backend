@@ -8,8 +8,18 @@ interface Deps {
 export function getOwnerController ({ ownersRepository }: Deps): RequestHandler {
   return async function (req, res): Promise<void> {
     return ownersRepository.get(req.params.ownerId)
-      .then(owner => {
-        res.json(owner)
+      .then(({
+               id,
+               name,
+               featuredContact,
+               person: { contacts },
+             }) => {
+        res.json({
+          id,
+          name,
+          contacts,
+          featuredContact,
+        })
       })
   }
 }
