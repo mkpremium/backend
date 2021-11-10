@@ -24,6 +24,7 @@ export class QueryError extends Error {
   constructor (
     readonly query: string,
     readonly name: string,
+    readonly params?: any,
     readonly code?: string
   ) {
     super('Query error')

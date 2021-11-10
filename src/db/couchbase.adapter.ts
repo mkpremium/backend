@@ -80,7 +80,7 @@ export class CouchbaseAdapter {
           .finally(() => beeline.finishSpan(span))
       }
     ).catch(error => {
-      throw new QueryError(query, error.message, error.code)
+      throw new QueryError(query, error.message, params, error.code)
     })
   }
 
