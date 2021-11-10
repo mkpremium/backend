@@ -68,6 +68,7 @@ CREATE INDEX person_migration_related on mkpremium(`_documentType`,`_relatedTo`)
 CREATE INDEX last_call_to_number ON mkpremium(status, phoneNumber) WHERE _documentType = 'virtual-agent-call' AND status IN [ 'CALLING', 'INPUT_GATHERED', 'DONE' ]
 CREATE INDEX virtual_call_worksheetId ON mkpremium(worksheetId) WHERE _documentType = 'virtual-agent-call'
 CREATE INDEX worksheet_city ON mkpremium(buildingAddress.city)WHERE _documentType = 'worksheet'
+CREATE INDEX call_to_number ON mkpremium(phoneNumber) WHERE _documentType = 'virtual-agent-call'
 
 
 BUILD INDEX mkpremium(
@@ -110,5 +111,6 @@ verified_owner_good_contact,
 user_scheduled_calls,
 virtual_call_created_at,
 last_call_to_number,
-user_meetings
+user_meetings,
+call_to_number
 )
