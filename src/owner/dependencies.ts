@@ -7,9 +7,11 @@ import { SetOwnerFeaturedContactService } from './service/set-featured-contact.s
 import { OwnerRepository as LegacyOwnerRepository } from './models'
 import { createCallFinishedListener } from './event-listener/call-finished.listener'
 import { markGoodContactOnCallScheduled } from './event-listener/mark-good-contact-on-call-scheduled'
+import { getOwnerController } from './controller/get-owner.controller'
 
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
+    getOwnerController: asFunction(getOwnerController).singleton(),
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
     searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
 

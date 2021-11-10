@@ -8,6 +8,7 @@ export const setupOwnersRoutes = (app: Express, container: AwilixContainer) => {
   const secured = jwt()
   const router = Router()
 
+  router.get('/:ownerId', wrap(container.resolve('getOwnerController')))
   router.put('/:id', updateOwnerController)
 
   router.put('/:ownerId/contacts/:contactId', wrap(container.resolve('changeContactStatusController')))
