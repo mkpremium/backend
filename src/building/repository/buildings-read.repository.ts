@@ -259,4 +259,8 @@ export class BuildingsReadRepository {
   static ownerOfId (validatedOwners, ownerId) {
     return validatedOwners.find(o => o.id === ownerId)
   }
+
+  ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
+    throw new Error('Not implemented')
+  }
 }
