@@ -55,7 +55,7 @@ describe('BuildingsReadRepository', () => {
     )()
   })
 
-  it.only('searches building by its cadastre reference', async () => {
+  it('searches building by its cadastre reference', async () => {
     const testCadastreReference = 'test-cadastre-reference'
     const testBuilding = buildingBuilder({ cadastre: { reference: testCadastreReference } }).build()
     await writeRepository.save(testBuilding)
