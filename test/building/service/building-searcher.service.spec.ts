@@ -34,6 +34,6 @@ describe('BuildingSearcherService', () => {
         expect(building).to.be.equal(testBuilding)
       }),
       orFail(),
-    )
+    )()
   })
 })

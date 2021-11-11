@@ -8,14 +8,22 @@ import { map } from 'fp-ts/TaskEither'
 import { orFail } from '../../helpers'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { ownerBuilder } from '../../owner/owner.builder'
+import { AwilixContainer } from 'awilix'
 
 describe('BuildingsReadRepository', () => {
-  it('gets flipper leads', async () => {
-    const container = await createTestContainer()
-    const readRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
-    const writeRepository = container.resolve('buildingsRepository') as BuildingsRepository
-    const ownersRepository = container.resolve('ownersRepository') as OwnerRepository
+  let readRepository: BuildingsReadRepository
+  let writeRepository: BuildingsRepository
+  let ownersRepository: OwnerRepository
+  let container: AwilixContainer
 
+  beforeEach(async () => {
+    container = await createTestContainer()
+    writeRepository = container.resolve('buildingsRepository') as BuildingsRepository
+    readRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
+    ownersRepository = container.resolve('ownersRepository') as OwnerRepository
+  })
+
+  it('gets flipper leads', async () => {
     const leadBuilding = buildingBuilder({
       id: 'test-lead-building',
       negotiationStatus: 'LEAD',
@@ -47,6 +55,20 @@ describe('BuildingsReadRepository', () => {
     )()
   })
 
+  it.only('searches building by its cadastre reference', async () => {
+    const testCadastreReference = 'test-cadastre-reference'
+    const testBuilding = buildingBuilder({ cadastre: { reference: testCadastreReference } }).build()
+    await writeRepository.save(testBuilding)
+    await ownersRepository.save(ownerBuilder({buildingId: testBuilding.id}).build())
+
+    await pipe(
+      readRepository.ofCadastreReference(testCadastreReference),
+      map(foundBuilding => {
+        expect(foundBuilding.id).to.be.equal(testBuilding.id)
+      }),
+      orFail(),
+    )()
+  })
 })
 
 describe('mapToPropertyAgentBuildingView', () => {

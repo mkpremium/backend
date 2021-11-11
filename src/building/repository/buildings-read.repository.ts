@@ -7,7 +7,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 
-const listBuildingsByIdQuery = bucketName => `
+const listBuildingsByQuery = (bucketName, condition) => `
 SELECT
     building.id,
     building.metadata,
@@ -45,8 +45,9 @@ LEFT JOIN ${bucketName} proposal ON proposal._documentType = 'building-proposal'
 LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = building.id
     AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
 WHERE building._documentType = 'building'
-AND building.id IN $1
+AND ${condition}
 `
+const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'building.id IN $1')
 
 const listProposalsForBuildingIdQuery = bucketName => `
     SELECT id,
@@ -162,6 +163,23 @@ export class BuildingsReadRepository {
     )
   }
 
+  ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
+    return pipe(
+      fromPromise(this.couchbaseAdapter.queryAsync(
+          listBuildingsByQuery(this.couchbaseAdapter.bucketName, 'building.cadastre.reference = $1'),
+          [ cadastreReference ]
+        )
+      ),
+      TE.chain(rows => {
+        if (rows.length === 0) {
+          return TE.of(undefined)
+        }
+
+        return TE.of(BuildingsReadRepository.mapToPropertyAgentBuildingView(rows)[ 0 ])
+      })
+    )
+  }
+
   private allAssignedBuildingsId (agentId): Promise<string[]> {
     return this.couchbaseAdapter
       .queryAsync(assignedBuildingsIdForAgentQuery(this.couchbaseAdapter.bucketName), [ agentId ])
@@ -173,7 +191,7 @@ export class BuildingsReadRepository {
       ({
          id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
          ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount,
-        lead
+         lead
        }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
@@ -258,9 +276,5 @@ export class BuildingsReadRepository {
 
   static ownerOfId (validatedOwners, ownerId) {
     return validatedOwners.find(o => o.id === ownerId)
-  }
-
-  ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
-    throw new Error('Not implemented')
   }
 }
