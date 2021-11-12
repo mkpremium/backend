@@ -72,6 +72,10 @@ function loop (container, retries = 2) {
           messageId: message.MessageId,
         })
       }
+      await sqsClient.deleteMessage({
+        QueueUrl: 'https://sqs.eu-west-1.amazonaws.com/173249668334/metadata-to-delete',
+        ReceiptHandle: message.ReceiptHandle,
+      }).promise()
 
       return loop(container)
     })
