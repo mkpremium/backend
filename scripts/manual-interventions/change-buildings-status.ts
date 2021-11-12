@@ -26,7 +26,7 @@ connectCouchbaseBucket()
 
 function loop (container, counter = { success: 0, error: 0 }, retries = 2) {
   if (retries <= 0) {
-    return
+    return Promise.resolve()
   }
   const buildingsReadRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
   const updateBuildingNegotiationStatusService = container.resolve('updateBuildingNegotiationStatusService') as UpdateBuildingNegotiationStatusService
