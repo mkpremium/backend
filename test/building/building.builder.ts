@@ -4,6 +4,7 @@ const buildingPrototype: BuildingProps = {
   negotiationStatus: undefined,
   id: 'test-building-id',
   floorArea: 0,
+  metadata: [],
   address: {
     type: 'CL',
     street: 'street, address',
