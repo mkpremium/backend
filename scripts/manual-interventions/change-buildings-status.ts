@@ -20,7 +20,7 @@ connectCouchbaseBucket()
     process.exit(0)
   })
   .catch(error => {
-    logger.error(error)
+    logger.error('Something went wrong', { error, errorMessage: error.message })
     process.exit(1)
   })
 
