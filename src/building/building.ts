@@ -207,6 +207,12 @@ export interface BuildingProps {
   assignedAgentId?: string;
   use?: string;
   recentProposal?: any
+  metadata: {
+    id: string,
+    name: string,
+    mimeType: string,
+    previewUrl: string
+  }[]
 }
 
 export const Building = t.struct<BuildingProps>(

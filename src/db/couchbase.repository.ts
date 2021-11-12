@@ -12,7 +12,7 @@ export abstract class CouchbaseRepository<T> {
     return this.couchbaseAdapter.bucketName
   }
 
-  get (entityId): Promise<T> {
+  get (entityId: string): Promise<T> {
     return this.couchbaseAdapter.getEntity(this.struct(), entityId)
   }
 

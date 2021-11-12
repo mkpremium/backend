@@ -75,7 +75,7 @@ interface StockTransaction {
   transactionDate: Date | string
 }
 
-export interface BuildingReadModel extends Omit<BuildingProps, 'address'> {
+export interface BuildingReadModel extends Omit<BuildingProps, 'address' | 'metadata'> {
   readonly address: Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> & {
     postalCode: {
       number: number | string
