@@ -41,7 +41,8 @@ function loop (container, counter = { success: 0, error: 0 }, retries = 2) {
         buildingsReadRepository.ofCadastreReference(cadastreReference),
         TE.chain(building => {
           if (!building) {
-            return TE.left(new Error('Building not found'))
+            logger.warn('Building not found', { cadastreReference })
+            return TE.of(undefined)
           }
           return fromPromise(updateBuildingNegotiationStatusService.updateBuildingStatus(building.id, {
             status: 'DESCARTADO',

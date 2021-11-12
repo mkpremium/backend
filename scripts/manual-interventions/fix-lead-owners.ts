@@ -1,10 +1,10 @@
 import { BuildingsRepository } from '../../src/building/repository/buildings.repository'
 import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
-import { Building, Lead, withCapturedLead } from '../../src/building/building'
+import { Building, Lead } from '../../src/building/building'
 import { initLogger } from '../../src/infrastructure/logger'
 import { OwnerRepository } from '../../src/owner/repository/owner.repository'
-import { mergeFeaturedContact, Owner } from '../../src/owner/owner'
+import { mergeFeaturedContact } from '../../src/owner/owner'
 
 const logger = initLogger()
 
