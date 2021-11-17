@@ -75,7 +75,7 @@ export class VirtualCallerService {
         .then(() => this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id))
         .catch(error => {
           if (error.context === lockingPhoneErrorContext) {
-            this.logger.error('Error getting lock', { ...error, error: error.message })
+            this.logger.warning('Error getting lock', { ...error, error: error.message })
             return
           }
           if (error instanceof NumberAlreadyCalled) {
