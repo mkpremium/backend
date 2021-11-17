@@ -64,7 +64,7 @@ const assignedBuildingsIdForAgentQuery = bucketName => `
     SELECT id buildingId
     FROM ${bucketName}
     WHERE _documentType = 'building'
-      AND negotiationStatus != 'NO VENDE'
+      AND negotiationStatus NOT IN ['NO VENDE', 'DESCARTADO']
       AND assignedAgentId = $1
 `
 
