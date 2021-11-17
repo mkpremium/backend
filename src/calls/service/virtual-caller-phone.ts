@@ -36,8 +36,6 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
 }
 
 const FREEZER_LENGTH_MONTHS = 3
-export const lockingPhoneErrorContext = 'Locking phone'
-
 export class NumberDoesNotExist extends Error {
   constructor (
     readonly ownerId: string,
@@ -46,6 +44,8 @@ export class NumberDoesNotExist extends Error {
     super(`Number does not exist (ownerId=${ownerId} contactId${contactId})`)
   }
 }
+
+export const lockingContextAction = 'virtual-caller-phone-lock'
 
 export class VirtualCallerPhone {
   constructor (
@@ -141,7 +141,7 @@ export class VirtualCallerPhone {
       }
     }).catch(error => {
       error.context = {
-        action: 'virtual-caller-phone-lock',
+        action: lockingContextAction,
         phoneNumber
       }
       throw error

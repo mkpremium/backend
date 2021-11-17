@@ -1,6 +1,10 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
-import { lockingPhoneErrorContext, NumberDoesNotExist, VirtualCallerPhone } from './virtual-caller-phone'
+import {
+  lockingContextAction,
+  NumberDoesNotExist,
+  VirtualCallerPhone
+} from './virtual-caller-phone'
 import {
   VirtualCallerWorksheet, VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
@@ -74,7 +78,7 @@ export class VirtualCallerService {
       })
         .then(() => this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id))
         .catch(error => {
-          if (error.context === lockingPhoneErrorContext) {
+          if (error.context && error.context.action === lockingContextAction) {
             this.logger.warning('Error getting lock', { ...error, error: error.message })
             return
           }
