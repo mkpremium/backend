@@ -140,7 +140,10 @@ export class VirtualCallerPhone {
         }), cas
       }
     }).catch(error => {
-      error.context = lockingPhoneErrorContext
+      error.context = {
+        action: 'virtual-caller-phone-lock',
+        phoneNumber
+      }
       throw error
     })
   }
