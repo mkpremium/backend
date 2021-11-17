@@ -99,7 +99,7 @@ export class VirtualCallerPhone {
     }
     const momentThreshold = moment().add(-3, 'days')
     callsToNumber.forEach(call => {
-      if (call.error === PHONE_DOES_NOT_EXIST) {
+      if (call.error === PHONE_DOES_NOT_EXIST || (call.error || '').startsWith('Number does not exist')) {
         throw new NumberDoesNotExist(contact.ownerId, contact.id)
       }
       if (VirtualCallerPhone.fromFreezer(call)) {
