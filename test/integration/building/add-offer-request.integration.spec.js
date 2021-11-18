@@ -30,7 +30,7 @@ describe('AddOfferRequest', () => {
 
   before(async () => {
     const diContainer = await createTestContainer()
-    buildingEventListeners(diContainer)
+    buildingEventListeners(diContainer.resolve('eventBus'), diContainer)
     addOfferRequestService = diContainer.resolve('addOfferRequestService')
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
