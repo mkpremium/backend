@@ -3,6 +3,7 @@ import { RequestHandler } from 'express'
 import { stub } from 'sinon'
 import { createStartVirtualCallerController } from '../../../src/calls/controller/virtual-caller-start.controller'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
+import { createLoggerMock } from '../../infrastructure/logger.spec'
 
 describe('virtual-caller-start.controller', () => {
   let controller: RequestHandler
@@ -20,6 +21,7 @@ describe('virtual-caller-start.controller', () => {
     controller = createStartVirtualCallerController({
       virtualCallerSupervisor: virtualCallerSupervisorStub,
       virtualCallersRepository: virtualCallersRepositoryStub,
+      logger: createLoggerMock(),
     })
   })
 
