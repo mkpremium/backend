@@ -152,7 +152,7 @@ describe('VirtualCallerService', () => {
       callerId: testCmd.caller.id,
     })
     expect(eventBusStub.publish).to.have.been.calledWith({
-      name: 'virtual-caller.worksheet_done',
+      name: 'virtual_caller.worksheet_done',
       callerId: testCmd.caller.id,
       worksheetId: testWorksheet.id,
     })
@@ -193,7 +193,7 @@ describe('VirtualCallerService', () => {
       status: 'DONE',
     })
     expect(eventBusStub.publish).to.have.been.calledWith({
-      name: 'virtual-caller.worksheet_done',
+      name: 'virtual_caller.worksheet_done',
       callerId: testCmd.caller.id,
       worksheetId: testWorksheet.id,
     })

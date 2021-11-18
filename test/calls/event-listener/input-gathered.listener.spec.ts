@@ -17,7 +17,7 @@ describe('input-gathered.listener', () => {
   const testVirtualCallerId = 'test-virtual-caller-id'
   const testVirtualCallerQueueId = 'test-queue-id'
   const testEvent: InputGathered = {
-    name: 'virtual-caller.input_gathered',
+    name: 'virtual_caller.input_gathered',
     ownerResponse: OwnerResponse.SALE,
     buildingId: 'test-building-id',
     callId: 'test-call-id',

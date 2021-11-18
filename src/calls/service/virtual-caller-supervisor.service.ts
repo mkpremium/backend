@@ -82,7 +82,7 @@ export class VirtualCallerSupervisorService {
         const firstContact = samePhoneNumberContacts[ 0 ]
         this.logger.info('Duplicated contact in owner', { ownerId: firstContact.ownerId, contactId: firstContact.id })
         this.eventBus.publish({
-          name: 'virtual-caller.duplicated_contact_detected_in_owner',
+          name: 'virtual_caller.duplicated_contact_detected_in_owner',
           ownerId: firstContact.ownerId,
         }).catch(error => this.logger.error('Couldnt publish event', { error: error.message }))
       }

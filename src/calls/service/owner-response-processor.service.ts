@@ -22,7 +22,7 @@ interface OwnerResponseProcessCommand {
 }
 
 export interface InputGathered {
-  name: 'virtual-caller.input_gathered'
+  name: 'virtual_caller.input_gathered'
   callId: string
   callerId: string
   ownerId: string
@@ -133,7 +133,7 @@ export class OwnerResponseProcessorService {
       })
 
     const inputGatheredEvent: InputGathered = {
-      name: 'virtual-caller.input_gathered',
+      name: 'virtual_caller.input_gathered',
       callerId: call.callerId,
       callId,
       ownerResponse,

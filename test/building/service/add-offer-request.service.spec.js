@@ -59,7 +59,7 @@ describe('addOfferRequestService', () => {
     return service.addOfferRequest(testCmd)
       .then(() => {
         expect(eventBusSpy.publish).to.have.been.calledWith({
-          name: 'offer-request.created',
+          name: 'offer_request.created',
           note: testCmd.note,
           userId: testCmd.callerId,
           buildingId: testCmd.buildingId,

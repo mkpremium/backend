@@ -28,7 +28,7 @@ describe('worksheet-done.listener', () => {
     virtualCallersRepositoryStub.get.withArgs(testVirtualCaller.id).resolves(testVirtualCaller)
 
     let testEvt: WorksheetDone = {
-      name: 'virtual-caller.worksheet_done',
+      name: 'virtual_caller.worksheet_done',
       callerId: testVirtualCaller.id,
       worksheetId: ''
     }

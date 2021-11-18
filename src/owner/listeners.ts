@@ -3,7 +3,7 @@ import { EventListener } from '../infrastructure/event-bus'
 
 export function ownerEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
-    'virtual-caller.call_finished',
+    'virtual_caller.call_finished',
     'owner.discard_bad_contact',
     container.resolve('callFinishedListener'),
   )

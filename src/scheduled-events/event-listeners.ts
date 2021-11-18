@@ -9,7 +9,7 @@ export function scheduledEventsEventListeners (eventBus: EventListener, containe
     container.resolve('removeCallsOnNewMeetingOrOfferRequest')
   )
   eventBus.on(
-    'offer-request.created',
+    'offer_request.created',
     'scheduled-events.remove_call',
     container.resolve('removeCallsOnNewMeetingOrOfferRequest'),
   )
@@ -19,7 +19,7 @@ export function scheduledEventsEventListeners (eventBus: EventListener, containe
     container.resolve('removeScheduledCallsOnOwnerRefusal')
   )
   eventBus.on(
-    'virtual-caller.sms-received',
+    'virtual_caller.sms_received',
     'scheduled-events.schedule_call',
     container.resolve('scheduledCallFromOwnerMessage')
   )

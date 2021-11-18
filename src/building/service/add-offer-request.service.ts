@@ -17,7 +17,7 @@ const AddOfferRequestCommand = t.struct({
 })
 
 export interface OfferRequestCreated {
-  name: 'offer-request.created'
+  name: 'offer_request.created'
   note: string
   userId: string
   buildingId: string
@@ -39,7 +39,7 @@ export class AddOfferRequestService {
     await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
     await this.eventBus.publish({
-      name: 'offer-request.created',
+      name: 'offer_request.created',
       note: addRequestCommand.note,
       userId: addRequestCommand.callerId,
       buildingId: addRequestCommand.buildingId,

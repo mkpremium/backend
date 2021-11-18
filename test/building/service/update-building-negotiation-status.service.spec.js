@@ -47,7 +47,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     await service.updateBuildingStatus('test-building-id', { status: 'COMPRADO', userId: 'operator-id' })
 
     expect(eventBus.publish).to.have.been.deep.calledWith({
-      name: 'building.negotiation-status-changed',
+      name: 'building.negotiation_status_changed',
       buildingId: 'test-building-id',
       userId: 'operator-id',
       negotiationStatus: 'COMPRADO'

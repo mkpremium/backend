@@ -23,7 +23,7 @@ describe('removeFavoriteForNoSaleBuildings', () => {
     usersRepositoryStub.withFavoriteBuilding.returns(TE.of(testUserWithFavoriteBuilding))
 
     await listener({
-      name: 'building.negotiation-status-changed',
+      name: 'building.negotiation_status_changed',
       negotiationStatus: 'NO VENDE',
       userId: '',
       buildingId: 'test-building-id',

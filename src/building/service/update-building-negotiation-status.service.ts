@@ -3,7 +3,7 @@ import { BuildingsRepository } from '../repository/buildings.repository'
 import { BuildingNegotiationStatus, changeNegotiationStatus, withFeaturedOwner } from '../building'
 
 export interface BuildingNegotiationStatusChanged {
-  name: 'building.negotiation-status-changed';
+  name: 'building.negotiation_status_changed';
   buildingId: string;
   userId: string;
   negotiationStatus: BuildingNegotiationStatus;
@@ -45,4 +45,4 @@ export class UpdateBuildingNegotiationStatusService {
   }
 }
 
-export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'building.negotiation-status-changed'
+export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'building.negotiation_status_changed'

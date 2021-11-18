@@ -8,7 +8,7 @@ describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
   let changeContactStatusServiceStub
   const testEvt: CallDone = {
-    name: 'virtual-caller.call_finished',
+    name: 'virtual_caller.call_finished',
     callId: 'test-call-id',
     callerId: 'test-caller-id',
     contactId: 'test-contact-id',

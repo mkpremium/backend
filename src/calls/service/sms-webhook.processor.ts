@@ -23,7 +23,7 @@ export class SmsWebhookProcessor {
       taskEither.map(this.composeMessage(cmd.fromNumber)),
       taskEither.map(([ lastSms, ws, response ]: [ SmsOutgoingMessage, WorksheetViewProps, MessagingResponse ]) => {
         this.eventBus.publish({
-          name: 'virtual-caller.sms-received',
+          name: 'virtual_caller.sms_received',
           callerId: lastSms.callerId,
           message: cmd.message,
           buildingId: ws.building.id,
@@ -69,7 +69,7 @@ interface ProcessSmsWebhookCommand {
 }
 
 export interface SmsReceived {
-  name: 'virtual-caller.sms-received'
+  name: 'virtual_caller.sms_received'
   callerId: string
   message: string
   buildingId: string

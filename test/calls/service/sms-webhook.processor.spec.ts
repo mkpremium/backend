@@ -73,7 +73,7 @@ describe('SmsWebhookProcessor', () => {
 
     expect(eventBusStub.publish).to.have.been.called
     expect(eventBusStub.publish.lastCall.firstArg).to.include({
-      name: 'virtual-caller.sms-received',
+      name: 'virtual_caller.sms_received',
       message: 'test message',
     })
   })

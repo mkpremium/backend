@@ -14,7 +14,7 @@ describe('call-finished.listener', () => {
   const testCallerPhoneNumber = '+34666666666'
   const testVirtualCaller = virtualCallerBuilder({ phoneNumber: testCallerPhoneNumber }).build()
   const testEvt: CallDone = {
-    name: 'virtual-caller.call_finished',
+    name: 'virtual_caller.call_finished',
     status: 'DONE',
     callerId: testVirtualCaller.id,
     callId: '',

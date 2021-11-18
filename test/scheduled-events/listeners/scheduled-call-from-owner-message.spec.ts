@@ -26,7 +26,7 @@ describe('scheduledCallFromOwnerMessage', () => {
 
   it('schedules call with assigned caller', async () => {
     const testSmsReceived: SmsReceived = {
-      name: 'virtual-caller.sms-received',
+      name: 'virtual_caller.sms_received',
       callerId: 'test-caller-id',
       buildingId: 'test-building-id',
       worksheetId: 'test-worksheet-id',

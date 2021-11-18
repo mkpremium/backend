@@ -17,7 +17,7 @@ describe('addSmsNoteListener', () => {
 
   it('adds note to building', async () => {
     const testSmsReceivedEvent: SmsReceived = {
-      name: 'virtual-caller.sms-received',
+      name: 'virtual_caller.sms_received',
       buildingId: 'test-building-id',
       message: 'test message',
       ownerId: 'test-owner-id',

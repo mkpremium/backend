@@ -6,7 +6,7 @@ import { taskEither } from 'fp-ts'
 import { TaskEither } from 'fp-ts/lib/TaskEither'
 
 export interface CallDone {
-  name: 'virtual-caller.call_finished';
+  name: 'virtual_caller.call_finished';
   callerId: string;
   callId: string;
   status: CallStatus;
@@ -66,7 +66,7 @@ export class CallFinishedProcessor {
 
           await this.virtualCallsRepository.save(updatedCall)
           await this.eventBus.publish({
-            name: 'virtual-caller.call_finished',
+            name: 'virtual_caller.call_finished',
             status,
             callId,
             callerId: call.callerId,

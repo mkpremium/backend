@@ -47,7 +47,7 @@ describe('CallFinishedProcessor', () => {
 
     expect(eventBusStub.publish).to.have.been.called
     expect(eventBusStub.publish.lastCall.firstArg).to.include({
-      name: 'virtual-caller.call_finished',
+      name: 'virtual_caller.call_finished',
       callId: 'test-call-id',
       status: 'DONE',
     })
