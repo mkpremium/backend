@@ -9,7 +9,6 @@ import cadastre from './cadastre'
 import { setupCallerRoutes } from './caller/init'
 
 import email from './email'
-import history from './history'
 import { createDiContainer } from './infrastructure/dependencies'
 import appErrorHandler from './infrastructure/error-handler'
 import { initLogger } from './infrastructure/logger'
@@ -37,6 +36,7 @@ import { flipperRoutes } from './flipper/routing'
 import { setupUserRoutes } from './user/routing'
 import { statListeners } from './stats/listeners'
 import { statRoutes } from './stats/routing'
+import { historyRoutes } from './history/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -80,8 +80,8 @@ export const createApp = (): Promise<Express> => {
       flipperRoutes(app, diContainer)
       setupStockRouter(app, diContainer)
       statRoutes(app)
+      historyRoutes(app)
 
-      history(app)
       notes(app)
       metadata(app)
       autocomplete(app)
