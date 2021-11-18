@@ -3,7 +3,6 @@ import { EventBus } from './event-bus'
 import { asClass, asFunction, asValue, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
-import { setupUserDependencies } from '../user'
 import { setupStockDependencies } from '../stock/stock-di'
 import { Bucket } from 'couchbase'
 import { setupHistoryDependencies } from '../history/dependencies'
@@ -14,6 +13,7 @@ import { setupCallsDependencies } from '../calls/dependencies'
 import { setupOwnerDependencies } from '../owner/dependencies'
 import { setupScheduledEventsDependencies } from '../scheduled-events/dependencies'
 import { setupFlipperDependencies } from '../flipper/dependencies'
+import { setupUserDependencies } from '../user/dependencies'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()

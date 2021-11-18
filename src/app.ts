@@ -24,7 +24,6 @@ import { setupStockRouter } from './stock/stock-router'
 import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
-import { setupUserRoutes } from './user'
 import { worksheetEventListeners } from './worksheet/listeners'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
@@ -37,6 +36,7 @@ import { scheduledEventsRoutes } from './scheduled-events/routing'
 import { scheduledEventsEventListeners } from './scheduled-events/event-listeners'
 import { userEventListeners } from './user/listeners'
 import { flipperRoutes } from './flipper/routing'
+import { setupUserRoutes } from './user/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
