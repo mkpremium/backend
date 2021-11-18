@@ -21,7 +21,7 @@ services:
       - couchbasedb
     depends_on:
       - couchbasedb
-    entrypoint: ["/tmp/wait-for-it.sh", "couchbasedb:8091", "--", "node", "/app/bin/www.js"]
+    entrypoint: [ "/tmp/wait-for-it.sh", "couchbasedb:8091", "--", "node", "/app/bin/www.js" ]
 
   couchbasedb:
     image: "couchbase:community-6.6.0"
@@ -38,10 +38,10 @@ services:
       core: 100000000
       memlock: 100000000
 
-#  localstack:
-#    image: localstack/localstack
-#    ports:
-#      - "4567-4584:4567-4584"
-#      - "8080:8080" # web UI
-#    environment:
-#      - SERVICES=sqs
+  sqs:
+    image: roribio16/alpine-sqs
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    volumes:
+      - ./docker/elasticmq.conf:/opt/config/elasticmq.conf
