@@ -32,7 +32,7 @@ describe('virtual-caller-start.controller', () => {
     ])
     virtualCallerSupervisorStub.check.resolves()
 
-    await controller(undefined, { json: stub() } as any, undefined)
+    await controller(undefined, { sendStatus: stub() } as any, undefined)
 
     expect(virtualCallerSupervisorStub.check).to.have.been.calledTwice
     expect(virtualCallerSupervisorStub.check).to.have.been.calledWithMatch(({caller}) => caller.id === 'caller-1')
