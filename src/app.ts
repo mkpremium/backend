@@ -18,8 +18,6 @@ import notes from './notes'
 // modules
 import operator from './operator'
 import { init as initPropertyManager } from './property-manager'
-
-import stats from './stats'
 import { setupStockRouter } from './stock/stock-router'
 import { createTestHarness } from './test-harness/routes'
 // app aware types
@@ -37,6 +35,8 @@ import { scheduledEventsEventListeners } from './scheduled-events/event-listener
 import { userEventListeners } from './user/listeners'
 import { flipperRoutes } from './flipper/routing'
 import { setupUserRoutes } from './user/routing'
+import { statListeners } from './stats/listeners'
+import { statRoutes } from './stats/routing'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -69,33 +69,32 @@ export const createApp = (): Promise<Express> => {
 
       operator(app) // start with login router
       callsRoutes(diContainer, app)
-
       setupUserRoutes(app, diContainer)
-      buildingEventListeners(diContainer)
-      ownerEventListeners(diContainer)
-      callsEventListeners(diContainer)
-      scheduledEventsEventListeners(diContainer)
-      worksheetEventListeners(diContainer)
-      userEventListeners(diContainer.resolve('eventBus'), diContainer)
-
       buildingRoutes(diContainer, app)
       setupOwnersRoutes(app, diContainer)
       scheduledEventsRoutes(diContainer, app)
-
       worksheetsRoutes(app, diContainer)
       createTestHarness(app, diContainer)
       initPropertyManager(app, diContainer)
       setupCallerRoutes(app, diContainer)
       flipperRoutes(app, diContainer)
       setupStockRouter(app, diContainer)
+      statRoutes(app)
 
-      stats(app, diContainer)
       history(app)
       notes(app)
       metadata(app)
       autocomplete(app)
       email(app)
       cadastre(app)
+
+      buildingEventListeners(diContainer)
+      ownerEventListeners(diContainer)
+      callsEventListeners(diContainer)
+      scheduledEventsEventListeners(diContainer)
+      worksheetEventListeners(diContainer)
+      userEventListeners(diContainer.resolve('eventBus'), diContainer)
+      statListeners(diContainer.resolve('eventBus'))
 
       app.use(appErrorHandler)
       app.set('IS_READY', true)
