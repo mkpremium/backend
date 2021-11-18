@@ -23,10 +23,10 @@ describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
 
   before(async () => {
     const container = await createTestContainer()
-    worksheetEventListeners(container)
+    eventBus = container.resolve('eventBus')
+    worksheetEventListeners(eventBus, container)
     service = container.resolve('updateWorksheetStatusOnOwnerChangeService')
     worksheetRepository = container.resolve('worksheetRepository')
-    eventBus = container.resolve('eventBus')
 
     await worksheetRepository.save(testWorksheet)
     await new Promise(resolve => setTimeout(resolve, 1000))

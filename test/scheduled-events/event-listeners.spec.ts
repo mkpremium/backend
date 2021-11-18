@@ -26,7 +26,7 @@ describe('scheduled-events.setupEventListeners', () => {
       removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
       removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
     })
-    scheduledEventsEventListeners(container)
+    scheduledEventsEventListeners(eventBus, container)
   })
 
   it('deletes scheduled calls when a visit is scheduled for the building', () => {

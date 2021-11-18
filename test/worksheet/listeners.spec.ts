@@ -8,7 +8,7 @@ import { OwnerStatusChangedEvent } from '../../src/owner/service/change-contact-
 
 describe('worksheetEventListeners', () => {
   let eventSubscribers
-  let eventBusMock: { on: Sinon.SinonSpy }
+  let eventBusMock
   let releaseUserOtherActiveWorksheetsInQueueServiceMock: { release: Sinon.SinonSpy }
   let updateWorksheetStatusOnOwnerChangeSpy
 
@@ -29,7 +29,6 @@ describe('worksheetEventListeners', () => {
 
     const testContainer = createContainer()
     testContainer.register({
-      eventBus: asValue(eventBusMock),
       releaseUserOtherActiveWorksheetsInQueueService: asValue(releaseUserOtherActiveWorksheetsInQueueServiceMock),
       updateWorksheetStatusOnOwnerChangeService: asValue(updateWorksheetStatusOnOwnerChangeSpy),
       legacyWorksheetRepository: asValue(null),
@@ -38,7 +37,7 @@ describe('worksheetEventListeners', () => {
       logger: asValue(noopLogger),
       consistencyDelay: asValue(0),
     })
-    worksheetEventListeners(testContainer)
+    worksheetEventListeners(eventBusMock, testContainer)
   })
 
   it('releases other worksheets taken by user when takes another', () => {
