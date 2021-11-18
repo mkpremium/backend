@@ -1,9 +1,16 @@
-export class EventNamingPolicy {
+export interface EventNamingPolicy {
+  satisfiesEventName (name: string): boolean
+
+  satisfiesListenerName (name: string): boolean
+}
+
+const eventNamePattern = /(?<module>[a-z_])\.(?<event>[a-z_])/
+export const eventNamingPolicy: EventNamingPolicy = {
   satisfiesEventName (name: string): boolean {
-    return false
-  }
+    return eventNamePattern.test(name)
+  },
 
   satisfiesListenerName (name: string): boolean {
-    return false
+    return eventNamePattern.test(name)
   }
 }

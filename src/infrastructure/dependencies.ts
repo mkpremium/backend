@@ -1,5 +1,4 @@
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
-import { EventBus } from './event-bus'
 import { asClass, asFunction, asValue, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
@@ -15,7 +14,7 @@ import { setupScheduledEventsDependencies } from '../scheduled-events/dependenci
 import { setupFlipperDependencies } from '../flipper/dependencies'
 import { setupUserDependencies } from '../user/dependencies'
 import { EventEmitterBus } from './event-bus/event-emitter-bus'
-import { EventNamingPolicy } from './event-bus/event-naming-policy'
+import { eventNamingPolicy } from './event-bus/event-naming-policy'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -24,7 +23,7 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
-    eventNamingPolicy: asClass(EventNamingPolicy).singleton(),
+    eventNamingPolicy: asValue(eventNamingPolicy),
     eventBus: asClass(EventEmitterBus).inject(() => ({})).classic().singleton(),
     logger: asFunction(initLogger).singleton(),
   })

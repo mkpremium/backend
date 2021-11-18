@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { Logger } from 'winston'
 import { EventBus } from '../event-bus'
+import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
 
 export class EventEmitterBus implements EventBus {
@@ -24,6 +25,10 @@ export class EventEmitterBus implements EventBus {
   }
 
   publish<T extends { name: string }> (event: T): Promise<void> {
+    if (!this.eventNamingPolicy.satisfiesEventName(event.name)) {
+      throw new WrongEventName(event.name)
+    }
+
     return new Promise((resolve, reject) => {
       try {
         this.emitter.emit(event.name, event)
@@ -34,7 +39,9 @@ export class EventEmitterBus implements EventBus {
     })
   }
 
-  on (eventName: string, subscriberName: string, subscriber: (event: any) => Promise<any>) {
+  on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
+    this.assertNamingSatisfiesPolicy(listenerName, eventName)
+
     this.logger.info('New event subscriber', { eventName })
     this.emitter
       .addListener(eventName, (event) => {
@@ -47,6 +54,15 @@ export class EventEmitterBus implements EventBus {
           this.logSubscriberError(event, eventName, error, subscriber)
         }
       })
+  }
+
+  private assertNamingSatisfiesPolicy (listenerName: string, eventName: string) {
+    if (!this.eventNamingPolicy.satisfiesListenerName(listenerName)) {
+      throw new WrongListenerName(listenerName)
+    }
+    if (!this.eventNamingPolicy.satisfiesEventName(eventName)) {
+      throw new WrongEventName(eventName)
+    }
   }
 
   private logSubscriberError (event, eventName, error, subscriber) {
