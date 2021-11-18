@@ -2,18 +2,18 @@ import { startListeners } from '../../src/infrastructure/listeners'
 import { EventBus } from '../../src/infrastructure/event-bus'
 import { expect } from 'chai'
 import { createDiContainer } from '../../src/infrastructure/dependencies'
+import { Logger } from 'winston'
 
-describe('startListeners', () => {
+describe.only('startListeners', () => {
   let container
   beforeEach(() => {
     container = createDiContainer(null)
   })
 
   it('start all listeners without errors', () => {
-    expect(() => startListeners(container)).to.not.throw
-  })
+    const logger: Logger = container.resolve('logger')
+    logger.silent = true
 
-  it('adds all listeners to bus', () => {
     startListeners(container)
 
     const eventBus: EventBus = container.resolve('eventBus')

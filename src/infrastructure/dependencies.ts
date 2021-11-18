@@ -15,6 +15,7 @@ import { setupScheduledEventsDependencies } from '../scheduled-events/dependenci
 import { setupFlipperDependencies } from '../flipper/dependencies'
 import { setupUserDependencies } from '../user/dependencies'
 import { EventEmitterBus } from './event-bus/event-emitter-bus'
+import { EventNamingPolicy } from './event-bus/event-naming-policy'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -23,8 +24,8 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
-    eventBus: asClass(EventEmitterBus).inject(() => ({
-    })).classic().singleton(),
+    eventNamingPolicy: asClass(EventNamingPolicy).singleton(),
+    eventBus: asClass(EventEmitterBus).inject(() => ({})).classic().singleton(),
     logger: asFunction(initLogger).singleton(),
   })
 

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { Logger } from 'winston'
 import { EventBus } from '../event-bus'
+import { EventNamingPolicy } from './event-naming-policy'
 
 export class EventEmitterBus implements EventBus {
   private emitter = new EventEmitter()
@@ -14,6 +15,7 @@ export class EventEmitterBus implements EventBus {
 
   constructor (
     private logger: Logger,
+    private eventNamingPolicy: EventNamingPolicy,
   ) {
     this.emitter.setMaxListeners(0)
     this.emitter.on('error', error => {
