@@ -2,14 +2,16 @@ import { AwilixContainer } from 'awilix'
 import { EventBus } from '../infrastructure/event-bus'
 
 export function buildingEventListeners (eventBus: EventBus, container: AwilixContainer) {
-  eventBus.on('meeting.created', container.resolve('addNoteToBuilding'))
-  eventBus.on('scheduled_events.call_scheduled', container.resolve('addNoteToBuilding'))
-  eventBus.on('scheduled_events.call_updated', container.resolve('addNoteToBuilding'))
-  eventBus.on('meeting.created', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
-  eventBus.on('building.lead_captured', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
-  eventBus.on('scheduled_events.call_scheduled', container.resolve('scheduledCallListener'))
-  eventBus.on('offer-request.created', container.resolve('setFeaturedOwnerFromOfferRequestListener'))
-  eventBus.on('offer-request.created', container.resolve('addNoteToBuilding'))
-  eventBus.on('building.proposal_scheduled', container.resolve('proposalScheduledListener'))
-  eventBus.on('virtual-caller.sms-received', container.resolve('addSmsNoteListener'))
+  eventBus.on('building.lead_captured', 'building.set_featured_owner', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
+  eventBus.on('building.proposal_scheduled', 'building.set_status_to_proposal_scheduled', container.resolve('proposalScheduledListener'))
+
+  eventBus.on('meeting.created', 'building.add_note', container.resolve('addNoteToBuilding'))
+  eventBus.on('meeting.created', 'building.set_featured_owner', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
+  eventBus.on('scheduled_events.call_scheduled', 'building.add_note', container.resolve('addNoteToBuilding'))
+  eventBus.on('scheduled_events.call_scheduled', 'building.set_featured_owner_on_call', container.resolve('scheduledCallListener'))
+  eventBus.on('scheduled_events.call_updated', 'building.add_note', container.resolve('addNoteToBuilding'))
+
+  eventBus.on('offer-request.created', 'building.set_featured_owner', container.resolve('setFeaturedOwnerFromOfferRequestListener'))
+  eventBus.on('offer-request.created', 'building.add_note', container.resolve('addNoteToBuilding'))
+  eventBus.on('virtual-caller.sms-received', 'building.add_note', container.resolve('addSmsNoteListener'))
 }

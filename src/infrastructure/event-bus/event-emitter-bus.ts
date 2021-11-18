@@ -5,7 +5,7 @@ import { EventBus } from '../event-bus'
 export class EventEmitterBus implements EventBus {
   private emitter = new EventEmitter()
 
-  get info(): Record<string, number> {
+  get info (): Record<string, number> {
     return this.emitter.eventNames().reduce((acc, name) => {
       acc[ name ] = this.emitter.listenerCount(name)
       return acc
@@ -32,7 +32,7 @@ export class EventEmitterBus implements EventBus {
     })
   }
 
-  on (eventName: string, subscriber: (event: any) => Promise<any>) {
+  on (eventName: string, subscriberName: string, subscriber: (event: any) => Promise<any>) {
     this.logger.info('New event subscriber', { eventName })
     this.emitter
       .addListener(eventName, (event) => {
