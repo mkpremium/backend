@@ -37,6 +37,7 @@ import { setupUserRoutes } from './user/routing'
 import { statListeners } from './stats/listeners'
 import { statRoutes } from './stats/routing'
 import { historyRoutes } from './history/routing'
+import { startListeners } from './infrastructure/listeners'
 
 let app: Express
 export const createApp = (): Promise<Express> => {
@@ -88,13 +89,7 @@ export const createApp = (): Promise<Express> => {
       email(app)
       cadastre(app)
 
-      buildingEventListeners(diContainer)
-      ownerEventListeners(diContainer)
-      callsEventListeners(diContainer)
-      scheduledEventsEventListeners(diContainer)
-      worksheetEventListeners(diContainer)
-      userEventListeners(diContainer.resolve('eventBus'), diContainer)
-      statListeners(diContainer.resolve('eventBus'))
+      startListeners(diContainer)
 
       app.use(appErrorHandler)
       app.set('IS_READY', true)

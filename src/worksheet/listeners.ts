@@ -15,8 +15,7 @@ import { WorksheetRepository } from './repository/worksheet.repository'
 import { Logger } from 'winston'
 import { setStatus } from './domain/worksheet'
 
-export function worksheetEventListeners (container: AwilixContainer) {
-  const eventBus = container.resolve('eventBus') as EventBus
+export function worksheetEventListeners (eventBus: EventBus, container: AwilixContainer) {
   const legacyWorksheetRepository = container.resolve('legacyWorksheetRepository') as LegacyWorksheetRepository
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
   const worksheetQueueActionsService = container.resolve('worksheetQueueActionsService') as WorksheetQueueActionsService
