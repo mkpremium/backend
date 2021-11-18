@@ -5,10 +5,10 @@ import { scheduledEventsEventListeners } from '../scheduled-events/event-listene
 import { worksheetEventListeners } from '../worksheet/listeners'
 import { userEventListeners } from '../user/listeners'
 import { statListeners } from '../stats/listeners'
-import { EventBus } from './event-bus'
+import { EventListener } from './event-bus'
 
 export function startListeners (diContainer) {
-  const eventBus = diContainer.resolve('eventBus') as EventBus
+  const eventBus = diContainer.resolve('eventBus') as EventListener
 
   buildingEventListeners(eventBus, diContainer)
   ownerEventListeners(eventBus, diContainer)

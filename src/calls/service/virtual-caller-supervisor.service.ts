@@ -4,7 +4,7 @@ import { Logger } from 'winston'
 import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { flatMap, groupBy } from 'lodash'
 import moment from 'moment-timezone'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { Timezone, VirtualCallerProps } from '../domain/virtual-caller'
 import { array, ord } from 'fp-ts'
 import { Ord } from 'fp-ts/number'
@@ -20,7 +20,7 @@ export class VirtualCallerSupervisorService {
   constructor (
     private virtualCaller: VirtualCallerService,
     private virtualCallerWorksheetsRepository: VirtualCallerWorksheetsRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
     private logger: Logger,
   ) {
   }

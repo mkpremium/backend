@@ -3,7 +3,7 @@ import { validate } from 'tcomb-validation'
 import { InvalidCommand } from '../../infrastructure/invalid-command.error'
 import { OfferRequestsRepository } from '../repository/offer-requests.repository'
 import { BuildingsRepository } from '../repository/buildings.repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 
 const AddOfferRequestCommand = t.struct({
   ownerId: t.String,
@@ -28,7 +28,7 @@ export class AddOfferRequestService {
   constructor (
     private offerRequestsRepository: OfferRequestsRepository,
     private buildingsRepository: BuildingsRepository,
-    private eventBus: EventBus
+    private eventBus: EventPublisher,
   ) {
   }
 

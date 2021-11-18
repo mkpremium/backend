@@ -1,6 +1,6 @@
 import { takeWorksheet } from '../domain/worksheet'
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { WorksheetRepository } from '../repository/worksheet.repository'
 import { removeScheduledCall } from '../domain/queue'
 
@@ -8,7 +8,7 @@ export class WorksheetQueueActionsService {
   constructor (
     private worksheetQueueRepository: WorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
-    private eventBus: EventBus
+    private eventBus: EventPublisher,
   ) {
   }
 

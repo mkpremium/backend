@@ -1,6 +1,6 @@
 import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { BuildingsRepository } from '../../building/repository/buildings.repository'
 
@@ -18,7 +18,7 @@ export class CreateMeetingService {
   constructor (
     private scheduledEventsRepository: ScheduledEventsRepository,
     private buildingsRepository: BuildingsRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
   ) {
   }
 

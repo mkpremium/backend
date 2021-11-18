@@ -2,7 +2,7 @@ import VoiceResponse, { GatherLanguage } from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualAgentCall } from '../virtual-agent-call'
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { Logger } from 'winston'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { CallLanguage, TwilioSayAttributes } from './call-attributes'
 
 export enum OwnerResponse {
@@ -70,7 +70,7 @@ export class OwnerResponseProcessorService {
   constructor (
     private virtualCallsRepository: VirtualCallsRepository,
     private twilioSayAttributes: TwilioSayAttributes,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
     private logger: Logger,
     private publicUrl: string,
   ) {

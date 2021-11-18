@@ -1,9 +1,9 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 
 interface Deps {
   scheduledEventsRepository: ScheduledEventsRepository
-  eventBus: EventBus
+  eventBus: EventPublisher
 }
 
 export const updateScheduledCallController = ({

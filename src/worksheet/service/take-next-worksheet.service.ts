@@ -1,7 +1,7 @@
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
 import { WorksheetNotFound, WorksheetRepository, WorksheetViewProps } from '../repository/worksheet.repository'
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 
 export interface InvalidWorksheetFound {
   name: 'worksheet.invalid_worksheet_found';
@@ -13,7 +13,7 @@ export class TakeNextWorksheetService {
     private takeWorksheetService: WorksheetQueueActionsService,
     private worksheetRepository: WorksheetRepository,
     private worksheetQueueRepository: WorksheetQueueRepository,
-    private eventBus: EventBus
+    private eventBus: EventPublisher,
   ) {
   }
 

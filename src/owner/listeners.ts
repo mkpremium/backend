@@ -1,7 +1,7 @@
 import { AwilixContainer } from 'awilix'
-import { EventBus } from '../infrastructure/event-bus'
+import { EventListener } from '../infrastructure/event-bus'
 
-export function ownerEventListeners (eventBus: EventBus, container: AwilixContainer) {
+export function ownerEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
     'virtual-caller.call_finished',
     'owner.discard_bad_contact',

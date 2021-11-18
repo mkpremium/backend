@@ -1,7 +1,7 @@
 import { AwilixContainer } from 'awilix'
-import { EventBus } from '../infrastructure/event-bus'
+import { EventListener } from '../infrastructure/event-bus'
 
-export const callsEventListeners = (eventBus: EventBus, container: AwilixContainer) => {
+export const callsEventListeners = (eventBus: EventListener, container: AwilixContainer) => {
   eventBus.on(
     'virtual-caller.input_gathered',
     'virtual-caller.process_gathered_input',

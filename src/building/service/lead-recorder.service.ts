@@ -3,7 +3,7 @@ import { constVoid, pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import * as TE from 'fp-ts/TaskEither'
 import { withCapturedLead } from '../building'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 
 export interface RecordLeadCommand {
   buildingId: string
@@ -23,7 +23,7 @@ export interface LeadCaptured {
 export class LeadRecorderService {
   constructor (
     private buildingsRepository: BuildingsRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
   ) {
   }
 

@@ -1,5 +1,5 @@
 import { AwilixContainer } from 'awilix'
-import { EventBus } from '../infrastructure/event-bus'
+import { EventListener } from '../infrastructure/event-bus'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
@@ -15,7 +15,7 @@ import { WorksheetRepository } from './repository/worksheet.repository'
 import { Logger } from 'winston'
 import { setStatus } from './domain/worksheet'
 
-export function worksheetEventListeners (eventBus: EventBus, container: AwilixContainer) {
+export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
   const legacyWorksheetRepository = container.resolve('legacyWorksheetRepository') as LegacyWorksheetRepository
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
   const worksheetQueueActionsService = container.resolve('worksheetQueueActionsService') as WorksheetQueueActionsService

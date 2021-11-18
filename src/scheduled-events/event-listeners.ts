@@ -1,8 +1,8 @@
 import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/update-building-negotiation-status.service'
 import { AwilixContainer } from 'awilix'
-import { EventBus } from '../infrastructure/event-bus'
+import { EventListener } from '../infrastructure/event-bus'
 
-export function scheduledEventsEventListeners (eventBus: EventBus, container: AwilixContainer) {
+export function scheduledEventsEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
     'meeting.created',
     'scheduled-events.remove_call',

@@ -1,5 +1,5 @@
 import { History } from '../../history/models'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { OwnerRepository } from '../repository/owner.repository'
 import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
 
@@ -21,7 +21,7 @@ export class ChangeContactStatusService {
   constructor (
     private ownersRepository: OwnerRepository,
     private historyRepository: History,
-    private eventBus: EventBus
+    private eventBus: EventPublisher,
   ) {
   }
 

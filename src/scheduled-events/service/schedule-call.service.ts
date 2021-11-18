@@ -1,6 +1,6 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { LegacyWorksheetQueueRepository } from '../../worksheet/models/queue-repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 
@@ -24,7 +24,7 @@ export class ScheduleCallService {
     private scheduledEventsRepository: ScheduledEventsRepository,
     private legacyWorksheetQueueRepository: LegacyWorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
   ) {
   }
 

@@ -1,12 +1,9 @@
 import { TakeNextWorksheetService } from '../../worksheet/service/take-next-worksheet.service'
 import { ContactProps } from '../../owner/owner'
+import { lockingContextAction, NumberDoesNotExist, VirtualCallerPhone } from './virtual-caller-phone'
 import {
-  lockingContextAction,
-  NumberDoesNotExist,
-  VirtualCallerPhone
-} from './virtual-caller-phone'
-import {
-  VirtualCallerWorksheet, VirtualCallerWorksheetProps,
+  VirtualCallerWorksheet,
+  VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
 } from '../repository/virtual-caller-worksheets.repository'
 import {
@@ -14,7 +11,7 @@ import {
   WorksheetRepository,
   WorksheetViewProps
 } from '../../worksheet/repository/worksheet.repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 import retry from 'bluebird-retry'
 import { OwnerResponse } from './owner-response-processor.service'
@@ -49,7 +46,7 @@ export class VirtualCallerService {
     private virtualCallerPhone: VirtualCallerPhone,
     private virtualCallerWorksheetsRepository: VirtualCallerWorksheetsRepository,
     private worksheetRepository: WorksheetRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
     private logger: Logger,
   ) {
   }

@@ -1,4 +1,4 @@
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { BuildingNegotiationStatus, changeNegotiationStatus, withFeaturedOwner } from '../building'
 
@@ -18,7 +18,7 @@ interface UpdateBuildingNegotiationStatusCommand {
 export class UpdateBuildingNegotiationStatusService {
   constructor (
     private buildingsRepository: BuildingsRepository,
-    private eventBus: EventBus
+    private eventBus: EventPublisher,
   ) {
   }
 

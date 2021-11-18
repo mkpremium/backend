@@ -22,7 +22,7 @@ import { createTestHarness } from './test-harness/routes'
 import './types'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
-import { EventBus } from './infrastructure/event-bus'
+import { EventBus, EventsDiagnostics } from './infrastructure/event-bus'
 import { callsRoutes } from './calls/routing'
 import { setupOwnersRoutes } from './owner/routing'
 import { scheduledEventsRoutes } from './scheduled-events/routing'
@@ -86,7 +86,7 @@ export const createApp = (): Promise<Express> => {
 
       app.use(appErrorHandler)
       app.set('IS_READY', true)
-      const eventBus: EventBus = diContainer.resolve('eventBus')
+      const eventBus: EventsDiagnostics = diContainer.resolve('eventBus')
       logger.info('App is ready', {
         eventSubscribersInfo: eventBus.info
       })

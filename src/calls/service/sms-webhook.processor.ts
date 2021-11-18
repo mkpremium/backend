@@ -4,14 +4,14 @@ import { TaskEither } from 'fp-ts/TaskEither'
 import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { SmsMessagesRepository, SmsOutgoingMessage } from '../repository/sms-messages.repository'
 import { pipe } from 'fp-ts/function'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 
 export class SmsWebhookProcessor {
   constructor (
     private worksheetRepository: WorksheetRepository,
     private smsMessagesRepository: SmsMessagesRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
     private logger: Logger,
   ) {
   }

@@ -1,7 +1,7 @@
 import { AwilixContainer } from 'awilix'
-import { EventBus } from '../infrastructure/event-bus'
+import { EventListener } from '../infrastructure/event-bus'
 
-export function buildingEventListeners (eventBus: EventBus, container: AwilixContainer) {
+export function buildingEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on('building.lead_captured', 'building.set_featured_owner', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on('building.proposal_scheduled', 'building.set_status_to_proposal_scheduled', container.resolve('proposalScheduledListener'))
 

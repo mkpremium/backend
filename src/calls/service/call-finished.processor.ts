@@ -1,6 +1,6 @@
 import { CallStatus, VirtualAgentCall } from '../virtual-agent-call'
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 import { taskEither } from 'fp-ts'
 import { TaskEither } from 'fp-ts/lib/TaskEither'
@@ -33,7 +33,7 @@ export const PHONE_DOES_NOT_EXIST = 'phone does not exist'
 export class CallFinishedProcessor {
   constructor (
     private virtualCallsRepository: VirtualCallsRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
     private logger: Logger,
   ) {
   }

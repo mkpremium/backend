@@ -1,8 +1,8 @@
 import { OperatorStats } from './models'
 import { OperatorActions } from './types'
-import { EventBus } from '../infrastructure/event-bus'
+import { EventListener } from '../infrastructure/event-bus'
 
-export function statListeners (eventBus: EventBus) {
+export function statListeners (eventBus: EventListener) {
   eventBus.on(
     'worksheet.next_in_queue_taken',
     'stats.count_view',

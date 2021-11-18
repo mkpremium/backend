@@ -1,7 +1,7 @@
 import { AddProposalService } from './add-proposal.service'
 import { OwnerRepository } from '../../owner/repository/owner.repository'
 import { contactOfId } from '../../owner/owner'
-import { EventBus } from '../../infrastructure/event-bus'
+import { EventPublisher } from '../../infrastructure/event-bus'
 
 interface CreateProposalCommand {
   amount: number;
@@ -22,7 +22,7 @@ export class AddProposalForBuildingService {
   constructor(
     private addProposalService: AddProposalService,
     private ownersRepository: OwnerRepository,
-    private eventBus: EventBus,
+    private eventBus: EventPublisher,
   ) {
   }
 
