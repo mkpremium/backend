@@ -42,7 +42,6 @@ export class EventEmitterBus implements EventBus {
   on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
     this.assertNamingSatisfiesPolicy(listenerName, eventName)
 
-    this.logger.info('New event subscriber', { eventName })
     this.emitter
       .addListener(eventName, (event) => {
         try {
