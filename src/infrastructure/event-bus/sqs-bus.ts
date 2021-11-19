@@ -44,5 +44,12 @@ export class SqsBus implements EventBus {
         ]
       }))
     }).promise()
+      .then((response) => {
+        response.Failed.forEach(error => {
+          error.SenderFault ?
+            this.logger.error('Error sending event into SQS', error) :
+            this.logger.warning('Event not saved in SQS', error)
+        })
+      })
   }
 }
