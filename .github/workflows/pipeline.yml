@@ -126,22 +126,6 @@ jobs:
           cluster: production
           wait-for-minutes: 5
 
-      - name: Render Amazon ECS task definition for websocket container
-        id: websocket-task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: infrastructure/ecs/websocket-task-definition.json
-          container-name: websocket
-          image: ${{ env.IMAGE_URL }}
-
-      - name: Deploy Amazon ECS WebSocket task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.websocket-task-def.outputs.task-definition }}
-          service: websocket
-          cluster: production
-          wait-for-minutes: 5
-
   deploy-scheduled-tasks:
     name: Deploy scheduled tasks (freezer and proposals sender)
     runs-on: ubuntu-latest
