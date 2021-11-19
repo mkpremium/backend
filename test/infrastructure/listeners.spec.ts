@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { createDiContainer } from '../../src/infrastructure/dependencies'
 import { Logger } from 'winston'
 
-describe.only('startListeners', () => {
+describe('startListeners', () => {
   let container
   beforeEach(() => {
     container = createDiContainer(null)
