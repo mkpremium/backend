@@ -5,27 +5,27 @@ import { EventListener } from '../infrastructure/event-bus'
 export function scheduledEventsEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
     'meeting.created',
-    'scheduled-events.remove_call',
+    'scheduled_events.remove_call',
     container.resolve('removeCallsOnNewMeetingOrOfferRequest')
   )
   eventBus.on(
     'offer_request.created',
-    'scheduled-events.remove_call',
+    'scheduled_events.remove_call',
     container.resolve('removeCallsOnNewMeetingOrOfferRequest'),
   )
   eventBus.on(
     BUILDING_NEGOTIATION_STATUS_CHANGED,
-    'scheduled-events.remove_call',
+    'scheduled_events.remove_call',
     container.resolve('removeScheduledCallsOnOwnerRefusal')
   )
   eventBus.on(
     'virtual_caller.sms_received',
-    'scheduled-events.schedule_call',
+    'scheduled_events.schedule_call',
     container.resolve('scheduledCallFromOwnerMessage')
   )
   eventBus.on(
     'owner.contact_status_changed',
-    'scheduled-events.remove_call',
+    'scheduled_events.remove_call',
     container.resolve('removeScheduledCallOnDiscardedContact')
   )
 }

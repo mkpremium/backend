@@ -59,7 +59,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
 
   eventBus.on(
     'worksheet.taken',
-    'worksheet.release-caller-extra-worksheets',
+    'worksheet.release_caller_extra_worksheets',
     async ({ queueId, by }) => {
       await releaseUserOtherActiveWorksheetsInQueueService.release(by, queueId)
     })
