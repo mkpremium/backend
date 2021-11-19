@@ -25,6 +25,10 @@
       "cpu": 0,
       "environment": [
         {
+          "name": "EVENTS_QUEUE_URL",
+          "value": "https://sqs.eu-west-1.amazonaws.com/173249668334/events.fifo"
+        },
+        {
           "name": "COUCHBASE_BUCKET",
           "value": "mkpremium"
         },
