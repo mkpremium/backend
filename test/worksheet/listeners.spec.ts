@@ -16,7 +16,7 @@ describe('worksheetEventListeners', () => {
     eventSubscribers = {}
     eventBusMock = {
       on: fake((eventName, listenerName, subscriber) => {
-        eventSubscribers[eventName] = subscriber
+        eventSubscribers[ eventName ] = subscriber
       })
     }
     releaseUserOtherActiveWorksheetsInQueueServiceMock = { release: spy() }
@@ -41,10 +41,10 @@ describe('worksheetEventListeners', () => {
   })
 
   it('releases other worksheets taken by user when takes another', () => {
-    expect(eventBusMock.on).to.have.been.calledWith('worksheet.taken', sinon.match.func)
+    expect(eventBusMock.on).to.have.been.calledWith('worksheet.taken', sinon.match.string, sinon.match.func)
     const testWorksheetTakenEvent = { queueId: 'test-queue-id', by: 'test-user-id' }
 
-    eventSubscribers['worksheet.taken'](testWorksheetTakenEvent)
+    eventSubscribers[ 'worksheet.taken' ](testWorksheetTakenEvent)
 
     expect(releaseUserOtherActiveWorksheetsInQueueServiceMock.release).to.have.been
       .calledWith(testWorksheetTakenEvent.by, testWorksheetTakenEvent.queueId)
@@ -63,7 +63,7 @@ describe('worksheetEventListeners', () => {
       oldStatus: 'NO_VERIFICADO',
       newStatus: 'WITHOUT_CONTACT',
     }
-    eventSubscribers['owner.status_changed'](testEvent)
+    eventSubscribers[ 'owner.status_changed' ](testEvent)
 
     setTimeout(() => {
       expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
