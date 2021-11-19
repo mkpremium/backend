@@ -29,20 +29,14 @@ export class SqsBus implements EventBus {
       this.logger.warning('No listener for event, not publishing it', event)
       return
     }
-    const eventBody = JSON.stringify(event)
 
     await this.sqsClient.sendMessageBatch({
       QueueUrl: this.eventsQueueUrl,
-      Entries: listeners.map(l => ({
-        Id: `${event.name}/${l}`,
-        MessageBody: eventBody,
-        MessageAttributes: [
-          {
-            EventName: { StringValue: event.name },
-            Listener: { StringValue: l },
-          },
-        ]
-      }))
+      Entries: listeners.map(listener => ({
+          Id: `${event.name}/${listener}`,
+          MessageBody: JSON.stringify({ event, listener }),
+        })
+      )
     }).promise()
       .then((response) => {
         response.Failed.forEach(error => {
