@@ -1,9 +1,11 @@
-export class InMemorySyncEventBus {
-  constructor () {
-    this.subscribers = {}
-  }
+import { EventBus } from '../event-bus'
 
-  publish (event) {
+export class InMemorySyncEventBus implements EventBus {
+  private subscribers = {}
+  info: Record<string, number>
+
+
+  publish (event): Promise<void> {
     if (!this.subscribers[ event.name ]) {
       return
     }
@@ -13,7 +15,7 @@ export class InMemorySyncEventBus {
     })
   }
 
-  on (eventName, subscriber) {
+  on (eventName, listenerName, subscriber) {
     if (!this.subscribers[ eventName ]) {
       this.subscribers[ eventName ] = []
     }

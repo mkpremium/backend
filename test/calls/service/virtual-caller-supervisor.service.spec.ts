@@ -299,7 +299,7 @@ describe('VirtualCallerSupervisorService', () => {
       contactsOrderStrategy(testWorksheet)
 
       expect(eventBusStub.publish).to.have.been.calledWith({
-        name: 'virtual-caller.duplicated_contact_detected_in_owner',
+        name: 'virtual_caller.duplicated_contact_detected_in_owner',
         ownerId: 'test-owner-id',
       })
     })
