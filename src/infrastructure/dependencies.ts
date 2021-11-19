@@ -1,5 +1,5 @@
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
-import { asClass, asFunction, asValue, createContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
 import { setupStockDependencies } from '../stock/stock-di'
@@ -24,7 +24,8 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
-    eventBus: asClass(EventEmitterBus).inject(() => ({})).classic().singleton(),
+    eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
+    eventBus: aliasTo('eventEmitterBus'),
     logger: asFunction(initLogger).singleton(),
   })
 
