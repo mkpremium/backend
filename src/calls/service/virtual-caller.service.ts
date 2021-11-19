@@ -62,6 +62,11 @@ export class VirtualCallerService {
     }
 
     const worksheet = await this.getWorksheet(inProgressWorksheet, cmd)
+    if (!worksheet) {
+      this.logger.warning('No worksheet found for virtual caller', cmd.caller)
+      return
+    }
+
     const contacts = cmd.contacts(worksheet)
     const contactToCall = this.nextContactToCall(contacts, lastCalledWorksheetContactId)
 
