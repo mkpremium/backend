@@ -15,6 +15,8 @@ import { setupFlipperDependencies } from '../flipper/dependencies'
 import { setupUserDependencies } from '../user/dependencies'
 import { EventEmitterBus } from './event-bus/event-emitter-bus'
 import { eventNamingPolicy } from './event-bus/event-naming-policy'
+import { SqsBus } from './event-bus/sqs-bus'
+import aws from 'aws-sdk'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -24,6 +26,10 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
+    sqsEventBus: asClass(SqsBus).inject(() => ({
+      eventsQueueUrl: process.env.EVENTS_QUEUE_URL,
+      sqsClient: new aws.SQS({ region: 'eu-west-1' })
+    })).classic().singleton(),
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     eventBus: aliasTo('eventEmitterBus'),
     logger: asFunction(initLogger).singleton(),
