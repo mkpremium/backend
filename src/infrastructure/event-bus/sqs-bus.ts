@@ -33,7 +33,7 @@ export class SqsBus implements EventBus {
     await this.sqsClient.sendMessageBatch({
       QueueUrl: this.eventsQueueUrl,
       Entries: listeners.map(listener => ({
-          Id: `${event.name}/${listener}`,
+          Id: listener,
           MessageBody: JSON.stringify({ event, listener }),
         })
       )
