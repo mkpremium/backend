@@ -15,7 +15,7 @@ describe('worksheetEventListeners', () => {
   beforeEach(() => {
     eventSubscribers = {}
     eventBusMock = {
-      on: fake((eventName, subscriber) => {
+      on: fake((eventName, listenerName, subscriber) => {
         eventSubscribers[eventName] = subscriber
       })
     }
