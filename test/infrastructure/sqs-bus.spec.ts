@@ -33,7 +33,7 @@ describe('SqsBus', () => {
   })
 
   it('puts message in SQS queue', async () => {
-    service.on(testEvent.name, 'test.listener', () => undefined)
+    service.on(testEvent.name, 'test.listener')
 
     await service.publish(testEvent)
 
@@ -42,8 +42,8 @@ describe('SqsBus', () => {
   })
 
   it('publishes an event for listener', async () => {
-    service.on(testEvent.name, 'test.listener_1', () => undefined)
-    service.on(testEvent.name, 'test.listener_2', () => undefined)
+    service.on(testEvent.name, 'test.listener_1')
+    service.on(testEvent.name, 'test.listener_2')
 
     await service.publish(testEvent)
 
@@ -60,7 +60,7 @@ describe('SqsBus', () => {
   }
 
   it('logs warning when message is wrong', async () => {
-    service.on(testEvent.name, 'test.listener', () => undefined)
+    service.on(testEvent.name, 'test.listener')
     sqsClientStub.sendMessageBatch.returns({
       promise: () => Promise.resolve({
         Failed: [ {
@@ -76,7 +76,7 @@ describe('SqsBus', () => {
   })
 
   it('logs error when message is not stored', async () => {
-    service.on(testEvent.name, 'test.listener', () => undefined)
+    service.on(testEvent.name, 'test.listener')
     sqsClientStub.sendMessageBatch.returns({
       promise: () => Promise.resolve({
         Failed: [ {
