@@ -77,7 +77,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
 
   eventBus.on(
     'owner.status_changed',
-    'worksheet.release-caller-extra-worksheets',
+    'worksheet.update_status',
     (evt: OwnerStatusChangedEvent) => {
     return new Promise(resolve => setTimeout(resolve, consistencyDelay))
       .then(() => updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt))
