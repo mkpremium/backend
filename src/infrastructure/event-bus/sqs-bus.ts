@@ -1,6 +1,8 @@
 import { EventBus } from '../event-bus'
 import { Logger } from '../logger'
 import { SQS } from 'aws-sdk'
+import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs'
+import uuid from 'uuid/v4'
 
 export class SqsBus implements EventBus {
   private listeners = {}
@@ -33,9 +35,11 @@ export class SqsBus implements EventBus {
     await this.sqsClient.sendMessageBatch({
       QueueUrl: this.eventsQueueUrl,
       Entries: listeners.map(listener => ({
-          Id: listener,
+          Id: listener.replace('.', '-'),
+          MessageGroupId: 'events',
+          MessageDeduplicationId: uuid(),
           MessageBody: JSON.stringify({ event, listener }),
-        })
+        } as SendMessageBatchRequestEntry)
       )
     }).promise()
       .then((response) => {
