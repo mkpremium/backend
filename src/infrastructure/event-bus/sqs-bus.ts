@@ -5,7 +5,7 @@ import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs'
 import uuid from 'uuid/v4'
 
 export class SqsBus implements EventBus {
-  private listeners = {}
+  private listeners: Record<string, string[]> = {}
 
   constructor (
     private logger: Logger,
@@ -14,8 +14,8 @@ export class SqsBus implements EventBus {
   ) {
   }
 
-  get info (): Record<string, number> {
-    return undefined
+  get info (): Record<string, string[]> {
+    return this.listeners
   }
 
   on (eventName: string, subscriberName: string) {

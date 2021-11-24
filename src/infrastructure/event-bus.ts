@@ -7,7 +7,7 @@ export interface EventListener {
 }
 
 export interface EventsDiagnostics {
-  info: Record<string, number>
+  info: any
 }
 
 export interface EventBus extends EventPublisher, EventListener, EventsDiagnostics {

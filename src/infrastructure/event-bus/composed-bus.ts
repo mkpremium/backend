@@ -4,7 +4,12 @@ import { SqsBus } from './sqs-bus'
 import { Logger } from '../logger'
 
 export class ComposedBus implements EventBus {
-  info: Record<string, number>
+  get info(): any {
+    return {
+      eventEmitter: this.eventEmitterBus.info,
+      sqs: this.sqsEventBus.info,
+    }
+  }
 
   constructor (
     private sqsEventBus: SqsBus,
