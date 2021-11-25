@@ -23,6 +23,23 @@ import { ListenersRegistry } from './event-bus/listeners-registry'
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
 
+  setupInfrastructureDependencies(container, couchbaseBucket)
+  setupBuildingDependencies(container)
+  setupOwnerDependencies(container)
+  setupScheduledEventsDependencies(container)
+  setupWorksheetDependencies(container)
+  setupCallerDependencies(container)
+  setupUserDependencies(container)
+  setupStockDependencies(container)
+  setupHistoryDependencies(container)
+  setupEmailDependencies(container)
+  setupCallsDependencies(container)
+  setupFlipperDependencies(container)
+
+  return container
+}
+
+function setupInfrastructureDependencies (container, couchbaseBucket) {
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
@@ -37,18 +54,4 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
     eventBus: aliasTo('composedEventBus'),
     logger: asFunction(initLogger).singleton(),
   })
-
-  setupBuildingDependencies(container)
-  setupOwnerDependencies(container)
-  setupScheduledEventsDependencies(container)
-  setupWorksheetDependencies(container)
-  setupCallerDependencies(container)
-  setupUserDependencies(container)
-  setupStockDependencies(container)
-  setupHistoryDependencies(container)
-  setupEmailDependencies(container)
-  setupCallsDependencies(container)
-  setupFlipperDependencies(container)
-
-  return container
 }
