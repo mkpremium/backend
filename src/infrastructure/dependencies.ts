@@ -19,6 +19,7 @@ import { SqsBus } from './event-bus/sqs-bus'
 import aws from 'aws-sdk'
 import { ComposedBus } from './event-bus/composed-bus'
 import { ListenersRegistry } from './event-bus/listeners-registry'
+import { EventPoller } from './event-bus/event-poller'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -47,6 +48,7 @@ function setupInfrastructureDependencies (container, couchbaseBucket) {
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
     eventsQueueUrl: asValue(process.env.EVENTS_QUEUE_URL),
+    eventPoller: asClass(EventPoller).classic().singleton(),
     listenersRegistry: asClass(ListenersRegistry).classic().singleton(),
     sqsEventBus: asClass(SqsBus).classic().singleton(),
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),

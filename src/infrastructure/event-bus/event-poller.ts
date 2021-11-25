@@ -11,7 +11,7 @@ export class EventPoller {
   ) {
   }
 
-  async poll () {
+  async poll (): Promise<'event-processed' | 'no-event-received'> {
     const { Messages } = await this.sqsClient.receiveMessage({
       QueueUrl: this.eventsQueueUrl,
       MaxNumberOfMessages: 1,
@@ -20,7 +20,7 @@ export class EventPoller {
 
     if (Messages.length === 0) {
       this.logger.info('No message received')
-      return
+      return 'no-event-received'
     }
 
     const messageEvent: {
@@ -32,14 +32,16 @@ export class EventPoller {
       .find(({ name }) => name === messageEvent.listener)
     if (!listener) {
       this.logger.error('Subscriber not found', messageEvent)
-      return
+      return 'event-processed'
     }
 
     await listener.subscriber(messageEvent.event)
 
     await this.sqsClient.deleteMessage({
       QueueUrl: this.eventsQueueUrl,
-      ReceiptHandle: Messages[0].ReceiptHandle,
+      ReceiptHandle: Messages[ 0 ].ReceiptHandle,
     })
+
+    return 'event-processed'
   }
 }
