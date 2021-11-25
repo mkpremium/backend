@@ -7,6 +7,12 @@ import { ListenersRegistry } from './listeners-registry'
 import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
 
+interface SQSEvent {
+  name: string,
+  messageGroupId?: string,
+  messageDeduplicationId?: string
+}
+
 export class SqsBus implements EventBus {
   constructor (
     private logger: Logger,
@@ -27,7 +33,7 @@ export class SqsBus implements EventBus {
     this.listenersRegistry.registry(eventName, listenerName, subscriber)
   }
 
-  async publish<T extends { name: string }> (event: T): Promise<void> {
+  async publish<T extends SQSEvent> (event: T): Promise<void> {
     if (!this.eventNamingPolicy.satisfiesEventName(event.name)) {
       throw new WrongEventName(event.name)
     }
@@ -42,8 +48,8 @@ export class SqsBus implements EventBus {
       QueueUrl: this.eventsQueueUrl,
       Entries: listeners.map(({ name }) => ({
           Id: name.replace('.', '-'),
-          MessageGroupId: 'events',
-          MessageDeduplicationId: uuid(),
+          MessageGroupId: event.messageGroupId || uuid(),
+          MessageDeduplicationId: event.messageDeduplicationId || uuid(),
           MessageBody: JSON.stringify({ event, listener: name }),
         } as SendMessageBatchRequestEntry)
       )
