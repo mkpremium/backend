@@ -1,3 +1,4 @@
+import '../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../src/infrastructure/logger'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { createDiContainer } from '../src/infrastructure/dependencies'
