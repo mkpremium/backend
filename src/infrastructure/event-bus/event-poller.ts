@@ -18,7 +18,7 @@ export class EventPoller {
       WaitTimeSeconds: 10,
     }).promise()
 
-    if (Messages.length === 0) {
+    if (!Messages || Messages.length === 0) {
       this.logger.info('No message received')
       return 'no-event-received'
     }
