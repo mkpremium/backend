@@ -4,6 +4,8 @@ import { SQS } from 'aws-sdk'
 import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs'
 import uuid from 'uuid/v4'
 import { ListenersRegistry } from './listeners-registry'
+import { WrongEventName, WrongListenerName } from './errors'
+import { EventNamingPolicy } from './event-naming-policy'
 
 export class SqsBus implements EventBus {
   constructor (
@@ -11,6 +13,7 @@ export class SqsBus implements EventBus {
     private sqsClient: SQS,
     private eventsQueueUrl: string,
     private listenersRegistry: ListenersRegistry,
+    private eventNamingPolicy: EventNamingPolicy,
   ) {
   }
 
@@ -18,11 +21,17 @@ export class SqsBus implements EventBus {
     return this.listenersRegistry.listeners
   }
 
-  on (eventName: string, subscriberName: string, subscriber: (event: any) => Promise<any>) {
-    this.listenersRegistry.registry(eventName, subscriberName, subscriber)
+  on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
+    this.assertNamingSatisfiesPolicy(listenerName, eventName)
+
+    this.listenersRegistry.registry(eventName, listenerName, subscriber)
   }
 
   async publish<T extends { name: string }> (event: T): Promise<void> {
+    if (!this.eventNamingPolicy.satisfiesEventName(event.name)) {
+      throw new WrongEventName(event.name)
+    }
+
     const listeners = this.listenersRegistry.listeningTo(event.name)
     if (!listeners) {
       this.logger.warning('No listener for event, not publishing it', event)
@@ -46,5 +55,14 @@ export class SqsBus implements EventBus {
             this.logger.warning('Event not saved in SQS', error)
         })
       })
+  }
+
+  private assertNamingSatisfiesPolicy (listenerName: string, eventName: string) {
+    if (!this.eventNamingPolicy.satisfiesListenerName(listenerName)) {
+      throw new WrongListenerName(listenerName)
+    }
+    if (!this.eventNamingPolicy.satisfiesEventName(eventName)) {
+      throw new WrongEventName(eventName)
+    }
   }
 }

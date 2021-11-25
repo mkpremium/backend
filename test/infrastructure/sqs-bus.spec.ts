@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { createLoggerMock } from './logger.spec'
 import { stub } from 'sinon'
 import { ListenersRegistry } from '../../src/infrastructure/event-bus/listeners-registry'
+import { eventNamingPolicy } from '../../src/infrastructure/event-bus/event-naming-policy'
 
 describe('SqsBus', () => {
   let service: SqsBus
@@ -25,6 +26,7 @@ describe('SqsBus', () => {
       sqsClientStub,
       testEventsQueueUrl,
       new ListenersRegistry(),
+      eventNamingPolicy,
     )
   })
 
