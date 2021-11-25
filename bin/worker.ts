@@ -3,6 +3,8 @@ import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { createDiContainer } from '../src/infrastructure/dependencies'
 import { EventPoller } from '../src/infrastructure/event-bus/event-poller'
 import { Bucket } from 'couchbase'
+import { AwilixContainer } from 'awilix'
+import { startListeners } from '../src/infrastructure/listeners'
 
 const logger = initLogger()
 logger.info('starting worker')
@@ -16,7 +18,11 @@ let killProcess = false
 process.on('SIGTERM', () => killProcess = true)
 
 async function init () {
-  const { poller, couchbaseBucket } = await getDependencies()
+  const container = await getDiContainer()
+  const poller: EventPoller = container.resolve('eventPoller')
+  const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
+  startListeners(container)
+
   while (true) {
     if (killProcess) {
       logger.info('SIGTERM received, stopping process')
@@ -37,13 +43,9 @@ async function init () {
   }
 }
 
-function getDependencies (): Promise<{ poller: EventPoller, couchbaseBucket: Bucket }> {
+function getDiContainer (): Promise<AwilixContainer> {
   return connectCouchbaseBucket()
     .then(createDiContainer)
-    .then(container => ({
-      poller: container.resolve('eventPoller'),
-      couchbaseBucket: container.resolve('couchbaseBucket'),
-    }))
 }
 
 function sleepEmptyMessageWaitTime () {
