@@ -39,7 +39,7 @@ export class EventPoller {
     await this.sqsClient.deleteMessage({
       QueueUrl: this.eventsQueueUrl,
       ReceiptHandle: Messages[ 0 ].ReceiptHandle,
-    })
+    }).promise()
 
     return 'event-processed'
   }

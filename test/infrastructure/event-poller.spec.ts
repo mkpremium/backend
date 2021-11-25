@@ -26,7 +26,7 @@ describe('EventPoller', () => {
   beforeEach(() => {
     sqsClientStub = {
       receiveMessage: stub().returns({ promise: () => Promise.resolve({ Messages: [ testMessage ] }) }),
-      deleteMessage: stub(),
+      deleteMessage: stub().returns({ promise: () => Promise.resolve() }),
     }
     loggerStub = createLoggerMock()
     listenersRegistry = new ListenersRegistry()
