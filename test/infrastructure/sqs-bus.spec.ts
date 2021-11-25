@@ -2,6 +2,7 @@ import { SqsBus } from '../../src/infrastructure/event-bus/sqs-bus'
 import { expect } from 'chai'
 import { createLoggerMock } from './logger.spec'
 import { stub } from 'sinon'
+import { ListenersRegistry } from '../../src/infrastructure/event-bus/listeners-registry'
 
 describe('SqsBus', () => {
   let service: SqsBus
@@ -11,6 +12,7 @@ describe('SqsBus', () => {
     name: 'source.event_name'
   }
   const testEventsQueueUrl = 'https://sqs.amazonaws.com/test-events-queue'
+  const noopListener = () => undefined
 
   beforeEach(() => {
     loggerStub = createLoggerMock()
@@ -22,6 +24,7 @@ describe('SqsBus', () => {
       loggerStub,
       sqsClientStub,
       testEventsQueueUrl,
+      new ListenersRegistry(),
     )
   })
 
@@ -33,7 +36,7 @@ describe('SqsBus', () => {
   })
 
   it('puts message in SQS queue', async () => {
-    service.on(testEvent.name, 'test.listener')
+    service.on(testEvent.name, 'test.listener', noopListener)
 
     await service.publish(testEvent)
 
@@ -42,8 +45,8 @@ describe('SqsBus', () => {
   })
 
   it('publishes an event for listener', async () => {
-    service.on(testEvent.name, 'test.listener_1')
-    service.on(testEvent.name, 'test.listener_2')
+    service.on(testEvent.name, 'test.listener_1', noopListener)
+    service.on(testEvent.name, 'test.listener_2', noopListener)
 
     await service.publish(testEvent)
 
@@ -60,7 +63,7 @@ describe('SqsBus', () => {
   }
 
   it('logs warning when message is wrong', async () => {
-    service.on(testEvent.name, 'test.listener')
+    service.on(testEvent.name, 'test.listener', noopListener)
     sqsClientStub.sendMessageBatch.returns({
       promise: () => Promise.resolve({
         Failed: [ {
@@ -76,7 +79,7 @@ describe('SqsBus', () => {
   })
 
   it('logs error when message is not stored', async () => {
-    service.on(testEvent.name, 'test.listener')
+    service.on(testEvent.name, 'test.listener', noopListener)
     sqsClientStub.sendMessageBatch.returns({
       promise: () => Promise.resolve({
         Failed: [ {

@@ -18,6 +18,7 @@ import { eventNamingPolicy } from './event-bus/event-naming-policy'
 import { SqsBus } from './event-bus/sqs-bus'
 import aws from 'aws-sdk'
 import { ComposedBus } from './event-bus/composed-bus'
+import { ListenersRegistry } from './event-bus/listeners-registry'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -27,10 +28,10 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
     couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
-    sqsEventBus: asClass(SqsBus).inject(() => ({
-      eventsQueueUrl: process.env.EVENTS_QUEUE_URL,
-      sqsClient: new aws.SQS({ region: 'eu-west-1' })
-    })).classic().singleton(),
+    sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
+    eventsQueueUrl: asValue(process.env.EVENTS_QUEUE_URL),
+    listenersRegistry: asClass(ListenersRegistry).classic().singleton(),
+    sqsEventBus: asClass(SqsBus).classic().singleton(),
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     composedEventBus: asClass(ComposedBus).classic().singleton(),
     eventBus: aliasTo('composedEventBus'),

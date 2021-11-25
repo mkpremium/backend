@@ -21,7 +21,7 @@ export class ComposedBus implements EventBus {
   on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
     this.eventEmitterBus.on(eventName, listenerName, subscriber)
     try {
-      this.sqsEventBus.on(eventName, listenerName)
+      this.sqsEventBus.on(eventName, listenerName, subscriber)
     } catch (error) {
       this.logger.error('Error registering listener in SQS bus', { eventName, listenerName, error: error.message })
     }

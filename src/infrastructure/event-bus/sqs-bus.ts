@@ -3,6 +3,7 @@ import { Logger } from '../logger'
 import { SQS } from 'aws-sdk'
 import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs'
 import uuid from 'uuid/v4'
+import { ListenersRegistry } from './listeners-registry'
 
 export class SqsBus implements EventBus {
   private listeners: Record<string, string[]> = {}
@@ -11,6 +12,7 @@ export class SqsBus implements EventBus {
     private logger: Logger,
     private sqsClient: SQS,
     private eventsQueueUrl: string,
+    private listenersRegistry: ListenersRegistry,
   ) {
   }
 
@@ -18,15 +20,12 @@ export class SqsBus implements EventBus {
     return this.listeners
   }
 
-  on (eventName: string, subscriberName: string) {
-    if (this.listeners[ eventName ] === undefined) {
-      this.listeners[ eventName ] = []
-    }
-    this.listeners[ eventName ].push(subscriberName)
+  on (eventName: string, subscriberName: string, subscriber: (event: any) => Promise<any>) {
+    this.listenersRegistry.registry(eventName, subscriberName, subscriber)
   }
 
   async publish<T extends { name: string }> (event: T): Promise<void> {
-    const listeners = this.listeners[ event.name ]
+    const listeners = this.listenersRegistry.listeningTo(event.name)
     if (!listeners) {
       this.logger.warning('No listener for event, not publishing it', event)
       return
@@ -34,11 +33,11 @@ export class SqsBus implements EventBus {
 
     await this.sqsClient.sendMessageBatch({
       QueueUrl: this.eventsQueueUrl,
-      Entries: listeners.map(listener => ({
-          Id: listener.replace('.', '-'),
+      Entries: listeners.map(({ name }) => ({
+          Id: name.replace('.', '-'),
           MessageGroupId: 'events',
           MessageDeduplicationId: uuid(),
-          MessageBody: JSON.stringify({ event, listener }),
+          MessageBody: JSON.stringify({ event, listener: name }),
         } as SendMessageBatchRequestEntry)
       )
     }).promise()
