@@ -53,7 +53,7 @@ function setupInfrastructureDependencies (container, couchbaseBucket) {
     sqsEventBus: asClass(SqsBus).classic().singleton(),
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     composedEventBus: asClass(ComposedBus).classic().singleton(),
-    eventBus: aliasTo('composedEventBus'),
+    eventBus: aliasTo('sqsEventBus'),
     logger: asFunction(initLogger).singleton(),
   })
 }
