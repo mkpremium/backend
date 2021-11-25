@@ -49,12 +49,12 @@ describe('EventPoller', () => {
     })
   })
 
-  it('logs info message when no event is received', async () => {
+  it('returns no-event-received outcome when  no event is received', async () => {
     sqsClientStub.receiveMessage.returns({ promise: () => Promise.resolve({ Messages: [] }) })
 
-    await eventPoller.poll()
+    const outcome = await eventPoller.poll()
 
-    expect(loggerStub.info).to.have.been.called
+    expect(outcome).to.be.equal('no-event-received')
   })
 
   it('does remove message and logs an error when cannot get listener', async () => {

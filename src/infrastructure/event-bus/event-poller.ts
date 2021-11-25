@@ -19,7 +19,6 @@ export class EventPoller {
     }).promise()
 
     if (!Messages || Messages.length === 0) {
-      this.logger.info('No message received')
       return 'no-event-received'
     }
 
