@@ -6,8 +6,6 @@ import uuid from 'uuid/v4'
 import { ListenersRegistry } from './listeners-registry'
 
 export class SqsBus implements EventBus {
-  private listeners: Record<string, string[]> = {}
-
   constructor (
     private logger: Logger,
     private sqsClient: SQS,
@@ -16,8 +14,8 @@ export class SqsBus implements EventBus {
   ) {
   }
 
-  get info (): Record<string, string[]> {
-    return this.listeners
+  get info (): any {
+    return this.listenersRegistry.listeners
   }
 
   on (eventName: string, subscriberName: string, subscriber: (event: any) => Promise<any>) {

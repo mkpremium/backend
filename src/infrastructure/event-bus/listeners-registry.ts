@@ -6,7 +6,7 @@ interface ListenerRegister {
 }
 
 export class ListenersRegistry {
-  private listeners: Record<string, ListenerRegister[]> = {}
+  readonly listeners: Record<string, ListenerRegister[]> = {}
 
   registry (eventName: string, name: string, subscriber: EventListener) {
     if (this.listeners[ eventName ] === undefined) {
