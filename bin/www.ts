@@ -1,11 +1,13 @@
-#!/usr/bin/env node
 import '../src/infrastructure/o11y/honeycomb'
 
-import http from 'http'
+import http, { Server } from 'http'
 import { logger } from '../src/infrastructure/logger'
 
 import { port } from '../config'
 import { createApp } from '../src/app'
+import { Express } from 'express'
+import { AwilixContainer } from 'awilix'
+import { Bucket } from 'couchbase'
 
 createApp()
   .then(app => {
@@ -14,6 +16,7 @@ createApp()
     server.listen(port)
     server.on('error', errorHandler)
     server.on('listen', createListenHandler(server))
+    setupGracefulShutdown(server, app.locals.diContainer)
   })
   .catch(error => {
     logger.error('Starting application', { error })
@@ -34,4 +37,12 @@ function errorHandler (error) {
   }
 
   logger.error('Error received', { error })
+}
+
+function setupGracefulShutdown (server: Server, diContainer: AwilixContainer) {
+  const couchbaseBucket: Bucket = diContainer.resolve('couchaseBucket')
+  server.close(() => {
+    couchbaseBucket.disconnect()
+    process.exit()
+  })
 }
