@@ -15,7 +15,7 @@ export class EventPoller {
     const { Messages } = await this.sqsClient.receiveMessage({
       QueueUrl: this.eventsQueueUrl,
       MaxNumberOfMessages: 1,
-      WaitTimeSeconds: 10,
+      WaitTimeSeconds: 20,
       VisibilityTimeout: 60,
     }).promise()
 

@@ -45,7 +45,7 @@ describe('EventPoller', () => {
     expect(sqsClientStub.receiveMessage).to.have.been.calledWithMatch({
       QueueUrl: testEventsQueueUrl,
       MaxNumberOfMessages: 1,
-      WaitTimeSeconds: 10,
+      WaitTimeSeconds: 20,
     })
   })
 
