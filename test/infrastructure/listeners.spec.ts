@@ -17,9 +17,7 @@ describe('startListeners', () => {
     startListeners(container)
 
     const eventBus: EventBus = container.resolve('eventBus')
-    expect(Object.values(eventBus.info.eventEmitter).reduce((acc: number, x: number) => acc + x, 0))
+    expect(Object.values(eventBus.info).reduce((acc: number, x: number) => acc + x, 0))
       .to.eql(29 + 1) // internal error listener
-    expect(Object.values(eventBus.info.sqs).reduce((acc: number, listeners: string[]) => acc + listeners.length, 0))
-      .to.eql(29)
   })
 })
