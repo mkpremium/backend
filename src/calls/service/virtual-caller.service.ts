@@ -40,6 +40,13 @@ export interface WorksheetDone {
   worksheetId: string
 }
 
+export interface UnExistingPhoneFound {
+  name: 'virtual-caller.unexisting_phone_found'
+  ownerId: string
+  contactId: string
+  worksheetId: string
+}
+
 export class VirtualCallerService {
   constructor (
     private takeNextWorksheetService: TakeNextWorksheetService,
@@ -89,11 +96,11 @@ export class VirtualCallerService {
           } else if (error instanceof NumberDoesNotExist) {
             this.logger.info('Number does not exist, skipping call', { contactToCall, callerId: cmd.caller.id })
             this.eventBus.publish({
-              name: 'virtual-caller.number_not_exist',
+              name: 'virtual-caller.unexisting_phone_found',
               ownerId: contactToCall.ownerId,
               contactId: contactToCall.id,
               worksheetId: worksheet.id,
-            })
+            } as UnExistingPhoneFound)
           } else {
             this.logger.error('Call failed', {
               ...error, error: error.message, callerId: cmd.caller.id,

@@ -10,5 +10,11 @@ export function ownerEventListeners (eventBus: EventListener, container: AwilixC
   eventBus.on(
     'scheduled_events.call_scheduled',
     'owner.flag_good_contact',
-    container.resolve('markGoodContactOnCallScheduled'))
+    container.resolve('markGoodContactOnCallScheduled'),
+  )
+  eventBus.on(
+    'virtual-caller.unexisting_phone_found',
+    'owner.discard_non_existing_contact',
+    container.resolve('discardNonExistingContactListener'),
+  )
 }
