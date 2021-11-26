@@ -5,7 +5,6 @@ import { logger } from '../src/infrastructure/logger'
 
 import { port } from '../config'
 import { createApp } from '../src/app'
-import { Express } from 'express'
 import { AwilixContainer } from 'awilix'
 import { Bucket } from 'couchbase'
 
@@ -19,7 +18,7 @@ createApp()
     setupGracefulShutdown(server, app.locals.diContainer)
   })
   .catch(error => {
-    logger.error('Starting application', { error })
+    logger.error('Starting application', { error: error.message, stack: error.stack })
     process.exit(1)
   })
 
@@ -40,7 +39,7 @@ function errorHandler (error) {
 }
 
 function setupGracefulShutdown (server: Server, diContainer: AwilixContainer) {
-  const couchbaseBucket: Bucket = diContainer.resolve('couchaseBucket')
+  const couchbaseBucket: Bucket = diContainer.resolve('couchbaseBucket')
   server.close(() => {
     couchbaseBucket.disconnect()
     process.exit()
