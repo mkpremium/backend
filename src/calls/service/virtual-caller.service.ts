@@ -88,9 +88,17 @@ export class VirtualCallerService {
             this.logger.info('Number already called, skipping call', { contactToCall, callerId: cmd.caller.id })
           } else if (error instanceof NumberDoesNotExist) {
             this.logger.info('Number does not exist, skipping call', { contactToCall, callerId: cmd.caller.id })
+            this.eventBus.publish({
+              name: 'virtual-caller.number_not_exist',
+              ownerId: contactToCall.ownerId,
+              contactId: contactToCall.id,
+              worksheetId: worksheet.id,
+            })
           } else {
-            this.logger.error('Call failed', { ...error, error: error.message, callerId: cmd.caller.id,
-              trace: error.trace, contactToCall })
+            this.logger.error('Call failed', {
+              ...error, error: error.message, callerId: cmd.caller.id,
+              trace: error.trace, contactToCall
+            })
           }
           return this.saveCalledContact(inProgressWorksheet, worksheet, cmd, contactToCall.id)
             .then(() => this.processNextWorksheet(cmd, {
