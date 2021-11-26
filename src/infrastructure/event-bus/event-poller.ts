@@ -16,6 +16,7 @@ export class EventPoller {
       QueueUrl: this.eventsQueueUrl,
       MaxNumberOfMessages: 1,
       WaitTimeSeconds: 10,
+      VisibilityTimeout: 60,
     }).promise()
 
     if (!Messages || Messages.length === 0) {
