@@ -94,7 +94,7 @@ export const createApp = (): Promise<Express> => {
       return app
     })
     .catch(error => {
-      logger.error('error starting application', { error: error.message, stack: error.stack })
+      logger.error('error starting application', { error: error, stack: error.stack, errorMessage: error.messge })
       process.exit(1)
     })
 }
