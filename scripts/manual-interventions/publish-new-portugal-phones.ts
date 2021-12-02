@@ -1,5 +1,6 @@
 import readline from 'readline'
 import aws from 'aws-sdk'
+import uuid from 'uuid/v4'
 
 exec()
   .then(() => {
@@ -19,8 +20,8 @@ async function exec () {
 
   const reader = readline.createInterface({ input: stream })
 
-  const phones = []
   return new Promise((resolve, reject) => {
+    const phones = []
     reader.on('line', row => {
       const columns = row.split(';')
       if (columns[ 0 ] === 'Nº C') // skip header
@@ -45,17 +46,18 @@ async function exec () {
 }
 
 const QueueUrl = process.env.QUEUE_URL
-async function sendBatch (buildingsBatch: any[], sqsClient: aws.SQS) {
-  if (buildingsBatch.length === 0) {
+
+async function sendBatch (batch: any[], sqsClient: aws.SQS) {
+  if (batch.length === 0) {
     return
   }
   return sqsClient.sendMessageBatch({
     QueueUrl: QueueUrl,
-    Entries: buildingsBatch.map(b => ({
-      Id: b.id,
-      MessageDeduplicationId: b.id,
+    Entries: batch.map(entry => ({
+      Id: uuid(),
+      MessageDeduplicationId: entry.id,
       MessageGroupId: 'portugal_data',
-      MessageBody: JSON.stringify(b),
+      MessageBody: JSON.stringify(entry),
     }))
   }).promise()
     .then(result => {
