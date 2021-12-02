@@ -41,7 +41,7 @@ function loop (sqsClient, couchbaseAdapter: CouchbaseAdapter, retries = 2) {
       const building = JSON.parse(message.Body)
 
       try {
-        await couchbaseAdapter.save(building.id, {
+        await couchbaseAdapter.insert(building.id, {
           ...building,
           status: 'INBOX',
           statusChangedAt: new Date(),
