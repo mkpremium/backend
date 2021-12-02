@@ -33,7 +33,10 @@ function loop (sqsClient, couchbaseAdapter: CouchbaseAdapter, retries = 2) {
   }).promise()
     .then(async ({ Messages }) => {
       if (!Messages || Messages.length === 0) {
-        return new Promise(resolve => setTimeout(resolve, 500))
+        return new Promise(resolve => {
+          logger.info('Empty response, waiting before continue polling')
+          setTimeout(resolve, 5000)
+        })
           .then(() => loop(sqsClient, couchbaseAdapter, retries - 1))
       }
 
