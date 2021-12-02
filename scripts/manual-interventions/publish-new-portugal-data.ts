@@ -62,9 +62,11 @@ async function exec () {
   })
     .then(async (buildings: any[]) => {
       const sqsClient = new aws.SQS({ region: 'eu-west-1' })
-      for (let i = 0; i < buildings.length; i += 10) {
-        await sendBatch(buildings.splice(i, 10), sqsClient)
-        console.log(`${i + 10}/${buildings.length} (${((i + 10) * 100 / buildings.length).toFixed(2)}%)`)
+      let counter = 0
+      while (buildings.length > 0) {
+        await sendBatch(buildings.splice(0, 10), sqsClient)
+        console.log(`${counter}/${buildings.length} (${(counter * 100 / buildings.length).toFixed(2)}%)`)
+        counter += 10
       }
     })
 }
