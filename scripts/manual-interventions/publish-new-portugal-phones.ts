@@ -1,0 +1,66 @@
+import readline from 'readline'
+import aws from 'aws-sdk'
+
+exec()
+  .then(() => {
+    process.exit()
+  })
+  .catch(error => {
+    console.error('Oops', { error: error.message, stack: error.stack })
+    process.exit(1)
+  })
+
+async function exec () {
+  const s3Client = new aws.S3({ region: 'eu-west-2' })
+  const stream = s3Client.getObject({
+    Bucket: 'mkpremium-files',
+    Key: 'phones.csv'
+  }).createReadStream()
+
+  const reader = readline.createInterface({ input: stream })
+
+  const phones = []
+  return new Promise((resolve, reject) => {
+    reader.on('line', row => {
+      const columns = row.split(';')
+      if (columns[ 0 ] === 'Nº C') // skip header
+        return
+
+      phones.push({
+        dni: columns[ 0 ],
+        phones: columns.slice(1).filter(Boolean),
+      })
+    })
+
+    reader.on('error', reject)
+    reader.on('close', () => resolve(phones))
+  })
+    .then(async (phones: any[]) => {
+      const sqsClient = new aws.SQS({ region: 'eu-west-1' })
+      for (let i = 0; i < phones.length; i += 10) {
+        await sendBatch(phones.slice(i, i + 10), sqsClient)
+        console.log(`${i + 10}/${phones.length} (${((i + 10) * 100 / phones.length).toFixed(2)}%)`)
+      }
+    })
+}
+
+const QueueUrl = process.env.QUEUE_URL
+async function sendBatch (buildingsBatch: any[], sqsClient: aws.SQS) {
+  if (buildingsBatch.length === 0) {
+    return
+  }
+  return sqsClient.sendMessageBatch({
+    QueueUrl: QueueUrl,
+    Entries: buildingsBatch.map(b => ({
+      Id: b.id,
+      MessageDeduplicationId: b.id,
+      MessageGroupId: 'portugal_data',
+      MessageBody: JSON.stringify(b),
+    }))
+  }).promise()
+    .then(result => {
+      if (result.Failed && result.Failed.length > 0) {
+        throw new Error(`Not all messages were sent: ${result.Failed}`)
+      }
+    })
+}
