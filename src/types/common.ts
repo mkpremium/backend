@@ -38,7 +38,7 @@ export const Address = t.struct(
     number: t.union([t.Number, t.String]),
     fullAddress: t.maybe(t.String),
     registerNumber: t.maybe(t.Number),
-    postalCode: PostalCode,
+    postalCode: t.maybe(PostalCode),
     city: t.String,
     province: t.maybe(t.String),
     zone: t.maybe(t.String),

@@ -162,7 +162,7 @@ export interface BuildingAddressProps {
   street: string;
   number: number | string;
   fullAddress: string;
-  postalCode: {
+  postalCode?: {
     number: number | string;
     verified: boolean;
   }
@@ -219,7 +219,7 @@ export const Building = t.struct<BuildingProps>(
   {
     id: t.String,
     address: Address,
-    buildingType: t.enums.of([ 'VERTICAL', 'HORIZONTAL' ]),
+    buildingType: t.maybe(t.enums.of([ 'VERTICAL', 'HORIZONTAL' ])),
     cadastre: t.maybe(BuildingCadastre),
     floorArea: t.union([ t.Number, t.String ]),
     landArea: t.union([ t.Number, t.String ]),
@@ -228,12 +228,12 @@ export const Building = t.struct<BuildingProps>(
     use: t.maybe(t.String),
     propertyType: t.maybe(t.String),
     buildingDate: t.union([ t.Number, t.String ]),
-    location: BuildingLocation,
+    location: t.maybe(BuildingLocation),
     elements: t.maybe(Elements),
-    entities: t.list(BuildingEntity),
+    entities: t.maybe(t.list(BuildingEntity)),
     ownerId: t.maybe(t.String),
     owner: t.maybe(BuildingOwner),
-    state: t.enums.of([ 'BUENO', 'MALO' ]),
+    state: t.maybe(t.enums.of([ 'BUENO', 'MALO' ])),
     proposals: t.list(t.String),
     recentProposal: t.maybe(BuildingProposal),
     negotiationStatus: NegotiationStatus,
