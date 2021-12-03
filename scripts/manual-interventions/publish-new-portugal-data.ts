@@ -1,6 +1,5 @@
 import fs from 'fs'
 import readline from 'readline'
-import uuid from 'uuid/v4'
 import aws from 'aws-sdk'
 
 exec()
@@ -63,9 +62,10 @@ async function exec () {
     .then(async (buildings: any[]) => {
       const sqsClient = new aws.SQS({ region: 'eu-west-1' })
       let counter = 0
+      const total = buildings.length
       while (buildings.length > 0) {
         await sendBatch(buildings.splice(0, 10), sqsClient)
-        console.log(`${counter}/${buildings.length} (${(counter * 100 / buildings.length).toFixed(2)}%)`)
+        console.log(`${counter}/${total} (${(counter * 100 / total).toFixed(2)}%)`)
         counter += 10
       }
     })
