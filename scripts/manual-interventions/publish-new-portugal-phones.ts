@@ -54,8 +54,8 @@ async function sendBatch (batch: any[], sqsClient: aws.SQS) {
   return sqsClient.sendMessageBatch({
     QueueUrl: QueueUrl,
     Entries: batch.map(entry => ({
-      Id: uuid(),
-      MessageDeduplicationId: entry.id,
+      Id: entry.dni,
+      MessageDeduplicationId: entry.dni,
       MessageGroupId: 'portugal_data',
       MessageBody: JSON.stringify(entry),
     }))
