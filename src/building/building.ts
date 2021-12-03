@@ -254,7 +254,17 @@ export const Building = t.struct<BuildingProps>(
 
     _migrateId: t.maybe(t.String),
     _relatedTo: t.maybe(t.String),
-    _documentType: t.String
+    _documentType: t.String,
+
+    // fields used for Portugal ingestion 2021
+    portugalSpecific: t.maybe(t.struct({
+      militaryGeo:  t.maybe(t.struct({
+        x: t.Number,
+        y: t.Number,
+      })),
+      artigo: t.maybe(t.String),
+      artigoMatricial: t.maybe(t.String),
+    }))
   },
   {
     name: 'Building',
