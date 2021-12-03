@@ -28,8 +28,8 @@ async function exec () {
         return
 
       phones.push({
-        dni: columns[ 0 ],
-        phones: columns.slice(1).filter(Boolean),
+        dni: trim(columns[ 0 ]),
+        phones: columns.slice(1).filter(Boolean).map(trim),
       })
     })
 
@@ -65,4 +65,8 @@ async function sendBatch (batch: any[], sqsClient: aws.SQS) {
         throw new Error(`Not all messages were sent: ${result.Failed}`)
       }
     })
+}
+
+function trim (s: string) {
+  return s.replace(/^[\s\-.]+/, '').replace(/[\s\-.]+$/, '')
 }
