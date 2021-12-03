@@ -39,9 +39,11 @@ function errorHandler (error) {
 }
 
 function setupGracefulShutdown (server: Server, diContainer: AwilixContainer) {
-  const couchbaseBucket: Bucket = diContainer.resolve('couchbaseBucket')
-  server.close(() => {
-    couchbaseBucket.disconnect()
-    process.exit()
+  process.on('SIGTERM', () => {
+    const couchbaseBucket: Bucket = diContainer.resolve('couchbaseBucket')
+    server.close(() => {
+      couchbaseBucket.disconnect()
+      process.exit()
+    })
   })
 }
