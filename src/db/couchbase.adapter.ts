@@ -42,8 +42,7 @@ export class CouchbaseAdapter {
       throw new WrongStructRecord(data._documentType, validationResult.errors, data)
     }
 
-    await this.withRetry(() => this.upsert(dataWithId.id, dataWithId, cas)
-    )
+    await this.withRetry(() => this.upsert(dataWithId.id, dataWithId, cas))
 
     return fromJSON(dataWithId, structType)
   }

@@ -39,6 +39,7 @@ import { addSmsNoteListener } from './event-listener/add-sms-note.listener'
 import { LeadRecorderService } from './service/lead-recorder.service'
 import { BuildingSearcherService } from './service/building-searcher.service'
 import { Portugal2021BuildingsRepository } from './repository/portugal2021-buildings.repository'
+import { Portugal2021BuildingsImporterService } from './service/portugal2021-buildings-importer.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -86,11 +87,14 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),
 
     offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
-    portugal2021BuildingsRepository: asClass(Portugal2021BuildingsRepository).classic().singleton(),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController),
 
     buildingSearcherService: asClass(BuildingSearcherService).classic().singleton(),
+
+    // Portugal 2021 import
+    portugal2021BuildingsRepository: asClass(Portugal2021BuildingsRepository).classic().singleton(),
+    portugal2021BuildingsImporterService: asClass(Portugal2021BuildingsImporterService).classic().singleton(),
   })
 }
