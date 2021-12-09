@@ -6,7 +6,7 @@ import { pipe } from 'fp-ts/function'
 import { orFail } from '../../helpers'
 import { map } from 'fp-ts/TaskEither'
 
-describe.only('Portugal2021BuildingsRepository', () => {
+describe('Portugal2021BuildingsRepository', () => {
   let repository: Portugal2021BuildingsRepository
 
   beforeEach(async () => {
