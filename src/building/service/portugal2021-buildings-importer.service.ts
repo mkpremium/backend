@@ -15,21 +15,33 @@ export class Portugal2021BuildingsImporterService {
   ) {
   }
 
-  importSlug (cmd: ImportSlugCommand): TE.TaskEither<Error, void> {
+  importSlug (cmd: ImportSlugCommand): TE.TaskEither<Error, any> {
     return pipe(
       this.portugal20210BuildingsRepository.pendingWithSlug(cmd.slug),
       TE.chain(buildings => {
         const sourceBuilding = buildings[ 0 ]
         const parsedBuilding = Portugal2021BuildingsImporterService.parseBuilding(sourceBuilding)
-        return fromPromise(this.buildingsRepository.save(parsedBuilding).then(() => sourceBuilding))
+
+        return pipe(
+          fromPromise(this.buildingsRepository.save(parsedBuilding)),
+          TE.chain(() => {
+            return this.portugal20210BuildingsRepository.save({
+              ...sourceBuilding,
+              status: 'BUILDING_IMPORTED',
+              statusChangedAt: new Date(),
+            })
+          }),
+          TE.orElse(error => {
+            return this.portugal20210BuildingsRepository.save({
+              ...sourceBuilding,
+              status: 'FAILED',
+              failure: error.message,
+              statusChangedAt: new Date(),
+            })
+          }),
+          TE.chain(() => TE.of(sourceBuilding))
+        )
       }),
-      TE.chain((sourceBuilding) => {
-        return this.portugal20210BuildingsRepository.save({
-          ...sourceBuilding,
-          status: 'BUILDING_IMPORTED',
-          statusChangedAt: new Date(),
-        })
-      })
     )
   }
 

@@ -19,7 +19,7 @@ describe('Portugal2021BuildingsImporterService', () => {
 
   beforeEach(() => {
     portugal20210BuildingsRepositoryStub = {
-      pendingWithSlug: stub(),
+      pendingWithSlug: stub().withArgs(testCmd.slug).returns(TE.of([ buildSourceBuilding() ])),
       save: stub().returns(TE.of(undefined)),
     }
     buildingsRepositoryStub = {
@@ -33,8 +33,6 @@ describe('Portugal2021BuildingsImporterService', () => {
   })
 
   it('saves only building when there are no others', () => {
-    portugal20210BuildingsRepositoryStub.pendingWithSlug.withArgs(testCmd.slug).returns(TE.of([buildSourceBuilding()]))
-
     return pipe(
       service.importSlug(testCmd),
       map(() => {
@@ -46,9 +44,25 @@ describe('Portugal2021BuildingsImporterService', () => {
       orFail(),
     )()
   })
+
+  it('saves building with FAILED status on failure', () => {
+    const testSaveFailure = new Error('Boom')
+    buildingsRepositoryStub.save.rejects(testSaveFailure)
+
+    return pipe(
+      service.importSlug(testCmd),
+      map(() => {
+        expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
+          status: 'FAILED',
+          failure: testSaveFailure.message
+        })
+      }),
+      orFail(),
+    )()
+  })
 })
 
-function buildSourceBuilding(overrides = {}) {
+function buildSourceBuilding (overrides = {}) {
   return {
     ...sourceBuildingPrototype,
     ...overrides,
