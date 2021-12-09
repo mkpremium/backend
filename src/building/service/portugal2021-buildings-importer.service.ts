@@ -1,5 +1,5 @@
 import * as TE from 'fp-ts/TaskEither'
-import { Portugal20210BuildingsRepository } from '../repository/portugal20210-buildings.repository'
+import { Portugal2021BuildingsRepository } from '../repository/portugal2021-buildings.repository'
 import { pipe } from 'fp-ts/function'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { fromPromise } from '../../infrastructure/fp-utils'
@@ -10,7 +10,7 @@ export interface ImportSlugCommand {
 
 export class Portugal2021BuildingsImporterService {
   constructor (
-    private portugal20210BuildingsRepository: Portugal20210BuildingsRepository,
+    private portugal20210BuildingsRepository: Portugal2021BuildingsRepository,
     private buildingsRepository: BuildingsRepository,
   ) {
   }

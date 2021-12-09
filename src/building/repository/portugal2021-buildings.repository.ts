@@ -1,7 +1,7 @@
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import * as TE from 'fp-ts/TaskEither'
 
-export class Portugal20210BuildingsRepository {
+export class Portugal2021BuildingsRepository {
   constructor (private couchbaseAdapter: CouchbaseAdapter,) {
   }
 
