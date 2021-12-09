@@ -76,5 +76,6 @@ export interface Portugal2021SourceBuilding {
   slug: string,
   status: 'INBOX' | 'BUILDING_IMPORTED' | 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED',
   statusChangedAt: Date,
+  importedWithBuildingId?: string,
   failure?: any,
 }

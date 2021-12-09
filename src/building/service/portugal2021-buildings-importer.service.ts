@@ -10,29 +10,30 @@ export interface ImportSlugCommand {
 
 export class Portugal2021BuildingsImporterService {
   constructor (
-    private portugal20210BuildingsRepository: Portugal2021BuildingsRepository,
+    private portugal2021BuildingsRepository: Portugal2021BuildingsRepository,
     private buildingsRepository: BuildingsRepository,
   ) {
   }
 
   importSlug (cmd: ImportSlugCommand): TE.TaskEither<Error, any> {
     return pipe(
-      this.portugal20210BuildingsRepository.pendingWithSlug(cmd.slug),
+      this.portugal2021BuildingsRepository.pendingWithSlug(cmd.slug),
       TE.chain(buildings => {
         const sourceBuilding = buildings[ 0 ]
         const parsedBuilding = Portugal2021BuildingsImporterService.parseBuilding(sourceBuilding)
 
         return pipe(
           fromPromise(this.buildingsRepository.save(parsedBuilding)),
-          TE.chain(() => {
-            return this.portugal20210BuildingsRepository.save({
+          TE.chain((building) => {
+            return this.portugal2021BuildingsRepository.save({
               ...sourceBuilding,
               status: 'BUILDING_IMPORTED',
+              importedWithBuildingId: building.id,
               statusChangedAt: new Date(),
             })
           }),
           TE.orElse(error => {
-            return this.portugal20210BuildingsRepository.save({
+            return this.portugal2021BuildingsRepository.save({
               ...sourceBuilding,
               status: 'FAILED',
               failure: error.message,
@@ -47,7 +48,6 @@ export class Portugal2021BuildingsImporterService {
 
   private static parseBuilding (building) {
     const {
-      id,
       address: {
         cadastreReferenceA,
         cadastreReferenceAM,
@@ -63,7 +63,6 @@ export class Portugal2021BuildingsImporterService {
     } = building
 
     return {
-      id,
       address: {
         type,
         street,

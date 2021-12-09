@@ -21,7 +21,7 @@ describe('Portugal2021BuildingsImporterService', () => {
   beforeEach(() => {
     portugal20210BuildingsRepositoryStub = {
       pendingWithSlug: stub().withArgs(testCmd.slug).returns(TE.of([ buildSourceBuilding() ])),
-      save: stub().returns(TE.of(undefined)),
+      save: stub().returns(TE.of({ id: 'test-imported-id' })),
     }
     buildingsRepositoryStub = {
       save: stub().resolves(),
