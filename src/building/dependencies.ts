@@ -38,6 +38,7 @@ import { createProposalScheduledListener } from './event-listener/proposal-added
 import { addSmsNoteListener } from './event-listener/add-sms-note.listener'
 import { LeadRecorderService } from './service/lead-recorder.service'
 import { BuildingSearcherService } from './service/building-searcher.service'
+import { Portugal2021BuildingsRepository } from './repository/portugal2021-buildings.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -85,6 +86,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),
 
     offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
+    portugal2021BuildingsRepository: asClass(Portugal2021BuildingsRepository).classic().singleton(),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController),
