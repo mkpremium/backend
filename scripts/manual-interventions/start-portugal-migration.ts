@@ -22,15 +22,13 @@ exec()
 async function exec () {
   const couchbaseBucket = await connectCouchbaseBucket()
   const diContainer = createDiContainer(couchbaseBucket)
+
   startListeners(diContainer)
 
-  return loop(diContainer)
+  return loop(diContainer.resolve('couchbaseAdapter'), diContainer.resolve('portugal2021BuildingsImporterService'))
 }
 
-async function loop (diContainer) {
-  const couchbaseAdapter: CouchbaseAdapter = diContainer.resolve('couchbaseAdapter')
-  const importer: Portugal2021BuildingsImporterService = diContainer.resolve('portugal2021BuildingsImporterService')
-
+async function loop (couchbaseAdapter: CouchbaseAdapter, importer: Portugal2021BuildingsImporterService) {
   const nextSlugsBatch = await couchbaseAdapter.queryAsync(pendingBuildingSlugs, [ 100 ])
   if (nextSlugsBatch.length === 0) {
     logger.info('No more buildings to import.')
@@ -50,6 +48,9 @@ async function loop (diContainer) {
       ),
     )()
   }
+
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  return loop(couchbaseAdapter, importer)
 }
 
 const pendingBuildingSlugs = `
