@@ -29,7 +29,7 @@ async function exec () {
 }
 
 async function loop (couchbaseAdapter: CouchbaseAdapter, importer: Portugal2021OwnersImporterService) {
-  const buildingIds = await couchbaseAdapter.queryAsync(importedBuildingsIds, [ 10 ])
+  const buildingIds = await couchbaseAdapter.queryAsync(importedBuildingsIds, [ 100 ])
   if (buildingIds.length === 0) {
     logger.info('No more buildings to import.')
     return
