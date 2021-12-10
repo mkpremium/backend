@@ -40,6 +40,7 @@ import { LeadRecorderService } from './service/lead-recorder.service'
 import { BuildingSearcherService } from './service/building-searcher.service'
 import { Portugal2021BuildingsRepository } from './repository/portugal2021-buildings.repository'
 import { Portugal2021BuildingsImporterService } from './service/portugal2021-buildings-importer.service'
+import { Portugal2021OwnersImporterService } from './service/portugal2021-owners-importer.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -96,5 +97,6 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     // Portugal 2021 import
     portugal2021BuildingsRepository: asClass(Portugal2021BuildingsRepository).classic().singleton(),
     portugal2021BuildingsImporterService: asClass(Portugal2021BuildingsImporterService).classic().singleton(),
+    portugal2021OwnersImporterService: asClass(Portugal2021OwnersImporterService).classic().singleton(),
   })
 }
