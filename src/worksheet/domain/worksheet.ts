@@ -4,7 +4,7 @@ import { utc } from '../../lib/date'
 import { OwnerWithInclude } from '../../owner/owner'
 
 import { ScheduledEvent } from '../../scheduled-events/types'
-import { Address } from '../../types/common'
+import { Address, AddressProp } from '../../types/common'
 import { QueueItem, QueueStatus } from '../models/queue-item'
 import { WorksheetQueue, WorksheetQueueProps } from './queue'
 
@@ -27,9 +27,10 @@ export const WorkSheetCall = t.struct({
 }, 'WorkSheetCall')
 
 export interface WorksheetProps {
-  id: string;
-  status: WorksheetStatusType;
-  relatedBuildingIds: [ string ];
+  id: string
+  status: WorksheetStatusType
+  relatedBuildingIds: [ string ]
+  buildingAddress: AddressProp
 }
 
 export const Worksheet = t.struct<WorksheetProps>({
@@ -144,6 +145,7 @@ export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetPr
 }
 
 const takenWorksheetStatuses = [ WorkSheetStatus.TAKEN, WorkSheetStatus.DEFAULT ]
+
 export function releaseWorksheet (worksheet: WorksheetProps) {
   const worksheetWithoutQueue = Worksheet.update(worksheet, { queueId: { $set: null } })
   return takenWorksheetStatuses.includes(worksheetWithoutQueue.status) ?

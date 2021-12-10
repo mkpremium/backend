@@ -70,7 +70,9 @@ export class Portugal2021BuildingsRepository {
   }
 }
 
-type ImportStatus = 'INBOX' | 'BUILDING_IMPORTED' | 'OWNERS_IMPORTED' | 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED'
+type REGULAR_FLOW = 'INBOX' | 'BUILDING_IMPORTED' | 'OWNERS_IMPORTED' | 'WORKSHEET_CREATED'
+type EXCEPTIONS = 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED'
+type ImportStatus = REGULAR_FLOW | EXCEPTIONS
 
 export interface Portugal2021SourceBuilding {
   _documentType: 'portugal-2021-building',

@@ -31,7 +31,20 @@ export const SimplePhoneNumber = t.struct(
   }
 )
 
-export const Address = t.struct(
+export interface AddressProp  {
+  street: string
+  number: number | string
+  city: string
+  type?: string
+  fullAddress?: string
+  registerNumber?: string
+  postalCode?: any
+  province?: string
+  zone?: string
+  neighborhood?: string
+}
+
+export const Address = t.struct<AddressProp>(
   {
     type: t.maybe(t.String),
     street: t.String,
