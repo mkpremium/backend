@@ -57,7 +57,7 @@ export class Portugal2021BuildingsImporterService {
         street,
         type,
         floorArea,
-        portugalSpecific,
+        militaryGeo,
         usage,
       }
     } = building
@@ -66,16 +66,16 @@ export class Portugal2021BuildingsImporterService {
       address: {
         type,
         street,
-        number,
+        number: number || 'SN',
         city,
         neighborhood,
         fullAddress: `${type} ${street} ${number}, ${city}`,
         province: Portugal2021BuildingsImporterService.inferProvince(city),
       },
-      floorArea: floorArea,
+      floorArea: floorArea || '',
       use: usage,
       portugalSpecific: {
-        militaryGeo: portugalSpecific,
+        militaryGeo,
         artigo: cadastreReferenceA,
         artigoMatricial: cadastreReferenceAM,
       }
