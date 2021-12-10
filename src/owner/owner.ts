@@ -114,7 +114,7 @@ export const Owner = t.struct(
 
     note: t.maybe(t.String),
 
-    confirmedByOperator: OwnerConfirmed,
+    confirmedByOperator: t.maybe(OwnerConfirmed),
     featuredContact: t.maybe(FeaturedContact),
 
     _documentType: t.String

@@ -39,6 +39,14 @@ export class Portugal2021BuildingsRepository {
     )
   }
 
+  phoneNumbersFor (ownerDNIs: string[]): TE.TaskEither<Error, { id: string, phones: string[] }[] | undefined> {
+    return undefined
+  }
+
+  get (sourceBuildingId: string): TE.TaskEither<Error, Portugal2021SourceBuilding> {
+    return undefined
+  }
+
   private pendingWithSlugQuery (slug) {
     const query = `SELECT building.*
                    FROM ${this.couchbaseAdapter.bucketName} building
@@ -74,8 +82,12 @@ export interface Portugal2021SourceBuilding {
     name: string,
   }[],
   slug: string,
-  status: 'INBOX' | 'BUILDING_IMPORTED' | 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED',
+  status: 'INBOX' | 'BUILDING_IMPORTED' | 'OWNERS_IMPORTED' | 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED',
   statusChangedAt: Date,
   importedWithBuildingId?: string,
+  importedOwners?: {
+    dni: string
+    id: string
+  }[]
   failure?: any,
 }
