@@ -58,6 +58,8 @@ export class Portugal2021BuildingsRepository {
   }
 }
 
+type ImportStatus = 'INBOX' | 'BUILDING_IMPORTED' | 'OWNERS_IMPORTED' | 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED'
+
 export interface Portugal2021SourceBuilding {
   _documentType: 'portugal-2021-building',
   address: {
@@ -82,7 +84,7 @@ export interface Portugal2021SourceBuilding {
     name: string,
   }[],
   slug: string,
-  status: 'INBOX' | 'BUILDING_IMPORTED' | 'OWNERS_IMPORTED' | 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED',
+  status: ImportStatus,
   statusChangedAt: Date,
   importedWithBuildingId?: string,
   importedOwners?: {
@@ -90,4 +92,5 @@ export interface Portugal2021SourceBuilding {
     id: string
   }[]
   failure?: any,
+  previousStatus?: ImportStatus
 }

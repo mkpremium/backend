@@ -7,6 +7,7 @@ import uniq from 'lodash/uniq'
 import { Owner } from '../../owner/owner'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import moment from 'moment'
+import { Logger } from '../../infrastructure/logger'
 
 export interface ImportOwnersOfCommand {
   sourceBuildingId: string
@@ -16,6 +17,7 @@ export class Portugal2021OwnersImporterService {
   constructor (
     private portugal2021BuildingsRepository: Portugal2021BuildingsRepository,
     private ownersRepository: OwnerRepository,
+    private logger: Logger,
   ) {
   }
 
@@ -56,12 +58,24 @@ export class Portugal2021OwnersImporterService {
                   .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
             )
           }),
-          TE.chain((importedOwners: {dni: string; id: string}[]) => {
+          TE.chain((importedOwners: { dni: string; id: string }[]) => {
             return this.portugal2021BuildingsRepository.save({
               ...sourceBuilding,
               status: 'OWNERS_IMPORTED',
               importedOwners: importedOwners,
               statusChangedAt: new Date(),
+              failure: undefined,
+            })
+          }),
+          TE.orElse(error => {
+            this.logger.error('Owner import failed', { error: error.message, stack: error.stack })
+
+            return this.portugal2021BuildingsRepository.save({
+              ...sourceBuilding,
+              status: 'FAILED',
+              previousStatus: sourceBuilding.status,
+              statusChangedAt: new Date(),
+              failure: error.message,
             })
           })
         )

@@ -9,6 +9,7 @@ import { map, of } from 'fp-ts/TaskEither'
 import { buildSourceBuilding } from './portugal2021-source-building.builder'
 import { constVoid, pipe } from 'fp-ts/function'
 import { orFail } from '../../helpers'
+import { createLoggerMock } from '../../infrastructure/logger.spec'
 
 describe('Portugal2021OwnersImporterService', () => {
   let service: Portugal2021OwnersImporterService
@@ -31,6 +32,7 @@ describe('Portugal2021OwnersImporterService', () => {
     service = new Portugal2021OwnersImporterService(
       portugal2021BuildingsRepositoryStub,
       ownersRepositoryStub,
+      createLoggerMock()
     )
   })
 
