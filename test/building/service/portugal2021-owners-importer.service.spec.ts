@@ -66,8 +66,7 @@ describe('Portugal2021OwnersImporterService', () => {
   })
 
   it('ignores owners without phones', () => {
-    portugal2021BuildingsRepositoryStub.phoneNumbersFor
-      .returns(of([ { id: '123', phones: [ '666666666' ] } ]))
+    portugal2021BuildingsRepositoryStub.phoneNumbersFor.returns(of([ { id: '123', phones: [ '666666666' ] } ]))
 
     return pipe(
       service.importOwnersOf(testCmd),
@@ -84,6 +83,23 @@ describe('Portugal2021OwnersImporterService', () => {
     )()
   })
 
-  it('saves only one owner by DNI')
+  it('saves only one owner by DNI, name, and address', () => {
+    portugal2021BuildingsRepositoryStub.phoneNumbersFor.returns(of([ { id: '123', phones: [ '666666666' ] } ]))
+    portugal2021BuildingsRepositoryStub.get.returns(of(buildSourceBuilding({
+      importedWithBuildingId: 'test-imported-building-id',
+      owners: [
+        { dni: '123', address: 'test owner address', name: 'test owner' },
+        { dni: '123', address: 'test owner address', name: 'test owner' },
+      ]
+    })))
+
+    return pipe(
+      service.importOwnersOf(testCmd),
+      map(() => {
+        expect(ownersRepositoryStub.save).to.have.been.calledOnce
+      }),
+      orFail(),
+    )()
+  })
   it('saves building as FAILED when no owner has phone')
 })

@@ -8,6 +8,7 @@ import { Owner } from '../../owner/owner'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import moment from 'moment'
 import { Logger } from '../../infrastructure/logger'
+import uniqBy from 'lodash/uniqBy'
 
 export interface ImportOwnersOfCommand {
   sourceBuildingId: string
@@ -27,11 +28,12 @@ export class Portugal2021OwnersImporterService {
       this.portugal2021BuildingsRepository.get(cmd.sourceBuildingId),
       TE.chain((sourceBuilding) => {
         const { importedWithBuildingId, owners: sourceOwners } = sourceBuilding
+        const uniqueOwners = uniqBy(sourceOwners, o => [o.dni, o.name, o.address].join())
         return pipe(
-          this.portugal2021BuildingsRepository.phoneNumbersFor(sourceOwners.map(({ dni }) => dni)),
+          this.portugal2021BuildingsRepository.phoneNumbersFor(uniqueOwners.map(({ dni }) => dni)),
           TE.chain((phoneNumbers) => {
             return TE.sequenceSeqArray(
-              sourceOwners.map(this.toOwner(phoneNumbers, importedWithBuildingId, now))
+              uniqueOwners.map(this.toOwner(phoneNumbers, importedWithBuildingId, now))
                 .filter(Boolean)
                 .map((o: any) => fromPromise(this.ownersRepository.save(o)
                   .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
