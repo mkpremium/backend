@@ -1,7 +1,7 @@
-import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
+import { connectCouchbaseBucket } from '../../../src/db/connect-couchbase-bucket'
 import aws from 'aws-sdk'
-import { initLogger } from '../../src/infrastructure/logger'
-import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
+import { initLogger } from '../../../src/infrastructure/logger'
+import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 
 const logger = initLogger()
 const QueueUrl = process.env.QUEUE_URL
