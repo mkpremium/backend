@@ -30,33 +30,41 @@ export class Portugal2021OwnersImporterService {
         return pipe(
           this.portugal2021BuildingsRepository.phoneNumbersFor(owners.map(({ dni }) => dni)),
           TE.chain((phoneNumbers) => {
-            return TE.sequenceSeqArray(
-              owners.map(o => {
-                const contacts = uniq(phoneNumbers.find(({ id }) => id === o.dni)!.phones).map(phoneNumber => ({
-                  id: uuid(),
-                  value: phoneNumber,
-                  status: 'UNDEFINED',
-                  type: 'TELEFONO'
-                }))
-
-                return Owner({
-                  id: uuid(),
-                  type: 'NINGUNO',
-                  status: 'NO_VERIFICADO',
-                  buildingId: importedWithBuildingId,
-                  name: o.name,
-                  note: `Import Portugal2021 ${now}`,
-                  person: {
-                    name: o.name,
-                    documentNumber: o.dni,
-                    addresses: [ { fullAddress: o.address } ],
-                    contacts,
+            try {
+              return TE.sequenceSeqArray(
+                owners.map(o => {
+                  const phonesForDNI = phoneNumbers.find(({ id }) => id === o.dni)
+                  if (!phonesForDNI) {
+                    throw new NoPhonesFoundForDNI(o.dni)
                   }
+                  const contacts = uniq(phonesForDNI.phones).map(phoneNumber => ({
+                    id: uuid(),
+                    value: phoneNumber,
+                    status: 'UNDEFINED',
+                    type: 'TELEFONO'
+                  }))
+
+                  return Owner({
+                    id: uuid(),
+                    type: 'NINGUNO',
+                    status: 'NO_VERIFICADO',
+                    buildingId: importedWithBuildingId,
+                    name: o.name,
+                    note: `Import Portugal2021 ${now}`,
+                    person: {
+                      name: o.name,
+                      documentNumber: o.dni,
+                      addresses: [ { fullAddress: o.address } ],
+                      contacts,
+                    }
+                  })
                 })
-              })
-                .map((o: any) => fromPromise(this.ownersRepository.save(o)
-                  .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
-            )
+                  .map((o: any) => fromPromise(this.ownersRepository.save(o)
+                    .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
+              )
+            } catch (error) {
+              return TE.left(error)
+            }
           }),
           TE.chain((importedOwners: { dni: string; id: string }[]) => {
             return this.portugal2021BuildingsRepository.save({
@@ -81,5 +89,11 @@ export class Portugal2021OwnersImporterService {
         )
       })
     )
+  }
+}
+
+class NoPhonesFoundForDNI extends Error {
+  constructor (readonly dni: string) {
+    super(`No phones found for DNI: ${dni}`)
   }
 }

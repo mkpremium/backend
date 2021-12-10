@@ -40,12 +40,12 @@ describe('Portugal2021BuildingsRepository', () => {
 
   it('gets owners phone numbers', async () => {
     await couchbaseAdapter.upsert('dni-1', {
-      dni: 'dni-1',
+      id: 'dni-1',
       phones: [ '666666666' ],
       _documentType: 'portugal-2021-owner-phone',
     })
     await couchbaseAdapter.upsert('dni-2', {
-      dni: 'dni-2',
+      id: 'dni-2',
       phones: [ '666666667' ],
       _documentType: 'portugal-2021-owner-phone',
     })
@@ -54,8 +54,8 @@ describe('Portugal2021BuildingsRepository', () => {
       repository.phoneNumbersFor([ 'dni-1', 'dni-2' ]),
       map((foundPhones) => {
         expect(foundPhones).to.be.eql([
-          { dni: 'dni-1', phones: [ '666666666' ] },
-          { dni: 'dni-2', phones: [ '666666667' ] },
+          { id: 'dni-1', phones: [ '666666666' ] },
+          { id: 'dni-2', phones: [ '666666667' ] },
         ])
       }),
       orFail(),

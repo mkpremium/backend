@@ -42,7 +42,7 @@ export class Portugal2021BuildingsRepository {
   phoneNumbersFor (ownerDNIs: string[]): TE.TaskEither<Error, { id: string, phones: string[] }[] | undefined> {
     return pipe(
       this.phoneNumberForDNIQuery(ownerDNIs),
-      TE.map(phones => phones.map(({ dni, phones }) => ({ dni, phones })))
+      TE.map(phones => phones.map(({ id, phones }) => ({ id, phones })))
     )
   }
 
