@@ -25,8 +25,15 @@ describe('Portugal2021OwnersImporterService', () => {
       phoneNumbersFor: stub(),
       save: stub().returns(of(constVoid))
     }
+    portugal2021BuildingsRepositoryStub.get.returns(of(buildSourceBuilding({
+      importedWithBuildingId: 'test-imported-building-id',
+      owners: [
+        { dni: '123', address: 'test owner address', name: 'test owner1' },
+        { dni: '456', address: 'test owner address', name: 'test owner2' },
+      ]
+    })))
     ownersRepositoryStub = {
-      save: stub().resolves(),
+      save: stub().resolves({ id: 'test-saved-owner-id' }),
     }
 
     service = new Portugal2021OwnersImporterService(
@@ -41,14 +48,6 @@ describe('Portugal2021OwnersImporterService', () => {
       .returns(of([ { id: '123', phones: [ '666666666' ] }, { id: '456', phones: [ '666666667' ] } ]))
     ownersRepositoryStub.save.withArgs(sinon.match({ name: 'test owner1' })).resolves({ id: 'first-owner-id' })
     ownersRepositoryStub.save.withArgs(sinon.match({ name: 'test owner2' })).resolves({ id: 'second-owner-id' })
-
-    portugal2021BuildingsRepositoryStub.get.returns(of(buildSourceBuilding({
-      importedWithBuildingId: 'test-imported-building-id',
-      owners: [
-        { dni: '123', address: 'test owner address', name: 'test owner1' },
-        { dni: '456', address: 'test owner address', name: 'test owner2' },
-      ]
-    })))
 
     return pipe(
       service.importOwnersOf(testCmd),
@@ -65,4 +64,26 @@ describe('Portugal2021OwnersImporterService', () => {
       orFail(),
     )()
   })
+
+  it('ignores owners without phones', () => {
+    portugal2021BuildingsRepositoryStub.phoneNumbersFor
+      .returns(of([ { id: '123', phones: [ '666666666' ] } ]))
+
+    return pipe(
+      service.importOwnersOf(testCmd),
+      map(() => {
+        expect(ownersRepositoryStub.save).to.have.been.calledOnce
+        expect(portugal2021BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
+          status: 'OWNERS_IMPORTED',
+          importedOwners: [
+            { dni: '123', id: 'test-saved-owner-id' },
+          ]
+        })
+      }),
+      orFail(),
+    )()
+  })
+
+  it('saves only one owner by DNI')
+  it('saves building as FAILED when no owner has phone')
 })

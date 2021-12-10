@@ -26,74 +26,78 @@ export class Portugal2021OwnersImporterService {
     return pipe(
       this.portugal2021BuildingsRepository.get(cmd.sourceBuildingId),
       TE.chain((sourceBuilding) => {
-        const { importedWithBuildingId, owners } = sourceBuilding
+        const { importedWithBuildingId, owners: sourceOwners } = sourceBuilding
         return pipe(
-          this.portugal2021BuildingsRepository.phoneNumbersFor(owners.map(({ dni }) => dni)),
+          this.portugal2021BuildingsRepository.phoneNumbersFor(sourceOwners.map(({ dni }) => dni)),
           TE.chain((phoneNumbers) => {
-            try {
-              return TE.sequenceSeqArray(
-                owners.map(o => {
-                  const phonesForDNI = phoneNumbers.find(({ id }) => id === o.dni)
-                  if (!phonesForDNI) {
-                    throw new NoPhonesFoundForDNI(o.dni)
-                  }
-                  const contacts = uniq(phonesForDNI.phones).map(phoneNumber => ({
-                    id: uuid(),
-                    value: phoneNumber,
-                    status: 'UNDEFINED',
-                    type: 'TELEFONO'
-                  }))
-
-                  return Owner({
-                    id: uuid(),
-                    type: 'NINGUNO',
-                    status: 'NO_VERIFICADO',
-                    buildingId: importedWithBuildingId,
-                    name: o.name,
-                    note: `Import Portugal2021 ${now}`,
-                    person: {
-                      name: o.name,
-                      documentNumber: o.dni,
-                      addresses: [ { fullAddress: o.address } ],
-                      contacts,
-                    }
-                  })
-                })
-                  .map((o: any) => fromPromise(this.ownersRepository.save(o)
-                    .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
-              )
-            } catch (error) {
-              return TE.left(error)
-            }
+            return TE.sequenceSeqArray(
+              sourceOwners.map(this.toOwner(phoneNumbers, importedWithBuildingId, now))
+                .filter(Boolean)
+                .map((o: any) => fromPromise(this.ownersRepository.save(o)
+                  .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
+            )
           }),
-          TE.chain((importedOwners: { dni: string; id: string }[]) => {
-            return this.portugal2021BuildingsRepository.save({
-              ...sourceBuilding,
-              status: 'OWNERS_IMPORTED',
-              importedOwners: importedOwners,
-              statusChangedAt: new Date(),
-              failure: undefined,
-            })
-          }),
-          TE.orElse(error => {
-            this.logger.error('Owner import failed', { error: error.message, stack: error.stack })
-
-            return this.portugal2021BuildingsRepository.save({
-              ...sourceBuilding,
-              status: 'FAILED',
-              previousStatus: sourceBuilding.status,
-              statusChangedAt: new Date(),
-              failure: error.message,
-            })
-          })
+          TE.chain(this.updateWithSuccessfulStatus(sourceBuilding)),
+          TE.orElse(this.handleError(sourceBuilding))
         )
       })
     )
   }
-}
 
-class NoPhonesFoundForDNI extends Error {
-  constructor (readonly dni: string) {
-    super(`No phones found for DNI: ${dni}`)
+  private toOwner (phoneNumbers, importedWithBuildingId, now: string) {
+    return sourceOwner => {
+      const phonesForDNI = phoneNumbers.find(({ id }) => id === sourceOwner.dni)
+      if (!phonesForDNI) {
+        this.logger.warning('No phones found for owner', { dni: sourceOwner.dni })
+        return undefined
+      }
+      const contacts = uniq(phonesForDNI.phones).map(phoneNumber => ({
+        id: uuid(),
+        value: phoneNumber,
+        status: 'UNDEFINED',
+        type: 'TELEFONO'
+      }))
+
+      return Owner({
+        id: uuid(),
+        type: 'NINGUNO',
+        status: 'NO_VERIFICADO',
+        buildingId: importedWithBuildingId,
+        name: sourceOwner.name,
+        note: `Import Portugal2021 ${now}`,
+        person: {
+          name: sourceOwner.name,
+          documentNumber: sourceOwner.dni,
+          addresses: [ { fullAddress: sourceOwner.address } ],
+          contacts,
+        }
+      })
+    }
+  }
+
+  private updateWithSuccessfulStatus (sourceBuilding) {
+    return (importedOwners: { dni: string; id: string }[]) => {
+      return this.portugal2021BuildingsRepository.save({
+        ...sourceBuilding,
+        status: 'OWNERS_IMPORTED',
+        importedOwners: importedOwners,
+        statusChangedAt: new Date(),
+        failure: undefined,
+      })
+    }
+  }
+
+  private handleError (sourceBuilding) {
+    return error => {
+      this.logger.error('Owner import failed', { error: error.message, stack: error.stack })
+
+      return this.portugal2021BuildingsRepository.save({
+        ...sourceBuilding,
+        status: 'FAILED',
+        previousStatus: sourceBuilding.status,
+        statusChangedAt: new Date(),
+        failure: error.message,
+      })
+    }
   }
 }
