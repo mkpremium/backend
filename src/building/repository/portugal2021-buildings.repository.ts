@@ -40,11 +40,14 @@ export class Portugal2021BuildingsRepository {
   }
 
   phoneNumbersFor (ownerDNIs: string[]): TE.TaskEither<Error, { id: string, phones: string[] }[] | undefined> {
-    return undefined
+    return pipe(
+      this.phoneNumberForDNIQuery(ownerDNIs),
+      TE.map(phones => phones.map(({ dni, phones }) => ({ dni, phones })))
+    )
   }
 
   get (sourceBuildingId: string): TE.TaskEither<Error, Portugal2021SourceBuilding> {
-    return undefined
+    return fromPromise(this.couchbaseAdapter.get(sourceBuildingId).then(({ value }) => value))
   }
 
   private pendingWithSlugQuery (slug) {
@@ -55,6 +58,15 @@ export class Portugal2021BuildingsRepository {
                      AND slug = $1`
 
     return fromPromise(this.couchbaseAdapter.queryAsync(query, [ slug ]))
+  }
+
+  private phoneNumberForDNIQuery (ownerDNIs: string[]) {
+    const query = `SELECT phone.*
+                   FROM ${this.couchbaseAdapter.bucketName} phone
+                   WHERE phone._documentType = 'portugal-2021-owner-phone'
+                     AND META(phone).id IN $1`
+
+    return fromPromise(this.couchbaseAdapter.queryAsync(query, [ ownerDNIs ]))
   }
 }
 

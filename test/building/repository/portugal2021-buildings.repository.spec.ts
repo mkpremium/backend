@@ -5,13 +5,16 @@ import { buildSourceBuilding } from '../service/portugal2021-source-building.bui
 import { pipe } from 'fp-ts/function'
 import { orFail } from '../../helpers'
 import { map } from 'fp-ts/TaskEither'
+import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 
 describe('Portugal2021BuildingsRepository', () => {
   let repository: Portugal2021BuildingsRepository
+  let couchbaseAdapter: CouchbaseAdapter
 
   beforeEach(async () => {
     const container = await createTestContainer()
     repository = container.resolve('portugal2021BuildingsRepository')
+    couchbaseAdapter = container.resolve('couchbaseAdapter')
   })
 
   it('gets pending buildings with slug', async () => {
@@ -30,6 +33,30 @@ describe('Portugal2021BuildingsRepository', () => {
       map(buildings => {
         expect(buildings).to.have.lengthOf(1)
         expect(buildings[ 0 ].id).to.be.equal(testPendingBuilding.id)
+      }),
+      orFail(),
+    )()
+  })
+
+  it('gets owners phone numbers', async () => {
+    await couchbaseAdapter.upsert('dni-1', {
+      dni: 'dni-1',
+      phones: [ '666666666' ],
+      _documentType: 'portugal-2021-owner-phone',
+    })
+    await couchbaseAdapter.upsert('dni-2', {
+      dni: 'dni-2',
+      phones: [ '666666667' ],
+      _documentType: 'portugal-2021-owner-phone',
+    })
+
+    return pipe(
+      repository.phoneNumbersFor([ 'dni-1', 'dni-2' ]),
+      map((foundPhones) => {
+        expect(foundPhones).to.be.eql([
+          { dni: 'dni-1', phones: [ '666666666' ] },
+          { dni: 'dni-2', phones: [ '666666667' ] },
+        ])
       }),
       orFail(),
     )()
