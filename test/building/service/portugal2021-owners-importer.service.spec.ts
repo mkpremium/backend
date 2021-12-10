@@ -101,5 +101,18 @@ describe('Portugal2021OwnersImporterService', () => {
       orFail(),
     )()
   })
-  it('saves building as FAILED when no owner has phone')
+
+  it('saves building as FAILED when no owner has phone', () => {
+    portugal2021BuildingsRepositoryStub.phoneNumbersFor.returns(of([]))
+
+    return pipe(
+      service.importOwnersOf(testCmd),
+      map(() => {
+        expect(portugal2021BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
+          status: 'FAILED'
+        })
+      }),
+      orFail(),
+    )()
+  })
 })

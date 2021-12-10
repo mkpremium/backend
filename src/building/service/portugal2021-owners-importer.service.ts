@@ -28,13 +28,16 @@ export class Portugal2021OwnersImporterService {
       this.portugal2021BuildingsRepository.get(cmd.sourceBuildingId),
       TE.chain((sourceBuilding) => {
         const { importedWithBuildingId, owners: sourceOwners } = sourceBuilding
-        const uniqueOwners = uniqBy(sourceOwners, o => [o.dni, o.name, o.address].join())
+        const uniqueOwners = uniqBy(sourceOwners, o => [ o.dni, o.name, o.address ].join())
         return pipe(
           this.portugal2021BuildingsRepository.phoneNumbersFor(uniqueOwners.map(({ dni }) => dni)),
           TE.chain((phoneNumbers) => {
+            const owners = uniqueOwners.map(this.toOwner(phoneNumbers, importedWithBuildingId, now)).filter(Boolean)
+            if (owners.length === 0) {
+              return TE.left(new NoOwnersWithContactFoundForBuilding(sourceBuilding.id))
+            }
             return TE.sequenceSeqArray(
-              uniqueOwners.map(this.toOwner(phoneNumbers, importedWithBuildingId, now))
-                .filter(Boolean)
+              owners
                 .map((o: any) => fromPromise(this.ownersRepository.save(o)
                   .then(({ id }) => ({ id: id as string, dni: o.person.documentNumber as string }))))
             )
@@ -91,7 +94,7 @@ export class Portugal2021OwnersImporterService {
 
   private handleError (sourceBuilding) {
     return error => {
-      this.logger.error('Owner import failed', { error: error.message, stack: error.stack })
+      this.logger.error('Owner import failed', { ...error, error: error.message, stack: error.stack })
 
       return this.portugal2021BuildingsRepository.save({
         ...sourceBuilding,
@@ -101,5 +104,11 @@ export class Portugal2021OwnersImporterService {
         failure: error.message,
       })
     }
+  }
+}
+
+class NoOwnersWithContactFoundForBuilding extends Error {
+  constructor (readonly sourceBuildingId: string) {
+    super(`No owners with contact found for building`)
   }
 }
