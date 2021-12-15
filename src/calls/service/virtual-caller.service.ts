@@ -155,7 +155,7 @@ export class VirtualCallerService {
           this.saveDoneWorksheet(inProgressWorksheet)
             .catch(error => this.logger.error('Saving done worksheet', { error: error.message }))
 
-          return new Promise(resolve => setTimeout(resolve, 10000)).then(() => this.takeNextWorksheet(cmd))
+          return new Promise(resolve => setTimeout(resolve, 1000)).then(() => this.takeNextWorksheet(cmd))
         })
     } else {
       worksheet = await this.takeNextWorksheet(cmd)
