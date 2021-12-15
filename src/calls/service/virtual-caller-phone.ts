@@ -119,7 +119,7 @@ export class VirtualCallerPhone {
   private getPhoneLock (phoneNumber: string): Promise<LockedPhone> {
     return retry<LockedPhone>(
       () => this.virtualCallerPhonesRepository.lockPhone(phoneNumber),
-      { backoff: 2, interval: 5000, max_tries: 3 }
+      { backoff: 2, max_tries: 3 }
     ).then(({ phone, cas }) => {
       const lockTimeout = moment().add(-5, 'minutes')
       const lastLockAfterTimeout = phone.lastLockAcquiredAt && moment(phone.lastLockAcquiredAt).isAfter(lockTimeout)
