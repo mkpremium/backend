@@ -1,6 +1,6 @@
 import * as TE from 'fp-ts/TaskEither'
 import { Portugal2021BuildingsRepository } from '../repository/portugal2021-buildings.repository'
-import { pipe } from 'fp-ts/function'
+import { constVoid, pipe } from 'fp-ts/function'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { fromPromise } from '../../infrastructure/fp-utils'
 
@@ -19,6 +19,9 @@ export class Portugal2021BuildingsImporterService {
     return pipe(
       this.portugal2021BuildingsRepository.pendingWithSlug(cmd.slug),
       TE.chain(buildings => {
+        if (buildings.length === 0) {
+          return TE.of(constVoid)
+        }
         const sourceBuilding = this.mergeBuildings(buildings)
         const parsedBuilding = Portugal2021BuildingsImporterService.parseBuilding(sourceBuilding)
 
