@@ -30,7 +30,7 @@ async function exec () {
 }
 
 async function loop (couchbaseAdapter: CouchbaseAdapter, importer: Portugal2021BuildingsImporterService) {
-  const nextSlugsBatch = await couchbaseAdapter.queryAsync(pendingBuildingSlugs, [ 100 ])
+  const nextSlugsBatch = await couchbaseAdapter.queryAsync(pendingBuildingSlugs, [ 500 ])
   if (nextSlugsBatch.length === 0) {
     logger.info('No more buildings to import.')
     return
