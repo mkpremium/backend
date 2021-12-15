@@ -5,8 +5,9 @@ import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 import { createDiContainer } from '../../../src/infrastructure/dependencies'
 import { startListeners } from '../../../src/infrastructure/listeners'
 import { Portugal2021BuildingsImporterService } from '../../../src/building/service/portugal2021-buildings-importer.service'
-import { pipe } from 'fp-ts/function'
+import { constVoid, pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
+import * as T from 'fp-ts/Task'
 
 const logger = initLogger()
 
@@ -35,7 +36,12 @@ async function loop (couchbaseAdapter: CouchbaseAdapter, importer: Portugal2021B
     return
   }
 
+  const processedSlugs = []
   for (const { slug } of nextSlugsBatch) {
+    if (processedSlugs.includes(slug)) {
+      logger.info('Slug already imported, skipping it', { slug })
+      continue
+    }
     await pipe(
       importer.importSlug({ slug }),
       TE.match(
@@ -46,6 +52,10 @@ async function loop (couchbaseAdapter: CouchbaseAdapter, importer: Portugal2021B
           logger.info('Building imported', { slug })
         }
       ),
+      T.chain(() => {
+        processedSlugs.push(slug)
+        return T.of(constVoid)
+      })
     )()
   }
 
