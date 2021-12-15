@@ -19,7 +19,7 @@ export class Portugal2021BuildingsImporterService {
     return pipe(
       this.portugal2021BuildingsRepository.pendingWithSlug(cmd.slug),
       TE.chain(buildings => {
-        const sourceBuilding = buildings[ 0 ]
+        const sourceBuilding = this.mergeBuildings(buildings)
         const parsedBuilding = Portugal2021BuildingsImporterService.parseBuilding(sourceBuilding)
 
         return pipe(
@@ -31,6 +31,19 @@ export class Portugal2021BuildingsImporterService {
               importedWithBuildingId: building.id,
               statusChangedAt: new Date(),
             })
+          }),
+          TE.chain(() => {
+            if (buildings.length === 1) {
+              return TE.of(undefined)
+            }
+            return TE.sequenceSeqArray(
+              buildings.slice(1).map(b => this.portugal2021BuildingsRepository.save({
+                ...b,
+                status: 'MERGED',
+                mergeWith: sourceBuilding.id,
+                statusChangedAt: new Date(),
+              }))
+            )
           }),
           TE.orElse(error => {
             return this.portugal2021BuildingsRepository.save({
@@ -44,6 +57,21 @@ export class Portugal2021BuildingsImporterService {
         )
       }),
     )
+  }
+
+  private mergeBuildings (buildings) {
+    const sourceBuilding = buildings[ 0 ]
+    buildings.slice(1).forEach(b => {
+      sourceBuilding.address.floorArea = sourceBuilding.address.floorArea || b.address.floorArea
+      sourceBuilding.address.usage = sourceBuilding.address.usage || b.address.usage
+      sourceBuilding.address.militaryGeo = {
+        x: sourceBuilding.address.militaryGeo.x || b.address.militaryGeo.x,
+        y: sourceBuilding.address.militaryGeo.y || b.address.militaryGeo.y,
+      }
+      sourceBuilding.owners = sourceBuilding.owners.concat(b.owners)
+    })
+
+    return sourceBuilding
   }
 
   private static parseBuilding (building) {

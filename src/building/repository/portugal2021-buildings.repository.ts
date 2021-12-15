@@ -71,7 +71,7 @@ export class Portugal2021BuildingsRepository {
 }
 
 type REGULAR_FLOW = 'INBOX' | 'BUILDING_IMPORTED' | 'OWNERS_IMPORTED' | 'WORKSHEET_CREATED'
-type EXCEPTIONS = 'DUPLICATED' | 'DUPLICATED_OWNER' | 'FAILED'
+type EXCEPTIONS = 'DUPLICATED' | 'MERGED' | 'DUPLICATED_OWNER' | 'FAILED'
 type ImportStatus = REGULAR_FLOW | EXCEPTIONS
 
 export interface Portugal2021SourceBuilding {
@@ -107,4 +107,5 @@ export interface Portugal2021SourceBuilding {
   }[]
   failure?: any,
   previousStatus?: ImportStatus
+  mergeWith?: string
 }

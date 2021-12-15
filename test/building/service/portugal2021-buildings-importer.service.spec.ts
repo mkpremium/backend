@@ -61,4 +61,30 @@ describe('Portugal2021BuildingsImporterService', () => {
       orFail(),
     )()
   })
+
+  it('merges buildings with same slug', () => {
+    portugal20210BuildingsRepositoryStub.pendingWithSlug.returns(TE.of([
+      buildSourceBuilding({ id: 'test-source-building-1' }),
+      buildSourceBuilding({ id: 'test-source-building-2' }),
+    ]))
+
+    return pipe(
+      service.importSlug(testCmd),
+      map(() => {
+        expect(buildingsRepositoryStub.save).to.have.been.calledOnce
+        expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledTwice
+        expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
+          id: 'test-source-building-2',
+          status: 'MERGED',
+          mergeWith: 'test-source-building-1',
+        })
+        expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
+          id: 'test-source-building-1',
+          status: 'BUILDING_IMPORTED',
+        })
+      }),
+      orFail(),
+    )()
+
+  })
 })
