@@ -60,7 +60,8 @@ SELECT
 id,
 name,
 person.contacts,
-featuredContact
+featuredContact,
+status
 FROM ${bucketName} owner
 WHERE _documentType = 'owner' and buildingId = $1
 `
@@ -102,7 +103,8 @@ const BuildingOwner = t.struct({
   featuredContact: t.maybe(t.struct({
     phoneId: t.maybe(t.String),
     emailId: t.maybe(t.String)
-  }))
+  })),
+  status: t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT'])
 })
 
 export class OwnerRepository extends CouchbaseRepository<OwnerProps> {
