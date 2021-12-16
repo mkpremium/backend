@@ -154,6 +154,10 @@ export class VirtualCallerService {
           }
 
           this.logger.info('Worksheet not found, taking next', { worksheetId: inProgressWorksheet.worksheetId })
+          this.eventBus.publish({
+            name: 'virtual-caller.worksheet_not_found',
+            worksheetId: inProgressWorksheet.worksheetId,
+          })
           return this.saveDoneWorksheet(inProgressWorksheet)
             .catch(error => this.logger.error('Saving done worksheet', { error: error.message }))
             .then(() => new Promise(resolve => setTimeout(resolve, 1000)))

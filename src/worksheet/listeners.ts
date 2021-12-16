@@ -67,19 +67,28 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
   eventBus.on(
     'worksheet.invalid_worksheet_found',
     'worksheet.invalidate_worksheet',
-    async ({ worksheetId }: InvalidWorksheetFound) => {
-      logger.info('Invalid worksheet found, updating status', { worksheetId })
-      const worksheet = await worksheetRepository.get(worksheetId)
-      const updatedWorksheet = setStatus(worksheet, 'INVALID')
+    invalidateWorksheet
+  )
 
-      await worksheetRepository.save(updatedWorksheet)
-    })
+  eventBus.on(
+    'virtual-caller.worksheet_not_found',
+    'worksheet.invalidate_worksheet',
+    invalidateWorksheet,
+  )
 
   eventBus.on(
     'owner.status_changed',
     'worksheet.update_status',
     (evt: OwnerStatusChangedEvent) => {
-    return new Promise(resolve => setTimeout(resolve, consistencyDelay))
-      .then(() => updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt))
-  })
+      return new Promise(resolve => setTimeout(resolve, consistencyDelay))
+        .then(() => updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt))
+    })
+
+  async function invalidateWorksheet ({ worksheetId }: InvalidWorksheetFound) {
+    logger.info('Invalid worksheet found, updating status', { worksheetId })
+    const worksheet = await worksheetRepository.get(worksheetId)
+    const updatedWorksheet = setStatus(worksheet, 'INVALID')
+
+    await worksheetRepository.save(updatedWorksheet)
+  }
 }
