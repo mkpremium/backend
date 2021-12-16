@@ -2,7 +2,7 @@ import _ from 'lodash'
 import _get from 'lodash/get'
 import mime from 'mime-types'
 import t from 'tcomb'
-import { cleanUrl, makePreview, uploadPreview } from '../aws'
+import { dropQueryParams, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
@@ -72,8 +72,9 @@ export class LegacyBuildingRepository extends CouchbaseModel {
   }
 
   async addMetadataToBuilding (building, params) {
-    const mimeType = mime.lookup(cleanUrl(params.url))
-    const localPreview = await makePreview(params.url)
+    const url = dropQueryParams(params.url)
+    const mimeType = mime.lookup(url)
+    const localPreview = await makePreview(url)
     const previewUrl = await uploadPreview('preview', localPreview)
 
     const metaRepo = new MetadataRepository()
@@ -81,7 +82,7 @@ export class LegacyBuildingRepository extends CouchbaseModel {
       buildingId: building.id,
       previewUrl,
       mimeType,
-      url: cleanUrl(params.url)
+      url,
     })
     const metadata = await metaRepo.save(body)
     const updatedMetadata = t.update(building.metadata, { $push: [ BuildingMetadataPreview(metadata) ] })

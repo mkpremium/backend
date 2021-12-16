@@ -42,16 +42,15 @@ export async function uploadFile (prefix, filepath) {
     return null
   }
 
-  const { name: fileName, ext: fileType } = path.parse(filepath)
   const s3 = new aws.S3({ region: metadataS3Config.region })
   const data = await fs.readFile(filepath)
-  const Key = keyName(prefix, fileName)
+  const Key = keyName(prefix, filepath)
 
   const s3params: PutObjectRequest = {
     Bucket: metadataS3Config.bucket,
     Key,
     ACL: 'private',
-    ContentType: fileType,
+    ContentType: mime.lookup(filepath),
     Body: data
   }
 
@@ -95,7 +94,7 @@ export async function uploadPreview (prefix, filepath) {
   })
 }
 
-export function cleanUrl (url) {
+export function dropQueryParams (url) {
   return url.split('?')[ 0 ]
 }
 
@@ -118,7 +117,7 @@ export function resolvePublicUrl (privateUrl) {
 }
 
 export async function makePreview (rawUrl) {
-  const url = cleanUrl(rawUrl)
+  const url = dropQueryParams(rawUrl)
   const extension = path.extname(url)
   logger.debug('aws#makePreview', { extension, url })
   switch (extension) {
