@@ -3,4 +3,6 @@
 set -x
 set -a && . ../../.env
 
-npx ts-node $1
+script="$1"
+shift
+npx ts-node "$script" "$@"

@@ -1,4 +1,3 @@
-import Promise from 'bluebird'
 import aws from 'aws-sdk'
 import path from 'path'
 import url from 'url'
@@ -10,8 +9,13 @@ import mime from 'mime-types'
 import { logger } from '../infrastructure/logger'
 
 import { metadataS3Config } from '../../config'
+import { PutObjectRequest } from 'aws-sdk/clients/s3'
 
-const SignedUrlRequest = t.struct({
+type SignedUrlRequestProps = {
+  fileName: string;
+  fileType: string;
+}
+const SignedUrlRequest = t.struct<SignedUrlRequestProps>({
   fileName: t.String,
   fileType: t.String
 })
@@ -33,21 +37,19 @@ export function getPrivateUploadUrl (prefix, config) {
   return s3.getSignedUrl('putObject', params)
 }
 
-export async function uploadFile (prefix, params, filepath) {
+export async function uploadFile (prefix, filepath) {
   if (!filepath) {
     return null
   }
 
-  const { fileName, fileType } = SignedUrlRequest(params)
-  const s3 = new aws.S3()
+  const { name: fileName, ext: fileType } = path.parse(filepath)
+  const s3 = new aws.S3({ region: metadataS3Config.region })
   const data = await fs.readFile(filepath)
   const Key = keyName(prefix, fileName)
 
-  const s3params = {
+  const s3params: PutObjectRequest = {
     Bucket: metadataS3Config.bucket,
-    Region: metadataS3Config.region,
     Key,
-    Expires: 900,
     ACL: 'private',
     ContentType: fileType,
     Body: data
