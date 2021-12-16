@@ -16,7 +16,7 @@ export const setupOwnersRoutes = (app: Express, container: AwilixContainer) => {
 
   router.post('/:id/contacts', addOwnerContactController)
 
-  router.put('/:ownerId/featured-contact', wrap(container.resolve('setFeaturedOwnerController')))
+  router.put('/:ownerId/featured-contact', wrap(container.resolve('setFeaturedContactController')))
 
   router.get('/', listOwnerController)
 

@@ -9,12 +9,14 @@ import { createCallFinishedListener } from './event-listener/call-finished.liste
 import { markGoodContactOnCallScheduled } from './event-listener/mark-good-contact-on-call-scheduled'
 import { getOwnerController } from './controller/get-owner.controller'
 import { discardNonExistingContactListener } from './event-listener/discard-non-existing-contact.listener'
+import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
 
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
     getOwnerController: asFunction(getOwnerController).singleton(),
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
     searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
+    setFeaturedContactController: asFunction(createSetFeaturedContactController).classic().singleton(),
 
     callFinishedListener: asFunction(createCallFinishedListener).singleton(),
     markGoodContactOnCallScheduled: asFunction(markGoodContactOnCallScheduled).singleton(),
