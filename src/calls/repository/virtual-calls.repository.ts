@@ -45,7 +45,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
                \`call\`.ownerResponse,
                count(*) as count
         FROM ${this.bucketName} \`call\`
-            JOIN mkpremium worksheet
+            JOIN ${this.bucketName} worksheet
         ON worksheet._documentType = 'worksheet' AND meta(worksheet).id = \`call\`.worksheetId
         WHERE \`call\`._documentType = 'virtual-agent-call'
           AND \`call\`.createdAt BETWEEN $1 AND $2
