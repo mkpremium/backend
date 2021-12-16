@@ -1,12 +1,12 @@
 import { WorksheetDone } from '../service/virtual-caller.service'
 import { VirtualCallerSupervisorService } from '../service/virtual-caller-supervisor.service'
-import { Logger } from 'winston'
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
+import { Logger } from '../../infrastructure/logger'
 
 interface Deps {
   virtualCallerSupervisor: VirtualCallerSupervisorService;
   virtualCallersRepository: VirtualCallersRepository;
-  logger: Pick<Logger, 'info'>;
+  logger: Logger;
 }
 
 export const createWorksheetDoneListener = ({
@@ -17,10 +17,12 @@ export const createWorksheetDoneListener = ({
 ) => async (evt: WorksheetDone) => {
   logger.info('Worksheet done, checking for more work', evt)
 
-  return virtualCallerSupervisor.check({
+  virtualCallerSupervisor.check({
     caller: await virtualCallersRepository.get(evt.callerId),
     lastWorksheetId: undefined,
     lastOwnerResponse: undefined,
+  }).catch(error => {
+    logger.error('Could not check with virtual caller supervisor', { error: error.message, stack: error.stack })
   })
 }
 
