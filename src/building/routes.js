@@ -15,6 +15,7 @@ import { wrap } from 'express-promise-wrap'
 export const createBuildingsRoutes = container => {
   const router = Router()
 
+  router.post('/', wrap(container.resolve('createBuildingController')))
   router.post('/create-url', createMetadataUploadUrlController)
 
   router.post('/:id/metadata', addMetadataToBuildingController)

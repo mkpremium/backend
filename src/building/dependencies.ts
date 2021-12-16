@@ -42,6 +42,7 @@ import { Portugal2021BuildingsRepository } from './repository/portugal2021-build
 import { Portugal2021BuildingsImporterService } from './service/portugal2021-buildings-importer.service'
 import { Portugal2021OwnersImporterService } from './service/portugal2021-owners-importer.service'
 import { Portugal2021WorksheetInitializerService } from './service/portugal2021-worksheet-initializer.service'
+import { createBuildingController } from './controller/create-building.controller'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -74,6 +75,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
     proposalsRepository: asClass(ProposalsRepository).classic().singleton(),
 
+    createBuildingController: asFunction(createBuildingController).singleton(),
     listBuildingsController: asFunction(createListBuildingsController).singleton(),
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
