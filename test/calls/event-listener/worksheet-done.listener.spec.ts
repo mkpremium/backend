@@ -3,6 +3,7 @@ import { stub } from 'sinon'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 import { WorksheetDone } from '../../../src/calls/service/virtual-caller.service'
 import { createWorksheetDoneListener } from '../../../src/calls/event-listener/worksheet-done.listener'
+import { createLoggerMock } from '../../infrastructure/logger.spec'
 
 describe('worksheet-done.listener', () => {
   let listener: (evt: WorksheetDone) => Promise<void>
@@ -17,7 +18,7 @@ describe('worksheet-done.listener', () => {
       check: stub().resolves(),
     }
     listener = createWorksheetDoneListener({
-      logger: { info: () => undefined },
+      logger: createLoggerMock(),
       virtualCallerSupervisor: virtualCallerSupervisorStub,
       virtualCallersRepository: virtualCallersRepositoryStub
     })
