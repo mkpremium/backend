@@ -5,16 +5,20 @@ import url from 'url'
 import uuid from 'uuid/v4'
 import { exec } from 'child_process'
 import fs from 'fs-extra'
-import t from './types'
+import t from 'tcomb'
 import mime from 'mime-types'
 import { logger } from '../infrastructure/logger'
 
 import { metadataS3Config } from '../../config'
 
-export function getPrivateUploadUrl (prefix, config) {
-  const { fileName, fileType } = t.SignedUrlRequest(config)
-  const s3 = new aws.S3()
+const SignedUrlRequest = t.struct({
+  fileName: t.String,
+  fileType: t.String
+})
 
+export function getPrivateUploadUrl (prefix, config) {
+  const { fileName, fileType } = SignedUrlRequest(config)
+  const s3 = new aws.S3()
   const Key = keyName(prefix, fileName)
 
   const params = {
@@ -34,7 +38,7 @@ export async function uploadFile (prefix, params, filepath) {
     return null
   }
 
-  const { fileName, fileType } = t.SignedUrlRequest(params)
+  const { fileName, fileType } = SignedUrlRequest(params)
   const s3 = new aws.S3()
   const data = await fs.readFile(filepath)
   const Key = keyName(prefix, fileName)
@@ -90,7 +94,7 @@ export async function uploadPreview (prefix, filepath) {
 }
 
 export function cleanUrl (url) {
-  return url.split('?')[0]
+  return url.split('?')[ 0 ]
 }
 
 export function resolvePublicUrl (privateUrl) {
