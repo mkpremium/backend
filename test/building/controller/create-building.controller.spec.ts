@@ -5,6 +5,7 @@ import { createBuildingController } from '../../../src/building/controller/creat
 
 describe('createBuildingController', () => {
   let controller: RequestHandler
+  let buildingsRepositoryStub
   let testReq
   let testRes
 
@@ -14,16 +15,12 @@ describe('createBuildingController', () => {
       sendStatus: stub(),
     }
 
-    controller = createBuildingController({})
+    controller = createBuildingController({
+      buildingsRepository: buildingsRepositoryStub,
+    })
   })
 
   it('creates SUT', () => {
     expect(controller).to.be.ok
-  })
-
-  it('is not implemented', async () => {
-    await controller(testReq, testRes)
-
-    expect(testRes.sendStatus).to.have.been.calledWith(501)
   })
 })
