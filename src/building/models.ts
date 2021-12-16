@@ -15,6 +15,7 @@ import { MetadataRepository } from './repository/metadata.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { SearchQuery } from 'couchbase'
 import HighlightStyle = SearchQuery.HighlightStyle
+import path = require('path')
 
 export class BuildingProposalRepository extends CouchbaseModel {
   protected Struct = BuildingProposal
@@ -80,6 +81,7 @@ export class LegacyBuildingRepository extends CouchbaseModel {
     const metaRepo = new MetadataRepository()
     const body = Object.assign({}, params, {
       buildingId: building.id,
+      name: path.basename(url),
       previewUrl,
       mimeType,
       url,
