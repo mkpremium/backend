@@ -4,6 +4,7 @@ import { virtualCallerBuilder } from '../virtual-caller.builder'
 import { CallerPhone } from '../../../src/calls/domain/caller.phone'
 import { continueVirtualCallerLoop } from '../../../src/calls/event-listener/continue-virtual-caller-loop'
 import { CallDone } from '../../../src/calls/service/call-finished.processor'
+import { createLoggerMock } from '../../infrastructure/logger.spec'
 
 describe('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
@@ -46,7 +47,7 @@ describe('call-finished.listener', () => {
     }
 
     listener = continueVirtualCallerLoop({
-      logger: { info: () => undefined },
+      logger: createLoggerMock(),
       virtualCallerSupervisor: virtualCallerSupervisorStub,
       virtualCallersRepository: virtualCallersRepositoryStub,
       virtualCallerPhonesRepository: virtualCallerPhonesRepositoryStub
