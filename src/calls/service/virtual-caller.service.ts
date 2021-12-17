@@ -47,6 +47,8 @@ export interface UnExistingPhoneFound {
   worksheetId: string
 }
 
+const TWILIO_INVALID_PHONE = 21211
+
 export class VirtualCallerService {
   constructor (
     private takeNextWorksheetService: TakeNextWorksheetService,
@@ -113,6 +115,16 @@ export class VirtualCallerService {
         break
       case error instanceof NumberAlreadyCalled:
         this.logger.info('Number already called, skipping call', { contactToCall, callerId: cmd.caller.id })
+        break
+      case error.code === TWILIO_INVALID_PHONE:
+        this.logger.info('Invalid phone number', { contactToCall, callerId: cmd.caller.id })
+        this.eventBus.publish({
+            name: 'virtual-caller.wrong_phone_format',
+            ownerId: contactToCall.ownerId,
+            contactId: contactToCall.id,
+            worksheetId: worksheet.id,
+          }
+        ).catch(error => this.logger.error('Could not publish unexisting_phone_found event', { error: error.message }))
         break
       case error instanceof NumberDoesNotExist:
         this.logger.info('Number does not exist, skipping call', { contactToCall, callerId: cmd.caller.id })
