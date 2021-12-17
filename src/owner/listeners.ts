@@ -22,4 +22,9 @@ export function ownerEventListeners (eventBus: EventListener, container: AwilixC
     'owner.discard_non_existing_contact',
     container.resolve('discardNonExistingContactListener'),
   )
+  eventBus.on(
+    'virtual-caller.special_phone_number',
+    'owner.discard_non_existing_contact',
+    container.resolve('discardNonExistingContactListener'),
+  )
 }

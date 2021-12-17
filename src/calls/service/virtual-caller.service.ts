@@ -48,6 +48,7 @@ export interface UnExistingPhoneFound {
 }
 
 const TWILIO_INVALID_PHONE = 21211
+const TWILIO_GEO_BLOCKED = 21215
 
 export class VirtualCallerService {
   constructor (
@@ -125,6 +126,16 @@ export class VirtualCallerService {
             worksheetId: worksheet.id,
           }
         ).catch(error => this.logger.error('Could not publish unexisting_phone_found event', { error: error.message }))
+        break
+      case error.code === TWILIO_GEO_BLOCKED && (contactToCall.value.startsWith('902') || contactToCall.value.startsWith('908')):
+        this.logger.info('Spanish special number', { contactToCall, callerId: cmd.caller.id })
+        this.eventBus.publish({
+            name: 'virtual-caller.special_phone_number',
+            ownerId: contactToCall.ownerId,
+            contactId: contactToCall.id,
+            worksheetId: worksheet.id,
+          }
+        ).catch(error => this.logger.error('Could not publish virtual-caller.commercial_phone_number event', { error: error.message }))
         break
       case error instanceof NumberDoesNotExist:
         this.logger.info('Number does not exist, skipping call', { contactToCall, callerId: cmd.caller.id })
