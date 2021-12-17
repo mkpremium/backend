@@ -49,6 +49,7 @@ export interface UnExistingPhoneFound {
 
 const TWILIO_INVALID_PHONE = 21211
 const TWILIO_GEO_BLOCKED = 21215
+const spanishSpecialNumberPrefix = [ '900', '902', '908' ]
 
 export class VirtualCallerService {
   constructor (
@@ -127,7 +128,7 @@ export class VirtualCallerService {
           }
         ).catch(error => this.logger.error('Could not publish unexisting_phone_found event', { error: error.message }))
         break
-      case error.code === TWILIO_GEO_BLOCKED && (contactToCall.value.startsWith('902') || contactToCall.value.startsWith('908')):
+      case error.code === TWILIO_GEO_BLOCKED && !!spanishSpecialNumberPrefix.find(prefix => contactToCall.value.startsWith(prefix)):
         this.logger.info('Spanish special number', { contactToCall, callerId: cmd.caller.id })
         this.eventBus.publish({
             name: 'virtual-caller.special_phone_number',
