@@ -179,18 +179,6 @@ export class VirtualCallerPhone {
       asyncAmdStatusCallback: `${this.publicUrl}/calls/twilio/${(call.id)}/machine-detection`,
       statusCallback: `${this.publicUrl}/calls/twilio/${(call.id)}/done`
     })
-      .catch(error => {
-        const updatedCall = VirtualAgentCall.update(call, {
-          status: {
-            $set: 'FAILED'
-          },
-          error: {
-            $set: error.message
-          }
-        })
-        this.virtualCallsRepository.save(updatedCall)
-        throw error
-      })
       .finally(() => beeline.finishSpan(callSpan))
   }
 
