@@ -48,16 +48,63 @@ CREATE INDEX user_scheduled_calls on mkpremium (`notifyTo`) where ((`_documentTy
 CREATE INDEX virtual_call_created_at on mkpremium (`createdAt`) where (`_documentType` = "virtual-agent-call") WITH {"defer_build": true, "nodes": ["10.0.3.22:8091"]};
 CREATE INDEX user_meetings ON mkpremium (notifyTo) WHERE _documentType = 'scheduled-event' AND type = 'MEETINGS' WITH {"defer_build": true, "nodes": ["10.0.3.22:8091"]};
 CREATE INDEX call_to_number ON mkpremium (phoneNumber) WHERE _documentType = 'virtual-agent-call' WITH {"defer_build": true, "nodes": ["10.0.3.22:8091"]};
+CREATE INDEX non_discarded_owners
+    ON mkpremium(buildingId)
+    WHERE _documentType = 'owner'
+AND status NOT IN ["ERRONEO", "WITHOUT_CONTACT"] WITH {"defer_build": true, "nodes": ["10.0.3.22:8091"]};
+CREATE INDEX building_meetings ON mkpremium(_documentType, event.buildingId)
+    WHERE _documentType = "scheduled-event" AND type = 'MEETINGS'
+WITH { "defer_build":TRUE, "nodes":[ "10.0.3.22:8091" ] }
 ```
 
 BUILD INDEX ON mkpremium(
-_documentType, id, test_buildings, worksheet_status, building_documents, operator_stats_count, worksheet_to_assign,
-building_id, person_document_number,
-_documentType_id, building_by_assigned_agent, operator_roles, call_call_id, entity_changes, verified_owners,
-operator_stats_operator_count, call_by_status, available_worksheets_by_province, person_address, next_worksheet,
-event_by_building, virtual_caller_worksheet, building_by_owner, worksheet_queue_id, event_by_worksheet,
-building_negotiation_status, worksheet_stats_by_province, operators_idx, worksheet_related_owners_one, note_migration,
-invalid_building_owners, building_stock, owner_contact_value, building_cadastre, owner_contact, building_already_sold,
-available_worksheets_by_city, person_name, owner_business_status, call_by_user, owner_to_building, worksheet_building,
-verified_owner_good_contact, user_scheduled_calls, virtual_call_created_at, user_meetings, call_to_number
+    _documentType,
+    id,
+    test_buildings,
+    worksheet_status,
+    building_documents,
+    operator_stats_count,
+    worksheet_to_assign,
+    building_id,
+    person_document_number,
+    _documentType_id,
+    building_by_assigned_agent,
+    operator_roles,
+    call_call_id,
+    entity_changes,
+    verified_owners,
+    operator_stats_operator_count,
+    call_by_status,
+    available_worksheets_by_province,
+    person_address,
+    next_worksheet,
+    event_by_building,
+    virtual_caller_worksheet,
+    building_by_owner,
+    worksheet_queue_id,
+    event_by_worksheet,
+    building_negotiation_status,
+    worksheet_stats_by_province,
+    operators_idx,
+    worksheet_related_owners_one,
+    note_migration,
+    invalid_building_owners,
+    building_stock,
+    owner_contact_value,
+    building_cadastre,
+    owner_contact,
+    building_already_sold,
+    available_worksheets_by_city,
+    person_name,
+    owner_business_status,
+    call_by_user,
+    owner_to_building,
+    worksheet_building,
+    verified_owner_good_contact,
+    user_scheduled_calls,
+    virtual_call_created_at,
+    user_meetings,
+    call_to_number,
+    non_discarded_owners,
+    building_meetings
 )
