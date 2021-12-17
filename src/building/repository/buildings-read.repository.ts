@@ -33,21 +33,21 @@ SELECT
     ARRAY {m.eventDate, "ownerId": m.event.owner.id, "inPerson": m.event.inPerson} FOR m IN buildingMeetings END buildingMeetings,
     ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN owners END owners
 FROM ${bucketName} building
-LEFT NEST ${bucketName} stock ON stock.buildingId = building.id AND stock._documentType = 'stock'
+LEFT NEST ${bucketName} stock ON stock.buildingId = META(building).id AND stock._documentType = 'stock'
 
-NEST ${bucketName} owners ON owners.status != "ERRONEO"
-    AND owners.buildingId = building.id
+NEST ${bucketName} owners ON owners.status NOT IN ["ERRONEO", "WITHOUT_CONTACT"]
+    AND owners.buildingId = META(building).id
     AND owners._documentType = 'owner'
 
 LEFT JOIN ${bucketName} proposal ON proposal._documentType = 'building-proposal'
-    AND proposal.id = building.recentProposal.id
+    AND META(proposal).id = building.recentProposal.id
 
-LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = building.id
+LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = META(building).id
     AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
 WHERE building._documentType = 'building'
 AND ${condition}
 `
-const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'building.id IN $1')
+const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'META(building).id IN $1')
 
 const listProposalsForBuildingIdQuery = bucketName => `
     SELECT id,
