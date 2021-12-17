@@ -144,7 +144,7 @@
     }
   ],
   "placementConstraints": [],
-  "memory": "2048",
+  "memory": "1024",
   "taskRoleArn": "backend-role",
   "family": "events-worker",
   "pidMode": null,
@@ -152,7 +152,7 @@
     "FARGATE"
   ],
   "networkMode": "awsvpc",
-  "cpu": "1024",
+  "cpu": "512",
   "inferenceAccelerators": null,
   "proxyConfiguration": null,
   "volumes": []
