@@ -34,7 +34,7 @@
         },
         {
           "name": "COUCHBASE_URI",
-          "value": "couchbase://10.0.9.143,10.0.3.22,10.0.30.198?n1ql_timeout=20"
+          "value": "couchbase://couchbase-internal-ddf95e6f6759c867.elb.eu-west-1.amazonaws.com?n1ql_timeout=20"
         },
         {
           "name": "COUCHBASE_USER",
