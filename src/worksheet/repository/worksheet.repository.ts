@@ -190,7 +190,7 @@ export class WorksheetNotFound extends Error {
 export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
   getForCallcenterView (worksheetId): Promise<WorksheetViewProps> {
     return this.couchbaseAdapter.queryAsync(
-      worksheetByIdQuery(this.bucketName), [ worksheetId ]
+      worksheetByIdQuery(this.bucketName), [ worksheetId ], {queryName: 'worksheet_view'}
     )
       .catch(error => {
         error.worksheetId = worksheetId
@@ -229,7 +229,7 @@ export class WorksheetRepository extends CouchbaseRepository<WorksheetProps> {
 
   nextAvailableWorksheetInSource (source, skipWorksheetId): Promise<WorksheetViewProps> {
     const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, skipWorksheetId)
-    return this.couchbaseAdapter.queryAsync(q)
+    return this.couchbaseAdapter.queryAsync(q, undefined, {queryName: 'next_worksheet_in_source'})
       .then(result => {
         if (result.length === 0) {
           return
