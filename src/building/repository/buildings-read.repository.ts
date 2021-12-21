@@ -133,7 +133,8 @@ export class BuildingsReadRepository {
   listById (ids): Promise<BuildingReadModel[]> {
     return this.couchbaseAdapter.queryAsync(
       listBuildingsByIdQuery(this.couchbaseAdapter.bucketName),
-      [ ids ]
+      [ ids ],
+      { queryName: 'list_buildings_by_id' }
     ).then(BuildingsReadRepository.mapToPropertyAgentBuildingView)
   }
 

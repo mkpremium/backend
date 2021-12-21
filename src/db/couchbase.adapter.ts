@@ -72,10 +72,15 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync (query: string, params?): Promise<any> {
+  queryAsync (query: string, params?, opts?: { queryName: string }): Promise<any> {
     return this.withRetry(() => {
         const beeline = honeycomb()
-        const span = beeline.startSpan({ name: 'couchbase_query' })
+        const spanInfo = { name: 'couchbase_query' }
+        if (opts) {
+          spanInfo[ 'query_name' ] = opts.queryName
+        }
+
+        const span = beeline.startSpan(spanInfo)
         return this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
           .finally(() => beeline.finishSpan(span))
       }
