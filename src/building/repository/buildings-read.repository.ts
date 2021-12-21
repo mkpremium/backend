@@ -60,7 +60,7 @@ const listProposalsForBuildingIdQuery = bucketName => `
       AND buildingId = $1
 `
 
-const assignedBuildingsIdForAgentQuery = bucketName => `
+const assignedBuildingsIdForFlipperQuery = bucketName => `
     SELECT id buildingId
     FROM ${bucketName}
     WHERE _documentType = 'building'
@@ -180,9 +180,9 @@ export class BuildingsReadRepository {
     )
   }
 
-  private allAssignedBuildingsId (agentId): Promise<string[]> {
+  private allAssignedBuildingsId (flipperId): Promise<string[]> {
     return this.couchbaseAdapter
-      .queryAsync(assignedBuildingsIdForAgentQuery(this.couchbaseAdapter.bucketName), [ agentId ])
+      .queryAsync(assignedBuildingsIdForFlipperQuery(this.couchbaseAdapter.bucketName), [ flipperId ])
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 
