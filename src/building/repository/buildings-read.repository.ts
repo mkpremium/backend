@@ -47,7 +47,7 @@ LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = 
 WHERE building._documentType = 'building'
 AND ${condition}
 `
-const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'META(building).id IN $1')
+const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'building.id IN $1')
 
 const listProposalsForBuildingIdQuery = bucketName => `
     SELECT id,
