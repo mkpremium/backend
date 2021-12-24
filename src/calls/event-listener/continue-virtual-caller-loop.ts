@@ -34,6 +34,10 @@ export const continueVirtualCallerLoop = ({
     lastWorksheetId: evt.worksheetId,
     lastOwnerResponse: evt.ownerResponse,
   }).catch(error => {
-    logger.error('Could not check with virtual caller supervisor', { error: error.message, stack: error.stack })
+    logger.error('Could not check with virtual caller supervisor', {
+      ...error,
+      error: error.message,
+      stack: error.stack,
+    })
   })
 }

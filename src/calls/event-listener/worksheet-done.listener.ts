@@ -22,7 +22,11 @@ export const createWorksheetDoneListener = ({
     lastWorksheetId: undefined,
     lastOwnerResponse: undefined,
   }).catch(error => {
-    logger.error('Could not check with virtual caller supervisor', { error: error.message, stack: error.stack })
+    logger.error('Could not check with virtual caller supervisor', {
+      ...error,
+      error: error.message,
+      stack: error.stack,
+    })
   })
 }
 
