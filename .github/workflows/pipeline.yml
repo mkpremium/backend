@@ -122,7 +122,7 @@ jobs:
         with:
           task-definition: ${{ steps.api-task-def.outputs.task-definition }}
           service: api
-          cluster: production
+          cluster: prod
           wait-for-minutes: 5
 
   deploy-events-worker:
@@ -154,7 +154,7 @@ jobs:
         with:
           task-definition: ${{ steps.events-worker-task-def.outputs.task-definition }}
           service: events-worker
-          cluster: production
+          cluster: prod
           wait-for-minutes: 5
 
   deploy-scheduled-tasks:
@@ -189,7 +189,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.proposals-sender-task-def.outputs.task-definition }}
-          cluster: production
+          cluster: prod
           wait-for-minutes: 5
 
       - name: Update proposals-sender schedule rule
@@ -207,7 +207,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.cronjobs-task-def.outputs.task-definition }}
-          cluster: production
+          cluster: prod
           wait-for-minutes: 5
 
       - name: Update freezer cronjob schedule rule
