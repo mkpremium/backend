@@ -52,8 +52,16 @@ async function pullOutFreezer (worksheets, buildingsRepository) {
   const repository = new LegacyWorksheetRepository()
   const updatedWorksheets = worksheets.map(worksheet => {
     logger.info(`moving worksheet out freezer`, { statusChangedAt: worksheet.statusChangedAt, id: worksheet.id })
-    return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.AVAILABLE)
-  })
+    try {
+      return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.AVAILABLE)
+    } catch (error) {
+      console.log('Could not pull worksheet out of freezer', {
+        ...error,
+        errorMessage: error.message,
+        worksheetId: worksheet.id
+      })
+    }
+  }).filter(Boolean)
 
   if (updatedWorksheets.length === 0) {
     return
