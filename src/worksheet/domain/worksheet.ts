@@ -59,7 +59,9 @@ export const Worksheet = t.struct<WorksheetProps>({
   _migrateId: t.maybe(t.String),
   _relatedTo: t.maybe(t.String),
 
-  lastAddedMeeting: t.maybe(ScheduledEvent),
+  lastAddedMeeting: t.maybe(t.struct({
+    id: t.String,
+  })),
 
   _documentType: t.enums.of([ 'worksheet' ]),
 
