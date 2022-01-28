@@ -144,9 +144,9 @@ describe('VirtualCallerPhone', () => {
     expect(gatherOwnerInterestMessageComposerStub.compose.lastCall.firstArg).to.include({ language: 'pt-PT' })
   })
 
-  it('does not call when phone number is already called in the last 3 days', async () => {
+  it('does not call when phone number is already called in the last 1 days', async () => {
     virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
-      createdAt: moment().add(-3, 'days').add(1, 'minute').toDate(),
+      createdAt: moment().add(-1, 'days').add(1, 'minute').toDate(),
       status: 'DONE',
       worksheetId: 'any-worksheet',
     }).build() ])
