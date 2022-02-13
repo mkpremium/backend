@@ -7,6 +7,7 @@ import { OwnerResponse } from '../service/owner-response-processor.service'
 import { groupBy } from 'fp-ts/NonEmptyArray'
 import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
+import moment from "moment";
 
 type CallsByProvince = {
   no_vende: number
@@ -16,6 +17,7 @@ type CallsByProvince = {
   otro: number
   total: number
 }
+const FREEZER_LENGTH_MONTHS = 3
 
 export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCallProps> {
   protected struct (): Struct<any> & Partial<RecordToDomain> {
@@ -23,10 +25,12 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
   }
 
   async previousCallsToNumber (phoneNumber: string): Promise<VirtualAgentCallProps[] | undefined> {
+    const currentPeriodBeginning = moment().add(-FREEZER_LENGTH_MONTHS, 'months').startOf('day')
     const query = `
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
+          AND createdAt > ${currentPeriodBeginning.format()}
           AND phoneNumber = $1
     `
     return this.couchbaseAdapter.queryAsync(query, [ phoneNumber ])

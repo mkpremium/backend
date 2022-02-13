@@ -35,7 +35,6 @@ const localizationByTimezone: Record<Timezone, { prefix: string; language: CallL
   },
 }
 
-const FREEZER_LENGTH_MONTHS = 3
 export class NumberDoesNotExist extends Error {
   constructor (
     readonly ownerId: string,
@@ -102,18 +101,11 @@ export class VirtualCallerPhone {
       if (call.error === PHONE_DOES_NOT_EXIST || (call.error || '').startsWith('Number does not exist')) {
         throw new NumberDoesNotExist(contact.ownerId, contact.id)
       }
-      if (VirtualCallerPhone.fromFreezer(call)) {
-        return
-      }
 
       if ((call.worksheetId === worksheetId && call.ownerResponse) || moment(call.createdAt).isAfter(momentThreshold)) {
         throw new NumberAlreadyCalled(call, { contactId: contact.id, ownerId: contact.ownerId })
       }
     })
-  }
-
-  private static fromFreezer (lastCallToNumber: VirtualAgentCallProps) {
-    return moment(lastCallToNumber.createdAt).isBefore(moment().add(-FREEZER_LENGTH_MONTHS, 'months'))
   }
 
   private getPhoneLock (phoneNumber: string): Promise<LockedPhone> {

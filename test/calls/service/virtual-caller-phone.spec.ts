@@ -198,17 +198,6 @@ describe('VirtualCallerPhone', () => {
     expect(twilioClientStub.calls.create).to.have.been.called
   })
 
-  it('calls to phone number when it was called three or more months ago, even with response', async () => {
-    virtualCallsRepositoryStub.previousCallsToNumber.resolves([ callBuilder({
-      createdAt: moment().add(-3, 'months').toDate(),
-      ownerResponse: OwnerResponse.SALE,
-    }).build() ])
-
-    await service.call(testCmd)
-
-    expect(twilioClientStub.calls.create).to.have.been.called
-  })
-
   // 13223 Invalid phone number format
   // 20003 Permission Denied
   // 21211 Invalid 'To' Phone Number ex. 934122309/933478789
