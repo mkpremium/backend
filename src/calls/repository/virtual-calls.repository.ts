@@ -31,7 +31,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
           AND createdAt > ${currentPeriodBeginning.format()}
-          AND phoneNumber = $1
+          AND phoneNumber = '$1'
     `
     return this.couchbaseAdapter.queryAsync(query, [ phoneNumber ])
       .then(rows => {
