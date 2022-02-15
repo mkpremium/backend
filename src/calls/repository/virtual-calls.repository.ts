@@ -30,10 +30,11 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
-          AND createdAt > ${currentPeriodBeginning.format()}
-          AND phoneNumber = '$1'
+          AND phoneNumber = $1
+          AND createdAt > $2
     `
-    return this.couchbaseAdapter.queryAsync(query, [ phoneNumber ])
+
+    return this.couchbaseAdapter.queryAsync(query, [ phoneNumber, currentPeriodBeginning.format() ])
       .then(rows => {
         if (!rows || rows.length === 0) {
           return
@@ -101,7 +102,7 @@ export class VirtualCallsRepository extends CouchbaseRepository<VirtualAgentCall
         SELECT \`call\`.*
         FROM ${this.bucketName} \`call\`
         WHERE _documentType = 'virtual-agent-call'
-          AND phoneNumber = '$1'
+          AND phoneNumber = $1
         ORDER BY createdAt DESC
             LIMIT 1
     `
