@@ -7,6 +7,7 @@ import { jwt as jwtConfig } from '../../config'
 import { OperatorRepository } from '../operator/models'
 import { UserRoles } from '../types/user'
 import { logger } from '../infrastructure/logger'
+import honeycomb from "honeycomb-beeline";
 
 export const jwt = (getToken) => {
   const jwtInstance: any = jwtMiddleware({ ...jwtConfig, getToken, algorithms: [ 'HS256' ] })
@@ -30,6 +31,7 @@ async function addUserInfo (req, res, next) {
         return
       }
       req.user.operator = user
+      honeycomb().addContext({userId: user.id})
       next()
     })
 }
