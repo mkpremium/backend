@@ -30,7 +30,7 @@ module.exports = (bucketName = 'mkpremium_test') => {
       return 'EXISTING_BUCKET'
     }
     throw error
-  }).then(existingBucket => (existingBucket ? existingBucket : 'NEW_BUCKET'))
+  }).then(from => (from === 'EXISTING_BUCKET' ? 'EXISTING_BUCKET' : 'NEW_BUCKET'))
 
   let bucketConnection
   const getBucketConnection = () => {
@@ -55,7 +55,7 @@ module.exports = (bucketName = 'mkpremium_test') => {
   }
 
   console.info(`Initializating bucket with name ${bucketName}`)
-  const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\'` grep -rq "The following buckets became ready on node" /opt/couchbase/var/lib/couchbase/logs/info.log'
+  const isBucketReadyCommand = 'docker exec  `docker ps --format \'{{.Names}}\' --filter \'name=couchbase\'` grep -rq "The following buckets became ready on node" /opt/couchbase/var/lib/couchbase/logs/info.log'
 
   return retry(createBucket, { max_tries: 3, interval: ONE_MINUTE / 6 })
     .then((bucketSource) => {
