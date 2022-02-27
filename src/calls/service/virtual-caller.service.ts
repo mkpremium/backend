@@ -17,6 +17,7 @@ import retry from 'bluebird-retry'
 import { OwnerResponse } from './owner-response-processor.service'
 import { VirtualCallerProps } from '../domain/virtual-caller'
 import { NumberAlreadyCalled } from './number-already-called'
+import { WorksheetStatusType } from "../../worksheet/domain/worksheet";
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
@@ -177,12 +178,21 @@ export class VirtualCallerService {
 
     if (inProgressWorksheet) {
       worksheet = await this.worksheetRepository.getForCallcenterView(inProgressWorksheet.worksheetId)
+        .then(ws => {
+          if (UNAVAILABLE_WORKSHEET_STATUES.includes(ws.status)) {
+            throw new UnavailableWorksheet(ws.id, ws.status)
+          }
+          return ws
+        })
         .catch(error => {
-          if (!(error instanceof WorksheetNotFound)) {
+          if (!(error instanceof WorksheetNotFound || error instanceof UnavailableWorksheet)) {
             throw error
           }
 
-          this.logger.info('Worksheet not found, taking next', { worksheetId: inProgressWorksheet.worksheetId })
+          this.logger.info('Worksheet not found, taking next', {
+            worksheetId: inProgressWorksheet.worksheetId,
+            ...error
+          })
           this.eventBus.publish({
             name: 'virtual-caller.worksheet_not_found',
             worksheetId: inProgressWorksheet.worksheetId,
@@ -227,5 +237,17 @@ export class VirtualCallerService {
       ...inProgressWorksheet,
       status: 'DONE',
     }))
+  }
+}
+
+const UNAVAILABLE_WORKSHEET_STATUES = [ 'NO_SALE', 'INVALID', 'YA_VENDIO', 'ENTE_PUBLICO', 'MEETING' ];
+export class UnavailableWorksheet extends Error {
+  readonly _type = 'UnavailableWorksheet'
+
+  constructor (
+    readonly id: string,
+    readonly status: WorksheetStatusType
+  ) {
+    super('Unavailable worksheet for virtual caller')
   }
 }

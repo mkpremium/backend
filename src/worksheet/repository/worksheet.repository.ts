@@ -180,6 +180,7 @@ ORDER BY worksheet.viewedAt LIMIT 1
 }
 
 export class WorksheetNotFound extends Error {
+  readonly _type = 'WorksheetNotFound'
   constructor (
     readonly worksheetId,
   ) {

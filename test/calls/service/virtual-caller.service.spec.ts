@@ -198,4 +198,20 @@ describe('VirtualCallerService', () => {
       worksheetId: testWorksheet.id,
     })
   })
+
+  it('marks worksheet as done when is in an unavailable status', async () => {
+    virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
+      .resolves(testInProgressWorksheet)
+    worksheetRepositoryStub.getForCallcenterView.withArgs(testInProgressWorksheet.worksheetId)
+      .resolves(worksheetViewBuilder({ status: 'NO_SALE' }).build())
+
+    await service.processNextWorksheet(testCmd)
+
+    expect(virtualCallerWorksheetsRepositoryStub.save).to.have.been.called
+    expect(virtualCallerWorksheetsRepositoryStub.save.firstCall.firstArg).to.include({
+      status: 'DONE',
+    })
+    expect(takeNextWorksheetServiceStub.nextWorksheetInQueueOfId).to.have.been
+      .calledWith(testCmd.caller.queueId, testCmd.caller.id)
+  })
 })
