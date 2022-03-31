@@ -27,7 +27,7 @@
       "environment": [
         {
           "name": "EVENTS_QUEUE_URL",
-          "value": "https://sqs.eu-west-1.amazonaws.com/173249668334/events.fifo"
+          "value": "https://sqs.eu-west-1.amazonaws.com/173249668334/events"
         },
         {
           "name": "COUCHBASE_BUCKET",

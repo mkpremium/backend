@@ -48,8 +48,8 @@ export class SqsBus implements EventBus {
       QueueUrl: this.eventsQueueUrl,
       Entries: listeners.map(({ name }) => ({
           Id: name.replace('.', '-'),
-          MessageGroupId: event.messageGroupId || uuid(),
-          MessageDeduplicationId: event.messageDeduplicationId || uuid(),
+          // MessageGroupId: event.messageGroupId || uuid(),
+          // MessageDeduplicationId: event.messageDeduplicationId || uuid(),
           MessageBody: JSON.stringify({ event, listener: name }),
         } as SendMessageBatchRequestEntry)
       )
