@@ -3,7 +3,6 @@ import cors from 'cors'
 import express, { Express } from 'express'
 import morgan from 'morgan'
 import { buildingRoutes } from './building/routing'
-import cadastre from './cadastre'
 import { setupCallerRoutes } from './caller/init'
 
 import email from './email'
@@ -78,7 +77,6 @@ export const createApp = (): Promise<Express> => {
       notes(app)
       metadata(app)
       email(app)
-      cadastre(app)
 
       startListeners(diContainer)
 
