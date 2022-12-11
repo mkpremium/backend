@@ -1,4 +1,4 @@
-```SQL
+```
 CREATE INDEX person_migration on mkpremium(`_documentType`,`name`,`_relatedTo`) where (`_documentType` = "person")
 CREATE INDEX worksheet_related_building_one on mkpremium((distinct (array `v` for `v` in `relatedBuildingIds` end)))
 where (`_documentType` = "worksheet")
@@ -24,4 +24,13 @@ CREATE INDEX last_call_to_number ON mkpremium(status, phoneNumber) WHERE _docume
 IN [ 'CALLING', 'INPUT_GATHERED', 'DONE' ]
 CREATE INDEX virtual_call_worksheetId ON mkpremium(worksheetId) WHERE _documentType = 'virtual-agent-call'
 CREATE INDEX worksheet_city ON mkpremium(buildingAddress.city)WHERE _documentType = 'worksheet'
+
+CREATE INDEX building_id_replica_10_114_0_5 on mkpremium (`_documentType`, `id`) where (`_documentType` = "building")
+    WITH {"defer_build": true, "nodes": ["10.114.0.5:8091"]};
+CREATE INDEX note_migration_replica_10_114_0_5 on mkpremium (`_documentType`, ( `context` . `_migrateId`)) where (`_documentType` = "note")
+    WITH {"defer_build": true, "nodes": ["10.114.0.5:8091"]};
+CREATE INDEX operator_roles_replica_10_114_0_5 on mkpremium ((all (tokens(`roles`)))) where (`_documentType` = "operator")
+    WITH {"defer_build": true, "nodes": ["10.114.0.5:8091"]};
+CREATE INDEX operators_idx_replica_10_114_0_5 on mkpremium (`username`) where (`_documentType` = "operator")
+    WITH {"defer_build": true, "nodes": ["10.114.0.5:8091"]};
 ```
