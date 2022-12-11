@@ -35,7 +35,7 @@
         },
         {
           "name": "COUCHBASE_URI",
-          "value": "couchbase://10.114.0.3,10.114.0.4,10.0.21.207?n1ql_timeout=20"
+          "value": "couchbase://10.0.26.222:8091?n1ql_timeout=20"
         },
         {
           "name": "COUCHBASE_USER",
