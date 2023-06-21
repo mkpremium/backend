@@ -230,7 +230,7 @@ export const Building = t.struct<BuildingProps>(
     buildingDate: t.union([ t.Number, t.String ]),
     location: t.maybe(BuildingLocation),
     elements: t.maybe(Elements),
-    entities: t.maybe(t.list(BuildingEntity)),
+    entities: t.maybe(t.list(t.Any)),
     ownerId: t.maybe(t.String),
     owner: t.maybe(BuildingOwner),
     state: t.maybe(t.enums.of([ 'BUENO', 'MALO' ])),
