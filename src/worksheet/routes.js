@@ -12,7 +12,7 @@ import {
   updateQueueController,
   deleteQueueController,
   getScheduledWorksheetsController,
-  searchWorksheetController
+  searchWorksheetController, updateWorksheetStatusController
 } from './controllers'
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
@@ -46,6 +46,8 @@ export function worksheetRoutes (awilixContainer) {
   router.get('/search', searchWorksheetController)
 
   router.get('/:id', worksheetFindByIdController)
+
+  router.put(':id/status', updateWorksheetStatusController)
 
   router.post('/:id/owners', addOwnerToWorksheetController)
 

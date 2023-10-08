@@ -14,6 +14,17 @@ async function worksheetList (req, res) {
   res.json(worksheets)
 }
 
+const updateWorksheetStatus = worksheetRepository => async (req, res) => {
+  const worksheetId = req.params.id
+  const worksheet = await worksheetRepository.findByIdOrThrow(worksheetId)
+  const updatedWorksheet = await worksheetRepository.update(worksheet, { status: req.body.status })
+  await History.registerUpdate({
+    contextModel: updatedWorksheet,
+    user: req.user
+  })
+  res.json(updatedWorksheet)
+}
+
 async function findById (req, res) {
   const id = req.params.id
   const repo = new LegacyWorksheetRepository()
@@ -140,6 +151,7 @@ async function searchWorksheets (request, response) {
 export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet)
 export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
+export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
 export const getQueueController = worksheetQueueRepository => wrap(getQueue(worksheetQueueRepository))
 export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
 export const actionsOnWorksheetQueueController = logger => wrap(actionsOnWorksheetQueue(logger))
