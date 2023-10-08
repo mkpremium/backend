@@ -6,6 +6,7 @@ import { canOperatorHandleQueue } from '../lib/role-operators'
 import { OwnerRepository } from '../owner/models'
 import { UserRoles } from '../types/user'
 import { WorksheetQueueBody } from './domain/queue'
+import { setStatus } from './domain/worksheet'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 
 async function worksheetList (req, res) {
@@ -17,15 +18,13 @@ async function worksheetList (req, res) {
 const updateWorksheetStatus = worksheetRepository => async (req, res) => {
   const worksheetId = req.params.id
   const worksheet = await worksheetRepository.get(worksheetId)
-  const updatedWorksheet = await worksheetRepository.update(worksheet, {
-    status: req.body.status,
-    statusChangeReason: req.body.reason,
-    statusChangedAt: new Date()
-  })
+  const updatedWorksheet = setStatus(worksheet, status, req.body.reason)
+  await worksheetRepository.save(updatedWorksheet)
   await History.registerUpdate({
     contextModel: updatedWorksheet,
     user: req.user
   })
+
   res.json(updatedWorksheet)
 }
 

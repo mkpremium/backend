@@ -7,6 +7,7 @@ import { ScheduledEvent } from '../../scheduled-events/types'
 import { Address, AddressProp } from '../../types/common'
 import { QueueItem, QueueStatus } from '../models/queue-item'
 import { WorksheetQueue, WorksheetQueueProps } from './queue'
+import { str } from 'squel'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -89,12 +90,16 @@ export const Worksheet = t.struct<WorksheetProps>({
   }
 })
 
-export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatusType) {
-  return Worksheet.update(worksheet, {
+export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatusType, reason?: string) {
+  const spec = {
     status: { $set: newStatus },
     statusChangedAt: { $set: utc().toDate() },
     inFreezer: { $set: newStatus === WorkSheetStatus.NO_SALE }
-  })
+  }
+  if (reason) {
+    spec["statusChangeReason"] = {$set: reason}
+  }
+  return Worksheet.update(worksheet, spec)
 }
 
 Worksheet.prototype.statusChanged = function () {
