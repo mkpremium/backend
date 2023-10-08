@@ -1,7 +1,7 @@
 # Build container
 FROM node:14
 
-RUN ["npm", "install", "-g", "npm", "--silent"]
+RUN ["npm", "install", "-g", "npm@9.9.0", "--silent"]
 
 RUN ["mkdir", "/app"]
 WORKDIR /app
