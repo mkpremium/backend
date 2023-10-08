@@ -17,7 +17,11 @@ async function worksheetList (req, res) {
 const updateWorksheetStatus = worksheetRepository => async (req, res) => {
   const worksheetId = req.params.id
   const worksheet = await worksheetRepository.findByIdOrThrow(worksheetId)
-  const updatedWorksheet = await worksheetRepository.update(worksheet, { status: req.body.status })
+  const updatedWorksheet = await worksheetRepository.update(worksheet, {
+    status: req.body.status,
+    statusChangeReason: req.body.reason,
+    statusChangedAt: new Date()
+  })
   await History.registerUpdate({
     contextModel: updatedWorksheet,
     user: req.user

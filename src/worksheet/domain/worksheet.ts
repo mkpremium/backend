@@ -47,6 +47,7 @@ export const Worksheet = t.struct<WorksheetProps>({
   relatedOwners: t.list(OwnerWithInclude),
 
   status: WorkSheetStatusEnum,
+  statusChangeReason: t.maybe(t.String),
 
   price: t.struct({
     maximumToPay: t.Number,
