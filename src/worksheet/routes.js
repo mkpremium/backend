@@ -47,7 +47,7 @@ export function worksheetRoutes (awilixContainer) {
 
   router.get('/:id', worksheetFindByIdController)
 
-  router.put(':id/status', updateWorksheetStatusController)
+  router.put('/:id/status', updateWorksheetStatusController)
 
   router.post('/:id/owners', addOwnerToWorksheetController)
 
