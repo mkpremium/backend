@@ -265,14 +265,29 @@ export class BuildingsReadRepository {
   }
 
   static getOwner (featuredOwnerId, lastMeeting, owners) {
-    const validatedOwners = (owners || []).filter(({ contacts }) => (contacts || []).find(({ status }) => status === 'GOOD'))
-    if (!validatedOwners || validatedOwners.length === 0) {
-      return
+    const featuredOwner = this.ownerOfId(owners, featuredOwnerId)
+    if (featuredOwner) {
+      return featuredOwner
     }
-    const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
 
-    return this.ownerOfId(validatedOwners, featuredOwnerId) ||
-      BuildingsReadRepository.ownerOfId(validatedOwners, lastMeetingOwnerId) || validatedOwners[ 0 ]
+    const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
+    const lastMeetingOwner = lastMeetingOwnerId ? BuildingsReadRepository.ownerOfId(owners, lastMeetingOwnerId) : undefined
+    if (lastMeetingOwner) {
+      return lastMeetingOwner
+    }
+
+    const validatedOwners = this.getValidatedOwners(owners)
+    const nonDiscardedOwners = BuildingsReadRepository.getNonDiscardedOwners(owners)
+
+    return validatedOwners[ 0 ] ?? nonDiscardedOwners[0]
+  }
+
+  private static getNonDiscardedOwners(owners) {
+    return owners.filter(o => _.some(o.contacts || [], c => c.status !== 'BAD'))
+  }
+
+  private static getValidatedOwners (owners) {
+    return (owners || []).filter(({ contacts }) => (contacts || []).find(({ status }) => status === 'GOOD'))
   }
 
   static ownerOfId (validatedOwners, ownerId) {
