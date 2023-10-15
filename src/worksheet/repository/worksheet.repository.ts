@@ -164,7 +164,12 @@ const worksheetByIdQuery = bucketName => worksheetForCallcenterViewQuery(bucketN
 
 const nextWorksheetAvailableInSourceQuery = (bucketName, source, skipWorksheetId) => {
   const sourceMatchCondition = Object.keys(source).filter(k => !!source[ k ])
-    .map(k => `worksheet.buildingAddress.${k} = "${source[ k ]}"`)
+    .map(k => {
+      const expr = Array.isArray(source[ k ]) ?
+        `IN [${source[ k ].map(val => `"${val}"`).join(',')}]` :
+        `= "${source[ k ]}"`
+      return `worksheet.buildingAddress.${k} ` + expr
+    })
 
   return `
 SELECT worksheet.id
