@@ -279,7 +279,7 @@ export class BuildingsReadRepository {
     const validatedOwners = this.getValidatedOwners(owners)
     const nonDiscardedOwners = BuildingsReadRepository.getNonDiscardedOwners(owners)
 
-    return validatedOwners[ 0 ] ?? nonDiscardedOwners[0]
+    return validatedOwners[ 0 ] ?? nonDiscardedOwners[0] ?? null
   }
 
   private static getNonDiscardedOwners(owners) {
