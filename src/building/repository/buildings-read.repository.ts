@@ -265,9 +265,14 @@ export class BuildingsReadRepository {
   }
 
   static getOwner (featuredOwnerId, lastMeeting, owners) {
-    const featuredOwner = this.ownerOfId(owners, featuredOwnerId)
-    if (featuredOwner) {
-      return featuredOwner
+    if (!owners) {
+      return
+    }
+    if (featuredOwnerId) {
+      const featuredOwner = this.ownerOfId(owners, featuredOwnerId)
+      if (featuredOwner) {
+        return featuredOwner
+      }
     }
 
     const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
@@ -279,7 +284,7 @@ export class BuildingsReadRepository {
     const validatedOwners = this.getValidatedOwners(owners)
     const nonDiscardedOwners = BuildingsReadRepository.getNonDiscardedOwners(owners)
 
-    return validatedOwners[ 0 ] ?? nonDiscardedOwners[0] ?? null
+    return validatedOwners[ 0 ] ?? nonDiscardedOwners[0] ?? undefined
   }
 
   private static getNonDiscardedOwners(owners) {
