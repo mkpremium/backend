@@ -3,11 +3,9 @@ import { Building } from '../../building/building'
 import { utc } from '../../lib/date'
 import { OwnerWithInclude } from '../../owner/owner'
 
-import { ScheduledEvent } from '../../scheduled-events/types'
 import { Address, AddressProp } from '../../types/common'
 import { QueueItem, QueueStatus } from '../models/queue-item'
 import { WorksheetQueue, WorksheetQueueProps } from './queue'
-import { str } from 'squel'
 
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
@@ -114,6 +112,7 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
 
   return t.update(updated, {
     inFreezer: { $set: false },
+    queueId: { $set: null },
     lastAddedMeeting: { $set: null }
   })
 }
