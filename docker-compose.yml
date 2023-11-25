@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  postgresdb:
+    image: "postgres:16.1"
+    environment:
+      POSTGRES_USER: mkpremium_local_user
+      POSTGRES_PASSWORD: mkpremium_local_password
+      POSTGRES_DB: mkpremium
+    ports:
+      - "5432:5432"
+
+
   couchbasedb:
     image: "couchbase:community-6.6.0"
 
@@ -16,10 +26,28 @@ services:
       core: 100000000
       memlock: 100000000
 
-  sqs:
-    image: roribio16/alpine-sqs
-    ports:
-      - "9324:9324"
-      - "9325:9325"
-    volumes:
-      - ./docker/elasticmq.conf:/opt/config/elasticmq.conf
+#  sqs:
+#    image: juanformoso/moto_docker
+#    ports:
+#      - "5000:5000"
+#    environment:
+#      - SQS_INIT_QUEUES=events
+#    image: roribio16/alpine-sqs
+#    ports:
+#      - "9324:9324"
+#      - "9325:9325"
+#    volumes:
+#      - ./docker/elasticmq.conf:/opt/config/elasticmq.conf
+
+#    image: localstack/localstack
+#    privileged: true
+#    environment:
+#      - SERVICES=SQS
+#      - DEBUG=1
+#      - DATA_DIR=/tmp/localstack/data
+#      - PORT_WEB_UI=8081
+#    ports:
+#      - "4576:4576"
+#      - "8081:8081"
+#    volumes:
+#      - "./tmp/localstack:/tmp/localstack"
