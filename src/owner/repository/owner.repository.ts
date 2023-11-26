@@ -104,7 +104,7 @@ const BuildingOwner = t.struct({
     phoneId: t.maybe(t.String),
     emailId: t.maybe(t.String)
   })),
-  status: t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT'])
+  status: t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT'])
 })
 
 export class OwnerRepository extends CouchbaseRepository<OwnerProps> {
