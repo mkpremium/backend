@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY package-lock.json .
 COPY package.json .
-RUN ["npm", "install", "--silent"]
+RUN ["npm", "ci", "--silent"]
 RUN ["npx", "prisma", "generate"]
 
 COPY . .
@@ -19,7 +19,7 @@ COPY package-lock.json build
 
 RUN ["cp", "-r", "fonts", "build"]
 WORKDIR /app/build
-RUN ["npm", "install", "--production", "--silent"]
+RUN ["npm", "ci", "--production", "--silent"]
 RUN ["mkdir", ".uploads"]
 
 # Run container
