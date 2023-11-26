@@ -20,7 +20,8 @@ model CouchbaseDocument {
 }
 
 model DomainEvent {
-  id   String @id
-  name String
-  body Json
+  id        String   @id
+  name      String
+  body      Json
+  createdAt DateTime @default(now())
 }
