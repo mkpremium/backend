@@ -2,6 +2,7 @@ import { OwnerRepository } from '../repository/owner.repository'
 import { Logger } from 'winston'
 import { ChangeContactStatusService } from '../service/change-contact-status.service'
 import _ from 'lodash'
+import { isPhoneContact } from '../owner'
 
 export function createResetOwnerBadContactsHandler ({ ownersRepository, logger, changeContactStatusService }: {
   ownersRepository: OwnerRepository,
@@ -18,7 +19,7 @@ export function createResetOwnerBadContactsHandler ({ ownersRepository, logger, 
     }
 
     for (const contact of owner.person.contacts) {
-      if ([ 'TELEFONO', 'MOVIL' ].includes(contact.type) && contact.status === 'BAD') {
+      if (isPhoneContact(contact) && contact.status === 'BAD') {
         logger.info('Changing contact from BAD to UNDEFINED', { ownerId, contactId: contact.id })
         await changeContactStatusService.change(
           { ownerId, contactId: contact.id, status: 'UNDEFINED' }, { id: 'reset-owner-discarded-contact' })

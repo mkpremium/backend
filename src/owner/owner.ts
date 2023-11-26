@@ -43,7 +43,8 @@ export const OwnerStatus = {
   VERIFIED: 'VERIFICADO',
   ERROR: 'ERRONEO',
   PUBLIC: 'ENTE_PUBLICO',
-  WITHOUT_CONTACT: 'WITHOUT_CONTACT'
+  WITHOUT_CONTACT: 'WITHOUT_CONTACT',
+  WITHOUT_PHONE_CONTACT: 'WITHOUT_PHONE_CONTACT',
 }
 export const OwnerBusinessStatus = {
   PENDING: 'PENDIENTE',
@@ -182,8 +183,7 @@ export const changeContactStatus = (owner, contactId, newStatus): OwnerProps => 
   const otherContacts = owner.person.contacts.filter(c => c.id !== contactId)
 
   const contacts = [ { ...contact, status: newStatus, id: contactId }, ...otherContacts ]
-  const updatedStatus = _.some(contacts, c => c.status === 'GOOD') ? OwnerStatus.VERIFIED
-    : (_.every(contacts, c => c.status === 'BAD') ? OwnerStatus.WITHOUT_CONTACT : owner.status)
+  const updatedStatus = calculateStatusFromContacts(contacts, owner)
 
   return t.update(owner, {
     $merge: {
@@ -193,6 +193,33 @@ export const changeContactStatus = (owner, contactId, newStatus): OwnerProps => 
       })
     }
   }) as OwnerProps
+}
+
+function calculateStatusFromContacts (contacts: ContactProps[], owner) {
+  const phoneContacts = contacts.filter(isPhoneContact)
+  switch (true) {
+    case _.some(phoneContacts, c => c.status === 'GOOD'):
+      return OwnerStatus.VERIFIED
+    case _.every(phoneContacts, c => c.status === 'BAD'):
+      const emailContacts = contacts.filter(isEmailContact)
+      return _.every(emailContacts, c => c.status === 'BAD') ?
+        OwnerStatus.WITHOUT_CONTACT : OwnerStatus.WITHOUT_PHONE_CONTACT
+    case [ OwnerStatus.WITHOUT_CONTACT, OwnerStatus.WITHOUT_PHONE_CONTACT ].includes(owner.status):
+      if (_.some(phoneContacts, c => isPhoneContact(c) && c.status !== 'BAD')) {
+        return OwnerStatus.NON_VERIFIED
+      }
+      return owner.status
+    default:
+      return owner.status
+  }
+}
+
+export function isPhoneContact (c: ContactProps) {
+  return [ 'TELEFONO', 'MOVIL' ].includes(c.type)
+}
+
+function isEmailContact (c: ContactProps) {
+  return c.type === 'EMAIL'
 }
 
 export const mergeFeaturedContact = (owner: OwnerProps, featuredContact) => {
@@ -251,7 +278,15 @@ export interface PersonProps {
 
 export type OwnerStatus = 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT'
 
-export type OwnerType = 'NINGUNO' | 'PRINCIPAL' | 'SECUNDARIO' | 'VECINO' | 'FAMILIAR' | 'HERMANOS' | 'HIJOS' | 'MISMA CASA'
+export type OwnerType =
+  'NINGUNO'
+  | 'PRINCIPAL'
+  | 'SECUNDARIO'
+  | 'VECINO'
+  | 'FAMILIAR'
+  | 'HERMANOS'
+  | 'HIJOS'
+  | 'MISMA CASA'
 
 export interface OwnerProps {
   id: string;
