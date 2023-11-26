@@ -3,6 +3,8 @@ import { Logger } from '../logger'
 import { ListenersRegistry } from './listeners-registry'
 
 export class EventPoller {
+  private messagesQueue: SQS.Message[] = []
+
   constructor (
     private sqsClient: SQS,
     private listenersRegistry: ListenersRegistry,
@@ -12,21 +14,15 @@ export class EventPoller {
   }
 
   async poll (): Promise<'event-processed' | 'no-event-received'> {
-    const { Messages } = await this.sqsClient.receiveMessage({
-      QueueUrl: this.eventsQueueUrl,
-      MaxNumberOfMessages: 1,
-      WaitTimeSeconds: 20,
-      VisibilityTimeout: 60,
-    }).promise()
-
-    if (!Messages || Messages.length === 0) {
+    const message = await this.nextMessage()
+    if (message === 'no-event-received') {
       return 'no-event-received'
     }
 
     const messageEvent: {
       listener: string,
       event: any,
-    } = JSON.parse(Messages[ 0 ].Body)
+    } = JSON.parse(message.Body)
 
     const listener = (this.listenersRegistry.listeningTo(messageEvent.event.name) || [])
       .find(({ name }) => name === messageEvent.listener)
@@ -39,11 +35,29 @@ export class EventPoller {
 
     await this.sqsClient.deleteMessage({
       QueueUrl: this.eventsQueueUrl,
-      ReceiptHandle: Messages[ 0 ].ReceiptHandle,
+      ReceiptHandle: message.ReceiptHandle,
     }).promise().catch(error => {
       this.logger.error('Could not delete event', { error: error.message, ...messageEvent })
     })
 
     return 'event-processed'
+  }
+
+  private async nextMessage () {
+    if (this.messagesQueue.length === 0) {
+      const { Messages } = await this.sqsClient.receiveMessage({
+        QueueUrl: this.eventsQueueUrl,
+        MaxNumberOfMessages: 10,
+        WaitTimeSeconds: 20,
+        VisibilityTimeout: 60,
+      }).promise()
+      if (!Messages || Messages.length === 0) {
+        return 'no-event-received'
+      }
+
+      this.messagesQueue = Messages
+    }
+
+    return this.messagesQueue.shift()
   }
 }
