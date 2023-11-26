@@ -102,6 +102,10 @@
           "name": "COUCHBASE_PASS"
         },
         {
+          "valueFrom": "backend.database_url",
+          "name": "DATABASE_URL"
+        },
+        {
           "valueFrom": "backend.mailer.pass",
           "name": "MAILER_PASS"
         },

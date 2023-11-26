@@ -24,7 +24,7 @@ export class EventPoller {
       event: any,
     } = JSON.parse(message.Body)
 
-    const listener = (this.listenersRegistry.listeningTo(messageEvent.event.name) || [])
+    const listener = (this.listenersRegistry.listeningTo(messageEvent.event.name))
       .find(({ name }) => name === messageEvent.listener)
     if (!listener) {
       this.logger.error('Subscriber not found', messageEvent)

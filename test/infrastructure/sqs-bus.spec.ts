@@ -57,6 +57,15 @@ describe('SqsBus', () => {
     expect(loggerStub.warning).to.not.have.been.called
   })
 
+  it('publishes all events to broadcast listener', async () => {
+    service.on('*', 'test.listener_1', noopListener)
+
+    await service.publish(testEvent)
+    await service.publish({ name: 'test.other_event' })
+
+    expect(sqsClientStub.sendMessageBatch).to.have.been.calledTwice
+  })
+
   const sqsErrorResponse = {
     Id: `${testEvent.name}/test.listener`,
     SenderFault: true,

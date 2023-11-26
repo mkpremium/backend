@@ -81,6 +81,10 @@
           "name": "COUCHBASE_PASS"
         },
         {
+          "valueFrom": "backend.database_url",
+          "name": "DATABASE_URL"
+        },
+        {
           "valueFrom": "backend.twilio_account_token",
           "name": "TWILIO_ACCOUNT_TOKEN"
         },

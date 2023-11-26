@@ -20,6 +20,9 @@ import aws from 'aws-sdk'
 import { ComposedBus } from './event-bus/composed-bus'
 import { ListenersRegistry } from './event-bus/listeners-registry'
 import { EventPoller } from './event-bus/event-poller'
+import { getClient } from './postgres/client'
+import { EventsRepository } from './postgres/events.repository'
+import { createEventRecorderListener } from './event-bus/event-recorder.listener'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -43,7 +46,8 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
 function setupInfrastructureDependencies (container, couchbaseBucket) {
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
-    couchbaseAdapter: asClass(CouchbaseAdapter).classic().singleton(),
+    couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
+    prismaClient: asFunction(getClient).classic(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
@@ -54,6 +58,8 @@ function setupInfrastructureDependencies (container, couchbaseBucket) {
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     composedEventBus: asClass(ComposedBus).classic().singleton(),
     eventBus: aliasTo(process.env.NODE_ENV === 'test' ? 'eventEmitterBus' : 'sqsEventBus'),
+    eventsRepository: asClass(EventsRepository).classic(),
+    eventRecorderListener: asFunction(createEventRecorderListener),
     logger: asFunction(initLogger).singleton(),
   })
 }

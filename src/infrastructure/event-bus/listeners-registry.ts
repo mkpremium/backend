@@ -15,7 +15,7 @@ export class ListenersRegistry {
     this.listeners[ eventName ].push({ name, subscriber })
   }
 
-  listeningTo (eventName: string): ListenerRegister[] | undefined {
-    return this.listeners[eventName]
+  listeningTo (eventName: string): ListenerRegister[] {
+    return this.listeners[eventName] || []
   }
 }
