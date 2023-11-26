@@ -2,6 +2,7 @@ import { History } from '../../history/models'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { OwnerRepository } from '../repository/owner.repository'
 import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
+import { Logger } from 'winston'
 
 export interface OwnerStatusChangedEvent {
   name: 'owner.status_changed';
@@ -23,6 +24,7 @@ export class ChangeContactStatusService {
     private ownersRepository: OwnerRepository,
     private historyRepository: History,
     private eventBus: EventPublisher,
+    private logger: Logger,
   ) {
   }
 
@@ -30,6 +32,7 @@ export class ChangeContactStatusService {
     const contextModel = { _documentType: 'owner-contact', modelId: contactId }
 
     const owner = await this.ownersRepository.get(ownerId) as OwnerProps
+    this.logger.debug('Changing owner contact status', { status, ownerId, contactId })
     const updatedOwner = await this.ownersRepository.save(
       changeContactStatus(owner, contactId, status)) as OwnerProps
 
