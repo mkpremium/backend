@@ -187,7 +187,10 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.PUBLIC):
         return WorkSheetStatus.PUBLIC
-      case _every(ownersStatus, ({ status }) => [ OwnerStatus.ERROR, OwnerStatus.WITHOUT_CONTACT ].indexOf(status) !== -1):
+      case _every(ownersStatus, ({ status }) => [
+        OwnerStatus.ERROR,
+        OwnerStatus.WITHOUT_CONTACT,
+        OwnerStatus.WITHOUT_PHONE_CONTACT ].includes(status)):
         return WorkSheetStatus.INVALID
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
