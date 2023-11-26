@@ -10,7 +10,7 @@ const sqsClient = Promise.promisifyAll(new SQS({
   region: 'eu-west-1'
 }), { suffix: 'Promise' })
 
-const queueUrl = 'https://sqs.eu-west-1.amazonaws.com/173249668334/events-dev'
+const queueUrl = 'https://sqs.eu-west-1.amazonaws.com/173249668334/events'
 
 
 console.time('Chunking owners')
