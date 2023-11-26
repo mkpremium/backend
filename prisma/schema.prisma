@@ -9,3 +9,12 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model CouchbaseDocument {
+  id           String @id
+  documentType String // TODO: can be an ENUM?
+
+  document  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
