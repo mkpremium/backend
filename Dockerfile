@@ -9,7 +9,6 @@ WORKDIR /app
 COPY package-lock.json .
 COPY package.json .
 RUN ["npm", "ci", "--silent"]
-RUN ["npx", "prisma", "generate"]
 
 COPY . .
 
