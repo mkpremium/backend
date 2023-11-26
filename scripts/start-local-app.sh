@@ -3,7 +3,6 @@
 readonly appName=${1:-www}
 
 set -x
-./scripts/start-dependencies-and-wait-for-it.sh
 
 set -a && . .env
 
