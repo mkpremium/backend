@@ -1,8 +1,8 @@
 import { initLogger } from '../../src/infrastructure/logger'
 import { SQS } from 'aws-sdk'
 import _ from 'lodash'
-// 342_348
-import allOwners from '/Users/jorge/Downloads/owner_ids.json'
+// 35_597
+import allOwners from './data/prod_owners_wo_contact_but_with_contacts_2023_26_11.json'
 import Promise from 'bluebird'
 
 const logger = initLogger()
