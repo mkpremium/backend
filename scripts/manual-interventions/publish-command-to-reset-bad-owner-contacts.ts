@@ -25,7 +25,13 @@ Promise.all(
           QueueUrl: queueUrl,
           Entries: batch.map(entry => ({
             Id: entry.id,
-            MessageBody: JSON.stringify(entry),
+            MessageBody: JSON.stringify({
+              listener: 'owner.reset_owner_discarded_contacts_command_handler',
+              event: {
+                name: 'owner.reset_owner_discarded_contacts_command',
+                ownerId: entry.id
+              }
+            }),
           }))
         }, (err: Error, result: SQS.SendMessageBatchResult) => {
           if (err) {

@@ -27,4 +27,9 @@ export function ownerEventListeners (eventBus: EventListener, container: AwilixC
     'owner.discard_non_existing_contact',
     container.resolve('discardNonExistingContactListener'),
   )
+  eventBus.on(
+    'owner.reset_owner_discarded_contacts_command',
+    'owner.reset_owner_discarded_contacts_command_handler',
+    container.resolve('resetOwnerBadContactsHandler')
+  )
 }

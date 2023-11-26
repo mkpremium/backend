@@ -10,6 +10,7 @@ import { markGoodContactOnCallScheduled } from './event-listener/mark-good-conta
 import { getOwnerController } from './controller/get-owner.controller'
 import { discardNonExistingContactListener } from './event-listener/discard-non-existing-contact.listener'
 import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
+import { createResetOwnerBadContactsHandler } from './command-handler/reset-owner-bad-contacts.handler'
 
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
@@ -26,6 +27,8 @@ export const setupOwnerDependencies = (container: AwilixContainer) => {
     setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
 
     ownersRepository: asClass(OwnerRepository).singleton().classic(),
-    legacyOwnersRepository: asClass(LegacyOwnerRepository).singleton()
+    legacyOwnersRepository: asClass(LegacyOwnerRepository).singleton(),
+
+    resetOwnerBadContactsHandler: asFunction(createResetOwnerBadContactsHandler).singleton(),
   })
 }
