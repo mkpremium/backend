@@ -26,6 +26,12 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
+      postgresdb:
+        image: "postgres:15.3"
+        env:
+          POSTGRES_USER: mkpremium_local_user
+          POSTGRES_PASSWORD: mkpremium_local_password
+          POSTGRES_DB: mkpremium
 
     steps:
       - name: Checkout
@@ -51,6 +57,8 @@ jobs:
           command: npx ts-node scripts/couchbase/init-db.js
 
       - name: Test
+        env:
+          DATABASE_URL: "postgresql://mkpremium_local_user:mkpremium_local_password@localhost:5432/mkpremium?schema=public"
         run: |
           npm run test-ci
           npm run test:e2e
