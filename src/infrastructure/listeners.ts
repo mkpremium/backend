@@ -17,5 +17,12 @@ export function startListeners (diContainer) {
   worksheetEventListeners(eventBus, diContainer)
   userEventListeners(eventBus, diContainer)
   statListeners(eventBus)
-  eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
+  try {
+    eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
+  } catch (e) {
+    console.error(`Error resolving event recorder listener: ${e}`)
+    console.trace(e)
+    throw e
+  }
+  // eventBus.on('postgres.save_document_command', 'postgres.save_document_command_handler', diContainer.resolve('saveDocumentCommandHandler'))
 }
