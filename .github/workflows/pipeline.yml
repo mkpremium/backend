@@ -32,6 +32,8 @@ jobs:
           POSTGRES_USER: mkpremium_local_user
           POSTGRES_PASSWORD: mkpremium_local_password
           POSTGRES_DB: mkpremium
+        ports:
+          - 5432:5432
 
     steps:
       - name: Checkout
