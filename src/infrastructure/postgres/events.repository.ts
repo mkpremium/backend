@@ -12,6 +12,7 @@ export class EventsRepository {
       data: {
         id: uuid(),
         name: event.name,
+        version: 'legacy',
         body: event
       }
     })
