@@ -28,13 +28,19 @@ describe('AddProposalForBuilding - Integration', () => {
     .build()
 
   before(async () => {
-    const { locals: { diContainer } } = await createTestApp()
+    try {
+      const { locals: { diContainer } } = await createTestApp()
 
-    addProposalForBuildingService = diContainer.resolve('addProposalForBuildingService')
-    ownersRepository = diContainer.resolve('ownersRepository')
-    buildingsRepository = diContainer.resolve('buildingsRepository')
+      addProposalForBuildingService = diContainer.resolve('addProposalForBuildingService')
+      ownersRepository = diContainer.resolve('ownersRepository')
+      buildingsRepository = diContainer.resolve('buildingsRepository')
 
-    legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
+      legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
+    } catch (e) {
+      console.error('Error initializing app from test')
+      console.trace(e)
+      throw e
+    }
   })
 
   it('saves proposal for building', async () => {
