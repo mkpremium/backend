@@ -17,5 +17,5 @@ export function startListeners (diContainer) {
   worksheetEventListeners(eventBus, diContainer)
   userEventListeners(eventBus, diContainer)
   statListeners(eventBus)
-  // eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
+  eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
 }
