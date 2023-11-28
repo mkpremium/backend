@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { Logger } from 'winston'
-import { EventBus } from '../event-bus'
+import { ALL_EVENTS_LISTENER, EventBus } from '../event-bus'
 import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
 
@@ -40,7 +40,9 @@ export class EventEmitterBus implements EventBus {
   }
 
   on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
-    this.assertNamingSatisfiesPolicy(listenerName, eventName)
+    if (eventName !== ALL_EVENTS_LISTENER) {
+      this.assertNamingSatisfiesPolicy(listenerName, eventName)
+    }
 
     this.emitter
       .addListener(eventName, (event) => {

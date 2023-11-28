@@ -13,6 +13,6 @@ export const eventNamingPolicy: EventNamingPolicy = {
   },
 
   satisfiesListenerName (name: string): boolean {
-    return eventNamePattern.test(name) || name === ALL_EVENTS_LISTENER
+    return eventNamePattern.test(name)
   }
 }

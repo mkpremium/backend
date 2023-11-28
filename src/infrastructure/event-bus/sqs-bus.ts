@@ -27,6 +27,11 @@ export class SqsBus implements EventBus {
   }
 
   on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
+    if (eventName === ALL_EVENTS_LISTENER) {
+      this.listenersRegistry.registry(eventName, listenerName, subscriber)
+      return
+    }
+
     this.assertNamingSatisfiesPolicy(listenerName, eventName)
 
     this.listenersRegistry.registry(eventName, listenerName, subscriber)
