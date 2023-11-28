@@ -14,7 +14,7 @@ export NODE_ENV=test
 npx mocha --config "${PWD}/${test_dir}/.mocharc.js" \
   --retries 3 \
   --check-leaks \
-  --trace-warnings \
+  --full-trace \
   -r ts-node/register \
   --extension js --extension ts \
   "${TEST_ARGS[@]}" "${test_dir}/**/*.spec.[j|t]s"
