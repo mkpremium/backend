@@ -1,4 +1,4 @@
-import { EventBus } from '../event-bus'
+import { ALL_EVENTS_LISTENER, EventBus } from '../event-bus'
 import { Logger } from '../logger'
 import { SQS } from 'aws-sdk'
 import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs'
@@ -11,8 +11,6 @@ interface SQSEvent {
   messageGroupId?: string,
   messageDeduplicationId?: string
 }
-
-const ALL_EVENTS = '*'
 
 export class SqsBus implements EventBus {
   constructor (
@@ -29,11 +27,6 @@ export class SqsBus implements EventBus {
   }
 
   on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
-    if (eventName === ALL_EVENTS) {
-      this.listenersRegistry.registry(eventName, listenerName, subscriber)
-      return
-    }
-
     this.assertNamingSatisfiesPolicy(listenerName, eventName)
 
     this.listenersRegistry.registry(eventName, listenerName, subscriber)
@@ -44,7 +37,7 @@ export class SqsBus implements EventBus {
       throw new WrongEventName(event.name)
     }
 
-    const allEventsListeners = this.listenersRegistry.listeningTo(ALL_EVENTS)
+    const allEventsListeners = this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER)
     const listeners = this.listenersRegistry.listeningTo(event.name).concat(allEventsListeners)
     if (listeners.length === 0) {
       this.logger.warning('No listener for event, not publishing it', event)
