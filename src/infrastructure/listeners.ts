@@ -19,5 +19,5 @@ export function startListeners (diContainer) {
   statListeners(eventBus)
   // TODO: why the test did show the error?
   eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
-  // eventBus.on('postgres.save_document_command', 'postgres.save_document_command_handler', diContainer.resolve('saveDocumentCommandHandler'))
+  eventBus.on('postgres.save_documents_command', 'postgres.save_documents_command_handler', diContainer.resolve('saveDocumentsCommandHandler'))
 }

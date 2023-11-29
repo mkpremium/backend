@@ -23,6 +23,7 @@ import { EventPoller } from './event-bus/event-poller'
 import { getClient } from './postgres/client'
 import { EventsRepository } from './postgres/events.repository'
 import { createEventRecorderListener } from './event-bus/event-recorder.listener'
+import { saveDocumentsCommandHandler } from './postgres/save-documents-command-handler'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -60,6 +61,7 @@ function setupInfrastructureDependencies (container, couchbaseBucket) {
     eventBus: aliasTo(process.env.NODE_ENV === 'test' ? 'eventEmitterBus' : 'sqsEventBus'),
     eventsRepository: asClass(EventsRepository).classic(),
     eventRecorderListener: asFunction(createEventRecorderListener),
+    saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandler),
     logger: asFunction(initLogger).singleton(),
   })
 }
