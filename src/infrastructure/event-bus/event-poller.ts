@@ -1,6 +1,7 @@
 import { SQS } from 'aws-sdk'
 import { Logger } from '../logger'
 import { ListenersRegistry } from './listeners-registry'
+import { ALL_EVENTS_LISTENER } from '../event-bus'
 
 export class EventPoller {
   private messagesQueue: SQS.Message[] = []
@@ -24,8 +25,10 @@ export class EventPoller {
       event: any,
     } = JSON.parse(message.Body)
 
-    const listener = (this.listenersRegistry.listeningTo(messageEvent.event.name))
-      .find(({ name }) => name === messageEvent.listener)
+
+    const listener = this.listenersRegistry.listeningTo(messageEvent.event.name)
+        .find(({ name }) => name === messageEvent.listener) ||
+      this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER).find(({ name }) => name === messageEvent.listener)
     if (!listener) {
       this.logger.error('Subscriber not found', messageEvent)
       return 'event-processed'
