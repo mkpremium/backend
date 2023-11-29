@@ -10,6 +10,11 @@ const sqsClient = new SQS({
   region: 'eu-west-1'
 })
 
+const DOCUMENTS_CONDITION = process.env["DOCUMENTS_CONDITION"]
+if (!DOCUMENTS_CONDITION) {
+  throw new Error('Missing DOCUMENTS_CONDITION environment variable.')
+}
+
 connectCouchbaseBucket()
   .then(bucket => {
     return new Promise((resolve, reject) => {
@@ -17,7 +22,7 @@ connectCouchbaseBucket()
       const allDocumentsQuery = bucket.query(
         N1qlQuery.fromString(`SELECT mkpremium.id
                               FROM mkpremium
-                              WHERE _documentType IN ['owner', 'building']`)
+                              WHERE ${DOCUMENTS_CONDITION}`)
       )
       allDocumentsQuery.on('error', reject)
       allDocumentsQuery.on('row', (row) => {
