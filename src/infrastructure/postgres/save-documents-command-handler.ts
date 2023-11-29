@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { Logger } from 'winston'
 
@@ -35,6 +35,10 @@ export function saveDocumentsCommandHandler ({ couchbaseAdapter, logger, prismaC
           }
         })
       } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+          logger.warning("Document already exist", {id})
+          continue
+        }
         logger.error('Error saving couchbase document into postgres', { id, error: e.message })
         throw e
       }
