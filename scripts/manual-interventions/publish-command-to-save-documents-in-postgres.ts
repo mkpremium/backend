@@ -14,6 +14,7 @@ const DOCUMENTS_CONDITION = process.env["DOCUMENTS_CONDITION"]
 if (!DOCUMENTS_CONDITION) {
   throw new Error('Missing DOCUMENTS_CONDITION environment variable.')
 }
+const BATCH_SIZE = parseInt(process.env["BATCH_SIZE"]) || 1_000
 
 connectCouchbaseBucket()
   .then(bucket => {
@@ -45,9 +46,6 @@ connectCouchbaseBucket()
     console.trace(error)
     process.exit(1)
   })
-
-
-const BATCH_SIZE = 1_000
 
 class CommandPublisher {
   private buffer: Id[] = []
