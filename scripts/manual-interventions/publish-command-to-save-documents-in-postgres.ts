@@ -15,11 +15,12 @@ if (!DOCUMENTS_CONDITION) {
   throw new Error('Missing DOCUMENTS_CONDITION environment variable.')
 }
 const BATCH_SIZE = parseInt(process.env["BATCH_SIZE"]) || 1_000
+const QUEUE_URL = process.env.EVENTS_QUEUE_URL
 
 connectCouchbaseBucket()
   .then(bucket => {
     return new Promise((resolve, reject) => {
-      const commandPublisher = new CommandPublisher(sqsClient)
+      const commandPublisher = new CommandPublisher(sqsClient, QUEUE_URL)
       const allDocumentsQuery = bucket.query(
         N1qlQuery.fromString(`SELECT mkpremium.id
                               FROM mkpremium
@@ -53,7 +54,7 @@ class CommandPublisher {
 
   constructor (
     private sqs: SQS,
-    private queueUrl = 'https://sqs.eu-west-1.amazonaws.com/173249668334/events-dev'
+    private queueUrl: string
   ) {
   }
 
