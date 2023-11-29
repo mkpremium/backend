@@ -9,7 +9,7 @@ import { ListBuildingProposalsService } from './service/list-building-proposals.
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
-import { BuildingsRepository } from './repository/buildings.repository'
+import { CouchbaseBuildingsRepository } from './repository/buildings.repository'
 import { LegacyBuildingRepository } from './models'
 import { MetadataRepository } from './repository/metadata.repository'
 import { BuildingsReadRepository } from './repository/buildings-read.repository'
@@ -63,7 +63,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     })).singleton().classic(),
     pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
-    buildingsRepository: asClass(BuildingsRepository).singleton().classic(),
+    buildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
 
     buildingRepository: aliasTo('buildingsRepository'),
