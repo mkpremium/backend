@@ -63,7 +63,8 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     })).singleton().classic(),
     pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
-    buildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
+    couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
+    buildingsRepository: aliasTo('couchbaseBuildingsRepository'),
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
 
     buildingRepository: aliasTo('buildingsRepository'),
