@@ -9,7 +9,6 @@ import { ListBuildingProposalsService } from './service/list-building-proposals.
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
-import { CouchbaseBuildingsRepository } from './repository/buildings.repository'
 import { LegacyBuildingRepository } from './models'
 import { MetadataRepository } from './repository/metadata.repository'
 import { BuildingsReadRepository } from './repository/buildings-read.repository'
@@ -43,6 +42,7 @@ import { Portugal2021BuildingsImporterService } from './service/portugal2021-bui
 import { Portugal2021OwnersImporterService } from './service/portugal2021-owners-importer.service'
 import { Portugal2021WorksheetInitializerService } from './service/portugal2021-worksheet-initializer.service'
 import { createBuildingController } from './controller/create-building.controller'
+import { CouchbaseBuildingsRepository } from './repository/couchbase-building.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
