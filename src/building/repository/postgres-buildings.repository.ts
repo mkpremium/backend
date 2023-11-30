@@ -3,10 +3,14 @@ import { BuildingNegotiationStatus, BuildingProps } from '../building'
 import Promise from 'bluebird'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 import { TaskEither } from 'fp-ts/TaskEither'
+import { PrismaClient } from '@prisma/client'
 
 export class PostgresBuildingsRepository implements BuildingsRepository, BuildingsReadRepository {
+  constructor (private prismaClient: PrismaClient) {
+  }
+
   // Repository
-  save (data: any): Promise<any> {
+  save (data: BuildingProps): Promise<any> {
     return Promise.reject(new Error('Not implemented'))
   }
 
