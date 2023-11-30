@@ -31,7 +31,7 @@ jobs:
         env:
           POSTGRES_USER: mkpremium_local_user
           POSTGRES_PASSWORD: mkpremium_local_password
-          POSTGRES_DB: mkpremium
+          POSTGRES_DB: test_mkpremium
         ports:
           - 5432:5432
 
