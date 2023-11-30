@@ -17,12 +17,16 @@ import { BuildingDocumentsRepository } from './repository/building-documents.rep
 import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
 import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
-import { createUpdateBuildingNegotiationStatusController } from './controller/update-building-negotiation-status.controller'
+import {
+  createUpdateBuildingNegotiationStatusController
+} from './controller/update-building-negotiation-status.controller'
 import { createAddNegotiationProposalController } from './controllers'
 import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
 import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
 import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
-import { setFeaturedOwnerAndContactFromMeetingListener } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
+import {
+  setFeaturedOwnerAndContactFromMeetingListener
+} from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { OfferRequestsRepository } from './repository/offer-requests.repository'
 import { AddOfferRequestService } from './service/add-offer-request.service'
 import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
@@ -44,6 +48,7 @@ import { Portugal2021WorksheetInitializerService } from './service/portugal2021-
 import { createBuildingController } from './controller/create-building.controller'
 import { CouchbaseBuildingsRepository } from './repository/couchbase-building.repository'
 import { CouchbaseBuildingsReadRepository } from './repository/couchbase-buildings-read.repository'
+import { PostgresBuildingsRepository } from './repository/postgres-buildings.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -65,13 +70,14 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
     couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
+    postgresBuildingsRepository: asClass(PostgresBuildingsRepository).singleton().classic(),
     buildingsRepository: aliasTo('couchbaseBuildingsRepository'),
-    leadRecorder: asClass(LeadRecorderService).singleton().classic(),
+    buildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
 
+    leadRecorder: asClass(LeadRecorderService).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     legacyMetadataRepository: asClass(MetadataRepository).singleton(),
-    buildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
