@@ -5,7 +5,7 @@ import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import moment from 'moment/moment'
 import _ from 'lodash'
-import { BuildingReadModel } from './buildings-read.repository'
+import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 
 const listBuildingsByQuery = (bucketName, condition) => `
     SELECT building.id,
@@ -157,7 +157,7 @@ const assignedBuildingsIdForFlipperQuery = bucketName => `
       AND assignedAgentId = $1
 `
 
-export class CouchbaseBuildingsReadRepository {
+export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository {
   constructor (
     private couchbaseAdapter: CouchbaseAdapter
   ) {
