@@ -1,8 +1,8 @@
-import { BuildingsRepository } from '../../src/building/repository/buildings.repository'
 import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
 import { withCapturedLead } from '../../src/building/building'
 import { initLogger } from '../../src/infrastructure/logger'
+import { CouchbaseBuildingsRepository } from '../../src/building/repository/couchbase-building.repository'
 
 const logger = initLogger()
 
@@ -12,7 +12,7 @@ export function migrate (dry = false) {
       const couchbaseAdapter = new CouchbaseAdapter(bucket)
       return {
         couchbaseAdapter,
-        buildingsRepository: new BuildingsRepository(couchbaseAdapter)
+        buildingsRepository: new CouchbaseBuildingsRepository(couchbaseAdapter)
       }
     })
     .then(async ({ buildingsRepository, couchbaseAdapter }) => {

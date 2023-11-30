@@ -9,6 +9,7 @@ import { orFail } from '../../helpers'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { ownerBuilder } from '../../owner/owner.builder'
 import { AwilixContainer } from 'awilix'
+import { CouchbaseBuildingsReadRepository } from '../../../src/building/repository/couchbase-buildings-read.repository'
 
 describe('BuildingsReadRepository', () => {
   let readRepository: BuildingsReadRepository
@@ -73,7 +74,7 @@ describe('BuildingsReadRepository', () => {
 
 describe('mapToPropertyAgentBuildingView', () => {
   it('parses featured owner', () => {
-    const result = BuildingsReadRepository.mapToPropertyAgentBuildingView([
+    const result = CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView([
       {
         address: {
           city: 'BARCELONA',
@@ -187,7 +188,7 @@ describe('mapToPropertyAgentBuildingView', () => {
   })
 
   it('parses owner contacts', () => {
-    const result = BuildingsReadRepository.mapToPropertyAgentBuildingView([
+    const result = CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView([
       {
         address: {
           city: 'MADRID',
@@ -278,12 +279,12 @@ describe('getOwner', () => {
   const testMeeting = {}
 
   it('returns nothing when no owners are provided', () => {
-    expect(BuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, undefined))
+    expect(CouchbaseBuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, undefined))
       .to.be.undefined
   })
 
   it('returns nothing when there is no owner with some contact validated', () => {
-    expect(BuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, [ {
+    expect(CouchbaseBuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, [ {
       contacts: []
     } ])).to.be.undefined
   })
