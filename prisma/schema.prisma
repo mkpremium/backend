@@ -28,3 +28,123 @@ model DomainEvent {
   body      Json
   createdAt DateTime @default(now())
 }
+
+// type PostalCode {
+//     number String
+//     verified Boolean
+// }
+
+model PostalAddress {
+  id           String     @id
+  street       String
+  number       String
+  fullAddress  String
+  postalCode   String?
+  city         String
+  province     String
+  neighborhood String
+  type         String
+  building     Building[]
+}
+
+enum BuildingState {
+  BUENO
+  MALO
+}
+
+model Building {
+  id                String             @id
+  address           PostalAddress      @relation(fields: [addressId], references: [id])
+  addressId         String
+  floorArea         Float
+  landArea          Float
+  roofArea          Float
+  coefficient       String
+  negotiationStatus String // TODO: validate schema
+  use               String?
+  propertyType      String?
+  buildingDate      String
+  state             BuildingState? // TODO: validate schema
+  cadastreReference String?
+  featuredOwner     Owner?             @relation(fields: [ownerId], references: [id])
+  ownerId           String?
+  location          Json? // TODO: validate schema
+  BuildingImages    BuildingImages[]
+  BuildingProposal  BuildingProposal[]
+}
+
+enum ProposalState {
+  aceptada
+  enviada
+  pendiente
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+}
+
+model BuildingProposal {
+  id         String        @id
+  owner      Owner         @relation(fields: [ownerId], references: [id])
+  ownerId    String
+  building   Building      @relation(fields: [buildingId], references: [id])
+  buildingId String
+  createdAt  DateTime
+  createdBy  String // TODO: foreign key?
+  state      ProposalState
+
+  updatedAt          DateTime?
+  aspiration         Float?
+  proposal           Float?
+  message            String?
+  notificationStatus NotificationStatus?
+  notificationSentAt DateTime?
+  notificationEmail  String?
+}
+
+model BuildingImages {
+  id         String   @id
+  name       String
+  mimeType   String
+  previewUrl String
+  building   Building @relation(fields: [buildingId], references: [id])
+  buildingId String
+}
+
+model Owner {
+  id                  String             @id
+  featuredInBuildings Building[]
+  BuildingProposal    BuildingProposal[]
+}
+
+model Role {
+  id   String @id
+  user User[]
+}
+
+model UserProfile {
+  id        String  @id
+  firstName String
+  lastName  String
+  city      String?
+  email     String?
+  language  String?
+  User      User[]
+}
+
+model User {
+  id          String  @id
+  username    String
+  password    String
+  agentNumber String?
+  serviceId   String?
+  enabled      Boolean
+  roles       Role[]
+
+  profile   UserProfile @relation(fields: [profileId], references: [id])
+  profileId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  disabledAt DateTime @updatedAt
+}
