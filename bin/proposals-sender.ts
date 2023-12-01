@@ -7,9 +7,8 @@ import { ProposalsSenderService } from '../src/building/service/proposals-sender
 const logger = initLogger()
 logger.info('Starting proposals sender')
 
-connectCouchbaseBucket()
-  .then(bucketConnection => {
-    const container = createDiContainer(bucketConnection)
+createDiContainer()
+  .then(container => {
     const service = container.resolve('proposalsSenderService') as ProposalsSenderService
     logger.info('Starting to process pending proposals')
     return service.checkAndSendProposals()

@@ -1,10 +1,8 @@
 import '../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../src/infrastructure/logger'
-import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { createDiContainer } from '../src/infrastructure/dependencies'
 import { EventPoller } from '../src/infrastructure/event-bus/event-poller'
 import { Bucket } from 'couchbase'
-import { AwilixContainer } from 'awilix'
 import { startListeners } from '../src/infrastructure/listeners'
 
 const logger = initLogger()
@@ -19,7 +17,7 @@ let killProcess = false
 process.on('SIGTERM', () => killProcess = true)
 
 async function init () {
-  const container = await getDiContainer()
+  const container = await createDiContainer()
   const poller: EventPoller = container.resolve('eventPoller')
   const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
   startListeners(container)
@@ -42,11 +40,6 @@ async function init () {
       logger.error('Error processing event or polling', { stack: error.stack, ...error })
     }
   }
-}
-
-function getDiContainer (): Promise<AwilixContainer> {
-  return connectCouchbaseBucket()
-    .then(createDiContainer)
 }
 
 function sleepEmptyMessageWaitTime () {

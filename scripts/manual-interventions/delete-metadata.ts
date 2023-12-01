@@ -1,4 +1,3 @@
-import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
 import { initLogger } from '../../src/infrastructure/logger'
 import { createDiContainer } from '../../src/infrastructure/dependencies'
 import aws from 'aws-sdk'
@@ -10,8 +9,7 @@ import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 const logger = initLogger()
 const sqsClient = new aws.SQS({ region: 'eu-west-1' })
 
-connectCouchbaseBucket()
-  .then(bucket => createDiContainer(bucket))
+createDiContainer()
   .then((container) => {
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const legacyMetadataRepository = container.resolve('legacyMetadataRepository') as MetadataRepository

@@ -14,7 +14,7 @@ exec()
   })
 
 async function exec () {
-  const diContainer = createDiContainer(null)
+  const diContainer = await createDiContainer()
   startListeners(diContainer)
 
   const eventBus: EventPublisher = diContainer.resolve('eventBus')

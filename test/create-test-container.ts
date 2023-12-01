@@ -1,6 +1,7 @@
-import { createDiContainer } from '../src/infrastructure/dependencies'
+import { createDiContainer, setupContainer } from '../src/infrastructure/dependencies'
 import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
 import { Bucket, N1qlQuery } from 'couchbase'
+import { createContainer } from 'awilix'
 
 let cachedBucket: Bucket
 
@@ -14,8 +15,10 @@ export async function createTestContainer() {
 
   const bucket = await bucketPromise
   await flushBucket(bucket)
+  const container = createContainer()
+  setupContainer(container, bucket, null)
 
-  return createDiContainer(bucket)
+  return container
 }
 
 export function flushBucket (bucket: Bucket) {

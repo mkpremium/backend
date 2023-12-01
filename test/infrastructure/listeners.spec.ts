@@ -1,13 +1,15 @@
 import { startListeners } from '../../src/infrastructure/listeners'
 import { EventBus } from '../../src/infrastructure/event-bus'
 import { expect } from 'chai'
-import { createDiContainer } from '../../src/infrastructure/dependencies'
+import { createDiContainer, setupContainer } from '../../src/infrastructure/dependencies'
 import { Logger } from 'winston'
+import { createContainer } from 'awilix'
 
 describe('startListeners', () => {
   let container
   beforeEach(() => {
-    container = createDiContainer(null)
+    container = createContainer()
+    setupContainer(container, null, null)
   })
 
   it('start all listeners without errors', () => {

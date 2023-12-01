@@ -53,9 +53,8 @@ export const createApp = (): Promise<Express> => {
   app.use(morgan('combined'))
   app.use(cors())
 
-  return connectCouchbaseBucket()
-    .then(couchbaseBucket => {
-      const diContainer = createDiContainer(couchbaseBucket)
+  return createDiContainer()
+    .then(diContainer => {
       app.locals.diContainer = diContainer
 
       operator(app) // start with login router

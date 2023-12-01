@@ -1,5 +1,4 @@
 import '../../../src/infrastructure/o11y/honeycomb'
-import { connectCouchbaseBucket } from '../../../src/db/connect-couchbase-bucket'
 import { initLogger } from '../../../src/infrastructure/logger'
 import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 import { createDiContainer } from '../../../src/infrastructure/dependencies'
@@ -20,8 +19,7 @@ exec()
   })
 
 async function exec () {
-  const couchbaseBucket = await connectCouchbaseBucket()
-  const diContainer = createDiContainer(couchbaseBucket)
+  const diContainer = await createDiContainer()
 
   startListeners(diContainer)
 

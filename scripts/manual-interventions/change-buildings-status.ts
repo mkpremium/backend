@@ -1,8 +1,9 @@
-import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
 import { initLogger } from '../../src/infrastructure/logger'
 import { BuildingsReadRepository } from '../../src/building/repository/buildings-read.repository'
 import { createDiContainer } from '../../src/infrastructure/dependencies'
-import { UpdateBuildingNegotiationStatusService } from '../../src/building/service/update-building-negotiation-status.service'
+import {
+  UpdateBuildingNegotiationStatusService
+} from '../../src/building/service/update-building-negotiation-status.service'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { fromPromise } from '../../src/infrastructure/fp-utils'
@@ -11,8 +12,7 @@ import aws from 'aws-sdk'
 const logger = initLogger()
 const sqsClient = new aws.SQS({ region: 'eu-west-1' })
 
-connectCouchbaseBucket()
-  .then(bucket => createDiContainer(bucket))
+createDiContainer()
   .then((container) => {
     return loop(container)
   })

@@ -1,12 +1,13 @@
 import '../../../src/infrastructure/o11y/honeycomb'
-import { connectCouchbaseBucket } from '../../../src/db/connect-couchbase-bucket'
 import { initLogger } from '../../../src/infrastructure/logger'
 import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 import { createDiContainer } from '../../../src/infrastructure/dependencies'
 import { startListeners } from '../../../src/infrastructure/listeners'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import { Portugal2021WorksheetInitializerService } from '../../../src/building/service/portugal2021-worksheet-initializer.service'
+import {
+  Portugal2021WorksheetInitializerService
+} from '../../../src/building/service/portugal2021-worksheet-initializer.service'
 
 const logger = initLogger()
 
@@ -20,8 +21,7 @@ exec()
   })
 
 async function exec () {
-  const couchbaseBucket = await connectCouchbaseBucket()
-  const diContainer = createDiContainer(couchbaseBucket)
+  const diContainer = await createDiContainer()
 
   startListeners(diContainer)
 

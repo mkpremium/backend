@@ -1,10 +1,11 @@
 import '../../../src/infrastructure/o11y/honeycomb'
-import { connectCouchbaseBucket } from '../../../src/db/connect-couchbase-bucket'
 import { initLogger } from '../../../src/infrastructure/logger'
 import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 import { createDiContainer } from '../../../src/infrastructure/dependencies'
 import { startListeners } from '../../../src/infrastructure/listeners'
-import { Portugal2021BuildingsImporterService } from '../../../src/building/service/portugal2021-buildings-importer.service'
+import {
+  Portugal2021BuildingsImporterService
+} from '../../../src/building/service/portugal2021-buildings-importer.service'
 import { constVoid, pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as T from 'fp-ts/Task'
@@ -21,8 +22,7 @@ exec()
   })
 
 async function exec () {
-  const couchbaseBucket = await connectCouchbaseBucket()
-  const diContainer = createDiContainer(couchbaseBucket)
+  const diContainer = await createDiContainer()
 
   startListeners(diContainer)
 

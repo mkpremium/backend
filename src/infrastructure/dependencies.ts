@@ -1,5 +1,5 @@
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
-import { aliasTo, asClass, asFunction, asValue, createContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, AwilixContainer, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
 import { setupStockDependencies } from '../stock/stock-di'
@@ -27,11 +27,22 @@ import { saveDocumentsCommandHandler } from './postgres/save-documents-command-h
 import { initializeDataSource } from '../data-source'
 import { DataSource } from 'typeorm'
 import { User } from '../entity/User'
+import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 
-export const createDiContainer = (couchbaseBucket: Bucket) => {
+export async function createDiContainer () {
   const container = createContainer()
+  const [ couchbaseBucket, dataSource ] = await Promise.all([
+    connectCouchbaseBucket(),
+    initializeDataSource()
+  ])
 
-  setupInfrastructureDependencies(container, couchbaseBucket)
+  setupContainer(container, couchbaseBucket, dataSource)
+
+  return container
+}
+
+export function setupContainer (container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource) {
+  setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
   setupBuildingDependencies(container)
   setupOwnerDependencies(container)
   setupScheduledEventsDependencies(container)
@@ -43,16 +54,14 @@ export const createDiContainer = (couchbaseBucket: Bucket) => {
   setupEmailDependencies(container)
   setupCallsDependencies(container)
   setupFlipperDependencies(container)
-
-  return container
 }
 
-function setupInfrastructureDependencies (container, couchbaseBucket) {
+function setupInfrastructureDependencies (container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource) {
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
-    ormDataSource: asFunction(initializeDataSource),
-    ormUsersRepository: asFunction(({ormDataSource}: {ormDataSource: DataSource}) => {
+    ormDataSource: asValue(dataSource),
+    ormUsersRepository: asFunction(({ ormDataSource }: { ormDataSource: DataSource }) => {
       console.log('ormDataSource', ormDataSource)
       return ormDataSource.getRepository(User)
     }),
