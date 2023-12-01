@@ -5,6 +5,7 @@ import { worksheetEventListeners } from '../../src/worksheet/listeners'
 import Sinon from 'sinon'
 import { ownerBuilder } from '../owner/owner.builder'
 import { OwnerStatusChangedEvent } from '../../src/owner/service/change-contact-status.service'
+import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-event.entity'
 
 describe('worksheetEventListeners', () => {
   let eventSubscribers
@@ -57,7 +58,7 @@ describe('worksheetEventListeners', () => {
     }).build()
 
     const testEvent: OwnerStatusChangedEvent = {
-      name: 'owner.status_changed',
+      name: DomainEventCatalog.OWNER__STATUS_CHANGED,
       buildingId: testOwner.buildingId,
       ownerId: testOwner.id,
       oldStatus: 'NO_VERIFICADO',
