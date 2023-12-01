@@ -1,4 +1,6 @@
-import { UpdateWorksheetStatusOnOwnerChangeService } from '../../../src/worksheet/service/update-worksheet-status-on-owner-change.service'
+import {
+  UpdateWorksheetStatusOnOwnerChangeService
+} from '../../../src/worksheet/service/update-worksheet-status-on-owner-change.service'
 import { createTestContainer } from '../../create-test-container'
 import { worksheetBuilder } from '../../worksheet/worksheet.builder'
 import { WorksheetRepository } from '../../../src/worksheet/repository/worksheet.repository'
@@ -6,6 +8,7 @@ import { expect } from 'chai'
 import { EventBus } from '../../../src/infrastructure/event-bus'
 import { OwnerStatusChangedEvent } from '../../../src/owner/service/change-contact-status.service'
 import { worksheetEventListeners } from '../../../src/worksheet/listeners'
+import { DomainEventCatalog } from '../../../src/infrastructure/postgres/domain-event.entity'
 
 describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
   let service: UpdateWorksheetStatusOnOwnerChangeService
@@ -14,7 +17,7 @@ describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
   const testWorksheet = worksheetBuilder().build()
   const testOwnerId = 'test-owner-id'
   const testEvent: OwnerStatusChangedEvent = {
-    name: 'owner.status_changed',
+    name: DomainEventCatalog.OWNER__STATUS_CHANGED,
     buildingId: testWorksheet.relatedBuildingIds[0],
     ownerId: testOwnerId,
     oldStatus: 'NO_VERIFICADO',
