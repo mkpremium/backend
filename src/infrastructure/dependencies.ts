@@ -24,6 +24,9 @@ import { getClient } from './postgres/client'
 import { EventsRepository } from './postgres/events.repository'
 import { createEventRecorderListener } from './event-bus/event-recorder.listener'
 import { saveDocumentsCommandHandler } from './postgres/save-documents-command-handler'
+import { initializeDataSource } from '../data-source'
+import { DataSource } from 'typeorm'
+import { User } from '../entity/User'
 
 export const createDiContainer = (couchbaseBucket: Bucket) => {
   const container = createContainer()
@@ -48,6 +51,12 @@ function setupInfrastructureDependencies (container, couchbaseBucket) {
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
+    ormDataSource: asFunction(initializeDataSource),
+    ormUsersRepository: asFunction(({ormDataSource}: {ormDataSource: DataSource}) => {
+      console.log('ormDataSource', ormDataSource)
+      return ormDataSource.getRepository(User)
+    }),
+
     prismaClient: asFunction(getClient).classic(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
