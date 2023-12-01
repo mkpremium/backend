@@ -3,6 +3,7 @@ import { WorksheetQueueRepository } from '../repository/worksheet-queue.reposito
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { WorksheetRepository } from '../repository/worksheet.repository'
 import { removeScheduledCall } from '../domain/queue'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export class WorksheetQueueActionsService {
   constructor (
@@ -20,7 +21,7 @@ export class WorksheetQueueActionsService {
 
     await this.worksheetRepository.save(worksheetInQueue)
     await this.worksheetQueueRepository.save(queueWithWorksheet)
-    await this.eventBus.publish({ name: 'worksheet.taken', worksheetId, queueId, by: userId })
+    await this.eventBus.publish({ name: DomainEventCatalog.WORKSHEET__TAKEN, worksheetId, queueId, by: userId })
 
     return this.worksheetRepository.getForCallcenterView(worksheetId)
   }

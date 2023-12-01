@@ -24,7 +24,7 @@ export function scheduledEventsEventListeners (eventBus: EventListener, containe
     container.resolve('scheduledCallFromOwnerMessage')
   )
   eventBus.on(
-    'owner.contact_status_changed',
+    DomainEventCatalog.OWNER__CONTACT_STATUS_CHANGED,
     'scheduled_events.remove_call',
     container.resolve('removeScheduledCallOnDiscardedContact')
   )

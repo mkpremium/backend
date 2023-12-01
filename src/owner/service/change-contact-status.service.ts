@@ -3,6 +3,7 @@ import { EventPublisher } from '../../infrastructure/event-bus'
 import { OwnerRepository } from '../repository/owner.repository'
 import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
 import { Logger } from 'winston'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface OwnerStatusChangedEvent {
   name: 'owner.status_changed';
@@ -13,7 +14,7 @@ export interface OwnerStatusChangedEvent {
 }
 
 export interface OwnerContactStatusChanged {
-  name: 'owner.contact_status_changed'
+  name: DomainEventCatalog.OWNER__CONTACT_STATUS_CHANGED
   ownerId: string
   contactId: string
   newContactStatus: 'GOOD' | 'BAD' | 'UNDEFINED'
@@ -38,7 +39,7 @@ export class ChangeContactStatusService {
 
     await this.historyRepository.register({ type: 'UPDATE', contextModel, user })
     await this.eventBus.publish({
-      name: 'owner.contact_status_changed',
+      name: DomainEventCatalog.OWNER__CONTACT_STATUS_CHANGED,
       ownerId,
       contactId,
       newContactStatus: status,

@@ -2,6 +2,7 @@ import { AddProposalService } from './add-proposal.service'
 import { OwnerRepository } from '../../owner/repository/owner.repository'
 import { contactOfId } from '../../owner/owner'
 import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 interface CreateProposalCommand {
   amount: number;
@@ -12,7 +13,7 @@ interface CreateProposalCommand {
 }
 
 export interface ProposalForBuildingScheduled {
-  name: 'building.proposal_scheduled';
+  name: DomainEventCatalog.BUILDING__PROPOSAL_SCHEDULED;
   createdBy: string;
   ownerId: string;
   buildingId: string
@@ -38,7 +39,7 @@ export class AddProposalForBuildingService {
     })
 
     const event: ProposalForBuildingScheduled = {
-      name: 'building.proposal_scheduled',
+      name: DomainEventCatalog.BUILDING__PROPOSAL_SCHEDULED,
       buildingId: buildingId,
       createdBy: cmd.createdBy,
       ownerId: cmd.ownerId

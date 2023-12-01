@@ -57,7 +57,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
     })
 
   eventBus.on(
-    'worksheet.taken',
+    DomainEventCatalog.WORKSHEET__TAKEN,
     'worksheet.release_caller_extra_worksheets',
     async ({ queueId, by }) => {
       await releaseUserOtherActiveWorksheetsInQueueService.release(by, queueId)
