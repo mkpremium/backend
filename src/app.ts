@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser'
 import cors from 'cors'
 import express, { Express } from 'express'
 import morgan from 'morgan'
@@ -20,7 +19,7 @@ import { createTestHarness } from './test-harness/routes'
 import './types'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
-import { EventBus, EventsDiagnostics } from './infrastructure/event-bus'
+import { EventsDiagnostics } from './infrastructure/event-bus'
 import { callsRoutes } from './calls/routing'
 import { setupOwnersRoutes } from './owner/routing'
 import { scheduledEventsRoutes } from './scheduled-events/routing'
@@ -49,8 +48,8 @@ export const createApp = (): Promise<Express> => {
     }
   })
 
-  app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(bodyParser.json())
+  app.use(express.urlencoded({ extended: false }))
+  app.use(express.json())
   app.use(morgan('combined'))
   app.use(cors())
 
