@@ -1,6 +1,5 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
-import { User } from './entity/User'
 import urlparse from 'url-parse'
 
 
