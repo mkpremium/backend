@@ -6,7 +6,7 @@ import { Logger } from 'winston'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface OwnerStatusChangedEvent {
-  name: 'owner.status_changed';
+  name: DomainEventCatalog.OWNER__STATUS_CHANGED;
   ownerId: string;
   buildingId: string;
   oldStatus: OwnerStatus;
@@ -47,7 +47,7 @@ export class ChangeContactStatusService {
 
     if (owner.status !== updatedOwner.status) {
       const event: OwnerStatusChangedEvent = {
-        name: 'owner.status_changed',
+        name: DomainEventCatalog.OWNER__STATUS_CHANGED,
         ownerId,
         buildingId: owner.buildingId,
         oldStatus: owner.status,

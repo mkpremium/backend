@@ -1,5 +1,6 @@
 import { AwilixContainer } from 'awilix'
 import { EventListener } from '../infrastructure/event-bus'
+import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.entity'
 
 export function ownerEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
@@ -8,7 +9,7 @@ export function ownerEventListeners (eventBus: EventListener, container: AwilixC
     container.resolve('callFinishedListener'),
   )
   eventBus.on(
-    'scheduled_events.call_scheduled',
+    DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED,
     'owner.flag_good_contact',
     container.resolve('markGoodContactOnCallScheduled'),
   )

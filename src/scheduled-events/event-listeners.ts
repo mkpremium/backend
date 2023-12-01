@@ -9,7 +9,7 @@ export function scheduledEventsEventListeners (eventBus: EventListener, containe
     container.resolve('removeCallsOnNewMeetingOrOfferRequest')
   )
   eventBus.on(
-    'offer_request.created',
+    DomainEventCatalog.OFFER_REQUEST__CREATED,
     'scheduled_events.remove_call',
     container.resolve('removeCallsOnNewMeetingOrOfferRequest'),
   )

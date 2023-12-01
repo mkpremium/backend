@@ -76,7 +76,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
   )
 
   eventBus.on(
-    'owner.status_changed',
+    DomainEventCatalog.OWNER__STATUS_CHANGED,
     'worksheet.update_status',
     (evt: OwnerStatusChangedEvent) => {
       return new Promise(resolve => setTimeout(resolve, consistencyDelay))

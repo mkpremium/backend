@@ -3,6 +3,7 @@ import { LegacyWorksheetQueueRepository } from '../../worksheet/models/queue-rep
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface ScheduleCallCommand {
   event: ScheduledEventProps & { note: string }
@@ -11,7 +12,7 @@ export interface ScheduleCallCommand {
 }
 
 export interface CallScheduled {
-  name: 'scheduled_events.call_scheduled'
+  name: DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED
   userId: string
   ownerId: string
   contactId: string
@@ -37,7 +38,7 @@ export class ScheduleCallService {
     await this.legacyWorksheetQueueRepository.scheduleWorksheetInQueue(queue, scheduledEvent)
 
     await this.eventBus.publish({
-      name: 'scheduled_events.call_scheduled',
+      name: DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED,
       userId: cmd.userId,
       ownerId: cmd.event.event.ownerId,
       contactId: cmd.event.event.contactId,

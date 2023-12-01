@@ -1,5 +1,6 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 interface Deps {
   scheduledEventsRepository: ScheduledEventsRepository
@@ -16,7 +17,7 @@ export const updateScheduledCallController = ({
 
     const updatedCall = await scheduledEventsRepository.update(id, cmd)
     await eventBus.publish({
-      name: 'scheduled_events.call_updated',
+      name: DomainEventCatalog.SCHEDULED_EVENTS__CALL_UPDATED,
       buildingId: updatedCall.event.buildingId,
       userId: req.user.id,
       note: cmd.note,

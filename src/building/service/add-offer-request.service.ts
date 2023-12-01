@@ -4,6 +4,7 @@ import { InvalidCommand } from '../../infrastructure/invalid-command.error'
 import { OfferRequestsRepository } from '../repository/offer-requests.repository'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 const AddOfferRequestCommand = t.struct({
   ownerId: t.String,
@@ -17,7 +18,7 @@ const AddOfferRequestCommand = t.struct({
 })
 
 export interface OfferRequestCreated {
-  name: 'offer_request.created'
+  name: DomainEventCatalog.OFFER_REQUEST__CREATED
   note: string
   userId: string
   buildingId: string
@@ -39,7 +40,7 @@ export class AddOfferRequestService {
     await this.buildingsRepository.assignBuildingToAgent(addRequestCommand.buildingId, addRequestCommand.flipperId)
 
     await this.eventBus.publish({
-      name: 'offer_request.created',
+      name: DomainEventCatalog.OFFER_REQUEST__CREATED,
       note: addRequestCommand.note,
       userId: addRequestCommand.callerId,
       buildingId: addRequestCommand.buildingId,

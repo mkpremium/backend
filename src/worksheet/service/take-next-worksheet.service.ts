@@ -2,6 +2,7 @@ import { WorksheetQueueRepository } from '../repository/worksheet-queue.reposito
 import { WorksheetNotFound, WorksheetRepository, WorksheetViewProps } from '../repository/worksheet.repository'
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
 import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface InvalidWorksheetFound {
   name: 'worksheet.invalid_worksheet_found';
@@ -43,7 +44,7 @@ export class TakeNextWorksheetService {
 
     const nextWorksheet = await this.takeWorksheetService.takeWorksheetInQueue(queue.id, worksheetFromSource.id, byUserOfId)
     await this.eventBus.publish({
-      name: 'worksheet.next_in_queue_taken',
+      name: DomainEventCatalog.WORKSHEET__NEXT_IN_QUEUE_TAKEN,
       by: byUserOfId,
       source: queue.source
     })
