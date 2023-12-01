@@ -2,15 +2,19 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
 
 export enum DomainEventCatalog {
   BUILDING__NEGOTIATION_STATUS_CHANGED = 'building.negotiation_status_changed',
-  SCHEDULED_EVENTS__EVENT_DELETED = 'scheduled_events.event_deleted',
-  OWNER__CONTACT_STATUS_CHANGED = 'owner.contact_status_changed',
-  WORKSHEET__TAKEN = 'worksheet.taken',
   BUILDING__PROPOSAL_SCHEDULED = 'building.proposal_scheduled',
+
+  OFFER_REQUEST__CREATED = 'offer_request.created',
+
+  OWNER__CONTACT_STATUS_CHANGED = 'owner.contact_status_changed',
+  OWNER__STATUS_CHANGED = 'owner.status_changed',
+
+  SCHEDULED_EVENTS__EVENT_DELETED = 'scheduled_events.event_deleted',
   SCHEDULED_EVENTS__CALL_SCHEDULED = 'scheduled_events.call_scheduled',
   SCHEDULED_EVENTS__CALL_UPDATED = 'scheduled_events.call_updated',
-  OWNER__STATUS_CHANGED = 'owner.status_changed',
+
+  WORKSHEET__TAKEN = 'worksheet.taken',
   WORKSHEET__NEXT_IN_QUEUE_TAKEN = 'worksheet.next_in_queue_taken',
-  OFFER_REQUEST__CREATED = 'offer_request.created',
 }
 
 @Entity()
