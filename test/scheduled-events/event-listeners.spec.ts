@@ -2,11 +2,17 @@ import { scheduledEventsEventListeners } from '../../src/scheduled-events/event-
 import { InMemorySyncEventBus } from '../../src/infrastructure/event-bus/in-memory-sync-event-bus'
 import { spy } from 'sinon'
 import { expect } from 'chai'
-import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../../src/building/service/update-building-negotiation-status.service'
 import { asFunction, asValue, createContainer } from 'awilix'
-import { removeCallsOnNewMeetingOrOfferRequest } from '../../src/scheduled-events/listeners/remove-calls-on-new-meeting-or-offer-request'
-import { removeScheduledCallsOnOwnerRefusal } from '../../src/scheduled-events/listeners/remove-scheduled-calls-on-owner-refusal'
-import { removeScheduledCallOnDiscardedContact } from '../../src/scheduled-events/listeners/remove-scheduled-call-on-discarded-contact'
+import {
+  removeCallsOnNewMeetingOrOfferRequest
+} from '../../src/scheduled-events/listeners/remove-calls-on-new-meeting-or-offer-request'
+import {
+  removeScheduledCallsOnOwnerRefusal
+} from '../../src/scheduled-events/listeners/remove-scheduled-calls-on-owner-refusal'
+import {
+  removeScheduledCallOnDiscardedContact
+} from '../../src/scheduled-events/listeners/remove-scheduled-call-on-discarded-contact'
+import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-event.entity'
 
 describe('scheduled-events.setupEventListeners', () => {
   let eventBus
@@ -37,7 +43,7 @@ describe('scheduled-events.setupEventListeners', () => {
 
   it('deletes scheduled calls when building is mark as not for sale', () => {
     eventBus.publish({
-      name: BUILDING_NEGOTIATION_STATUS_CHANGED,
+      name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
       buildingId: 'test-building-id',
       negotiationStatus: 'NO VENDE'
     })
@@ -47,7 +53,7 @@ describe('scheduled-events.setupEventListeners', () => {
 
   it('deletes scheduled calls when building is discarded', () => {
     eventBus.publish({
-      name: BUILDING_NEGOTIATION_STATUS_CHANGED,
+      name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
       buildingId: 'test-building-id',
       negotiationStatus: 'DESCARTADO'
     })

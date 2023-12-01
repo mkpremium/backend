@@ -1,9 +1,10 @@
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { BuildingNegotiationStatus, changeNegotiationStatus, withFeaturedOwner } from '../building'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface BuildingNegotiationStatusChanged {
-  name: 'building.negotiation_status_changed';
+  name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED;
   buildingId: string;
   userId: string;
   negotiationStatus: BuildingNegotiationStatus;
@@ -37,12 +38,10 @@ export class UpdateBuildingNegotiationStatusService {
 
     await this.buildingsRepository.save(updatedBuilding)
     await this.eventBus.publish({
-      name: BUILDING_NEGOTIATION_STATUS_CHANGED,
+      name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
       buildingId,
       userId,
       negotiationStatus: status
     } as BuildingNegotiationStatusChanged)
   }
 }
-
-export const BUILDING_NEGOTIATION_STATUS_CHANGED = 'building.negotiation_status_changed'

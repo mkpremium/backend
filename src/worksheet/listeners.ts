@@ -4,7 +4,6 @@ import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
 import {
-  BUILDING_NEGOTIATION_STATUS_CHANGED,
   BuildingNegotiationStatusChanged
 } from '../building/service/update-building-negotiation-status.service'
 import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
@@ -14,6 +13,7 @@ import { InvalidWorksheetFound } from './service/take-next-worksheet.service'
 import { WorksheetRepository } from './repository/worksheet.repository'
 import { Logger } from 'winston'
 import { setStatus } from './domain/worksheet'
+import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.entity'
 
 export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
   const legacyWorksheetRepository = container.resolve('legacyWorksheetRepository') as LegacyWorksheetRepository
@@ -25,7 +25,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
   const consistencyDelay = container.resolve('consistencyDelay') as number
 
   eventBus.on(
-    BUILDING_NEGOTIATION_STATUS_CHANGED,
+    DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
     'worksheet.update_status',
     async ({
              buildingId,

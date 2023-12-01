@@ -1,6 +1,6 @@
-import { BUILDING_NEGOTIATION_STATUS_CHANGED } from '../building/service/update-building-negotiation-status.service'
 import { AwilixContainer } from 'awilix'
 import { EventListener } from '../infrastructure/event-bus'
+import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.entity'
 
 export function scheduledEventsEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
@@ -14,7 +14,7 @@ export function scheduledEventsEventListeners (eventBus: EventListener, containe
     container.resolve('removeCallsOnNewMeetingOrOfferRequest'),
   )
   eventBus.on(
-    BUILDING_NEGOTIATION_STATUS_CHANGED,
+    DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
     'scheduled_events.remove_call',
     container.resolve('removeScheduledCallsOnOwnerRefusal')
   )
