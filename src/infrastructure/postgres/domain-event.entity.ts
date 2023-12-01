@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 export enum DomainEventCatalog {
+  BUILDING__LEAD_CAPTURED='building.lead_captured',
   BUILDING__NEGOTIATION_STATUS_CHANGED = 'building.negotiation_status_changed',
   BUILDING__PROPOSAL_SCHEDULED = 'building.proposal_scheduled',
 
@@ -27,6 +28,9 @@ export class DomainEvent {
     enum: DomainEventCatalog,
   })
   name: DomainEventCatalog
+
+  @Column({ default: 'unknwon' })
+  version: String
 
   @Column({
     type: 'jsonb'

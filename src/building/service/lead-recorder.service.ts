@@ -4,6 +4,7 @@ import { fromPromise } from '../../infrastructure/fp-utils'
 import * as TE from 'fp-ts/TaskEither'
 import { withCapturedLead } from '../building'
 import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface RecordLeadCommand {
   buildingId: string
@@ -14,7 +15,7 @@ export interface RecordLeadCommand {
 }
 
 export interface LeadCaptured {
-  name: 'building.lead_captured'
+  name: DomainEventCatalog.BUILDING__LEAD_CAPTURED
   buildingId: string
   ownerId: string
   contactId: string
@@ -45,7 +46,7 @@ export class LeadRecorderService {
         }
       ),
       TE.chain(() => fromPromise(this.eventBus.publish({
-        name: 'building.lead_captured',
+        name: DomainEventCatalog.BUILDING__LEAD_CAPTURED,
         ...cmd,
       } as LeadCaptured)))
     )

@@ -4,6 +4,7 @@ import { removeFavoriteForNoSaleBuildings } from '../../../src/user/event-listen
 import * as TE from 'fp-ts/TaskEither'
 import { userBuilder } from '../user.builder'
 import { expect } from 'chai'
+import { DomainEventCatalog } from '../../../src/infrastructure/postgres/domain-event.entity'
 
 describe('removeFavoriteForNoSaleBuildings', () => {
   let listener: (evt: BuildingNegotiationStatusChanged) => Promise<void>
@@ -23,7 +24,7 @@ describe('removeFavoriteForNoSaleBuildings', () => {
     usersRepositoryStub.withFavoriteBuilding.returns(TE.of(testUserWithFavoriteBuilding))
 
     await listener({
-      name: 'building.negotiation_status_changed',
+      name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
       negotiationStatus: 'NO VENDE',
       userId: '',
       buildingId: 'test-building-id',
