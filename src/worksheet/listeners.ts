@@ -1,7 +1,6 @@
 import { AwilixContainer } from 'awilix'
 import { EventListener } from '../infrastructure/event-bus'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
-import { SCHEDULED_EVENT_DELETED } from '../scheduled-events/controllers'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
 import {
   BuildingNegotiationStatusChanged
@@ -45,7 +44,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
     })
 
   eventBus.on(
-    SCHEDULED_EVENT_DELETED,
+    DomainEventCatalog.SCHEDULED_EVENTS__EVENT_DELETED,
     'worksheet.remove_scheduled_call',
     async ({ id }) => {
       worksheetQueueActionsService.removeScheduledCallFromWorksheets(id)

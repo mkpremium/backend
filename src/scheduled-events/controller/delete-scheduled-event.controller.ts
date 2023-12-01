@@ -1,6 +1,6 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
-import { SCHEDULED_EVENT_DELETED } from '../controllers'
 import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 const deleteScheduledEvent = (eventBus: EventPublisher) => async (req, res) => {
   const id = req.params.id
@@ -8,7 +8,7 @@ const deleteScheduledEvent = (eventBus: EventPublisher) => async (req, res) => {
   await repo.delete(id)
   await eventBus.publish({
     id,
-    name: SCHEDULED_EVENT_DELETED,
+    name: DomainEventCatalog.SCHEDULED_EVENTS__EVENT_DELETED,
   })
   res.status(204).send()
 }

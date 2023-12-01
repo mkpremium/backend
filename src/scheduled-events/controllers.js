@@ -15,7 +15,5 @@ async function findByIdScheduledEvent (req, res) {
   res.json(scheduleEvent)
 }
 
-export const SCHEDULED_EVENT_DELETED = 'scheduled_events.event_deleted'
-
 export const weekScheduleEventMeetingsController = wrap(weekScheduleEventMeetings)
 export const findScheduledEventController = wrap(findByIdScheduledEvent)
