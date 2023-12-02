@@ -15,7 +15,6 @@ COPY . .
 RUN ["npm", "run", "build"]
 COPY package.json build
 COPY package-lock.json build
-COPY prisma build
 
 RUN ["cp", "-r", "fonts", "build"]
 WORKDIR /app/build
