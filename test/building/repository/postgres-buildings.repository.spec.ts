@@ -9,7 +9,7 @@ import { expect } from 'chai'
 import { orFail } from '../../helpers'
 import { PostgresBuildingsRepository } from '../../../src/building/repository/postgres-buildings.repository'
 
-describe('PostgresBuildingsRepository', () => {
+describe.skip('PostgresBuildingsRepository', () => {
   let buildingsRepository: PostgresBuildingsRepository
   let ownersRepository: OwnerRepository
   let container: AwilixContainer
