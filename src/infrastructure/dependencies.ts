@@ -20,7 +20,6 @@ import aws from 'aws-sdk'
 import { ComposedBus } from './event-bus/composed-bus'
 import { ListenersRegistry } from './event-bus/listeners-registry'
 import { EventPoller } from './event-bus/event-poller'
-import { getClient } from './postgres/client'
 import { EventsRepository } from './postgres/events.repository'
 import { createEventRecorderListener } from './event-bus/event-recorder.listener'
 import { saveDocumentsCommandHandler } from './postgres/save-documents-command-handler'
@@ -60,7 +59,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
     ormDataSource: asValue(dataSource),
-    prismaClient: asFunction(getClient).classic(),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
