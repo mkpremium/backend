@@ -7,18 +7,19 @@ import { pipe } from 'fp-ts/function'
 import { map } from 'fp-ts/TaskEither'
 import { expect } from 'chai'
 import { orFail } from '../../helpers'
-import { PostgresBuildingsRepository } from '../../../src/building/repository/postgres-buildings.repository'
 import uuid from 'uuid/v4'
+import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
+import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
 
 describe.skip('PostgresBuildingsRepository', () => {
-  let buildingsRepository: PostgresBuildingsRepository
+  let buildingsRepository: BuildingsRepository & BuildingsReadRepository
   let ownersRepository: OwnerRepository
   let container: AwilixContainer
 
   beforeEach(async () => {
     container = await createTestContainer()
-    buildingsRepository = container.resolve('postgresBuildingsRepository') as PostgresBuildingsRepository
-    ownersRepository = container.resolve('ownersRepository') as OwnerRepository
+    buildingsRepository = container.resolve('postgresBuildingsRepository') as BuildingsRepository & BuildingsReadRepository
+    ownersRepository = container.resolve('postgresOwnersRepository') as OwnerRepository
   })
 
   it('gets flipper leads', async () => {
