@@ -1,8 +1,17 @@
-import { EventsRepository } from '../postgres/events.repository'
-import type { DomainEvent } from '../postgres/events.repository'
+import { DataSource } from 'typeorm'
+import { DomainEvent } from '../postgres/domain-event.entity'
 
-export function createEventRecorderListener ({ eventsRepository }: { eventsRepository: EventsRepository }) {
-  return async (event: DomainEvent) => {
-    await eventsRepository.saveEvent(event)
+type PublishedEvent = Pick<DomainEvent, 'name'> & any
+
+export function createEventRecorderListener ({ ormDataSource }: {
+  ormDataSource: DataSource
+}) {
+  return async (event: PublishedEvent) => {
+    const repository = ormDataSource.getRepository(DomainEvent)
+    await repository.save({
+      name: event.name,
+      version: event.name || 'unknown',
+      body: event,
+    })
   }
 }

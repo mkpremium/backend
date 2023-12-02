@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import urlparse from 'url-parse'
+import { DomainEvent } from './infrastructure/postgres/domain-event.entity'
 
 
 const parsedDSN = urlparse(process.env['DATABASE_URL'])
@@ -13,8 +14,12 @@ export const AppDataSource = new DataSource({
   database: parsedDSN.pathname.substring(1), // remove slash
   synchronize: process.env.NODE_ENV === 'dev',
   logging: false,
-  entities: [],
-  migrations: [],
+  entities: [
+    DomainEvent
+  ],
+  migrations:[
+    'migrations/*.ts'
+  ],
   subscribers: [],
 })
 
