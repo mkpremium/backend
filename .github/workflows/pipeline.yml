@@ -59,8 +59,6 @@ jobs:
           command: npx ts-node scripts/couchbase/init-db.js
 
       - name: Test
-        env:
-          DATABASE_URL: "postgresql://mkpremium_local_user:mkpremium_local_password@localhost:5432/mkpremium?schema=public"
         run: |
           echo $DATABASE_URL
           npm run test-ci
