@@ -27,46 +27,33 @@ describe('AddProposalForBuilding - Integration', () => {
     .withEmailContact(testCmd.contactId)
     .build()
 
-  before(async () => {
-    try {
-      const { locals: { diContainer } } = await createTestApp()
+  beforeEach(async () => {
+    const { locals: { diContainer } } = await createTestApp()
 
-      addProposalForBuildingService = diContainer.resolve('addProposalForBuildingService')
-      ownersRepository = diContainer.resolve('ownersRepository')
-      buildingsRepository = diContainer.resolve('buildingsRepository')
+    addProposalForBuildingService = diContainer.resolve('addProposalForBuildingService')
+    ownersRepository = diContainer.resolve('ownersRepository')
+    buildingsRepository = diContainer.resolve('buildingsRepository')
 
-      legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
-    } catch (e) {
-      console.error('Error initializing app from test')
-      console.trace(e)
-      throw e
-    }
+    legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
   })
 
   it('saves proposal for building', async () => {
-    try {
+    await ownersRepository.save(testOwner)
+    await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
+    await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
 
-      await ownersRepository.save(testOwner)
-      await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
-      await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
-
-      const proposals = await legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
-      expect(proposals).to.have.lengthOf(1)
-      expect(proposals[ 0 ]).to.be.deep.contains({
-        ownerId: testCmd.ownerId,
-        buildingId: testCmd.buildingId,
-        createdBy: testCmd.createdBy,
-        proposal: testCmd.amount,
-        message: testCmd.message,
-        notificationStatus: 'PENDING',
-        notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
-      })
-      expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
-        .to.be.true
-    } catch (e) {
-      console.error('Error running  test')
-      console.trace(e)
-      throw e
-    }
+    const proposals = await legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
+    expect(proposals).to.have.lengthOf(1)
+    expect(proposals[ 0 ]).to.be.deep.contains({
+      ownerId: testCmd.ownerId,
+      buildingId: testCmd.buildingId,
+      createdBy: testCmd.createdBy,
+      proposal: testCmd.amount,
+      message: testCmd.message,
+      notificationStatus: 'PENDING',
+      notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
+    })
+    expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
+      .to.be.true
   })
 })
