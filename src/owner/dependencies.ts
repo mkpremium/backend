@@ -11,6 +11,7 @@ import { discardNonExistingContactListener } from './event-listener/discard-non-
 import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
 import { createResetOwnerBadContactsHandler } from './command-handler/reset-owner-bad-contacts.handler'
 import { CouchbaseOwnersRepository } from './repository/couchbase-owners.repository'
+import { PostgresOwnersRepository } from './repository/postgres-owners.repository'
 
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
@@ -26,6 +27,7 @@ export const setupOwnerDependencies = (container: AwilixContainer) => {
     changeContactStatusService: asClass(ChangeContactStatusService).singleton().classic(),
     setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
 
+    postgresOwnersRepository: asClass(PostgresOwnersRepository).singleton().classic(),
     couchbaseOwnersRepository: asClass(CouchbaseOwnersRepository).singleton().classic(),
     ownersRepository: aliasTo('couchbaseOwnersRepository'),
     legacyOwnersRepository: asClass(LegacyOwnerRepository).singleton(),
