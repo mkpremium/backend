@@ -13,6 +13,7 @@ import { Owner } from '../owner/owner.entity'
 import { Flipper } from '../flipper/flipper.entity'
 import { DealProposal } from './deal-proposal.entity'
 import _ from 'lodash'
+import { BuildingToOwner } from './building-to-owner.entity'
 
 
 @Entity()
@@ -50,9 +51,8 @@ export class Building extends BaseEntity {
   @OneToMany(() => BuildingImage, image => image.building)
   images: BuildingImage[]
 
-  @ManyToMany(() => Owner, owner => owner.buildings)
-  @JoinTable()
-  owners: Owner[]
+  @OneToMany(() => BuildingToOwner, bo => bo.owner)
+  owners: BuildingToOwner[]
 
   get recentProposal () {
     return _.sortBy(this.proposals || [], '.createdAt').at(-1)
