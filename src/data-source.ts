@@ -24,6 +24,8 @@ export const AppDataSource = new DataSource({
 })
 
 export async function initializeDataSource () {
-  await AppDataSource.initialize()
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize()
+  }
   return AppDataSource
 }
