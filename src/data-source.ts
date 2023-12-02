@@ -22,17 +22,11 @@ export const AppDataSource = new DataSource({
   synchronize: process.env.NODE_ENV === 'dev',
   logging: false,
   entities: [
-    Building,
-    BuildingImage,
-    CouchbaseDocument,
-    DealProposal,
-    DomainEvent,
-    Flipper,
-    Owner,
-    User,
+    '**/*.entity.ts',
   ],
   migrations: [
-    'migrations/*.ts'
+    'migrations/*.ts',
+    'migrations/*.js',
   ],
   subscribers: [],
 })

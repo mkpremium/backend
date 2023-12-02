@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import {
   BuildingAddressProps,
   BuildingLocation,
@@ -49,6 +49,10 @@ export class Building extends BaseEntity {
 
   @OneToMany(() => BuildingImage, image => image.building)
   images: BuildingImage[]
+
+  @ManyToMany(() => Owner, owner => owner.buildings)
+  @JoinTable()
+  owners: Owner[]
 
   get recentProposal () {
     return _.sortBy(this.proposals || [], '.createdAt').at(-1)

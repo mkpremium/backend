@@ -1,4 +1,4 @@
-import { Entity, OneToMany } from 'typeorm'
+import { Entity, ManyToMany, OneToMany } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
 import { Building } from '../building/building.entity'
 
@@ -6,4 +6,7 @@ import { Building } from '../building/building.entity'
 export class Owner extends BaseEntity {
   @OneToMany(() => Building, building => building.featuredOwner)
   featuredInBuildings: Building[]
+
+  @ManyToMany(() =>Building, building => building.owners)
+  buildings: Building[]
 }
