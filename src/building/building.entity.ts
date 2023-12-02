@@ -26,7 +26,7 @@ export class Building extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   lead?: Lead
 
-  @OneToMany(() => Owner, owner => owner.featuredInBuildings, { nullable: true })
+  @ManyToOne(() => Owner, owner => owner.featuredInBuildings, { nullable: true })
   featuredOwner?: Owner
 
   @ManyToOne(() => Flipper, flipper => flipper.assignedBuildings)
