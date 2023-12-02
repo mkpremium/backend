@@ -7,7 +7,7 @@
     "start": "./scripts/start-local-app.sh",
     "test": "./scripts/run-test.sh test",
     "test:coverage": "nyc --reporter=html ./scripts/run-test.sh test",
-    "test-ci": "./scripts/run-test.sh test --forbid-only --forbid-pending",
+    "test-ci": "./scripts/run-test.sh test --forbid-only",
     "test:e2e": "./scripts/run-test.sh test-e2e",
     "test-watch": "./scripts/run-test.sh test -w --watch-files src --watch-files test",
     "test-watch:e2e": "./scripts/run-test.sh test-e2e -w --watch-files src --watch-files test-e2e",

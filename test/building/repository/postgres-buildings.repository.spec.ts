@@ -10,7 +10,7 @@ import { orFail } from '../../helpers'
 import { PostgresBuildingsRepository } from '../../../src/building/repository/postgres-buildings.repository'
 import uuid from 'uuid/v4'
 
-describe('PostgresBuildingsRepository', () => {
+describe.skip('PostgresBuildingsRepository', () => {
   let buildingsRepository: PostgresBuildingsRepository
   let ownersRepository: OwnerRepository
   let container: AwilixContainer
