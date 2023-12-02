@@ -1,10 +1,16 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import urlparse from 'url-parse'
+import { Building } from './building/building.entity'
+import { BuildingImage } from './building/building-image.entity'
+import { DealProposal } from './building/deal-proposal.entity'
 import { DomainEvent } from './infrastructure/postgres/domain-event.entity'
+import { Flipper } from './flipper/flipper.entity'
+import { User } from './user/user.entity'
+import { Owner } from './owner/owner.entity'
 
 
-const parsedDSN = urlparse(process.env['DATABASE_URL'])
+const parsedDSN = urlparse(process.env[ 'DATABASE_URL' ])
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: parsedDSN.hostname,
@@ -15,9 +21,15 @@ export const AppDataSource = new DataSource({
   synchronize: process.env.NODE_ENV === 'dev',
   logging: false,
   entities: [
-    DomainEvent
+    Building,
+    BuildingImage,
+    DealProposal,
+    DomainEvent,
+    Flipper,
+    Owner,
+    User,
   ],
-  migrations:[
+  migrations: [
     'migrations/*.ts'
   ],
   subscribers: [],

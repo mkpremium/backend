@@ -190,6 +190,18 @@ export interface Lead {
   capturedAt: Date
 }
 
+export interface BuildingLocation {
+  lat: number;
+  lng: number;
+}
+
+export interface BuildingMetadataProps {
+  id: string,
+  name: string,
+  mimeType: string,
+  previewUrl: string
+}
+
 export interface BuildingProps {
   id: string;
   address: BuildingAddressProps;
@@ -197,22 +209,14 @@ export interface BuildingProps {
   cadastre?: {
     reference: string;
   };
-  location?: {
-    lat: number;
-    lng: number;
-  };
+  location?: BuildingLocation;
   ownerId?: string;
   negotiationStatus: BuildingNegotiationStatus;
   lead?: Lead
   assignedAgentId?: string;
   use?: string;
   recentProposal?: any
-  metadata: {
-    id: string,
-    name: string,
-    mimeType: string,
-    previewUrl: string
-  }[]
+  metadata: BuildingMetadataProps[]
 }
 
 export const Building = t.struct<BuildingProps>(
