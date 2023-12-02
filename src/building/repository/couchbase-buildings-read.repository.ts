@@ -8,135 +8,44 @@ import _ from 'lodash'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 
 const listBuildingsByQuery = (bucketName, condition) => `
-    SELECT building.id,
-           building.metadata,
-           building.address,
-           building.floorArea,
-           building.location,
-           building.cadastre.reference cadastreReference, {
-        "amount": proposal.proposal, proposal.createdAt, proposal.notificationStatus, proposal.notificationSentAt
-        } latestProposal, building.\`use\`, building.ownerId, building.negotiationStatus, building.salePrice, building.totalExpensesAmount, building.lead, stock[0] stock, ARRAY {m.eventDate, "ownerId": m.event.owner.id, "inPerson": m.event.inPerson} FOR m IN buildingMeetings
-    END buildingMeetings
-    ,
-    ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN owners
-    END owners
-    FROM
-    ${bucketName}
-    building
-    LEFT
-    NEST
-    ${bucketName}
-    stock
-    ON
-    stock
-    .
-    buildingId
-    =
-    META
-    (
-    building
-    )
-    .
-    id
-    AND
-    stock
-    .
-    _documentType
-    =
-    'stock'
+    SELECT
+        building.id,
+        building.metadata,
+        building.address,
+        building.floorArea,
+        building.location,
+        building.cadastre.reference cadastreReference,
+        {
+        "amount": proposal.proposal,
+        proposal.createdAt,
+        proposal.notificationStatus,
+        proposal.notificationSentAt
+        } latestProposal,
+        building.\`use\`,
+        building.ownerId,
+        building.negotiationStatus,
+        building.salePrice,
+        building.totalExpensesAmount,
+        building.lead,
 
-    NEST
-    ${bucketName}
-    owners
-    ON
-    owners
-    .
-    status
-    NOT
-    IN
-    [
-    "ERRONEO",
-    "WITHOUT_CONTACT"
-    ]
-    AND
-    owners
-    .
-    buildingId
-    =
-    META
-    (
-    building
-    )
-    .
-    id
-    AND
-    owners
-    .
-    _documentType
-    =
-    'owner'
+        stock[0] stock,
 
-    LEFT
-    JOIN
-    ${bucketName}
-    proposal
-    ON
-    proposal
-    .
-    _documentType
-    =
-    'building-proposal'
-    AND
-    META
-    (
-    proposal
-    )
-    .
-    id
-    =
-    building
-    .
-    recentProposal
-    .
-    id
+        ARRAY {m.eventDate, "ownerId": m.event.owner.id, "inPerson": m.event.inPerson} FOR m IN buildingMeetings END buildingMeetings,
+    ARRAY {o.id, o.featuredContact, "personId": o.person.id, o.person.firstName, "fullName": o.person.name, o.person.contacts} FOR o IN owners END owners
+FROM ${bucketName} building
+    LEFT NEST ${bucketName} stock ON stock.buildingId = META(building).id AND stock._documentType = 'stock'
 
-    LEFT
-    NEST
-    ${bucketName}
-    buildingMeetings
-    ON
-    buildingMeetings
-    .
-    event
-    .
-    buildingId
-    =
-    META
-    (
-    building
-    )
-    .
-    id
-    AND
-    buildingMeetings
-    .
-    _documentType
-    =
-    'scheduled-event'
-    AND
-    buildingMeetings
-    .
-    type
-    =
-    'MEETINGS'
-    WHERE
-    building
-    .
-    _documentType
-    =
-    'building'
-    AND
-    ${condition}
+    NEST ${bucketName} owners ON owners.status NOT IN ["ERRONEO", "WITHOUT_CONTACT"]
+    AND owners.buildingId = META(building).id
+    AND owners._documentType = 'owner'
+
+    LEFT JOIN ${bucketName} proposal ON proposal._documentType = 'building-proposal'
+    AND META(proposal).id = building.recentProposal.id
+
+    LEFT NEST ${bucketName} buildingMeetings ON buildingMeetings.event.buildingId = META(building).id
+    AND buildingMeetings._documentType = 'scheduled-event' AND buildingMeetings.type = 'MEETINGS'
+    WHERE building._documentType = 'building'
+    AND ${condition}
 `
 const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'building.id IN $1')
 const listProposalsForBuildingIdQuery = bucketName => `
