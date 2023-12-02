@@ -36,7 +36,7 @@ describe('PostgresBuildingsRepository', () => {
     const otherBuilding = buildingBuilder({ id: 'other-building', assignedAgentId: 'test-flipper-id' }).build()
     const ownerOtherBuilding = ownerBuilder({ buildingId: otherBuilding.id, id: 'test-other-owner' }).build()
 
-    await buildingsRepository.create(leadBuilding)
+    await buildingsRepository.save(leadBuilding)
     await ownersRepository.save(ownerLeadBuilding)
     await buildingsRepository.save(otherBuilding)
     await ownersRepository.save(ownerOtherBuilding)
