@@ -1,6 +1,7 @@
 require('honeycomb-beeline')({ disableInstrumentation: true })
 
 require('../src/types')
+require('./factories')
 
 const chai = require('chai')
 const sc = require('sinon-chai')

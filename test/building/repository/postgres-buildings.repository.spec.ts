@@ -10,27 +10,32 @@ import { orFail } from '../../helpers'
 import uuid from 'uuid/v4'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
+import { Factory } from 'rosie'
+import { FlipperRepository } from '../../../src/flipper/flipper.repository'
 
-describe.skip('PostgresBuildingsRepository', () => {
+describe('PostgresBuildingsRepository', () => {
   let buildingsRepository: BuildingsRepository & BuildingsReadRepository
   let ownersRepository: OwnerRepository
+  let flippersRepository: FlipperRepository
   let container: AwilixContainer
 
   beforeEach(async () => {
     container = await createTestContainer()
-    buildingsRepository = container.resolve('postgresBuildingsRepository') as BuildingsRepository & BuildingsReadRepository
-    ownersRepository = container.resolve('postgresOwnersRepository') as OwnerRepository
+    buildingsRepository = container.resolve('postgresBuildingsRepository')
+    ownersRepository = container.resolve('postgresOwnersRepository')
+    flippersRepository = container.resolve('flippersRepository')
   })
 
   it('gets flipper leads', async () => {
-    const assignedFlipperId = uuid()
     const featuredOwnerId = uuid()
     const ownerContactId = uuid()
     const worksheetId = uuid()
+
+    const flipper = await flippersRepository.save(Factory.build('flipper'))
     const leadBuilding = buildingBuilder({
       id: uuid(),
       negotiationStatus: 'LEAD',
-      assignedAgentId: assignedFlipperId,
+      assignedAgentId: flipper.id,
       lead: {
         capturedAt: new Date(),
         ownerId: featuredOwnerId,
@@ -38,8 +43,8 @@ describe.skip('PostgresBuildingsRepository', () => {
         worksheetId: worksheetId,
       }
     }).build()
-    const ownerLeadBuilding = ownerBuilder({ buildingId: leadBuilding.id, id: uuid() }).build()
-    const otherBuilding = buildingBuilder({ assignedAgentId: assignedFlipperId, id: uuid() }).build()
+    const ownerLeadBuilding = await ownersRepository.save(ownerBuilder({ id: uuid() }).build())
+    const otherBuilding = buildingBuilder({ assignedAgentId: flipper.id, id: uuid() }).build()
     const ownerOtherBuilding = ownerBuilder({ buildingId: otherBuilding.id, id: uuid() }).build()
 
     await buildingsRepository.save(leadBuilding)
@@ -48,7 +53,7 @@ describe.skip('PostgresBuildingsRepository', () => {
     await ownersRepository.save(ownerOtherBuilding)
 
     return pipe(
-      buildingsRepository.assignedToFlipperAndWithStatus(assignedFlipperId, 'LEAD'),
+      buildingsRepository.assignedToFlipperAndWithStatus(flipper.id, 'LEAD'),
       map(buildings => {
         expect(buildings).to.have.lengthOf(1)
         expect(buildings[ 0 ].id).to.eql(leadBuilding.id)

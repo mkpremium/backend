@@ -28,10 +28,14 @@ export class PostgresBuildingsRepository
 
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TaskEither<Error, BuildingReadModel[]> {
     return pipe(
-      fromPromise(this.repository.findBy({
-        assignedFlipper: Equal(flipperId),
-        negotiationStatus: status
-      })),
+      fromPromise(this.repository.find(
+        {
+          where: { assignedFlipper: Equal(flipperId), negotiationStatus: status },
+          relations: {
+            images: true,
+          }
+        },
+      )),
       TE.chain(buildings => TE.of(buildings.map(mapEntityToReadModel)))
     )
   }
@@ -57,7 +61,7 @@ export class PostgresBuildingsRepository
   }
 
   protected entityToStruct (entity: Building): BuildingProps {
-    return undefined
+    return null
   }
 
   protected structToEntity (buildingStruct: BuildingProps): Partial<Building> {
@@ -78,6 +82,65 @@ export class PostgresBuildingsRepository
 }
 
 
-function mapEntityToReadModel (entity: Building): BuildingReadModel {
-  return {} as BuildingReadModel
+function mapEntityToReadModel ({ id, images, lead }: Building): BuildingReadModel {
+  return {
+    id,
+    lead,
+    metadata: images.map(({ id, mimeType, previewUrl }) => ({
+      id,
+      mimeType,
+      thumbnailUrl: previewUrl
+    })),
+    // stock: {
+    //   purchase: stock && stock.purchase ? {
+    //     reservationAmount: stock.purchase.reservationAmount,
+    //     reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
+    //     transactionAmount: stock.purchase.transactionAmount,
+    //     transactionDate: moment(stock.purchase.transactionDate).format()
+    //   } : undefined,
+    //   sell: stock && stock.sell ? {
+    //     reservationAmount: stock.sell.reservationAmount,
+    //     reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
+    //     transactionAmount: stock.sell.transactionAmount,
+    //     transactionDate: moment(stock.sell.transactionDate).format()
+    //   } : undefined,
+    //   close: stock && stock.close ? {
+    //     gain: stock.close.gain,
+    //     transactionDate: moment(stock.close.transactionDate).format()
+    //   } : undefined
+    // },
+    // latestProposal: latestProposal && latestProposal.amount ? latestProposal : undefined,
+    // address: address ? {
+    //   neighborhood: address.neighborhood ? address.neighborhood : undefined,
+    //   type: address.type ? address.type : undefined,
+    //   street: address.street ? address.street : undefined,
+    //   number: address.number ? address.number : undefined,
+    //   postalCode: address.postalCode && address.postalCode.number ? {
+    //     number: address.postalCode.number
+    //   } : undefined,
+    //   city: address.city ? address.city : undefined,
+    //   province: address.province ? address.province : undefined
+    // } : undefined,
+    // geolocation: location && (location.lat || location.lng) ? {
+    //   latitude: location.lat ? location.lat : undefined,
+    //   longitude: location.lng ? location.lng : undefined
+    // } : undefined,
+    // cadastreReference: cadastreReference || undefined,
+    // negotiationStatus: negotiationStatus || undefined,
+    // floorArea,
+    // usage: use !== null ? use : undefined,
+    // owner: (featuredOwner && {
+    //   id: featuredOwner.id,
+    //   firstName: _.get(featuredOwner, 'firstName'),
+    //   name: _.get(featuredOwner, 'fullName'),
+    //   contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
+    //   featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
+    // }) || undefined,
+    // lastMeeting: (lastMeeting && {
+    //   dateMeeting: moment(lastMeeting.eventDate).format(),
+    //   inPerson: lastMeeting.inPerson
+    // }) || undefined,
+    // salePrice: salePrice || undefined,
+    // totalExpensesAmount: totalExpensesAmount || undefined,
+  } as BuildingReadModel
 }
