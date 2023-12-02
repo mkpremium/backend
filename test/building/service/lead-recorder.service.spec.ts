@@ -5,6 +5,7 @@ import { pipe } from 'fp-ts/function'
 import { map } from 'fp-ts/TaskEither'
 import { orFail } from '../../helpers'
 import { buildingBuilder } from '../building.builder'
+import { DomainEventCatalog } from '../../../src/infrastructure/postgres/domain-event.entity'
 
 describe('LeadRecorderService', () => {
   let service: LeadRecorderService
@@ -45,7 +46,7 @@ describe('LeadRecorderService', () => {
       service.recordLead(testCmd),
       map(() => {
         expect(eventBusStub.publish).to.have.been.calledWith(sinon.match({
-          name: 'building.lead_captured',
+          name: DomainEventCatalog.BUILDING__LEAD_CAPTURED,
           buildingId: testCmd.buildingId,
           ownerId: testCmd.ownerId,
           contactId: testCmd.contactId,
