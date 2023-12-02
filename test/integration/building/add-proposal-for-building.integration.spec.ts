@@ -44,22 +44,29 @@ describe('AddProposalForBuilding - Integration', () => {
   })
 
   it('saves proposal for building', async () => {
-    await ownersRepository.save(testOwner)
-    await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
-    await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
+    try {
 
-    const proposals = await legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
-    expect(proposals).to.have.lengthOf(1)
-    expect(proposals[ 0 ]).to.be.deep.contains({
-      ownerId: testCmd.ownerId,
-      buildingId: testCmd.buildingId,
-      createdBy: testCmd.createdBy,
-      proposal: testCmd.amount,
-      message: testCmd.message,
-      notificationStatus: 'PENDING',
-      notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
-    })
-    expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
-      .to.be.true
+      await ownersRepository.save(testOwner)
+      await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
+      await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
+
+      const proposals = await legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
+      expect(proposals).to.have.lengthOf(1)
+      expect(proposals[ 0 ]).to.be.deep.contains({
+        ownerId: testCmd.ownerId,
+        buildingId: testCmd.buildingId,
+        createdBy: testCmd.createdBy,
+        proposal: testCmd.amount,
+        message: testCmd.message,
+        notificationStatus: 'PENDING',
+        notificationEmail: contactOfId(testOwner, testCmd.contactId).value,
+      })
+      expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
+        .to.be.true
+    } catch (e) {
+      console.error('Error running  test')
+      console.trace(e)
+      throw e
+    }
   })
 })
