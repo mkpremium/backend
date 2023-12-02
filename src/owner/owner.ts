@@ -272,6 +272,7 @@ export interface PersonProps {
   firstName?: string,
   firstSurname?: string,
   secondSurname?: string,
+  documentNumber?: string,
 
   contacts: ContactProps[],
 }

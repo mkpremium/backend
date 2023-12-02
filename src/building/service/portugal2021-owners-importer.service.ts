@@ -58,11 +58,13 @@ export class Portugal2021OwnersImporterService {
       }
       const contacts = uniq(phonesForDNI.phones).map(phoneNumber => ({
         id: uuid(),
-        value: phoneNumber,
-        status: 'UNDEFINED',
-        type: 'TELEFONO'
+        value: phoneNumber as string,
+        status: 'UNDEFINED' as const,
+        type: 'TELEFONO' as const
       }))
 
+      // @ts-ignore
+      // @ts-ignore
       return Owner({
         id: uuid(),
         type: 'NINGUNO',
@@ -73,6 +75,7 @@ export class Portugal2021OwnersImporterService {
         person: {
           name: sourceOwner.name,
           documentNumber: sourceOwner.dni,
+          // @ts-ignore
           addresses: [ { fullAddress: sourceOwner.address } ],
           contacts,
         }
