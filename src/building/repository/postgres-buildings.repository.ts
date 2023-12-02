@@ -19,6 +19,7 @@ export class PostgresBuildingsRepository implements BuildingsRepository, Buildin
       id: buildingStruct.id,
       address: buildingStruct.address,
       negotiationStatus: buildingStruct.negotiationStatus,
+      // TODO: validate lead IDs (contact, owner, and worksheet)
       lead: buildingStruct.lead,
       featuredOwnerId: buildingStruct.ownerId,
       assignedFlipperId: buildingStruct.assignedAgentId,

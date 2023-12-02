@@ -8,8 +8,9 @@ import { map } from 'fp-ts/TaskEither'
 import { expect } from 'chai'
 import { orFail } from '../../helpers'
 import { PostgresBuildingsRepository } from '../../../src/building/repository/postgres-buildings.repository'
+import uuid from 'uuid/v4'
 
-describe.skip('PostgresBuildingsRepository', () => {
+describe('PostgresBuildingsRepository', () => {
   let buildingsRepository: PostgresBuildingsRepository
   let ownersRepository: OwnerRepository
   let container: AwilixContainer
@@ -21,20 +22,24 @@ describe.skip('PostgresBuildingsRepository', () => {
   })
 
   it('gets flipper leads', async () => {
+    const assignedFlipperId = uuid()
+    const featuredOwnerId = uuid()
+    const ownerContactId = uuid()
+    const worksheetId = uuid()
     const leadBuilding = buildingBuilder({
-      id: 'test-lead-building',
+      id: uuid(),
       negotiationStatus: 'LEAD',
-      assignedAgentId: 'test-flipper-id',
+      assignedAgentId: assignedFlipperId,
       lead: {
         capturedAt: new Date(),
-        ownerId: 'test-owner-id',
-        contactId: 'test-contact-id',
-        worksheetId: 'test-worksheet-id',
+        ownerId: featuredOwnerId,
+        contactId: ownerContactId,
+        worksheetId: worksheetId,
       }
     }).build()
-    const ownerLeadBuilding = ownerBuilder({ buildingId: leadBuilding.id, id: 'test-lead-owner' }).build()
-    const otherBuilding = buildingBuilder({ id: 'other-building', assignedAgentId: 'test-flipper-id' }).build()
-    const ownerOtherBuilding = ownerBuilder({ buildingId: otherBuilding.id, id: 'test-other-owner' }).build()
+    const ownerLeadBuilding = ownerBuilder({ buildingId: leadBuilding.id, id: uuid() }).build()
+    const otherBuilding = buildingBuilder({ assignedAgentId: assignedFlipperId, id: uuid() }).build()
+    const ownerOtherBuilding = ownerBuilder({ buildingId: otherBuilding.id, id: uuid() }).build()
 
     await buildingsRepository.save(leadBuilding)
     await ownersRepository.save(ownerLeadBuilding)
@@ -42,10 +47,10 @@ describe.skip('PostgresBuildingsRepository', () => {
     await ownersRepository.save(ownerOtherBuilding)
 
     return pipe(
-      buildingsRepository.assignedToFlipperAndWithStatus('test-flipper-id', 'LEAD'),
+      buildingsRepository.assignedToFlipperAndWithStatus(assignedFlipperId, 'LEAD'),
       map(buildings => {
         expect(buildings).to.have.lengthOf(1)
-        expect(buildings[ 0 ].id).to.eql('test-lead-building')
+        expect(buildings[ 0 ].id).to.eql(leadBuilding.id)
         expect(buildings[ 0 ].lead).to.be.ok
       }),
       orFail()
