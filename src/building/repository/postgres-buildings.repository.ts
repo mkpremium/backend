@@ -2,15 +2,36 @@ import { BuildingsRepository } from './buildings.repository'
 import { BuildingNegotiationStatus, BuildingProps } from '../building'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 import { TaskEither } from 'fp-ts/TaskEither'
+import { DataSource, Repository } from 'typeorm'
+import { Building } from '../building.entity'
+import { Building as BuildingStruct } from '../building'
 
 export class PostgresBuildingsRepository implements BuildingsRepository, BuildingsReadRepository {
-  constructor () {
+  private repository: Repository<Building>
+
+  constructor (ormDataSource: DataSource) {
+    this.repository = ormDataSource.getRepository(Building)
   }
 
   // Repository
+  async save (buildingStruct: BuildingProps): Promise<any> {
+    const savedEntity = await this.repository.save({
+      id: buildingStruct.id,
+      address: buildingStruct.address,
+      negotiationStatus: buildingStruct.negotiationStatus,
+      lead: buildingStruct.lead,
+      featuredOwnerId: buildingStruct.ownerId,
+      assignedFlipperId: buildingStruct.assignedAgentId,
+      floorArea: typeof buildingStruct.floorArea === 'string' ? parseFloat(buildingStruct.floorArea) : buildingStruct.floorArea,
+      publicIdentifier: buildingStruct.cadastre?.reference,
+      location: buildingStruct.location,
+      use: buildingStruct.use,
+    })
+    if (!buildingStruct.id) {
+      buildingStruct =  BuildingStruct.update(buildingStruct, { $set: { id: savedEntity.id } })
+    }
 
-  save (data: BuildingProps): Promise<any> {
-    return Promise.reject(new Error('Not implemented'))
+    return buildingStruct
   }
 
   get (id: string): Promise<BuildingProps> {
