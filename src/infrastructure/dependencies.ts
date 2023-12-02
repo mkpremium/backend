@@ -20,7 +20,6 @@ import aws from 'aws-sdk'
 import { ComposedBus } from './event-bus/composed-bus'
 import { ListenersRegistry } from './event-bus/listeners-registry'
 import { EventPoller } from './event-bus/event-poller'
-import { EventsRepository } from './postgres/events.repository'
 import { createEventRecorderListener } from './event-bus/event-recorder.listener'
 import { saveDocumentsCommandHandler } from './postgres/save-documents-command-handler'
 import { initializeDataSource } from '../data-source'
@@ -69,7 +68,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     composedEventBus: asClass(ComposedBus).classic().singleton(),
     eventBus: aliasTo(process.env.NODE_ENV === 'test' ? 'eventEmitterBus' : 'sqsEventBus'),
-    eventsRepository: asClass(EventsRepository).classic(),
     eventRecorderListener: asFunction(createEventRecorderListener),
     saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandler),
     logger: asFunction(initLogger).singleton(),

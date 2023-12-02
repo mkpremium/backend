@@ -1,6 +1,5 @@
 import { BuildingsRepository } from './buildings.repository'
 import { BuildingNegotiationStatus, BuildingProps } from '../building'
-import Promise from 'bluebird'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 import { TaskEither } from 'fp-ts/TaskEither'
 
@@ -9,6 +8,7 @@ export class PostgresBuildingsRepository implements BuildingsRepository, Buildin
   }
 
   // Repository
+
   save (data: BuildingProps): Promise<any> {
     return Promise.reject(new Error('Not implemented'))
   }
@@ -18,6 +18,7 @@ export class PostgresBuildingsRepository implements BuildingsRepository, Buildin
   }
 
   // BuildingsRepository
+
   assignBuildingToAgent (buildingId: string, agentId: string): Promise<void> {
     return Promise.reject(new Error('Not implemented'))
   }
@@ -27,6 +28,7 @@ export class PostgresBuildingsRepository implements BuildingsRepository, Buildin
   }
 
   //   BuildingsReadRepository
+
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TaskEither<Error, BuildingReadModel[]> {
     throw new Error('Not implemented')
   }
