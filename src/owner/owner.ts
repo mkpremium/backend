@@ -101,7 +101,7 @@ export const FeaturedContact = t.struct({
   emailId: t.maybe(t.String)
 })
 
-export const Owner = t.struct(
+export const Owner = t.struct<OwnerProps>(
   {
     id: t.maybe(t.String),
     type: OwnerTypeEnum,
