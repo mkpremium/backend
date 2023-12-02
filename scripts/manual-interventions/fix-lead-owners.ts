@@ -5,6 +5,7 @@ import { initLogger } from '../../src/infrastructure/logger'
 import { OwnerRepository } from '../../src/owner/repository/owner.repository'
 import { mergeFeaturedContact } from '../../src/owner/owner'
 import { CouchbaseBuildingsRepository } from '../../src/building/repository/couchbase-building.repository'
+import { CouchbaseOwnersRepository } from '../../src/owner/repository/couchbase-owners.repository'
 
 const logger = initLogger()
 
@@ -15,7 +16,7 @@ export function migrate (dry = false) {
       return {
         couchbaseAdapter,
         buildingsRepository: new CouchbaseBuildingsRepository(couchbaseAdapter),
-        ownersRepository: new OwnerRepository(couchbaseAdapter),
+        ownersRepository: new CouchbaseOwnersRepository(couchbaseAdapter),
       }
     })
     .then(async ({ buildingsRepository, ownersRepository, couchbaseAdapter }) => {

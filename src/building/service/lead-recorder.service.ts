@@ -34,7 +34,7 @@ export class LeadRecorderService {
       TE.chain(
         building => {
           if (building.lead) {
-            return TE.of(constVoid)
+            return TE.of(building)
           }
 
           const lead = withCapturedLead(building, cmd.toFlipperId, {
