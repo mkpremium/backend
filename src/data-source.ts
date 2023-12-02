@@ -1,14 +1,6 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import urlparse from 'url-parse'
-import { Building } from './building/building.entity'
-import { BuildingImage } from './building/building-image.entity'
-import { DealProposal } from './building/deal-proposal.entity'
-import { DomainEvent } from './infrastructure/postgres/domain-event.entity'
-import { Flipper } from './flipper/flipper.entity'
-import { User } from './user/user.entity'
-import { Owner } from './owner/owner.entity'
-import { CouchbaseDocument } from './infrastructure/postgres/couchbase-document.entity'
 
 
 const parsedDSN = urlparse(process.env[ 'DATABASE_URL' ])
