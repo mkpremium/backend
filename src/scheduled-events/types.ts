@@ -1,6 +1,7 @@
 import t from 'tcomb'
 import { OwnerWithInclude } from '../owner/owner'
 import { DateTimeString } from '../infrastructure/shared-types'
+import { CouchbaseDocumentType } from '../infrastructure/postgres/couchbase-document.entity'
 
 export const ScheduledEventType = {
   CALLS: 'CALLS',
@@ -46,7 +47,7 @@ export const ScheduledEvent = t.struct<ScheduledEventProps>(
   {
     name: 'ScheduledEvent',
     defaultProps: {
-      _documentType: 'scheduled-event',
+      _documentType: CouchbaseDocumentType.SCHEDULED_EVENT,
       event: {},
       get createdAt () {
         return new Date()
