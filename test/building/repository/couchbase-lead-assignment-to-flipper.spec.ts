@@ -11,7 +11,7 @@ import { ownerBuilder } from '../../owner/owner.builder'
 import { AwilixContainer } from 'awilix'
 import { CouchbaseBuildingsReadRepository } from '../../../src/building/repository/couchbase-buildings-read.repository'
 
-describe('CouchbaseBuildingsReadRepository', () => {
+describe('Lead assignment to flipper (Couchbase)', () => {
   let readRepository: BuildingsReadRepository
   let writeRepository: BuildingsRepository
   let ownersRepository: OwnerRepository

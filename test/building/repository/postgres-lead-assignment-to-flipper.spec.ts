@@ -13,7 +13,7 @@ import { BuildingsReadRepository } from '../../../src/building/repository/buildi
 import { Factory } from 'rosie'
 import { FlipperRepository } from '../../../src/flipper/flipper.repository'
 
-describe('Lead assignment to flipper', () => {
+describe('Lead assignment to flipper (Postgres)', () => {
   let buildingsRepository: BuildingsRepository & BuildingsReadRepository
   let ownersRepository: OwnerRepository
   let flippersRepository: FlipperRepository
