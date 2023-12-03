@@ -10,7 +10,7 @@ export const ScheduledEventType = {
 
 export const ScheduledEventTypeEnum = t.enums.of(Object.values(ScheduledEventType), 'ScheduledEventType')
 
-export const Event = t.struct(
+export const Event = t.struct<EventProps>(
   {
     owner: t.maybe(OwnerWithInclude),
     ownerId: t.String,
