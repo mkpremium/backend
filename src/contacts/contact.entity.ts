@@ -1,6 +1,6 @@
 import { Column, Entity } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
-import { ContactStatus, ContactType } from '../owner/owner'
+import { ContactType } from '../owner/owner'
 
 @Entity()
 export class Contact extends BaseEntity {
@@ -9,7 +9,4 @@ export class Contact extends BaseEntity {
 
   @Column('text')
   type: ContactType
-
-  @Column('text')
-  status: ContactStatus
 }

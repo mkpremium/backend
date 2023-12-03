@@ -262,13 +262,13 @@ export class WrongFeaturedContact extends Error {
 
 export type ContactType = 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB'
 
-export type ContactStatus = 'UNDEFINED' | 'GOOD' | 'BAD'
+export type OwnerContactStatus = 'UNDEFINED' | 'GOOD' | 'BAD'
 
 export interface ContactProps {
   id: string;
   type: ContactType;
   value: string;
-  status: ContactStatus;
+  status: OwnerContactStatus;
 }
 
 export interface PersonProps {
