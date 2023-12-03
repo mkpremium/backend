@@ -53,7 +53,7 @@ describe('Portugal2021BuildingsRepository', () => {
     return pipe(
       repository.phoneNumbersFor([ 'dni-1', 'dni-2' ]),
       map((foundPhones) => {
-        expect(foundPhones).to.be.eql([
+        expect(foundPhones).to.have.members([
           { id: 'dni-1', phones: [ '666666666' ] },
           { id: 'dni-2', phones: [ '666666667' ] },
         ])
