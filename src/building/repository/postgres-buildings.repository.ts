@@ -61,7 +61,7 @@ export class PostgresBuildingsRepository
   }
 
   protected entityToStruct (entity: Building): BuildingProps {
-    return null
+    throw new Error('Not implemented')
   }
 
   protected structToEntity (buildingStruct: BuildingProps): Partial<Building> {
