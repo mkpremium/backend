@@ -10,18 +10,12 @@ import { CouchbaseBuildingsRepository } from '../../../src/building/repository/c
 import { CouchbaseOwnersRepository } from '../../../src/owner/repository/couchbase-owners.repository'
 
 describe('CouchbaseWorksheetRepository', () => {
-  let repository: CouchbaseWorksheetRepository
-  let buildingsRepository: CouchbaseBuildingsRepository
-  let ownersRepository: CouchbaseOwnersRepository
-
-  beforeEach(async () => {
+  it('gets worksheet with callcenter view', async () => {
     const container = await createTestContainer()
-    repository = container.resolve('worksheetRepository')
-    buildingsRepository = container.resolve('buildingsRepository')
-    ownersRepository = container.resolve('ownersRepository')
-  })
+    const repository: CouchbaseWorksheetRepository = container.resolve('worksheetRepository')
+    const buildingsRepository: CouchbaseBuildingsRepository = container.resolve('buildingsRepository')
+    const ownersRepository: CouchbaseOwnersRepository = container.resolve('ownersRepository')
 
-  it('gets worksheet with callcenter view', () => {
     const testWorksheetId = 'test-worksheet-id'
     const testBuilding = buildingBuilder({
       cadastre: {
