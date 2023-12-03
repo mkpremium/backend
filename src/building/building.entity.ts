@@ -14,6 +14,7 @@ import { Flipper } from '../flipper/flipper.entity'
 import { DealProposal } from './deal-proposal.entity'
 import _ from 'lodash'
 import { BuildingToOwner } from './building-to-owner.entity'
+import { Worksheet } from '../worksheet/worksheet.entity'
 
 
 @Entity()
@@ -53,6 +54,9 @@ export class Building extends BaseEntity {
 
   @OneToMany(() => BuildingToOwner, bo => bo.owner)
   owners: BuildingToOwner[]
+
+  @OneToOne(() => Worksheet, worksheet => worksheet.building)
+  worksheet: Worksheet
 
   get recentProposal () {
     return _.sortBy(this.proposals || [], '.createdAt').at(-1)
