@@ -15,7 +15,7 @@ export type WorksheetBuildingAddressProps = Omit<BuildingAddressProps, 'fullAddr
     }
   }
 
-type WorksheetBuildingProps = Omit<BuildingProps, 'cadastre' | 'address' | 'assignedAgentId' | 'ownerId'>
+export type WorksheetBuildingProps = Omit<BuildingProps, 'cadastre' | 'address' | 'assignedAgentId' | 'ownerId'>
   & {
   address: WorksheetBuildingAddressProps;
   metadata: {

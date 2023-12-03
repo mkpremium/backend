@@ -1,4 +1,4 @@
-import { FoundOwner, OwnerRepository } from './owner.repository'
+import { FoundOwnerProps, OwnerRepository } from './owner.repository'
 import { OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
@@ -10,7 +10,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return Promise.reject(new Error('Not implemented'))
   }
 
-  findByPhoneNumber (phoneNumber: string): Promise<typeof FoundOwner[]> {
+  findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]> {
     return Promise.reject(new Error('Not implemented'))
   }
 

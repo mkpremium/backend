@@ -3,7 +3,7 @@ import { Owner, OwnerProps } from '../owner'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import t from 'tcomb'
-import { BuildingOwner, FoundOwner } from './owner.repository'
+import { BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
 
 
 const findOwnerByContactValueQuery = bucketName => `
@@ -65,8 +65,8 @@ FROM ${bucketName} owner
 WHERE _documentType = 'owner' and buildingId = $1
 `
 
-export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> {
-  async findByPhoneNumber (phoneNumber) {
+export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> implements OwnerRepository {
+  async findByPhoneNumber (phoneNumber: string) {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),
       [ phoneNumber ]
@@ -97,7 +97,7 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> {
   }
 }
 
-export function parseFoundPhones (phoneNumber) {
+export function parseFoundPhones (phoneNumber): (result: any[]) => FoundOwnerProps[] {
   return function (result) {
     return fromJSON(result.map(rec => {
       const matchingContactIdx = rec.contacts.findIndex(c => c.value === phoneNumber)

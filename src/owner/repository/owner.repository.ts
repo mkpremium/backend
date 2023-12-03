@@ -1,15 +1,36 @@
-import { Owner, OwnerProps } from '../owner'
+import { OwnerProps } from '../owner'
 import t from 'tcomb'
-import { CouchbaseRepository } from '../../db/couchbase.repository'
-import fromJSON from 'tcomb/lib/fromJSON'
-import { logger } from '../../infrastructure/logger'
 import { DateTimeString } from '../../infrastructure/shared-types'
-import { NegotiationStatus } from '../../building/building'
-import { WorksheetBuilding } from '../../worksheet/repository/worksheet.repository'
+import { BuildingNegotiationStatus, NegotiationStatus } from '../../building/building'
+import { WorksheetBuilding, WorksheetBuildingProps, } from '../../worksheet/repository/worksheet.repository'
 import { Repository } from '../../db/repository'
 
 
-export const FoundOwner = t.struct({
+export interface FoundOwnerProps {
+  id: string
+  buildingId: string,
+  negotiationStatus: BuildingNegotiationStatus,
+  worksheetId: string,
+  scheduledCalls: { at: string }[],
+  matchingContactId: string,
+  name: string,
+  contacts: {
+    id: string,
+    value: string,
+    type: 'TELEFONO' | 'MOVIL' | 'EMAIL',
+    status: 'UNDEFINED' | 'GOOD' | 'BAD'
+  }[]
+  lastEvent?: {
+    eventDate: string,
+    type: 'meeting' | 'offer-request',
+    ownerId: string,
+    flipperName: string
+  },
+  building: WorksheetBuildingProps,
+}
+
+
+export const FoundOwner = t.struct<FoundOwnerProps>({
   id: t.String,
   buildingId: t.String,
   negotiationStatus: NegotiationStatus,
@@ -47,11 +68,11 @@ export const BuildingOwner = t.struct({
     phoneId: t.maybe(t.String),
     emailId: t.maybe(t.String)
   })),
-  status: t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT'])
+  status: t.enums.of([ 'NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT' ])
 })
 
 export interface OwnerRepository extends Repository<OwnerProps> {
-  findByPhoneNumber (phoneNumber: string): Promise<typeof FoundOwner[]>
+  findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]>
 
   buildingOwners (buildingId: string): Promise<OwnerProps[]>
 }
