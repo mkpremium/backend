@@ -5,9 +5,14 @@ import { worksheetBuilder } from '../worksheet.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { ownerBuilder } from '../../owner/owner.builder'
 import { validate } from 'tcomb-validation'
+import { CouchbaseWorksheetRepository } from '../../../src/worksheet/repository/couchbase-worksheet.repository'
+import { CouchbaseBuildingsRepository } from '../../../src/building/repository/couchbase-building.repository'
+import { CouchbaseOwnersRepository } from '../../../src/owner/repository/couchbase-owners.repository'
 
-describe('worksheet.repository', () => {
-  let repository, buildingsRepository, ownersRepository
+describe('CouchbaseWorksheetRepository', () => {
+  let repository: CouchbaseWorksheetRepository
+  let buildingsRepository: CouchbaseBuildingsRepository
+  let ownersRepository: CouchbaseOwnersRepository
 
   beforeEach(async () => {
     const container = await createTestContainer()
