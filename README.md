@@ -1,6 +1,5 @@
 # Backend
 
-
 ## Instalación
 
 ```bash
@@ -19,23 +18,23 @@ npm start
 
 El comando creará 20 edificios y los siguientes usuarios.
 
-Nombre de Usuario | Contraseña | Rol
-----|---|---
-admin | admin | ADMIN
-flipper | flipper1 | FLIPPER
-caller | caller10 | CALLER
-flipper-caller | flipper-caller1 | FLIPPER, CALLER
+ Nombre de Usuario | Contraseña      | Rol             
+-------------------|-----------------|-----------------
+ admin             | admin           | ADMIN           
+ flipper           | flipper1        | FLIPPER         
+ caller            | caller10        | CALLER          
+ flipper-caller    | flipper-caller1 | FLIPPER, CALLER 
 
 ## Crear edificios de prueba
 
 - Utilizar endpoint `test-harness => Create Test Building` en Postman.
 
-
 ## Gestión de nodos Couchbase
 
 ### Añadir nodo
 
-1. Usar [este](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchTemplateDetails:launchTemplateId=lt-0f071d39b784bfdf1) `Launch Template`.
+1.
+Usar [este](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchTemplateDetails:launchTemplateId=lt-0f071d39b784bfdf1) `Launch Template`.
 2. Añadir servidores desde consola de Couchbase
 3. Crear indices.
 4. Apuntar servicios a nuevas instancias.
@@ -48,3 +47,55 @@ flipper-caller | flipper-caller1 | FLIPPER, CALLER
 3. **Asegurarse de que hayan otros nodos con indices**
 4. Quitar nodo del cluster desde consola de Couchbase.
 5. Parar o terminar instancia en EC2.
+
+## Consultas de Couchbase
+
+### Siguiente ficha disponible
+
+```
+SELECT worksheet.id
+FROM mkpremium worksheet
+
+WHERE worksheet._documentType = 'worksheet'
+  AND worksheet.status IN ['OPEN', 'LOOKING_MEETING']
+AND worksheet.queueId IS NULL
+AND worksheet.buildingAddress.province IN ["MADRID","BARCELONA","ILLES BALEARS","VALENCIA"]
+
+ORDER BY worksheet.viewedAt LIMIT 1
+```
+
+### Ficha para callcenter
+
+```
+SELECT worksheet.id      id,
+       worksheet.status  status,
+       worksheet.queueId queueId,
+       {
+        building.id, building.address, building.metadata, building.`use`, "usage": building.`use`,
+        building.location, building.recentProposal, building.cadastre, building.floorArea,
+        "negotiationStatus": CASE WHEN building.negotiationStatus IS MISSING 
+            THEN "PENDIENTE"
+            ELSE building.negotiationStatus
+            END,
+        "featuredOwnerId": building.ownerId,
+        "cadastreReference": building.cadastre.reference
+        } building,
+        ARRAY {
+            o.id,
+            o.name,
+            o.featuredContact,
+            o.type,
+            o.status,
+            "person": {
+                "contacts": ARRAY c FOR c IN o.person.contacts WHEN c.status != 'BAD' END
+            }
+        } FOR o IN owners END relatedOwners
+
+FROM mkpremium worksheet
+JOIN mkpremium building ON building._documentType = 'building'
+                            AND building.id = worksheet.relatedBuildingIds[0]
+NEST mkpremium owners ON owners._documentType = 'owner' AND owners.buildingId = building.id
+                          AND owners.status NOT IN ['WITHOUT_CONTACT', 'ERRONEO']
+
+WHERE worksheet._documentType = 'worksheet' AND worksheet.id = $1
+```
