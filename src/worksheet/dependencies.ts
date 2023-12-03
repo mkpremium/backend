@@ -10,6 +10,7 @@ import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { LegacyWorksheetQueueRepository } from './models/queue-repository'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { CouchbaseWorksheetRepository } from './repository/couchbase-worksheet.repository'
+import { PostgresWorksheetRepository } from './repository/postgres-worksheet.repository'
 
 export const setupWorksheetDependencies = diContainer => {
   diContainer.register({
@@ -23,6 +24,7 @@ export const setupWorksheetDependencies = diContainer => {
       .inject(() => ({ maxOpenedWorksheetPerQueueAndUser: 2 })),
 
     couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
+    postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
     worksheetRepository: aliasTo('couchbaseWorksheetRepository'),
     worksheetQueueRepository: asClass(WorksheetQueueRepository).classic().singleton(),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
