@@ -25,7 +25,7 @@ describe('PostgresOfferRequestsRepository', () => {
 
   before(async () => {
     console.log('process.env.DATABASE_URL', process.env.DATABASE_URL)
-    const container = await createTestContainer()
+    const container = await createTestContainer({postgres: true, couchbase: false})
     buildingsRepository = container.resolve('postgresBuildingsRepository')
     ownersRepository = container.resolve('postgresOwnersRepository')
     contactsRepository = container.resolve('contactsRepository')

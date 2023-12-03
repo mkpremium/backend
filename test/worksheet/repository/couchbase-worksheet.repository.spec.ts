@@ -11,7 +11,7 @@ import { CouchbaseOwnersRepository } from '../../../src/owner/repository/couchba
 
 describe('CouchbaseWorksheetRepository', () => {
   it('gets worksheet with callcenter view', async () => {
-    const container = await createTestContainer()
+    const container = await createTestContainer({postgres: false, couchbase: true})
     const repository: CouchbaseWorksheetRepository = container.resolve('worksheetRepository')
     const buildingsRepository: CouchbaseBuildingsRepository = container.resolve('buildingsRepository')
     const ownersRepository: CouchbaseOwnersRepository = container.resolve('ownersRepository')

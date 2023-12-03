@@ -16,7 +16,7 @@ describe('OfferRequestsRepository', () => {
   let worksheetRepository
 
   before(async () => {
-    const container = await createTestContainer()
+    const container = await createTestContainer({postgres: false, couchbase: true})
     buildingsRepository = container.resolve('buildingsRepository')
     ownersRepository = container.resolve('ownersRepository')
     worksheetRepository = container.resolve('worksheetRepository')

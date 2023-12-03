@@ -18,7 +18,7 @@ describe('Lead assignment to flipper (Couchbase)', () => {
   let container: AwilixContainer
 
   beforeEach(async () => {
-    container = await createTestContainer()
+    container = await createTestContainer({postgres: false, couchbase: true})
     writeRepository = container.resolve('buildingsRepository') as BuildingsRepository
     readRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
     ownersRepository = container.resolve('ownersRepository') as OwnerRepository
