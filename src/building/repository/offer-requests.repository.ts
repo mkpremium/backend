@@ -1,6 +1,6 @@
 import { ScheduledEventProps } from '../../scheduled-events/types'
 
-export interface AddOfferCommand {
+export interface AddBuildingOffertCommand {
   flipperId: string,
   callerId: string,
   ownerId: string,
@@ -10,5 +10,5 @@ export interface AddOfferCommand {
 }
 
 export interface OfferRequestsRepository {
-  add (offer: AddOfferCommand): Promise<AddOfferCommand & {id: string}>
+  add (offer: AddBuildingOffertCommand): Promise<AddBuildingOffertCommand & {id: string}>
 }

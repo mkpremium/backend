@@ -25,6 +25,7 @@ import { saveDocumentsCommandHandler } from './postgres/save-documents-command-h
 import { initializeDataSource } from '../data-source'
 import { DataSource } from 'typeorm'
 import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
+import { setupContactsDependencies } from '../contacts/dependencies'
 
 export async function createDiContainer () {
   const container = createContainer()
@@ -42,6 +43,7 @@ export function setupContainer (container: AwilixContainer, couchbaseBucket: Buc
   setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
   setupBuildingDependencies(container)
   setupOwnerDependencies(container)
+  setupContactsDependencies(container)
   setupScheduledEventsDependencies(container)
   setupWorksheetDependencies(container)
   setupCallerDependencies(container)

@@ -1,15 +1,19 @@
 import { Repository as EntityRepository } from '../../db/repository'
 import { DataSource, DeepPartial, EntityTarget, Repository } from 'typeorm'
 
-export abstract class PostgresRepository<S extends { id: string }, E extends {
-  id: string
-}> implements EntityRepository<S> {
+export abstract class WithPostgresRepository<E> {
   protected repository: Repository<E>
 
   constructor (ormDataSource: DataSource) {
     this.repository = ormDataSource.getRepository(this.getEntityTarget())
   }
 
+  protected abstract getEntityTarget (): EntityTarget<E>
+}
+
+export abstract class PostgresRepository<S extends { id: string }, E extends {
+  id: string
+}> extends WithPostgresRepository<E> implements EntityRepository<S> {
   get (id: string): Promise<S> {
     return Promise.reject(new Error('Not implemented'))
   }
@@ -25,8 +29,6 @@ export abstract class PostgresRepository<S extends { id: string }, E extends {
         return struct
       })
   }
-
-  protected abstract getEntityTarget (): EntityTarget<E>
 
   protected abstract structToEntity (struct: S): DeepPartial<E>
 

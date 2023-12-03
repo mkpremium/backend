@@ -1,7 +1,8 @@
 import jwt, { permissions } from '../middleware/jwt'
 import { Router } from 'express'
+import { CallerRepository } from './caller.repository'
 import { createGetNextCallerWorksheetController } from './controller/get-next-worksheet.controller'
-import { asFunction } from 'awilix'
+import { asClass, asFunction } from 'awilix'
 import { wrap } from 'express-promise-wrap'
 import { createTakeWorksheetInQueueController } from './controller/take-worksheet-in-queue.controller'
 import { createAssignFlipperToCallerController } from './controller/assign-flipper-to-caller.controller'
@@ -22,7 +23,8 @@ export const setupCallerDependencies = awilixContainer => {
             awilixContainer.resolve('scheduledCallsService'), awilixContainer.resolve('usersRepository')
           )
         })
-      })
+      }),
+    callerRepository: asClass(CallerRepository).singleton().classic()
   })
 }
 

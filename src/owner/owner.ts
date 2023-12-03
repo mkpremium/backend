@@ -260,11 +260,15 @@ export class WrongFeaturedContact extends Error {
   }
 }
 
+export type ContactType = 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB'
+
+export type ContactStatus = 'UNDEFINED' | 'GOOD' | 'BAD'
+
 export interface ContactProps {
   id: string;
-  type: 'TELEFONO' | 'FAX' | 'MOVIL' | 'EMAIL' | 'SITIO_WEB';
+  type: ContactType;
   value: string;
-  status: 'UNDEFINED' | 'GOOD' | 'BAD';
+  status: ContactStatus;
 }
 
 export interface PersonProps {

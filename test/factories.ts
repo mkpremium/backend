@@ -1,8 +1,16 @@
-import {Factory} from 'rosie'
-import { Flipper } from '../src/flipper/flipper.entity'
-import { User } from '../src/user/user.entity'
+import { Factory } from 'rosie'
 
-Factory.define('flipper', Flipper)
+Factory.define('caller')
   .attr('user', () => Factory.attributes('user', {}))
 
-Factory.define('user', User)
+Factory.define('flipper')
+  .attr('user', () => Factory.attributes('user', {}))
+
+Factory.define('user')
+
+Factory.define('phone-contact')
+  .attrs({
+    status: 'UNDEFINED',
+    type: 'MOVIL',
+    value: '666666666'
+  })

@@ -1,4 +1,4 @@
-import { OwnerProps } from '../owner'
+import { ContactStatus, OwnerProps } from '../owner'
 import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { BuildingNegotiationStatus, NegotiationStatus } from '../../building/building'
@@ -18,7 +18,7 @@ export interface FoundOwnerProps {
     id: string,
     value: string,
     type: 'TELEFONO' | 'MOVIL' | 'EMAIL',
-    status: 'UNDEFINED' | 'GOOD' | 'BAD'
+    status: ContactStatus,
   }[]
   lastEvent?: {
     eventDate: string,

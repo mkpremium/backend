@@ -2,8 +2,7 @@ import { BuildingsRepository } from './buildings.repository'
 import { BuildingNegotiationStatus, BuildingProps } from '../building'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 import * as TE from 'fp-ts/TaskEither'
-import { TaskEither } from 'fp-ts/TaskEither'
-import { EntityTarget, Equal } from 'typeorm'
+import { EntityTarget, Equal, In } from 'typeorm'
 import { Building } from '../building.entity'
 import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
@@ -26,7 +25,7 @@ export class PostgresBuildingsRepository
 
   //   BuildingsReadRepository
 
-  assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TaskEither<Error, BuildingReadModel[]> {
+  assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]> {
     return pipe(
       fromPromise(this.repository.find(
         {
@@ -44,15 +43,22 @@ export class PostgresBuildingsRepository
     return Promise.reject(new Error('Not implemented'))
   }
 
-  listById (ids): Promise<BuildingReadModel[]> {
-    return Promise.reject(new Error('Not implemented'))
+  async listById (ids): Promise<BuildingReadModel[]> {
+    return this.repository.find({
+      where: {
+        id: In(ids)
+      },
+      relations: {
+        images: true,
+      }
+    }).then(buildings => buildings.map(mapEntityToReadModel))
   }
 
   listProposalsForBuilding (buildingId): Promise<unknown[]> {
     return Promise.reject(new Error('Not implemented'))
   }
 
-  ofCadastreReference (cadastreReference: string): TaskEither<Error, BuildingReadModel | undefined> {
+  ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
     throw new Error('Not implemented')
   }
 
