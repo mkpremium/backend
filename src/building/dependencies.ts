@@ -48,6 +48,7 @@ import { createBuildingController } from './controller/create-building.controlle
 import { CouchbaseBuildingsRepository } from './repository/couchbase-building.repository'
 import { CouchbaseBuildingsReadRepository } from './repository/couchbase-buildings-read.repository'
 import { PostgresBuildingsRepository } from './repository/postgres-buildings.repository'
+import { CouchbaseOfferRequestsRepository } from './repository/couchbase-offer-requests.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -97,7 +98,8 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),
 
-    offerRequestsRepository: asClass(OfferRequestsRepository).classic().singleton(),
+    couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
+    offerRequestsRepository: aliasTo('couchbaseOfferRequestsRepository'),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController),
