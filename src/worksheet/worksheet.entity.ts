@@ -20,14 +20,14 @@ export class Worksheet extends BaseEntity {
     @Column({ type: 'text', default: '' })
     statusChangeReason?: string
 
-    @Column({ type: 'timestamptz' })
-    lastStatusChangedAt: Date
+    @Column({ type: 'timestamptz', nullable: true })
+    lastStatusChangedAt?: Date
 
-    @Column({ type: 'timestamptz' })
-    lastViewedAt: Date
+    @Column({ type: 'timestamptz', nullable: true })
+    lastViewedAt?: Date
 
-    @ManyToOne(() => User)
-    lastViewedBy: User
+    @ManyToOne(() => User, {nullable: true})
+    lastViewedBy?: User
 
     // lastMeeting
 }

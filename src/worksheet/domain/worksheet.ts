@@ -30,6 +30,11 @@ export interface WorksheetProps {
   status: WorksheetStatusType
   relatedBuildingIds: [ string ]
   buildingAddress: AddressProp
+  queueId?: string
+  statusChangeReason?: string
+  statusChangedAt?: Date,
+  viewedAt?: Date
+  viewedBy?: string
 }
 
 export const Worksheet = t.struct<WorksheetProps>({

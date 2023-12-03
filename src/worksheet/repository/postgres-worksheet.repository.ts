@@ -9,11 +9,21 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
   }
 
   protected getEntityTarget (): EntityTarget<Worksheet> {
-    throw new Error('Not implemented')
+    return Worksheet
   }
 
   protected structToEntity (struct: WorksheetProps): DeepPartial<Worksheet> {
-    throw new Error('Not implemented')
+    return this.repository.create({
+      id: struct.id,
+      status: struct.status,
+      lastStatusChangedAt: struct.statusChangedAt,
+      statusChangeReason: struct.statusChangeReason,
+      lastViewedAt: struct.viewedAt,
+      lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
+      building: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      queue: struct.queueId ? { id: struct.queueId } : null,
+    })
   }
-
 }
