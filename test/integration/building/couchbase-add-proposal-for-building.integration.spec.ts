@@ -9,7 +9,7 @@ import moment from 'moment'
 import { contactOfId } from '../../../src/owner/owner'
 import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
 
-describe('AddProposalForBuilding - Integration', () => {
+describe('AddProposalForBuilding - Integration (Couchbase)', () => {
   let addProposalForBuildingService: AddProposalForBuildingService
   let ownersRepository: OwnerRepository
   let buildingsRepository: BuildingsRepository
