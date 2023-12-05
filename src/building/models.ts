@@ -42,56 +42,11 @@ export class LegacyBuildingRepository extends CouchbaseModel {
     return building
   }
 
-  static async findByCadastreReference (cadastreReference) {
-    const legacyBuildingRepository = new LegacyBuildingRepository()
-    const qb = legacyBuildingRepository.getQueryBuilder()
-      .where('cadastre IS NOT MISSING')
-      .where('cadastre.reference = ?', cadastreReference)
-      .limit(1)
-    const [ building ] = await legacyBuildingRepository.query(qb)
-    return building
-  }
-
-  static async findByAddress (fullAddress) {
-    if (_.isEmpty(fullAddress)) {
-      throw newHttpError(400, 'fullAddress no puede estar vacia')
-    }
-    const legacyBuildingRepository = new LegacyBuildingRepository()
-    const qb = legacyBuildingRepository.getQueryBuilder()
-      .where('cadastre IS NOT MISSING')
-      .where('address.fullAddress = ?', fullAddress)
-      .limit(1)
-    const [ building ] = await legacyBuildingRepository.query(qb)
-    return building
-  }
-
   static async createNewBuilding (data) {
     const json = toJSON(data)
     const building = Building(json)
     const legacyBuildingRepository = new LegacyBuildingRepository()
     return legacyBuildingRepository.save(building)
-  }
-
-  async addMetadataToBuilding (building, params) {
-    const url = dropQueryParams(params.url)
-    const mimeType = mime.lookup(url)
-    const localPreview = await makePreview(url)
-    const previewUrl = await uploadPreview('preview', localPreview)
-
-    const metaRepo = new MetadataRepository()
-    const body = Object.assign({}, params, {
-      buildingId: building.id,
-      name: path.basename(url),
-      previewUrl,
-      mimeType,
-      url,
-    })
-    const metadata = await metaRepo.save(body)
-    const updatedMetadata = t.update(building.metadata, { $push: [ BuildingMetadataPreview(metadata) ] })
-    const updatedBuilding = t.update(building, { metadata: { $merge: updatedMetadata } })
-
-    await this.save(updatedBuilding)
-    return metadata
   }
 
   async addNegotiationProposal (building, operatorId, params) {
