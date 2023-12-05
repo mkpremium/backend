@@ -55,7 +55,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
-    addProposalService: asClass(AddProposalService).singleton(),
+    addProposalService: asClass(AddProposalService).singleton().classic(),
     updateBuildingNegotiationStatusService: asClass(UpdateBuildingNegotiationStatusService).singleton().classic(),
     setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
     listBuildingsService: asClass(ListBuildingsService).classic().singleton(),
