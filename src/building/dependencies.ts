@@ -50,6 +50,7 @@ import { PostgresBuildingsRepository } from './repository/postgres-buildings.rep
 import { CouchbaseOfferRequestsRepository } from './repository/couchbase-offer-requests.repository'
 import { PostgresOfferRequestsRepository } from './repository/postgres-offer-requests.repository'
 import { UpdateProposalService } from './service/update-proposal.service'
+import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -85,7 +86,8 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
-    proposalsRepository: asClass(ProposalsRepository).classic().singleton(),
+    couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
+    proposalsRepository: aliasTo('couchbaseProposalsRepository'),
 
     updateNegotiationProposalController: asFunction(createUpdateNegotiationProposalController).singleton(),
     createBuildingController: asFunction(createBuildingController).singleton(),
