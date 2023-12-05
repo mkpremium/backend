@@ -1,6 +1,5 @@
 import { wrap } from 'express-promise-wrap'
 import { History } from '../history/models'
-import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { OwnerRepository } from './models'
 import { Owner } from './owner'
 import t from 'tcomb'
@@ -9,7 +8,6 @@ async function updateOwner (req, res) {
   const id = req.params.id
   const contextModel = { _documentType: 'owner', id }
   const repo = new OwnerRepository()
-  await LegacyWorksheetRepository.notifyWorkSheetChangeByOwner(id)
 
   const owner = await repo.findByIdOrThrow(id)
   let updatedOwner = t.update(owner, { $merge: Object.assign({}, req.body, { id }) })
@@ -31,7 +29,6 @@ async function addOwnerContact (req, res) {
   const updatedOwner = await repo.addContact(ownerId, req.body)
 
   await History.registerCreate({ contextModel: updatedOwner, user: req.user })
-  await LegacyWorksheetRepository.notifyWorkSheetChangeByOwner(ownerId)
 
   res.json(updatedOwner)
 }

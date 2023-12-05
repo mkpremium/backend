@@ -7,8 +7,6 @@ import _isNil from 'lodash/isNil'
 import _some from 'lodash/some'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import uuid from 'uuid/v4'
-import { LegacyBuildingRepository } from '../../building/models'
 
 import { CouchbaseModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
@@ -238,51 +236,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
                           OR status = 'LOOKING_MEETING') ${filter}`
     const results = await this.queryRaw(baseQuery)
     return _get(results, '0.count', 0)
-  }
-
-  static async notifyWorkSheetChangeByOwner (ownerId) {
-  }
-
-  static async createNewForBuilding (building) {
-    const worksheet = Worksheet({
-      id: uuid(),
-      _relatedTo: _get(building, 'owner.name'),
-      relatedBuildingIds: [ building.id ],
-      relatedOwnerIds: [],
-      buildingAddress: building.address,
-      status: WorkSheetStatus.INVALID,
-      queueId: null
-    })
-    const repo = new LegacyWorksheetRepository()
-
-    return repo.save(worksheet)
-  }
-
-  async preSave (data) {
-    // never store this
-    return t.update(data, {
-      ownerContacts: { $set: [] },
-      relatedBuildings: { $set: [] },
-      relatedOwners: { $set: [] }
-    })
-  }
-
-  /**
-   * Attaches related building objects to a worksheet
-   * @param worksheet
-   * @returns {Promise<*>}
-   */
-  async worksheetWithRelatedBuildings (worksheet) {
-    let updatedWorksheet = worksheet
-    if (worksheet.relatedBuildingIds.length > 0) {
-      const legacyBuildingRepository = new LegacyBuildingRepository()
-      const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`
-      const rbQb = await legacyBuildingRepository.getQueryBuilder().where(`id IN ${idsText}`)
-      const relatedBuildings = await legacyBuildingRepository.query(rbQb)
-      updatedWorksheet = t.update(worksheet, { relatedBuildings: { $set: relatedBuildings } })
-    }
-
-    return updatedWorksheet
   }
 
   async list (query = {}) {
