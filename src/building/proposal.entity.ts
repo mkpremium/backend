@@ -3,7 +3,7 @@ import { BaseEntity } from '../infrastructure/entity'
 import { Building } from './building.entity'
 
 @Entity()
-export class DealProposal extends BaseEntity {
+export class Proposal extends BaseEntity {
   @ManyToOne(() => Building, building => building.proposals)
   building: Building
 }

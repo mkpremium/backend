@@ -1,17 +1,10 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm'
-import {
-  BuildingAddressProps,
-  BuildingLocation,
-  BuildingNegotiationStatus,
-  Lead,
-  ProposalProps,
-  proposalSent
-} from './building'
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
+import { BuildingAddressProps, BuildingLocation, BuildingNegotiationStatus, Lead } from './building'
 import { BuildingImage } from './building-image.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { Owner } from '../owner/owner.entity'
 import { Flipper } from '../flipper/flipper.entity'
-import { DealProposal } from './deal-proposal.entity'
+import { Proposal } from './proposal.entity'
 import _ from 'lodash'
 import { BuildingToOwner } from './building-to-owner.entity'
 import { Worksheet } from '../worksheet/worksheet.entity'
@@ -46,8 +39,8 @@ export class Building extends BaseEntity {
   @Column({ nullable: true })
   use?: string
 
-  @OneToMany(() => DealProposal, proposal => proposal.building)
-  proposals?: DealProposal[]
+  @OneToMany(() => Proposal, proposal => proposal.building)
+  proposals?: Proposal[]
 
   @OneToMany(() => BuildingImage, image => image.building)
   images: BuildingImage[]

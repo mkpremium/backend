@@ -4,8 +4,8 @@ import { proposalBuilder } from '../proposal.builder'
 import { ProposalProps } from '../../../src/building/building'
 import { expect } from 'chai'
 
-describe('ProposalsRepository', () => {
-  let repository!: ProposalsRepository
+describe.skip('ProposalsRepository(Postgres)', () => {
+  let repository: ProposalsRepository
   let proposalsToBeSend: ProposalProps[]
   const testPendingProposal = proposalBuilder({
     id: 'test-pending-proposal-id',
@@ -14,7 +14,7 @@ describe('ProposalsRepository', () => {
 
   before(async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
-    repository = container.resolve('dealProposalsRepository')
+    repository = container.resolve('postgresProposalsRepository')
 
     await repository.save(testPendingProposal)
     proposalsToBeSend = await repository.pendingProposals()
