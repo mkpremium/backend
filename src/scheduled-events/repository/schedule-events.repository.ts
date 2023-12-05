@@ -5,7 +5,6 @@ import { CouchbaseModel } from '../../db/model'
 import { buildRangeFromWeek, utc } from '../../lib/date'
 import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder } from '../../lib/query/helpers'
-import { OwnerRepository } from '../../owner/models'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
@@ -104,18 +103,5 @@ export class ScheduledEventsRepository extends CouchbaseModel {
        LIMIT 1
       `, [ buildingId ]
     ).then(rows => rows.length === 1 ? fromJSON(rows[0], ScheduledEvent) : undefined)
-  }
-
-  async preSave (scheduleEvent) {
-    const ownerId = _get(scheduleEvent, 'event.ownerId')
-    if (ownerId) {
-      const ownerRepo = new OwnerRepository()
-      const [ owner ] = await ownerRepo.findByIdWithIncludes(ownerId, [ 'building' ])
-      if (owner) {
-        const updatedEvent = t.update(scheduleEvent.event, { $merge: { owner } })
-        return t.update(scheduleEvent, { event: { $set: updatedEvent } })
-      }
-    }
-    return scheduleEvent
   }
 }
