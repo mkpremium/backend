@@ -31,22 +31,6 @@ export class BuildingProposalRepository extends CouchbaseModel {
 export class LegacyBuildingRepository extends CouchbaseModel implements BuyOfferRepository {
   protected Struct = Building
 
-  async findByIdOrThrow (buildingId) {
-    const building = await this.findById(buildingId)
-    if (!building) {
-      throw newHttpError(404, `El edificio ${buildingId} no existe`)
-    }
-
-    return building
-  }
-
-  static async createNewBuilding (data) {
-    const json = toJSON(data)
-    const building = Building(json)
-    const legacyBuildingRepository = new LegacyBuildingRepository()
-    return legacyBuildingRepository.save(building)
-  }
-
   async addNegotiationProposal (building, operatorId, params) {
     const paramsWithOperator = Object.assign({}, params, {
       createdBy: operatorId,
@@ -93,6 +77,22 @@ export class LegacyBuildingRepository extends CouchbaseModel implements BuyOffer
                    WHERE _documentType = 'building-proposal' AND buildingId = $1`,
         [ buildingId ]
       ).then(rows => fromJSON(rows, t.list(BuildingProposal)))
+  }
+
+  async findByIdOrThrow (buildingId) {
+    const building = await this.findById(buildingId)
+    if (!building) {
+      throw newHttpError(404, `El edificio ${buildingId} no existe`)
+    }
+
+    return building
+  }
+
+  static async createNewBuilding (data) {
+    const json = toJSON(data)
+    const building = Building(json)
+    const legacyBuildingRepository = new LegacyBuildingRepository()
+    return legacyBuildingRepository.save(building)
   }
 
   async update (building, $merge) {
