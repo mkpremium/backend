@@ -127,18 +127,6 @@ const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
   res.json(items)
 }
 
-/**
- * Searches worksheets by keyword.
- * @param request
- * @param response
- * @returns {Promise<void>}
- */
-async function searchWorksheets (request, response) {
-  const repo = new LegacyWorksheetRepository()
-  const worksheets = await repo.searchWorksheets(request.query)
-  response.json(worksheets)
-}
-
 export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
 export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
@@ -150,4 +138,3 @@ export const createQueueController = worksheetQueueRepository => wrap(createQueu
 export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))
 export const deleteQueueController = worksheetQueueRepository => wrap(deleteQueue(worksheetQueueRepository))
 export const getScheduledWorksheetsController = worksheetQueueRepository => wrap(getScheduledWorksheets(worksheetQueueRepository))
-export const searchWorksheetController = wrap(searchWorksheets)
