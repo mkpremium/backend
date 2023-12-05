@@ -14,7 +14,7 @@ describe('ProposalsRepository', () => {
 
   before(async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
-    repository = container.resolve('dealProposalsRepository')
+    repository = container.resolve('proposalsRepository')
 
     await repository.save(testPendingProposal)
     proposalsToBeSend = await repository.pendingProposals()
