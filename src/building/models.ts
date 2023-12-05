@@ -13,7 +13,7 @@ import { SearchQuery } from 'couchbase'
 import { BuyOfferRepository } from './buy-offer.repository'
 import HighlightStyle = SearchQuery.HighlightStyle
 
-export class BuildingProposalRepository extends CouchbaseModel {
+class BuildingProposalRepository extends CouchbaseModel {
   protected Struct = BuildingProposal
 
   async findByIdOrThrow (proposalId) {
