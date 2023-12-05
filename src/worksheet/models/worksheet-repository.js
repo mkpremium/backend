@@ -14,7 +14,6 @@ import { LegacyBuildingRepository } from '../../building/models'
 import { CouchbaseModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
-import { OwnerRepository } from '../../owner/models'
 import { OwnerStatus } from '../../owner/owner'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import { ScheduledEventType } from '../../scheduled-events/types'
@@ -97,18 +96,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     if (!worksheet) {
       throw newHttpError(404, `La hoja de trabajo ${worksheetId} no existe`)
     }
-
-    return worksheet
-  }
-
-  async findByIdWIthIncludes (id) {
-    let worksheet = await this.findByIdOrThrow(id)
-
-    const ownerRepo = new OwnerRepository()
-    const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds)
-    worksheet = t.update(worksheet, {
-      relatedOwners: { $set: relatedOwners }
-    })
 
     return worksheet
   }
@@ -199,7 +186,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
   }
 
   async updateStatus (worksheetId, operatorId) {
-    const worksheetData = await this.findByIdWIthIncludes(worksheetId)
+    const worksheetData = await this.findByIdOrThrow(worksheetId)
     const worksheet = fromJSON(worksheetData, Worksheet)
     const newStatus = await this.calculateFixedStatus(worksheet)
     const updatedWorksheet = setStatus(worksheet, newStatus)

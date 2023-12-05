@@ -36,7 +36,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
 
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new LegacyWorksheetRepository()
-      const worksheet = await worksheetRepo.findByIdWIthIncludes(_get(scheduledEvent, 'event.worksheetId'))
+      const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'))
       const { city, province } = _get(worksheet, 'relatedBuildings.0.address', {})
       const updatedWorksheet = t.update(worksheet, {
         lastAddedMeeting: { $set: scheduledEvent },
