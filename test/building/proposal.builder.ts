@@ -3,6 +3,7 @@ import { BuildingProposal, ProposalProps } from '../../src/building/building'
 
 const proposalPrototype: ProposalProps = {
   id: 'test-proposal-id',
+  state: 'pendiente',
   buildingId: 'test-building-id',
   ownerId: 'test-owner-id',
   notificationEmail: 'owner@email.test',
