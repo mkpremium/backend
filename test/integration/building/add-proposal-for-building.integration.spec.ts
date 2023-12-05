@@ -5,15 +5,15 @@ import { buildingBuilder } from '../../building/building.builder'
 import { AddProposalForBuildingService } from '../../../src/building/service/add-proposal-for-building.service'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
-import { LegacyBuildingRepository } from '../../../src/building/models'
 import moment from 'moment'
 import { contactOfId } from '../../../src/owner/owner'
+import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
 
 describe('AddProposalForBuilding - Integration', () => {
   let addProposalForBuildingService: AddProposalForBuildingService
   let ownersRepository: OwnerRepository
   let buildingsRepository: BuildingsRepository
-  let legacyBuildingsRepository: LegacyBuildingRepository
+  let buildingsReadRepository: BuildingsReadRepository
 
   const testCmd = {
     buildingId: 'test-building-id',
@@ -34,7 +34,7 @@ describe('AddProposalForBuilding - Integration', () => {
     ownersRepository = diContainer.resolve('ownersRepository')
     buildingsRepository = diContainer.resolve('buildingsRepository')
 
-    legacyBuildingsRepository = diContainer.resolve('legacyBuildingsRepository')
+    buildingsReadRepository = diContainer.resolve('buildingsReadRepository')
   })
 
   it('saves proposal for building', async () => {
@@ -42,7 +42,7 @@ describe('AddProposalForBuilding - Integration', () => {
     await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
     await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
 
-    const proposals = await legacyBuildingsRepository.listProposalsForBuilding(testCmd.buildingId)
+    const proposals = await buildingsReadRepository.listProposalsForBuilding(testCmd.buildingId)
     expect(proposals).to.have.lengthOf(1)
     expect(proposals[ 0 ]).to.be.deep.contains({
       ownerId: testCmd.ownerId,
