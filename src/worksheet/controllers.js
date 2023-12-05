@@ -27,13 +27,6 @@ const updateWorksheetStatus = worksheetRepository => async (req, res) => {
   res.json(updatedWorksheet)
 }
 
-async function findById (req, res) {
-  const id = req.params.id
-  const repo = new LegacyWorksheetRepository()
-  const worksheet = await repo.findByIdWIthIncludes(id)
-  res.json(worksheet)
-}
-
 function bool (value) {
   return value === 'true'
 }
@@ -128,7 +121,6 @@ const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
 }
 
 export const worksheetListController = wrap(worksheetList)
-export const worksheetFindByIdController = wrap(findById)
 export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
 export const getQueueController = worksheetQueueRepository => wrap(getQueue(worksheetQueueRepository))
 export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))

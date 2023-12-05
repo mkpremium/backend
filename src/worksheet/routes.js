@@ -12,7 +12,6 @@ import {
   queueTakenFindByOperatorController,
   updateQueueController,
   updateWorksheetStatusController,
-  worksheetFindByIdController,
   worksheetListController
 } from './controllers'
 
@@ -41,8 +40,6 @@ export function worksheetRoutes (awilixContainer) {
   router.delete('/queues/:id', permissions.manager, deleteQueueController(legacyWorksheetQueueRepository))
 
   router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController(legacyWorksheetQueueRepository))
-
-  router.get('/:id', worksheetFindByIdController)
 
   router.put('/:id/status', updateWorksheetStatusController(awilixContainer.resolve('worksheetRepository')))
 

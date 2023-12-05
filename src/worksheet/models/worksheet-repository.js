@@ -103,11 +103,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
 
   async findByIdWIthIncludes (id) {
     let worksheet = await this.findByIdOrThrow(id)
-    const legacyBuildingRepository = new LegacyBuildingRepository()
-    const idsText = `[${worksheet.relatedBuildingIds.map(id => `'${id}'`).join(', ')}]`
-    const rbQb = await legacyBuildingRepository.getQueryBuilder().where(`id IN ${idsText}`)
-    const relatedBuildings = await legacyBuildingRepository.query(rbQb)
-    worksheet = t.update(worksheet, { relatedBuildings: { $set: relatedBuildings } })
 
     const ownerRepo = new OwnerRepository()
     const relatedOwners = await ownerRepo.findByIdWithIncludes(worksheet.relatedOwnerIds)
