@@ -7,7 +7,6 @@ import _head from 'lodash/head'
 import _isNil from 'lodash/isNil'
 import _map from 'lodash/map'
 import _some from 'lodash/some'
-import _uniq from 'lodash/uniq'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
@@ -213,19 +212,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     if (canRegisterVerified(worksheet, newStatus, operatorId)) {
       await OperatorStats.registerAction(operatorId, OperatorActions.VERIFIED_OWNER)
     }
-
-    return this.save(updatedWorksheet)
-  }
-
-  async addOwner (worksheet, owner) {
-    const updatedWorksheet = t.update(worksheet, {
-      relatedBuildingIds: {
-        $set: _uniq(worksheet.relatedBuildingIds.concat([ owner.buildingId ]))
-      },
-      relatedOwnerIds: {
-        $set: _uniq(worksheet.relatedOwnerIds.concat([ owner.id ]))
-      }
-    })
 
     return this.save(updatedWorksheet)
   }

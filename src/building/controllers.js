@@ -2,7 +2,6 @@ import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
-import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { BuildingProposalRepository, LegacyBuildingRepository } from './models'
 
 export function createListBuildingProposalsController (listBuildingProposalsService) {
@@ -52,13 +51,9 @@ async function updateNegotiationProposal (req, res) {
 }
 
 async function addOwnerToBuilding (req, res) {
-  const worksheetRepo = new LegacyWorksheetRepository()
   const ownerRepo = new OwnerRepository()
-  const worksheet = await worksheetRepo.findWorksheetByBuilding(req.params.id)
   const owner = await ownerRepo.createOwnerAndPerson(req.body)
-  await worksheetRepo.addOwner(worksheet, owner)
   await History.registerCreate({ contextModel: owner, user: req.user })
-  await History.registerUpdate({ contextModel: worksheet, user: req.user })
   res.status(201).json(owner)
 }
 
