@@ -11,17 +11,6 @@ export function createListBuildingProposalsController (listBuildingProposalsServ
   })
 }
 
-async function addMetadataToBuilding (req, res) {
-  const legacyBuildingRepository = new LegacyBuildingRepository()
-  const buildingId = req.params.id
-  const building = await legacyBuildingRepository.findByIdOrThrow(buildingId)
-  const bodyWithAuthor = Object.assign({}, req.body, {
-    createdBy: req.user.id
-  })
-  const metadata = await legacyBuildingRepository.addMetadataToBuilding(building, bodyWithAuthor)
-  res.status(201).json(metadata)
-}
-
 async function createMetadataUploadUrl (req, res) {
   const url = getPrivateUploadUrl('metadata', req.body)
   res.json({ url })
@@ -96,7 +85,6 @@ export const createAllAgentsStockStatsController = adminBuildingRepository => {
   })
 }
 
-export const addMetadataToBuildingController = wrap(addMetadataToBuilding)
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
 export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)

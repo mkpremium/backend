@@ -1,6 +1,6 @@
 import { Router } from 'express'
+import { wrap } from 'express-promise-wrap'
 import {
-  addMetadataToBuildingController,
   addOwnerToBuildingController,
   createAllAgentsStockStatsController,
   createListBuildingProposalsController,
@@ -10,15 +10,12 @@ import {
   createSignDocumentsUrlController,
   updateNegotiationProposalController
 } from './controllers'
-import { wrap } from 'express-promise-wrap'
 
 export const createBuildingsRoutes = container => {
   const router = Router()
 
   router.post('/', wrap(container.resolve('createBuildingController')))
   router.post('/create-url', createMetadataUploadUrlController)
-
-  router.post('/:id/metadata', addMetadataToBuildingController)
 
   router.post('/:buildingId/documents-signed-urls',
     createSignDocumentsUrlController(container.resolve('getDocumentsSignedURLService')))
