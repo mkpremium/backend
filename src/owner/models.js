@@ -209,7 +209,7 @@ GROUP BY negotiationStatus, assignedAgentId
 
     const results = await this.query(qb)
     const ownerIds = _.map(results, 'id')
-    const owners = await this.findByIdWithIncludes(ownerIds, [ 'building' ])
+    const owners = await this.findByIdWithIncludes(ownerIds)
     return this.getVerifiedOwners(owners)
   }
 
