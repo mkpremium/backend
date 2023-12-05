@@ -1,35 +1,14 @@
 import _ from 'lodash'
-import _head from 'lodash/head'
 import _isArray from 'lodash/isArray'
 import _isNil from 'lodash/isNil'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { LegacyBuildingRepository } from '../building/models'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
 import { ListQuery } from '../types/params'
 import { TypedContactInfo } from './contact'
 import { FeaturedContact, Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, OwnerWithInclude, Person } from './owner'
-
-function ownerIncludes (qb, includes) {
-  if (includes.indexOf('building') !== -1) {
-    const legacyBuildingRepository = new LegacyBuildingRepository()
-    const letBuildingQuery = legacyBuildingRepository
-      .getQueryBuilder('use', 'b')
-      .useKey('t.`buildingId`')
-      .where('t.`buildingId` = b.`id`')
-    qb
-      .letQuery('building', letBuildingQuery)
-      .field('building')
-  }
-}
-
-function mapOwnerIncludes (owner) {
-  return Object.assign({}, owner, {
-    building: _head(owner.building || [])
-  })
-}
 
 const OwnerListQuery = ListQuery.extend(
   {
@@ -73,7 +52,7 @@ export class OwnerRepository extends CouchbaseModel {
     return owner
   }
 
-  async findByIdWithIncludes (id, includes = []) {
+  async findByIdWithIncludes (id) {
     if (!id) {
       // noinspection HtmlUnknownTag
       throw new Error('id undefined, expected String or Array<String>')
@@ -81,12 +60,9 @@ export class OwnerRepository extends CouchbaseModel {
 
     const ids = _isArray(id) ? id : [ id ]
     const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`
-    const qb = this.getQueryBuilder(includes.length > 0 ? 'let' : 'select').where(`id IN ${idsText}`)
+    const qb = this.getQueryBuilder('select').where(`id IN ${idsText}`)
 
-    ownerIncludes(qb, includes)
-    const result = await this.query(qb)
-
-    return result.map(mapOwnerIncludes)
+    return this.query(qb)
   }
 
   async createOwnerAndPerson (body) {
