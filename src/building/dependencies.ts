@@ -51,6 +51,7 @@ import { CouchbaseOfferRequestsRepository } from './repository/couchbase-offer-r
 import { PostgresOfferRequestsRepository } from './repository/postgres-offer-requests.repository'
 import { UpdateProposalService } from './service/update-proposal.service'
 import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.repository'
+import { PostgresProposalsRepository } from './repository/postgres-proposals.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
@@ -87,6 +88,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
     couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
+    postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
     proposalsRepository: aliasTo('couchbaseProposalsRepository'),
 
     updateNegotiationProposalController: asFunction(createUpdateNegotiationProposalController).singleton(),
