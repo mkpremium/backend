@@ -1,11 +1,11 @@
-import { AddBuildingOffertCommand, OfferRequestsRepository } from './offer-requests.repository'
+import { AddBuildingOfferCommand, OfferRequestsRepository } from './offer-requests.repository'
 import { WithPostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { BuildingOfferRequest } from './building-offer-request.entity'
 import { EntityTarget } from 'typeorm'
 
 export class PostgresOfferRequestsRepository
   extends WithPostgresRepository<BuildingOfferRequest> implements OfferRequestsRepository {
-  async add (cmd: AddBuildingOffertCommand): Promise<AddBuildingOffertCommand & { id: string }> {
+  async add (cmd: AddBuildingOfferCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     const savedEntity = await this.repository.save({
       flipper: { id: cmd.flipperId },
       caller: { id: cmd.callerId },
