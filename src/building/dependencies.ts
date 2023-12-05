@@ -78,6 +78,8 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
     buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
+    buyOfferRepository: aliasTo('legacyBuildingsRepository'),
+
     legacyMetadataRepository: asClass(MetadataRepository).singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),

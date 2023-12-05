@@ -1,21 +1,18 @@
 import _ from 'lodash'
 import _get from 'lodash/get'
-import mime from 'mime-types'
 import t from 'tcomb'
-import { dropQueryParams, makePreview, uploadPreview } from '../aws'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Building, BuildingMetadataPreview, BuildingProposal } from './building'
+import { Building, BuildingProposal } from './building'
 
 import { logger } from '../infrastructure/logger'
-import { MetadataRepository } from './repository/metadata.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { SearchQuery } from 'couchbase'
+import { BuyOfferRepository } from './buy-offer.repository'
 import HighlightStyle = SearchQuery.HighlightStyle
-import path = require('path')
 
 export class BuildingProposalRepository extends CouchbaseModel {
   protected Struct = BuildingProposal
@@ -30,7 +27,8 @@ export class BuildingProposalRepository extends CouchbaseModel {
   }
 }
 
-export class LegacyBuildingRepository extends CouchbaseModel {
+
+export class LegacyBuildingRepository extends CouchbaseModel implements BuyOfferRepository {
   protected Struct = Building
 
   async findByIdOrThrow (buildingId) {
