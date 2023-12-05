@@ -9,7 +9,6 @@ import { OperatorActions } from '../stats/types'
 import { Building, BuildingProposal } from './building'
 
 import { logger } from '../infrastructure/logger'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { SearchQuery } from 'couchbase'
 import { BuyOfferRepository } from './buy-offer.repository'
 import HighlightStyle = SearchQuery.HighlightStyle
@@ -68,15 +67,6 @@ export class LegacyBuildingRepository extends CouchbaseModel implements BuyOffer
     await this.save(updatedBuilding)
 
     return proposal
-  }
-
-  listProposalsForBuilding (buildingId) {
-    return this.couchbaseAdapter
-      .queryAsync(`SELECT proposals.*
-                   FROM ${this.getBucketName()} proposals
-                   WHERE _documentType = 'building-proposal' AND buildingId = $1`,
-        [ buildingId ]
-      ).then(rows => fromJSON(rows, t.list(BuildingProposal)))
   }
 
   async findByIdOrThrow (buildingId) {
