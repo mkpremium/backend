@@ -19,7 +19,7 @@ import { createSetFeaturedOwnerController } from './controller/set-featured-owne
 import {
   createUpdateBuildingNegotiationStatusController
 } from './controller/update-building-negotiation-status.controller'
-import { createAddNegotiationProposalController } from './controllers'
+import { createAddNegotiationProposalController, createUpdateNegotiationProposalController } from './controllers'
 import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
 import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
 import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
@@ -50,12 +50,14 @@ import { CouchbaseBuildingsReadRepository } from './repository/couchbase-buildin
 import { PostgresBuildingsRepository } from './repository/postgres-buildings.repository'
 import { CouchbaseOfferRequestsRepository } from './repository/couchbase-offer-requests.repository'
 import { PostgresOfferRequestsRepository } from './repository/postgres-offer-requests.repository'
+import { UpdateProposalService } from './service/update-proposal.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer) => {
   container.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
     addProposalService: asClass(AddProposalService).singleton().classic(),
+    updateProposalService: asClass(UpdateProposalService).singleton().classic(),
     updateBuildingNegotiationStatusService: asClass(UpdateBuildingNegotiationStatusService).singleton().classic(),
     setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
     listBuildingsService: asClass(ListBuildingsService).classic().singleton(),
@@ -86,6 +88,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
     proposalsRepository: asClass(ProposalsRepository).classic().singleton(),
 
+    updateNegotiationProposalController: asFunction(createUpdateNegotiationProposalController).singleton(),
     createBuildingController: asFunction(createBuildingController).singleton(),
     listBuildingsController: asFunction(createListBuildingsController).singleton(),
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),

@@ -6,7 +6,7 @@ import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { OperatorStats } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { Building, BuildingProposal } from './building'
+import { Building, BuildingProposal, ProposalProps } from './building'
 
 import { logger } from '../infrastructure/logger'
 import { SearchQuery } from 'couchbase'
@@ -49,6 +49,11 @@ export class LegacyBuildingRepository extends CouchbaseModel implements BuyOffer
     await OperatorStats.registerAction(operatorId, OperatorActions.PROPOSAL_SENT, { city, province })
 
     return proposal
+  }
+
+  getProposal (proposalId: string): Promise<ProposalProps> {
+    const proposalRepo = new BuildingProposalRepository()
+    return proposalRepo.findByIdOrThrow(proposalId)
   }
 
   async updateNegotiationProposal (proposal, operatorId, params) {

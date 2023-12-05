@@ -2,7 +2,6 @@ import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
-import { BuildingProposalRepository, LegacyBuildingRepository } from './models'
 
 export function createListBuildingProposalsController (listBuildingProposalsService) {
   return wrap(async (req, res) => {
@@ -40,14 +39,13 @@ export const createSignDocumentsUrlController = getDocumentsSignedURLService => 
   })
 }
 
-async function updateNegotiationProposal (req, res) {
-  const proposalRepo = new BuildingProposalRepository()
-  const legacyBuildingRepository = new LegacyBuildingRepository()
-  const proposalId = req.params.id
-  const proposal = await proposalRepo.findByIdOrThrow(proposalId)
+export function createUpdateNegotiationProposalController ({ updateProposalService }) {
+  return async function updateNegotiationProposal (req, res) {
+    const proposalId = req.params.id
 
-  await legacyBuildingRepository.updateNegotiationProposal(proposal, req.user.id, req.body)
-  res.status(201)
+    await updateProposalService.updateProposal(proposalId, req.user.id, req.body)
+    res.status(201)
+  }
 }
 
 async function addOwnerToBuilding (req, res) {
@@ -81,7 +79,6 @@ export const createAllAgentsStockStatsController = adminBuildingRepository => {
 }
 
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
-export const updateNegotiationProposalController = wrap(updateNegotiationProposal)
 export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createSetBuildingSalePriceController = setBuildingSalePriceService => {

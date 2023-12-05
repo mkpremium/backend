@@ -7,8 +7,7 @@ import {
   createListVerifiedOwnersController,
   createMetadataUploadUrlController,
   createSetBuildingSalePriceController,
-  createSignDocumentsUrlController,
-  updateNegotiationProposalController
+  createSignDocumentsUrlController
 } from './controllers'
 
 export const createBuildingsRoutes = container => {
@@ -24,7 +23,7 @@ export const createBuildingsRoutes = container => {
 
   router.get('/:buildingId/proposals', createListBuildingProposalsController(container.resolve('listBuildingProposalsService')))
 
-  router.put('/:building_id/negotiation/:id', updateNegotiationProposalController)
+  router.put('/:building_id/negotiation/:id', container.resolve('updateNegotiationProposalController'))
 
   router.post('/:id/owners', addOwnerToBuildingController)
   router.post('/:buildingId/set-featured-owner', wrap(container.resolve('setFeaturedOwnerController')))
