@@ -9,16 +9,8 @@ import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
 import { ListQuery } from '../types/params'
-import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { TypedContactInfo } from './contact'
-import {
-  FeaturedContact,
-  Owner,
-  OwnerBody,
-  OwnerBusinessStatus,
-  OwnerStatus, OwnerWithInclude,
-  Person
-} from './owner'
+import { FeaturedContact, Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, OwnerWithInclude, Person } from './owner'
 
 function ownerIncludes (qb, includes) {
   if (includes.indexOf('building') !== -1) {
@@ -99,26 +91,10 @@ export class OwnerRepository extends CouchbaseModel {
 
   async createOwnerAndPerson (body) {
     const ownerBody = OwnerBody(body)
-    const legacyBuildingRepository = new LegacyBuildingRepository()
-    const buildingId = ownerBody.buildingId
-    let building
-
-    if (buildingId) {
-      building = await legacyBuildingRepository.findByIdOrThrow(buildingId)
-    }
-
     const person = Person(ownerBody.person)
     body.name = person.fullName()
 
-    const owner = await this.save(body)
-
-    if (building) {
-      const worksheetRepository = new LegacyWorksheetRepository()
-      const worksheet = await worksheetRepository.findWorksheetByBuilding(buildingId)
-      await worksheetRepository.addOnlyOwner(worksheet, owner)
-    }
-
-    return owner
+    return this.save(body)
   }
 
   async addContact (ownerId, addContactRequest) {
