@@ -3,13 +3,13 @@ import { ProposalProps } from '../building'
 
 export class UpdateProposalService {
   constructor (
-    private offerRepository: BuyOfferRepository,
+    private buyOffersRepository: BuyOfferRepository,
     ) {
   }
 
   async updateProposal (proposalId: string, callerId: string, proposalUpdate: Partial<ProposalProps>) {
-    const proposal = await this.offerRepository.getProposal(proposalId)
+    const proposal = await this.buyOffersRepository.getProposal(proposalId)
 
-    return this.offerRepository.updateNegotiationProposal(proposal, callerId, proposalUpdate)
+    return this.buyOffersRepository.updateNegotiationProposal(proposal, callerId, proposalUpdate)
   }
 }
