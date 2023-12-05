@@ -56,6 +56,8 @@ const listProposalsForBuildingIdQuery = bucketName => `
            message,
            createdBy,
            createdAt,
+           notificationEmail,
+           notificationStatus,
            updatedAt,
            aspiration
     FROM ${bucketName}
