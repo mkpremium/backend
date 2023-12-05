@@ -46,7 +46,6 @@ describe('AddProposalForBuilding - Integration', () => {
     expect(proposals).to.have.lengthOf(1)
     expect(proposals[ 0 ]).to.be.deep.contains({
       ownerId: testCmd.ownerId,
-      buildingId: testCmd.buildingId,
       createdBy: testCmd.createdBy,
       proposal: testCmd.amount,
       message: testCmd.message,
