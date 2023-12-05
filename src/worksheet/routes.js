@@ -1,21 +1,21 @@
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
-import {
-  worksheetFindByIdController,
-  worksheetListController,
-  queueListController,
-  actionsOnWorksheetQueueController,
-  queueTakenFindByOperatorController,
-  addOwnerToWorksheetController,
-  getQueueController,
-  createQueueController,
-  updateQueueController,
-  deleteQueueController,
-  getScheduledWorksheetsController,
-  searchWorksheetController, updateWorksheetStatusController
-} from './controllers'
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
+import {
+  actionsOnWorksheetQueueController,
+  createQueueController,
+  deleteQueueController,
+  getQueueController,
+  getScheduledWorksheetsController,
+  queueListController,
+  queueTakenFindByOperatorController,
+  searchWorksheetController,
+  updateQueueController,
+  updateWorksheetStatusController,
+  worksheetFindByIdController,
+  worksheetListController
+} from './controllers'
 
 export function worksheetRoutes (awilixContainer) {
   const router = Router()
@@ -48,8 +48,6 @@ export function worksheetRoutes (awilixContainer) {
   router.get('/:id', worksheetFindByIdController)
 
   router.put('/:id/status', updateWorksheetStatusController(awilixContainer.resolve('worksheetRepository')))
-
-  router.post('/:id/owners', addOwnerToWorksheetController)
 
   router.post('/status-changed', awilixContainer.resolve('worksheetStatusChangedController'))
 

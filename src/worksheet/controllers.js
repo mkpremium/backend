@@ -3,7 +3,6 @@ import _get from 'lodash/get'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { History } from '../history/models'
 import { canOperatorHandleQueue } from '../lib/role-operators'
-import { OwnerRepository } from '../owner/models'
 import { UserRoles } from '../types/user'
 import { WorksheetQueueBody } from './domain/queue'
 import { setStatus } from './domain/worksheet'
@@ -120,17 +119,6 @@ const queueTakenFindByOperator = worksheetQueueRepository => async (req, res) =>
   res.json(queueItem || {})
 }
 
-async function addOwnerToWorksheet (req, res) {
-  const worksheetRepo = new LegacyWorksheetRepository()
-  const ownerRepo = new OwnerRepository()
-  const worksheet = await worksheetRepo.findByIdOrThrow(req.params.id)
-  const owner = await ownerRepo.createOwnerAndPerson(req.body)
-  await worksheetRepo.addOwner(worksheet, owner)
-  await History.registerCreate({ contextModel: owner, user: req.user })
-  await History.registerUpdate({ contextModel: worksheet, user: req.user })
-  res.status(201).json(owner)
-}
-
 const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
   const queueId = req.params.id
   const operatorId = req.user.id
@@ -151,7 +139,6 @@ async function searchWorksheets (request, response) {
   response.json(worksheets)
 }
 
-export const addOwnerToWorksheetController = wrap(addOwnerToWorksheet)
 export const worksheetListController = wrap(worksheetList)
 export const worksheetFindByIdController = wrap(findById)
 export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
