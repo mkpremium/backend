@@ -1,5 +1,4 @@
 import { wrap } from 'express-promise-wrap'
-import _get from 'lodash/get'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { History } from '../history/models'
 import { canOperatorHandleQueue } from '../lib/role-operators'
@@ -25,10 +24,6 @@ const updateWorksheetStatus = worksheetRepository => async (req, res) => {
   })
 
   res.json(updatedWorksheet)
-}
-
-function bool (value) {
-  return value === 'true'
 }
 
 const createQueue = worksheetQueueRepository => async (req, res) => {
@@ -61,21 +56,6 @@ const deleteQueue = worksheetQueueRepository => async (req, res) => {
     user: req.user
   })
   res.status(204).send()
-}
-
-const getQueue = worksheetQueueRepository => async (req, res) => {
-  const extra = bool(_get(req.query, 'extra', false))
-  const queueId = req.params.id
-
-  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
-  canOperatorHandleQueue(req.user.operator, queueId)
-
-  if (extra) {
-    const queueWithExtraInfo = await worksheetQueueRepository.findWithExtra(queue)
-    res.json(queueWithExtraInfo)
-  } else {
-    res.json(queue)
-  }
 }
 
 const queueList = worksheetQueueRepository => async (req, res) => {
@@ -122,7 +102,6 @@ const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
 
 export const worksheetListController = wrap(worksheetList)
 export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
-export const getQueueController = worksheetQueueRepository => wrap(getQueue(worksheetQueueRepository))
 export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
 export const actionsOnWorksheetQueueController = logger => wrap(actionsOnWorksheetQueue(logger))
 export const queueTakenFindByOperatorController = worksheetQueueRepository => wrap(queueTakenFindByOperator(worksheetQueueRepository))

@@ -6,7 +6,6 @@ import {
   actionsOnWorksheetQueueController,
   createQueueController,
   deleteQueueController,
-  getQueueController,
   getScheduledWorksheetsController,
   queueListController,
   queueTakenFindByOperatorController,
@@ -24,8 +23,6 @@ export function worksheetRoutes (awilixContainer) {
   router.get('/queues', permissions.manager, queueListController(legacyWorksheetQueueRepository))
 
   router.post('/queues', permissions.manager, createQueueController(legacyWorksheetQueueRepository))
-
-  router.get('/queues/:id', getQueueController(legacyWorksheetQueueRepository))
 
   router.get('/queues/:id/taken', queueTakenFindByOperatorController(legacyWorksheetQueueRepository))
 

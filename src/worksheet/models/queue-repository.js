@@ -1,7 +1,5 @@
 import Promise from 'bluebird'
 import _ from 'lodash'
-import _map from 'lodash/map'
-import _set from 'lodash/set'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
@@ -9,41 +7,8 @@ import { logger } from '../../infrastructure/logger'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { ListQuery } from '../../types/params'
-import { WorksheetQueue, WorksheetQueueBody, WorksheetQueueCount, WorksheetQueueSource } from '../domain/queue'
-import { WorkSheetCall } from '../domain/worksheet'
-import { QueueItem } from './queue-item'
+import { WorksheetQueue, WorksheetQueueBody, WorksheetQueueCount } from '../domain/queue'
 import { LegacyWorksheetRepository } from './worksheet-repository'
-
-const QueueItemExtraInfo = QueueItem.extend({
-  totalContacts: t.Number,
-  totalBuildings: t.Number,
-  ownerName: t.maybe(t.String),
-  ownerType: t.maybe(t.String),
-  buildingAddress: t.maybe(t.String),
-  note: t.maybe(t.String),
-  lastCall: t.maybe(WorkSheetCall)
-})
-
-const WorksheetQueueExtraInfo = t.struct(
-  {
-    id: t.maybe(t.String),
-    name: t.String,
-    size: t.Number,
-    source: WorksheetQueueSource,
-    worksheets: t.list(QueueItemExtraInfo),
-
-    _documentType: t.enums.of([ 'worksheet-queue' ])
-  },
-  {
-    name: 'WorksheetQueue',
-    defaultProps: {
-      worksheets: [],
-      source: {},
-      size: 100,
-      _documentType: 'worksheet-queue'
-    }
-  }
-)
 
 const QueueListResponse = t.struct(
   {
@@ -135,18 +100,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
 
   /**
    * @public
-   * @param queue
-   * @returns {Promise<unknown>}
-   */
-  async findWithExtra (queue) {
-    const worksheets = await this.getQueueWorksheets(queue)
-    const queueExtraInfo = Object.assign({}, JSON.parse(JSON.stringify(queue)), { worksheets })
-
-    return fromJSON(queueExtraInfo, WorksheetQueueExtraInfo)
-  }
-
-  /**
-   * @public
    * @param query
    * @returns {Promise<unknown>}
    */
@@ -185,42 +138,5 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
     const qb = this.getQueryBuilder('delete')
     qb.where('id = ?', queue.id)
     await this.deleteQuery(qb)
-  }
-
-  /**
-   * @private
-   * @param queue
-   * @returns {Promise<Worksheet[]>}
-   */
-  async getQueueWorksheets (queue) {
-    const worksheetIds = _map(queue.worksheets, 'worksheetId')
-    const worksheets = await Promise
-      .map(worksheetIds, (worksheetId) => this.worksheetRepository.findByIdWIthIncludes(worksheetId))
-
-    return worksheets.map(worksheet => {
-      const info = {}
-      const item = queue.findItemByWorksheetId(worksheet.id)
-
-      _set(info, 'totalContacts', worksheet.relatedOwners.length)
-      _set(info, 'totalBuildings', worksheet.relatedBuildings.length)
-
-      const [ owner ] = worksheet.relatedOwners
-      if (owner) {
-        _set(info, 'ownerName', owner.person.name)
-        _set(info, 'ownerType', owner.type)
-      }
-
-      const [ building ] = worksheet.relatedBuildings
-      if (building) {
-        _set(info, 'buildingAddress', building.address.fullAddress)
-      }
-
-      const [ call ] = worksheet.calls
-      if (call) {
-        _set(info, 'lastCall', call)
-      }
-
-      return Object.assign({}, JSON.parse(JSON.stringify(item)), info)
-    })
   }
 }
