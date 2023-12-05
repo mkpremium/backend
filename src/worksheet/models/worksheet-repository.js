@@ -1,4 +1,3 @@
-import Promise from 'bluebird'
 import _ from 'lodash'
 import _every from 'lodash/every'
 import _find from 'lodash/find'
@@ -124,11 +123,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     }
 
     return fromJSON(_head(results), Worksheet)
-  }
-
-  findByBuilding (buildingId) {
-    const repo = new LegacyWorksheetRepository()
-    return repo.findWorksheetByBuilding(buildingId)
   }
 
   /**
@@ -318,8 +312,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
 
     const total = await this.countQuery(qbCount)
     let results = await this.query(qb)
-
-    results = await Promise.map(results, (worksheet) => this.worksheetWithRelatedBuildings(worksheet))
 
     return fromJSON({ total, results }, WorkSheetListResponse)
   }

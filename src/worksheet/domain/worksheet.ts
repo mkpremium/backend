@@ -46,9 +46,7 @@ export const Worksheet = t.struct<WorksheetProps>({
 
   relatedBuildingIds: t.list(t.String),
   // buildingId: t.String,
-  relatedBuildings: t.list(Building),
   relatedOwnerIds: t.list(t.String),
-  relatedOwners: t.list(OwnerWithInclude),
 
   status: WorkSheetStatusEnum,
   statusChangeReason: t.maybe(t.String),
