@@ -2,7 +2,6 @@ import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/models'
-import { OwnerBusinessStatus } from '../owner/owner'
 import { LegacyWorksheetRepository } from '../worksheet/models/worksheet-repository'
 import { BuildingProposalRepository, LegacyBuildingRepository } from './models'
 
@@ -29,19 +28,20 @@ async function createMetadataUploadUrl (req, res) {
 }
 
 export function createAddNegotiationProposalController ({
-  legacyBuildingsRepository,
-  updateBuildingNegotiationStatusService
+  addProposalForBuildingService
 }) {
   return async (req, res) => {
     const buildingId = req.params.id
-    const building = await legacyBuildingsRepository.findByIdOrThrow(buildingId)
-    const proposal = await legacyBuildingsRepository.addNegotiationProposal(building, req.user.id, req.body)
-    await updateBuildingNegotiationStatusService.updateBuildingStatus(
-      buildingId,
-      { status: OwnerBusinessStatus.PROPOSAL_SENT, userId: req.user.id, sourceOwnerId: building.ownerId }
-    )
+    const cmd = req.body
+    const proposalId = await addProposalForBuildingService.add(buildingId, {
+      amount: cmd.proposal,
+      contactId: cmd.contactId,
+      ownerId: cmd.ownerId,
+      createdBy: req.user.id,
+      message: cmd.message
+    })
 
-    res.status(201).json(proposal)
+    res.status(201).json({ id: proposalId })
   }
 }
 
