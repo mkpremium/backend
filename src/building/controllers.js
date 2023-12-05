@@ -46,8 +46,8 @@ async function updateNegotiationProposal (req, res) {
   const proposalId = req.params.id
   const proposal = await proposalRepo.findByIdOrThrow(proposalId)
 
-  const updatedProposal = await legacyBuildingRepository.updateNegotiationProposal(proposal, req.user.id, req.body)
-  res.status(200).json(updatedProposal)
+  await legacyBuildingRepository.updateNegotiationProposal(proposal, req.user.id, req.body)
+  res.status(201)
 }
 
 async function addOwnerToBuilding (req, res) {
