@@ -1,7 +1,7 @@
 import { BuildingProps, ProposalProps } from './building'
 
 export interface BuyOfferRepository {
-  addNegotiationProposal (building: BuildingProps, operatorId: string, proposal: ProposalProps): Promise<{ id: string }>
+  addNegotiationProposal (building: BuildingProps, proposal: Omit<ProposalProps, 'id'>): Promise<{ id: string }>
 
   updateNegotiationProposal (proposal: ProposalProps, operatorId: string, patch: Partial<ProposalProps>): Promise<{ id: string }>
 

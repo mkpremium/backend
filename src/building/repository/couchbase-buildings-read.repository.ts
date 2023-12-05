@@ -51,6 +51,7 @@ const listBuildingsByIdQuery = bucketName => listBuildingsByQuery(bucketName, 'b
 const listProposalsForBuildingIdQuery = bucketName => `
     SELECT id,
            proposal,
+           ownerId,
            createdAt,
            updatedAt,
            aspiration

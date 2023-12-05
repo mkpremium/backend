@@ -45,11 +45,12 @@ const BuildingOwner = t.struct(
 const BuildingProposalStatus = {
   DEAL: 'aceptada',
   SENT: 'enviada',
-  PENDING: 'pendiente'
+  PENDING: 'pendiente',
 }
 
 export interface ProposalProps {
   id: string;
+  state: 'aceptada' | 'enviada' | 'pendiente'
   buildingId: string;
   ownerId: string;
   createdBy: string;
