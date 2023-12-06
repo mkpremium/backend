@@ -1,7 +1,7 @@
 import { Express, Router } from 'express'
 import { AwilixContainer } from 'awilix'
 import jwt from '../middleware/jwt'
-import { addOwnerContactController, updateOwnerController } from './controllers'
+import { addOwnerContactController } from './controllers'
 import { wrap } from 'express-promise-wrap'
 
 export const setupOwnersRoutes = (app: Express, container: AwilixContainer) => {
@@ -9,7 +9,7 @@ export const setupOwnersRoutes = (app: Express, container: AwilixContainer) => {
   const router = Router()
 
   router.get('/:ownerId', wrap(container.resolve('getOwnerController')))
-  router.put('/:id', updateOwnerController)
+  router.put('/:id', wrap(container.resolve('updateOwnerController')))
 
   router.put('/:ownerId/contacts/:contactId', wrap(container.resolve('changeContactStatusController')))
   router.put('/:ownerId/contacts/:contactId/status', wrap(container.resolve('changeContactStatusController')))
