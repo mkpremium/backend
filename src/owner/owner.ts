@@ -30,8 +30,8 @@ export const Person = t.struct(
     }
   }
 )
-Person.prototype.findContactById = function (id) {
-  return _find(this.contacts, { id })
+export function findContactById(person: PersonProps, id: string) {
+  return _find(person.contacts, { id })
 }
 
 Person.prototype.fullName = function () {

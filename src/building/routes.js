@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 import {
-  addOwnerToBuildingController,
   createAllAgentsStockStatsController,
   createListBuildingProposalsController,
   createListVerifiedOwnersController,
@@ -25,7 +24,7 @@ export const createBuildingsRoutes = container => {
 
   router.put('/:building_id/negotiation/:id', container.resolve('updateNegotiationProposalController'))
 
-  router.post('/:id/owners', addOwnerToBuildingController)
+  router.post('/:id/owners', wrap(container.resolve('addOwnerToBuildingController')))
   router.post('/:buildingId/set-featured-owner', wrap(container.resolve('setFeaturedOwnerController')))
 
   router.get('/:buildingId/owners', wrap(container.resolve('listBuildingOwnersController')))

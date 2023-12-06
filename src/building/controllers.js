@@ -1,7 +1,6 @@
 import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
-import { OwnerRepository } from '../owner/models'
 
 export function createListBuildingProposalsController (listBuildingProposalsService) {
   return wrap(async (req, res) => {
@@ -48,11 +47,12 @@ export function createUpdateNegotiationProposalController ({ updateProposalServi
   }
 }
 
-async function addOwnerToBuilding (req, res) {
-  const ownerRepo = new OwnerRepository()
-  const owner = await ownerRepo.createOwnerAndPerson(req.body)
-  await History.registerCreate({ contextModel: owner, user: req.user })
-  res.status(201).json(owner)
+export function createAddOwnerToBuildingController ({ownersRepository}) {
+  return async function (req, res) {
+    const owner = await ownersRepository.save(req.body)
+    await History.registerCreate({ contextModel: owner, user: req.user })
+    res.status(201).json(owner)
+  }
 }
 
 export const createListVerifiedOwnersController = legacyOwnerRepository => {
@@ -79,7 +79,6 @@ export const createAllAgentsStockStatsController = adminBuildingRepository => {
 }
 
 export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
-export const addOwnerToBuildingController = wrap(addOwnerToBuilding)
 
 export const createSetBuildingSalePriceController = setBuildingSalePriceService => {
   return wrap(async (req, res) => {
