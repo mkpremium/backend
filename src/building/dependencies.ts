@@ -75,7 +75,8 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
     postgresBuildingsRepository: asClass(PostgresBuildingsRepository).singleton().classic(),
     buildingsRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsRepository'),
-    buildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
+    couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
+    buildingsReadRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsReadRepository'),
 
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
