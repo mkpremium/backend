@@ -1,7 +1,7 @@
 import { Repository as EntityRepository } from '../../db/repository'
 import { DataSource, DeepPartial, EntityTarget, Repository } from 'typeorm'
 
-export abstract class WithPostgresRepository<E> {
+export abstract class WithPostgresRepository<E extends {id: string}> {
   protected repository: Repository<E>
 
   constructor (ormDataSource: DataSource) {
@@ -15,7 +15,9 @@ export abstract class PostgresRepository<S extends { id: string }, E extends {
   id: string
 }> extends WithPostgresRepository<E> implements EntityRepository<S> {
   get (id: string): Promise<S> {
-    return Promise.reject(new Error('Not implemented'))
+    return this.repository.findOneBy({
+      id: id as any
+    }).then(this.entityToStruct)
   }
 
   save (struct: S): Promise<S> {
