@@ -2,36 +2,11 @@ import _ from 'lodash'
 import _isArray from 'lodash/isArray'
 import _isNil from 'lodash/isNil'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
-import { ListQuery } from '../types/params'
 import { TypedContactInfo } from './contact'
-import { FeaturedContact, Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, OwnerWithInclude, Person } from './owner'
-
-const OwnerListQuery = ListQuery.extend(
-  {
-    contactNumber: t.maybe(t.String)
-  },
-  {
-    name: 'OwnerListQuery',
-    defaultProps: {
-    }
-  }
-)
-
-const OwnerListingResponse = t.struct(
-  {
-    results: t.list(OwnerWithInclude)
-  },
-  {
-    name: 'OwnerLitResponse',
-    defaultProps: {
-      results: []
-    }
-  }
-)
+import { FeaturedContact, Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, Person } from './owner'
 
 const OwnerStatsParams = t.struct({
   city: t.maybe(t.String)
