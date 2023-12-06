@@ -33,12 +33,5 @@ async function addOwnerContact (req, res) {
   res.json(updatedOwner)
 }
 
-async function ownerList (req, res) {
-  const repo = new OwnerRepository()
-  const owners = await repo.list(req.query)
-  res.json(owners)
-}
-
 export const updateOwnerController = wrap(updateOwner)
 export const addOwnerContactController = wrap(addOwnerContact)
-export const listOwnerController = wrap(ownerList)

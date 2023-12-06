@@ -166,19 +166,6 @@ GROUP BY negotiationStatus, assignedAgentId
     return owners
   }
 
-  async list (query = {}) {
-    const params = new OwnerListQuery(query)
-    if (!params.contactNumber) {
-      return []
-    }
-
-    const qb = this.getQueryBuilder()
-      .where('ANY v IN person.contacts SATISFIES `v`.`value` = ? END', params.contactNumber)
-    const results = await this.query(qb)
-
-    return fromJSON({ results }, OwnerListingResponse)
-  }
-
   async findAllVerifiedOwnersByBuildingId (buildingId) {
     const qb = this.getQueryBuilder()
       .where('t.`buildingId` = ?', buildingId)
