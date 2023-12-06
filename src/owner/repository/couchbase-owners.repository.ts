@@ -1,9 +1,10 @@
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { Owner, OwnerProps } from '../owner'
+import { FeaturedContact, Owner, OwnerProps, Person } from '../owner'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import t from 'tcomb'
-import { BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
+import { AddContactCmd, BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
+import { TypedContactInfo } from '../contact'
 
 
 const findOwnerByContactValueQuery = bucketName => `
@@ -66,6 +67,36 @@ WHERE _documentType = 'owner' and buildingId = $1
 `
 
 export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> implements OwnerRepository {
+  async addContact (cmd: AddContactCmd): Promise<OwnerProps> {
+    const owner = await this.get(cmd.ownerId)
+    let featuredContact = owner.featuredContact
+    const newContact = TypedContactInfo(cmd as any)
+
+    const { isFeatured } = cmd
+    if (isFeatured) {
+      featuredContact = FeaturedContact.update(featuredContact || FeaturedContact({}), {
+        [ cmd.type === 'EMAIL' ? 'emailId' : 'phoneId' ]: {
+          $set: newContact.id
+        }
+      })
+    }
+
+    const updatedOwner = Owner.update(owner, {
+      featuredContact: { $set: featuredContact },
+      $merge: {
+        person: Person.update(owner.person, {
+          $merge: {
+            contacts: t.update(owner.person.contacts, {
+              $push: [ newContact ]
+            })
+          }
+        })
+      }
+    })
+
+    return await this.save(updatedOwner)
+  }
+
   async findByPhoneNumber (phoneNumber: string) {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),

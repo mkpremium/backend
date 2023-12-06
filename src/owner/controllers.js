@@ -1,6 +1,4 @@
-import { wrap } from 'express-promise-wrap'
 import { History } from '../history/models'
-import { OwnerRepository } from './models'
 import { Owner } from './owner'
 import t from 'tcomb'
 
@@ -24,14 +22,13 @@ export function createUpdateOwnerController ({ ownersRepository }) {
   }
 }
 
-async function addOwnerContact (req, res) {
-  const ownerId = req.params.id
-  const repo = new OwnerRepository()
-  const updatedOwner = await repo.addContact(ownerId, req.body)
+export function createAddOwnerContactController ({ ownersRepository }) {
+  return async function (req, res) {
+    const ownerId = req.params.id
+    const updatedOwner = await ownersRepository.addContact({ ownerId, ...req.body })
 
-  await History.registerCreate({ contextModel: updatedOwner, user: req.user })
+    await History.registerCreate({ contextModel: updatedOwner, user: req.user })
 
-  res.json(updatedOwner)
+    res.json(updatedOwner)
+  }
 }
-
-export const addOwnerContactController = wrap(addOwnerContact)

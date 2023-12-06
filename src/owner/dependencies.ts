@@ -12,12 +12,13 @@ import { createSetFeaturedContactController } from './controller/set-featured-co
 import { createResetOwnerBadContactsHandler } from './command-handler/reset-owner-bad-contacts.handler'
 import { CouchbaseOwnersRepository } from './repository/couchbase-owners.repository'
 import { PostgresOwnersRepository } from './repository/postgres-owners.repository'
-import { createUpdateOwnerController } from './controllers'
+import { createAddOwnerContactController, createUpdateOwnerController } from './controllers'
 
 export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
     getOwnerController: asFunction(getOwnerController).singleton(),
     updateOwnerController: asFunction(createUpdateOwnerController).singleton(),
+    addOwnerContactController: asFunction(createAddOwnerContactController).singleton(),
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
     searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
     setFeaturedContactController: asFunction(createSetFeaturedContactController).classic().singleton(),

@@ -5,8 +5,7 @@ import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
-import { TypedContactInfo } from './contact'
-import { FeaturedContact, Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, Person } from './owner'
+import { Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, Person } from './owner'
 
 const OwnerStatsParams = t.struct({
   city: t.maybe(t.String)
@@ -46,35 +45,6 @@ export class OwnerRepository extends CouchbaseModel {
     body.name = person.fullName()
 
     return this.save(body)
-  }
-
-  async addContact (ownerId, addContactRequest) {
-    const owner = await this.findByIdOrThrow(ownerId)
-    let featuredContact = owner.featuredContact
-    const newContact = TypedContactInfo(addContactRequest)
-
-    const { isFeatured } = addContactRequest
-    if (isFeatured) {
-      featuredContact = FeaturedContact.update(featuredContact || FeaturedContact({}), {
-        [ addContactRequest.type === 'EMAIL' ? 'emailId' : 'phoneId' ]: {
-          $set: newContact.id
-        }
-      })
-    }
-
-    const updatedOwner = Owner.update(owner, {
-      featuredContact: { $set: featuredContact },
-      $merge: {
-        person: Person.update(owner.person, {
-          $merge: {
-            contacts: t.update(owner.person.contacts, {
-              $push: [ newContact ]
-            })
-          }
-        })
-      }
-    })
-    return this.save(updatedOwner)
   }
 
   async ownerStats (args = {}) {
