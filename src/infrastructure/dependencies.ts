@@ -26,26 +26,28 @@ import { initializeDataSource } from '../data-source'
 import { DataSource } from 'typeorm'
 import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import { setupContactsDependencies } from '../contacts/dependencies'
+import { Database } from './database'
 
-export async function createDiContainer () {
+export async function createDiContainer (database: Database) {
   const container = createContainer()
   const [ couchbaseBucket, dataSource ] = await Promise.all([
     connectCouchbaseBucket(),
     initializeDataSource()
   ])
 
-  setupContainer(container, couchbaseBucket, dataSource)
+  setupContainer(container, couchbaseBucket, dataSource, database === 'postgres')
 
   return container
 }
 
-export function setupContainer (container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource) {
+export function setupContainer (
+  container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource, usePostgres: boolean) {
   setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
-  setupBuildingDependencies(container)
-  setupOwnerDependencies(container)
+  setupBuildingDependencies(container, usePostgres)
+  setupOwnerDependencies(container, usePostgres)
   setupContactsDependencies(container)
   setupScheduledEventsDependencies(container)
-  setupWorksheetDependencies(container)
+  setupWorksheetDependencies(container, usePostgres)
   setupCallerDependencies(container)
   setupUserDependencies(container)
   setupStockDependencies(container)

@@ -28,9 +28,10 @@ import { setupUserRoutes } from './user/routing'
 import { statRoutes } from './stats/routing'
 import { historyRoutes } from './history/routing'
 import { startListeners } from './infrastructure/listeners'
+import { Database } from './infrastructure/database'
 
 let app: Express
-export const createApp = (): Promise<Express> => {
+export const createApp = (database: Database = 'couchbase'): Promise<Express> => {
   const logger = initLogger()
   logger.info('starting app')
 
@@ -53,7 +54,7 @@ export const createApp = (): Promise<Express> => {
   app.use(morgan('combined'))
   app.use(cors())
 
-  return createDiContainer()
+  return createDiContainer(database)
     .then(diContainer => {
       app.locals.diContainer = diContainer
 

@@ -12,7 +12,7 @@ import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-work
 import { CouchbaseWorksheetRepository } from './repository/couchbase-worksheet.repository'
 import { PostgresWorksheetRepository } from './repository/postgres-worksheet.repository'
 
-export const setupWorksheetDependencies = diContainer => {
+export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
@@ -25,7 +25,7 @@ export const setupWorksheetDependencies = diContainer => {
 
     couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
-    worksheetRepository: aliasTo('couchbaseWorksheetRepository'),
+    worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
     worksheetQueueRepository: asClass(WorksheetQueueRepository).classic().singleton(),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
     legacyWorksheetQueueRepository: asClass(LegacyWorksheetQueueRepository).classic().singleton()

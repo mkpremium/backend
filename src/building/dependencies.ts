@@ -32,7 +32,6 @@ import { createAddOfferRequestController } from './controller/add-offer-request.
 import { createAddProposalController } from './controller/add-proposal.controller'
 import { AddProposalForBuildingService } from './service/add-proposal-for-building.service'
 import { ProposalsSenderService } from './service/proposals-sender.service'
-import { ProposalsRepository } from './repository/proposals.repository'
 import { PdfProposalComposer } from './service/pdf-proposal-composer'
 import { createListBuildingsController } from './controller/list-buildings.controller'
 import { createProposalScheduledListener } from './event-listener/proposal-added.listener'
@@ -53,7 +52,7 @@ import { UpdateProposalService } from './service/update-proposal.service'
 import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.repository'
 import { PostgresProposalsRepository } from './repository/postgres-proposals.repository'
 
-export const setupBuildingDependencies = (container: AwilixContainer) => {
+export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
@@ -75,11 +74,10 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
     couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
     postgresBuildingsRepository: asClass(PostgresBuildingsRepository).singleton().classic(),
-    buildingsRepository: aliasTo('couchbaseBuildingsRepository'),
+    buildingsRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsRepository'),
     buildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
 
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
-    buildingRepository: aliasTo('buildingsRepository'),
     legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     buyOffersRepository: aliasTo('legacyBuildingsRepository'),
 
@@ -89,7 +87,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
     buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
     couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
     postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
-    proposalsRepository: aliasTo('couchbaseProposalsRepository'),
+    proposalsRepository: aliasTo(usePostgres ? 'postgresProposalsRepository' : 'couchbaseProposalsRepository'),
 
     updateNegotiationProposalController: asFunction(createUpdateNegotiationProposalController).singleton(),
     createBuildingController: asFunction(createBuildingController).singleton(),
@@ -109,7 +107,7 @@ export const setupBuildingDependencies = (container: AwilixContainer) => {
 
     couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
     postgresOfferRequestsRepository: asClass(PostgresOfferRequestsRepository).classic().singleton(),
-    offerRequestsRepository: aliasTo('couchbaseOfferRequestsRepository'),
+    offerRequestsRepository: aliasTo(usePostgres ? 'postgresOfferRequestsRepository' : 'couchbaseOfferRequestsRepository'),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController),

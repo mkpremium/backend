@@ -13,7 +13,7 @@ import { createResetOwnerBadContactsHandler } from './command-handler/reset-owne
 import { CouchbaseOwnersRepository } from './repository/couchbase-owners.repository'
 import { PostgresOwnersRepository } from './repository/postgres-owners.repository'
 
-export const setupOwnerDependencies = (container: AwilixContainer) => {
+export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
     getOwnerController: asFunction(getOwnerController).singleton(),
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
@@ -29,7 +29,7 @@ export const setupOwnerDependencies = (container: AwilixContainer) => {
 
     postgresOwnersRepository: asClass(PostgresOwnersRepository).singleton().classic(),
     couchbaseOwnersRepository: asClass(CouchbaseOwnersRepository).singleton().classic(),
-    ownersRepository: aliasTo('couchbaseOwnersRepository'),
+    ownersRepository: aliasTo(usePostgres ? 'postgresOwnersRepository' : 'couchbaseOwnersRepository'),
     legacyOwnersRepository: asClass(LegacyOwnerRepository).singleton(),
 
     resetOwnerBadContactsHandler: asFunction(createResetOwnerBadContactsHandler).singleton(),

@@ -37,7 +37,7 @@ export async function createTestContainer ({ couchbase, postgres }: {
     postgres ? setupPostgres() : Promise.resolve(null),
   ])
   const container = createContainer()
-  setupContainer(container, bucket, dataSource)
+  setupContainer(container, bucket, dataSource, postgres)
 
   return container
 }
