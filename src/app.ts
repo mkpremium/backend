@@ -30,15 +30,11 @@ import { historyRoutes } from './history/routing'
 import { startListeners } from './infrastructure/listeners'
 import { Database } from './infrastructure/database'
 
-let app: Express
-export const createApp = (database: Database = 'couchbase'): Promise<Express> => {
+export const createApp = async (database: Database = 'couchbase'): Promise<Express> => {
   const logger = initLogger()
   logger.info('starting app')
 
-  if (app) {
-    return Promise.resolve(app)
-  }
-  app = express()
+  const app = express()
 
   app.set('IS_READY', false)
   app.get('/_ready', (req, res) => {
@@ -54,42 +50,42 @@ export const createApp = (database: Database = 'couchbase'): Promise<Express> =>
   app.use(morgan('combined'))
   app.use(cors())
 
-  return createDiContainer(database)
-    .then(diContainer => {
-      app.locals.diContainer = diContainer
+  try {
+    const diContainer = await createDiContainer(database)
 
-      operator(app) // start with login router
-      callsRoutes(diContainer, app)
-      setupUserRoutes(app, diContainer)
-      buildingRoutes(diContainer, app)
-      setupOwnersRoutes(app, diContainer)
-      scheduledEventsRoutes(diContainer, app)
-      worksheetsRoutes(app, diContainer)
-      createTestHarness(app, diContainer)
-      initPropertyManager(app, diContainer)
-      setupCallerRoutes(app, diContainer)
-      flipperRoutes(app, diContainer)
-      setupStockRouter(app, diContainer)
-      statRoutes(app)
-      historyRoutes(app)
+    app.locals.diContainer = diContainer
 
-      notes(app)
-      metadata(app)
-      email(app)
+    operator(app) // start with login router
+    callsRoutes(diContainer, app)
+    setupUserRoutes(app, diContainer)
+    buildingRoutes(diContainer, app)
+    setupOwnersRoutes(app, diContainer)
+    scheduledEventsRoutes(diContainer, app)
+    worksheetsRoutes(app, diContainer)
+    createTestHarness(app, diContainer)
+    initPropertyManager(app, diContainer)
+    setupCallerRoutes(app, diContainer)
+    flipperRoutes(app, diContainer)
+    setupStockRouter(app, diContainer)
+    statRoutes(app)
+    historyRoutes(app)
 
-      startListeners(diContainer)
+    notes(app)
+    metadata(app)
+    email(app)
 
-      app.use(appErrorHandler)
-      app.set('IS_READY', true)
-      const eventBus: EventsDiagnostics = diContainer.resolve('eventBus')
-      logger.info('App is ready', {
-        eventSubscribersInfo: eventBus.info
-      })
+    startListeners(diContainer)
 
-      return app
+    app.use(appErrorHandler)
+    app.set('IS_READY', true)
+    const eventBus: EventsDiagnostics = diContainer.resolve('eventBus')
+    logger.info('App is ready', {
+      eventSubscribersInfo: eventBus.info
     })
-    .catch(error => {
-      logger.error('error starting application', { error: error, stack: error.stack, errorMessage: error.messge })
-      process.exit(1)
-    })
+
+    return app
+  } catch (error) {
+    logger.error('error starting application', { error: error, stack: error.stack, errorMessage: error.messge })
+    process.exit(1)
+  }
 }
