@@ -29,7 +29,7 @@ export const createBuildingsRoutes = container => {
 
   router.get('/:buildingId/owners', wrap(container.resolve('listBuildingOwnersController')))
 
-  router.get('/:buildingId/verified-owners', createListVerifiedOwnersController(container.resolve('legacyOwnersRepository')))
+  router.get('/:buildingId/verified-owners', createListVerifiedOwnersController(container.resolve('ownersRepository')))
 
   router.get('/', wrap(container.resolve('listBuildingsController')))
 

@@ -5,6 +5,7 @@ import { logger } from '../../infrastructure/logger'
 import t from 'tcomb'
 import { AddContactCmd, BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
 import { TypedContactInfo } from '../contact'
+import _ from 'lodash'
 
 
 const findOwnerByContactValueQuery = bucketName => `
@@ -121,6 +122,17 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
         return o
       }
     }))
+  }
+
+  async findAllVerifiedOwnersByBuildingId (buildingId: string): Promise<OwnerProps[]> {
+    const owners = await this.buildingOwners(buildingId)
+    return owners.filter(this.isVerifiedOwner)
+  }
+
+  isVerifiedOwner (owner: OwnerProps) {
+    const contacts = _.get(owner, 'person.contacts')
+    const goodContacts = contacts.filter(c => c.status === 'GOOD')
+    return goodContacts.length > 0
   }
 
   struct () {
