@@ -57,7 +57,7 @@ export function createAddOwnerToBuildingController ({ownersRepository}) {
 
 export const createListVerifiedOwnersController = ownersRepository => {
   return wrap(async (req, res) => {
-    const owners = await ownersRepository.findAllVerifiedOwnersByBuildingId(req.params.buildingId)
+    const owners = await ownersRepository.verifiedOwnersOfBuildingWithId(req.params.buildingId)
     const result = owners.map(o => ({
       id: o.id,
       name: o.person.name,

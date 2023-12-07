@@ -124,7 +124,7 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
     }))
   }
 
-  async findAllVerifiedOwnersByBuildingId (buildingId: string): Promise<OwnerProps[]> {
+  async verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]> {
     const owners = await this.buildingOwners(buildingId)
     return owners.filter(this.isVerifiedOwner)
   }

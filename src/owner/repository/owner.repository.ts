@@ -85,4 +85,6 @@ export interface OwnerRepository extends Repository<OwnerProps> {
   buildingOwners (buildingId: string): Promise<OwnerProps[]>
 
   addContact (cmd: AddContactCmd): Promise<OwnerProps>
+
+  verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]>
 }
