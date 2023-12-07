@@ -10,7 +10,7 @@ const proposalPrototype: ProposalProps = {
   notificationStatus: 'PENDING',
   createdBy: 'test-flipper-id',
   message: 'test proposal message',
-  proposal: 1000000,
+  proposal: 1_000_000,
 }
 
 export const proposalBuilder = (overrides: Partial<ProposalProps> = {}) => ({

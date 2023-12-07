@@ -22,7 +22,7 @@ async function setupCouchbaseBucket () {
 async function setupPostgres () {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize()
-    await AppDataSource.synchronize()
+    await AppDataSource.synchronize(true)
   }
 
   return AppDataSource

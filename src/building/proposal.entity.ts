@@ -1,9 +1,35 @@
-import { Entity, ManyToOne } from 'typeorm'
+import { Column, Entity, ManyToOne } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
+import { Owner } from '../owner/owner.entity'
 import { Building } from './building.entity'
+import { User } from '../user/user.entity'
 
 @Entity()
 export class Proposal extends BaseEntity {
+  @Column('text')
+  status: 'ACCEPTED' | 'SENT' | 'PENDING'
+
   @ManyToOne(() => Building, building => building.proposals)
   building: Building
+
+  @ManyToOne(() => Owner)
+  owner: Owner
+
+  @ManyToOne(() => User)
+  author: User
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  amount: number
+
+  @Column()
+  notificationEmail: string
+
+  @Column('text')
+  notificationStatus: 'PENDING' | 'SENT'
+
+  @Column({ type: 'timestamptz', nullable: true })
+  notificationSentAt?: Date
+
+  @Column('text')
+  message?: string;
 }
