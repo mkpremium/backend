@@ -1,11 +1,9 @@
 import _ from 'lodash'
-import _isArray from 'lodash/isArray'
 import _isNil from 'lodash/isNil'
 import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
-import { newHttpError } from '../lib/http-error'
 import { OperatorRepository } from '../operator/models'
-import { Owner, OwnerBody, OwnerBusinessStatus, OwnerStatus, Person } from './owner'
+import { Owner, OwnerBusinessStatus, OwnerStatus } from './owner'
 
 const OwnerStatsParams = t.struct({
   city: t.maybe(t.String)
@@ -15,36 +13,6 @@ export class OwnerRepository extends CouchbaseModel {
   constructor () {
     super()
     this.Struct = Owner
-  }
-
-  async findByIdOrThrow (ownerId) {
-    const owner = await this.findById(ownerId)
-    if (!owner) {
-      throw newHttpError(404, `El propietario ${ownerId} no existe`)
-    }
-
-    return owner
-  }
-
-  async findByIdWithIncludes (id) {
-    if (!id) {
-      // noinspection HtmlUnknownTag
-      throw new Error('id undefined, expected String or Array<String>')
-    }
-
-    const ids = _isArray(id) ? id : [ id ]
-    const idsText = `[${ids.map(id => `'${id}'`).join(', ')}]`
-    const qb = this.getQueryBuilder('select').where(`id IN ${idsText}`)
-
-    return this.query(qb)
-  }
-
-  async createOwnerAndPerson (body) {
-    const ownerBody = OwnerBody(body)
-    const person = Person(ownerBody.person)
-    body.name = person.fullName()
-
-    return this.save(body)
   }
 
   async ownerStats (args = {}) {

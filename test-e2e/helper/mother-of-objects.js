@@ -54,9 +54,9 @@ export const createWorksheetForBuilding = (app, building) => {
 
 export const createOwner = async (app, { status } = { status: OwnerStatus.VERIFIED }) => {
   const container = typeof app.resolve === 'function' ? app : app.locals.diContainer
-  const ownerRepository = container.resolve('legacyOwnersRepository')
+  const ownerRepository = container.resolve('ownersRepository')
 
-  return ownerRepository.createOwnerAndPerson({
+  return ownerRepository.save({
     status,
     person: {
       name: testOwnerName,
