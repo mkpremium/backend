@@ -16,3 +16,10 @@ Factory.define('phone-contact')
     type: 'MOVIL',
     value: '666666666'
   })
+
+Factory.define('email-contact')
+  .attrs({
+    status: 'UNDEFINED',
+    type: 'EMAIL',
+    value: 'test@email.org',
+  })
