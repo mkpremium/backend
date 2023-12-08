@@ -1,13 +1,13 @@
 import { BaseEntity } from '../infrastructure/entity'
 import { Column, Entity, ManyToOne } from 'typeorm'
-import { Owner } from './owner.entity'
 import { Contact } from '../contacts/contact.entity'
 import { OwnerContactStatus } from './owner'
+import { Person } from './person.entity'
 
 @Entity()
-export class OwnerContact extends BaseEntity {
-  @ManyToOne(() => Owner)
-  owner: Owner
+export class PersonContact extends BaseEntity {
+  @ManyToOne(() => Person)
+  owner: Person
 
   @ManyToOne(() => Contact)
   contact: Contact

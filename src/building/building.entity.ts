@@ -6,7 +6,6 @@ import { Owner } from '../owner/owner.entity'
 import { Flipper } from '../flipper/flipper.entity'
 import { Proposal } from './proposal.entity'
 import _ from 'lodash'
-import { BuildingToOwner } from './building-to-owner.entity'
 import { Worksheet } from '../worksheet/worksheet.entity'
 
 
@@ -45,8 +44,8 @@ export class Building extends BaseEntity {
   @OneToMany(() => BuildingImage, image => image.building)
   images: BuildingImage[]
 
-  @OneToMany(() => BuildingToOwner, bo => bo.owner)
-  owners: BuildingToOwner[]
+  @OneToMany(() => Owner, owner => owner.building)
+  owners: Owner[]
 
   @OneToOne(() => Worksheet, worksheet => worksheet.building)
   worksheet: Worksheet

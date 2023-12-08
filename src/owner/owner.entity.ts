@@ -1,17 +1,21 @@
-import { Entity, ManyToMany, OneToMany } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
 import { Building } from '../building/building.entity'
-import { BuildingToOwner } from '../building/building-to-owner.entity'
-import { OwnerContact } from './owner-contact.entity'
+import { Person } from './person.entity'
 
 @Entity()
 export class Owner extends BaseEntity {
+  @OneToOne(() => Person)
+  @JoinColumn()
+  person: Person
+
   @OneToMany(() => Building, building => building.featuredOwner)
   featuredInBuildings: Building[]
 
-  @OneToMany(() => BuildingToOwner, bo => bo.owner)
-  buildings: Building[]
+  @ManyToOne(() => Building)
+  building: Building[]
 
-  @OneToMany(() => OwnerContact, oc => oc.owner)
-  contacts: OwnerContact[]
+  // TODO: declare type for OwnerStatus
+  @Column('text')
+  status: string
 }

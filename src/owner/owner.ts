@@ -30,9 +30,6 @@ export const Person = t.struct(
     }
   }
 )
-export function findContactById(person: PersonProps, id: string) {
-  return _find(person.contacts, { id })
-}
 
 Person.prototype.fullName = function () {
   return `${this.name}`.trim()
@@ -295,7 +292,7 @@ export type OwnerType =
 
 export interface OwnerProps {
   id: string;
-  type: OwnerType;
+  type?: OwnerType;
   status: OwnerStatus;
   person: PersonProps;
   buildingId: string,
