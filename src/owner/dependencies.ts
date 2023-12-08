@@ -13,6 +13,7 @@ import { CouchbaseOwnersRepository } from './repository/couchbase-owners.reposit
 import { PostgresOwnersRepository } from './repository/postgres-owners.repository'
 import { createAddOwnerContactController, createUpdateOwnerController } from './controllers'
 import { createAddOwnerToBuildingController } from '../building/controllers'
+import { AddOwnerService } from './service/add-owner.service'
 
 export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -30,6 +31,7 @@ export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: 
 
     changeContactStatusService: asClass(ChangeContactStatusService).singleton().classic(),
     setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
+    addOwnerService: asClass(AddOwnerService).singleton().classic(),
 
     postgresOwnersRepository: asClass(PostgresOwnersRepository).singleton().classic(),
     couchbaseOwnersRepository: asClass(CouchbaseOwnersRepository).singleton().classic(),

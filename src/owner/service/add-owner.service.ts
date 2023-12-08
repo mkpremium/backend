@@ -1,4 +1,5 @@
 import { ContactProps, OwnerStatus, OwnerType } from '../owner'
+import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
 
 export interface AddOwnerCommand {
   verified: boolean,
@@ -12,5 +13,14 @@ export interface AddOwnerCommand {
     firstSurname: string,
     secondSurname: string,
     contacts: ContactProps[]
+  }
+}
+
+export class AddOwnerService {
+  constructor (private couchbaseOwnersRepository: CouchbaseOwnersRepository) {
+  }
+
+  addOwner (cmd: AddOwnerCommand) {
+    return this.couchbaseOwnersRepository.save(cmd)
   }
 }

@@ -47,9 +47,9 @@ export function createUpdateNegotiationProposalController ({ updateProposalServi
   }
 }
 
-export function createAddOwnerToBuildingController ({ownersRepository}) {
+export function createAddOwnerToBuildingController ({addOwnerService}) {
   return async function (req, res) {
-    const owner = await ownersRepository.save(req.body)
+    const owner = await addOwnerService.addOwner(req.body)
     await History.registerCreate({ contextModel: owner, user: req.user })
     res.status(201).json(owner)
   }
