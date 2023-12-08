@@ -42,6 +42,7 @@ export async function createDiContainer (database: Database) {
 
 export function setupContainer (
   container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource, usePostgres: boolean) {
+  container.register('usePostgres', asValue(usePostgres))
   setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
   setupBuildingDependencies(container, usePostgres)
   setupOwnerDependencies(container, usePostgres)
