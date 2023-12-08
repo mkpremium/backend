@@ -17,7 +17,7 @@ let killProcess = false
 process.on('SIGTERM', () => killProcess = true)
 
 async function init () {
-  const container = await createDiContainer()
+  const container = await createDiContainer('couchbase')
   const poller: EventPoller = container.resolve('eventPoller')
   const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
   startListeners(container)
