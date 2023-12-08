@@ -5,6 +5,17 @@ import { Owner } from '../owner.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
 
 export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Owner> implements OwnerRepository {
+  protected relations = {
+    building: true,
+    person: {
+      contacts: {
+        contact: true
+      },
+      featuredPhoneContact: true,
+      featuredEmailContact: true,
+    }
+  }
+
   // Owners repository
   buildingOwners (buildingId: string): Promise<OwnerProps[]> {
     return Promise.reject(new Error('Not implemented'))
@@ -23,7 +34,20 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   }
 
   protected entityToStruct (entity: Owner): OwnerProps {
-    return null
+    return {
+      id: entity.id,
+      status: entity.status ,
+      name: entity.person.fullName,
+      buildingId: entity.building.id,
+      person: {
+        name: entity.person.fullName,
+        contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status })),
+      },
+      featuredContact: entity.person.featuredEmailContact ||  entity.person.featuredPhoneContact ? {
+        phoneId: entity.person.featuredPhoneContact?.id,
+        emailId: entity.person.featuredEmailContact?.id,
+      } : null
+    }
   }
 
   protected getEntityTarget (): EntityTarget<Owner> {
@@ -32,7 +56,15 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
 
   protected structToEntity (owner: OwnerProps): DeepPartial<Owner> {
     return {
-      id: owner.id
+      id: owner.id,
+      status: owner.status,
+      person: {
+        fullName: owner.person.name,
+        contacts: owner.person.contacts,
+        featuredPhoneContact: owner.featuredContact?.phoneId ? {id: owner.featuredContact?.phoneId} : null,
+        featuredEmailContact: owner.featuredContact?.emailId ? {id: owner.featuredContact?.emailId} : null,
+        documentNumber: owner.person.documentNumber,
+      }
     }
   }
 }

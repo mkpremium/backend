@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { BaseEntity } from '../infrastructure/entity'
 import { Building } from '../building/building.entity'
 import { Person } from './person.entity'
+import { OwnerStatus } from './owner'
 
 @Entity()
 export class Owner extends BaseEntity {
@@ -13,9 +14,8 @@ export class Owner extends BaseEntity {
   featuredInBuildings: Building[]
 
   @ManyToOne(() => Building)
-  building: Building[]
+  building: Building
 
-  // TODO: declare type for OwnerStatus
-  @Column('text')
-  status: string
+  @Column('text', { default: 'NO_VERIFICADO' })
+  status: OwnerStatus
 }

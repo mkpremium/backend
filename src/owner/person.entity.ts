@@ -1,9 +1,12 @@
-import { Column, Entity, OneToMany } from 'typeorm'
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
 import { PersonContact } from './owner-contact.entity'
 
 @Entity()
 export class Person extends BaseEntity {
+  @Column('text')
+  fullName: string
+
   @Column('text')
   firstName: string
 
@@ -15,4 +18,12 @@ export class Person extends BaseEntity {
 
   @OneToMany(() => PersonContact, oc => oc.owner)
   contacts: PersonContact[]
+
+  @OneToOne(() => PersonContact, { nullable: true })
+  @JoinColumn()
+  featuredPhoneContact?: PersonContact
+
+  @OneToOne(() => PersonContact, { nullable: true })
+  @JoinColumn()
+  featuredEmailContact?: PersonContact
 }
