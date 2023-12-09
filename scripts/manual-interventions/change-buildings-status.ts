@@ -12,7 +12,7 @@ import aws from 'aws-sdk'
 const logger = initLogger()
 const sqsClient = new aws.SQS({ region: 'eu-west-1' })
 
-createDiContainer()
+createDiContainer('couchbase')
   .then((container) => {
     return loop(container)
   })

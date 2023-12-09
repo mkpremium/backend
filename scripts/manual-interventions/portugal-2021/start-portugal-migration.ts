@@ -22,7 +22,7 @@ exec()
   })
 
 async function exec () {
-  const diContainer = await createDiContainer()
+  const diContainer = await createDiContainer('couchbase')
 
   startListeners(diContainer)
 

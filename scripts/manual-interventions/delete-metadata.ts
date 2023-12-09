@@ -9,7 +9,7 @@ import { CouchbaseAdapter } from '../../src/db/couchbase.adapter'
 const logger = initLogger()
 const sqsClient = new aws.SQS({ region: 'eu-west-1' })
 
-createDiContainer()
+createDiContainer('couchbase')
   .then((container) => {
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const legacyMetadataRepository = container.resolve('legacyMetadataRepository') as MetadataRepository
