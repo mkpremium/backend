@@ -13,7 +13,7 @@ type CreateOwnerCommand = {
   }
 }
 
-export async function createOwner (entityManager: EntityManager, cmd: CreateOwnerCommand) {
+export async function createOwner (entityManager: EntityManager, cmd: CreateOwnerCommand): Promise<[ Owner, Person ]> {
   // TODO: review and consolidate owner names.
   const person: DeepPartial<Person> = {
     fullName: cmd.person.name,
@@ -26,5 +26,5 @@ export async function createOwner (entityManager: EntityManager, cmd: CreateOwne
     building: cmd.buildingId ? { id: cmd.buildingId } : undefined,
     status: cmd.status
   })
-  return [savedOwner, savedPerson]
-  }
+  return [ savedOwner, savedPerson ]
+}

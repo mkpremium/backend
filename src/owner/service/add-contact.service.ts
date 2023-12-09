@@ -1,5 +1,5 @@
 import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
-import { DataSource } from 'typeorm'
+import { DataSource, EntityManager } from 'typeorm'
 import {
   ContactProps,
   ContactType,
@@ -43,10 +43,10 @@ export class AddContactService {
     // TODO: Publish event including building ID.
     return new Promise(async (resolve) => {
       await this.ormDataSource.transaction(async entityManager => {
-        const contact = await entityManager.save(Contact, {
-          value: cmd.value,
-          type: cmd.type,
-        })
+        let recording = []
+        const [ contact, contactRecording ] = await this.getOrCreateContact(entityManager, cmd)
+        recording = recording.concat(contactRecording)
+
         const owner = await entityManager.findOne(Owner, {
           where: {
             id: cmd.ownerId
@@ -78,6 +78,20 @@ export class AddContactService {
         })
       })
     })
+  }
+
+  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCmd): Promise<[Contact, any[]]> {
+    const contact = await entityManager.findOneBy(Contact, { value: cmd.value })
+    if (contact) {
+      return [ contact, [ { type: 'contact_already_existed', contact_id: contact.id } ] ]
+    }
+
+    return [
+      await entityManager.save(Contact, {
+        value: cmd.value,
+        type: cmd.type,
+      }), []
+    ]
   }
 
   private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps | MaybeFeaturedContact> {
