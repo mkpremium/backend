@@ -34,7 +34,9 @@ export async function createTestContainer ({ couchbase, postgres }: {
 } = { couchbase: true, postgres: false }) {
   const [ bucket, dataSource ] = await Promise.all([
     couchbase ? setupCouchbaseBucket() : Promise.resolve(null),
-    postgres ? setupPostgres() : Promise.resolve(null),
+    postgres ? setupPostgres() : Promise.resolve({
+      getRepository: () => null
+    } as any),
   ])
   const container = createContainer()
   setupContainer(container, bucket, dataSource, postgres)
