@@ -8,7 +8,7 @@ import {
   testContactPhone,
   testPhoneContactId
 } from '../helper/mother-of-objects'
-import { authenticatedGet, authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
+import { authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
 
 describe('Building owner contacts management', () => {
   let app, businessUser, owner
@@ -61,7 +61,7 @@ describe('Building owner contacts management', () => {
   })
 
   it('list owners with matching phone number', async () => {
-    await authenticatedGet(`/owners?contactNumber=${testContactPhone}`, businessUser, app)
+    await authenticatedPost(`/owners/search`, businessUser, app, { phoneNumber: testContactPhone })
       .then(async (response) => {
         expect(response.status).to.be.equal(200)
 
