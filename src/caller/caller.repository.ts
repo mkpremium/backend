@@ -3,9 +3,7 @@ import { Caller } from './caller.entity'
 import { EntityTarget } from 'typeorm'
 
 export class CallerRepository extends WithPostgresRepository<Caller> {
-  protected getEntityTarget (): EntityTarget<Caller> {
-    return Caller
-  }
+  protected target = Caller
 
   async save (c: Caller) {
     return this.repository.save(c)

@@ -5,6 +5,7 @@ import { ProposalsRepository } from './proposals.repository'
 import { ProposalProps } from '../building'
 
 export class PostgresProposalsRepository extends PostgresRepository<ProposalProps, Proposal> implements ProposalsRepository {
+  protected target = Proposal
   async pendingProposals (): Promise<ProposalProps[]> {
     const pendingProposals = await this.repository.find({
       where: {
@@ -46,10 +47,6 @@ export class PostgresProposalsRepository extends PostgresRepository<ProposalProp
       notificationStatus: entity.notificationStatus,
       message: entity.message,
     }
-  }
-
-  protected getEntityTarget (): EntityTarget<Proposal> {
-    return Proposal
   }
 }
 

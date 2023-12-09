@@ -16,6 +16,7 @@ import moment from 'moment'
 export class PostgresBuildingsRepository
   extends PostgresRepository<BuildingProps, Building>
   implements BuildingsRepository, BuildingsReadRepository {
+  protected target = Building
   protected relations: {
     assignedFlipper: true,
     featuredOwner: true,
@@ -91,10 +92,6 @@ export class PostgresBuildingsRepository
 
   ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
     throw new Error('Not implemented')
-  }
-
-  protected getEntityTarget (): EntityTarget<Building> {
-    return Building
   }
 
   protected entityToStruct (entity: Building): BuildingProps {

@@ -4,12 +4,9 @@ import { Worksheet } from '../worksheet.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
 
 export class PostgresWorksheetRepository extends PostgresRepository<WorksheetProps, Worksheet> {
+  protected target = Worksheet
   protected entityToStruct (entity: Worksheet): WorksheetProps {
     throw new Error('Not implemented')
-  }
-
-  protected getEntityTarget (): EntityTarget<Worksheet> {
-    return Worksheet
   }
 
   protected structToEntity (struct: WorksheetProps): DeepPartial<Worksheet> {

@@ -5,6 +5,7 @@ import { Owner } from '../owner.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
 
 export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Owner> implements OwnerRepository {
+  protected target = Owner
   protected relations = {
     building: true,
     person: {
@@ -44,10 +45,6 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
         emailId: entity.person.featuredEmailContact?.id,
       } : null
     }
-  }
-
-  protected getEntityTarget (): EntityTarget<Owner> {
-    return Owner
   }
 
   protected structToEntity (owner: OwnerProps): DeepPartial<Owner> {
