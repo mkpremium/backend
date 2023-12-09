@@ -36,7 +36,7 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
         firstSurname: 'Name',
         contacts: []
       }
-    })
+    }, 'test-requester-id')
     const testEmailContact = await addContactService.addContact({
       ...Factory.build('email-contact'),
       isFeatured: true,
