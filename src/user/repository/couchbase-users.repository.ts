@@ -6,7 +6,10 @@ import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import { map } from 'fp-ts/TaskEither'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { FlipperFavoritesBuildingsService, UserNotFound } from './flipper-favorites-buildings.service'
+import {
+  FlipperFavoritesBuildingsService,
+  UserNotFound
+} from '../../flipper/service/flipper-favorites-buildings.service'
 
 export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps> implements FlipperFavoritesBuildingsService {
   struct () {
