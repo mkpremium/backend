@@ -28,8 +28,8 @@ describe('Building owner contacts management', () => {
     await authenticatedPut(`/owners/${owner.id}/contacts/${testPhoneContactId}/status`, businessUser, app, { status: 'BAD' })
       .then(async (response) => {
         expect(response.status).to.be.equal(204)
-        const ownerRepository = app.locals.diContainer.resolve('legacyOwnersRepository')
-        const savedOwner = await ownerRepository.findById(owner.id)
+        const ownerRepository = app.locals.diContainer.resolve('ownersRepository')
+        const savedOwner = await ownerRepository.get(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(1)
         expect(savedOwner.person.contacts[ 0 ]).to.be.deep.equal({
@@ -52,8 +52,8 @@ describe('Building owner contacts management', () => {
     await authenticatedPost(`/owners/${owner.id}/contacts`, businessUser, app, contactInfoToAdd)
       .then(async (response) => {
         expect(response.status).to.be.equal(200)
-        const ownerRepository = app.locals.diContainer.resolve('legacyOwnersRepository')
-        const savedOwner = await ownerRepository.findById(owner.id)
+        const ownerRepository = app.locals.diContainer.resolve('ownersRepository')
+        const savedOwner = await ownerRepository.get(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(2)
         expect(savedOwner.person.contacts[ 1 ]).to.include(contactInfoToAdd)
