@@ -1,7 +1,7 @@
 import { VirtualCallersRepository } from '../repository/virtual-callers.repository'
 import { VirtualCaller, VirtualCallerProps } from '../domain/virtual-caller'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
-import { UsersRepository } from '../../user/repository/users.repository'
+import { CouchbaseUsersRepository } from '../../user/repository/couchbase-users.repository'
 
 type CreateVirtualCallerCommand = {
   phoneNumber: string,
@@ -14,14 +14,14 @@ export class CreateVirtualCallerService {
   constructor (
     private virtualCallersRepository: VirtualCallersRepository,
     private worksheetQueueRepository: WorksheetQueueRepository,
-    private usersRepository: UsersRepository,
+    private couchbaseUsersRepository: CouchbaseUsersRepository,
   ) {
   }
 
   async createVirtualCaller (cmd: CreateVirtualCallerCommand) {
     await Promise.all([
       this.worksheetQueueRepository.get(cmd.queueId),
-      this.usersRepository.get(cmd.assignCallsTo),
+      this.couchbaseUsersRepository.get(cmd.assignCallsTo),
     ])
 
     const inferredLocalization = CreateVirtualCallerService.inferLocalization(cmd.phoneNumber)

@@ -4,14 +4,14 @@ import { userBuilder } from '../user.builder'
 import { pipe } from 'fp-ts/function'
 import { map } from 'fp-ts/TaskEither'
 import { orFail } from '../../helpers'
-import { UsersRepository } from '../../../src/user/repository/users.repository'
+import { CouchbaseUsersRepository } from '../../../src/user/repository/couchbase-users.repository'
 
-describe('UsersRepository', () => {
-  let repository: UsersRepository
+describe('UsersRepository (Couchbase)', () => {
+  let repository: CouchbaseUsersRepository
 
   beforeEach(async () => {
     const container = await createTestContainer()
-    repository = container.resolve('usersRepository')
+    repository = container.resolve('couchbaseUsersRepository')
   })
 
   it('finds operator with favorite building', async () => {

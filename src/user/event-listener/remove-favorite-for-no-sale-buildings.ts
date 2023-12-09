@@ -3,21 +3,21 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import { User, UserProps } from '../../types/user'
-import { UsersRepository } from '../repository/users.repository'
+import { CouchbaseUsersRepository } from '../repository/couchbase-users.repository'
 
-export function removeFavoriteForNoSaleBuildings ({ usersRepository }: { usersRepository: UsersRepository }) {
+export function removeFavoriteForNoSaleBuildings ({ couchbaseUsersRepository }: { couchbaseUsersRepository: CouchbaseUsersRepository }) {
   return async function removeFavorite(evt: BuildingNegotiationStatusChanged) {
     if (evt.negotiationStatus !== 'NO VENDE') {
       return
     }
     await pipe(
-      usersRepository.withFavoriteBuilding(evt.buildingId),
+      couchbaseUsersRepository.withFavoriteBuilding(evt.buildingId),
       TE.chain((user) => {
         if (!user) {
           return TE.of(undefined)
         }
         const updatedUser = removeFavoriteBuilding(user, evt.buildingId)
-        return fromPromise(usersRepository.save(updatedUser))
+        return fromPromise(couchbaseUsersRepository.save(updatedUser))
       })
     )()
   }

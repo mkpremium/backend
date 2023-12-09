@@ -3,12 +3,12 @@ import { ProposalProps, proposalSent } from '../building'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { ProposalsRepository } from '../repository/proposals.repository'
 import { EmailSenderService } from '../../email/email-sender.service'
-import { UsersRepository } from '../../user/repository/users.repository'
 import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import moment from 'moment'
 import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
+import { CouchbaseUsersRepository } from '../../user/repository/couchbase-users.repository'
 
 function isFridayOrWeekend (lastScheduledEventDateToInclude: moment.Moment) {
   return [ 5, 6, 7 ].includes(lastScheduledEventDateToInclude.isoWeekday())
@@ -18,7 +18,7 @@ export class ProposalsSenderService {
   constructor (
     private proposalsRepository: ProposalsRepository,
     private emailSender: EmailSenderService,
-    private usersRepository: UsersRepository,
+    private couchbaseUsersRepository: CouchbaseUsersRepository,
     private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
     private scheduledEventsRepository: ScheduledEventsRepository,
@@ -72,7 +72,7 @@ export class ProposalsSenderService {
   private async processProposal (proposal: ProposalProps, lastScheduledEventDateToInclude: moment.Moment): Promise<boolean> {
     const [ building, sender, lastScheduledEvent ] = await Promise.all([
       this.buildingsRepository.get(proposal.buildingId),
-      this.usersRepository.get(proposal.createdBy),
+      this.couchbaseUsersRepository.get(proposal.createdBy),
       this.scheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
     ])
     if (lastScheduledEvent && moment(lastScheduledEvent.eventDate).isAfter(lastScheduledEventDateToInclude)) {

@@ -16,7 +16,7 @@ describe('removeFavoriteForNoSaleBuildings', () => {
       save: stub().resolves(),
     }
 
-    listener = removeFavoriteForNoSaleBuildings({ usersRepository: usersRepositoryStub })
+    listener = removeFavoriteForNoSaleBuildings({ couchbaseUsersRepository: usersRepositoryStub })
   })
 
   it('removes no sale buildings from flipper favorite list', async () => {

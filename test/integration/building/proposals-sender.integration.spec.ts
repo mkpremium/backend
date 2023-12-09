@@ -8,10 +8,10 @@ import { AddProposalForBuildingService } from '../../../src/building/service/add
 import { ownerBuilder } from '../../owner/owner.builder'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
-import { UsersRepository } from '../../../src/user/repository/users.repository'
 import { UserProps } from '../../../src/types/user'
 import { userBuilder } from '../../user/user.builder'
 import moment from 'moment-timezone'
+import { CouchbaseUsersRepository } from '../../../src/user/repository/couchbase-users.repository'
 
 describe('ProposalsSenderService - Integration', () => {
   let service!: ProposalsSenderService
@@ -36,8 +36,8 @@ describe('ProposalsSenderService - Integration', () => {
 
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const ownersRepository = container.resolve('ownersRepository') as OwnerRepository
-    const usersRepository = container.resolve('usersRepository') as UsersRepository
-    await usersRepository.save(testCaller)
+    const couchbaseUsersRepository = container.resolve('couchbaseUsersRepository') as CouchbaseUsersRepository
+    await couchbaseUsersRepository.save(testCaller)
     await ownersRepository.save(testOwner)
     await buildingsRepository.save(testBuilding)
   })

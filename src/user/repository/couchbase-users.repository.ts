@@ -6,8 +6,9 @@ import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import { map } from 'fp-ts/TaskEither'
 import fromJSON from 'tcomb/lib/fromJSON'
+import { FlipperFavoritesBuildingsService, UserNotFound } from './flipper-favorites-buildings.service'
 
-export class UsersRepository extends CouchbaseRepository<UserProps> {
+export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps> implements FlipperFavoritesBuildingsService {
   struct () {
     return User
   }
@@ -65,11 +66,5 @@ export class UsersRepository extends CouchbaseRepository<UserProps> {
         return fromJSON(rows[0], User)
       })
     )
-  }
-}
-
-class UserNotFound extends Error {
-  constructor (readonly userId) {
-    super(`User of id ${userId} doesn't exists`)
   }
 }

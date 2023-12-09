@@ -1,13 +1,14 @@
-import { asClass, asFunction } from 'awilix'
-import { UsersRepository } from './repository/users.repository'
+import { aliasTo, asClass, asFunction } from 'awilix'
 import { AddFavoriteBuildingService } from './service/add-favorite-building.service'
 import { DeleteFavoriteBuildingService } from './service/delete-favorite-building.service'
 import { UserBlockedAvailabilityService } from './service/user-blocked-availability.service'
 import { removeFavoriteForNoSaleBuildings } from './event-listener/remove-favorite-for-no-sale-buildings'
+import { CouchbaseUsersRepository } from './repository/couchbase-users.repository'
 
 export const setupUserDependencies = container => {
   container.register({
-    usersRepository: asClass(UsersRepository).classic().singleton(),
+    couchbaseUsersRepository: asClass(CouchbaseUsersRepository).classic().singleton(),
+    usersRepository: aliasTo('couchbaseUsersRepository'),
     addFavoriteBuildingService: asClass(AddFavoriteBuildingService).classic().singleton(),
     deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic().singleton(),
     userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService).singleton(),
