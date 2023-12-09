@@ -4,8 +4,7 @@ import { DataSource, DeepPartial, EntityManager } from 'typeorm'
 import { Owner } from '../owner.entity'
 import { Person } from '../person.entity'
 import { Contact } from '../../contacts/contact.entity'
-import { PersonContact } from '../owner-contact.entity'
-import { Logger } from 'winston'
+import { PersonContact } from '../person-contact.entity'
 
 export interface AddOwnerCommand {
   // verified: boolean,
