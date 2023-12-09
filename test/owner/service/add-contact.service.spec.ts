@@ -6,20 +6,31 @@ import uuid from 'uuid/v4'
 import { Factory } from 'rosie'
 import { ContactProps } from '../../../src/owner/owner'
 import { AddContactService } from '../../../src/owner/service/add-contact.service'
+import { DataSource } from 'typeorm'
+import { createOwner } from '../../../src/owner/service/create-owner'
 
-describe('OwnerRepository (Couchbase)', () => {
+describe('Add Contact service', () => {
   let service: AddContactService
   let ownersRepository: OwnerRepository
+  let dataSource: DataSource
 
   beforeEach(async () => {
     const diContainer = await createTestContainer({ couchbase: false, postgres: true })
 
     service = diContainer.resolve('addContactService')
     ownersRepository = diContainer.resolve('ownersRepository')
+    dataSource = diContainer.resolve('ormDataSource')
   })
 
   it('adds contact to person', async () => {
-    const owner = await ownersRepository.save(ownerBuilder({ id: uuid() }).build())
+    const [owner] = await createOwner(dataSource.manager, {
+      status: 'NO_VERIFICADO',
+      person: {
+        name: 'Name',
+        firstName: 'firstName',
+        firstSurname: 'firstSurname'
+      }
+    })
 
     const contact = {
       ...Factory.build<ContactProps>('phone-contact'),

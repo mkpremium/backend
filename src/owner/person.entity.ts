@@ -20,11 +20,13 @@ export class Person extends BaseEntity {
   @OneToMany(() => PersonContact, oc => oc.person)
   contacts: PersonContact[]
 
-  @OneToOne(() => PersonContact, { nullable: true })
+  // TODO: add constrain in type
+  @OneToOne(() => Contact, { nullable: true })
   @JoinColumn()
   featuredPhoneContact?: Contact
 
-  @OneToOne(() => PersonContact, { nullable: true })
+  // TODO: add constrain in type
+  @OneToOne(() => Contact, { nullable: true })
   @JoinColumn()
   featuredEmailContact?: Contact
 }

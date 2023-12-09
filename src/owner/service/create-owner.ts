@@ -1,8 +1,20 @@
 import { DeepPartial, EntityManager } from 'typeorm'
 import { Person } from '../person.entity'
 import { Owner } from '../owner.entity'
+import { OwnerStatus } from '../owner'
 
-export async function createOwner (entityManager: EntityManager, cmd) {
+type CreateOwnerCommand = {
+  buildingId?: string,
+  status: OwnerStatus,
+  person: {
+    name: string,
+    firstName: string,
+    firstSurname: string,
+  }
+}
+
+export async function createOwner (entityManager: EntityManager, cmd: CreateOwnerCommand) {
+  // TODO: review and consolidate owner names.
   const person: DeepPartial<Person> = {
     fullName: cmd.person.name,
     firstName: cmd.person.firstName,
@@ -11,7 +23,7 @@ export async function createOwner (entityManager: EntityManager, cmd) {
   const savedPerson = await entityManager.save(Person, person)
   const savedOwner = await entityManager.save(Owner, {
     person: savedPerson,
-    building: { id: cmd.buildingId },
+    building: cmd.buildingId ? { id: cmd.buildingId } : undefined,
     status: cmd.status
   })
   return [savedOwner, savedPerson]
