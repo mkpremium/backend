@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
-import { PersonContact } from './owner-contact.entity'
+import { PersonContact } from './person-contact.entity'
 
 @Entity()
 export class Person extends BaseEntity {
@@ -16,7 +16,7 @@ export class Person extends BaseEntity {
   @Column('text', { unique: true, nullable: true })
   documentNumber?: string
 
-  @OneToMany(() => PersonContact, oc => oc.owner)
+  @OneToMany(() => PersonContact, oc => oc.person)
   contacts: PersonContact[]
 
   @OneToOne(() => PersonContact, { nullable: true })
