@@ -3,20 +3,7 @@ import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
-import { Building, BuildingProposal } from './building'
-
-class BuildingProposalRepository extends CouchbaseModel {
-  protected Struct = BuildingProposal
-
-  async findByIdOrThrow (proposalId) {
-    const proposal = await this.findById(proposalId)
-    if (!proposal) {
-      throw newHttpError(404, `La negociación ${proposalId} no existe`)
-    }
-
-    return proposal
-  }
-}
+import { Building } from './building'
 
 
 export class LegacyBuildingRepository extends CouchbaseModel {
