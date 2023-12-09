@@ -5,7 +5,6 @@ import { EntityTarget } from 'typeorm'
 
 export class PostgresOfferRequestsRepository
   extends WithPostgresRepository<BuildingOfferRequest> implements OfferRequestsRepository {
-  protected target = BuildingOfferRequest
   async add (cmd: AddBuildingOfferCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     const savedEntity = await this.repository.save({
       flipper: { id: cmd.flipperId },
@@ -20,5 +19,9 @@ export class PostgresOfferRequestsRepository
       id: savedEntity.id,
       ...cmd,
     }
+  }
+
+  protected getEntityTarget (): EntityTarget<BuildingOfferRequest> {
+    return BuildingOfferRequest
   }
 }

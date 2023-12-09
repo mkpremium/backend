@@ -4,12 +4,13 @@ import { DataSource, DeepPartial, EntityManager, EntityTarget, FindOptionsRelati
 export abstract class WithPostgresRepository<E extends { id: string }> {
   protected repository: Repository<E>
   protected entityManager: EntityManager
-  protected target: EntityTarget<E>
 
   constructor (ormDataSource: DataSource) {
-    this.repository = ormDataSource.getRepository(this.target)
+    this.repository = ormDataSource.getRepository(this.getEntityTarget())
     this.entityManager = ormDataSource.manager
   }
+
+  protected abstract getEntityTarget (): EntityTarget<E>
 }
 
 export abstract class PostgresRepository<S extends { id?: string }, E extends {
