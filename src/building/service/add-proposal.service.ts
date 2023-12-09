@@ -5,19 +5,27 @@ import { CouchbaseBuildingsRepository } from '../repository/couchbase-building.r
 import _get from 'lodash/get'
 import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
+import { PostgresProposalsRepository } from '../repository/postgres-proposals.repository'
 
 export class AddProposalService {
   constructor (
     private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private couchbaseProposalsRepository: CouchbaseProposalsRepository,
+    private postgresProposalsRepository: PostgresProposalsRepository,
     private usePostgres: boolean
   ) {
   }
 
   async addProposal (buildingId: string, userId: string, partialProposal: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
-    if (!this.usePostgres) {
-      return this.addProposalToCouchbase(buildingId, userId, partialProposal)
-    }
+    return this.usePostgres ? this.addProposalToPostgres(buildingId, userId, partialProposal) : this.addProposalToCouchbase(buildingId, userId, partialProposal)
+  }
+
+  private async addProposalToPostgres (buildingId: string, userId: string, partialProposal: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
+    return this.postgresProposalsRepository.save({
+      ...partialProposal,
+      buildingId,
+      createdBy: userId,
+    })
   }
 
   private async addProposalToCouchbase (buildingId: string, userId: string, props: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {

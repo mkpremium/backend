@@ -49,7 +49,7 @@ const BuildingProposalStatus = {
 }
 
 export interface ProposalProps {
-  id: string;
+  id?: string;
   state: 'aceptada' | 'enviada' | 'pendiente'
   buildingId: string;
   ownerId: string;

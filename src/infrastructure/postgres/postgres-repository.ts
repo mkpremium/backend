@@ -13,7 +13,7 @@ export abstract class WithPostgresRepository<E extends { id: string }> {
   protected abstract getEntityTarget (): EntityTarget<E>
 }
 
-export abstract class PostgresRepository<S extends { id: string }, E extends {
+export abstract class PostgresRepository<S extends { id?: string }, E extends {
   id: string
 }> extends WithPostgresRepository<E> implements EntityRepository<S> {
   protected relations: FindOptionsRelations<E> | string[] = {}
