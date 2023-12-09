@@ -8,7 +8,7 @@ import { Promise as BluebirdPromise } from 'bluebird'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 
-describe('OwnerRepository (Couchbase)', () => {
+describe('OwnerRepository (Postgres)', () => {
   let repository: OwnerRepository
   let buildingsRepository: BuildingsRepository
 
