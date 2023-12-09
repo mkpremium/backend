@@ -1,11 +1,13 @@
 import { Repository as EntityRepository } from '../../db/repository'
-import { DataSource, DeepPartial, EntityTarget, FindOptionsRelations, Repository } from 'typeorm'
+import { DataSource, DeepPartial, EntityManager, EntityTarget, FindOptionsRelations, Repository } from 'typeorm'
 
 export abstract class WithPostgresRepository<E extends { id: string }> {
   protected repository: Repository<E>
+  protected entityManager: EntityManager
 
   constructor (ormDataSource: DataSource) {
     this.repository = ormDataSource.getRepository(this.getEntityTarget())
+    this.entityManager = ormDataSource.manager
   }
 
   protected abstract getEntityTarget (): EntityTarget<E>

@@ -1,5 +1,5 @@
 import { BuildingsRepository } from './buildings.repository'
-import { BuildingNegotiationStatus, BuildingProps } from '../building'
+import { BuildingNegotiationStatus, BuildingProps, ProposalProps } from '../building'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 import * as TE from 'fp-ts/TaskEither'
 import { EntityTarget, Equal, In } from 'typeorm'
@@ -9,10 +9,20 @@ import { fromPromise } from '../../infrastructure/fp-utils'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../../owner/owner.entity'
 import { Flipper } from '../../flipper/flipper.entity'
+import { Proposal } from '../proposal.entity'
+import { entityStatusToOldProposal } from './postgres-proposals.repository'
+import moment from 'moment'
 
 export class PostgresBuildingsRepository
   extends PostgresRepository<BuildingProps, Building>
   implements BuildingsRepository, BuildingsReadRepository {
+  protected relations: {
+    assignedFlipper: true,
+    featuredOwner: true,
+    images: true,
+    proposals: true,
+  }
+
   // BuildingsRepository
 
   assignBuildingToAgent (buildingId: string, agentId: string): Promise<void> {
@@ -54,8 +64,29 @@ export class PostgresBuildingsRepository
     }).then(buildings => buildings.map(mapEntityToReadModel))
   }
 
-  listProposalsForBuilding (buildingId): Promise<unknown[]> {
-    return Promise.reject(new Error('Not implemented'))
+  async listProposalsForBuilding (buildingId: string): Promise<ProposalProps[]> {
+    // TODO: move to proposals repository
+    const proposals = await this.entityManager.find(Proposal, {
+      where: {
+        building: { id: buildingId }
+      },
+      relations: {
+        author: true,
+        owner: true,
+      }
+    })
+    return proposals.map(p => ({
+      id: p.id,
+      buildingId,
+      createdBy: p.author.id,
+      proposal: p.amount,
+      message: p.message,
+      notificationStatus: p.notificationStatus,
+      notificationSentAt: moment(p.notificationSentAt),
+      ownerId: p.owner.id,
+      state: entityStatusToOldProposal(p.status),
+      notificationEmail: p.notificationEmail,
+    }))
   }
 
   ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
@@ -67,7 +98,20 @@ export class PostgresBuildingsRepository
   }
 
   protected entityToStruct (entity: Building): BuildingProps {
-    throw new Error('Not implemented')
+    return {
+      id: entity.id,
+      address: entity.address,
+      floorArea: entity.floorArea,
+      cadastre: entity.publicIdentifier ? { reference: entity.publicIdentifier } : undefined,
+      location: entity.location,
+      ownerId: entity.featuredOwner?.id,
+      negotiationStatus: entity.negotiationStatus,
+      lead: entity.lead,
+      assignedAgentId: entity.assignedFlipper?.id,
+      use: entity.use,
+      recentProposal: entity.recentProposal,
+      metadata: entity.images
+    }
   }
 
   protected structToEntity (buildingStruct: BuildingProps): Partial<Building> {

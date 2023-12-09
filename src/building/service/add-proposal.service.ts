@@ -1,24 +1,39 @@
-import { BuyOfferRepository } from '../buy-offer.repository'
-import { BuildingsRepository } from '../repository/buildings.repository'
 import { ProposalProps } from '../building'
+import { CouchbaseProposalsRepository } from '../repository/couchbase-proposals.repository'
+import t from 'tcomb'
+import { CouchbaseBuildingsRepository } from '../repository/couchbase-building.repository'
+import _get from 'lodash/get'
+import { OperatorStats } from '../../stats/models'
+import { OperatorActions } from '../../stats/types'
 
 export class AddProposalService {
   constructor (
-    private buyOffersRepository: BuyOfferRepository,
-    private buildingsRepository: BuildingsRepository
+    private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
+    private couchbaseProposalsRepository: CouchbaseProposalsRepository,
+    private usePostgres: boolean
   ) {
   }
 
   async addProposal (buildingId: string, userId: string, partialProposal: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
-    const building = await this.buildingsRepository.get(buildingId)
-
-    const proposal = {
-      ...partialProposal,
-      createdBy: userId,
-      buildingId: building.id,
+    if (!this.usePostgres) {
+      return this.addProposalToCouchbase(buildingId, userId, partialProposal)
     }
+  }
 
+  private async addProposalToCouchbase (buildingId: string, userId: string, props: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
+    const building = await this.couchbaseBuildingsRepository.get(buildingId) as any
+    const proposal = await this.couchbaseProposalsRepository.save(props)
+    const updatedProposals = t.update(building.proposals || [], { $push: [ proposal.id ] })
+    const updatedBuilding = t.update(building, {
+      proposals: { $set: updatedProposals },
+      recentProposal: { $set: proposal }
+    })
 
-    return this.buyOffersRepository.addNegotiationProposal(building, proposal)
+    await this.couchbaseBuildingsRepository.save(updatedBuilding)
+    const { city, province } = _get(building, 'address', {})
+
+    await OperatorStats.registerAction(userId, OperatorActions.PROPOSAL_SENT, { city, province })
+
+    return proposal
   }
 }

@@ -1,11 +1,8 @@
 import _ from 'lodash'
-import _get from 'lodash/get'
 import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
-import { OperatorStats } from '../stats/models'
-import { OperatorActions } from '../stats/types'
 import { Building, BuildingProposal, ProposalProps } from './building'
 
 import { BuyOfferRepository } from './buy-offer.repository'
@@ -26,23 +23,6 @@ class BuildingProposalRepository extends CouchbaseModel {
 
 export class LegacyBuildingRepository extends CouchbaseModel implements BuyOfferRepository {
   protected Struct = Building
-
-  async addNegotiationProposal (building, props: ProposalProps) {
-    const proposalRepo = new BuildingProposalRepository()
-    const proposal = await proposalRepo.save(props)
-    const updateProposals = t.update(building.proposals || [], { $push: [ proposal.id ] })
-    const updatedBuilding = t.update(building, {
-      proposals: { $set: updateProposals },
-      recentProposal: { $set: proposal }
-    })
-
-    await this.save(updatedBuilding)
-    const { city, province } = _get(building, 'address', {})
-
-    await OperatorStats.registerAction(props.createdBy, OperatorActions.PROPOSAL_SENT, { city, province })
-
-    return proposal
-  }
 
   getProposal (proposalId: string): Promise<ProposalProps> {
     const proposalRepo = new BuildingProposalRepository()

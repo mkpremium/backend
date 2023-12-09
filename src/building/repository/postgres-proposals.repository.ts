@@ -60,6 +60,6 @@ function oldProposalToEntityStatus (state: 'aceptada' | 'enviada' | 'pendiente')
   return newStatus[ oldStates.indexOf(state) ]
 }
 
-function entityStatusToOldProposal (status: 'ACCEPTED' | 'SENT' | 'PENDING') {
+export function entityStatusToOldProposal (status: 'ACCEPTED' | 'SENT' | 'PENDING') {
   return oldStates[ newStatus.indexOf(status) ]
 }

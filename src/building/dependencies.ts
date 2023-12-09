@@ -57,12 +57,12 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
     addProposalService: asClass(AddProposalService).singleton().classic(),
+    addProposalForBuildingService: asClass(AddProposalForBuildingService).singleton().classic(),
     updateProposalService: asClass(UpdateProposalService).singleton().classic(),
     updateBuildingNegotiationStatusService: asClass(UpdateBuildingNegotiationStatusService).singleton().classic(),
     setBuildingExpensesService: asClass(SetBuildingExpensesService).singleton(),
     listBuildingsService: asClass(ListBuildingsService).classic().singleton(),
     listBuildingProposalsService: asClass(ListBuildingProposalsService).singleton().classic(),
-    addProposalForBuildingService: asClass(AddProposalForBuildingService).singleton().classic(),
     getDocumentsSignedURLService: asClass(GetDocumentsSignedURLService).inject(() => ({
       s3Client: new aws.S3({
         signatureVersion: 'v4',
