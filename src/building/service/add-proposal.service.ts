@@ -30,7 +30,7 @@ export class AddProposalService {
 
   private async addProposalToCouchbase (buildingId: string, userId: string, props: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
     const building = await this.couchbaseBuildingsRepository.get(buildingId) as any
-    const proposal = await this.couchbaseProposalsRepository.save(props)
+    const proposal = await this.couchbaseProposalsRepository.save({ buildingId, createdBy: userId, ...props })
     const updatedProposals = t.update(building.proposals || [], { $push: [ proposal.id ] })
     const updatedBuilding = t.update(building, {
       proposals: { $set: updatedProposals },
