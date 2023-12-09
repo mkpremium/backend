@@ -7,7 +7,7 @@ import { validate } from 'tcomb-validation'
 import { WorksheetBuilding } from '../../../src/worksheet/repository/worksheet.repository'
 import { Promise as BluebirdPromise } from 'bluebird'
 
-describe('OwnerRepository', () => {
+describe('OwnerRepository (Couchbase)', () => {
   let repository
   let buildingsRepository
   let worksheetsRepository
