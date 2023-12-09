@@ -19,7 +19,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 
-export interface AddContactCmd {
+export interface AddContactCommand {
   ownerId: string
   isFeatured: boolean
   type: ContactType,
@@ -40,11 +40,11 @@ export class AddContactService {
   ) {
   }
 
-  addContact (cmd: AddContactCmd): Promise<MaybeFeaturedContact | OwnerProps> {
+  addContact (cmd: AddContactCommand): Promise<MaybeFeaturedContact | OwnerProps> {
     return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd)
   }
 
-  private saveInPostgres (cmd: AddContactCmd): Promise<MaybeFeaturedContact> {
+  private saveInPostgres (cmd: AddContactCommand): Promise<MaybeFeaturedContact> {
     this.recording = []
     return new Promise<MaybeFeaturedContact>(async (resolve) => {
       await this.ormDataSource.transaction(async entityManager => {
@@ -74,7 +74,7 @@ export class AddContactService {
     })
   }
 
-  private async getOwner (entityManager: EntityManager, cmd: AddContactCmd) {
+  private async getOwner (entityManager: EntityManager, cmd: AddContactCommand) {
     return await entityManager.findOne(Owner, {
       where: {
         id: cmd.ownerId
@@ -85,7 +85,7 @@ export class AddContactService {
     })
   }
 
-  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCmd): Promise<Contact> {
+  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCommand): Promise<Contact> {
     const contact = await entityManager.findOneBy(Contact, { value: cmd.value })
     if (contact) {
       this.recording.push({ type: 'contact_already_existed', contact_id: contact.id })
@@ -98,7 +98,7 @@ export class AddContactService {
     })
   }
 
-  private async linkPersonToContact (entityManager: EntityManager, owner: Owner, contact: Contact, cmd: AddContactCmd) {
+  private async linkPersonToContact (entityManager: EntityManager, owner: Owner, contact: Contact, cmd: AddContactCommand) {
     let personAndContactLink = await entityManager.findOneBy(PersonContact, {
       contact: { id: contact.id },
       person: { id: owner.person.id }
@@ -127,7 +127,7 @@ export class AddContactService {
     return personAndContactLink
   }
 
-  private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps> {
+  private async saveInCouchbase (cmd: AddContactCommand): Promise<OwnerProps> {
     const owner = await this.couchbaseOwnersRepository.get(cmd.ownerId)
     let featuredContact = owner.featuredContact
     const newContact = TypedContactInfo(cmd as any)

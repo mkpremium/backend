@@ -1,9 +1,9 @@
 import { TypedContactInfo } from '../contact'
 import { FeaturedContact, Owner, OwnerProps, Person } from '../owner'
-import { AddContactCmd } from './owner.repository'
 import t from 'tcomb'
+import { AddContactCommand } from '../service/add-contact.service'
 
-export function addContactToOwner (owner: OwnerProps, cmd: AddContactCmd): OwnerProps {
+export function addContactToOwner (owner: OwnerProps, cmd: AddContactCommand): OwnerProps {
   let featuredContact = owner.featuredContact
   const newContact = TypedContactInfo(cmd as any)
 
