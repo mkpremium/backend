@@ -30,6 +30,8 @@ export interface AddContactCmd {
 type MaybeFeaturedContact = ContactProps & { isFeatured: boolean }
 
 export class AddContactService {
+  private recording = []
+
   constructor (
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private ormDataSource: DataSource,
@@ -43,70 +45,86 @@ export class AddContactService {
   }
 
   private saveInPostgres (cmd: AddContactCmd): Promise<MaybeFeaturedContact> {
-    return new Promise(async (resolve) => {
+    this.recording = []
+    return new Promise<MaybeFeaturedContact>(async (resolve) => {
       await this.ormDataSource.transaction(async entityManager => {
-        let recording = []
-        const [ contact, contactRecording ] = await this.getOrCreateContact(entityManager, cmd)
-        recording = recording.concat(contactRecording)
+        const contact = await this.getOrCreateContact(entityManager, cmd)
 
-        const owner = await entityManager.findOne(Owner, {
-          where: {
-            id: cmd.ownerId
-          },
-          relations: {
-            person: true
-          }
-        })
-        const personToContactLink = await entityManager.save(PersonContact, {
-          person: owner.person,
-          contact,
-          status: cmd.status,
-        })
-        if (cmd.isFeatured) {
-          if (isPhoneContact(cmd)) {
-            owner.person.featuredPhoneContact = contact
-          } else {
-            owner.person.featuredEmailContact = contact
-          }
-          await entityManager.save(owner.person)
-        }
+        const owner = await this.getOwner(entityManager, cmd)
+        const personToContactLink = await this.linkPersonToContact(entityManager, owner, contact, cmd)
 
-        resolve([
-          {
-            id: contact.id,
-            type: contact.type,
-            value: contact.value,
-            status: personToContactLink.status,
-            isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
-          },
-          recording
-        ])
+        resolve({
+          id: contact.id,
+          type: contact.type,
+          value: contact.value,
+          status: personToContactLink.status,
+          isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
+        })
       })
-    }).then(async ([ contact, recording ]) => {
+    }).then(async (contact) => {
       await this.eventBus.publish({
         name: DomainEventCatalog.OWNER__CONTACT_ADDED,
         version: '1',
         contactId: contact.id,
         ownerId: cmd.ownerId,
-        recording,
+        recording: this.recording,
       })
 
       return contact
     })
   }
 
-  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCmd): Promise<[ Contact, any[] ]> {
+  private async getOwner (entityManager: EntityManager, cmd: AddContactCmd) {
+    return await entityManager.findOne(Owner, {
+      where: {
+        id: cmd.ownerId
+      },
+      relations: {
+        person: true
+      }
+    })
+  }
+
+  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCmd): Promise<Contact> {
     const contact = await entityManager.findOneBy(Contact, { value: cmd.value })
     if (contact) {
-      return [ contact, [ { type: 'contact_already_existed', contact_id: contact.id } ] ]
+      this.recording.push({ type: 'contact_already_existed', contact_id: contact.id })
+      return contact
     }
 
-    return [
-      await entityManager.save(Contact, {
-        value: cmd.value,
-        type: cmd.type,
-      }), []
-    ]
+    return entityManager.save(Contact, {
+      value: cmd.value,
+      type: cmd.type,
+    })
+  }
+
+  private async linkPersonToContact (entityManager: EntityManager, owner: Owner, contact: Contact, cmd: AddContactCmd) {
+    let personAndContactLink = await entityManager.findOneBy(PersonContact, {
+      contact: { id: contact.id },
+      person: { id: owner.person.id }
+    })
+    if (personAndContactLink) {
+      this.recording.push({type: 'person_contact_already_existed'})
+      personAndContactLink.status = cmd.status
+      await entityManager.save(personAndContactLink)
+    } else {
+      personAndContactLink = await entityManager.save(PersonContact, {
+        person: owner.person,
+        contact,
+        status: cmd.status,
+      })
+    }
+
+    if (cmd.isFeatured) {
+      if (isPhoneContact(cmd)) {
+        owner.person.featuredPhoneContact = contact
+      } else {
+        owner.person.featuredEmailContact = contact
+      }
+      await entityManager.save(owner.person)
+    }
+
+    return personAndContactLink
   }
 
   private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps | MaybeFeaturedContact> {

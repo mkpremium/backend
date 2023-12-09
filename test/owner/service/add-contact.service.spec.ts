@@ -32,7 +32,7 @@ describe('Add Contact service', () => {
     })
 
     const contact = {
-      ...Factory.build<ContactProps>('phone-contact'),
+      ...Factory.build<ContactProps>('phone-contact', { status: 'UNDEFINED' }),
       isFeatured: true,
       ownerId: firstOwner.id
     }
@@ -61,5 +61,11 @@ describe('Add Contact service', () => {
     expect(savedPersonContacts).to.have.length(2)
     expect(savedPersonContacts.map(({ person }) => person.id)).to.deep.equal(
       [ firstOwner.person.id, secondOwner.person.id ])
+
+    // update status when attempting to add an already existing contact
+    const updatedContact = await service.addContact({ ...contact, status: 'GOOD' }) as ContactProps
+
+    expect(updatedContact.id).to.be.equal(savedContact.id)
+    expect(updatedContact.status).to.be.equal('GOOD')
   })
 })
