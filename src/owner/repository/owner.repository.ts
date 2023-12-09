@@ -1,4 +1,4 @@
-import { ContactType, OwnerContactStatus, OwnerProps } from '../owner'
+import { ContactProps, ContactType, OwnerContactStatus, OwnerProps } from '../owner'
 import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { BuildingNegotiationStatus, NegotiationStatus } from '../../building/building'
@@ -84,7 +84,7 @@ export interface OwnerRepository extends Repository<OwnerProps> {
 
   buildingOwners (buildingId: string): Promise<OwnerProps[]>
 
-  addContact (cmd: AddContactCmd): Promise<OwnerProps>
+  addContact (cmd: AddContactCmd): Promise<OwnerProps | ContactProps>
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]>
 }

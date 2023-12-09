@@ -1,8 +1,10 @@
 import { AddContactCmd, FoundOwnerProps, OwnerRepository } from './owner.repository'
-import { OwnerProps } from '../owner'
+import { ContactProps, OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
+import { Contact } from '../../contacts/contact.entity'
+import { PersonContact } from '../person-contact.entity'
 
 export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Owner> implements OwnerRepository {
   protected relations = {
@@ -25,8 +27,31 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return Promise.reject(new Error('Not implemented'))
   }
 
-  addContact (cmd: AddContactCmd): Promise<OwnerProps> {
-    return Promise.reject(new Error('Not implemented'))
+  async addContact (cmd: AddContactCmd): Promise<ContactProps> {
+    return new Promise(async (resolve) => {
+      await this.repository.manager.transaction(async entityManager => {
+        const owner = await entityManager.findOne(Owner, {
+          where: {
+            id: cmd.ownerId
+          },
+          relations: {
+            person: true
+          }
+        })
+        const contact = await entityManager.save(Contact, {
+          value: cmd.value,
+          type: cmd.type,
+        })
+        const personToContactLink = await entityManager.save(PersonContact, { person: owner.person, contact, status: cmd.status })
+
+        resolve({
+          id: contact.id,
+          type: contact.type,
+          value: contact.value,
+          status: personToContactLink.status
+        })
+      })
+    })
   }
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]> {
@@ -36,14 +61,14 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   protected entityToStruct (entity: Owner): OwnerProps {
     return {
       id: entity.id,
-      status: entity.status ,
+      status: entity.status,
       name: entity.person.fullName,
       buildingId: entity.building.id,
       person: {
         name: entity.person.fullName,
         contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status })),
       },
-      featuredContact: entity.person.featuredEmailContact ||  entity.person.featuredPhoneContact ? {
+      featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact ? {
         phoneId: entity.person.featuredPhoneContact?.id,
         emailId: entity.person.featuredEmailContact?.id,
       } : null
@@ -61,8 +86,8 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
       person: {
         fullName: owner.person.name,
         contacts: owner.person.contacts,
-        featuredPhoneContact: owner.featuredContact?.phoneId ? {id: owner.featuredContact?.phoneId} : null,
-        featuredEmailContact: owner.featuredContact?.emailId ? {id: owner.featuredContact?.emailId} : null,
+        featuredPhoneContact: owner.featuredContact?.phoneId ? { id: owner.featuredContact?.phoneId } : null,
+        featuredEmailContact: owner.featuredContact?.emailId ? { id: owner.featuredContact?.emailId } : null,
         documentNumber: owner.person.documentNumber,
       }
     }
