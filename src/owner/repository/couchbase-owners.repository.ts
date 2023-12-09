@@ -6,6 +6,7 @@ import t from 'tcomb'
 import { AddContactCmd, BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
 import { TypedContactInfo } from '../contact'
 import _ from 'lodash'
+import { addContactToOwner } from './add-contact-to-owner'
 
 
 const findOwnerByContactValueQuery = bucketName => `
@@ -70,30 +71,7 @@ WHERE _documentType = 'owner' and buildingId = $1
 export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> implements OwnerRepository {
   async addContact (cmd: AddContactCmd): Promise<OwnerProps> {
     const owner = await this.get(cmd.ownerId)
-    let featuredContact = owner.featuredContact
-    const newContact = TypedContactInfo(cmd as any)
-
-    const { isFeatured } = cmd
-    if (isFeatured) {
-      featuredContact = FeaturedContact.update(featuredContact || FeaturedContact({}), {
-        [ cmd.type === 'EMAIL' ? 'emailId' : 'phoneId' ]: {
-          $set: newContact.id
-        }
-      })
-    }
-
-    const updatedOwner = Owner.update(owner, {
-      featuredContact: { $set: featuredContact },
-      $merge: {
-        person: Person.update(owner.person, {
-          $merge: {
-            contacts: t.update(owner.person.contacts, {
-              $push: [ newContact ]
-            })
-          }
-        })
-      }
-    })
+    const updatedOwner = addContactToOwner(owner, cmd)
 
     return await this.save(updatedOwner)
   }
