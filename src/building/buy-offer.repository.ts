@@ -1,4 +1,4 @@
-import { BuildingProps, ProposalProps } from './building'
+import { ProposalProps } from './building'
 
 export interface BuyOfferRepository {
   updateNegotiationProposal (proposal: ProposalProps, operatorId: string, patch: Partial<ProposalProps>): Promise<{ id: string }>
