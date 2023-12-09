@@ -211,7 +211,7 @@ function calculateStatusFromContacts (contacts: ContactProps[], owner) {
   }
 }
 
-export function isPhoneContact (c: ContactProps) {
+export function isPhoneContact (c: Pick<ContactProps, 'type'>) {
   return [ 'TELEFONO', 'MOVIL' ].includes(c.type)
 }
 

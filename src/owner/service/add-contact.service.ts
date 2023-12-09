@@ -1,20 +1,19 @@
 import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
-import { DataSource, DeepPartial, EntityManager } from 'typeorm'
+import { DataSource } from 'typeorm'
 import {
   ContactProps,
   ContactType,
+  FeaturedContact,
+  isPhoneContact,
   Owner as OwnerStruct,
   OwnerContactStatus,
   OwnerProps,
   Person as PersonStruct
 } from '../owner'
 import { Owner } from '../owner.entity'
-import { Person } from '../person.entity'
 import { Contact } from '../../contacts/contact.entity'
 import { PersonContact } from '../person-contact.entity'
-import { AddOwnerCommand } from './add-owner.service'
 import { TypedContactInfo } from '../contact'
-import { FeaturedContact } from '../owner'
 import t from 'tcomb'
 
 
@@ -25,6 +24,8 @@ export interface AddContactCmd {
   value: string,
   status: OwnerContactStatus
 }
+
+type MaybeFeaturedContact = ContactProps & { isFeatured: boolean }
 
 export class AddContactService {
   constructor (
@@ -38,7 +39,48 @@ export class AddContactService {
     return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd)
   }
 
-  private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps | ContactProps> {
+  private saveInPostgres (cmd: AddContactCmd): Promise<MaybeFeaturedContact> {
+    // TODO: Publish event including building ID.
+    return new Promise(async (resolve) => {
+      await this.ormDataSource.transaction(async entityManager => {
+        const contact = await entityManager.save(Contact, {
+          value: cmd.value,
+          type: cmd.type,
+        })
+        const owner = await entityManager.findOne(Owner, {
+          where: {
+            id: cmd.ownerId
+          },
+          relations: {
+            person: true
+          }
+        })
+        const personToContactLink = await entityManager.save(PersonContact, {
+          person: owner.person,
+          contact,
+          status: cmd.status,
+        })
+        if (cmd.isFeatured) {
+          if (isPhoneContact(cmd)) {
+            owner.person.featuredPhoneContact = contact
+          } else {
+            owner.person.featuredEmailContact = contact
+          }
+          await entityManager.save(owner.person)
+        }
+
+        resolve({
+          id: contact.id,
+          type: contact.type,
+          value: contact.value,
+          status: personToContactLink.status,
+          isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
+        })
+      })
+    })
+  }
+
+  private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps | MaybeFeaturedContact> {
     const owner = await this.couchbaseOwnersRepository.get(cmd.ownerId)
     let featuredContact = owner.featuredContact
     const newContact = TypedContactInfo(cmd as any)
@@ -66,38 +108,6 @@ export class AddContactService {
     })
 
     return await this.couchbaseOwnersRepository.save(updatedOwner)
-  }
-
-  private saveInPostgres (cmd: AddContactCmd): Promise<ContactProps> {
-    // TODO: Publish event including building ID.
-    return new Promise(async (resolve) => {
-      await this.ormDataSource.transaction(async entityManager => {
-        const owner = await entityManager.findOne(Owner, {
-          where: {
-            id: cmd.ownerId
-          },
-          relations: {
-            person: true
-          }
-        })
-        const contact = await entityManager.save(Contact, {
-          value: cmd.value,
-          type: cmd.type,
-        })
-        const personToContactLink = await entityManager.save(PersonContact, {
-          person: owner.person,
-          contact,
-          status: cmd.status
-        })
-
-        resolve({
-          id: contact.id,
-          type: contact.type,
-          value: contact.value,
-          status: personToContactLink.status
-        })
-      })
-    })
   }
 
 }

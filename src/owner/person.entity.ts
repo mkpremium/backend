@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
+import { Contact } from '../contacts/contact.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { PersonContact } from './person-contact.entity'
 
@@ -21,9 +22,9 @@ export class Person extends BaseEntity {
 
   @OneToOne(() => PersonContact, { nullable: true })
   @JoinColumn()
-  featuredPhoneContact?: PersonContact
+  featuredPhoneContact?: Contact
 
   @OneToOne(() => PersonContact, { nullable: true })
   @JoinColumn()
-  featuredEmailContact?: PersonContact
+  featuredEmailContact?: Contact
 }
