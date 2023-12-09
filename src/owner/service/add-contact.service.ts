@@ -15,6 +15,8 @@ import { Contact } from '../../contacts/contact.entity'
 import { PersonContact } from '../person-contact.entity'
 import { TypedContactInfo } from '../contact'
 import t from 'tcomb'
+import { EventBus } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 
 export interface AddContactCmd {
@@ -32,6 +34,7 @@ export class AddContactService {
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private ormDataSource: DataSource,
     private usePostgres: boolean,
+    private eventBus: EventBus,
   ) {
   }
 
@@ -40,7 +43,6 @@ export class AddContactService {
   }
 
   private saveInPostgres (cmd: AddContactCmd): Promise<MaybeFeaturedContact> {
-    // TODO: Publish event including building ID.
     return new Promise(async (resolve) => {
       await this.ormDataSource.transaction(async entityManager => {
         let recording = []
@@ -69,18 +71,31 @@ export class AddContactService {
           await entityManager.save(owner.person)
         }
 
-        resolve({
-          id: contact.id,
-          type: contact.type,
-          value: contact.value,
-          status: personToContactLink.status,
-          isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
-        })
+        resolve([
+          {
+            id: contact.id,
+            type: contact.type,
+            value: contact.value,
+            status: personToContactLink.status,
+            isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
+          },
+          recording
+        ])
       })
+    }).then(async ([ contact, recording ]) => {
+      await this.eventBus.publish({
+        name: DomainEventCatalog.OWNER__CONTACT_ADDED,
+        version: '1',
+        contactId: contact.id,
+        ownerId: cmd.ownerId,
+        recording,
+      })
+
+      return contact
     })
   }
 
-  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCmd): Promise<[Contact, any[]]> {
+  private async getOrCreateContact (entityManager: EntityManager, cmd: AddContactCmd): Promise<[ Contact, any[] ]> {
     const contact = await entityManager.findOneBy(Contact, { value: cmd.value })
     if (contact) {
       return [ contact, [ { type: 'contact_already_existed', contact_id: contact.id } ] ]

@@ -9,6 +9,7 @@ export enum DomainEventCatalog {
 
   OWNER__CONTACT_STATUS_CHANGED = 'owner.contact_status_changed',
   OWNER__STATUS_CHANGED = 'owner.status_changed',
+  OWNER__CONTACT_ADDED = 'owner.contact_added',
 
   SCHEDULED_EVENTS__EVENT_DELETED = 'scheduled_events.event_deleted',
   SCHEDULED_EVENTS__CALL_SCHEDULED = 'scheduled_events.call_scheduled',
