@@ -8,10 +8,14 @@ describe('PropertyManagerRepository', () => {
   let propertyManagerRepository, operatorRepository
 
   beforeEach(async () => {
-    const diContainer = await createTestContainer()
-    propertyManagerRepository = diContainer.resolve('propertyManagersRepository')
-    operatorRepository = new OperatorRepository()
-    await new Promise(resolve => setTimeout(resolve, 50))
+    try {
+      const diContainer = await createTestContainer()
+      propertyManagerRepository = diContainer.resolve('propertyManagersRepository')
+      operatorRepository = new OperatorRepository()
+    } catch (e) {
+      console.trace(e)
+      throw e
+    }
   })
 
   describe('getActivePropertyManagers', () => {
