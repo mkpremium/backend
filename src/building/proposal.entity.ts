@@ -3,6 +3,7 @@ import { BaseEntity } from '../infrastructure/entity'
 import { Owner } from '../owner/owner.entity'
 import { Building } from './building.entity'
 import { User } from '../user/user.entity'
+import { DecimalColumnTransformer } from '../infrastructure/postgres/decimal-column-transformer'
 
 @Entity()
 export class Proposal extends BaseEntity {
@@ -18,7 +19,7 @@ export class Proposal extends BaseEntity {
   @ManyToOne(() => User)
   author: User
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, transformer: new DecimalColumnTransformer() })
   amount: number
 
   @Column()

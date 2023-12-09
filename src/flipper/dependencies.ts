@@ -4,9 +4,11 @@ import { SetFlipperMaxLineService } from './service/set-flipper-max-line.service
 import { createFlipperBlockedAvailabilityController } from './controller/flipper-availability.controller'
 import { createSetFlipperMaxLineController } from './controller/set-flipper-max-line.controller'
 import { FlipperRepository } from './flipper.repository'
+import { AddFlipperService } from './service/add-flipper.service'
 
 export const setupFlipperDependencies = (container: AwilixContainer) => {
   container.register({
+    addFlipperService: asClass(AddFlipperService).singleton().classic(),
     flipperAvailabilityService: asClass(FlipperAvailabilityService).singleton(),
     setFlipperMaxLineService: asClass(SetFlipperMaxLineService).singleton(),
     flipperBlockedAvailabilityController: asFunction(createFlipperBlockedAvailabilityController).singleton(),

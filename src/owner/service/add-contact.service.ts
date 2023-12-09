@@ -27,7 +27,7 @@ export interface AddContactCmd {
   status: OwnerContactStatus
 }
 
-type MaybeFeaturedContact = ContactProps & { isFeatured: boolean }
+export type MaybeFeaturedContact = ContactProps & { isFeatured: boolean }
 
 export class AddContactService {
   private recording = []
@@ -40,7 +40,7 @@ export class AddContactService {
   ) {
   }
 
-  addContact (cmd: AddContactCmd): Promise<{ id: string }> {
+  addContact (cmd: AddContactCmd): Promise<MaybeFeaturedContact | OwnerProps> {
     return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd)
   }
 
@@ -127,7 +127,7 @@ export class AddContactService {
     return personAndContactLink
   }
 
-  private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps | MaybeFeaturedContact> {
+  private async saveInCouchbase (cmd: AddContactCmd): Promise<OwnerProps> {
     const owner = await this.couchbaseOwnersRepository.get(cmd.ownerId)
     let featuredContact = owner.featuredContact
     const newContact = TypedContactInfo(cmd as any)
