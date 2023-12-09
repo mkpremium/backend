@@ -71,20 +71,11 @@ export const BuildingOwner = t.struct({
   status: t.enums.of([ 'NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT' ])
 })
 
-export interface AddContactCmd {
-  ownerId: string
-  isFeatured: boolean
-  type: ContactType,
-  value: string,
-  status: OwnerContactStatus
-}
 
 export interface OwnerRepository extends Repository<OwnerProps> {
   findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]>
 
   buildingOwners (buildingId: string): Promise<OwnerProps[]>
-
-  addContact (cmd: AddContactCmd): Promise<OwnerProps | ContactProps>
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]>
 }

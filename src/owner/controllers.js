@@ -22,10 +22,10 @@ export function createUpdateOwnerController ({ ownersRepository }) {
   }
 }
 
-export function createAddOwnerContactController ({ ownersRepository }) {
+export function createAddOwnerContactController ({ addContactService }) {
   return async function (req, res) {
     const ownerId = req.params.id
-    const updatedOwner = await ownersRepository.addContact({ ownerId, ...req.body })
+    const updatedOwner = await addContactService.addContact({ ownerId, ...req.body })
 
     await History.registerCreate({ contextModel: updatedOwner, user: req.user })
 

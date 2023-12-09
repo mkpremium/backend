@@ -1,10 +1,8 @@
-import { AddContactCmd, FoundOwnerProps, OwnerRepository } from './owner.repository'
-import { ContactProps, OwnerProps } from '../owner'
+import { FoundOwnerProps, OwnerRepository } from './owner.repository'
+import { OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
-import { Contact } from '../../contacts/contact.entity'
-import { PersonContact } from '../person-contact.entity'
 
 export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Owner> implements OwnerRepository {
   protected relations = {
@@ -25,33 +23,6 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
 
   findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]> {
     return Promise.reject(new Error('Not implemented'))
-  }
-
-  async addContact (cmd: AddContactCmd): Promise<ContactProps> {
-    return new Promise(async (resolve) => {
-      await this.repository.manager.transaction(async entityManager => {
-        const owner = await entityManager.findOne(Owner, {
-          where: {
-            id: cmd.ownerId
-          },
-          relations: {
-            person: true
-          }
-        })
-        const contact = await entityManager.save(Contact, {
-          value: cmd.value,
-          type: cmd.type,
-        })
-        const personToContactLink = await entityManager.save(PersonContact, { person: owner.person, contact, status: cmd.status })
-
-        resolve({
-          id: contact.id,
-          type: contact.type,
-          value: contact.value,
-          status: personToContactLink.status
-        })
-      })
-    })
   }
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]> {

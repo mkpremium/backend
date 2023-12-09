@@ -7,9 +7,6 @@ import { WorksheetBuilding } from '../../../src/worksheet/repository/worksheet.r
 import { Promise as BluebirdPromise } from 'bluebird'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
-import uuid from 'uuid/v4'
-import { Factory } from 'rosie'
-import { ContactProps } from '../../../src/owner/owner'
 
 describe('OwnerRepository (Couchbase)', () => {
   let repository: OwnerRepository
@@ -19,19 +16,6 @@ describe('OwnerRepository (Couchbase)', () => {
     const diContainer = await createTestContainer({ couchbase: false, postgres: true })
 
     repository = diContainer.resolve('ownersRepository')
-  })
-
-  it('adds contact to person', async () => {
-    const owner = await repository.save(ownerBuilder({ id: uuid() }).build())
-
-    const contact = {
-      ...Factory.build<ContactProps>('phone-contact'),
-      isFeatured: true,
-      ownerId: owner.id
-    }
-    const updatedOwner = await repository.addContact(contact) as ContactProps
-
-    expect(updatedOwner).to.deep.include({ value: contact.value, status: contact.status })
   })
 
   it.skip('finds owner by its phone contact', async function () {

@@ -1,12 +1,10 @@
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { FeaturedContact, Owner, OwnerProps, Person } from '../owner'
+import { Owner, OwnerProps } from '../owner'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import t from 'tcomb'
-import { AddContactCmd, BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
-import { TypedContactInfo } from '../contact'
+import { BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
 import _ from 'lodash'
-import { addContactToOwner } from './add-contact-to-owner'
 
 
 const findOwnerByContactValueQuery = bucketName => `
@@ -69,13 +67,6 @@ WHERE _documentType = 'owner' and buildingId = $1
 `
 
 export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> implements OwnerRepository {
-  async addContact (cmd: AddContactCmd): Promise<OwnerProps> {
-    const owner = await this.get(cmd.ownerId)
-    const updatedOwner = addContactToOwner(owner, cmd)
-
-    return await this.save(updatedOwner)
-  }
-
   async findByPhoneNumber (phoneNumber: string) {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),
