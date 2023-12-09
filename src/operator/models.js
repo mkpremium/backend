@@ -127,15 +127,6 @@ export class OperatorRepository extends CouchbaseModel {
     return operator
   }
 
-  static async setOnline (operatorId, online) {
-    const repo = new OperatorRepository()
-    const operator = await repo.findById(operatorId)
-    if (operator) {
-      const updatedOperator = t.update(operator, { online: { $set: online } })
-      await repo.save(updatedOperator, false)
-    }
-  }
-
   async findByCredential (data) {
     const { username, password } = new t.Credentials(data)
     const qb = this.getQueryBuilder()
