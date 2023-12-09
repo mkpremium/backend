@@ -1,4 +1,3 @@
-import { BuyOfferRepository } from '../buy-offer.repository'
 import { ProposalProps } from '../building'
 import { CouchbaseBuildingsRepository } from '../repository/couchbase-building.repository'
 import { CouchbaseProposalsRepository } from '../repository/couchbase-proposals.repository'

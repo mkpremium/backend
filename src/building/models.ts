@@ -3,9 +3,7 @@ import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
-import { Building, BuildingProposal, ProposalProps } from './building'
-
-import { BuyOfferRepository } from './buy-offer.repository'
+import { Building, BuildingProposal } from './building'
 
 class BuildingProposalRepository extends CouchbaseModel {
   protected Struct = BuildingProposal
@@ -21,13 +19,8 @@ class BuildingProposalRepository extends CouchbaseModel {
 }
 
 
-export class LegacyBuildingRepository extends CouchbaseModel implements BuyOfferRepository {
+export class LegacyBuildingRepository extends CouchbaseModel {
   protected Struct = Building
-
-  getProposal (proposalId: string): Promise<ProposalProps> {
-    const proposalRepo = new BuildingProposalRepository()
-    return proposalRepo.findByIdOrThrow(proposalId)
-  }
 
   async findByIdOrThrow (buildingId) {
     const building = await this.findById(buildingId)
