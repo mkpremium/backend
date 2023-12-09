@@ -35,7 +35,7 @@ describe('AddOwnerService Postgres', () => {
           }
         ]
       }
-    })
+    }, 'test-requester-id')
 
     expect(actualOwner.id).to.exist
   })
