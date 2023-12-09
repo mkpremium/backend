@@ -51,7 +51,7 @@ export class AddOwnerService {
     const savedPerson = await entityManager.save(Person, person)
     const { contacts } = cmd.person
     for (const c of contacts) {
-      // Handle duplicated contact case.
+      // TODO: Handle duplicated contact case.
       const savedContact = await entityManager.save(Contact, {
         value: c.value,
         type: c.type
