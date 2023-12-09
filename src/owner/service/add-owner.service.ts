@@ -1,10 +1,10 @@
 import { ContactProps, OwnerStatus, OwnerType } from '../owner'
 import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
-import { DataSource, DeepPartial, EntityManager } from 'typeorm'
+import { DataSource, EntityManager } from 'typeorm'
 import { Owner } from '../owner.entity'
-import { Person } from '../person.entity'
 import { Contact } from '../../contacts/contact.entity'
 import { PersonContact } from '../person-contact.entity'
+import { createOwner } from './create-owner'
 
 export interface AddOwnerCommand {
   // verified: boolean,
@@ -34,7 +34,7 @@ export class AddOwnerService {
   }
 
   private saveInPostgres (cmd: AddOwnerCommand): Promise<Owner> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       await this.ormDataSource.transaction('SERIALIZABLE', async (entityManager) => {
         resolve(await this.createEntities(cmd, entityManager))
       })
@@ -42,12 +42,8 @@ export class AddOwnerService {
   }
 
   private async createEntities (cmd: AddOwnerCommand, entityManager: EntityManager) {
-    const person: DeepPartial<Person> = {
-      fullName: cmd.person.name,
-      firstName: cmd.person.firstName,
-      lastName: cmd.person.firstSurname,
-    }
-    const savedPerson = await entityManager.save(Person, person)
+    const [ savedOwner, savedPerson ] = await createOwner(entityManager, cmd)
+
     const { contacts } = cmd.person
     for (const c of contacts) {
       // TODO: Handle duplicated contact case.
@@ -62,10 +58,6 @@ export class AddOwnerService {
       })
     }
 
-    return await entityManager.save(Owner, {
-      person: savedPerson,
-      building: { id: cmd.buildingId },
-      status: cmd.status
-    })
+    return savedOwner as Owner
   }
 }
