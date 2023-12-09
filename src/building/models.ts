@@ -29,24 +29,6 @@ export class LegacyBuildingRepository extends CouchbaseModel implements BuyOffer
     return proposalRepo.findByIdOrThrow(proposalId)
   }
 
-  async updateNegotiationProposal (proposal, operatorId, params) {
-    const proposalRepo = new BuildingProposalRepository()
-    const updatedProposal = t.update(proposal, {
-      $merge: Object.assign({}, params, {
-        updatedBy: operatorId,
-        updatedAt: new Date()
-      })
-    })
-
-    await proposalRepo.save(updatedProposal)
-
-    const building = await this.findByIdOrThrow(proposal.buildingId)
-    const updatedBuilding = t.update(building, { recentProposal: { $set: proposal } })
-    await this.save(updatedBuilding)
-
-    return proposal
-  }
-
   async findByIdOrThrow (buildingId) {
     const building = await this.findById(buildingId)
     if (!building) {
