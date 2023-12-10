@@ -41,6 +41,10 @@
           "value": "backend"
         },
         {
+          "name": "DATABASE",
+          "value": "couchbase"
+        },
+        {
           "name": "NODE_ENV",
           "value": "production"
         },

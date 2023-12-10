@@ -47,6 +47,10 @@
           "value": "backend"
         },
         {
+          "name": "DATABASE",
+          "value": "couchbase"
+        },
+        {
           "name": "JWT_EXPIRES",
           "value": "7 days"
         },
