@@ -12,8 +12,6 @@ import { DataSource } from 'typeorm'
 import { User } from '../../../src/user/user.entity'
 
 describe('ProposalsRepository(Postgres)', () => {
-
-
   it('returns all pending proposals', async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
     const proposalsRepository = container.resolve('postgresProposalsRepository') as ProposalsRepository
@@ -23,7 +21,8 @@ describe('ProposalsRepository(Postgres)', () => {
 
     const testBuilding = await buildingsRepository.save(buildingBuilder({ id: uuid() }).build())
     const testOwner = await ownersRepository.save(ownerBuilder({ id: uuid() }).build())
-    const testUser = await ormDataSource.getRepository(User).save(Factory.build('user', { username: 'flipper-username' }))
+    const testUser = await ormDataSource.getRepository(User).save(
+      Factory.build('user', { username: 'flipper-username' }))
     const testPendingProposal = proposalBuilder({
       id: uuid(),
       buildingId: testBuilding.id,

@@ -12,7 +12,7 @@ Factory.define('user')
   .attrs({
       password: 'test-user-password',
       profile: () => Factory.attributes('user-profile', {}),
-      enable: true,
+      enabled: true,
       roles: []
     }
   )
