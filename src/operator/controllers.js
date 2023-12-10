@@ -6,12 +6,12 @@ import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-reposi
 import _get from 'lodash/get'
 import { OperatorRefreshTokenRepository } from './operatorRefreshTokenRepository'
 
-async function login (req, res) {
-  const repo = new OperatorRepository()
-  const operator = await repo.findByCredential(req.body)
-  const response = await repo.createAuthenticatedResponse(operator)
+export function createLoginController ({loginService}) {
+  return async function (req, res) {
+    const response = await loginService.login(req.body)
 
-  res.json(response)
+    res.json(response)
+  }
 }
 
 async function refreshToken (req, res) {
@@ -74,7 +74,6 @@ async function selfCallCenterWorkInProgress (req, res) {
   res.json(Object.assign({}, req.user.operator, { activeCall: null, queueItem }))
 }
 
-export const loginController = wrap(login)
 export const createOperatorController = wrap(createOperator)
 export const listOperatorController = wrap(listOperator)
 export const limitedListOperatorController = wrap(limitedListOperator)

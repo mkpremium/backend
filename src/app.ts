@@ -55,7 +55,7 @@ export const createApp = async (database: Database = 'couchbase'): Promise<Expre
 
     app.locals.diContainer = diContainer
 
-    operator(app) // start with login router
+    operator(app, diContainer) // start with login router
     callsRoutes(diContainer, app)
     setupUserRoutes(app, diContainer)
     buildingRoutes(diContainer, app)

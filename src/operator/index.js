@@ -1,11 +1,11 @@
 import jwt from '../middleware/jwt'
 import profitGoalsRoutes from './ProfitGoal/routes'
 import restringedHoursRoutes from './restringed-hours/routes'
-import routes from './routes'
 
 import './types'
+import { operatorRouter } from './routes'
 
-export default (app) => {
+export default (app, diContainer) => {
   const secured = jwt().unless({
     path: [
       '/operators/login',
@@ -13,7 +13,7 @@ export default (app) => {
     ]
   })
 
-  app.use('/operators', secured, routes)
+  app.use('/operators', secured, operatorRouter(diContainer))
   app.use('/operators/restringed-hours', secured, restringedHoursRoutes)
   app.use('/operators/profit', secured, profitGoalsRoutes)
 }
