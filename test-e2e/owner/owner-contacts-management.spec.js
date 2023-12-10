@@ -68,5 +68,5 @@ describe('Building owner contacts management', () => {
         expect(response.body).to.have.lengthOf(1)
         expect(response.body[0].id).to.equal(owner.id)
       })
-  }).timeout(30000)
+  })
 })
