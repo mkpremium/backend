@@ -10,7 +10,7 @@ import _ from 'lodash'
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
 meta(owner).id,
-owner.name,
+owner.person.name,
 owner.buildingId,
 owner.person.contacts,
 {

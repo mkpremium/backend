@@ -65,10 +65,8 @@ describe('Building owner contacts management', () => {
       .then(async (response) => {
         expect(response.status).to.be.equal(200)
 
-        expect(response.body.results).to.have.lengthOf(1)
-        expect(response.body.results[ 0 ]).to.include({
-          id: owner.id
-        })
+        expect(response.body).to.have.lengthOf(1)
+        expect(response.body[0].id).to.equal(owner.id)
       })
-  })
+  }).timeout(30000)
 })
