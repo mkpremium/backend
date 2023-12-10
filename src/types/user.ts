@@ -66,13 +66,17 @@ export interface UserProfileProps {
   city: string;
   email: string;
   language: 'es' | 'pt';
+  queueId?: string;
 }
 
 export interface UserProps {
   id: string;
   username: string;
   password: string;
+  enable: boolean;
+  roles: string[],
   profile: UserProfileProps;
+  flipperId?: string,
   favoriteBuildings?: string[]
 }
 

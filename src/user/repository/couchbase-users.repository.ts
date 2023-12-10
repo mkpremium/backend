@@ -2,9 +2,9 @@ import { User, UserProps } from '../../types/user'
 import t from 'tcomb'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import * as TE from 'fp-ts/TaskEither'
+import { map } from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
-import { map } from 'fp-ts/TaskEither'
 import fromJSON from 'tcomb/lib/fromJSON'
 import {
   FlipperFavoritesBuildingsService,
@@ -14,6 +14,20 @@ import {
 export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps> implements FlipperFavoritesBuildingsService {
   struct () {
     return User
+  }
+
+  async getUserWithUsername (username) {
+    const rows = await this.couchbaseAdapter.queryAsync(
+      `SELECT *
+       FROM ${this.bucketName}
+       WHERE _documentType = 'operator'
+         AND username = $1`,
+      [username]
+    )
+    if (rows.length === 0)
+      throw new UserNotFound(username)
+
+    return fromJSON(rows[0], User)
   }
 
   async addFavoriteBuildingToUserOfId (userId, buildingId) {
@@ -66,7 +80,7 @@ export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps> imp
           return undefined
         }
 
-        return fromJSON(rows[0], User)
+        return fromJSON(rows[ 0 ], User)
       })
     )
   }

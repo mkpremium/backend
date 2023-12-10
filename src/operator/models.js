@@ -127,15 +127,6 @@ export class OperatorRepository extends CouchbaseModel {
     return operator
   }
 
-  async getCredentialsFor (username) {
-    const qb = this.getQueryBuilder()
-      .where('username = ?', username)
-      .limit(1)
-    const [operator] = await this.query(qb)
-
-    return operator
-  }
-
   static async createToken (payload) {
     const options = {
       expiresIn: jwt.expiresIn
