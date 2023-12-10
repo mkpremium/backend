@@ -20,8 +20,8 @@ export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps>
 
   async getUserWithUsername (username) {
     const rows = await this.couchbaseAdapter.queryAsync(
-      `SELECT *
-       FROM ${this.bucketName}
+      `SELECT operator.*
+       FROM ${this.bucketName} as operator
        WHERE _documentType = 'operator'
          AND username = $1`,
       [ username ]
