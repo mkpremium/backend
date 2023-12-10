@@ -7,8 +7,24 @@ Factory.define('flipper')
   .attr('user', () => Factory.attributes('user', {}))
 
 Factory.define('user')
-  .sequence('username', idx => `user-${idx}`)
-  .attr('password', 'test-password')
+  .sequence('username', idx => `test-user-${idx}`)
+  .option('roles', [])
+  .attrs({
+      password: 'test-user-password',
+      profile: () => Factory.attributes('user-profile', {}),
+      enable: true,
+      roles: []
+    }
+  )
+
+Factory.define('user-profile')
+  .attrs({
+    firstName: 'User-Name',
+    lastName: 'User-Surname',
+    city: 'User CITY',
+    language: 'es',
+    email: 'user@email.test',
+  })
 
 Factory.define('phone-contact')
   .attrs({

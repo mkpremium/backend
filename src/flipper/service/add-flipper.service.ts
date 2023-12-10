@@ -1,10 +1,12 @@
 import { DataSource } from 'typeorm'
 import { Flipper } from '../flipper.entity'
 import { addUserService } from '../../user/service/add-user.service'
+import { UserProfileProps } from '../../types/user'
 
-type AddFlipperCommand = {
+export interface AddFlipperCommand {
   username: string
   password: string
+  profile: UserProfileProps
 }
 
 export class AddFlipperService {
@@ -20,6 +22,7 @@ export class AddFlipperService {
           em,
           password: cmd.password,
           username: cmd.username,
+          profile: cmd.profile
         })
         resolve(em.save(Flipper, { user }))
       })

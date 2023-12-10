@@ -7,4 +7,5 @@ export class Caller extends BaseEntity {
   @OneToOne(() => User)
   @JoinColumn()
   user: User
+  flipperId: string
 }

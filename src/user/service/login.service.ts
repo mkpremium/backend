@@ -1,4 +1,3 @@
-import { OperatorRepository } from '../../operator/models'
 import bcrypt from 'bcrypt'
 import { newHttpError } from '../../lib/http-error'
 import { OperatorRefreshTokenRepository } from '../../operator/operatorRefreshTokenRepository'
@@ -7,8 +6,9 @@ import { CouchbaseUsersRepository } from '../repository/couchbase-users.reposito
 import { UserProps } from '../../types/user'
 import { jwt } from '../../../config'
 import { sign } from 'jsonwebtoken'
+import { PostgresUserRepository } from '../repository/postgres-user.repository'
 
-interface Credentials {
+export interface Credentials {
   username: string
   password: string
 }
@@ -16,27 +16,38 @@ interface Credentials {
 export class LoginService {
   constructor (
     private couchbaseUsersRepository: CouchbaseUsersRepository,
+    private postgresUsersRepository: PostgresUserRepository,
+    private usePostgres: boolean,
   ) {
   }
 
   async login (credentials: Credentials) {
     const { username, password } = credentials
-    const operator = await this.couchbaseUsersRepository.getUserWithUsername(username)
-    await this.validateUserPassword(operator, password)
+    const user =
+      await (this.usePostgres ? this.getPostgresUser(username) : this.getCouchbaseUser(username))
+    await this.validateUserPassword(user, password)
 
-    return await this.createAuthenticatedResponse(operator)
+    return await this.createAuthenticatedResponse(user)
   }
 
-  private async validateUserPassword (operator: { enable: boolean, password: string }, password: string) {
-    if (!operator) {
+  private getPostgresUser (username: string) {
+    return this.postgresUsersRepository.getUserWithUsername(username)
+  }
+
+  private getCouchbaseUser (username: string) {
+    return this.couchbaseUsersRepository.getUserWithUsername(username)
+  }
+
+  private async validateUserPassword (user: Pick<UserProps, 'enable' | 'password'>, password: string) {
+    if (!user) {
       throw newHttpError(401, 'Contraseña o usuario incorrecto')
     }
 
-    if (!operator.enable) {
+    if (!user.enable) {
       throw newHttpError(401, 'Cuenta desactivada, comuníquese con el administrador')
     }
 
-    const valid = await bcrypt.compare(password, operator.password)
+    const valid = await bcrypt.compare(password, user.password)
 
     if (!valid) {
       throw newHttpError(401, 'Contraseña o usuario incorrecto')
@@ -50,7 +61,7 @@ export class LoginService {
       flipperId: user.flipperId,
       operator: {
         id: user.id,
-        name: [user.profile.firstName, user.profile.lastName].join(' '),
+        name: [user.profile.firstName, user.profile.lastName ].join(' '),
         username: user.username,
         city: user.profile.city,
         queueId: user.profile.queueId,

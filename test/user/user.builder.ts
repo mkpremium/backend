@@ -10,7 +10,9 @@ const userPrototype: UserProps = {
     city: 'User CITY',
     language: 'es',
     email: 'user@email.test',
-  }
+  },
+  enable: true,
+  roles: []
 }
 export const userBuilder = (overrides: Partial<UserProps> = {}) => ({
   build () {
