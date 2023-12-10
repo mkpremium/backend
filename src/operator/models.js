@@ -11,7 +11,7 @@ import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
 import { User as OperatorType, UserRoles } from '../types/user'
 import { OperatorRefreshTokenRepository, OperatorRequest } from './operatorRefreshTokenRepository'
-import { OperatorListResponse } from './types'
+import { AuthenticatedResponse, OperatorListResponse } from './types'
 
 const ListStats = t.struct(
   {
@@ -108,7 +108,7 @@ export class OperatorRepository extends CouchbaseModel {
     const { refreshToken } = await OperatorRefreshTokenRepository.createToken(operator)
     const token = await OperatorRepository.createToken(tokenPayload)
 
-    return t.AuthenticatedResponse({
+    return AuthenticatedResponse({
       refreshToken,
       token,
       access_token: token,
@@ -127,28 +127,13 @@ export class OperatorRepository extends CouchbaseModel {
     return operator
   }
 
-  async findByCredential (data) {
-    const { username, password } = new t.Credentials(data)
+  async getCredentialsFor (username) {
     const qb = this.getQueryBuilder()
       .where('username = ?', username)
       .limit(1)
-    const [ operator ] = await this.query(qb)
+    const [operator] = await this.query(qb)
 
-    if (!operator) {
-      throw newHttpError(401, 'Contraseña o usuario incorrecto')
-    }
-
-    if (!operator.enable) {
-      throw newHttpError(401, 'Cuenta desactivada, comuníquese con el administrador')
-    }
-
-    const valid = await bcrypt.compare(password, operator.password)
-
-    if (!valid) {
-      throw newHttpError(401, 'Contraseña o usuario incorrecto')
-    }
-
-    return fromJSON(operator, this.Struct)
+    return operator
   }
 
   static async createToken (payload) {

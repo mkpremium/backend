@@ -8,7 +8,7 @@ t.Credentials = t.struct({
   password: t.String
 }, 'Credentials')
 
-t.AuthenticatedResponse = t.struct({
+export const AuthenticatedResponse = t.struct({
   refreshToken: t.String,
   token: t.String,
   access_token: t.String,
