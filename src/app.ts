@@ -30,7 +30,7 @@ import { historyRoutes } from './history/routing'
 import { startListeners } from './infrastructure/listeners'
 import { Database } from './infrastructure/database'
 
-export const createApp = async (database: Database = 'couchbase'): Promise<Express> => {
+export const createApp = async (database: Database): Promise<Express> => {
   const logger = initLogger()
   logger.info('starting app')
 
