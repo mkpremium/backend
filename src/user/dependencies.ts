@@ -8,6 +8,7 @@ import { OperatorRepository } from '../operator/models'
 import { LoginService } from './service/login.service'
 import { createLoginController } from '../operator/controllers'
 import { PostgresUserRepository } from './repository/postgres-user.repository'
+import { AuthTokenIssuerService } from './service/auth-token-issuer.service'
 
 export const setupUserDependencies = container => {
   const usePostgres = container.resolve('usePostgres')
@@ -17,6 +18,7 @@ export const setupUserDependencies = container => {
     couchbaseUsersRepository: asClass(CouchbaseUsersRepository).classic().singleton(),
     usersRepository: aliasTo(usePostgres ? 'postgresUsersRepository' : 'couchbaseUsersRepository'),
 
+    authTokenIssuerService: asClass(AuthTokenIssuerService).classic().singleton(),
     addFavoriteBuildingService: asClass(AddFavoriteBuildingService).classic().singleton(),
     deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic().singleton(),
     loginService: asClass(LoginService).classic().singleton(),

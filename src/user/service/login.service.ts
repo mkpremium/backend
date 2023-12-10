@@ -1,12 +1,10 @@
 import bcrypt from 'bcrypt'
 import { newHttpError } from '../../lib/http-error'
-import { OperatorRefreshTokenRepository } from '../../operator/operatorRefreshTokenRepository'
 import { AuthenticatedResponse } from '../../operator/types'
 import { CouchbaseUsersRepository } from '../repository/couchbase-users.repository'
 import { UserProps } from '../../types/user'
-import { jwt } from '../../../config'
-import { sign } from 'jsonwebtoken'
 import { PostgresUserRepository } from '../repository/postgres-user.repository'
+import { AuthTokenIssuerService } from './auth-token-issuer.service'
 
 export interface Credentials {
   username: string
@@ -17,6 +15,7 @@ export class LoginService {
   constructor (
     private couchbaseUsersRepository: CouchbaseUsersRepository,
     private postgresUsersRepository: PostgresUserRepository,
+    private authTokenIssuerService: AuthTokenIssuerService,
     private usePostgres: boolean,
   ) {
   }
@@ -61,7 +60,7 @@ export class LoginService {
       flipperId: user.flipperId,
       operator: {
         id: user.id,
-        name: [user.profile.firstName, user.profile.lastName ].join(' '),
+        name: [ user.profile.firstName, user.profile.lastName ].join(' '),
         username: user.username,
         city: user.profile.city,
         queueId: user.profile.queueId,
@@ -70,8 +69,8 @@ export class LoginService {
       }
     }
 
-    const { refreshToken } = await OperatorRefreshTokenRepository.createToken(user)
-    const token = await this.createToken(tokenPayload)
+    const { refreshToken } = await this.authTokenIssuerService.issueRefreshToken(user.id)
+    const token = this.authTokenIssuerService.issueToken(tokenPayload)
 
     return AuthenticatedResponse({
       refreshToken,
@@ -81,13 +80,5 @@ export class LoginService {
       roles: user.roles,
       operator: tokenPayload.operator
     })
-  }
-
-  private async createToken (payload: object) {
-    const options = {
-      expiresIn: jwt.expiresIn
-    }
-
-    return sign(payload, jwt.secret, options)
   }
 }
