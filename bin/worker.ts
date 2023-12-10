@@ -1,9 +1,9 @@
 import '../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../src/infrastructure/logger'
-import { createDiContainer } from '../src/infrastructure/dependencies'
 import { EventPoller } from '../src/infrastructure/event-bus/event-poller'
 import { Bucket } from 'couchbase'
 import { startListeners } from '../src/infrastructure/listeners'
+import { createContainer } from './create-container'
 
 const logger = initLogger()
 logger.info('starting worker')
@@ -17,7 +17,7 @@ let killProcess = false
 process.on('SIGTERM', () => killProcess = true)
 
 async function init () {
-  const container = await createDiContainer('couchbase')
+  const container = await createContainer()
   const poller: EventPoller = container.resolve('eventPoller')
   const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
   startListeners(container)

@@ -1,12 +1,12 @@
 import { moveWorksheetOutOfFreezer } from '../src/business/worksheets/freezer'
-import { createDiContainer } from '../src/infrastructure/dependencies'
 import { initLogger } from '../src/infrastructure/logger'
 import '../src/types'
+import { createContainer } from './create-container'
 
 const logger = initLogger()
 logger.info('starting freezer')
 
-createDiContainer('couchbase')
+createContainer()
   .then(async diContainer => {
     await moveWorksheetOutOfFreezer(500, diContainer.resolve('buildingsRepository'), parseInt(process.env.DAYS_IN_FREEZER) || 90)
     logger.info('freezer finished correctly')
