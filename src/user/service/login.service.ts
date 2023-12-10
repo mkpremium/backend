@@ -9,6 +9,20 @@ interface Credentials {
   password: string
 }
 
+type UserToAuthenticate = {
+  id: string,
+  username: string,
+  roles: string[],
+  flipperId?: string,
+  profile: {
+    fullName: () => string,
+    city: string,
+    queueId: string,
+    email: string,
+    language: string,
+  }
+}
+
 export class LoginService {
   constructor (private operatorRepository: OperatorRepository) {
   }
@@ -37,23 +51,23 @@ export class LoginService {
     }
   }
 
-  private async createAuthenticatedResponse (operator) {
+  private async createAuthenticatedResponse (user: UserToAuthenticate) {
     const tokenPayload = {
-      id: operator.id,
-      permissions: operator.roles,
-      flipperId: operator.flipperId,
+      id: user.id,
+      permissions: user.roles,
+      flipperId: user.flipperId,
       operator: {
-        id: operator.id,
-        name: operator.profile.fullName(),
-        username: operator.username,
-        city: operator.profile.city,
-        queueId: operator.profile.queueId,
-        email: operator.profile.email,
-        language: operator.profile.language
+        id: user.id,
+        name: user.profile.fullName(),
+        username: user.username,
+        city: user.profile.city,
+        queueId: user.profile.queueId,
+        email: user.profile.email,
+        language: user.profile.language
       }
     }
 
-    const { refreshToken } = await OperatorRefreshTokenRepository.createToken(operator)
+    const { refreshToken } = await OperatorRefreshTokenRepository.createToken(user)
     const token = await OperatorRepository.createToken(tokenPayload)
 
     return AuthenticatedResponse({
@@ -61,7 +75,7 @@ export class LoginService {
       token,
       access_token: token,
       token_type: 'bearer',
-      roles: operator.roles,
+      roles: user.roles,
       operator: tokenPayload.operator
     })
   }
