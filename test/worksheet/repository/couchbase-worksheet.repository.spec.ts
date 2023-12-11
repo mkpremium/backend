@@ -11,7 +11,7 @@ import { CouchbaseOwnersRepository } from '../../../src/owner/repository/couchba
 
 describe('CouchbaseWorksheetRepository', () => {
   it('gets worksheet with callcenter view', async () => {
-    const container = await createTestContainer({postgres: false, couchbase: true})
+    const container = await createTestContainer({ postgres: false, couchbase: true })
     const repository: CouchbaseWorksheetRepository = container.resolve('worksheetRepository')
     const buildingsRepository: CouchbaseBuildingsRepository = container.resolve('buildingsRepository')
     const ownersRepository: CouchbaseOwnersRepository = container.resolve('ownersRepository')
@@ -37,17 +37,15 @@ describe('CouchbaseWorksheetRepository', () => {
       relatedBuildingIds: [ testBuilding.id ]
     }).build()
 
-    return Promise.all([
+    await Promise.all([
       buildingsRepository.save(testBuilding),
       repository.save(testWorksheet),
       ownersRepository.save(testOwner)
-    ]).then(() =>
-      repository.getForCallcenterView(testWorksheetId)
-        .then(result => {
-          expect(validate(result, CallcenterView).errors).to.deep.equal([])
-          expect(result.building.latestProposal).not.to.be.undefined
-          expect(result.building.cadastreReference).to.be.equal('test-cadastre-reference')
-        })
-    )
+    ])
+
+    const result = await repository.getForCallcenterView(testWorksheetId)
+    expect(validate(result, CallcenterView).errors).to.deep.equal([])
+    expect(result.building.latestProposal).not.to.be.undefined
+    expect(result.building.cadastreReference).to.be.equal('test-cadastre-reference')
   })
 })
