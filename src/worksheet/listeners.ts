@@ -40,6 +40,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
           errorMessage: error.message,
           buildingId
         })
+        throw error
       }
     })
 
