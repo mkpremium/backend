@@ -99,7 +99,7 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
   }
 
   isVerifiedOwner (owner: OwnerProps) {
-    const contacts = _.get(owner, 'person.contacts')
+    const contacts = _.get(owner, 'person.contacts', _.get(owner, 'contacts'))
     const goodContacts = contacts.filter(c => c.status === 'GOOD')
     return goodContacts.length > 0
   }
