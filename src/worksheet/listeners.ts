@@ -1,11 +1,10 @@
 import { AwilixContainer } from 'awilix'
 import { EventListener } from '../infrastructure/event-bus'
-import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
+import { BuildingNegotiationStatusChanged } from '../building/service/update-building-negotiation-status.service'
 import {
-  BuildingNegotiationStatusChanged
-} from '../building/service/update-building-negotiation-status.service'
-import { ReleaseUserExtraOpenedWorksheetsInQueueService } from './service/release-user-extra-opened-worksheets-in-queue.service'
+  ReleaseUserExtraOpenedWorksheetsInQueueService
+} from './service/release-user-extra-opened-worksheets-in-queue.service'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { OwnerStatusChangedEvent } from '../owner/service/change-contact-status.service'
 import { InvalidWorksheetFound } from './service/take-next-worksheet.service'
@@ -13,10 +12,13 @@ import { WorksheetRepository } from './repository/worksheet.repository'
 import { Logger } from 'winston'
 import { setStatus } from './domain/worksheet'
 import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.entity'
+import {
+  SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
+} from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
 
 export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
-  const legacyWorksheetRepository = container.resolve('legacyWorksheetRepository') as LegacyWorksheetRepository
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
+  const service = container.resolve('syncWorksheetStatusOnBuildingNegotiationStatusChangeService') as SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
   const worksheetQueueActionsService = container.resolve('worksheetQueueActionsService') as WorksheetQueueActionsService
   const releaseUserOtherActiveWorksheetsInQueueService = container.resolve('releaseUserOtherActiveWorksheetsInQueueService') as ReleaseUserExtraOpenedWorksheetsInQueueService
   const updateWorksheetStatusOnOwnerChangeService = container.resolve('updateWorksheetStatusOnOwnerChangeService') as UpdateWorksheetStatusOnOwnerChangeService
@@ -26,22 +28,9 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
   eventBus.on(
     DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
     'worksheet.update_status',
-    async ({
-             buildingId,
-             userId
-           }: BuildingNegotiationStatusChanged) => {
-      logger.info('updating worksheet because building negotiation status changed', { buildingId, userId })
-      try {
-        const worksheet = await worksheetRepository.ofBuildingId(buildingId)
-        await legacyWorksheetRepository.updateStatus(worksheet.id, userId)
-      } catch (error) {
-        logger.crit('could not update worksheet on building status change', {
-          error,
-          errorMessage: error.message,
-          buildingId
-        })
-        throw error
-      }
+    async (evt: BuildingNegotiationStatusChanged) => {
+      this.logger.info('updating worksheet because building negotiation status changed', evt)
+      await service.updateWorksheet(evt)
     })
 
   eventBus.on(

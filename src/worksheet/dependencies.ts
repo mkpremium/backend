@@ -11,11 +11,16 @@ import { LegacyWorksheetQueueRepository } from './models/queue-repository'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { CouchbaseWorksheetRepository } from './repository/couchbase-worksheet.repository'
 import { PostgresWorksheetRepository } from './repository/postgres-worksheet.repository'
+import {
+  SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
+} from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
+    syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asClass(
+      SyncWorksheetStatusOnBuildingNegotiationStatusChangeService).singleton().classic(),
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
     updateWorksheetStatusOnOwnerChangeService: asClass(UpdateWorksheetStatusOnOwnerChangeService).classic().singleton(),
     takeWorksheetService: aliasTo('worksheetQueueActionsService'),
