@@ -32,7 +32,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
            }: BuildingNegotiationStatusChanged) => {
       logger.info('updating worksheet because building negotiation status changed', { buildingId, userId })
       try {
-        const worksheet = await legacyWorksheetRepository.findWorksheetByBuilding(buildingId)
+        const worksheet = await worksheetRepository.ofBuildingId(buildingId)
         await legacyWorksheetRepository.updateStatus(worksheet.id, userId)
       } catch (error) {
         logger.crit('could not update worksheet on building status change', {

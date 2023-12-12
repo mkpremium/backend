@@ -2,7 +2,6 @@ import _ from 'lodash'
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _get from 'lodash/get'
-import _head from 'lodash/head'
 import _isNil from 'lodash/isNil'
 import _some from 'lodash/some'
 import t from 'tcomb'
@@ -103,24 +102,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     qb.where('type = ?', ScheduledEventType.MEETINGS)
     qb.where('event.worksheetId = ?', worksheetId)
     return meetingRepo.query(qb)
-  }
-
-  async findWorksheetByBuilding (buildingId) {
-    const qb = this.getQueryBuilder()
-      .where('t.`relatedBuildingIds`[0] = ?', buildingId)
-
-    const results = await this.query(qb)
-
-    if (results.length === 0) {
-      throw new (class extends Error {
-        constructor () {
-          super('No Worksheet found for building')
-          this.buildingId = buildingId
-        }
-      })()
-    }
-
-    return fromJSON(_head(results), Worksheet)
   }
 
   /**
