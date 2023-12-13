@@ -57,11 +57,12 @@ export function createAddOwnerToBuildingController ({addOwnerService}) {
 
 export const createListVerifiedOwnersController = ownersRepository => {
   return wrap(async (req, res) => {
+    // TODO: review owner props,
     const owners = await ownersRepository.verifiedOwnersOfBuildingWithId(req.params.buildingId)
     const result = owners.map(o => ({
       id: o.id,
-      name: o.person.name,
-      contacts: (o.person.contacts || []).map(({ id, status, type, value }) => ({ id, status, type, value })),
+      name: o.name,
+      contacts: (o.contacts || []).map(({ id, status, type, value }) => ({ id, status, type, value })),
       featuredContact: o.featuredContact
     }))
 
