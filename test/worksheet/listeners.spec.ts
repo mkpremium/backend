@@ -70,7 +70,7 @@ describe('worksheetEventListeners', () => {
     eventSubscribers[ 'owner.status_changed' ](testEvent)
 
     setTimeout(() => {
-      expect(syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy.updateWorksheet)
+      expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
         .to.have.been.calledWith(testEvent)
       done()
     }, 0)
