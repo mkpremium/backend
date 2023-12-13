@@ -31,7 +31,7 @@ describe('worksheetEventListeners', () => {
     const testContainer = createContainer()
     testContainer.register({
       releaseUserOtherActiveWorksheetsInQueueService: asValue(releaseUserOtherActiveWorksheetsInQueueServiceMock),
-      syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy: asValue(syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy),
+      syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asValue(syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy),
       legacyWorksheetRepository: asValue(null),
       worksheetQueueActionsService: asValue(null),
       worksheetRepository: asValue(null),
