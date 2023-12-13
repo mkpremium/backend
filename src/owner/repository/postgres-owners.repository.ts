@@ -1,4 +1,4 @@
-import { FoundOwnerProps, OwnerRepository } from './owner.repository'
+import { BuildingOwnerProps, FoundOwnerProps, OwnerRepository } from './owner.repository'
 import { OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
@@ -17,7 +17,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   }
 
   // Owners repository
-  buildingOwners (buildingId: string): Promise<OwnerProps[]> {
+  buildingOwners (buildingId: string): Promise<BuildingOwnerProps[]> {
     return Promise.reject(new Error('Not implemented'))
   }
 
@@ -25,7 +25,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return Promise.reject(new Error('Not implemented'))
   }
 
-  verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]> {
+  verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
     return Promise.reject(new Error('Not implemented'))
   }
 

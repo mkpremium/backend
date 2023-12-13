@@ -3,8 +3,7 @@ import { Owner, OwnerProps } from '../owner'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import t from 'tcomb'
-import { BuildingOwner, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
-import _ from 'lodash'
+import { BuildingOwner, BuildingOwnerProps, FoundOwner, FoundOwnerProps, OwnerRepository } from './owner.repository'
 
 
 const findOwnerByContactValueQuery = bucketName => `
@@ -74,7 +73,7 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
     ).then(parseFoundPhones(phoneNumber))
   }
 
-  async buildingOwners (buildingId): Promise<OwnerProps[]> {
+  async buildingOwners (buildingId): Promise<BuildingOwnerProps[]> {
     return this.couchbaseAdapter.queryAsync(
       buildingOwnersQuery(this.bucketName),
       [ buildingId ]
@@ -93,13 +92,13 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
     }))
   }
 
-  async verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]> {
+  async verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
     const owners = await this.buildingOwners(buildingId)
     return owners.filter(this.isVerifiedOwner)
   }
 
-  isVerifiedOwner (owner: OwnerProps) {
-    const contacts = _.get(owner, 'person.contacts', _.get(owner, 'contacts'))
+  isVerifiedOwner (owner: BuildingOwnerProps) {
+    const contacts = owner.contacts
     const goodContacts = contacts.filter(c => c.status === 'GOOD')
     return goodContacts.length > 0
   }
