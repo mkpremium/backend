@@ -1,4 +1,4 @@
-import { ContactProps, ContactType, OwnerContactStatus, OwnerProps } from '../owner'
+import { ContactProps, ContactType, OwnerContactStatus, OwnerProps, OwnerStatus } from '../owner'
 import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { BuildingNegotiationStatus, NegotiationStatus } from '../../building/building'
@@ -55,7 +55,18 @@ export const FoundOwner = t.struct<FoundOwnerProps>({
   building: WorksheetBuilding
 })
 
-export const BuildingOwner = t.struct({
+export interface BuildingOwnerProps {
+  id: string;
+  name: string;
+  contacts: ContactProps[];
+  status: OwnerStatus
+  featuredContact?: {
+    phoneId?: string
+    emailId?: string
+  }
+}
+
+export const BuildingOwner = t.struct<BuildingOwnerProps>({
   id: t.String,
   name: t.String,
   contacts: t.list(t.struct({
@@ -77,5 +88,5 @@ export interface OwnerRepository extends Repository<OwnerProps> {
 
   buildingOwners (buildingId: string): Promise<OwnerProps[]>
 
-  verifiedOwnersOfBuildingWithId (buildingId: string): Promise<OwnerProps[]>
+  verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]>
 }

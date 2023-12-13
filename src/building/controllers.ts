@@ -1,6 +1,7 @@
 import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
+import { OwnerRepository } from '../owner/repository/owner.repository'
 
 export function createListBuildingProposalsController (listBuildingProposalsService) {
   return wrap(async (req, res) => {
@@ -55,7 +56,7 @@ export function createAddOwnerToBuildingController ({addOwnerService}) {
   }
 }
 
-export const createListVerifiedOwnersController = ownersRepository => {
+export const createListVerifiedOwnersController = (ownersRepository: OwnerRepository) => {
   return wrap(async (req, res) => {
     // TODO: review owner props,
     const owners = await ownersRepository.verifiedOwnersOfBuildingWithId(req.params.buildingId)
