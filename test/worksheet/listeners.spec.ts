@@ -12,6 +12,7 @@ describe('worksheetEventListeners', () => {
   let eventBusMock
   let releaseUserOtherActiveWorksheetsInQueueServiceMock: { release: Sinon.SinonSpy }
   let syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy
+  let updateWorksheetStatusOnOwnerChangeSpy
 
   beforeEach(() => {
     eventSubscribers = {}
@@ -21,6 +22,7 @@ describe('worksheetEventListeners', () => {
       })
     }
     releaseUserOtherActiveWorksheetsInQueueServiceMock = { release: spy() }
+    updateWorksheetStatusOnOwnerChangeSpy = { updateWorksheet: spy() }
     syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy = { updateWorksheet: spy() }
     const noopLogger = {
       info: spy(),
@@ -32,6 +34,7 @@ describe('worksheetEventListeners', () => {
     testContainer.register({
       releaseUserOtherActiveWorksheetsInQueueService: asValue(releaseUserOtherActiveWorksheetsInQueueServiceMock),
       syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asValue(syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy),
+      updateWorksheetStatusOnOwnerChangeService: asValue(updateWorksheetStatusOnOwnerChangeSpy),
       legacyWorksheetRepository: asValue(null),
       worksheetQueueActionsService: asValue(null),
       worksheetRepository: asValue(null),
