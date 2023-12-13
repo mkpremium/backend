@@ -18,7 +18,7 @@ import {
 
 export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
-  const service = container.resolve('syncWorksheetStatusOnBuildingNegotiationStatusChangeService') as SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
+  const syncWorksheetStatusOnBuildingNegotiationStatusChangeService = container.resolve('syncWorksheetStatusOnBuildingNegotiationStatusChangeService') as SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
   const worksheetQueueActionsService = container.resolve('worksheetQueueActionsService') as WorksheetQueueActionsService
   const releaseUserOtherActiveWorksheetsInQueueService = container.resolve('releaseUserOtherActiveWorksheetsInQueueService') as ReleaseUserExtraOpenedWorksheetsInQueueService
   const updateWorksheetStatusOnOwnerChangeService = container.resolve('updateWorksheetStatusOnOwnerChangeService') as UpdateWorksheetStatusOnOwnerChangeService
@@ -30,7 +30,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
     'worksheet.update_status',
     async (evt: BuildingNegotiationStatusChanged) => {
       this.logger.info('updating worksheet because building negotiation status changed', evt)
-      await service.updateWorksheet(evt)
+      await syncWorksheetStatusOnBuildingNegotiationStatusChangeService.updateWorksheet(evt)
     })
 
   eventBus.on(

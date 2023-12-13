@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import sinon, { fake, spy } from 'sinon'
+import sinon from 'sinon'
+import Sinon, { fake, spy } from 'sinon'
 import { asValue, createContainer } from 'awilix'
 import { worksheetEventListeners } from '../../src/worksheet/listeners'
-import Sinon from 'sinon'
 import { ownerBuilder } from '../owner/owner.builder'
 import { OwnerStatusChangedEvent } from '../../src/owner/service/change-contact-status.service'
 import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-event.entity'
@@ -11,7 +11,7 @@ describe('worksheetEventListeners', () => {
   let eventSubscribers
   let eventBusMock
   let releaseUserOtherActiveWorksheetsInQueueServiceMock: { release: Sinon.SinonSpy }
-  let updateWorksheetStatusOnOwnerChangeSpy
+  let syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy
 
   beforeEach(() => {
     eventSubscribers = {}
@@ -21,7 +21,7 @@ describe('worksheetEventListeners', () => {
       })
     }
     releaseUserOtherActiveWorksheetsInQueueServiceMock = { release: spy() }
-    updateWorksheetStatusOnOwnerChangeSpy = { updateWorksheet: spy() }
+    syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy = { updateWorksheet: spy() }
     const noopLogger = {
       info: spy(),
       error: spy(),
@@ -31,7 +31,7 @@ describe('worksheetEventListeners', () => {
     const testContainer = createContainer()
     testContainer.register({
       releaseUserOtherActiveWorksheetsInQueueService: asValue(releaseUserOtherActiveWorksheetsInQueueServiceMock),
-      updateWorksheetStatusOnOwnerChangeService: asValue(updateWorksheetStatusOnOwnerChangeSpy),
+      syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy: asValue(syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy),
       legacyWorksheetRepository: asValue(null),
       worksheetQueueActionsService: asValue(null),
       worksheetRepository: asValue(null),
@@ -67,7 +67,7 @@ describe('worksheetEventListeners', () => {
     eventSubscribers[ 'owner.status_changed' ](testEvent)
 
     setTimeout(() => {
-      expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
+      expect(syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy.updateWorksheet)
         .to.have.been.calledWith(testEvent)
       done()
     }, 0)
