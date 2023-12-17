@@ -57,7 +57,7 @@ AND ANY c IN owner.person.contacts SATISFIES c.\`value\` = $1 AND c.status != 'B
 const buildingOwnersQuery = bucketName => `
 SELECT
 id,
-name,
+person.name,
 person.contacts,
 featuredContact,
 status
