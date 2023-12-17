@@ -23,4 +23,7 @@ export class User extends BaseEntity {
 
   @Column('jsonb')
   profile: UserProfileProps
+
+  @Column({default: false})
+  isAdmin: boolean
 }
