@@ -7,7 +7,7 @@ const sqsClient = new aws.SQS({ region: 'eu-west-1' })
 const contactsToDiscard = JSON.parse(fs.readFileSync(process.env.WRONG_CONTACTS_PATH, 'utf8'))
 
 chunk(contactsToDiscard, 10)
-  .forEach(async (batch) => {
+  .forEach(async (batch: any[]) => {
     await sqsClient.sendMessageBatch({
       QueueUrl: 'https://sqs.eu-west-1.amazonaws.com/173249668334/events.fifo',
       Entries: batch.map(({ id, ownerId, contactId, worksheetId }) => ({
