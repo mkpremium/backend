@@ -5,6 +5,7 @@ import { canManageOperator } from '../lib/role-operators'
 import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
 import _get from 'lodash/get'
 import { OperatorRefreshTokenRepository } from './operatorRefreshTokenRepository'
+import { AddOperatorService } from '../user/service/add-operator.service'
 
 export function createLoginController ({loginService}) {
   return async function (req, res) {
@@ -23,18 +24,15 @@ async function refreshToken (req, res) {
   res.json(response)
 }
 
-async function createOperator (req, res) {
-  const repo = new OperatorRepository()
+export function createAddOperatorController (addOperatorService: AddOperatorService) {
+  return async function createOperator (req, res) {
+    canManageOperator(req.user.operator, req.body)
 
-  canManageOperator(req.user.operator, req.body)
+    const operator = await addOperatorService.addOperator(req.body, req.user)
 
-  const operator = await repo.createOperator(req.body)
-  await History.registerCreate({
-    contextModel: operator,
-    user: req.user
-  })
-  res.status(201)
-  res.json(operator)
+    res.status(201)
+    res.json(operator)
+  }
 }
 
 async function updateOperator (req, res) {
@@ -74,7 +72,6 @@ async function selfCallCenterWorkInProgress (req, res) {
   res.json(Object.assign({}, req.user.operator, { activeCall: null, queueItem }))
 }
 
-export const createOperatorController = wrap(createOperator)
 export const listOperatorController = wrap(listOperator)
 export const limitedListOperatorController = wrap(limitedListOperator)
 export const selfCallCenterWorkInProgressController = wrap(selfCallCenterWorkInProgress)

@@ -1,7 +1,9 @@
 import { Router } from 'express'
+import { wrap } from 'express-promise-wrap'
 import { permissions } from '../middleware/jwt'
 import {
-  createOperatorController,
+  createAddOperatorController,
+
   limitedListOperatorController,
   listOperatorController,
   refreshTokenController,
@@ -16,7 +18,7 @@ export function operatorRouter (diContainer) {
 
   router.post('/refresh-token', refreshTokenController)
 
-  router.post('/', permissions.allManagers, createOperatorController)
+  router.post('/', permissions.allManagers, wrap(createAddOperatorController(diContainer.resolve('addOperatorService'))))
 
   router.put('/:id', permissions.allManagers, updateOperatorController)
 
