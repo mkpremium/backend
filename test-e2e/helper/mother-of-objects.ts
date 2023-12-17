@@ -1,11 +1,12 @@
-import _get from 'lodash/get'
 import moment from 'moment'
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { OwnerStatus } from '../../src/owner/owner'
+import { OwnerProps, OwnerStatus } from '../../src/owner/owner'
 import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/schedule-events.repository'
 import { closeSellStock } from '../../src/stock/application'
-import { Worksheet, WorkSheetStatus } from '../../src/worksheet/domain/worksheet'
+import { Worksheet } from '../../src/worksheet/domain/worksheet'
+import { BuildingProps } from '../../src/building/building'
+import { DeepPartial } from 'typeorm'
 
 const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
@@ -13,7 +14,7 @@ export const testContactPhone = '666666666'
 export const testOwnerName = 'Owner Name'
 export const testOwnerFirstName = 'Owner First Name'
 
-export const createBuilding = async (app, buildingProperties = {}) => {
+export const createBuilding = async (app, buildingProperties: DeepPartial<BuildingProps & { owner: OwnerProps }> = {}) => {
   const owner = await (buildingProperties.owner ? Promise.resolve(buildingProperties.owner) : createOwner(app))
   delete buildingProperties.owner
   const legacyBuildingsRepository = app.locals.diContainer.resolve('legacyBuildingsRepository')
@@ -43,11 +44,9 @@ export const createWorksheetForBuilding = (app, building) => {
   const legacyWorksheetRepository = app.locals.diContainer.resolve('legacyWorksheetRepository')
   return legacyWorksheetRepository.save(Worksheet({
     id: uuid(),
-    _relatedTo: _get(building, 'owner.name'),
     relatedBuildingIds: [ building.id ],
-    relatedOwnerIds: [],
     buildingAddress: building.address,
-    status: WorkSheetStatus.INVALID,
+    status: 'INVALID' as const,
     queueId: null
   }))
 }

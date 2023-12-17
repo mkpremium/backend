@@ -29,7 +29,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return scheduledEvent
   }
 
-  async addScheduledMeetingEvent (data: ScheduledEventProps, createdBy: string) {
+  async addScheduledMeetingEvent (data: Omit<ScheduledEventProps, 'id' | 'type' | 'createdAt' | '_documentType'>, createdBy: string) {
     const params = { ...data, createdBy, type: 'MEETINGS' }
     const scheduledEvent = await this.save(params)
 

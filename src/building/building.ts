@@ -165,7 +165,7 @@ export interface BuildingAddressProps {
   fullAddress: string;
   postalCode?: {
     number: number | string;
-    verified: boolean;
+    verified?: boolean;
   }
   city: string;
   province: string;
