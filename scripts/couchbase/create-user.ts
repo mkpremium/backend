@@ -1,5 +1,5 @@
-import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
-import { createFullOperator } from '../test/common'
+import { connectCouchbaseBucket } from '../../src/db/connect-couchbase-bucket'
+import { createFullOperator } from '../../test/common'
 
 const [ username, password, role ] = process.argv.slice(2)
 console.log('creating user', { username, password, role })
