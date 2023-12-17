@@ -32,7 +32,7 @@ import { Database } from './infrastructure/database'
 
 export const createApp = async (database: Database): Promise<Express> => {
   const logger = initLogger()
-  logger.info('starting app')
+  logger.info('starting app', {database})
 
   const app = express()
 
