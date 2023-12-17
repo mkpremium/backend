@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { createFlipper } from '../../test/common'
+import { buildUser, createFullOperator } from '../../test/common'
 import {
   closeBuildingStock,
   createBuilding,
@@ -13,19 +13,24 @@ import {
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 import { Promise as BluePromise } from 'bluebird'
+import uuid from 'uuid/v4'
+import { Application } from 'express'
+import { AwilixContainer } from 'awilix'
 
 describe.skip('Building listing endpoint (Postgres)', () => {
-  let app, flipper
+  let app: Application
+  let flipper: any
 
   beforeEach(async () => {
-    app = await initApplication('postgres')
+    const [ createdApp, container ] = await initApplication('postgres') as [ Application, AwilixContainer ]
+    app = createdApp
     flipper = await createFlipper()
   })
 
   it('returns list of given building IDs', async () => {
-    const testMetadataId = 'test-metadata-1'
+    const testMetadataId = uuid()
     const building1 = await createBuilding(app, {
-      id: 'test-building1',
+      id: uuid(),
       metadata: [ {
         id: testMetadataId,
         name: '5325108TG3452E0001YT.jpg',
@@ -186,3 +191,15 @@ describe.skip('Building listing endpoint (Postgres)', () => {
       })
   })
 })
+
+
+async function createFlipper () {
+  const id = uuid()
+  return createFullOperator(buildUser({
+    id,
+    username: 'business' + id,
+    roles: [
+      'BUSINESS'
+    ]
+  }))
+}
