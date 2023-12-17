@@ -34,3 +34,10 @@ export const createDeleteFavoriteBuildingController = deleteFavoriteBuildingServ
     res.json()
   }
 }
+
+
+export function createAddUserController () {
+  return function (req, res) {
+    res.status(501).send()
+  }
+}
