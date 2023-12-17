@@ -1,7 +1,3 @@
-/**
- * @param {UserRepository} usersRepository
- * @return {function(*, *): Promise<void>}
- */
 export const createMeController = usersRepository => {
   return async (req, res) => {
     const {
