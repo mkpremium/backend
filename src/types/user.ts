@@ -78,6 +78,13 @@ export interface UserProps {
   profile: UserProfileProps;
   flipperId?: string,
   favoriteBuildings?: string[]
+  restringedHours?: {
+    [key: string]: {
+      description: string;
+      start: string;
+      end: string;
+    }[];
+  }
 }
 
 export const User = t.struct<UserProps>(

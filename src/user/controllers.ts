@@ -1,15 +1,15 @@
-export const createMeController = usersRepository => {
+import { UsersRepository } from './repository/users.repository'
+
+export const createMeController = (usersRepository: UsersRepository) => {
   return async (req, res) => {
     const {
       favoriteBuildings,
-      featuredOwners,
       restringedHours,
       signatures,
       profile,
       maxLine
     } = await usersRepository.get(req.user.operator.id)
     res.json({
-      featuredOwners,
       favoriteBuildings,
       restringedHours,
       signatures,
