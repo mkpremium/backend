@@ -15,7 +15,7 @@ export async function operatorLogin (app, credentials = { username: 'admin', pas
 
 export async function createFullOperator (object) {
   const repo = new OperatorRepository()
-  return repo.save(object, false)
+  return repo.save(object)
 }
 
 export async function operatorCreate () {
