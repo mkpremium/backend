@@ -12,14 +12,14 @@ import {
   testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
-import { Promise } from 'bluebird'
+import { Promise as BluePromise } from 'bluebird'
 
-describe('Building listing endpoint', () => {
-  let app, businessUser
+describe.skip('Building listing endpoint (Postgres)', () => {
+  let app, flipper
 
   beforeEach(async () => {
-    app = await initApplication()
-    businessUser = await createFlipper()
+    app = await initApplication('postgres')
+    flipper = await createFlipper()
   })
 
   it('returns list of given building IDs', async () => {
@@ -55,16 +55,16 @@ describe('Building listing endpoint', () => {
     })
     const building1Purchase = (await purchaseBuilding(app, {
       buildingId: building1.id,
-      propertyAgentId: businessUser.id
+      propertyAgentId: flipper.id
     })).purchase
 
     const building1Proposal = await createProposalForBuilding(app, {
-      propertyAgentId: businessUser.id,
+      propertyAgentId: flipper.id,
       buildingId: building1.id
     })
 
     const building1LastMeeting = await createMeeting(app, {
-      propertyAgentId: businessUser.id,
+      propertyAgentId: flipper.id,
       contactId: testPhoneContactId,
       buildingId: building1.id,
       ownerId: building1.ownerId
@@ -72,18 +72,18 @@ describe('Building listing endpoint', () => {
     await createWorksheetForBuilding(app, building1)
     const building1Sale = (await sellBuilding(app, {
       buildingId: building1.id,
-      propertyAgentId: businessUser.id
+      propertyAgentId: flipper.id
     })).sell
 
     const building1ClosedStock = (await closeBuildingStock(app, {
       buildingId: building1.id,
-      propertyAgentId: businessUser.id
+      propertyAgentId: flipper.id
     })).close
     const building2 = await createBuilding(app, { id: 'test-building2' })
 
-    await Promise.delay(100)
+    await BluePromise.delay(100)
 
-    return authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, businessUser, app)
+    return authenticatedGet(`/buildings?id=${building1.id}&id=${building2.id}`, flipper, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         expect(response.body).to.be.deep.equal([

@@ -1,10 +1,11 @@
 import { createApp } from '../../src/app'
 import { defaultPassword, operatorLogin } from '../../test/common'
 import request from 'supertest'
+import { Database } from '../../src/infrastructure/database'
 
 const DEFAULT_MILLISECONDS_TO_WAIT = 1000
 
-export const initApplication = () => createApp('couchbase')
+export const initApplication = (database: Database = 'couchbase') => createApp(database)
   .then(app => {
     const bucket = app.locals.diContainer.resolve('couchbaseBucket')
     return new Promise(resolve => {
