@@ -29,7 +29,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
     DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
     'worksheet.update_status',
     async (evt: BuildingNegotiationStatusChanged) => {
-      this.logger.info('updating worksheet because building negotiation status changed', evt)
+      logger.info('updating worksheet because building negotiation status changed', evt)
       await syncWorksheetStatusOnBuildingNegotiationStatusChangeService.updateWorksheet(evt)
     })
 
