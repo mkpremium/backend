@@ -7,11 +7,12 @@ import { jwt as jwtConfig } from '../../config'
 import { OperatorRepository } from '../operator/models'
 import { UserRoles } from '../types/user'
 import { logger } from '../infrastructure/logger'
-import honeycomb from "honeycomb-beeline";
+import honeycomb from 'honeycomb-beeline'
+import { UsersRepository } from '../user/repository/users.repository'
 
-function jwtMiddlewareAdapter () {
+function jwtMiddlewareAdapter (usersRepository: UsersRepository) {
   const jwtInstance: any = jwtMiddleware({ ...jwtConfig, bearerTokenExtractor, algorithms: [ 'HS256' ] })
-  const composedJwt: any = compose(jwtInstance, wrap(addUserInfo))
+  const composedJwt: any = compose(jwtInstance, wrap(addUserInfoFactory(usersRepository)))
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError
   composedJwt.unless = jwtInstance.unless
   return composedJwt
@@ -19,22 +20,25 @@ function jwtMiddlewareAdapter () {
 
 export default jwtMiddlewareAdapter
 
-async function addUserInfo (req, res, next) {
-  logger.debug('jwt-middleware#addUserInfo', req.user.id)
-  const id = req.user.id
-  const userRepo = new OperatorRepository()
+function addUserInfoFactory (usersRepository: UsersRepository) {
+  return async function addUserInfo (req, res, next) {
+    logger.debug('jwt-middleware#addUserInfo', req.user.id)
+    const id = req.user.id
 
-  return userRepo.findById(id)
-    .then(user => {
-      if (!user || !user.enable) {
-        res.sendStatus(401)
-        return
-      }
-      req.user.operator = user
-      honeycomb().addContext({userId: user.id})
-      next()
-    })
+    return usersRepository.get(id)
+      .then(user => {
+        if (!user || !user.enable) {
+          res.sendStatus(401)
+          return
+        }
+        req.user.operator = user
+        honeycomb().addContext({ userId: user.id })
+        next()
+      })
+  }
+
 }
+
 
 export function bearerTokenExtractor (req) {
   const authorization = _get(req, 'headers.authorization', '')

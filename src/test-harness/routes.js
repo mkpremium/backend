@@ -1,13 +1,12 @@
 import { wrap } from 'express-promise-wrap'
-import jwt, { permissions } from '../middleware/jwt'
+import { permissions } from '../middleware/jwt'
 import { OperatorRepository } from '../operator/models'
 import { createBuildingFactory, CreateBuildingRequest } from './create-building'
 import { CreateOwnerCmd, createOwnerFactory } from './create-owner'
 import { createBuildingWorksheetFactory } from './create-worksheet'
 import { createOwnerCmd } from './fake-data-generator'
 
-export function createTestHarness (app, awilixContainer) {
-  const secured = jwt()
+export function createTestHarness (app, awilixContainer, secured) {
   const createOwner = createOwnerFactory(awilixContainer.resolve('ownersRepository'))
   const createWorksheet = createBuildingWorksheetFactory(awilixContainer.resolve('worksheetRepository'))
   const createBuilding = createBuildingFactory(

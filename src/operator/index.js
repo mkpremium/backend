@@ -1,12 +1,11 @@
-import jwt from '../middleware/jwt'
 import profitGoalsRoutes from './ProfitGoal/routes'
 import restringedHoursRoutes from './restringed-hours/routes'
 
 import './types'
 import { operatorRouter } from './routes'
 
-export default (app, diContainer) => {
-  const secured = jwt().unless({
+export default (app, diContainer, jwt) => {
+  const secured = jwt.unless({
     path: [
       '/operators/login',
       '/operators/refresh-token'

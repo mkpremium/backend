@@ -1,7 +1,5 @@
 import routes from './routes'
-import jwt from '../middleware/jwt'
 
-export default (app) => {
-  const secured = jwt()
+export default (app, secured) => {
   app.use('/metadata', secured, routes)
 }

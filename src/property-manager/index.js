@@ -1,8 +1,5 @@
-import jwt from '../middleware/jwt'
 import { createPropertyManagerRouter } from './routes'
 
-export const init = (app, container) => {
-  const secured = jwt()
-
+export const init = (app, container, secured) => {
   app.use('/property-manager', secured, createPropertyManagerRouter(container.resolve('stockRepository')))
 }

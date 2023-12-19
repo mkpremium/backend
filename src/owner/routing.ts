@@ -1,10 +1,8 @@
 import { Express, Router } from 'express'
 import { AwilixContainer } from 'awilix'
-import jwt from '../middleware/jwt'
 import { wrap } from 'express-promise-wrap'
 
-export const setupOwnersRoutes = (app: Express, container: AwilixContainer) => {
-  const secured = jwt()
+export const setupOwnersRoutes = (app: Express, container: AwilixContainer, secured) => {
   const router = Router()
 
   router.get('/:ownerId', wrap(container.resolve('getOwnerController')))

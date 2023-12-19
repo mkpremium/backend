@@ -1,9 +1,9 @@
-import jwt, { permissions } from '../middleware/jwt'
+import { permissions } from '../middleware/jwt'
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 
-export function flipperRoutes (app, container) {
-  app.use('/flipper', jwt(), createRouter(container))
+export function flipperRoutes (app, container, secured) {
+  app.use('/flipper', secured, createRouter(container))
 }
 
 

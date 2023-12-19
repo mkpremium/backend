@@ -1,10 +1,9 @@
 import './types'
-import jwt, { permissions } from '../middleware/jwt'
+import { permissions } from '../middleware/jwt'
 import { Router } from 'express'
 import { listHistoryController } from './controllers'
 
-export function historyRoutes (app) {
-  const secured = jwt()
+export function historyRoutes (app, secured) {
   const router = Router()
 
   router.get('/', permissions.operator, listHistoryController)

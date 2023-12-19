@@ -1,4 +1,5 @@
 import { UserProps } from '../../types/user'
+import { EntityNotFound } from '../../db/errors'
 
 
 interface Signature {
@@ -18,5 +19,6 @@ interface FlipperProfile {
 export interface UsersRepository {
   getUserWithUsername (username: string): Promise<UserProps>
 
+  // Throws EntityNotFound if user not found.
   get (id: string): Promise<UserProps & FlipperProfile>
 }

@@ -1,14 +1,18 @@
-import jwt, { permissions } from '../middleware/jwt'
-import { Router } from 'express'
-import { CallerRepository } from './caller.repository'
-import { createGetNextCallerWorksheetController } from './controller/get-next-worksheet.controller'
 import { asClass, asFunction } from 'awilix'
+import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
-import { createTakeWorksheetInQueueController } from './controller/take-worksheet-in-queue.controller'
+import { permissions } from '../middleware/jwt'
+import { CallerRepository } from './caller.repository'
 import { createAssignFlipperToCallerController } from './controller/assign-flipper-to-caller.controller'
+import {
+  createAssignedFlipperBlockedAvailabilityController
+} from './controller/assigned-flipper-blocked-availability.controller'
+import {
+  createAssignedFlipperScheduleMeetingController
+} from './controller/assigned-flipper-schedule-meeting.controller'
+import { createGetNextCallerWorksheetController } from './controller/get-next-worksheet.controller'
+import { createTakeWorksheetInQueueController } from './controller/take-worksheet-in-queue.controller'
 import { AssignFlipperToCallerService } from './service/assign-flipper-to-caller.service'
-import { createAssignedFlipperBlockedAvailabilityController } from './controller/assigned-flipper-blocked-availability.controller'
-import { createAssignedFlipperScheduleMeetingController } from './controller/assigned-flipper-schedule-meeting.controller'
 
 export const setupCallerDependencies = awilixContainer => {
   awilixContainer.register({
@@ -28,9 +32,7 @@ export const setupCallerDependencies = awilixContainer => {
   })
 }
 
-export const setupCallerRoutes = (app, awilixContainer) => {
-  const secured = jwt()
-
+export const setupCallerRoutes = (app, awilixContainer, secured) => {
   app.use('/caller',
     secured,
     createRouter(awilixContainer)

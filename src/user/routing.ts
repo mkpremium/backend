@@ -1,11 +1,8 @@
-import jwt from '../middleware/jwt'
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 import { createAddFavoritesController, createDeleteFavoriteBuildingController, createMeController } from './controllers'
 
-export const setupUserRoutes = (app, container) => {
-  const secured = jwt()
-
+export const setupUserRoutes = (app, container, secured) => {
   const router = Router()
 
   router.get('/me', wrap(createMeController(container.resolve('usersRepository'))))

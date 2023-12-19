@@ -29,6 +29,7 @@ import { statRoutes } from './stats/routing'
 import { historyRoutes } from './history/routing'
 import { startListeners } from './infrastructure/listeners'
 import { Database } from './infrastructure/database'
+import jwt from './middleware/jwt'
 
 export const createApp = async (database: Database): Promise<Express> => {
   const logger = initLogger()
@@ -55,24 +56,26 @@ export const createApp = async (database: Database): Promise<Express> => {
 
     app.locals.diContainer = diContainer
 
-    operator(app, diContainer) // start with login router
-    callsRoutes(diContainer, app)
-    setupUserRoutes(app, diContainer)
-    buildingRoutes(diContainer, app)
-    setupOwnersRoutes(app, diContainer)
-    scheduledEventsRoutes(diContainer, app)
-    worksheetsRoutes(app, diContainer)
-    createTestHarness(app, diContainer)
-    initPropertyManager(app, diContainer)
-    setupCallerRoutes(app, diContainer)
-    flipperRoutes(app, diContainer)
-    setupStockRouter(app, diContainer)
-    statRoutes(app)
-    historyRoutes(app)
+    const secured = jwt(diContainer.resolve('usersRepository'))
 
-    notes(app)
-    metadata(app)
-    email(app)
+    operator(app, diContainer, secured) // start with login router
+    callsRoutes(diContainer, app, secured)
+    setupUserRoutes(app, diContainer, secured)
+    buildingRoutes(diContainer, app, secured)
+    setupOwnersRoutes(app, diContainer, secured)
+    scheduledEventsRoutes(diContainer, app, secured)
+    worksheetsRoutes(app, diContainer, secured)
+    createTestHarness(app, diContainer, secured)
+    initPropertyManager(app, diContainer, secured)
+    setupCallerRoutes(app, diContainer, secured)
+    flipperRoutes(app, diContainer, secured)
+    setupStockRouter(app, diContainer, secured)
+    statRoutes(app, secured)
+    historyRoutes(app, secured)
+
+    notes(app, secured)
+    metadata(app, secured)
+    email(app, secured)
 
     startListeners(diContainer)
 

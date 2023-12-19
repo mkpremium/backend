@@ -1,9 +1,8 @@
 import { Express, Router } from 'express'
 import { AwilixContainer } from 'awilix'
 import { wrap } from 'express-promise-wrap'
-import jwt from '../middleware/jwt'
 
-export const callsRoutes = (container: AwilixContainer, app: Express) => {
+export const callsRoutes = (container: AwilixContainer, app: Express, jwt) => {
   const router = Router()
 
   // needed for calls from web (aka callcenter)
@@ -23,7 +22,7 @@ export const callsRoutes = (container: AwilixContainer, app: Express) => {
   router.patch('/virtual-callers/:callerId', wrap(container.resolve('patchVirtualCallerController')))
   router.post('/virtual-callers', wrap(container.resolve('createVirtualCallerController')))
 
-  const secured = jwt().unless({
+  const secured = jwt.unless({
     path: [
       // '/calls/twilio/voice', // needed for calls from web (aka callcenter)
       /^\/calls\/twilio\/[0-9a-z-]+\/gather$/,
