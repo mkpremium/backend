@@ -18,13 +18,15 @@ export abstract class PostgresRepository<S extends { id?: string }, E extends {
 }> extends WithPostgresRepository<E> implements EntityRepository<S> {
   protected relations: FindOptionsRelations<E> | string[] = {}
 
-  get (id: string): Promise<S> {
-    return this.repository.findOne({
+  async get (id: string): Promise<S> {
+    let entity = await this.repository.findOne({
       where: {
         id: id as any
       },
       relations: this.relations
-    }).then(this.entityToStruct)
+    })
+
+    return this.entityToStruct(entity)
   }
 
   save (struct: S): Promise<S> {
