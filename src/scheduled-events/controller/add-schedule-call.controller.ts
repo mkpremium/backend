@@ -1,7 +1,13 @@
 import { canScheduleCall } from '../../lib/role-operators'
 import { ScheduleCallService } from '../service/schedule-call.service'
+import { ScheduledCallsService } from '../service/scheduled-calls.service'
 
-export const createAddScheduledCallController = ({ scheduleCall }: { scheduleCall: ScheduleCallService }) =>
+interface Deps {
+  scheduleCall: ScheduleCallService,
+  scheduledCallsService: ScheduledCallsService
+}
+
+export const createAddScheduledCallController = ({ scheduleCall, scheduledCallsService }: Deps) =>
   async (req, res) => {
     canScheduleCall(req.user.operator, req.body.notifyTo)
 
@@ -11,5 +17,7 @@ export const createAddScheduledCallController = ({ scheduleCall }: { scheduleCal
       queueId: req.user.operator.profile.queueId,
     })
 
-    res.status(201).json(scheduledEvent)
+    const fullScheduledEvent = await scheduledCallsService.getById(scheduledEvent.id)
+
+    res.status(201).json(fullScheduledEvent)
   }
