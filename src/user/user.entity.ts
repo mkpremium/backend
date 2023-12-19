@@ -15,10 +15,10 @@ export class User extends BaseEntity {
   @Column()
   enabled: boolean
 
-  @OneToOne(() => Flipper)
+  @OneToOne(() => Flipper, flipper => flipper.user)
   flipper?: Flipper
 
-  @OneToOne(() => Caller)
+  @OneToOne(() => Caller, caller => caller.user)
   caller?: Caller
 
   @Column('jsonb')
