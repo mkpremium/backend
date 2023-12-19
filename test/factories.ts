@@ -6,11 +6,14 @@ Factory.define('caller')
 Factory.define('flipper')
   .attr('user', () => Factory.attributes('user', {}))
 
-Factory.define('user')
+Factory.define('user-credentials')
   .sequence('username', idx => `test-user-${idx}`)
+  .attr('password', 'test-User-pa$$w0rd')
+
+Factory.define('user')
+  .extend('user-credentials')
   .option('roles', [])
   .attrs({
-      password: 'test-user-password',
       profile: () => Factory.attributes('user-profile', {}),
       enabled: true,
       roles: []
