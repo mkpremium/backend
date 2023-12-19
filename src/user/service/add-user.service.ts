@@ -9,6 +9,7 @@ interface AddUserCommand {
   username: string
   password: string
   profile: UserProfileProps
+  isAdmin?: boolean
 }
 
 export async function addUserService (cmd: AddUserCommand) {
@@ -16,6 +17,7 @@ export async function addUserService (cmd: AddUserCommand) {
     username: cmd.username,
     password: await hashPassword(cmd.password),
     enabled: true,
+    isAdmin: cmd.isAdmin ?? false,
     profile: cmd.profile,
   })
 }
