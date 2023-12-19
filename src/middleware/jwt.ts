@@ -9,15 +9,15 @@ import { UserRoles } from '../types/user'
 import { logger } from '../infrastructure/logger'
 import honeycomb from "honeycomb-beeline";
 
-export const jwt = (getToken) => {
-  const jwtInstance: any = jwtMiddleware({ ...jwtConfig, getToken, algorithms: [ 'HS256' ] })
+function jwtMiddlewareAdapter () {
+  const jwtInstance: any = jwtMiddleware({ ...jwtConfig, bearerTokenExtractor, algorithms: [ 'HS256' ] })
   const composedJwt: any = compose(jwtInstance, wrap(addUserInfo))
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError
   composedJwt.unless = jwtInstance.unless
   return composedJwt
 }
 
-export default () => jwt(bearerTokenExtractor)
+export default jwtMiddlewareAdapter
 
 async function addUserInfo (req, res, next) {
   logger.debug('jwt-middleware#addUserInfo', req.user.id)
