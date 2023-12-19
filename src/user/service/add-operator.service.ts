@@ -1,5 +1,8 @@
 import { OperatorRepository } from '../../operator/models'
 import { History } from '../../history/models'
+import { UserProps } from '../../types/user'
+
+type AddOperatorCommand = Omit<UserProps, 'favoriteBuildings' | 'restringedHours'>
 
 export class AddOperatorService {
   constructor (
@@ -7,15 +10,15 @@ export class AddOperatorService {
   ) {
   }
 
-  async addOperator (body: any, user: any) {
-    return await this.saveInCouchbase(body, user)
+  async addOperator (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
+    return await this.saveInCouchbase(cmd, requester)
   }
 
-  private async saveInCouchbase (body: any, user: any) {
-    const operator = await this.operatorRepository.createOperator(body)
+  private async saveInCouchbase (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
+    const operator = await this.operatorRepository.createOperator(cmd)
     await History.registerCreate({
       contextModel: operator,
-      user: user
+      user: requester
     })
 
     return operator
