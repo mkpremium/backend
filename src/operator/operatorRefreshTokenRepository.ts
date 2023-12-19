@@ -27,10 +27,7 @@ const OperatorRefreshToken = t.struct(
 )
 
 export class OperatorRefreshTokenRepository extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = OperatorRefreshToken
-  }
+  protected Struct = OperatorRefreshToken
 
   static async createRefreshToken (payload) {
     const options = {
@@ -67,7 +64,7 @@ export class OperatorRefreshTokenRepository extends CouchbaseModel {
     return repo.save({
       operatorId,
       refreshToken
-    }, false)
+    })
   }
 
   static async consume (id) {
@@ -89,7 +86,7 @@ export const OperatorRequest = t.struct(
     agentNumber: t.maybe(t.String),
     level: t.maybe(t.Number),
     serviceId: t.maybe(t.String),
-    enable: t.Bool,
+    enable: t.Boolean,
     flipperId: t.maybe(t.String),
     roles: t.list(UserRole),
 
