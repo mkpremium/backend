@@ -1,3 +1,5 @@
+import '../src/infrastructure/o11y/honeycomb'
+
 import { moveWorksheetOutOfFreezer } from '../src/business/worksheets/freezer'
 import { initLogger } from '../src/infrastructure/logger'
 import '../src/types'
