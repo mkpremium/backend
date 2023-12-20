@@ -3,6 +3,7 @@ import { AwilixContainer } from 'awilix'
 import { createAdminUserWithPostgres, operatorLogin } from '../../common'
 import { Factory } from 'rosie'
 import request from 'supertest'
+import { expect } from 'chai'
 
 describe('AddOperatorService', () => {
   it('adds user', async () => {
@@ -12,15 +13,18 @@ describe('AddOperatorService', () => {
 
     const loggedInAdmin = await operatorLogin(app)
 
+    const testCommand = {
+      ...Factory.build<{username: string, password: string}>('user-credentials'),
+      profile: Factory.build('user-profile'),
+      roles: [],
+      enable: true,
+    }
     const response = await request(app)
       .post('/operators/')
       .set('Authorization', loggedInAdmin.authorization)
-      .send({
-        ...Factory.build('user-credentials'),
-        profile: Factory.build('user-profile'),
-        roles: [],
-        enable: true,
-      })
+      .send(testCommand)
       .expect(201)
+
+    expect(response.body.password).to.not.eql(testCommand.password)
   })
 })
