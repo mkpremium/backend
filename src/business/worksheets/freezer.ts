@@ -1,4 +1,4 @@
-import Promise from 'bluebird'
+import { Promise as BirdPromise } from 'bluebird'
 import _ from 'lodash'
 import fromJSON from 'tcomb/lib/fromJSON'
 
@@ -44,11 +44,10 @@ async function pullWorksheetsOutOfFreezer (worksheets, buildingsRepository) {
     return
   }
 
-  const saveWorksheet = async (worksheet) => {
-    await repository.save(worksheet, false)
-  }
-
-  await Promise.map(updatedWorksheets, saveWorksheet, { concurrency: 1 })
+  await BirdPromise.map(updatedWorksheets, async (worksheet) => {
+    await repository.save(worksheet)
+  }, { concurrency: 1 })
   const outOfFreezerBuildingIds = _.flatMap(updatedWorksheets.map(({ relatedBuildingIds }) => relatedBuildingIds))
+
   await buildingsRepository.pullBuildingsOutOfFreezer(outOfFreezerBuildingIds)
 }
