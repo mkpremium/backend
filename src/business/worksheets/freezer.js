@@ -4,7 +4,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 
 import { logger } from '../../infrastructure/logger'
 import { utc } from '../../lib/date'
-import { Worksheet, WorkSheetStatus } from '../../worksheet/domain/worksheet'
+import { pullOutFreezer, Worksheet, WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 
 let limit = 100
@@ -28,7 +28,7 @@ export async function moveFreezerWorksheets (daysInFreezer, buildingsRepository)
     .limit(limit)
 
   const worksheets = await repository.query(queryBuilder)
-  return pullOutFreezer(worksheets, buildingsRepository)
+  return pullWorksheetsOutOfFreezer(worksheets, buildingsRepository)
 }
 
 export async function moveNoSaleWorksheets (daysInFreezer, buildingsRepository) {
@@ -41,10 +41,10 @@ export async function moveNoSaleWorksheets (daysInFreezer, buildingsRepository) 
     .limit(limit)
 
   const worksheets = await repository.query(queryBuilder)
-  return pullOutFreezer(worksheets, buildingsRepository)
+  return pullWorksheetsOutOfFreezer(worksheets, buildingsRepository)
 }
 
-async function pullOutFreezer (worksheets, buildingsRepository) {
+async function pullWorksheetsOutOfFreezer (worksheets, buildingsRepository) {
   if (!worksheets || worksheets.length === 0) {
     return
   }
@@ -53,7 +53,7 @@ async function pullOutFreezer (worksheets, buildingsRepository) {
   const updatedWorksheets = worksheets.map(worksheet => {
     logger.info(`moving worksheet out freezer`, { statusChangedAt: worksheet.statusChangedAt, id: worksheet.id })
     try {
-      return fromJSON(worksheet, Worksheet).pullOutFreezer(WorkSheetStatus.AVAILABLE)
+      return pullOutFreezer(fromJSON(worksheet, Worksheet), WorkSheetStatus.AVAILABLE)
     } catch (error) {
       console.log('Could not pull worksheet out of freezer', {
         ...error,

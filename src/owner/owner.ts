@@ -143,11 +143,6 @@ Owner.prototype.setStatus = function ($set) {
   return t.update(this, { status: { $set } })
 }
 
-Owner.prototype.pullOutFreezer = function (newStatus) {
-  return t.update(this, {
-    status: { $set: newStatus }
-  })
-}
 
 Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   return t.update(this, {

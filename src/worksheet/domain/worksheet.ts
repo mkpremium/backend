@@ -110,8 +110,8 @@ Worksheet.prototype.statusChanged = function () {
   })
 }
 
-Worksheet.prototype.pullOutFreezer = function (newStatus) {
-  const updated = setStatus(this, newStatus)
+export function pullOutFreezer (worksheet, newStatus) {
+  const updated = setStatus(worksheet, newStatus)
 
   return t.update(updated, {
     inFreezer: { $set: false },
@@ -119,6 +119,7 @@ Worksheet.prototype.pullOutFreezer = function (newStatus) {
     lastAddedMeeting: { $set: null }
   })
 }
+
 
 export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string): [ WorksheetQueueProps, WorksheetProps ] => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
