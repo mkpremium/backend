@@ -64,7 +64,7 @@ const scheduledCallQuery = (bucketName: string, conditions: string[]) => `
         AND meta(owner).id = se.event.ownerId
 
     WHERE se._documentType = 'scheduled-event'
-      AND se.type = 'CALLS' ${conditions.join(' AND ')}
+      AND se.type = 'CALLS' AND ${conditions.join(' AND ')}
 `
 
 interface ScheduledCallProps {
