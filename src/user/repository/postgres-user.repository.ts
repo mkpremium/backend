@@ -7,13 +7,15 @@ import { UserNotFound } from '../../flipper/service/flipper-favorites-buildings.
 
 export class PostgresUserRepository extends PostgresRepository<UserProps, User>
   implements UsersRepository {
+  protected relations = {
+    flipper: true,
+    caller: true,
+  }
+
   async getUserWithUsername (username: string) {
     const user = await this.repository.findOne({
       where: { username },
-      relations: {
-        flipper: true,
-        caller: true,
-      }
+      relations: this.relations
     })
     if (!user) {
       throw new UserNotFound(username)

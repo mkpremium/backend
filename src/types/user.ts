@@ -3,10 +3,11 @@ import { RestringedHourObject } from '../operator/restringed-hours/types'
 import { DateTimeString } from '../infrastructure/shared-types'
 
 export const UserRoles = {
-  OPERATOR: 'OPERATOR',
-  MANAGER: 'MANAGER',
-  BUSINESS: 'BUSINESS',
   ADMIN: 'ADMIN',
+  BUSINESS: 'BUSINESS',
+  OPERATOR: 'OPERATOR',
+
+  MANAGER: 'MANAGER',
   STREET: 'STREET',
   STREET_MANAGER: 'STREET_MANAGER',
   STREET_ADMIN: 'STREET_ADMIN'

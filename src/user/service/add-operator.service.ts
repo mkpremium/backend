@@ -1,10 +1,12 @@
 import { OperatorRepository } from '../../operator/models'
 import { History } from '../../history/models'
-import { UserProps } from '../../types/user'
+import { UserProps, UserRoles } from '../../types/user'
 import { DataSource } from 'typeorm'
 import { addUserService } from './add-user.service'
+import { Flipper } from '../../flipper/flipper.entity'
+import { Caller } from '../../caller/caller.entity'
 
-type AddOperatorCommand = Omit<UserProps, 'favoriteBuildings' | 'restringedHours' | 'enable'>
+type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'restringedHours' | 'enable'>
 
 export class AddOperatorService {
   constructor (
@@ -29,18 +31,27 @@ export class AddOperatorService {
   }
 
   private async saveInPostgres (cmd: AddOperatorCommand) {
-    const user = await addUserService({
-      em: this.ormDataSource.manager,
-      username: cmd.username,
-      password: cmd.password,
-      isAdmin: cmd.roles.includes('admin'),
-      profile: cmd.profile,
+    return this.ormDataSource.transaction(async em => {
+      const user = await addUserService({
+        em,
+        username: cmd.username,
+        password: cmd.password,
+        isAdmin: cmd.roles.includes(UserRoles.ADMIN),
+        profile: cmd.profile,
+      })
+      if (cmd.roles.includes(UserRoles.BUSINESS)) {
+        await em.save(Flipper, {user})
+      }
+      if (cmd.roles.includes(UserRoles.OPERATOR)) {
+        await em.save(Caller, {user})
+      }
+
+      return {
+        enable: user.enabled,
+        roles: cmd.roles,
+        ...user
+      }
     })
 
-    return {
-      enable: user.enabled,
-      roles: cmd.roles,
-      ...user
-    }
   }
 }
