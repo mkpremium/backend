@@ -8,7 +8,9 @@ import { User } from '../src/user/user.entity'
 
 export const defaultPassword = 'Passw0rd'
 
-export async function operatorLogin (app, credentials = { username: 'admin', password: defaultPassword }) {
+export async function operatorLogin (app, credentials = { username: 'admin', password: defaultPassword }): Promise<{
+  authorization: string
+}> {
   const response = await request(app)
     .post('/operators/login')
     .send(credentials)

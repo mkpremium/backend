@@ -1,22 +1,28 @@
-import { createTestApp } from '../../integration/create-test-app'
+import { createTestApp } from '../create-test-app'
 import { AwilixContainer } from 'awilix'
 import { createAdminUserWithPostgres, operatorLogin } from '../../common'
 import { Factory } from 'rosie'
 import request from 'supertest'
 import { expect } from 'chai'
+import { Application } from 'express'
 
 describe('AddOperatorService', () => {
-  it('adds user', async () => {
-    const app = await createTestApp('postgres')
+  let app: Application
+  let loggedInAdmin
+
+  before(async () => {
+    app = await createTestApp('postgres')
     const container = app.locals.diContainer as AwilixContainer
     await createAdminUserWithPostgres(container)
 
-    const loggedInAdmin = await operatorLogin(app)
+    loggedInAdmin = await operatorLogin(app)
+  })
 
+  it('adds user with hashed password', async () => {
     const testCommand = {
-      ...Factory.build<{username: string, password: string}>('user-credentials'),
+      ...Factory.build<{ username: string, password: string }>('user-credentials'),
       profile: Factory.build('user-profile'),
-      roles: [],
+      roles: ['ADMIN'],
       enable: true,
     }
     const response = await request(app)
