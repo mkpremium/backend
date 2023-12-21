@@ -103,13 +103,6 @@ export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatus
   return Worksheet.update(worksheet, spec)
 }
 
-Worksheet.prototype.statusChanged = function () {
-  return Worksheet.update(this, {
-    statusChangedAt: { $set: utc().toDate() },
-    inFreezer: { $set: this.status === WorkSheetStatus.NO_SALE }
-  })
-}
-
 export function pullOutFreezer (worksheet, newStatus) {
   const updated = setStatus(worksheet, newStatus)
 
