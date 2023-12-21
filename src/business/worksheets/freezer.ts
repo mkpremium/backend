@@ -9,12 +9,12 @@ import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repo
 
 export async function moveWorksheetOutOfFreezer (limit, buildingsRepository, daysInFreezer) {
   logger.info('starting to move worksheets from freezer settings', { daysInFreezer })
-  const maxDays = utc().subtract(daysInFreezer, 'days').toDate()
+  const dateLimit = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
     .where('inFreezer = ?', true)
-    .where('viewedAt IS NOT NULL')
-    .where('viewedAt <= ?', maxDays)
+    .where('statusChangedAt IS NOT NULL')
+    .where('statusChangedAt <= ?', dateLimit)
     .where(`status IN ${JSON.stringify([ WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING ])}`)
     .limit(limit)
 
