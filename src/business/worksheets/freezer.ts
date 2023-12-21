@@ -12,6 +12,7 @@ export async function moveWorksheetOutOfFreezer (limit, buildingsRepository, day
   const maxDays = utc().subtract(daysInFreezer, 'days').toDate()
   const repository = new LegacyWorksheetRepository()
   const queryBuilder = repository.getQueryBuilder()
+    .where('inFreezer = ?', true)
     .where('viewedAt IS NOT NULL')
     .where('viewedAt <= ?', maxDays)
     .where(`status IN ${JSON.stringify([ WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING ])}`)
