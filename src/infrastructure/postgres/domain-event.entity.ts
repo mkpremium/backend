@@ -25,10 +25,7 @@ export class DomainEvent {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({
-    type: 'enum',
-    enum: DomainEventCatalog,
-  })
+  @Column('text')
   name: DomainEventCatalog
 
   @Column({ default: 'unknwon' })
