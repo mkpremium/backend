@@ -85,12 +85,10 @@ export function canOperatorHandleQueue (operator, queueId) {
 
 export function canScheduleCall (operator, operatorId) {
   if (isManager(operator.roles)) {
-    return true
+    return
   }
 
   if (!isOperator(operator.roles) || operator.id !== operatorId) {
     throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
   }
-
-  return true
 }
