@@ -8,18 +8,20 @@ import { Application } from 'express'
 
 const DEFAULT_MILLISECONDS_TO_WAIT = 1000
 
-export const initApplication = (database: Database = 'couchbase'): Promise<Application | [ Application, AwilixContainer ]> => createApp(database)
-  .then(app => {
-    const diContainer = app.locals.diContainer as AwilixContainer
-    const bucket = diContainer.resolve('couchbaseBucket') as Bucket
-    return new Promise(resolve => {
-      bucket.manager().flush(
-        () => setTimeout(() => resolve(database === 'postgres' ? [ app, diContainer ] : app), 500)
-      )
+export function initApplication (database: Database = 'couchbase'): Promise<Application | [ Application, AwilixContainer ]> {
+  return createApp(database)
+    .then(app => {
+      const diContainer = app.locals.diContainer as AwilixContainer
+      const bucket = diContainer.resolve('couchbaseBucket') as Bucket
+      return new Promise(resolve => {
+        bucket.manager().flush(
+          () => setTimeout(() => resolve(database === 'postgres' ? [ app, diContainer ] : app), 500)
+        )
+      })
     })
-  })
+}
 
-export const authenticatedGet = async (endpoint, user, app) => {
+export async function authenticatedGet (endpoint, user, app) {
   const authenticatedUser = await operatorLogin(app,
     { username: user.username, password: defaultPassword })
 
@@ -29,7 +31,7 @@ export const authenticatedGet = async (endpoint, user, app) => {
     .set('Authorization', authenticatedUser.authorization)
 }
 
-export const authenticatedDelete = async (endpoint, user, app) => {
+export async function authenticatedDelete (endpoint, user, app) {
   const authenticatedUser = await operatorLogin(app,
     { username: user.username, password: defaultPassword })
 
@@ -39,7 +41,7 @@ export const authenticatedDelete = async (endpoint, user, app) => {
     .set('Authorization', authenticatedUser.authorization)
 }
 
-export const authenticatedPost = async (endpoint, user, app, body) => {
+export async function authenticatedPost (endpoint, user, app, body) {
   const authenticatedUser = await operatorLogin(app,
     { username: user.username, password: defaultPassword })
 
@@ -51,7 +53,7 @@ export const authenticatedPost = async (endpoint, user, app, body) => {
     .set('Authorization', authenticatedUser.authorization)
 }
 
-export const authenticatedPut = async (endpoint, user, app, body) => {
+export async function authenticatedPut (endpoint, user, app, body) {
   const authenticatedUser = await operatorLogin(app,
     { username: user.username, password: defaultPassword })
 
