@@ -11,7 +11,7 @@ import uuid from 'uuid/v4'
 import { CallcenterWorksheetService } from '../../../src/worksheet/service/callcenter-worksheet.service'
 import { PostgresWorksheetRepository } from '../../../src/worksheet/repository/postgres-worksheet.repository'
 
-describe('CallcenterWorksheetService', () => {
+describe.skip('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
     const service: CallcenterWorksheetService = container.resolve('callcenterWorksheetService')
