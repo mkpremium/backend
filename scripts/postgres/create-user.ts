@@ -11,7 +11,7 @@ createContainer()
         firstName: username,
         lastName: '',
         language: 'es',
-        email: `test{Math.random()}@test.com`,
+        email: `${username}@test.com`,
         city: 'Barcelona',
       }
     }, { id: 'local' })
