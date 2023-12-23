@@ -14,7 +14,7 @@ describe('WorksheetQueueActionsService', () => {
 
   let service
   let queueRepositoryMock
-  let worksheetRepositoryMock
+  let callcenterWorksheetServiceMock
   let eventBusMock
 
   beforeEach(() => {
@@ -23,10 +23,10 @@ describe('WorksheetQueueActionsService', () => {
       findQueueWithScheduledCallOfId: stub(),
       save: spy()
     }
-    worksheetRepositoryMock = {
+    callcenterWorksheetServiceMock = {
       get: stub(),
       save: spy(),
-      getForCallcenterView: stub()
+      getWorksheetForCallcenterView: stub()
     }
     eventBusMock = {
       publish: spy()
@@ -34,7 +34,7 @@ describe('WorksheetQueueActionsService', () => {
 
     service = new WorksheetQueueActionsService(
       queueRepositoryMock,
-      worksheetRepositoryMock,
+      callcenterWorksheetServiceMock,
       eventBusMock
     )
   })
@@ -54,8 +54,8 @@ describe('WorksheetQueueActionsService', () => {
 
     beforeEach(async () => {
       queueRepositoryMock.get.withArgs(testQueueId).resolves(emptyQueue)
-      worksheetRepositoryMock.get.withArgs(testWorksheetId).resolves(testWorksheet)
-      worksheetRepositoryMock.getForCallcenterView.withArgs(testWorksheetId).resolves(testWorksheetForCallcenterView)
+      callcenterWorksheetServiceMock.get.withArgs(testWorksheetId).resolves(testWorksheet)
+      callcenterWorksheetServiceMock.getWorksheetForCallcenterView.withArgs(testWorksheetId).resolves(testWorksheetForCallcenterView)
 
       takenWorksheet = await service.takeWorksheetInQueue(testQueueId, testWorksheetId, testUserId)
     })
@@ -69,10 +69,10 @@ describe('WorksheetQueueActionsService', () => {
     })
 
     it('updates worksheet with assigned queue and view timestamp', () => {
-      expect(worksheetRepositoryMock.save).to.have.been.calledOnce
-      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].viewedAt.valueOf())
+      expect(callcenterWorksheetServiceMock.save).to.have.been.calledOnce
+      expect(callcenterWorksheetServiceMock.save.firstCall.args[ 0 ].viewedAt.valueOf())
         .to.be.closeTo(utc().toDate().valueOf(), 100)
-      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].queueId)
+      expect(callcenterWorksheetServiceMock.save.firstCall.args[ 0 ].queueId)
         .to.be.equal(testQueueId)
     })
 

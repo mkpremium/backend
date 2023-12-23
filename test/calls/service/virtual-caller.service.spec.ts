@@ -48,7 +48,7 @@ describe('VirtualCallerService', () => {
   let takeNextWorksheetServiceStub
   let virtualCallerPhoneStub
   let virtualCallerWorksheetsRepositoryStub
-  let worksheetRepositoryStub
+  let callcenterWorksheetServiceStub
   let eventBusStub
 
   beforeEach(() => {
@@ -62,8 +62,8 @@ describe('VirtualCallerService', () => {
       save: stub().resolves(),
       inProgressWorksheetFor: stub(),
     }
-    worksheetRepositoryStub = {
-      getForCallcenterView: stub()
+    callcenterWorksheetServiceStub = {
+      getWorksheetForCallcenterView: stub()
     }
     eventBusStub = {
       publish: stub().resolves(),
@@ -73,7 +73,7 @@ describe('VirtualCallerService', () => {
       takeNextWorksheetServiceStub,
       virtualCallerPhoneStub,
       virtualCallerWorksheetsRepositoryStub,
-      worksheetRepositoryStub,
+      callcenterWorksheetServiceStub,
       eventBusStub,
       {
         info: stub(),
@@ -116,7 +116,7 @@ describe('VirtualCallerService', () => {
   it('continues with in progress worksheet', async () => {
     virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
-    worksheetRepositoryStub.getForCallcenterView.withArgs(testInProgressWorksheet.worksheetId)
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.withArgs(testInProgressWorksheet.worksheetId)
       .resolves(testWorksheet)
 
     await service.processNextWorksheet(testCmd)
@@ -140,7 +140,7 @@ describe('VirtualCallerService', () => {
   it('saves worksheet as done when there are no contacts left', async () => {
     virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves({ ...testInProgressWorksheet, lastContactId: lastContact.id })
-    worksheetRepositoryStub.getForCallcenterView.resolves(testWorksheet)
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.resolves(testWorksheet)
 
     await service.processNextWorksheet(testCmd)
 
@@ -162,7 +162,7 @@ describe('VirtualCallerService', () => {
     const clock = sinon.useFakeTimers()
     virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
-    worksheetRepositoryStub.getForCallcenterView.rejects(new WorksheetNotFound(testWorksheet.id))
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.rejects(new WorksheetNotFound(testWorksheet.id))
 
     service.processNextWorksheet(testCmd)
     await clock.runAllAsync()
@@ -179,7 +179,7 @@ describe('VirtualCallerService', () => {
   it('saves worksheet as done when owner is interested on selling', async () => {
     virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
-    worksheetRepositoryStub.getForCallcenterView.resolves(testWorksheet)
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.resolves(testWorksheet)
 
     await service.processNextWorksheet({
       ...testCmd,
@@ -202,7 +202,7 @@ describe('VirtualCallerService', () => {
   it('marks worksheet as done when is in an unavailable status', async () => {
     virtualCallerWorksheetsRepositoryStub.inProgressWorksheetFor.withArgs(testCmd.caller.id)
       .resolves(testInProgressWorksheet)
-    worksheetRepositoryStub.getForCallcenterView.withArgs(testInProgressWorksheet.worksheetId)
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.withArgs(testInProgressWorksheet.worksheetId)
       .resolves(worksheetViewBuilder({ status: 'NO_SALE' }).build())
 
     await service.processNextWorksheet(testCmd)
