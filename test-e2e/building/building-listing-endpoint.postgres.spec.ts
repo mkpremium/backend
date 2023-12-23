@@ -16,6 +16,8 @@ import { Promise as BluePromise } from 'bluebird'
 import uuid from 'uuid/v4'
 import { Application } from 'express'
 import { AwilixContainer } from 'awilix'
+import { AddOperatorService } from '../../src/user/service/add-operator.service'
+import { Factory } from 'rosie'
 
 describe.skip('Building listing endpoint (Postgres)', () => {
   let app: Application
@@ -24,7 +26,7 @@ describe.skip('Building listing endpoint (Postgres)', () => {
   beforeEach(async () => {
     const [ createdApp, container ] = await initApplication('postgres') as [ Application, AwilixContainer ]
     app = createdApp
-    flipper = await createFlipper()
+    flipper = await createFlipper(container)
   })
 
   it('returns list of given building IDs', async () => {
@@ -193,13 +195,14 @@ describe.skip('Building listing endpoint (Postgres)', () => {
 })
 
 
-async function createFlipper () {
-  const id = uuid()
-  return createFullOperator(buildUser({
-    id,
-    username: 'business' + id,
-    roles: [
-      'BUSINESS'
-    ]
-  }))
+async function createFlipper (container: AwilixContainer<any>) {
+  const service = container.resolve('addOperatorService') as AddOperatorService
+  const addFlipperCommand = {
+    ...Factory.build<{ username: string, password: string }>('user-credentials'),
+    profile: Factory.build('user-profile'),
+    roles: [ 'ADMIN' ],
+    enable: true,
+  } as any
+
+  return service.addOperator(addFlipperCommand, { id: uuid() })
 }
