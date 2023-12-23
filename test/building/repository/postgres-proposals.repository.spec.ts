@@ -19,8 +19,8 @@ describe('ProposalsRepository(Postgres)', () => {
     const ownersRepository = container.resolve('ownersRepository') as OwnerRepository
     const ormDataSource = container.resolve('ormDataSource') as DataSource
 
-    const testBuilding = await buildingsRepository.save(buildingBuilder({ id: uuid() }).build())
-    const testOwner = await ownersRepository.save(ownerBuilder({ id: uuid() }).build())
+    const testBuilding = await buildingsRepository.save(buildingBuilder().build())
+    const testOwner = await ownersRepository.save(ownerBuilder().build())
     const testUser = await ormDataSource.getRepository(User).save(
       Factory.build('user', { username: 'flipper-username' }))
     const testPendingProposal = proposalBuilder({

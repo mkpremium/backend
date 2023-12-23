@@ -17,7 +17,7 @@ describe('AddOwnerService Postgres', () => {
   })
 
   it('saves all corresponding data', async () => {
-    const testBuilding = await buildingsRepository.save(buildingBuilder({ id: uuid() }).build())
+    const testBuilding = await buildingsRepository.save(buildingBuilder().build())
     const actualOwner = await service.addOwner({
       status: 'VERIFICADO',
       buildingId: testBuilding.id,

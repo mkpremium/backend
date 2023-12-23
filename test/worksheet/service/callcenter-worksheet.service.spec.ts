@@ -29,7 +29,6 @@ describe('CallcenterWorksheetService', () => {
 
     const testWorksheetId = uuid()
     const testBuilding = await buildingsRepository.save(buildingBuilder({
-      id: uuid(),
       cadastre: {
         reference: 'test-cadastre-reference',
       },

@@ -1,7 +1,7 @@
 import { Owner as OwnerStruct, OwnerProps, Person, PersonProps } from '../../src/owner/owner'
+import uuid from 'uuid/v4'
 
 const ownerPrototype: Partial<OwnerProps> = {
-  id: 'test-owner-id',
   name: 'test name',
   person: Person({
     name: 'test name'
@@ -11,7 +11,7 @@ const ownerPrototype: Partial<OwnerProps> = {
 export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
   return {
     build (): OwnerProps {
-      return OwnerStruct({ ...ownerPrototype, ...overwrites } as OwnerProps)
+      return OwnerStruct({ ...ownerPrototype, id: uuid(), ...overwrites } as OwnerProps)
     },
 
     withPhoneContact (id = 'test-phone-id', status = 'UNDEFINED', phoneNumber = '666666666') {

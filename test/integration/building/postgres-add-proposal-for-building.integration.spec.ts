@@ -24,7 +24,7 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
       buildingsReadRepository,
     } = await buildDependencies()
 
-    const testBuilding = await buildingsRepository.save(buildingBuilder({ id: uuid() }).build())
+    const testBuilding = await buildingsRepository.save(buildingBuilder().build())
     const testOwner = await addOwnerService.addOwner({
       status: 'VERIFICADO',
       buildingId: testBuilding.id,

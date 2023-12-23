@@ -35,9 +35,9 @@ describe('PostgresOfferRequestsRepository', () => {
   })
 
   it('adds offer request to flipper negotiations', async () => {
-    const testBuilding = await buildingsRepository.save(buildingBuilder({ id: uuid() }).build())
+    const testBuilding = await buildingsRepository.save(buildingBuilder().build())
     const testOwner = await ownersRepository.save(ownerBuilder({
-      id: uuid(), buildingId: testBuilding.id
+      buildingId: testBuilding.id
     }).build())
     const testWorksheet = await worksheetRepository.save(worksheetBuilder({
       id: uuid(),

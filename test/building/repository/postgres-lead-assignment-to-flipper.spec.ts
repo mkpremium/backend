@@ -33,7 +33,6 @@ describe('Lead assignment to flipper (Postgres)', () => {
 
     const flipper = await flippersRepository.save(Factory.build('flipper'))
     const leadBuilding = buildingBuilder({
-      id: uuid(),
       negotiationStatus: 'LEAD',
       assignedAgentId: flipper.id,
       lead: {
@@ -43,7 +42,7 @@ describe('Lead assignment to flipper (Postgres)', () => {
         worksheetId: worksheetId,
       }
     }).build()
-    const ownerLeadBuilding = await ownersRepository.save(ownerBuilder({ id: uuid() }).build())
+    const ownerLeadBuilding = await ownersRepository.save(ownerBuilder().build())
     const otherBuilding = buildingBuilder({ assignedAgentId: flipper.id, id: uuid() }).build()
     const ownerOtherBuilding = ownerBuilder({ buildingId: otherBuilding.id, id: uuid() }).build()
 

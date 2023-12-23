@@ -1,4 +1,5 @@
 import { Worksheet, WorksheetProps } from '../../src/worksheet/domain/worksheet'
+import uuid from 'uuid/v4'
 
 const worksheetPrototype: WorksheetProps = {
   status: 'OPEN',
@@ -17,6 +18,7 @@ export const worksheetBuilder = (overrides: Partial<WorksheetProps> = {}) =>
     build: () => {
       return Worksheet({
         ...worksheetPrototype,
+        id: uuid(),
         ...overrides
       })
     }
