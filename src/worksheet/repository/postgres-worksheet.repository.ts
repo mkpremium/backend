@@ -10,38 +10,6 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
     building: true
   }
 
-  async getForCallcenterView (worksheetId: string): Promise<WorksheetViewProps> {
-    const ws = await this.repository.findOne({
-        where: { id: worksheetId },
-        relations: {
-          queue: true,
-          building: {
-            owners: {
-              person: {
-                contacts: {
-                  contact: true
-                }
-              }
-            }
-          }
-        }
-      }
-    )
-
-    return {
-      id: ws.id,
-      status: ws.status,
-      queueId: ws.queue.id,
-      building: mapEntityToReadModel(ws.building),
-      // relatedOwners: ws.building.owners.map(owner => ({}))
-      relatedOwners: []
-    }
-  }
-
-  nextAvailableWorksheetInSource (source: any, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    throw new Error('Method not implemented.')
-  }
-
   ofBuildingId (buildingId: string): Promise<WorksheetProps> {
     throw new Error('Method not implemented.')
   }

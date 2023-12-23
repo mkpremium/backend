@@ -5,15 +5,18 @@ import { worksheetBuilder } from '../worksheet.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { ownerBuilder } from '../../owner/owner.builder'
 import { validate } from 'tcomb-validation'
-import { PostgresWorksheetRepository } from '../../../src/worksheet/repository/postgres-worksheet.repository'
 import { PostgresBuildingsRepository } from '../../../src/building/repository/postgres-buildings.repository'
 import { PostgresOwnersRepository } from '../../../src/owner/repository/postgres-owners.repository'
 import uuid from 'uuid/v4'
+import { CallcenterWorksheetService } from '../../../src/worksheet/service/callcenter-worksheet.service'
+import { PostgresWorksheetRepository } from '../../../src/worksheet/repository/postgres-worksheet.repository'
 
-describe('PostgresWorksheetRepository', () => {
+describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
-    const repository: PostgresWorksheetRepository = container.resolve('worksheetRepository')
+    const service: CallcenterWorksheetService = container.resolve('callcenterWorksheetService')
+
+    const worksheetRepository: PostgresWorksheetRepository = container.resolve('worksheetRepository')
     const buildingsRepository: PostgresBuildingsRepository = container.resolve('buildingsRepository')
     const ownersRepository: PostgresOwnersRepository = container.resolve('ownersRepository')
 
@@ -42,11 +45,11 @@ describe('PostgresWorksheetRepository', () => {
 
     await Promise.all([
       buildingsRepository.save(testBuilding),
-      repository.save(testWorksheet),
+      worksheetRepository.save(testWorksheet),
       ownersRepository.save(testOwner)
     ])
 
-    const result = await repository.getForCallcenterView(testWorksheetId)
+    const result = await service.getWorksheetForCallcenterView(testWorksheetId)
     expect(validate(result, CallcenterView).errors).to.deep.equal([])
     // // TODO: assert owner
     expect(result.building.latestProposal).not.to.be.undefined
