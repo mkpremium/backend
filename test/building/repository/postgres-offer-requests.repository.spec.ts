@@ -24,7 +24,7 @@ describe('PostgresOfferRequestsRepository', () => {
   let callerRepository: CallerRepository
 
   before(async () => {
-    const container = await createTestContainer({postgres: true, couchbase: false})
+    const container = await createTestContainer({ postgres: true, couchbase: false })
     buildingsRepository = container.resolve('postgresBuildingsRepository')
     ownersRepository = container.resolve('postgresOwnersRepository')
     contactsRepository = container.resolve('contactsRepository')
@@ -57,18 +57,11 @@ describe('PostgresOfferRequestsRepository', () => {
       worksheetId: testWorksheet.id,
     }
 
-    return Promise.all([
-      buildingsRepository.save(testBuilding),
-      ownersRepository.save(testOwner),
-      worksheetRepository.save(worksheetBuilder({ id: testOfferRequest.worksheetId }).build())
-    ])
-      .then(() => repository.add(testOfferRequest))
-      .then(async () => {
-        const flipperNegotiations = await buildingsRepository.listById([ testBuilding.id ])
-        expect(flipperNegotiations).to.be.lengthOf(1)
-        // TODO: how to replace the following two assertions?
-        // expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
-        // expect(moment(flipperNegotiations[ 0 ].lastMeeting.dateMeeting).isSame(moment(), 'day')).to.be.true
-      })
+    await repository.add(testOfferRequest)
+    const flipperNegotiations = await buildingsRepository.listById([ testBuilding.id ])
+    expect(flipperNegotiations).to.be.lengthOf(1)
+    // TODO: how to replace the following two assertions?
+    // expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
+    // expect(moment(flipperNegotiations[ 0 ].lastMeeting.dateMeeting).isSame(moment(), 'day')).to.be.true
   })
 })
