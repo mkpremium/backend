@@ -28,7 +28,7 @@ describe('IncomingCallProcessor', () => {
       compose: stub().returns({ toString: () => testComposedMessage }),
     }
     callcenterWorksheetServiceStub = {
-      getForCallcenterView: stub(),
+      getWorksheetForCallcenterView: stub(),
     }
     callcenterWorksheetServiceStub.getWorksheetForCallcenterView.withArgs(testCall.worksheetId).resolves(testWorksheet)
 
