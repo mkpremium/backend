@@ -14,7 +14,7 @@ import {
 export function operatorRouter (diContainer) {
   const router = Router()
 
-  router.post('/login', diContainer.resolve('loginController'))
+  router.post('/login', wrap(diContainer.resolve('loginController')))
 
   router.post('/refresh-token', refreshTokenController)
 
