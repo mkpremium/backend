@@ -13,7 +13,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
       get: stub(),
       save: spy()
     }
-    buildingsRepository.get.withArgs('test-building-id').resolves(testBuilding)
+    buildingsRepository.get.withArgs(testBuilding.id).resolves(testBuilding)
     eventBus = {
       publish: spy()
     }
@@ -31,31 +31,31 @@ describe('UpdateBuildingNegotiationStatusService', () => {
   ]
   validNegotiationStatuses.forEach((status) => {
     it(`[${status}] saves building with new negotiation status`, async () => {
-      await service.updateBuildingStatus('test-building-id', { status, userId: 'operator-id' })
+      await service.updateBuildingStatus(testBuilding.id, { status, userId: 'operator-id' })
 
       expect(buildingsRepository.save).to.have.been
-        .calledWithMatch(b => Building.is(b) && b.id === 'test-building-id' && b.negotiationStatus === status)
+        .calledWithMatch(b => Building.is(b) && b.id === testBuilding.id && b.negotiationStatus === status)
     })
   })
 
   it('rejects invalid negotiation statuses', () => {
-    return expect(service.updateBuildingStatus('test-building-id', { status: 'UNKNOWN STATUS', userId: 'operator-id' }))
+    return expect(service.updateBuildingStatus(testBuilding.id, { status: 'UNKNOWN STATUS', userId: 'operator-id' }))
       .to.be.rejected
   })
 
   it('publishes negotiation status changed event', async () => {
-    await service.updateBuildingStatus('test-building-id', { status: 'COMPRADO', userId: 'operator-id' })
+    await service.updateBuildingStatus(testBuilding.id, { status: 'COMPRADO', userId: 'operator-id' })
 
     expect(eventBus.publish).to.have.been.deep.calledWith({
       name: 'building.negotiation_status_changed',
-      buildingId: 'test-building-id',
+      buildingId: testBuilding.id,
       userId: 'operator-id',
       negotiationStatus: 'COMPRADO'
     })
   })
 
   it('saves source owner as featured owner', async () => {
-    await service.updateBuildingStatus('test-building-id', {
+    await service.updateBuildingStatus(testBuilding.id, {
       status: 'COMPRADO',
       userId: 'operator-id',
       sourceOwnerId: 'test-source-owner-id'

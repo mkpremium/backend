@@ -1,8 +1,8 @@
 import { Building, BuildingProps } from '../../src/building/building'
+import uuid from 'uuid/v4'
 
-const buildingPrototype: BuildingProps = {
+const buildingPrototype: Omit<BuildingProps, 'id'> = {
   negotiationStatus: undefined,
-  id: 'test-building-id',
   floorArea: 0,
   metadata: [],
   address: {
@@ -27,7 +27,7 @@ const buildingPrototype: BuildingProps = {
 export const buildingBuilder = (overrides: Partial<BuildingProps> = {}) => {
   return {
     build (): BuildingProps {
-      return Building({ ...buildingPrototype, ...overrides } as any)
+      return Building({ id: uuid(), ...buildingPrototype, ...overrides } as any)
     }
   }
 }

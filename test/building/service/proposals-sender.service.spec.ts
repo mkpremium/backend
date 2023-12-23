@@ -18,7 +18,8 @@ describe('ProposalsSenderService', () => {
   let updateBuildingNegotiationStatusServiceStub
   let clock: SinonFakeTimers
 
-  const testProposal = proposalBuilder().build()
+  const testBuilding = buildingBuilder().build()
+  const testProposal = proposalBuilder({buildingId: testBuilding.id}).build()
   const testFlipper = {
     id: testProposal.createdBy,
     profile: {
@@ -27,7 +28,6 @@ describe('ProposalsSenderService', () => {
   }
   const testProposalPdf = Buffer.from('test proposal pdf', 'utf-8')
 
-  const testBuilding = buildingBuilder().build()
   beforeEach(() => {
     proposalsRepositoryStub = {
       pendingProposals: stub(),
