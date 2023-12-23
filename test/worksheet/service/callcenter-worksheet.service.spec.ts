@@ -5,20 +5,25 @@ import { worksheetBuilder } from '../worksheet.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { ownerBuilder } from '../../owner/owner.builder'
 import { validate } from 'tcomb-validation'
-import { PostgresBuildingsRepository } from '../../../src/building/repository/postgres-buildings.repository'
-import { PostgresOwnersRepository } from '../../../src/owner/repository/postgres-owners.repository'
 import uuid from 'uuid/v4'
 import { CallcenterWorksheetService } from '../../../src/worksheet/service/callcenter-worksheet.service'
 import { PostgresWorksheetRepository } from '../../../src/worksheet/repository/postgres-worksheet.repository'
+import { AddContactService } from '../../../src/owner/service/add-contact.service'
+import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
+import { AddProposalForBuildingService } from '../../../src/building/service/add-proposal-for-building.service'
+import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
+import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
+import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
+import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 
 describe.skip('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
-    const container = await createTestContainer({ postgres: true, couchbase: false })
-    const service: CallcenterWorksheetService = container.resolve('callcenterWorksheetService')
-
-    const worksheetRepository: PostgresWorksheetRepository = container.resolve('worksheetRepository')
-    const buildingsRepository: PostgresBuildingsRepository = container.resolve('buildingsRepository')
-    const ownersRepository: PostgresOwnersRepository = container.resolve('ownersRepository')
+    const {
+      callcenterWorksheetService,
+      worksheetRepository,
+      buildingsRepository,
+      ownersRepository,
+    } = await buildDependencies()
 
     const testWorksheetId = uuid()
     const testBuilding = buildingBuilder({
@@ -49,10 +54,39 @@ describe.skip('CallcenterWorksheetService', () => {
       ownersRepository.save(testOwner)
     ])
 
-    const result = await service.getWorksheetForCallcenterView(testWorksheetId)
+    const result = await callcenterWorksheetService.getWorksheetForCallcenterView(testWorksheetId)
     expect(validate(result, CallcenterView).errors).to.deep.equal([])
     // // TODO: assert owner
     expect(result.building.latestProposal).not.to.be.undefined
     expect(result.building.cadastreReference).to.be.equal('test-cadastre-reference')
   })
 })
+
+async function buildDependencies (): Promise<{
+  addContactService: AddContactService,
+  addOwnerService: AddOwnerService,
+  addProposalForBuildingService: AddProposalForBuildingService,
+  callcenterWorksheetService: CallcenterWorksheetService,
+  worksheetRepository: PostgresWorksheetRepository,
+
+  ownersRepository: OwnerRepository,
+  buildingsRepository: BuildingsRepository,
+  buildingsReadRepository: BuildingsReadRepository,
+  addFlipperService: AddFlipperService,
+}> {
+  const container = await createTestContainer({ couchbase: true, postgres: true })
+
+  return {
+    addContactService: container.resolve('addContactService'),
+    addProposalForBuildingService: container.resolve('addProposalForBuildingService'),
+    addOwnerService: container.resolve('addOwnerService'),
+
+    callcenterWorksheetService: container.resolve('callcenterWorksheetService'),
+
+    ownersRepository: container.resolve('ownersRepository'),
+    buildingsRepository: container.resolve('buildingsRepository'),
+    addFlipperService: container.resolve('addFlipperService'),
+    buildingsReadRepository: container.resolve('buildingsReadRepository'),
+    worksheetRepository: container.resolve('worksheetRepository'),
+  }
+}
