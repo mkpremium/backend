@@ -3,56 +3,72 @@ import { createTestContainer } from '../../create-test-container'
 import { expect } from 'chai'
 import { worksheetBuilder } from '../worksheet.builder'
 import { buildingBuilder } from '../../building/building.builder'
-import { ownerBuilder } from '../../owner/owner.builder'
 import { validate } from 'tcomb-validation'
 import uuid from 'uuid/v4'
 import { CallcenterWorksheetService } from '../../../src/worksheet/service/callcenter-worksheet.service'
 import { PostgresWorksheetRepository } from '../../../src/worksheet/repository/postgres-worksheet.repository'
-import { AddContactService } from '../../../src/owner/service/add-contact.service'
-import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
+import { AddContactService, MaybeFeaturedContact } from '../../../src/owner/service/add-contact.service'
 import { AddProposalForBuildingService } from '../../../src/building/service/add-proposal-for-building.service'
-import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
+import { Factory } from 'rosie'
+import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 
 describe.skip('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
     const {
+      addContactService,
+      addFlipperService,
+      addOwnerService,
+      addProposalForBuildingService,
       callcenterWorksheetService,
       worksheetRepository,
       buildingsRepository,
-      ownersRepository,
     } = await buildDependencies()
 
     const testWorksheetId = uuid()
-    const testBuilding = buildingBuilder({
+    const testBuilding = await buildingsRepository.save(buildingBuilder({
       id: uuid(),
       cadastre: {
         reference: 'test-cadastre-reference',
       },
-      // TODO: add proposal.
-      // recentProposal: {
-      //   id: 'test-proposal-id',
-      //   buildingId: 'test-building-id',
-      //   ownerId: 'test-owner-id',
-      //   createdBy: 'test-created-by',
-      //   createdAt: '2021-03-31T11:45:00.000Z',
-      //   proposal: 100000
-      // }
-    }).build()
+    }).build())
 
-    const testOwner = ownerBuilder({ id: uuid(), buildingId: testBuilding.id }).build()
-    const testWorksheet = worksheetBuilder({
-      id: testWorksheetId,
-      relatedBuildingIds: [ testBuilding.id ]
-    }).build()
+    const testOwner = await addOwnerService.addOwner({
+      status: 'VERIFICADO',
+      buildingId: testBuilding.id,
+      note: 'test note',
+      type: 'PRINCIPAL',
+      person: {
+        name: 'Full Name',
+        firstName: 'Full',
+        firstSurname: 'Name',
+        contacts: []
+      }
+    }, 'test-requester-id')
+    const testEmailContact = await addContactService.addContact({
+      ...Factory.build('email-contact'),
+      isFeatured: true,
+      ownerId: testOwner.id
+    }) as MaybeFeaturedContact
+    const testFlipper = await addFlipperService.addFlipper(Factory.build('user'))
 
-    await Promise.all([
-      buildingsRepository.save(testBuilding),
-      worksheetRepository.save(testWorksheet),
-      ownersRepository.save(testOwner)
-    ])
+    const testAddProposalCommand = {
+      buildingId: testBuilding.id,
+      ownerId: testOwner.id,
+      amount: 1_000,
+      contactId: testEmailContact.id,
+      createdBy: testFlipper.user.id,
+      message: 'test email message'
+    }
+    await addProposalForBuildingService.add(testBuilding.id, testAddProposalCommand)
+
+    await worksheetRepository.save(worksheetBuilder({
+        id: testWorksheetId,
+        relatedBuildingIds: [ testBuilding.id ]
+      }).build()
+    )
 
     const result = await callcenterWorksheetService.getWorksheetForCallcenterView(testWorksheetId)
     expect(validate(result, CallcenterView).errors).to.deep.equal([])
@@ -69,7 +85,6 @@ async function buildDependencies (): Promise<{
   callcenterWorksheetService: CallcenterWorksheetService,
   worksheetRepository: PostgresWorksheetRepository,
 
-  ownersRepository: OwnerRepository,
   buildingsRepository: BuildingsRepository,
   buildingsReadRepository: BuildingsReadRepository,
   addFlipperService: AddFlipperService,
@@ -78,12 +93,11 @@ async function buildDependencies (): Promise<{
 
   return {
     addContactService: container.resolve('addContactService'),
-    addProposalForBuildingService: container.resolve('addProposalForBuildingService'),
     addOwnerService: container.resolve('addOwnerService'),
+    addProposalForBuildingService: container.resolve('addProposalForBuildingService'),
 
     callcenterWorksheetService: container.resolve('callcenterWorksheetService'),
 
-    ownersRepository: container.resolve('ownersRepository'),
     buildingsRepository: container.resolve('buildingsRepository'),
     addFlipperService: container.resolve('addFlipperService'),
     buildingsReadRepository: container.resolve('buildingsReadRepository'),

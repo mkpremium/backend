@@ -29,6 +29,7 @@ export class CallcenterWorksheetService {
           queue: true,
           building: {
             images: true,
+            proposals: true,
             owners: {
               person: {
                 contacts: {

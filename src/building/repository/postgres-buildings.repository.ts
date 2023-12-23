@@ -132,28 +132,32 @@ export class PostgresBuildingsRepository
 }
 
 
-export function mapEntityToReadModel ({ id, images, lead, negotiationStatus, address }: Building): BuildingReadModel {
+export function mapEntityToReadModel (b: Building): BuildingReadModel {
   return {
-    id,
-    lead,
-    negotiationStatus: negotiationStatus || undefined,
-    address: address ? {
-      neighborhood: address.neighborhood ? address.neighborhood : undefined,
-      type: address.type ? address.type : undefined,
-      street: address.street ? address.street : undefined,
-      number: address.number ? address.number : undefined,
-      postalCode: address.postalCode && address.postalCode.number ? {
-        number: address.postalCode.number
+    id: b.id,
+    lead: b.lead,
+    negotiationStatus: b.negotiationStatus || undefined,
+    address: b.address ? {
+      neighborhood: b.address.neighborhood ? b.address.neighborhood : undefined,
+      type: b.address.type ? b.address.type : undefined,
+      street: b.address.street ? b.address.street : undefined,
+      number: b.address.number ? b.address.number : undefined,
+      postalCode: b.address.postalCode && b.address.postalCode.number ? {
+        number: b.address.postalCode.number
       } : undefined,
-      city: address.city ? address.city : undefined,
-      province: address.province
+      city: b.address.city ? b.address.city : undefined,
+      province: b.address.province
     } : undefined,
-    metadata: images.map(({ id, mimeType, previewUrl }) => ({
+    metadata: b.images.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
       previewUrl,
       thumbnailUrl: previewUrl,
     })),
+    latestProposal: b.recentProposal,
+    floorArea: b.floorArea,
+    stock: null,
+    // latestProposal: b.recentProposal?.amount,
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,
@@ -172,7 +176,6 @@ export function mapEntityToReadModel ({ id, images, lead, negotiationStatus, add
     //     transactionDate: moment(stock.close.transactionDate).format()
     //   } : undefined
     // },
-    // latestProposal: latestProposal && latestProposal.amount ? latestProposal : undefined,
     // geolocation: location && (location.lat || location.lng) ? {
     //   latitude: location.lat ? location.lat : undefined,
     //   longitude: location.lng ? location.lng : undefined
