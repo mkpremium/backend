@@ -16,7 +16,7 @@ const testCas = 'test-cas'
 describe('SmsMessageSender', () => {
   let service: SmsMessageSender
   let twilioClientStub
-  let worksheetRepositoryStub
+  let callcenterWorksheetServiceStub
   let smsMessagesRepositoryStub
   let buildingOwnerPhonesRepositoryStub
   const spanishNumber = '+34666666666'
@@ -29,8 +29,8 @@ describe('SmsMessageSender', () => {
         create: stub().resolves(),
       }
     }
-    worksheetRepositoryStub = {
-      getForCallcenterView: stub().resolves(testWorksheet)
+    callcenterWorksheetServiceStub = {
+      getWorksheetForCallcenterView: stub().resolves(testWorksheet)
     }
     smsMessagesRepositoryStub = {
       addOutgoing: stub().returns(taskEither.of(undefined))
@@ -45,7 +45,7 @@ describe('SmsMessageSender', () => {
 
     service = new SmsMessageSender(
       twilioClientStub,
-      worksheetRepositoryStub,
+      callcenterWorksheetServiceStub,
       smsMessagesRepositoryStub,
       buildingOwnerPhonesRepositoryStub,
     )
@@ -73,7 +73,7 @@ describe('SmsMessageSender', () => {
     [ spanishNumber, 'Spanish' ],
     [ portugueseNumber, 'Portuguese' ],
   ].forEach(([ to, lang ]) => it(`includes address and city in message when it fits in SMS message limit(${lang})`, async () => {
-    worksheetRepositoryStub.getForCallcenterView.resolves({
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.resolves({
       ...testWorksheet,
       building: {
         ...testWorksheet.building,
@@ -96,7 +96,7 @@ describe('SmsMessageSender', () => {
     [ spanishNumber, 'Spanish' ],
     [ portugueseNumber, 'Portuguese' ],
   ].forEach(([ to, lang ]) => it(`keeps message under SMS limit(${lang})`, async () => {
-    worksheetRepositoryStub.getForCallcenterView.resolves({
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.resolves({
       ...testWorksheet,
       building: {
         ...testWorksheet.building,

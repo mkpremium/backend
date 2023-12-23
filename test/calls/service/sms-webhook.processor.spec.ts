@@ -9,7 +9,7 @@ import { taskEither } from 'fp-ts'
 
 describe('SmsWebhookProcessor', () => {
   let service: SmsWebhookProcessor
-  let worksheetRepositoryStub
+  let callcenterWorksheetServiceStub
   let smsMessagesRepositoryStub
   let eventBusStub
   let loggerStub
@@ -19,8 +19,8 @@ describe('SmsWebhookProcessor', () => {
   const testWorksheetView = worksheetViewBuilder().withCity(testBuildingCity).build()
 
   beforeEach(() => {
-    worksheetRepositoryStub = {
-      getForCallcenterView: stub().resolves(testWorksheetView),
+    callcenterWorksheetServiceStub = {
+      getWorksheetForCallcenterView: stub().resolves(testWorksheetView),
     }
     smsMessagesRepositoryStub = {
       lastSentTo: stub().returns(taskEither.of(outgoingSmsBuilder({})()))
@@ -33,7 +33,7 @@ describe('SmsWebhookProcessor', () => {
     }
 
     service = new SmsWebhookProcessor(
-      worksheetRepositoryStub,
+      callcenterWorksheetServiceStub,
       smsMessagesRepositoryStub,
       eventBusStub,
       loggerStub,
