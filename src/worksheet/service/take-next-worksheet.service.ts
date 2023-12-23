@@ -19,8 +19,9 @@ export class TakeNextWorksheetService {
   ) {
   }
 
-  nextWorksheetInQueueOfId (queueId, byUserOfId): Promise<WorksheetViewProps> {
-    return this.worksheetQueueRepository.get(queueId).then(queue => this.nextWorksheetInQueue(queue, byUserOfId))
+  async nextWorksheetInQueueOfId (queueId: string, byUserOfId: string): Promise<WorksheetViewProps> {
+    const queue = await this.worksheetQueueRepository.get(queueId)
+    return await this.nextWorksheetInQueue(queue, byUserOfId)
   }
 
   async nextWorksheetInQueue (queue, byUserOfId): Promise<WorksheetViewProps> {

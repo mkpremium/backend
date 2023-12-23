@@ -15,7 +15,7 @@ export class WorksheetQueueActionsService {
   ) {
   }
 
-  async takeWorksheetInQueue (queueId, worksheetId, userId) {
+  async takeWorksheetInQueue (queueId: string, worksheetId: string, userId: string) {
     const queue = await this.worksheetQueueRepository.get(queueId)
     const worksheet = await this.worksheetRepository.get(worksheetId)
 
@@ -28,7 +28,7 @@ export class WorksheetQueueActionsService {
     return this.callcenterWorksheetService.getWorksheetForCallcenterView(worksheetId)
   }
 
-  async removeScheduledCallFromWorksheets (scheduledCallId) {
+  async removeScheduledCallFromWorksheets (scheduledCallId: string) {
     return this.worksheetQueueRepository.findQueueWithScheduledCallOfId(scheduledCallId)
       .then(queue => {
         if (!queue) {
