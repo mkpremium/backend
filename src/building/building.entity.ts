@@ -29,7 +29,8 @@ export class Building extends BaseEntity {
   @Column({ type: 'float', nullable: true })
   floorArea: number
 
-  @Column({ nullable: true })
+  // Spanish "Referencia Catastral". It's a unique identifier for a building.
+  @Column({ nullable: true, unique: true })
   publicIdentifier?: string
 
   @Column({ type: 'jsonb', nullable: true })
