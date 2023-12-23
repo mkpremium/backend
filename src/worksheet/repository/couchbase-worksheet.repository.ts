@@ -110,15 +110,15 @@ export class CouchbaseWorksheetRepository extends CouchbaseRepository<WorksheetP
     return record
   }
 
-  nextAvailableWorksheetInSource (source, skipWorksheetId): Promise<WorksheetViewProps> {
+  async nextAvailableWorksheetInSource (source: {
+    province: string | string[]
+  }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     const q = nextWorksheetAvailableInSourceQuery(this.bucketName, source, skipWorksheetId)
-    return this.couchbaseAdapter.queryAsync(q, undefined, { queryName: 'next_worksheet_in_source' })
-      .then(result => {
-        if (result.length === 0) {
-          return
-        }
-        return this.getForCallcenterView(result[ 0 ].id)
-      })
+    const result = await this.couchbaseAdapter.queryAsync(q, undefined, { queryName: 'next_worksheet_in_source' })
+    if (result.length === 0) {
+      return
+    }
+    return this.getForCallcenterView(result[ 0 ].id)
   }
 
   ofBuildingId (buildingId): Promise<WorksheetProps> {

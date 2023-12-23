@@ -9,7 +9,9 @@ export class CallcenterWorksheetService {
     return this.couchbaseWorksheetRepository.getForCallcenterView(worksheetId)
   }
 
-  nextAvailableWorksheetInSource (source, skipWorksheetId?: string): Promise<WorksheetViewProps> {
+  nextAvailableWorksheetInSource (source: {
+    province: string | string[]
+  }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     return this.couchbaseWorksheetRepository.nextAvailableWorksheetInSource(source, skipWorksheetId)
   }
 }
