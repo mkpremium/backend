@@ -29,3 +29,6 @@ conf
 *.csv
 .DS_STORE
 *.tgz
+
+# Coverage
+.nyc_output
