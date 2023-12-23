@@ -48,6 +48,7 @@ describe('PostgresWorksheetRepository', () => {
 
     const result = await repository.getForCallcenterView(testWorksheetId)
     expect(validate(result, CallcenterView).errors).to.deep.equal([])
+    // // TODO: assert owner
     expect(result.building.latestProposal).not.to.be.undefined
     expect(result.building.cadastreReference).to.be.equal('test-cadastre-reference')
   })

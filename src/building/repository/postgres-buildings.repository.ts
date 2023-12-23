@@ -132,14 +132,15 @@ export class PostgresBuildingsRepository
 }
 
 
-function mapEntityToReadModel ({ id, images, lead }: Building): BuildingReadModel {
+export function mapEntityToReadModel ({ id, images, lead }: Building): BuildingReadModel {
   return {
     id,
     lead,
     metadata: images.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
-      thumbnailUrl: previewUrl
+      previewUrl,
+      thumbnailUrl: previewUrl,
     })),
     // stock: {
     //   purchase: stock && stock.purchase ? {

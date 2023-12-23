@@ -23,7 +23,9 @@ export interface BuildingReadModel extends Omit<BuildingProps, 'address' | 'meta
   readonly metadata: {
     id: string
     mimeType: string
+    // TODO: decide on the one to send.
     thumbnailUrl: string
+    previewUrl: string
   }[]
   readonly stock: {
     purchase: StockTransaction
