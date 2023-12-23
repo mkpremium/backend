@@ -13,6 +13,7 @@ describe('WorksheetQueueActionsService', () => {
   const testUserId = 'test-user-id'
 
   let service
+  let worksheetRepositoryMock
   let queueRepositoryMock
   let callcenterWorksheetServiceMock
   let eventBusMock
@@ -24,9 +25,11 @@ describe('WorksheetQueueActionsService', () => {
       save: spy()
     }
     callcenterWorksheetServiceMock = {
-      get: stub(),
-      save: spy(),
       getWorksheetForCallcenterView: stub()
+    }
+    worksheetRepositoryMock = {
+      get: stub(),
+      save: spy()
     }
     eventBusMock = {
       publish: spy()
@@ -34,6 +37,7 @@ describe('WorksheetQueueActionsService', () => {
 
     service = new WorksheetQueueActionsService(
       queueRepositoryMock,
+      worksheetRepositoryMock,
       callcenterWorksheetServiceMock,
       eventBusMock
     )
@@ -54,7 +58,7 @@ describe('WorksheetQueueActionsService', () => {
 
     beforeEach(async () => {
       queueRepositoryMock.get.withArgs(testQueueId).resolves(emptyQueue)
-      callcenterWorksheetServiceMock.get.withArgs(testWorksheetId).resolves(testWorksheet)
+      worksheetRepositoryMock.get.withArgs(testWorksheetId).resolves(testWorksheet)
       callcenterWorksheetServiceMock.getWorksheetForCallcenterView.withArgs(testWorksheetId).resolves(testWorksheetForCallcenterView)
 
       takenWorksheet = await service.takeWorksheetInQueue(testQueueId, testWorksheetId, testUserId)
@@ -69,10 +73,10 @@ describe('WorksheetQueueActionsService', () => {
     })
 
     it('updates worksheet with assigned queue and view timestamp', () => {
-      expect(callcenterWorksheetServiceMock.save).to.have.been.calledOnce
-      expect(callcenterWorksheetServiceMock.save.firstCall.args[ 0 ].viewedAt.valueOf())
+      expect(worksheetRepositoryMock.save).to.have.been.calledOnce
+      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].viewedAt.valueOf())
         .to.be.closeTo(utc().toDate().valueOf(), 100)
-      expect(callcenterWorksheetServiceMock.save.firstCall.args[ 0 ].queueId)
+      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].queueId)
         .to.be.equal(testQueueId)
     })
 
