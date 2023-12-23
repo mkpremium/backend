@@ -15,7 +15,7 @@ import { AddFlipperService } from '../../../src/flipper/service/add-flipper.serv
 import { Factory } from 'rosie'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 
-describe.skip('CallcenterWorksheetService', () => {
+describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
     const {
       addContactService,

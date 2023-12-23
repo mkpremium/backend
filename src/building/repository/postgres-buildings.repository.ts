@@ -156,6 +156,7 @@ export function mapEntityToReadModel (b: Building): BuildingReadModel {
     })),
     latestProposal: b.recentProposal,
     floorArea: b.floorArea,
+    cadastreReference: b.publicIdentifier,
     stock: null,
     // latestProposal: b.recentProposal?.amount,
     // stock: {
@@ -180,7 +181,6 @@ export function mapEntityToReadModel (b: Building): BuildingReadModel {
     //   latitude: location.lat ? location.lat : undefined,
     //   longitude: location.lng ? location.lng : undefined
     // } : undefined,
-    // cadastreReference: cadastreReference || undefined,
     // floorArea,
     // usage: use !== null ? use : undefined,
     // owner: (featuredOwner && {
