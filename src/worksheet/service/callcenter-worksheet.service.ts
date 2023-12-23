@@ -28,6 +28,7 @@ export class CallcenterWorksheetService {
         relations: {
           queue: true,
           building: {
+            images: true,
             owners: {
               person: {
                 contacts: {

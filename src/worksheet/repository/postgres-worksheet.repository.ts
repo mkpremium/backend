@@ -30,7 +30,7 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
       statusChangeReason: struct.statusChangeReason,
       lastViewedAt: struct.viewedAt,
       lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
-      building: null,
+      building: { id: struct.relatedBuildingIds[0] },
       createdAt: new Date(),
       updatedAt: new Date(),
       queue: struct.queueId ? { id: struct.queueId } : null,

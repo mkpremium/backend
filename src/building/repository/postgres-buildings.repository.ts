@@ -132,10 +132,22 @@ export class PostgresBuildingsRepository
 }
 
 
-export function mapEntityToReadModel ({ id, images, lead }: Building): BuildingReadModel {
+export function mapEntityToReadModel ({ id, images, lead, negotiationStatus, address }: Building): BuildingReadModel {
   return {
     id,
     lead,
+    negotiationStatus: negotiationStatus || undefined,
+    address: address ? {
+      neighborhood: address.neighborhood ? address.neighborhood : undefined,
+      type: address.type ? address.type : undefined,
+      street: address.street ? address.street : undefined,
+      number: address.number ? address.number : undefined,
+      postalCode: address.postalCode && address.postalCode.number ? {
+        number: address.postalCode.number
+      } : undefined,
+      city: address.city ? address.city : undefined,
+      province: address.province
+    } : undefined,
     metadata: images.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
@@ -161,23 +173,11 @@ export function mapEntityToReadModel ({ id, images, lead }: Building): BuildingR
     //   } : undefined
     // },
     // latestProposal: latestProposal && latestProposal.amount ? latestProposal : undefined,
-    // address: address ? {
-    //   neighborhood: address.neighborhood ? address.neighborhood : undefined,
-    //   type: address.type ? address.type : undefined,
-    //   street: address.street ? address.street : undefined,
-    //   number: address.number ? address.number : undefined,
-    //   postalCode: address.postalCode && address.postalCode.number ? {
-    //     number: address.postalCode.number
-    //   } : undefined,
-    //   city: address.city ? address.city : undefined,
-    //   province: address.province ? address.province : undefined
-    // } : undefined,
     // geolocation: location && (location.lat || location.lng) ? {
     //   latitude: location.lat ? location.lat : undefined,
     //   longitude: location.lng ? location.lng : undefined
     // } : undefined,
     // cadastreReference: cadastreReference || undefined,
-    // negotiationStatus: negotiationStatus || undefined,
     // floorArea,
     // usage: use !== null ? use : undefined,
     // owner: (featuredOwner && {
