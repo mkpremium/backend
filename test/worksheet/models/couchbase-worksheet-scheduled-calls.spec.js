@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { createTestContainer } from '../../create-test-container'
 
-describe('LegacyWorksheetQueueRepository', () => {
+describe('Worksheet scheduled calls (Couchbase)', () => {
   let repository
   let worksheetRepository
 
