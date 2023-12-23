@@ -6,18 +6,15 @@ import {
   VirtualCallerWorksheetProps,
   VirtualCallerWorksheetsRepository
 } from '../repository/virtual-caller-worksheets.repository'
-import {
-  WorksheetNotFound,
-  WorksheetRepository,
-  WorksheetViewProps
-} from '../../worksheet/repository/worksheet.repository'
+import { WorksheetNotFound, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 import retry from 'bluebird-retry'
 import { OwnerResponse } from './owner-response-processor.service'
 import { VirtualCallerProps } from '../domain/virtual-caller'
 import { NumberAlreadyCalled } from './number-already-called'
-import { WorksheetStatusType } from "../../worksheet/domain/worksheet";
+import { WorksheetStatusType } from '../../worksheet/domain/worksheet'
+import { CallcenterWorksheetService } from '../../worksheet/service/callcenter-worksheet.service'
 
 export type OwnerContact = ContactProps & { ownerId: string }
 
@@ -57,7 +54,7 @@ export class VirtualCallerService {
     private takeNextWorksheetService: TakeNextWorksheetService,
     private virtualCallerPhone: VirtualCallerPhone,
     private virtualCallerWorksheetsRepository: VirtualCallerWorksheetsRepository,
-    private worksheetRepository: WorksheetRepository,
+    private callcenterWorksheetService: CallcenterWorksheetService,
     private eventBus: EventPublisher,
     private logger: Logger,
   ) {
@@ -111,7 +108,9 @@ export class VirtualCallerService {
     }
   }
 
-  private handleCallError (error, contactToCall: ContactProps & { ownerId: string }, cmd: ProcessNextWorksheetCommand, worksheet: WorksheetViewProps) {
+  private handleCallError (error, contactToCall: ContactProps & {
+    ownerId: string
+  }, cmd: ProcessNextWorksheetCommand, worksheet: WorksheetViewProps) {
     switch (true) {
       case error.context && error.context.action === lockingContextAction:
         this.logger.warning('Error getting lock', { ...error, error: error.message })
@@ -177,7 +176,7 @@ export class VirtualCallerService {
     let worksheet: WorksheetViewProps
 
     if (inProgressWorksheet) {
-      worksheet = await this.worksheetRepository.getForCallcenterView(inProgressWorksheet.worksheetId)
+      worksheet = await this.callcenterWorksheetService.getWorksheetForCallcenterView(inProgressWorksheet.worksheetId)
         .then(ws => {
           if (UNAVAILABLE_WORKSHEET_STATUES.includes(ws.status)) {
             throw new UnavailableWorksheet(ws.id, ws.status)

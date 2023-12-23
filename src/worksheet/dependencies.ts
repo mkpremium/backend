@@ -19,6 +19,7 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
+    callcenterWorksheetService: asClass(CallcenterWorksheetService).classic().singleton(),
     syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asClass(
       SyncWorksheetStatusOnBuildingNegotiationStatusChangeService).singleton().classic(),
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),

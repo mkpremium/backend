@@ -3,14 +3,15 @@ import VoiceResponse from 'twilio/lib/twiml/VoiceResponse'
 import { VirtualCallsRepository } from '../repository/virtual-calls.repository'
 import { pipe } from 'fp-ts/function'
 import { GatherOwnerInterestMessageComposer } from './gather-owner-interest-message-composer'
-import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
+import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { VirtualAgentCallProps } from '../virtual-agent-call'
+import { CallcenterWorksheetService } from '../../worksheet/service/callcenter-worksheet.service'
 
 export class IncomingCallProcessor {
   constructor (
     private virtualCallsRepository: VirtualCallsRepository,
     private gatherOwnerInterestMessageComposer: GatherOwnerInterestMessageComposer,
-    private worksheetRepository: WorksheetRepository,
+    private callcenterWorksheetService: CallcenterWorksheetService,
   ) {
   }
 
@@ -23,7 +24,7 @@ export class IncomingCallProcessor {
         }
 
         return TE.tryCatch(
-          () => this.worksheetRepository.getForCallcenterView(lastCall.worksheetId).then(ws => [ lastCall, ws ]),
+          () => this.callcenterWorksheetService.getWorksheetForCallcenterView(lastCall.worksheetId).then(ws => [ lastCall, ws ]),
           reason => new Error(String(reason)),
         )
       }),

@@ -1,5 +1,5 @@
 import { Twilio } from 'twilio'
-import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
+import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { SmsMessagesRepository } from '../repository/sms-messages.repository'
 import { chain, map, TaskEither } from 'fp-ts/TaskEither'
 import { type, TypeOf } from 'io-ts'
@@ -9,6 +9,7 @@ import uuid from 'uuid/v4'
 import { NonEmptyString } from 'io-ts-types'
 import moment from 'moment'
 import { BuildingOwnerPhonesRepository, LockedOwnerPhone } from '../repository/building-owner-phones.repository'
+import { CallcenterWorksheetService } from '../../worksheet/service/callcenter-worksheet.service'
 
 export const SendMessageToUnreachedOwnerCodec = type({
   to: NonEmptyString,
@@ -23,7 +24,7 @@ const MAX_SMS_LENGTH = 160
 export class SmsMessageSender {
   constructor (
     private twilioClient: Twilio,
-    private worksheetRepository: WorksheetRepository,
+    private callcenterWorksheetService: CallcenterWorksheetService,
     private smsMessagesRepository: SmsMessagesRepository,
     private buildingOwnerPhonesRepository: BuildingOwnerPhonesRepository,
   ) {
@@ -68,7 +69,7 @@ export class SmsMessageSender {
   private composeMessageWithAddress (lang: string, worksheetId: string): TaskEither<Error, string> {
     return pipe(
       taskEither.tryCatch<Error, WorksheetViewProps>(
-        () => this.worksheetRepository.getForCallcenterView(worksheetId),
+        () => this.callcenterWorksheetService.getWorksheetForCallcenterView(worksheetId),
         reason => reason instanceof Error ? reason : new Error(String(reason))
       ),
       map(worksheet => {

@@ -1,8 +1,9 @@
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
-import { WorksheetNotFound, WorksheetRepository, WorksheetViewProps } from '../repository/worksheet.repository'
+import { WorksheetNotFound, WorksheetViewProps } from '../repository/worksheet.repository'
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import { CallcenterWorksheetService } from './callcenter-worksheet.service'
 
 export interface InvalidWorksheetFound {
   name: 'worksheet.invalid_worksheet_found';
@@ -12,7 +13,7 @@ export interface InvalidWorksheetFound {
 export class TakeNextWorksheetService {
   constructor (
     private takeWorksheetService: WorksheetQueueActionsService,
-    private worksheetRepository: WorksheetRepository,
+    private callcenterWorksheetService: CallcenterWorksheetService,
     private worksheetQueueRepository: WorksheetQueueRepository,
     private eventBus: EventPublisher,
   ) {
@@ -53,7 +54,7 @@ export class TakeNextWorksheetService {
   }
 
   private getNextWorksheet (queue, byUserOfId, skipWorksheetId?): Promise<WorksheetViewProps> {
-    return this.worksheetRepository.nextAvailableWorksheetInSource(queue.source, skipWorksheetId)
+    return this.callcenterWorksheetService.nextAvailableWorksheetInSource(queue.source, skipWorksheetId)
       .catch(error => {
         error.queueId = queue.id
         error.byUserOfId = byUserOfId

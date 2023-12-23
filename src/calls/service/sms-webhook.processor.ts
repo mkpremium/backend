@@ -1,15 +1,16 @@
 import MessagingResponse from 'twilio/lib/twiml/MessagingResponse'
 import { taskEither } from 'fp-ts'
 import { TaskEither } from 'fp-ts/TaskEither'
-import { WorksheetRepository, WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
+import { WorksheetViewProps } from '../../worksheet/repository/worksheet.repository'
 import { SmsMessagesRepository, SmsOutgoingMessage } from '../repository/sms-messages.repository'
 import { pipe } from 'fp-ts/function'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
+import { CallcenterWorksheetService } from '../../worksheet/service/callcenter-worksheet.service'
 
 export class SmsWebhookProcessor {
   constructor (
-    private worksheetRepository: WorksheetRepository,
+    private callcenterWorksheetService: CallcenterWorksheetService,
     private smsMessagesRepository: SmsMessagesRepository,
     private eventBus: EventPublisher,
     private logger: Logger,
@@ -56,7 +57,8 @@ export class SmsWebhookProcessor {
         return taskEither.left(new Error('No message sent to number'))
       }
       return taskEither.tryCatch(
-        () => this.worksheetRepository.getForCallcenterView(lastSms.worksheetId).then(ws => [ lastSms, ws ]),
+        () => this.callcenterWorksheetService.getWorksheetForCallcenterView(lastSms.worksheetId)
+          .then(ws => [ lastSms, ws ]),
         reason => new Error(String(reason))
       )
     }

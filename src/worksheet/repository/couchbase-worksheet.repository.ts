@@ -71,7 +71,7 @@ ORDER BY worksheet.viewedAt LIMIT 1
 
 export class CouchbaseWorksheetRepository extends CouchbaseRepository<WorksheetProps>
   implements WorksheetRepository {
-  getForCallcenterView (worksheetId): Promise<WorksheetViewProps> {
+  getForCallcenterView (worksheetId: string): Promise<WorksheetViewProps> {
     return this.couchbaseAdapter.queryAsync(
       worksheetByIdQuery(this.bucketName), [ worksheetId ], { queryName: 'worksheet_view' }
     )

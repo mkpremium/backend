@@ -130,10 +130,5 @@ export class WorksheetNotFound extends Error {
 }
 
 export interface WorksheetRepository extends Repository<WorksheetProps> {
-  getForCallcenterView (worksheetId: string): Promise<WorksheetViewProps>
-
-  nextAvailableWorksheetInSource (source, skipWorksheetId?: string): Promise<WorksheetViewProps>
-
   ofBuildingId (buildingId: string): Promise<WorksheetProps>
-
 }

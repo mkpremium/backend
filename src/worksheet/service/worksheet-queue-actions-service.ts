@@ -4,11 +4,13 @@ import { EventPublisher } from '../../infrastructure/event-bus'
 import { WorksheetRepository } from '../repository/worksheet.repository'
 import { removeScheduledCall } from '../domain/queue'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import { CallcenterWorksheetService } from './callcenter-worksheet.service'
 
 export class WorksheetQueueActionsService {
   constructor (
     private worksheetQueueRepository: WorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
+    private callcenterWorksheetService: CallcenterWorksheetService,
     private eventBus: EventPublisher,
   ) {
   }
@@ -23,7 +25,7 @@ export class WorksheetQueueActionsService {
     await this.worksheetQueueRepository.save(queueWithWorksheet)
     await this.eventBus.publish({ name: DomainEventCatalog.WORKSHEET__TAKEN, worksheetId, queueId, by: userId })
 
-    return this.worksheetRepository.getForCallcenterView(worksheetId)
+    return this.callcenterWorksheetService.getWorksheetForCallcenterView(worksheetId)
   }
 
   async removeScheduledCallFromWorksheets (scheduledCallId) {
