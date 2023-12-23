@@ -19,7 +19,7 @@ export abstract class PostgresRepository<S extends { id?: string }, E extends {
   protected relations: FindOptionsRelations<E> | string[] = {}
 
   async get (id: string): Promise<S> {
-    let entity = await this.repository.findOne({
+    const entity = await this.repository.findOne({
       where: {
         id: id as any
       },
