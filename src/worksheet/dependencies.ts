@@ -14,6 +14,7 @@ import { PostgresWorksheetRepository } from './repository/postgres-worksheet.rep
 import {
   SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
 } from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
+import { CallcenterWorksheetService } from './service/callcenter-worksheet.service'
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({

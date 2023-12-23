@@ -17,7 +17,7 @@ describe('IncomingCallProcessor', () => {
   let processor: IncomingCallProcessor
   let virtualCallsRepositoryStub
   let gatherOwnerInterestMessageComposerStub
-  let worksheetRepositoryStub
+  let callcenterWorksheetServiceStub
 
   beforeEach(() => {
     virtualCallsRepositoryStub = {
@@ -27,15 +27,15 @@ describe('IncomingCallProcessor', () => {
     gatherOwnerInterestMessageComposerStub = {
       compose: stub().returns({ toString: () => testComposedMessage }),
     }
-    worksheetRepositoryStub = {
+    callcenterWorksheetServiceStub = {
       getForCallcenterView: stub(),
     }
-    worksheetRepositoryStub.getForCallcenterView.withArgs(testCall.worksheetId).resolves(testWorksheet)
+    callcenterWorksheetServiceStub.getWorksheetForCallcenterView.withArgs(testCall.worksheetId).resolves(testWorksheet)
 
     processor = new IncomingCallProcessor(
       virtualCallsRepositoryStub,
       gatherOwnerInterestMessageComposerStub,
-      worksheetRepositoryStub,
+      callcenterWorksheetServiceStub,
     )
   })
 
