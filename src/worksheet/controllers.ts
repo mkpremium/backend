@@ -1,11 +1,12 @@
 import { wrap } from 'express-promise-wrap'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { History } from '../history/models'
-import { canOperatorHandleQueue } from '../lib/role-operators'
 import { UserRoles } from '../types/user'
 import { WorksheetQueueBody } from './domain/queue'
 import { setStatus } from './domain/worksheet'
+import { LegacyWorksheetQueueRepository } from './models/queue-repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
+import { WorksheetRepository } from './repository/worksheet.repository'
 
 async function worksheetList (req, res) {
   const repo = new LegacyWorksheetRepository()
@@ -13,7 +14,7 @@ async function worksheetList (req, res) {
   res.json(worksheets)
 }
 
-const updateWorksheetStatus = worksheetRepository => async (req, res) => {
+const updateWorksheetStatus = (worksheetRepository: WorksheetRepository) => async (req, res) => {
   const worksheetId = req.params.id
   const worksheet = await worksheetRepository.get(worksheetId)
   const updatedWorksheet = setStatus(worksheet, req.body.status, req.body.reason)
@@ -26,7 +27,7 @@ const updateWorksheetStatus = worksheetRepository => async (req, res) => {
   res.json(updatedWorksheet)
 }
 
-const createQueue = worksheetQueueRepository => async (req, res) => {
+const createQueue = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => async (req, res) => {
   const params = fromJSON(req.body, WorksheetQueueBody)
   const queue = await worksheetQueueRepository.save(params)
   await History.registerCreate({
@@ -36,7 +37,7 @@ const createQueue = worksheetQueueRepository => async (req, res) => {
   res.status(201).json(queue)
 }
 
-const updateQueue = worksheetQueueRepository => async (req, res) => {
+const updateQueue = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => async (req, res) => {
   const queueId = req.params.id
   const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   const updatedQueue = await worksheetQueueRepository.update(queue, req.body)
@@ -47,7 +48,7 @@ const updateQueue = worksheetQueueRepository => async (req, res) => {
   res.json(updatedQueue)
 }
 
-const deleteQueue = worksheetQueueRepository => async (req, res) => {
+const deleteQueue = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => async (req, res) => {
   const queueId = req.params.id
   const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
   await worksheetQueueRepository.deleteQueue(queue)
@@ -58,7 +59,7 @@ const deleteQueue = worksheetQueueRepository => async (req, res) => {
   res.status(204).send()
 }
 
-const queueList = worksheetQueueRepository => async (req, res) => {
+const queueList = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => async (req, res) => {
   const queues = await worksheetQueueRepository.list(req.query)
   res.json(queues)
 }
@@ -70,33 +71,9 @@ function operatorIdByPermissions (req) {
     : req.user.id
 }
 
-const queueTakenFindByOperator = worksheetQueueRepository => async (req, res) => {
-  const operatorId = operatorIdByPermissions(req)
-  const queueId = req.params.id
-  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
-  canOperatorHandleQueue(req.user.operator, queueId)
-
-  const queueItem = queue.findOpenedItemByOperatorId(operatorId)
-  await History.registerGet({
-    contextModel: queue,
-    user: req.user
-  })
-  res.json(queueItem || {})
-}
-
-const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
-  const queueId = req.params.id
-  const operatorId = req.user.id
-  const queue = await worksheetQueueRepository.findByIdOrThrow(queueId)
-  const items = queue.findScheduledItemsByOperatorId(operatorId)
-  res.json(items)
-}
-
 export const worksheetListController = wrap(worksheetList)
-export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
-export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
-export const queueTakenFindByOperatorController = worksheetQueueRepository => wrap(queueTakenFindByOperator(worksheetQueueRepository))
-export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
-export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))
-export const deleteQueueController = worksheetQueueRepository => wrap(deleteQueue(worksheetQueueRepository))
-export const getScheduledWorksheetsController = worksheetQueueRepository => wrap(getScheduledWorksheets(worksheetQueueRepository))
+export const updateWorksheetStatusController = (worksheetRepository: WorksheetRepository) => wrap(updateWorksheetStatus(worksheetRepository))
+export const queueListController = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => wrap(queueList(worksheetQueueRepository))
+export const createQueueController = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => wrap(createQueue(worksheetQueueRepository))
+export const updateQueueController = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => wrap(updateQueue(worksheetQueueRepository))
+export const deleteQueueController = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => wrap(deleteQueue(worksheetQueueRepository))

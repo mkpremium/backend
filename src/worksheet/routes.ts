@@ -5,27 +5,24 @@ import { createTakeWorksheetIntoQueueController } from './controller/take-worksh
 import {
   createQueueController,
   deleteQueueController,
-  getScheduledWorksheetsController,
   queueListController,
-  queueTakenFindByOperatorController,
   updateQueueController,
   updateWorksheetStatusController,
   worksheetListController
 } from './controllers'
 import { AwilixContainer } from 'awilix'
 import { createStatusChangedController } from './controller/status-changed.controller'
+import type { LegacyWorksheetQueueRepository } from './models/queue-repository'
 
 export function worksheetRoutes (container: AwilixContainer) {
   const router = Router()
 
   router.get('/', worksheetListController)
 
-  const legacyWorksheetQueueRepository = container.resolve('legacyWorksheetQueueRepository')
+  const legacyWorksheetQueueRepository = container.resolve('legacyWorksheetQueueRepository') as LegacyWorksheetQueueRepository
   router.get('/queues', permissions.manager, queueListController(legacyWorksheetQueueRepository))
 
   router.post('/queues', permissions.manager, createQueueController(legacyWorksheetQueueRepository))
-
-  router.get('/queues/:id/taken', queueTakenFindByOperatorController(legacyWorksheetQueueRepository))
 
   router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
     createTakeWorksheetIntoQueueController(container.resolve('worksheetQueueActionsService'))
@@ -34,8 +31,6 @@ export function worksheetRoutes (container: AwilixContainer) {
   router.put('/queues/:id', permissions.manager, updateQueueController(legacyWorksheetQueueRepository))
 
   router.delete('/queues/:id', permissions.manager, deleteQueueController(legacyWorksheetQueueRepository))
-
-  router.get('/queues/:id/scheduled', permissions.operator, getScheduledWorksheetsController(legacyWorksheetQueueRepository))
 
   router.put('/:id/status', updateWorksheetStatusController(container.resolve('worksheetRepository')))
 
