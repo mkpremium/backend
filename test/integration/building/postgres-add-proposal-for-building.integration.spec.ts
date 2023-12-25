@@ -12,7 +12,7 @@ import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 import { AddContactService, MaybeFeaturedContact } from '../../../src/owner/service/add-contact.service'
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { ProposalProps } from '../../../src/building/building'
-import { addProposal, createOwnerWithEmailContact } from '../../worksheet/helpers'
+import { addProposal, createOwnerWithEmailContact } from '../../helpers'
 
 describe('AddProposalForBuilding - Integration (Postgres)', () => {
   it('saves proposal for building', async () => {

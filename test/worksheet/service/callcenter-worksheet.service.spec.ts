@@ -14,7 +14,7 @@ import { BuildingsReadRepository } from '../../../src/building/repository/buildi
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { Factory } from 'rosie'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
-import { addProposal, createOwnerWithEmailContact } from '../helpers'
+import { addProposal, createOwnerWithEmailContact } from '../../helpers'
 
 describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
