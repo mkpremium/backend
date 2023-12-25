@@ -64,13 +64,6 @@ const queueList = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => 
   res.json(queues)
 }
 
-function operatorIdByPermissions (req) {
-  const allowQuery = req.user.permissions.indexOf(UserRoles.MANAGER) !== -1
-  return allowQuery
-    ? req.query.operationId || req.user.id
-    : req.user.id
-}
-
 export const worksheetListController = wrap(worksheetList)
 export const updateWorksheetStatusController = (worksheetRepository: WorksheetRepository) => wrap(updateWorksheetStatus(worksheetRepository))
 export const queueListController = (worksheetQueueRepository: LegacyWorksheetQueueRepository) => wrap(queueList(worksheetQueueRepository))
