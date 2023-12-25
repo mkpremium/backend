@@ -6,8 +6,6 @@ import { QueueItemProps } from '../models/queue-item'
 export interface WorksheetQueueRepository extends Repository<WorksheetQueueProps> {
   findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps>
 
-  scheduleWorksheetInQueue (queue: WorksheetQueueProps, scheduledEvent: ScheduledEventProps): Promise<QueueItemProps>
-
   list(): Promise<WorksheetQueueProps[]>
 }
 

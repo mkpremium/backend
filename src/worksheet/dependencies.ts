@@ -14,6 +14,7 @@ import {
 } from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
 import { CallcenterWorksheetService } from './service/callcenter-worksheet.service'
 import { CouchbaseWorksheetQueueRepository } from './repository/couchbase-worksheet-queue.repository'
+import { CallSchedulerService } from './service/call-scheduler.service'
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
@@ -25,6 +26,7 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
     updateWorksheetStatusOnOwnerChangeService: asClass(UpdateWorksheetStatusOnOwnerChangeService).classic().singleton(),
     takeWorksheetService: aliasTo('worksheetQueueActionsService'),
+    callSchedulerService: asClass(CallSchedulerService).classic().singleton(),
     takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),
     releaseUserOtherActiveWorksheetsInQueueService: asClass(ReleaseUserExtraOpenedWorksheetsInQueueService).classic().singleton()
       .inject(() => ({ maxOpenedWorksheetPerQueueAndUser: 2 })),

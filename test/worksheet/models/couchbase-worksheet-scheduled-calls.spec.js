@@ -1,5 +1,6 @@
 import { expect } from 'chai'
-import { addWorksheet } from '../../../src/worksheet/repository/couchbase-worksheet-queue.repository'
+
+import { addWorksheet } from '../../../src/worksheet/service/call-scheduler.service'
 import { createTestContainer } from '../../create-test-container'
 
 describe('Worksheet scheduled calls (Couchbase)', () => {

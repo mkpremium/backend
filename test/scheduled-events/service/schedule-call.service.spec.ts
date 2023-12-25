@@ -8,15 +8,18 @@ describe('ScheduleCallService', () => {
   let legacyWorksheetQueueRepositoryStub
   let eventBusStub
   let worksheetRepositoryStub
+  let callSchedulerServiceStub
 
   beforeEach(() => {
     scheduledEventsRepositoryStub = {
       addScheduleCallEvent: stub(),
-    },
-      legacyWorksheetQueueRepositoryStub = {
-        get: stub(),
-        scheduleWorksheetInQueue: stub(),
-      }
+    }
+    callSchedulerServiceStub = {
+      scheduleWorksheetInQueue: stub(),
+    }
+    legacyWorksheetQueueRepositoryStub = {
+      get: stub(),
+    }
     eventBusStub = {
       publish: stub(),
     }
@@ -26,6 +29,7 @@ describe('ScheduleCallService', () => {
 
     service = new ScheduleCallService(
       scheduledEventsRepositoryStub,
+      callSchedulerServiceStub,
       legacyWorksheetQueueRepositoryStub,
       worksheetRepositoryStub,
       eventBusStub,
