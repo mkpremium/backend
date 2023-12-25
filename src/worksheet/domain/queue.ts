@@ -60,14 +60,6 @@ WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
   return _find(this.worksheets, { worksheetId })
 }
 
-WorksheetQueue.prototype.findOpenedItemByOperatorId = function (operatorId) {
-  return _find(this.worksheets, { operatorId, status: QueueStatus.OPENED })
-}
-
-WorksheetQueue.prototype.findScheduledItemsByOperatorId = function (operatorId) {
-  return _filter(this.worksheets, { operatorId, status: QueueStatus.SCHEDULED })
-}
-
 /**
  * @param {Worksheet} worksheet
  * @return {WorksheetQueue}
