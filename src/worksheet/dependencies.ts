@@ -33,7 +33,8 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
     worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
-    worksheetQueueRepository: asClass(WorksheetQueueRepository).classic().singleton(),
+    couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
+    worksheetQueueRepository: aliasTo('couchbaseWorksheetQueueRepository'),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
     legacyWorksheetQueueRepository: asClass(LegacyWorksheetQueueRepository).classic().singleton()
   })
