@@ -1,11 +1,10 @@
-import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
-import { WorksheetQueueActionsService } from '../../../src/worksheet/service/worksheet-queue-actions-service'
-import { stub } from 'sinon'
-import { Worksheet } from '../../../src/worksheet/domain/worksheet'
-import spy from 'sinon/lib/sinon/spy'
 import { expect } from 'chai'
+import { spy, stub } from 'sinon'
 import { utc } from '../../../src/lib/date'
+import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
+import { Worksheet } from '../../../src/worksheet/domain/worksheet'
 import { QueueStatus } from '../../../src/worksheet/models/queue-item'
+import { WorksheetQueueActionsService } from '../../../src/worksheet/service/worksheet-queue-actions-service'
 
 describe('WorksheetQueueActionsService', () => {
   const testQueueId = 'test-queue-id'

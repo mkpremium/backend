@@ -1,6 +1,5 @@
-import stub from 'sinon/lib/sinon/stub'
-import { spy } from 'sinon'
 import { expect } from 'chai'
+import { spy, stub } from 'sinon'
 import { createTakeWorksheetInQueueController } from '../../../src/caller/controller/take-worksheet-in-queue.controller'
 
 describe('Take Worksheet In Queue Controller', () => {

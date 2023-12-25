@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { createGetNextCallerWorksheetController } from '../../../src/caller/controller/get-next-worksheet.controller'
-import stub from 'sinon/lib/sinon/stub'
-import { spy } from 'sinon'
+import { spy, stub } from 'sinon'
 
 describe('Get Next Caller Worksheet Controller', () => {
   it('gets next worksheet from caller assigned queue', async () => {
