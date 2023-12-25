@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import { addWorksheet } from '../../../src/worksheet/repository/couchbase-worksheet-queue.repository'
 import { createTestContainer } from '../../create-test-container'
 
 describe('Worksheet scheduled calls (Couchbase)', () => {
@@ -43,7 +44,7 @@ describe('Worksheet scheduled calls (Couchbase)', () => {
     })
 
     it('schedules call for worksheet in queue', async () => {
-      const queueWithWorksheet = await repository.save(testWorksheetQueue.addWorksheet(testWorksheet))
+      const queueWithWorksheet = await repository.save(addWorksheet(testWorksheetQueue, testWorksheet))
       const scheduledCall = await repository.scheduleWorksheetInQueue(queueWithWorksheet, testCallToSchedule)
 
       expect(scheduledCall).to.not.be.empty
@@ -54,7 +55,7 @@ describe('Worksheet scheduled calls (Couchbase)', () => {
 
       expect(scheduledCall).to.not.be.empty
 
-      const updatedQueue = await repository.findById(testWorksheetQueue.id)
+      const updatedQueue = await repository.get(testWorksheetQueue.id)
 
       expect(updatedQueue.worksheets.length).to.be.equal(1)
       expect(updatedQueue.worksheets[ 0 ].worksheetId).to.be.equal(testWorksheet.id)

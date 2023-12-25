@@ -102,7 +102,7 @@ function findItemByWorksheetId (queue: WorksheetQueueProps, worksheetId: string)
   return _find(queue.worksheets, { worksheetId })
 }
 
-function addWorksheet (queue: WorksheetQueueProps, worksheet: WorksheetProps): WorksheetQueueProps {
+export function addWorksheet (queue: WorksheetQueueProps, worksheet: WorksheetProps): WorksheetQueueProps {
   return t.update(queue, {
     worksheets: {
       $push: [
