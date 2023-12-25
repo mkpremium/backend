@@ -4,7 +4,6 @@ import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
 import {
   createQueueController,
-  deleteQueueController,
   queueListController,
   updateQueueController,
   updateWorksheetStatusController,
@@ -12,25 +11,23 @@ import {
 } from './controllers'
 import { AwilixContainer } from 'awilix'
 import { createStatusChangedController } from './controller/status-changed.controller'
-import type { LegacyWorksheetQueueRepository } from './models/legacy-worksheet-queue.repository'
+import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
 
 export function worksheetRoutes (container: AwilixContainer) {
   const router = Router()
 
   router.get('/', worksheetListController)
 
-  const legacyWorksheetQueueRepository = container.resolve('legacyWorksheetQueueRepository') as LegacyWorksheetQueueRepository
-  router.get('/queues', permissions.manager, queueListController(legacyWorksheetQueueRepository))
+  const worksheetQueueRepository = container.resolve('worksheetQueueRepository') as WorksheetQueueRepository
+  router.get('/queues', permissions.manager, queueListController(worksheetQueueRepository))
 
-  router.post('/queues', permissions.manager, createQueueController(legacyWorksheetQueueRepository))
+  router.post('/queues', permissions.manager, createQueueController(worksheetQueueRepository))
 
   router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
     createTakeWorksheetIntoQueueController(container.resolve('worksheetQueueActionsService'))
   ))
 
-  router.put('/queues/:id', permissions.manager, updateQueueController(legacyWorksheetQueueRepository))
-
-  router.delete('/queues/:id', permissions.manager, deleteQueueController(legacyWorksheetQueueRepository))
+  router.put('/queues/:id', permissions.manager, updateQueueController(worksheetQueueRepository))
 
   router.put('/:id/status', updateWorksheetStatusController(container.resolve('worksheetRepository')))
 

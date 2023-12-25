@@ -14,16 +14,6 @@ import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import _find from 'lodash/find'
 import { WorksheetProps } from '../domain/worksheet'
 
-const queueWithScheduledCallOfIdQuery = bucketName => `
-    SELECT id,
-           name,
-           source,
-           worksheets
-    FROM ${bucketName}
-    WHERE _documentType = 'worksheet-queue'
-      AND ANY w IN worksheets SATISFIES w.event.id = $1 END
-`
-
 export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<WorksheetQueueProps>
   implements WorksheetQueueRepository {
   constructor (
@@ -33,22 +23,34 @@ export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<Works
     super(couchbaseAdapter)
   }
 
+  async list (): Promise<WorksheetQueueProps[]> {
+    const rows = await this.couchbaseAdapter.queryAsync(
+      this.getQueuesMatchingConditionsQuery([ '1=1' ])
+    )
+
+    return fromJSON(rows, t.list(WorksheetQueue))
+  }
+
+  delete (id: string): Promise<void> {
+    throw new Error('Method not implemented.')
+  }
+
   struct () {
     return WorksheetQueue
   }
 
   async findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps> {
-    return this.couchbaseAdapter.queryAsync(
-      queueWithScheduledCallOfIdQuery(this.bucketName), [ scheduledCallId ]
-    ).then(rows => {
-      if (rows.length === 0) {
-        return
-      }
-      if (rows.length > 1) {
-        throw new ScheduledCallInMultipleQueues(scheduledCallId)
-      }
-      return fromJSON(rows[ 0 ], WorksheetQueue)
-    })
+    const rows = await this.couchbaseAdapter.queryAsync(
+      this.queueWithScheduledCallOfIdQuery(), [ scheduledCallId ]
+    )
+
+    if (rows.length === 0) {
+      return
+    }
+    if (rows.length > 1) {
+      throw new ScheduledCallInMultipleQueues(scheduledCallId)
+    }
+    return fromJSON(rows[ 0 ], WorksheetQueue)
   }
 
   async scheduleWorksheetInQueue (queue: WorksheetQueueProps, scheduledEvent: ScheduledEventProps): Promise<QueueItemProps> {
@@ -77,6 +79,22 @@ export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<Works
     await this.save(updatedQueue)
 
     return updatedItem
+  }
+
+  private queueWithScheduledCallOfIdQuery () {
+    return this.getQueuesMatchingConditionsQuery([ 'ANY w IN worksheets SATISFIES w.event.id = $1 END' ])
+  }
+
+  private getQueuesMatchingConditionsQuery (conditions: string[]) {
+    return `
+        SELECT id,
+               name,
+               source,
+               worksheets
+        FROM ${this.bucketName}
+        WHERE _documentType = 'worksheet-queue'
+          AND ${conditions.join(' AND ')}
+    `
   }
 }
 
@@ -111,4 +129,3 @@ function schedule (item: QueueItemProps, operatorId: string, scheduledEvent: Sch
     }
   }) as QueueItemProps
 }
-

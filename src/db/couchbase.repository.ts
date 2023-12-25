@@ -1,8 +1,9 @@
 import { CouchbaseAdapter } from './couchbase.adapter'
 import { Struct } from 'tcomb'
 import { RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
+import { Repository } from './repository'
 
-export abstract class CouchbaseRepository<T> {
+export abstract class CouchbaseRepository<T> implements Repository<T> {
   constructor (
     protected couchbaseAdapter: CouchbaseAdapter
   ) {
