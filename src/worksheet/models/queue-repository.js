@@ -73,20 +73,6 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
   /**
    * @public
    * @param queueId
-   * @param operatorId
-   * @returns {Promise<null|*>}
-   */
-  async findItemByOperator (queueId, operatorId) {
-    if (!queueId) {
-      return null
-    }
-    const queue = await this.findByIdOrThrow(queueId)
-    return queue.findOpenedItemByOperatorId(operatorId)
-  }
-
-  /**
-   * @public
-   * @param queueId
    * @returns {Promise<WorksheetQueue>}
    */
   async findByIdOrThrow (queueId) {
