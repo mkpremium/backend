@@ -9,8 +9,21 @@ export const QueueStatus = {
   CLOSED: 'CLOSED'
 }
 export const WorkSheetQueueStatus = t.enums(QueueStatus, 'WorkSheetQueueStatus')
-export const QueueItem = t.struct(
-  {
+
+export interface QueueItemProps {
+  id?: string
+  worksheetId: string
+  operatorId?: string
+  status: string
+  addedAt: Date
+  event?: {
+    id: string
+    eventDate: Date
+    type: string
+  }
+}
+
+export const QueueItem = t.struct<QueueItemProps>({
     id: t.maybe(t.String),
     worksheetId: t.String,
     operatorId: t.maybe(t.String),
@@ -32,20 +45,6 @@ export const QueueItem = t.struct(
     }
   }
 )
-
-QueueItem.prototype.schedule = function (operatorId, scheduledEvent) {
-  return t.update(this, {
-    status: { $set: QueueStatus.SCHEDULED },
-    operatorId: { $set: operatorId },
-    event: {
-      $set: {
-        id: scheduledEvent.id,
-        type: scheduledEvent.type,
-        eventDate: scheduledEvent.eventDate
-      }
-    }
-  })
-}
 
 export function removeScheduledCallFromItem (queueItem) {
   t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')

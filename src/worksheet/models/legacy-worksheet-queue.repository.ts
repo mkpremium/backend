@@ -1,4 +1,4 @@
-import Promise from 'bluebird'
+import BirdPromise from 'bluebird'
 import _ from 'lodash'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -7,8 +7,12 @@ import { logger } from '../../infrastructure/logger'
 import { newHttpError } from '../../lib/http-error'
 import { updateList } from '../../lib/tcomb-utils'
 import { ListQuery } from '../../types/params'
-import { WorksheetQueue, WorksheetQueueBody, WorksheetQueueCount } from '../domain/queue'
+import { WorksheetQueue, WorksheetQueueBody, WorksheetQueueCount, WorksheetQueueProps } from '../domain/queue'
 import { LegacyWorksheetRepository } from './worksheet-repository'
+import { ScheduledEventProps } from '../../scheduled-events/types'
+import _find from 'lodash/find'
+import { QueueItem, QueueItemProps, QueueStatus } from './queue-item'
+import { WorksheetProps } from '../domain/worksheet'
 
 const QueueListResponse = t.struct(
   {
@@ -24,39 +28,30 @@ const QueueListResponse = t.struct(
   }
 )
 
-/**
- * @field {WorksheetRepository} worksheetRepository
- */
 export class LegacyWorksheetQueueRepository extends CouchbaseModel {
+  Struct = WorksheetQueue
+
   constructor (
-    legacyWorksheetRepository = new LegacyWorksheetRepository()
+    private legacyWorksheetRepository: LegacyWorksheetRepository = new LegacyWorksheetRepository()
   ) {
     super()
-    this.Struct = WorksheetQueue
-    this.worksheetRepository = legacyWorksheetRepository
   }
 
-  /**
-   * @public
-   * @param {WorksheetQueue} queue
-   * @param {ScheduledEvent} scheduledEvent
-   * @returns {Promise<QueueItem>}
-   */
-  async scheduleWorksheetInQueue (queue, scheduledEvent) {
+  async scheduleWorksheetInQueue (queue: WorksheetQueueProps, scheduledEvent: ScheduledEventProps): Promise<any> {
     const worksheetId = scheduledEvent.event.worksheetId
-    const worksheet = await this.worksheetRepository.findById(worksheetId)
+    const worksheet = await this.legacyWorksheetRepository.findById(worksheetId)
     if (!worksheet) {
       throw newHttpError(409, `La hoja de trabajo ${worksheetId} no puede abrirse, comuníquese con su administrador`)
     }
 
     const operatorId = scheduledEvent.notifyTo
-    let item = queue.findItemByWorksheetId(worksheetId)
+    let item = findItemByWorksheetId(queue, worksheetId)
     if (!item) {
-      queue = queue.addWorksheet(worksheet)
+      queue = addWorksheet(queue, worksheet)
       item = _.find(queue.worksheets, i => i.worksheetId === worksheetId)
     }
 
-    const updatedItem = item.schedule(operatorId, scheduledEvent)
+    const updatedItem = schedule(item, operatorId, scheduledEvent)
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
     const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
 
@@ -70,12 +65,7 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
     return updatedItem
   }
 
-  /**
-   * @public
-   * @param queueId
-   * @returns {Promise<WorksheetQueue>}
-   */
-  async findByIdOrThrow (queueId) {
+  async findByIdOrThrow (queueId: string): Promise<WorksheetQueueProps> {
     const queue = await this.findById(queueId)
     if (!queue) {
       throw newHttpError(404, `La cola ${queueId} no existe`)
@@ -96,8 +86,8 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
       .offset(params.offset)
     const total = await this.countQuery()
     const results = await this.query(qb)
-    const resultsWithCount = await Promise.map(results, async (queue) => {
-      const count = await this.worksheetRepository.countWorksheetsInSource(queue.source)
+    const resultsWithCount = await BirdPromise.map(results, async (queue) => {
+      const count = await this.legacyWorksheetRepository.countWorksheetsInSource(queue.source)
       return Object.assign(JSON.parse(JSON.stringify(queue)), { possibleNumberOfWorksheets: count })
     })
     return fromJSON({ total, results: resultsWithCount }, QueueListResponse)
@@ -125,4 +115,37 @@ export class LegacyWorksheetQueueRepository extends CouchbaseModel {
     qb.where('id = ?', queue.id)
     await this.deleteQuery(qb)
   }
+}
+
+
+function findItemByWorksheetId (queue: WorksheetQueueProps, worksheetId: string): QueueItemProps | undefined {
+  return _find(queue.worksheets, { worksheetId })
+}
+
+function addWorksheet (queue: WorksheetQueueProps, worksheet: WorksheetProps): WorksheetQueueProps {
+  return t.update(queue, {
+    worksheets: {
+      $push: [
+        QueueItem({
+          worksheetId: worksheet.id,
+          status: QueueStatus.AVAILABLE,
+          addedAt: new Date()
+        })
+      ]
+    }
+  }) as WorksheetQueueProps
+}
+
+function schedule(item: QueueItemProps, operatorId: string, scheduledEvent: ScheduledEventProps): QueueItemProps {
+  return t.update(item, {
+    status: { $set: QueueStatus.SCHEDULED },
+    operatorId: { $set: operatorId },
+    event: {
+      $set: {
+        id: scheduledEvent.id,
+        type: scheduledEvent.type,
+        eventDate: scheduledEvent.eventDate
+      }
+    }
+  }) as QueueItemProps
 }

@@ -12,7 +12,7 @@ import {
 } from './controllers'
 import { AwilixContainer } from 'awilix'
 import { createStatusChangedController } from './controller/status-changed.controller'
-import type { LegacyWorksheetQueueRepository } from './models/queue-repository'
+import type { LegacyWorksheetQueueRepository } from './models/legacy-worksheet-queue.repository'
 
 export function worksheetRoutes (container: AwilixContainer) {
   const router = Router()

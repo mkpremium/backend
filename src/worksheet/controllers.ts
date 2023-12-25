@@ -4,7 +4,7 @@ import { History } from '../history/models'
 import { UserRoles } from '../types/user'
 import { WorksheetQueueBody } from './domain/queue'
 import { setStatus } from './domain/worksheet'
-import { LegacyWorksheetQueueRepository } from './models/queue-repository'
+import { LegacyWorksheetQueueRepository } from './models/legacy-worksheet-queue.repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { WorksheetRepository } from './repository/worksheet.repository'
 
