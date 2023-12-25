@@ -2,8 +2,6 @@ import t from 'tcomb'
 import { QueueItem, QueueStatus, removeScheduledCallFromItem } from '../models/queue-item'
 import _ from 'lodash'
 import _get from 'lodash/get'
-import _find from 'lodash/find'
-import _filter from 'lodash/filter'
 
 export const WorksheetQueueSource = t.struct({
   city: t.maybe(t.String),
@@ -55,28 +53,6 @@ export const WorksheetQueue = t.struct<WorksheetQueueProps>(
     }
   }
 )
-
-WorksheetQueue.prototype.findItemByWorksheetId = function (worksheetId) {
-  return _find(this.worksheets, { worksheetId })
-}
-
-/**
- * @param {Worksheet} worksheet
- * @return {WorksheetQueue}
- */
-WorksheetQueue.prototype.addWorksheet = function (worksheet) {
-  return t.update(this, {
-    worksheets: {
-      $push: [
-        QueueItem({
-          worksheetId: worksheet.id,
-          status: QueueStatus.AVAILABLE,
-          addedAt: new Date()
-        })
-      ]
-    }
-  })
-}
 
 const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser): string[] => {
   const userOpenedWorksheets = queue.worksheets
