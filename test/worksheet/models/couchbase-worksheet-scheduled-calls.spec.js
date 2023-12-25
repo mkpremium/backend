@@ -6,8 +6,8 @@ describe('Worksheet scheduled calls (Couchbase)', () => {
   let worksheetRepository
 
   beforeEach(async () => {
-    const container = await createTestContainer()
-    repository = container.resolve('legacyWorksheetQueueRepository')
+    const container = await createTestContainer({couchbase: true, postgres: false})
+    repository = container.resolve('couchbaseWorksheetQueueRepository')
     worksheetRepository = container.resolve('worksheetRepository')
   })
 

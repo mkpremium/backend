@@ -14,7 +14,7 @@ describe('ScheduleCallService', () => {
       addScheduleCallEvent: stub(),
     },
       legacyWorksheetQueueRepositoryStub = {
-        findByIdOrThrow: stub(),
+        get: stub(),
         scheduleWorksheetInQueue: stub(),
       }
     eventBusStub = {
