@@ -116,7 +116,8 @@ describe('ProposalsSenderService', () => {
     }).build()
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId)
       .resolves(testLastFridayMeeting)
-    const clock = sinon.useFakeTimers(lastMonday.toDate())
+    clock.restore()
+    clock = sinon.useFakeTimers(lastMonday.toDate())
 
     await service.checkAndSendProposals()
 
