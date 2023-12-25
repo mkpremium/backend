@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import { ListQuery } from '../types/params'
-import { Positive, StringSplitList } from '../types/refinement'
-import { Worksheet, WorkSheetStatusEnum } from './domain/worksheet'
+import { StringSplitList } from '../types/refinement'
+import { WorkSheetStatusEnum } from './domain/worksheet'
 
 export const QueueRequestAction = {
   TAKE: 'TAKE',
@@ -20,31 +20,6 @@ export const WorksheetListQuery = ListQuery.extend(
     name: 'WorksheetListQuery',
     defaultProps: {
       viewedBetween: ','
-    }
-  }
-)
-
-export const WorksheetSearchQuery = t.struct(
-  {
-    query: t.String,
-    limit: Positive
-  },
-  {
-    name: 'WorksheetSearchQuery',
-    defaultProps: {
-      limit: 20
-    }
-  }
-)
-
-export const WorksheetSearchResponse = t.struct(
-  {
-    results: t.list(Worksheet)
-  },
-  {
-    name: 'WorksheetSearchResponse',
-    defaultProps: {
-      results: []
     }
   }
 )
