@@ -28,7 +28,6 @@ describe('CallcenterWorksheetService', () => {
       buildingsRepository,
     } = await buildDependencies()
 
-    const testWorksheetId = uuid()
     const testBuilding = await buildingsRepository.save(buildingBuilder({
       cadastre: {
         reference: 'test-cadastre-reference',
@@ -41,13 +40,13 @@ describe('CallcenterWorksheetService', () => {
 
     await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
 
-    await worksheetRepository.save(worksheetBuilder({
-        id: testWorksheetId,
+    const testWorksheet = await worksheetRepository.save(worksheetBuilder({
         relatedBuildingIds: [ testBuilding.id ]
       }).build()
     )
 
-    const result = await callcenterWorksheetService.getWorksheetForCallcenterView(testWorksheetId)
+    const result =
+      await callcenterWorksheetService.getWorksheetForCallcenterView(testWorksheet.id)
     expect(validate(result, CallcenterView).errors).to.deep.equal([])
     // // TODO: assert owner
     expect(result.building.latestProposal).not.to.be.undefined
