@@ -8,8 +8,25 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
-import { Worksheet, WorkSheetStatus } from '../domain/worksheet'
-import { QueueRequestAction, WorksheetListQuery } from '../types'
+import { ListQuery } from '../../types/params'
+import { StringSplitList } from '../../types/refinement'
+import { Worksheet, WorkSheetStatus, WorkSheetStatusEnum } from '../domain/worksheet'
+import { QueueRequestAction } from '../types'
+
+export const WorksheetListQuery = ListQuery.extend(
+  {
+    status: t.maybe(WorkSheetStatusEnum),
+    viewedAt: t.maybe(t.String),
+    viewedBetween: t.maybe(StringSplitList),
+    ownerName: t.maybe(t.String)
+  },
+  {
+    name: 'WorksheetListQuery',
+    defaultProps: {
+      viewedBetween: ','
+    }
+  }
+)
 
 const QueueRequestParamsBase = t.struct(
   {
