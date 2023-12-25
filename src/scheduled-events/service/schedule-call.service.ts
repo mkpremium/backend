@@ -4,6 +4,7 @@ import { EventPublisher } from '../../infrastructure/event-bus'
 import { ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
 
 export interface ScheduleCallCommand {
   event: ScheduledEventProps & { note: string }
@@ -23,7 +24,7 @@ export interface CallScheduled {
 export class ScheduleCallService {
   constructor (
     private scheduledEventsRepository: ScheduledEventsRepository,
-    private legacyWorksheetQueueRepository: LegacyWorksheetQueueRepository,
+    private worksheetQueueRepository: WorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
     private eventBus: EventPublisher,
   ) {
@@ -34,8 +35,8 @@ export class ScheduleCallService {
     cmd.event.event.worksheetId = worksheet.id
     const scheduledEvent = await this.scheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)
 
-    const queue = await this.legacyWorksheetQueueRepository.findByIdOrThrow(cmd.queueId)
-    await this.legacyWorksheetQueueRepository.scheduleWorksheetInQueue(queue, scheduledEvent)
+    const queue = await this.worksheetQueueRepository.get(cmd.queueId)
+    await this.worksheetQueueRepository.scheduleWorksheetInQueue(queue, scheduledEvent)
 
     await this.eventBus.publish({
       name: DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED,
