@@ -5,7 +5,6 @@ import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import {
   ReleaseUserExtraOpenedWorksheetsInQueueService
 } from './service/release-user-extra-opened-worksheets-in-queue.service'
-import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { LegacyWorksheetQueueRepository } from './models/legacy-worksheet-queue.repository'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
@@ -15,6 +14,7 @@ import {
   SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
 } from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
 import { CallcenterWorksheetService } from './service/callcenter-worksheet.service'
+import { CouchbaseWorksheetQueueRepository } from './repository/couchbase-worksheet-queue.repository'
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
@@ -33,7 +33,7 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
     worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
-    couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
+    couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton(),
     worksheetQueueRepository: aliasTo('couchbaseWorksheetQueueRepository'),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
     legacyWorksheetQueueRepository: asClass(LegacyWorksheetQueueRepository).classic().singleton()
