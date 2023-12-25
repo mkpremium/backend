@@ -12,6 +12,7 @@ import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 import { AddContactService, MaybeFeaturedContact } from '../../../src/owner/service/add-contact.service'
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { ProposalProps } from '../../../src/building/building'
+import { addProposal } from '../../worksheet/helpers'
 
 describe('AddProposalForBuilding - Integration (Postgres)', () => {
   it('saves proposal for building', async () => {
@@ -44,27 +45,20 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
     }) as MaybeFeaturedContact
     const testFlipper = await addFlipperService.addFlipper(Factory.build('user'))
 
-    const testCmd = {
-      buildingId: testBuilding.id,
-      ownerId: testOwner.id,
-      amount: 1000,
-      contactId: testEmailContact.id,
-      createdBy: testFlipper.user.id,
-      message: 'test email message'
-    }
+    const proposalAmount = 1_000
 
-    await addProposalForBuildingService.add(testCmd.buildingId, testCmd)
+    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
 
-    const proposals = await buildingsReadRepository.listProposalsForBuilding(testCmd.buildingId)
+    const proposals = await buildingsReadRepository.listProposalsForBuilding(testBuilding.id)
     expect(proposals).to.have.lengthOf(1)
     expect(proposals[ 0 ]).to.be.deep.contains({
-      ownerId: testCmd.ownerId,
-      createdBy: testCmd.createdBy,
-      message: testCmd.message,
+      ownerId: testOwner.id,
+      createdBy: testFlipper.user.id,
+      message: 'test email message',
       notificationStatus: 'PENDING',
       notificationEmail: testEmailContact.value,
     })
-    expect((proposals[0] as ProposalProps).proposal).to.be.closeTo(testCmd.amount, 0.001)
+    expect((proposals[0] as ProposalProps).proposal).to.be.closeTo(proposalAmount, 0.001)
     expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
       .to.be.true
   })

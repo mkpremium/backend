@@ -14,6 +14,7 @@ import { BuildingsReadRepository } from '../../../src/building/repository/buildi
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { Factory } from 'rosie'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
+import { addProposal } from '../helpers'
 
 describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
@@ -53,15 +54,7 @@ describe('CallcenterWorksheetService', () => {
     }) as MaybeFeaturedContact
     const testFlipper = await addFlipperService.addFlipper(Factory.build('user'))
 
-    const testAddProposalCommand = {
-      buildingId: testBuilding.id,
-      ownerId: testOwner.id,
-      amount: 1_000,
-      contactId: testEmailContact.id,
-      createdBy: testFlipper.user.id,
-      message: 'test email message'
-    }
-    await addProposalForBuildingService.add(testBuilding.id, testAddProposalCommand)
+    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
 
     await worksheetRepository.save(worksheetBuilder({
         id: testWorksheetId,
