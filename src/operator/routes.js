@@ -7,7 +7,6 @@ import {
   limitedListOperatorController,
   listOperatorController,
   refreshTokenController,
-  selfCallCenterWorkInProgressController,
   updateOperatorController
 } from './controllers'
 
@@ -24,8 +23,6 @@ export function operatorRouter (diContainer) {
 
   router.get('/', permissions.admin, listOperatorController)
   router.get('/business', limitedListOperatorController)
-
-  router.get('/me', selfCallCenterWorkInProgressController)
 
   return router
 }

@@ -80,12 +80,9 @@ QueueRequestParams.dispatch = function (x) {
 }
 
 export class LegacyWorksheetRepository extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = Worksheet
-  }
+  protected Struct = Worksheet
 
-  async findByIdOrThrow (worksheetId) {
+  async findByIdOrThrow (worksheetId: string) {
     const worksheet = await this.findById(worksheetId)
     if (!worksheet) {
       throw newHttpError(404, `La hoja de trabajo ${worksheetId} no existe`)

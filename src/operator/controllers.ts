@@ -62,18 +62,7 @@ async function limitedListOperator (req, res) {
   res.json(operators)
 }
 
-async function selfCallCenterWorkInProgress (req, res) {
-  const queueId = _get(req, 'user.operator.profile.queueId', null)
-  const operatorId = _get(req, 'user.operator.id', null)
-
-  const repoWorksheetQueue = new LegacyWorksheetQueueRepository()
-  const queueItem = await repoWorksheetQueue.findItemByOperator(queueId, operatorId)
-
-  res.json(Object.assign({}, req.user.operator, { activeCall: null, queueItem }))
-}
-
 export const listOperatorController = wrap(listOperator)
 export const limitedListOperatorController = wrap(limitedListOperator)
-export const selfCallCenterWorkInProgressController = wrap(selfCallCenterWorkInProgress)
 export const refreshTokenController = wrap(refreshToken)
 export const updateOperatorController = wrap(updateOperator)
