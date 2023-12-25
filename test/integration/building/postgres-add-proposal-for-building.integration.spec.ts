@@ -12,7 +12,7 @@ import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 import { AddContactService, MaybeFeaturedContact } from '../../../src/owner/service/add-contact.service'
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { ProposalProps } from '../../../src/building/building'
-import { addProposal } from '../../worksheet/helpers'
+import { addProposal, createOwnerWithEmailContact } from '../../worksheet/helpers'
 
 describe('AddProposalForBuilding - Integration (Postgres)', () => {
   it('saves proposal for building', async () => {
@@ -26,28 +26,12 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
     } = await buildDependencies()
 
     const testBuilding = await buildingsRepository.save(buildingBuilder().build())
-    const testOwner = await addOwnerService.addOwner({
-      status: 'VERIFICADO',
-      buildingId: testBuilding.id,
-      note: 'test note',
-      type: 'PRINCIPAL',
-      person: {
-        name: 'Full Name',
-        firstName: 'Full',
-        firstSurname: 'Name',
-        contacts: []
-      }
-    }, 'test-requester-id')
-    const testEmailContact = await addContactService.addContact({
-      ...Factory.build('email-contact'),
-      isFeatured: true,
-      ownerId: testOwner.id
-    }) as MaybeFeaturedContact
+    const [ testOwner, testEmailContact ] =
+      await createOwnerWithEmailContact(testBuilding, addOwnerService, addContactService)
     const testFlipper = await addFlipperService.addFlipper(Factory.build('user'))
 
-    const proposalAmount = 1_000
-
-    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
+    const addProposalCmd =
+      await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
 
     const proposals = await buildingsReadRepository.listProposalsForBuilding(testBuilding.id)
     expect(proposals).to.have.lengthOf(1)
@@ -58,7 +42,7 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
       notificationStatus: 'PENDING',
       notificationEmail: testEmailContact.value,
     })
-    expect((proposals[0] as ProposalProps).proposal).to.be.closeTo(proposalAmount, 0.001)
+    expect((proposals[ 0 ] as ProposalProps).proposal).to.be.closeTo(addProposalCmd.amount, 0.001)
     expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
       .to.be.true
   })

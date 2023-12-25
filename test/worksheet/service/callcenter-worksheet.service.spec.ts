@@ -14,7 +14,7 @@ import { BuildingsReadRepository } from '../../../src/building/repository/buildi
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { Factory } from 'rosie'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
-import { addProposal } from '../helpers'
+import { addProposal, createOwnerWithEmailContact } from '../helpers'
 
 describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
@@ -35,23 +35,8 @@ describe('CallcenterWorksheetService', () => {
       },
     }).build())
 
-    const testOwner = await addOwnerService.addOwner({
-      status: 'VERIFICADO',
-      buildingId: testBuilding.id,
-      note: 'test note',
-      type: 'PRINCIPAL',
-      person: {
-        name: 'Full Name',
-        firstName: 'Full',
-        firstSurname: 'Name',
-        contacts: []
-      }
-    }, 'test-requester-id')
-    const testEmailContact = await addContactService.addContact({
-      ...Factory.build('email-contact'),
-      isFeatured: true,
-      ownerId: testOwner.id
-    }) as MaybeFeaturedContact
+    const [ testOwner, testEmailContact ] =
+      await createOwnerWithEmailContact(testBuilding, addOwnerService, addContactService)
     const testFlipper = await addFlipperService.addFlipper(Factory.build('user'))
 
     await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
