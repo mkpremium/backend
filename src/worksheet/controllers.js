@@ -63,14 +63,6 @@ const queueList = worksheetQueueRepository => async (req, res) => {
   res.json(queues)
 }
 
-/**
- * @param {Logger} logger
- */
-const actionsOnWorksheetQueue = logger => async (req, res) => {
-  logger.error('Actions on worksheet queue endpoint hit', { headers: req.headers })
-  return res.status(400).send('Deprecated endpoint')
-}
-
 function operatorIdByPermissions (req) {
   const allowQuery = req.user.permissions.indexOf(UserRoles.MANAGER) !== -1
   return allowQuery
@@ -103,7 +95,6 @@ const getScheduledWorksheets = worksheetQueueRepository => async (req, res) => {
 export const worksheetListController = wrap(worksheetList)
 export const updateWorksheetStatusController = worksheetRepository => wrap(updateWorksheetStatus(worksheetRepository))
 export const queueListController = worksheetQueueRepository => wrap(queueList(worksheetQueueRepository))
-export const actionsOnWorksheetQueueController = logger => wrap(actionsOnWorksheetQueue(logger))
 export const queueTakenFindByOperatorController = worksheetQueueRepository => wrap(queueTakenFindByOperator(worksheetQueueRepository))
 export const createQueueController = worksheetQueueRepository => wrap(createQueue(worksheetQueueRepository))
 export const updateQueueController = worksheetQueueRepository => wrap(updateQueue(worksheetQueueRepository))

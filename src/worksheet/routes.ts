@@ -3,7 +3,6 @@ import { wrap } from 'express-promise-wrap'
 import { permissions } from '../middleware/jwt'
 import { createTakeWorksheetIntoQueueController } from './controller/take-worksheet.controller'
 import {
-  actionsOnWorksheetQueueController,
   createQueueController,
   deleteQueueController,
   getScheduledWorksheetsController,
@@ -27,8 +26,6 @@ export function worksheetRoutes (container: AwilixContainer) {
   router.post('/queues', permissions.manager, createQueueController(legacyWorksheetQueueRepository))
 
   router.get('/queues/:id/taken', queueTakenFindByOperatorController(legacyWorksheetQueueRepository))
-
-  router.post('/queues/:id', actionsOnWorksheetQueueController(container.resolve('logger')))
 
   router.post('/queues/:queueId/worksheets/:worksheetId', permissions.operator, wrap(
     createTakeWorksheetIntoQueueController(container.resolve('worksheetQueueActionsService'))
