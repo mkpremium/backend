@@ -1,5 +1,4 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
-import { LegacyWorksheetQueueRepository } from '../../worksheet/models/legacy-worksheet-queue.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'

@@ -6,7 +6,6 @@ import {
   ReleaseUserExtraOpenedWorksheetsInQueueService
 } from './service/release-user-extra-opened-worksheets-in-queue.service'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
-import { LegacyWorksheetQueueRepository } from './models/legacy-worksheet-queue.repository'
 import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { CouchbaseWorksheetRepository } from './repository/couchbase-worksheet.repository'
 import { PostgresWorksheetRepository } from './repository/postgres-worksheet.repository'
@@ -36,6 +35,5 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton(),
     worksheetQueueRepository: aliasTo('couchbaseWorksheetQueueRepository'),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
-    legacyWorksheetQueueRepository: asClass(LegacyWorksheetQueueRepository).classic().singleton()
   })
 }
