@@ -4,12 +4,14 @@ import { addWorksheet } from '../../../src/worksheet/service/call-scheduler.serv
 import { createTestContainer } from '../../create-test-container'
 
 describe('Worksheet scheduled calls (Couchbase)', () => {
+  let service
   let repository
   let worksheetRepository
 
   beforeEach(async () => {
     const container = await createTestContainer({couchbase: true, postgres: false})
     repository = container.resolve('couchbaseWorksheetQueueRepository')
+    service = container.resolve('callSchedulerService')
     worksheetRepository = container.resolve('worksheetRepository')
   })
 
@@ -46,13 +48,13 @@ describe('Worksheet scheduled calls (Couchbase)', () => {
 
     it('schedules call for worksheet in queue', async () => {
       const queueWithWorksheet = await repository.save(addWorksheet(testWorksheetQueue, testWorksheet))
-      const scheduledCall = await repository.scheduleWorksheetInQueue(queueWithWorksheet, testCallToSchedule)
+      const scheduledCall = await service.scheduleWorksheetInQueue(queueWithWorksheet, testCallToSchedule)
 
       expect(scheduledCall).to.not.be.empty
     })
 
     it('schedules call and adds worksheet to queue', async () => {
-      const scheduledCall = await repository.scheduleWorksheetInQueue(testWorksheetQueue, testCallToSchedule)
+      const scheduledCall = await service.scheduleWorksheetInQueue(testWorksheetQueue, testCallToSchedule)
 
       expect(scheduledCall).to.not.be.empty
 
