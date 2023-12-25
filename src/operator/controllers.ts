@@ -2,8 +2,6 @@ import { wrap } from 'express-promise-wrap'
 import { OperatorRepository } from './models'
 import { History } from '../history/models'
 import { canManageOperator } from '../lib/role-operators'
-import { LegacyWorksheetQueueRepository } from '../worksheet/models/queue-repository'
-import _get from 'lodash/get'
 import { OperatorRefreshTokenRepository } from './operatorRefreshTokenRepository'
 import { AddOperatorService } from '../user/service/add-operator.service'
 
