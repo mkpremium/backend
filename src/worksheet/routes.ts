@@ -14,6 +14,7 @@ import {
   worksheetListController
 } from './controllers'
 import { AwilixContainer } from 'awilix'
+import { createStatusChangedController } from './controller/status-changed.controller'
 
 export function worksheetRoutes (container: AwilixContainer) {
   const router = Router()
@@ -41,7 +42,9 @@ export function worksheetRoutes (container: AwilixContainer) {
 
   router.put('/:id/status', updateWorksheetStatusController(container.resolve('worksheetRepository')))
 
-  router.post('/status-changed', wrap(container.resolve('worksheetStatusChangedController')))
+  router.post('/status-changed', wrap(
+    container.resolve('worksheetStatusChangedController') as ReturnType<typeof createStatusChangedController>
+  ))
 
   return router
 }
