@@ -92,7 +92,7 @@ describe('Worksheet scheduled calls', () => {
       relatedBuildingIds: [ testBuilding.id ],
     })
     testWorksheetQueue = await queuesRepository.save({
-      name: 'test worksheet',
+      name: 'test worksheet queue',
       worksheets: []
     })
   }
