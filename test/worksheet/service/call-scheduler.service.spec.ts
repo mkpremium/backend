@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 
-import { addWorksheet } from '../../../src/worksheet/service/call-scheduler.service'
+import { addWorksheet, CallSchedulerService } from '../../../src/worksheet/service/call-scheduler.service'
 import { createTestContainer } from '../../create-test-container'
 
 describe('Worksheet scheduled calls', () => {
-  let service
+  let service: CallSchedulerService
   let repository
   let worksheetRepository
 
@@ -25,7 +25,7 @@ describe('Worksheet scheduled calls', () => {
       },
     notifyAt: '2020-11-14T08:00:00.000Z',
     eventDate: '2020-11-14T08:00:00.000Z'
-  }
+  } as any
 
   describe.skip('with Postgres', () => {
     beforeEach(async () => {
@@ -72,10 +72,11 @@ describe('Worksheet scheduled calls', () => {
     expect(updatedQueue.worksheets.length).to.be.equal(1)
     expect(updatedQueue.worksheets[ 0 ].worksheetId).to.be.equal(testWorksheet.id)
   }
+
   async function beforeEachSetup (usePostgres: boolean) {
     const container = await createTestContainer({ couchbase: !usePostgres, postgres: usePostgres })
 
-    repository = container.resolve('couchbaseWorksheetQueueRepository')
+    repository = container.resolve('worksheetQueueRepository')
     service = container.resolve('callSchedulerService')
     worksheetRepository = container.resolve('worksheetRepository')
 

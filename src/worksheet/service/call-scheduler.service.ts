@@ -10,17 +10,19 @@ import { CouchbaseWorksheetQueueRepository } from '../repository/couchbase-works
 import { LegacyWorksheetRepository } from '../models/worksheet-repository'
 import _find from 'lodash/find'
 import { WorksheetProps } from '../domain/worksheet'
+import { WorksheetRepository } from '../repository/worksheet.repository'
+import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
 
 export class CallSchedulerService {
   constructor (
-    private legacyWorksheetRepository: LegacyWorksheetRepository,
-    private couchbaseWorksheetQueueRepository: CouchbaseWorksheetQueueRepository,
+    private worksheetRepository: WorksheetRepository,
+    private worksheetQueueRepository: WorksheetQueueRepository,
   ) {
   }
 
   async scheduleWorksheetInQueue (queue: WorksheetQueueProps, scheduledEvent: ScheduledEventProps): Promise<QueueItemProps> {
     const worksheetId = scheduledEvent.event.worksheetId
-    const worksheet = await this.legacyWorksheetRepository.findById(worksheetId)
+    const worksheet = await this.worksheetRepository.get(worksheetId)
     if (!worksheet) {
       throw newHttpError(409, `La hoja de trabajo ${worksheetId} no puede abrirse, comuníquese con su administrador`)
     }
@@ -41,7 +43,7 @@ export class CallSchedulerService {
       queueId: queue.id
     })
 
-    await this.couchbaseWorksheetQueueRepository.save(updatedQueue)
+    await this.worksheetQueueRepository.save(updatedQueue)
 
     return updatedItem
   }
