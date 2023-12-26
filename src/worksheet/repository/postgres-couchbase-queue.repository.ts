@@ -3,10 +3,11 @@ import { WorksheetQueueRepository } from './worksheet-queue.repository'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { WorksheetQueue } from '../worksheet-queue.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
+import { BaseEntity } from '../../infrastructure/entity'
 
-export class PostgresCouchbaseQueueRepository extends PostgresRepository<WorksheetQueueProps, WorksheetQueue>
+export class PostgresCouchbaseQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
   implements WorksheetQueueRepository {
-  findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps> {
+  findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps & BaseEntity> {
     throw new Error('Method not implemented.')
   }
 
@@ -14,8 +15,14 @@ export class PostgresCouchbaseQueueRepository extends PostgresRepository<Workshe
     throw new Error('Method not implemented.')
   }
 
-  protected structToEntity (struct: WorksheetQueueProps): DeepPartial<WorksheetQueue> {
-    throw new Error('Method not implemented.')
+  protected structToEntity (struct: WorksheetQueueProps & Partial<BaseEntity>): DeepPartial<WorksheetQueue> {
+    return {
+      id: struct.id,
+      name: struct.name,
+      worksheets: struct.worksheets,
+      createdAt: struct.createdAt,
+      updatedAt: struct.updatedAt,
+    }
   }
 
   protected entityToStruct (entity: WorksheetQueue): WorksheetQueueProps {

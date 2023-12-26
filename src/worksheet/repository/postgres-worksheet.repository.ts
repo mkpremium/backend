@@ -2,12 +2,13 @@ import { PostgresRepository } from '../../infrastructure/postgres/postgres-repos
 import { WorksheetProps } from '../domain/worksheet'
 import { Worksheet } from '../worksheet.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
-import { WorksheetRepository, WorksheetViewProps } from './worksheet.repository'
-import { mapEntityToReadModel } from '../../building/repository/postgres-buildings.repository'
+import { WorksheetRepository } from './worksheet.repository'
 
 export class PostgresWorksheetRepository extends PostgresRepository<WorksheetProps, Worksheet> implements WorksheetRepository {
   protected relations = {
-    building: true
+    building: true,
+    queue: true,
+    lastViewedBy: true,
   }
 
   ofBuildingId (buildingId: string): Promise<WorksheetProps> {
@@ -15,11 +16,17 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
   }
 
   protected entityToStruct (entity: Worksheet): WorksheetProps {
-    throw new Error('Not implemented')
-  }
-
-  protected getEntityTarget (): EntityTarget<Worksheet> {
-    return Worksheet
+    return {
+      id: entity.id,
+      status: entity.status,
+      queueId: entity.queue?.id,
+      relatedBuildingIds: [ entity.building.id ],
+      statusChangedAt: entity.lastStatusChangedAt,
+      viewedAt: entity.lastViewedAt,
+      viewedBy: entity.lastViewedBy?.id,
+      statusChangeReason: entity.statusChangeReason,
+      buildingAddress: entity.building.address,
+    }
   }
 
   protected structToEntity (struct: WorksheetProps): DeepPartial<Worksheet> {
@@ -30,10 +37,14 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
       statusChangeReason: struct.statusChangeReason,
       lastViewedAt: struct.viewedAt,
       lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
-      building: { id: struct.relatedBuildingIds[0] },
+      building: { id: struct.relatedBuildingIds[ 0 ] },
       createdAt: new Date(),
       updatedAt: new Date(),
       queue: struct.queueId ? { id: struct.queueId } : null,
     })
+  }
+
+  protected getEntityTarget (): EntityTarget<Worksheet> {
+    return Worksheet
   }
 }
