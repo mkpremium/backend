@@ -15,7 +15,7 @@ import {
 import { CallcenterWorksheetService } from './service/callcenter-worksheet.service'
 import { CouchbaseWorksheetQueueRepository } from './repository/couchbase-worksheet-queue.repository'
 import { CallSchedulerService } from './service/call-scheduler.service'
-import { PostgresCouchbaseQueueRepository } from './repository/postgres-couchbase-queue.repository'
+import { PostgresWorksheetQueueRepository } from './repository/postgres-worksheet-queue.repository'
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
@@ -36,7 +36,7 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
     worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
     couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton(),
-    postgresCouchbaseQueueRepository: asClass(PostgresCouchbaseQueueRepository).classic().singleton(),
+    postgresCouchbaseQueueRepository: asClass(PostgresWorksheetQueueRepository).classic().singleton(),
     worksheetQueueRepository: aliasTo(usePostgres ? 'postgresCouchbaseQueueRepository' :'couchbaseWorksheetQueueRepository'),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
   })

@@ -5,7 +5,7 @@ import { WorksheetQueue } from '../worksheet-queue.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
 import { BaseEntity } from '../../infrastructure/entity'
 
-export class PostgresCouchbaseQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
+export class PostgresWorksheetQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
   implements WorksheetQueueRepository {
   findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps & BaseEntity> {
     throw new Error('Method not implemented.')
