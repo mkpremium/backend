@@ -16,7 +16,7 @@ import moment from 'moment'
 export class PostgresBuildingsRepository
   extends PostgresRepository<BuildingProps, Building>
   implements BuildingsRepository, BuildingsReadRepository {
-  protected relations: {
+  protected relations = {
     assignedFlipper: true,
     featuredOwner: true,
     images: true,
