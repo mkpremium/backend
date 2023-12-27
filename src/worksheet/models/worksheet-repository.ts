@@ -116,30 +116,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     return totals
   }
 
-  async countWorksheetsInSource (source) {
-    const bucket = this.getBucketName()
-    const sourceFilter = []
-    Object.keys(source).forEach(key => {
-      const value = source[ key ]
-      if (!_isNil(value)) {
-        sourceFilter.push(`t.buildingAddress.${key} IS NOT MISSING`)
-        sourceFilter.push(`t.buildingAddress.${key} = ${JSON.stringify(value)}`)
-      }
-    })
-    const filter = sourceFilter.length > 0
-      ? 'AND ' + sourceFilter.join(' AND ')
-      : ''
-
-    const baseQuery = `SELECT COUNT(*) as count
-                       FROM ${bucket} t
-                       WHERE (t._documentType = 'worksheet')
-                         AND (queueId IS NULL)
-                         AND (status = 'OPEN'
-                          OR status = 'LOOKING_MEETING') ${filter}`
-    const results = await this.queryRaw(baseQuery)
-    return _get(results, '0.count', 0)
-  }
-
   async list (query = {}) {
     const params = new WorksheetListQuery(query)
     const qb = this.getQueryBuilder('select')
