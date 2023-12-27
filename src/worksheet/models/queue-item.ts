@@ -45,12 +45,3 @@ export const QueueItem = t.struct<QueueItemProps>({
     }
   }
 )
-
-export function removeScheduledCallFromItem (queueItem) {
-  t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
-
-  return QueueItem.update(queueItem, {
-    status: { $set: queueItem.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
-    event: { $set: undefined }
-  })
-}

@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { QueueItem, QueueStatus, removeScheduledCallFromItem } from '../models/queue-item'
+import { QueueItem, QueueStatus } from '../models/queue-item'
 import _ from 'lodash'
 import _get from 'lodash/get'
 
@@ -88,3 +88,12 @@ export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId
 export const WorksheetQueueCount = WorksheetQueue.extend({
   possibleNumberOfWorksheets: t.Number
 })
+
+function removeScheduledCallFromItem (queueItem) {
+  t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
+
+  return QueueItem.update(queueItem, {
+    status: { $set: queueItem.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
+    event: { $set: undefined }
+  })
+}
