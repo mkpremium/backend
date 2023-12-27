@@ -85,10 +85,6 @@ export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId
   })
 }
 
-export const WorksheetQueueCount = WorksheetQueue.extend({
-  possibleNumberOfWorksheets: t.Number
-})
-
 function removeScheduledCallFromItem (queueItem) {
   t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
 
