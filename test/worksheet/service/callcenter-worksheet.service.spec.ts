@@ -14,38 +14,31 @@ import { AddFlipperService } from '../../../src/flipper/service/add-flipper.serv
 import { Factory } from 'rosie'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 import { addProposal, createOwnerWithEmailContact } from '../../helpers'
+import { buildingFactory } from '../../factories'
 
 describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
-    const {
-      addContactService,
-      addFlipperService,
-      addOwnerService,
-      addProposalForBuildingService,
-      callcenterWorksheetService,
-      worksheetRepository,
-      buildingsRepository,
-    } = await buildDependencies()
+    const deps = await buildDependencies()
 
-    const testBuilding = await buildingsRepository.save(buildingBuilder({
+    const testBuilding = await deps.buildingsRepository.save(buildingBuilder({
       cadastre: {
         reference: 'test-cadastre-reference',
       },
     }).build())
 
     const [ testOwner, testEmailContact ] =
-      await createOwnerWithEmailContact(testBuilding, addOwnerService, addContactService)
-    const testFlipper = await addFlipperService.addFlipper(Factory.build('user'))
+      await createOwnerWithEmailContact(testBuilding, deps)
+    const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
-    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, addProposalForBuildingService)
+    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps.addProposalForBuildingService)
 
-    const testWorksheet = await worksheetRepository.save(worksheetBuilder({
+    const testWorksheet = await deps.worksheetRepository.save(worksheetBuilder({
         relatedBuildingIds: [ testBuilding.id ]
       }).build()
     )
 
     const result =
-      await callcenterWorksheetService.getWorksheetForCallcenterView(testWorksheet.id)
+      await deps.callcenterWorksheetService.getWorksheetForCallcenterView(testWorksheet.id)
     expect(validate(result, CallcenterView).errors).to.deep.equal([])
     // // TODO: assert owner
     expect(result.building.latestProposal).not.to.be.undefined
@@ -53,7 +46,7 @@ describe('CallcenterWorksheetService', () => {
   })
 })
 
-async function buildDependencies (): Promise<{
+interface Deps {
   addContactService: AddContactService,
   addOwnerService: AddOwnerService,
   addProposalForBuildingService: AddProposalForBuildingService,
@@ -63,8 +56,10 @@ async function buildDependencies (): Promise<{
   buildingsRepository: BuildingsRepository,
   buildingsReadRepository: BuildingsReadRepository,
   addFlipperService: AddFlipperService,
-}> {
-  const container = await createTestContainer({ couchbase: true, postgres: true })
+}
+
+async function buildDependencies (): Promise<Deps> {
+  const container = await createTestContainer({ couchbase: false, postgres: true })
 
   return {
     addContactService: container.resolve('addContactService'),

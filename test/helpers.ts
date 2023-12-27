@@ -34,7 +34,7 @@ export async function addProposal (testBuilding: BuildingProps, testOwner: {
 }
 
 export async function createOwnerWithEmailContact (
-  testBuilding: BuildingProps, addOwnerService: AddOwnerService, addContactService: AddContactService) {
+  testBuilding: BuildingProps, { addOwnerService, addContactService }) {
   const testOwner = await addOwnerService.addOwner({
     status: 'VERIFICADO',
     buildingId: testBuilding.id,
