@@ -3,20 +3,18 @@ import { ScheduledEventProps } from '../../scheduled-events/types'
 import { QueueItem, QueueItemProps, QueueStatus } from '../models/queue-item'
 import { newHttpError } from '../../lib/http-error'
 import _ from 'lodash'
-import { updateList } from '../../lib/tcomb-utils'
 import t from 'tcomb'
-import { logger } from '../../infrastructure/logger'
-import { CouchbaseWorksheetQueueRepository } from '../repository/couchbase-worksheet-queue.repository'
-import { LegacyWorksheetRepository } from '../models/worksheet-repository'
 import _find from 'lodash/find'
 import { WorksheetProps } from '../domain/worksheet'
 import { WorksheetRepository } from '../repository/worksheet.repository'
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
+import { Logger } from 'winston'
 
 export class CallSchedulerService {
   constructor (
     private worksheetRepository: WorksheetRepository,
     private worksheetQueueRepository: WorksheetQueueRepository,
+    private logger: Logger,
   ) {
   }
 
@@ -30,6 +28,7 @@ export class CallSchedulerService {
     const operatorId = scheduledEvent.notifyTo
     let item = findItemByWorksheetId(queue, worksheetId)
     if (!item) {
+      this.logger.warning('Worksheet added to queue while scheduling', {worksheetId: worksheet.id, queueId: queue.id})
       queue = addWorksheet(queue, worksheet)
       item = _.find(queue.worksheets, i => i.worksheetId === worksheetId)
     }
@@ -38,7 +37,7 @@ export class CallSchedulerService {
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
     const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
 
-    logger.info('WorksheetQueueRepository#scheduleWorksheetInQueue worksheet from queue', {
+    this.logger.info('WorksheetQueueRepository#scheduleWorksheetInQueue worksheet from queue', {
       worksheetId: worksheet.id,
       queueId: queue.id
     })
@@ -79,4 +78,9 @@ function schedule (item: QueueItemProps, operatorId: string, scheduledEvent: Sch
       }
     }
   }) as QueueItemProps
+}
+
+function updateList (list, currentItem, newValues) {
+  const index = list.indexOf(currentItem)
+  return t.update(list, { [index]: { $set: newValues } })
 }
