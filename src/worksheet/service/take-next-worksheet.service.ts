@@ -6,7 +6,7 @@ import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.e
 import { CallcenterWorksheetService } from './callcenter-worksheet.service'
 
 export interface InvalidWorksheetFound {
-  name: 'worksheet.invalid_worksheet_found';
+  name: DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND;
   worksheetId: string;
 }
 
@@ -31,7 +31,7 @@ export class TakeNextWorksheetService {
     } catch (error) {
       if (error instanceof WorksheetNotFound) {
         await this.eventBus.publish({
-          name: 'worksheet.invalid_worksheet_found',
+          name: DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND,
           worksheetId: error.worksheetId,
         } as InvalidWorksheetFound)
         worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId, error.worksheetId)

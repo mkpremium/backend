@@ -54,7 +54,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
     })
 
   eventBus.on(
-    'worksheet.invalid_worksheet_found',
+    DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND,
     'worksheet.invalidate_worksheet',
     invalidateWorksheet
   )

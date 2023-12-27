@@ -16,6 +16,7 @@ export enum DomainEventCatalog {
   SCHEDULED_EVENTS__CALL_UPDATED = 'scheduled_events.call_updated',
   SCHEDULED_EVENTS__EVENT_DELETED = 'scheduled_events.event_deleted',
 
+  WORKSHEET__INVALID_WORKSHEET_FOUND = 'worksheet.invalid_worksheet_found',
   WORKSHEET__NEXT_IN_QUEUE_TAKEN = 'worksheet.next_in_queue_taken',
   WORKSHEET__TAKEN = 'worksheet.taken',
 }
