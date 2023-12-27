@@ -19,7 +19,8 @@ export class CallcenterWorksheetService {
   nextAvailableWorksheetInSource (source: {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    return this.couchbaseWorksheetRepository.nextAvailableWorksheetInSource(source, skipWorksheetId)
+    return this.usePostgres ? this.nextAvailableWorksheetInSourcePostgres(source, skipWorksheetId) :
+      this.couchbaseWorksheetRepository.nextAvailableWorksheetInSource(source, skipWorksheetId)
   }
 
   private async getPostgresWorksheet (worksheetId: string): Promise<WorksheetViewProps> {
@@ -41,6 +42,26 @@ export class CallcenterWorksheetService {
         }
       }
     )
+
+    return {
+      id: ws.id,
+      status: ws.status,
+      queueId: ws.queue?.id,
+      building: mapEntityToReadModel(ws.building),
+      // relatedOwners: ws.building.owners.map(owner => ({}))
+      relatedOwners: []
+    }
+  }
+
+  private async nextAvailableWorksheetInSourcePostgres (source: {
+    province: string | string[]
+  }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
+    const ws = await this.ormDataSource.manager.createQueryBuilder(Worksheet, 'worksheet')
+      .innerJoinAndSelect('worksheet.building', 'building')
+      .leftJoinAndSelect('building.images', 'images')
+      .where('building.address ::jsonb @> :address', { address: { province: source.province } })
+      .orderBy('worksheet.lastViewedAt')
+      .getOne()
 
     return {
       id: ws.id,

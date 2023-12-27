@@ -44,6 +44,22 @@ describe('CallcenterWorksheetService', () => {
     expect(result.building.latestProposal).not.to.be.undefined
     expect(result.building.cadastreReference).to.be.equal('test-cadastre-reference')
   })
+
+  it('gets next available worksheet in source', async () => {
+    const deps = await buildDependencies()
+
+    const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
+
+    await createOwnerWithEmailContact(testBuilding, deps)
+
+    const testWorksheet = await deps.worksheetRepository.save(worksheetBuilder({
+        relatedBuildingIds: [ testBuilding.id ]
+      }).build())
+
+    const nextWorksheet = await deps.callcenterWorksheetService.nextAvailableWorksheetInSource({province: testBuilding.address.province})
+
+    expect(nextWorksheet.id).to.be.equal(testWorksheet.id)
+  })
 })
 
 interface Deps {
