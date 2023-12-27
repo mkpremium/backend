@@ -11,7 +11,7 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
   ) {
   }
 
-  async release (userId, queueId) {
+  async release (userId: string, queueId: string) {
     const queue = await this.worksheetQueueRepository.get(queueId)
     if (queue.worksheets.length <= this.maxOpenedWorksheetPerQueueAndUser) {
       return
