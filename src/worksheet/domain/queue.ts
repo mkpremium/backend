@@ -62,7 +62,7 @@ const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser): 
   return _.map(_.drop(userOpenedWorksheets, maxOpenedWorksheetsByUser), 'worksheetId')
 }
 
-export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number) {
+export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): [Object, string[]] {
   const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
 
   return [
