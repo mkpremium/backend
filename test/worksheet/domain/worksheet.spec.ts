@@ -1,4 +1,3 @@
-import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 import {
   releaseWorksheet,
   takeWorksheet,
@@ -6,9 +5,10 @@ import {
   WorksheetStatusType
 } from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
-import { QueueItem, removeScheduledCallFromItem } from '../../../src/worksheet/models/queue-item'
+import { QueueItem } from '../../../src/worksheet/models/queue-item'
 import { worksheetBuilder } from '../worksheet.builder'
 import { worksheetQueueBuilder } from '../worksheet-queue.builder'
+import { removeScheduledCallFromItem } from '../../../src/worksheet/domain/queue'
 
 const testWorksheet = worksheetBuilder().build()
 

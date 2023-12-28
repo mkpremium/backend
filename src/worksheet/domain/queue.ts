@@ -86,7 +86,7 @@ export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId
   })
 }
 
-function removeScheduledCallFromItem (queueItem: QueueItemProps) {
+export function removeScheduledCallFromItem (queueItem: QueueItemProps) {
   t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
 
   return QueueItem.update(queueItem, {
