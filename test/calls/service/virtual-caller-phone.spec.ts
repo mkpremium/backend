@@ -84,7 +84,6 @@ describe('VirtualCallerPhone', () => {
     expect(twilioClientStub.calls.create.lastCall.firstArg).to.include({
       callerId: testVirtualCallerPhoneNumber,
       from: testVirtualCallerPhoneNumber,
-      // TODO body
       to: '+34' + testCmd.contact.value,
       machineDetection: 'Enable',
       asyncAmd: 'true',
