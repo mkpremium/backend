@@ -25,32 +25,24 @@ export class CallcenterWorksheetService {
 
   private async getPostgresWorksheet (worksheetId: string): Promise<WorksheetViewProps> {
     const ws = await this.ormDataSource.manager.findOne(Worksheet, {
-        where: { id: worksheetId },
-        relations: {
-          queue: true,
-          building: {
-            images: true,
-            proposals: true,
-            owners: {
-              person: {
-                contacts: {
-                  contact: true
-                }
+      where: { id: worksheetId },
+      relations: {
+        queue: true,
+        building: {
+          images: true,
+          proposals: true,
+          owners: {
+            person: {
+              contacts: {
+                contact: true
               }
             }
           }
         }
       }
-    )
+    })
 
-    return {
-      id: ws.id,
-      status: ws.status,
-      queueId: ws.queue?.id,
-      building: mapEntityToReadModel(ws.building),
-      // relatedOwners: ws.building.owners.map(owner => ({}))
-      relatedOwners: []
-    }
+    return toView(ws)
   }
 
   private async nextAvailableWorksheetInSourcePostgres (source: {
@@ -58,18 +50,32 @@ export class CallcenterWorksheetService {
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     const ws = await this.ormDataSource.manager.createQueryBuilder(Worksheet, 'worksheet')
       .innerJoinAndSelect('worksheet.building', 'building')
+      .innerJoinAndSelect('building.owners', 'owners')
+      .innerJoinAndSelect('owners.person', 'person')
+      .innerJoinAndSelect('person.contacts', 'contacts')
+      .innerJoinAndSelect('contacts.contact', 'contact')
       .leftJoinAndSelect('building.images', 'images')
       .where('building.address ::jsonb @> :address', { address: { province: source.province } })
       .orderBy('worksheet.lastViewedAt')
       .getOne()
 
-    return {
-      id: ws.id,
-      status: ws.status,
-      queueId: ws.queue?.id,
-      building: mapEntityToReadModel(ws.building),
-      // relatedOwners: ws.building.owners.map(owner => ({}))
-      relatedOwners: []
-    }
+    return toView(ws)
+  }
+}
+
+function toView (ws: Worksheet): WorksheetViewProps {
+  return {
+    id: ws.id,
+    status: ws.status,
+    queueId: ws.queue?.id,
+    building: mapEntityToReadModel(ws.building),
+    relatedOwners: ws.building.owners.map(o => ({
+      ...o,
+      type: 'PRINCIPAL', // TODO
+      name: o.person.fullName,
+      person: {
+        contacts: o.person.contacts.map(oc => ({ ...oc.contact, status: oc.status })),
+      }
+    })),
   }
 }

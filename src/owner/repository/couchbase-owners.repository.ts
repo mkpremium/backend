@@ -60,7 +60,8 @@ id,
 person.name,
 person.contacts,
 featuredContact,
-status
+status,
+type
 FROM ${bucketName} owner
 WHERE _documentType = 'owner' and buildingId = $1
 `

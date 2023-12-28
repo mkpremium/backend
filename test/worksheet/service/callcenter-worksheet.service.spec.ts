@@ -50,7 +50,8 @@ describe('CallcenterWorksheetService', () => {
 
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
 
-    await createOwnerWithEmailContact(testBuilding, deps)
+    const [ _, testEmailContact ] =
+      await createOwnerWithEmailContact(testBuilding, deps)
 
     const testWorksheet = await deps.worksheetRepository.save(worksheetBuilder({
         relatedBuildingIds: [ testBuilding.id ]
@@ -59,6 +60,7 @@ describe('CallcenterWorksheetService', () => {
     const nextWorksheet = await deps.callcenterWorksheetService.nextAvailableWorksheetInSource({province: testBuilding.address.province})
 
     expect(nextWorksheet.id).to.be.equal(testWorksheet.id)
+    expect(nextWorksheet.relatedOwners[0].person.contacts[0].value).to.be.equal(testEmailContact.value)
   })
 })
 

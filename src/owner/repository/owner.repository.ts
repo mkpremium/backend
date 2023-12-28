@@ -1,4 +1,4 @@
-import { ContactProps, ContactType, OwnerContactStatus, OwnerProps, OwnerStatus } from '../owner'
+import { ContactProps, ContactType, OwnerContactStatus, OwnerProps, OwnerStatus, OwnerType } from '../owner'
 import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { BuildingNegotiationStatus, NegotiationStatus } from '../../building/building'
@@ -64,6 +64,7 @@ export interface BuildingOwnerProps {
     phoneId?: string
     emailId?: string
   }
+  type: OwnerType // TODO: is still needed?
 }
 
 export const BuildingOwner = t.struct<BuildingOwnerProps>({
