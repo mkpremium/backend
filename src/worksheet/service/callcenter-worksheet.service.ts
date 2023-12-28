@@ -24,23 +24,9 @@ export class CallcenterWorksheetService {
   }
 
   private async getPostgresWorksheet (worksheetId: string): Promise<WorksheetViewProps> {
-    const ws = await this.ormDataSource.manager.findOne(Worksheet, {
-      where: { id: worksheetId },
-      relations: {
-        queue: true,
-        building: {
-          images: true,
-          proposals: true,
-          owners: {
-            person: {
-              contacts: {
-                contact: true
-              }
-            }
-          }
-        }
-      }
-    })
+    const ws = await this.getWorksheetQueryBuilder()
+      .where('worksheet.id = :worksheetId', { worksheetId })
+      .getOne()
 
     return toView(ws)
   }
@@ -48,18 +34,29 @@ export class CallcenterWorksheetService {
   private async nextAvailableWorksheetInSourcePostgres (source: {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    const ws = await this.ormDataSource.manager.createQueryBuilder(Worksheet, 'worksheet')
+    let builder = this.getWorksheetQueryBuilder()
+      .where('building.address ::jsonb @> :address', { address: { province: source.province } })
+    if (skipWorksheetId) {
+      builder = builder.where('worksheet.id != :skipWorksheetId', { skipWorksheetId })
+    }
+
+    const ws = await builder
+      .orderBy('worksheet.lastViewedAt')
+      .getOne()
+
+    return toView(ws)
+  }
+
+  private getWorksheetQueryBuilder () {
+    return this.ormDataSource.manager.createQueryBuilder(Worksheet, 'worksheet')
       .innerJoinAndSelect('worksheet.building', 'building')
       .innerJoinAndSelect('building.owners', 'owners')
       .innerJoinAndSelect('owners.person', 'person')
       .innerJoinAndSelect('person.contacts', 'contacts')
       .innerJoinAndSelect('contacts.contact', 'contact')
       .leftJoinAndSelect('building.images', 'images')
-      .where('building.address ::jsonb @> :address', { address: { province: source.province } })
-      .orderBy('worksheet.lastViewedAt')
-      .getOne()
-
-    return toView(ws)
+      .leftJoinAndSelect('worksheet.queue', 'queue')
+      .leftJoinAndSelect('building.proposals', 'proposals')
   }
 }
 
