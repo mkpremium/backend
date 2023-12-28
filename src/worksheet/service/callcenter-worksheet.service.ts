@@ -68,7 +68,6 @@ function toView (ws: Worksheet): WorksheetViewProps {
     building: mapEntityToReadModel(ws.building),
     relatedOwners: ws.building.owners.map(o => ({
       ...o,
-      type: 'PRINCIPAL', // TODO
       name: o.person.fullName,
       person: {
         contacts: o.person.contacts.map(oc => ({ ...oc.contact, status: oc.status })),

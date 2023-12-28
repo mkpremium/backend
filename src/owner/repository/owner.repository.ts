@@ -64,7 +64,7 @@ export interface BuildingOwnerProps {
     phoneId?: string
     emailId?: string
   }
-  type: OwnerType // TODO: is still needed?
+  type: OwnerType
 }
 
 export const BuildingOwner = t.struct<BuildingOwnerProps>({
