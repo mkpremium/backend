@@ -55,6 +55,16 @@ export const OwnerBusinessStatus = {
   DISCARDED: 'DESCARTADO'
 }
 
+export type OwnerType =
+  'NINGUNO'
+  | 'PRINCIPAL'
+  | 'SECUNDARIO'
+  | 'VECINO'
+  | 'FAMILIAR'
+  | 'HERMANOS'
+  | 'HIJOS'
+  | 'MISMA CASA'
+
 export const OwnerType = {
   NONE: 'NINGUNO',
   PRINCIPAL: 'PRINCIPAL',
@@ -274,16 +284,6 @@ export interface PersonProps {
 }
 
 export type OwnerStatus = 'NO_VERIFICADO' | 'VERIFICADO' | 'ERRONEO' | 'ENTE_PUBLICO' | 'WITHOUT_CONTACT'
-
-export type OwnerType =
-  'NINGUNO'
-  | 'PRINCIPAL'
-  | 'SECUNDARIO'
-  | 'VECINO'
-  | 'FAMILIAR'
-  | 'HERMANOS'
-  | 'HIJOS'
-  | 'MISMA CASA'
 
 export interface OwnerProps {
   id: string;

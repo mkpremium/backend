@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { BaseEntity } from '../infrastructure/entity'
 import { Building } from '../building/building.entity'
 import { Person } from './person.entity'
+import type { OwnerType } from './owner'
 import { OwnerStatus } from './owner'
 
 @Entity()
@@ -18,4 +19,7 @@ export class Owner extends BaseEntity {
 
   @Column('text', { default: 'NO_VERIFICADO' })
   status: OwnerStatus
+
+  @Column('text')
+  type: OwnerType
 }
