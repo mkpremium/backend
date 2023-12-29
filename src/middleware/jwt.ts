@@ -22,7 +22,6 @@ export default jwtMiddlewareAdapter
 
 function addUserInfoFactory (usersRepository: UsersRepository) {
   return async function addUserInfo (req, res, next) {
-    logger.debug('jwt-middleware#addUserInfo', req.user.id)
     const id = req.user.id
 
     return usersRepository.get(id)
