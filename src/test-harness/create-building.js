@@ -28,14 +28,14 @@ export const CreateBuildingRequest = t.struct({
   )
 })
 
-export const createBuildingFactory = (legacyBuildingsRepository, createOwner, createBuildingWorksheet) => async (req) => {
+export const createBuildingFactory = (buildingsRepository, createOwner, createBuildingWorksheet) => async (req) => {
   t.assert(CreateBuildingRequest.is(req))
   const buildingId = uuid()
   const fakedRequest = createBuildingReq(buildingId)
   const createOwnerCommands = fakedRequest.owners.map(o => CreateOwnerCmd(o))
 
   const owners = await Promise.all(createOwnerCommands.map(cmd => createOwner(cmd)))
-  const savedBuilding = await legacyBuildingsRepository.save(
+  const savedBuilding = await buildingsRepository.save(
     t.update(
       Building({ ...fakedRequest.building, isTest: true, ownerId: owners[ 0 ].id }),
       { $merge: req.owner }
