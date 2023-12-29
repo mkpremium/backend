@@ -24,7 +24,7 @@ export const createOwnerCmd = buildingId => {
 }
 
 export const createBuildingReq = (buildingId) => {
-  const streetNumber = faker.random.number().toString()
+  const streetNumber = faker.datatype.number().toString()
   const nbOfOwners = 1 + ((Math.random() * 10) % 2) // [1, 3]
 
   return ({
