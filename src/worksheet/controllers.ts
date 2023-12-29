@@ -31,7 +31,7 @@ const createQueue = (worksheetQueueRepository: WorksheetQueueRepository) => asyn
   const params = fromJSON(req.body, WorksheetQueueBody)
   const queue = await worksheetQueueRepository.save(params)
   await History.registerCreate({
-    contextModel: queue,
+    contextModel: { ...queue, _documentType: 'worksheet-queue' },
     user: req.user
   })
   res.status(201).json(queue)
