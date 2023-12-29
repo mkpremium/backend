@@ -26,7 +26,7 @@ axios.post(`${baseURL}/operators/login`, {
           })
         ])
     ).catch(error => {
-      console.error('Error!', { error })
+      console.error('Error!', { response: error.response })
       process.exit(1)
     })
     .then(() => {
@@ -53,7 +53,7 @@ function createWorksheetQueue (client) {
   return client.post('/worksheets/queues', {
       name: 'test-queue',
       source: {
-        city: 'TEST_PORTO'
+        province: 'BARCELONA'
       }
     }
   )
