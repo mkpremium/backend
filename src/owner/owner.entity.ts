@@ -20,6 +20,6 @@ export class Owner extends BaseEntity {
   @Column('text', { default: 'NO_VERIFICADO' })
   status: OwnerStatus
 
-  @Column('text')
+  @Column('text', {default: 'PRINCIPAL'})
   type: OwnerType
 }
