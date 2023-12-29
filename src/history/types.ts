@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import { ListQuery } from '../types/params'
 
-const RecordAction = t.enums.of([
+export const RecordAction = t.enums.of([
   'UPDATE',
   'CREATE',
   'DELETE',
@@ -13,7 +13,7 @@ const RecordAction = t.enums.of([
   'ERROR'
 ])
 
-t.History = t.struct({
+export const HistoryStruct = t.struct({
   id: t.maybe(t.String),
   modelName: t.String,
   modelId: t.String,
@@ -32,37 +32,7 @@ t.History = t.struct({
     }
   }
 })
-
-/**
- * @swagger
- * definitions:
- *   HistoryListResponse:
- *     required:
- *       - total
- *       - results
- *     properties:
- *       total:
- *         type: number
- *       results:
- *         type: array
- *         items:
- *           $ref: "#/definitions/History"
- */
-t.HistoryListResponse = t.struct(
-  {
-    total: t.Number,
-    results: t.list(t.History)
-  },
-  {
-    name: 'HistoryListResponse',
-    defaultProps: {
-      total: 0,
-      results: []
-    }
-  }
-)
-
-t.HistoryListQuery = ListQuery.extend(
+export const HistoryListQuery = ListQuery.extend(
   {
     actionType: t.maybe(RecordAction),
     modelName: t.maybe(t.String),
@@ -74,6 +44,19 @@ t.HistoryListQuery = ListQuery.extend(
     name: 'HistoryListQuery',
     defaultProps: {
       createdBetween: ','
+    }
+  }
+)
+export const HistoryListResponse = t.struct(
+  {
+    total: t.Number,
+    results: t.list(HistoryStruct)
+  },
+  {
+    name: 'HistoryListResponse',
+    defaultProps: {
+      total: 0,
+      results: []
     }
   }
 )

@@ -1,16 +1,13 @@
-import t from 'tcomb'
 import { CouchbaseModel } from '../db/model'
 import { getHistoryStruct } from './helper'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { addDateQueryToBuilder, addBetweenQueryToBuilder } from '../lib/query/helpers'
+import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../lib/query/helpers'
 
 import './types'
+import { HistoryListQuery, HistoryListResponse, HistoryStruct } from './types'
 
 export class History extends CouchbaseModel {
-  constructor () {
-    super()
-    this.Struct = t.History
-  }
+  Struct = HistoryStruct
 
   async register (eventData) {
     return this.save(getHistoryStruct(eventData))
@@ -22,27 +19,9 @@ export class History extends CouchbaseModel {
     return history.register(eventData)
   }
 
-  static async registerGet (eventData) {
-    const history = new History()
-    eventData.type = 'GET'
-    return history.register(eventData)
-  }
-
   static async registerUpdate (eventData) {
     const history = new History()
     eventData.type = 'UPDATE'
-    return history.register(eventData)
-  }
-
-  static async registerDelete (eventData) {
-    const history = new History()
-    eventData.type = 'DELETE'
-    return history.register(eventData)
-  }
-
-  static async registerOpen (eventData) {
-    const history = new History()
-    eventData.type = 'OPEN'
     return history.register(eventData)
   }
 
@@ -51,23 +30,11 @@ export class History extends CouchbaseModel {
     eventData.type = 'LIST'
     return history.register(eventData)
   }
-
-  static async registerTake (eventData) {
-    const history = new History()
-    eventData.type = 'TAKE'
-    return history.register(eventData)
-  }
-
-  static async registerRelease (eventData) {
-    const history = new History()
-    eventData.type = 'RELEASE'
-    return history.register(eventData)
-  }
 }
 
 export class HistoryRepository extends History {
   async list (query = {}) {
-    const params = t.HistoryListQuery(query)
+    const params = HistoryListQuery(query)
     const qb = this.getQueryBuilder('select')
       .limit(params.limit)
       .offset(params.offset)
@@ -98,6 +65,6 @@ export class HistoryRepository extends History {
     const total = await this.countQuery(qbCount)
     const results = await this.query(qb)
 
-    return fromJSON({ total, results }, t.HistoryListResponse)
+    return fromJSON({ total, results }, HistoryListResponse)
   }
 }
