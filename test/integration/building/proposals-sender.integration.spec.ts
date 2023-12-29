@@ -28,7 +28,7 @@ describe('ProposalsSenderService - Integration', () => {
       sendMail: stub()
     }
     const lastMondayMorning = moment().startOf('isoWeek').hours(9).minutes(0)
-    clock = sinon.useFakeTimers(lastMondayMorning.toDate())
+    clock = sinon.useFakeTimers({ now: lastMondayMorning.toDate(), shouldClearNativeTimers: true })
     container.register('emailTransport', asValue(mailerSpy))
 
     service = container.resolve('proposalsSenderService')
