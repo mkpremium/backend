@@ -34,7 +34,10 @@ export abstract class PostgresRepository<S extends { id?: string }, E extends {
       .save(this.structToEntity(struct))
       .then(savedEntity => {
         if (!struct.id) {
-          struct[ 'id' ] = savedEntity.id
+          return {
+            ...struct,
+            id: savedEntity.id
+          }
         }
 
         return struct
