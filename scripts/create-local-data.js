@@ -96,6 +96,6 @@ async function createTestBuildings (client, n) {
   }
 
   for await (let i of generator()) {
-    client.post('/test-harness/create-building')
+    await client.post('/test-harness/create-building')
   }
 }
