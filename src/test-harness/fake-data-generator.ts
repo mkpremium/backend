@@ -185,5 +185,5 @@ function generateCityAndProvince () {
   const cities = weightedCitiesAndProvinces.find(([ p ]) => p === province)![ 1 ]
   const city = faker.helpers.weightedArrayElement(cities.map(({ city, weight }) => ({ value: city, weight })))
 
-  return [province, city]
+  return [`TEST_${province}`, `TEST_${city}`]
 }

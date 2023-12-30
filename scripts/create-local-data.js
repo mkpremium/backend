@@ -53,7 +53,7 @@ function createWorksheetQueue (client) {
   return client.post('/worksheets/queues', {
       name: 'test-queue',
       source: {
-        province: 'BARCELONA'
+        province: 'TEST_BARCELONA'
       }
     }
   )
