@@ -15,6 +15,7 @@
     "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.3.1",
     "awilix": "^4.3.1",
     "aws-sdk": "^2.955.0",
     "axios": "^0.21.4",
@@ -30,7 +31,6 @@
     "express-jwt": "^6.0.0",
     "express-jwt-permissions": "^1.1.0",
     "express-promise-wrap": "^0.2.2",
-    "faker": "^5.1.0",
     "fp-ts": "^2.11.1",
     "fs-extra": "^5.0.0",
     "honeycomb-beeline": "^2.8.1",
