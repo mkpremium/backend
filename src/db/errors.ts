@@ -5,11 +5,11 @@ export class EntityNotFound extends Error {
 
   constructor (
     readonly entityId: string,
-    structType: t.Type<any>
+    structType?: t.Type<any>
   ) {
     super()
     this.entityId = entityId
-    this.structType = structType.meta.name
+    this.structType = structType?.meta.name
     this.message = `${this.structType} ${entityId} not found`
   }
 }

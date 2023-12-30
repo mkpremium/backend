@@ -1,5 +1,6 @@
 import { Repository as EntityRepository } from '../../db/repository'
 import { DataSource, DeepPartial, EntityManager, EntityTarget, FindOptionsRelations, Repository } from 'typeorm'
+import { EntityNotFound } from '../../db/errors'
 
 export abstract class WithPostgresRepository<E extends { id: string }> {
   protected repository: Repository<E>
@@ -25,6 +26,9 @@ export abstract class PostgresRepository<S extends { id?: string }, E extends {
       },
       relations: this.relations
     })
+    if (entity === null) {
+      throw new EntityNotFound(id)
+    }
 
     return this.entityToStruct(entity)
   }
