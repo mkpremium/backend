@@ -20,13 +20,19 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
       id: struct.id,
       name: struct.name,
       worksheets: struct.worksheets,
+      source: struct.source,
       createdAt: struct.createdAt,
       updatedAt: struct.updatedAt,
     }
   }
 
   protected entityToStruct (entity: WorksheetQueue): WorksheetQueueProps {
-    throw new Error('Method not implemented.')
+    return {
+      id: entity.id,
+      name: entity.name,
+      source: entity.source,
+      worksheets: entity.worksheets,
+    }
   }
 
   protected getEntityTarget (): EntityTarget<WorksheetQueue> {

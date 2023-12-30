@@ -22,16 +22,18 @@ export const WorksheetQueueBody = t.struct(
   }
 )
 
+export interface QueueSource {
+  city?: string;
+  province?: string;
+  zone?: string;
+  neighborhood?: string;
+}
+
 export interface WorksheetQueueProps {
   worksheets: any[]; // queue items
   id: string;
   name: string;
-  source: {
-    city?: string;
-    province?: string;
-    zone?: string;
-    neighborhood?: string;
-  };
+  source: QueueSource;
 }
 
 export const WorksheetQueue = t.struct<WorksheetQueueProps>(
