@@ -42,7 +42,7 @@ export class CallcenterWorksheetService {
 
     const ws = await builder
       .orderBy('worksheet.lastViewedAt')
-      .getOne()
+      .getOneOrFail()
 
     return toView(ws)
   }
