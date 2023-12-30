@@ -1,9 +1,9 @@
+import _ from 'lodash'
 import t from 'tcomb'
-import uuid from 'uuid/v4'
 import { Building } from '../building/building'
 import { TypedContactInfo } from '../owner/contact'
 import { OwnerStatus } from '../owner/owner'
-import { createBuildingReq } from './fake-data-generator'
+import { createBuildingReq, createOwnerCmd } from './fake-data-generator'
 import { CreateOwnerCmd } from './create-owner'
 import { CreateWorksheetRequest } from './create-worksheet'
 
@@ -30,22 +30,23 @@ export const CreateBuildingRequest = t.struct({
 
 export const createBuildingFactory = (buildingsRepository, createOwner, createBuildingWorksheet) => async (req) => {
   t.assert(CreateBuildingRequest.is(req))
-  const buildingId = uuid()
-  const fakedRequest = createBuildingReq(buildingId)
-  const createOwnerCommands = fakedRequest.owners.map(o => CreateOwnerCmd(o))
-
-  const owners = await Promise.all(createOwnerCommands.map(cmd => createOwner(cmd)))
-  const savedBuilding = await buildingsRepository.save(
+  const fakedRequest = createBuildingReq()
+  const nbOfOwners = 1 + ((Math.random() * 10) % 2) // [1, 3]
+  const building = await buildingsRepository.save(
     t.update(
-      Building({ ...fakedRequest.building, isTest: true, ownerId: owners[ 0 ].id }),
+      Building({ ...fakedRequest.building, isTest: true }),
       { $merge: req.owner }
     )
   )
+  const ownersRequest = _.times(nbOfOwners, () => createOwnerCmd(building.id))
+  const createOwnerCommands = ownersRequest.map(o => CreateOwnerCmd(o))
+
+  const owners = await Promise.all(createOwnerCommands.map(cmd => createOwner(cmd)))
 
   const worksheet = await createBuildingWorksheet(CreateWorksheetRequest({
-    building: savedBuilding,
+    building: building,
     ownersId: owners.map(({ id }) => id)
   }))
 
-  return { building: savedBuilding, owners, worksheet }
+  return { building: building, owners, worksheet }
 }
