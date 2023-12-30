@@ -24,7 +24,7 @@ export const createOwnerCmd = (buildingId: string) => {
 }
 
 export const createBuildingReq = (buildingId) => {
-  const streetNumber = faker.datatype.number().toString()
+  const streetNumber = faker.number.int().toString()
   const nbOfOwners = 1 + ((Math.random() * 10) % 2) // [1, 3]
   const [ province, city ] = generateCityAndProvince()
 
@@ -33,10 +33,10 @@ export const createBuildingReq = (buildingId) => {
       id: buildingId,
       buildingType: faker.helpers.shuffle([ 'VERTICAL', 'HORIZONTAL' ])[ 0 ],
       address: {
-        street: `${faker.address.streetName()}`,
+        street: faker.location.street(),
         number: streetNumber,
         postalCode: {
-          number: faker.address.zipCode()
+          number: faker.location.zipCode()
         },
         province,
         city,
