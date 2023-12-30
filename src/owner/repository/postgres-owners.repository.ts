@@ -54,6 +54,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return {
       id: owner.id,
       status: owner.status,
+      building: owner.buildingId ? {id: owner.buildingId} : null,
       person: {
         fullName: owner.person.name,
         contacts: owner.person.contacts,
