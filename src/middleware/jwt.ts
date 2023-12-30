@@ -24,16 +24,14 @@ function addUserInfoFactory (usersRepository: UsersRepository) {
   return async function addUserInfo (req, res, next) {
     const id = req.user.id
 
-    return usersRepository.get(id)
-      .then(user => {
-        if (!user || !user.enable) {
-          res.sendStatus(401)
-          return
-        }
-        req.user.operator = user
-        honeycomb().addContext({ userId: user.id })
-        next()
-      })
+    const user = await usersRepository.get(id)
+    if (!user || !user.enable) {
+      res.sendStatus(401)
+      return
+    }
+    req.user.operator = user
+    honeycomb().addContext({ userId: user.id })
+    next()
   }
 
 }
