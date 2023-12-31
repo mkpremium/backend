@@ -3,14 +3,15 @@ import { BuildingAddressProps, BuildingProps, NegotiationStatus } from '../src/b
 import uuid from 'uuid/v4'
 import { ContactProps } from '../src/owner/owner'
 import { Worksheet } from '../src/worksheet/worksheet.entity'
+import { Caller } from '../src/caller/caller.entity'
 
 const EntityFactory = Factory.define<{id: string}>('Entity')
   .attr('id', () => uuid())
 
-Factory.define('caller')
+export const callerFactory = Factory.define<Caller>('caller').extend(EntityFactory)
   .attr('user', () => Factory.attributes('user', {}))
 
-Factory.define('flipper')
+export const flipperFactory = Factory.define('flipper').extend(EntityFactory)
   .attr('user', () => Factory.attributes('user', {}))
 
 Factory.define('user-credentials')
@@ -36,7 +37,7 @@ Factory.define('user-profile')
     email: 'user@email.test',
   })
 
-export const phoneContactFactory = Factory.define<Omit<ContactProps, 'id'>>('phone-contact')
+export const phoneContactFactory = Factory.define<ContactProps>('phone-contact').extend('Entity')
   .attrs({
     status: 'UNDEFINED',
     type: 'MOVIL',

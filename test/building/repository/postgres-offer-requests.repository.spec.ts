@@ -14,6 +14,7 @@ import { FlipperRepository } from '../../../src/flipper/flipper.repository'
 import { ContactsRepository } from '../../../src/contacts/contacs.repository'
 import { CallerRepository } from '../../../src/caller/caller.repository'
 import { ListBuildingsService } from '../../../src/building/service/list-buildings.service'
+import { callerFactory, flipperFactory, phoneContactFactory } from '../../factories'
 
 describe('PostgresOfferRequestsRepository', () => {
   let repository: OfferRequestsRepository
@@ -46,9 +47,9 @@ describe('PostgresOfferRequestsRepository', () => {
       id: uuid(),
       relatedBuildingIds: [ testBuilding.id ]
     }).build())
-    const caller = await callerRepository.save(Factory.build('caller'))
-    const flipper = await flippersRepository.save(Factory.build('flipper'))
-    const destinationContact = await contactsRepository.save(Factory.build('phone-contact', {}))
+    const caller = await callerRepository.save(callerFactory.build())
+    const flipper = await flippersRepository.save(flipperFactory.build())
+    const destinationContact = await contactsRepository.save(phoneContactFactory.build() as any)
 
     const testOfferRequest = {
       ownerId: testOwner.id,
