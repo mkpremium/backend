@@ -7,6 +7,10 @@ import { BaseEntity } from '../../infrastructure/entity'
 
 export class PostgresWorksheetQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
   implements WorksheetQueueRepository {
+  relations = {
+    worksheets: true,
+  }
+
   findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps & BaseEntity> {
     throw new Error('Method not implemented.')
   }
