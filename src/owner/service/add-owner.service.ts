@@ -38,7 +38,7 @@ export class AddOwnerService {
 
   private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<Owner> {
     const owner = await new Promise(async (resolve) => {
-      await this.ormDataSource.transaction('SERIALIZABLE', async (entityManager) => {
+      await this.ormDataSource.transaction(async (entityManager) => {
         resolve(await this.createEntities(cmd, entityManager))
       })
     }) as Owner
