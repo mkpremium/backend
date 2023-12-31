@@ -86,9 +86,9 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
     ).then(CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView)
   }
 
-  listAssignedToPropertyAgentOfId (agentId): Promise<BuildingReadModel[]> {
-    return this.allAssignedBuildingsId(agentId)
-      .then(buildingsId => this.listById(buildingsId))
+  async listAssignedToPropertyAgentOfId (flipperId: string): Promise<BuildingReadModel[]> {
+    const buildingsId = await this.allAssignedBuildingsId(flipperId)
+    return await this.listById(buildingsId)
   }
 
   listProposalsForBuilding (buildingId) {

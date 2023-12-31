@@ -61,10 +61,6 @@ export interface BuildingReadModel extends Omit<BuildingProps, 'address' | 'meta
 }
 
 export interface BuildingsReadRepository {
-  listById (ids): Promise<BuildingReadModel[]>
-
-  listAssignedToPropertyAgentOfId (agentId): Promise<BuildingReadModel[]>
-
   listProposalsForBuilding (buildingId): Promise<unknown[]>
 
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]>
