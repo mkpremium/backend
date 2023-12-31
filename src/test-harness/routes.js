@@ -2,16 +2,13 @@ import { wrap } from 'express-promise-wrap'
 import { permissions } from '../middleware/jwt'
 import { OperatorRepository } from '../operator/models'
 import { createBuildingFactory, CreateBuildingRequest } from './create-building'
-import { CreateOwnerCmd, createOwnerFactory } from './create-owner'
 import { createBuildingWorksheetFactory } from './create-worksheet'
-import { createOwnerCmd } from './fake-data-generator'
 
 export function createTestHarness (app, awilixContainer, secured) {
-  const createOwner = createOwnerFactory(awilixContainer.resolve('ownersRepository'))
   const createWorksheet = createBuildingWorksheetFactory(awilixContainer.resolve('worksheetRepository'))
   const createBuilding = createBuildingFactory(
     awilixContainer.resolve('buildingsRepository'),
-    createOwner,
+    awilixContainer.resolve('addOwnerService'),
     createWorksheet
   )
 
@@ -23,18 +20,6 @@ export function createTestHarness (app, awilixContainer, secured) {
       async (req, res) => {
         const createBuildingReq = CreateBuildingRequest(req.body)
         res.json(await createBuilding(createBuildingReq))
-      }
-    )
-  )
-
-  app.post(
-    '/test-harness/create-owner',
-    secured,
-    permissions.admin,
-    wrap(
-      async (req, res) => {
-        const fakeOwner = createOwnerCmd(createOwnerCmd.buildingId)
-        res.json(await createOwner(CreateOwnerCmd(fakeOwner)))
       }
     )
   )

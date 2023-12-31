@@ -2,24 +2,29 @@ import { faker } from '@faker-js/faker/locale/es'
 import uuid from 'uuid/v4'
 import { OwnerType } from '../owner/owner'
 import _ from 'lodash'
+import { AddOwnerCommand } from '../owner/service/add-owner.service'
 
-export const createOwnerCmd = (buildingId: string) => {
+export function createOwnerCmd (buildingId: string): AddOwnerCommand {
   const ownerFirstName = faker.person.firstName()
   const ownerLastName = faker.person.lastName()
   const nbOfContacts = 1 + ((Math.random() * 10) % 5) // [1, 6]
 
   return {
     buildingId,
-    name: `${ownerFirstName} ${ownerLastName}`,
-    firstName: ownerFirstName,
-    status: faker.helpers.shuffle([ 'VERIFICADO', 'NO_VERIFICADO' ])[ 0 ],
-    type: faker.helpers.shuffle(Object.values(OwnerType))[ 0 ],
-    contacts: _.times(nbOfContacts, () => ({
-      id: uuid(),
-      type: 'TELEFONO',
-      value: faker.helpers.fromRegExp('9########'),
-      status: faker.helpers.shuffle([ 'UNDEFINED', 'GOOD' ])[ 0 ]
-    }))
+    status: faker.helpers.shuffle([ 'VERIFICADO' as const, 'NO_VERIFICADO' as const ])[ 0 ],
+    type: faker.helpers.shuffle(Object.values(OwnerType))[ 0 ] as OwnerType,
+    note: 'fake owner',
+    person: {
+      name: `${ownerFirstName} ${ownerLastName}`,
+      firstName: ownerFirstName,
+      firstSurname: ownerLastName,
+      contacts: _.times(nbOfContacts, () => ({
+        id: uuid(),
+        type: 'TELEFONO',
+        value: faker.helpers.fromRegExp('9########'),
+        status: faker.helpers.shuffle([ 'UNDEFINED' as const, 'GOOD' as const ])[ 0 ]
+      }))
+    },
   }
 }
 
@@ -178,9 +183,9 @@ function generateCityAndProvince () {
           cities.reduce((count, { weight }) => count + weight, 0)
       }
     ))
-  const province =  faker.helpers.weightedArrayElement(weightedProvinces)
+  const province = faker.helpers.weightedArrayElement(weightedProvinces)
   const cities = weightedCitiesAndProvinces.find(([ p ]) => p === province)![ 1 ]
   const city = faker.helpers.weightedArrayElement(cities.map(({ city, weight }) => ({ value: city, weight })))
 
-  return [`TEST_${province}`, `TEST_${city}`]
+  return [ `TEST_${province}`, `TEST_${city}` ]
 }

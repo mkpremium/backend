@@ -4,7 +4,6 @@ import { Building } from '../building/building'
 import { TypedContactInfo } from '../owner/contact'
 import { OwnerStatus } from '../owner/owner'
 import { createBuildingReq, createOwnerCmd } from './fake-data-generator'
-import { CreateOwnerCmd } from './create-owner'
 import { CreateWorksheetRequest } from './create-worksheet'
 
 export const CreateBuildingRequest = t.struct({
@@ -28,7 +27,7 @@ export const CreateBuildingRequest = t.struct({
   )
 })
 
-export const createBuildingFactory = (buildingsRepository, createOwner, createBuildingWorksheet) => async (req) => {
+export const createBuildingFactory = (buildingsRepository, addOwnerService, createBuildingWorksheet) => async (req) => {
   t.assert(CreateBuildingRequest.is(req))
   const fakedRequest = createBuildingReq()
   const nbOfOwners = 1 + ((Math.random() * 10) % 2) // [1, 3]
@@ -38,10 +37,8 @@ export const createBuildingFactory = (buildingsRepository, createOwner, createBu
       { $merge: req.owner }
     )
   )
-  const ownersRequest = _.times(nbOfOwners, () => createOwnerCmd(building.id))
-  const createOwnerCommands = ownersRequest.map(o => CreateOwnerCmd(o))
-
-  const owners = await Promise.all(createOwnerCommands.map(cmd => createOwner(cmd)))
+  const addOwnerCommands = _.times(nbOfOwners, () => createOwnerCmd(building.id))
+  const owners = await Promise.all(addOwnerCommands.map(cmd => addOwnerService.addOwner(cmd)))
 
   const worksheet = await createBuildingWorksheet(CreateWorksheetRequest({
     building: building,
