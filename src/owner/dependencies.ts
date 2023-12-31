@@ -15,6 +15,7 @@ import { createAddOwnerContactController, createUpdateOwnerController } from './
 import { createAddOwnerToBuildingController } from '../building/controllers'
 import { AddOwnerService } from './service/add-owner.service'
 import { AddContactService } from './service/add-contact.service'
+import { SearchOwnerOrBuildingService } from './service/search-owner-or-building.service'
 
 export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -31,6 +32,7 @@ export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: 
     discardNonExistingContactListener: asFunction(discardNonExistingContactListener).singleton(),
 
     changeContactStatusService: asClass(ChangeContactStatusService).singleton().classic(),
+    searchOwnerOrBuildingService: asClass(SearchOwnerOrBuildingService).singleton().classic(),
     setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
     addContactService: asClass(AddContactService).singleton().classic(),
     addOwnerService: asClass(AddOwnerService).singleton().classic(),

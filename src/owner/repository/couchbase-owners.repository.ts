@@ -67,7 +67,7 @@ WHERE _documentType = 'owner' and buildingId = $1
 `
 
 export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> implements OwnerRepository {
-  async findByPhoneNumber (phoneNumber: string) {
+  async findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]> {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),
       [ phoneNumber ]

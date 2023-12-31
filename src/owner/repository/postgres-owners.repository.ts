@@ -21,10 +21,6 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return Promise.reject(new Error('Not implemented'))
   }
 
-  findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]> {
-    return Promise.reject(new Error('Not implemented'))
-  }
-
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
     return Promise.reject(new Error('Not implemented'))
   }

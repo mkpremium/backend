@@ -85,8 +85,6 @@ export const BuildingOwner = t.struct<BuildingOwnerProps>({
 
 
 export interface OwnerRepository extends Repository<OwnerProps> {
-  findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]>
-
   buildingOwners (buildingId: string): Promise<BuildingOwnerProps[]>
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]>
