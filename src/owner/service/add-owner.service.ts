@@ -65,7 +65,7 @@ export class AddOwnerService {
         type: c.type
       })
       await entityManager.save(PersonContact, {
-        owner: savedPerson,
+        person: savedPerson,
         contact: savedContact,
         status: c.status,
       })
