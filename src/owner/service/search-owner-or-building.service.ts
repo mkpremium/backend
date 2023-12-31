@@ -66,19 +66,16 @@ export class SearchOwnerOrBuildingService {
       const { contacts } = owner.person
       delete owner.person
       const building = mappedBuildings[ owner.buildingId ]
-      // const building = foundOwner.building
 
       return {
         ...owner,
         contacts,
-        building, // TODO: map building to expected output
+        building,
         worksheetId: building.worksheetId,
         negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
         matchingContactId: foundOwner.person.contacts[ matchingContactIdx ].id,
         scheduledCalls: [], // TODO: add scheduledCalls
         // TODO: add lastEvent
-        // TODO: add latestProposal
-        // TODO: anything else?
       }
     }), t.list(FoundOwner))
   }
