@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker/locale/es'
 import _ from 'lodash'
 import t from 'tcomb'
 import { Building } from '../building/building'
@@ -30,7 +31,7 @@ export const CreateBuildingRequest = t.struct({
 export const createBuildingFactory = (buildingsRepository, addOwnerService, createBuildingWorksheet) => async (req) => {
   t.assert(CreateBuildingRequest.is(req))
   const fakedRequest = createBuildingReq()
-  const nbOfOwners = 1 + ((Math.random() * 10) % 2) // [1, 3]
+  const nbOfOwners = faker.number.int({ min: 1, max: 3 })
   const building = await buildingsRepository.save(
     t.update(
       Building({ ...fakedRequest.building, isTest: true }),

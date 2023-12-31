@@ -7,7 +7,7 @@ import { AddOwnerCommand } from '../owner/service/add-owner.service'
 export function createOwnerCmd (buildingId: string): AddOwnerCommand {
   const ownerFirstName = faker.person.firstName()
   const ownerLastName = faker.person.lastName()
-  const nbOfContacts = 1 + ((Math.random() * 10) % 5) // [1, 6]
+  const nbOfContacts = faker.number.int({ min: 1, max: 6 })
 
   return {
     buildingId,
@@ -21,7 +21,7 @@ export function createOwnerCmd (buildingId: string): AddOwnerCommand {
       contacts: _.times(nbOfContacts, () => ({
         id: uuid(),
         type: 'TELEFONO',
-        value: faker.helpers.fromRegExp('9########'),
+        value: '6' + faker.string.numeric(8), // Spanish Mobile Phone Number.
         status: faker.helpers.shuffle([ 'UNDEFINED' as const, 'GOOD' as const ])[ 0 ]
       }))
     },
