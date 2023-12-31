@@ -13,6 +13,7 @@ import { Factory } from 'rosie'
 import { FlipperRepository } from '../../../src/flipper/flipper.repository'
 import { ContactsRepository } from '../../../src/contacts/contacs.repository'
 import { CallerRepository } from '../../../src/caller/caller.repository'
+import { ListBuildingsService } from '../../../src/building/service/list-buildings.service'
 
 describe('PostgresOfferRequestsRepository', () => {
   let repository: OfferRequestsRepository
@@ -22,9 +23,11 @@ describe('PostgresOfferRequestsRepository', () => {
   let worksheetRepository: WorksheetRepository
   let flippersRepository: FlipperRepository
   let callerRepository: CallerRepository
+  let listBuildingsService: ListBuildingsService
 
   before(async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
+    listBuildingsService = container.resolve('listBuildingsService')
     buildingsRepository = container.resolve('postgresBuildingsRepository')
     ownersRepository = container.resolve('postgresOwnersRepository')
     contactsRepository = container.resolve('contactsRepository')
@@ -58,7 +61,7 @@ describe('PostgresOfferRequestsRepository', () => {
     }
 
     await repository.add(testOfferRequest)
-    const flipperNegotiations = await buildingsRepository.listById([ testBuilding.id ])
+    const flipperNegotiations = await listBuildingsService.buildingsOfId([ testBuilding.id ])
     expect(flipperNegotiations).to.be.lengthOf(1)
     // TODO: how to replace the following two assertions?
     // expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
