@@ -72,7 +72,7 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     sqsEventBus: asClass(SqsBus).classic().singleton(),
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     composedEventBus: asClass(ComposedBus).classic().singleton(),
-    eventBus: aliasTo(process.env.NODE_ENV === 'test' ? 'eventEmitterBus' : 'sqsEventBus'),
+    eventBus: aliasTo(['test', 'development'].includes(process.env.NODE_ENV) ? 'eventEmitterBus' : 'sqsEventBus'),
     eventRecorderListener: asFunction(createEventRecorderListener),
     saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandler),
     logger: asFunction(initLogger).singleton(),
