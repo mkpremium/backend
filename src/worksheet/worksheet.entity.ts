@@ -15,7 +15,7 @@ export class Worksheet extends BaseEntity {
     building: Building
 
     @ManyToOne(() => WorksheetQueue, wq => wq.worksheets)
-    queue: WorksheetQueue
+    queue?: WorksheetQueue
 
     @Column({ type: 'text', default: '' })
     statusChangeReason?: string
