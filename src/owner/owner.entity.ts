@@ -7,7 +7,7 @@ import { OwnerStatus } from './owner'
 
 @Entity()
 export class Owner extends BaseEntity {
-  @OneToOne(() => Person)
+  @OneToOne(() => Person, person => person.owner)
   @JoinColumn()
   person: Person
 

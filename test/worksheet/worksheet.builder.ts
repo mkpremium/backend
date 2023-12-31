@@ -10,7 +10,6 @@ const worksheetPrototype: WorksheetProps = {
     number: 123,
     city: 'Test City'
   },
-
 }
 
 export const worksheetBuilder = (overrides: Partial<WorksheetProps> = {}) =>

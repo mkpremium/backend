@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { Contact } from '../contacts/contact.entity'
 import { BaseEntity } from '../infrastructure/entity'
+import { Owner } from './owner.entity'
 import { PersonContact } from './person-contact.entity'
 
 @Entity()
@@ -27,4 +28,7 @@ export class Person extends BaseEntity {
   // TODO: add constrain in type
   @ManyToOne(() => Contact, { nullable: true })
   featuredEmailContact?: Contact
+
+  @OneToOne(() => Owner, owner => owner.person)
+  owner: Owner
 }

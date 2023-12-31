@@ -98,20 +98,7 @@ export class PostgresBuildingsRepository
   }
 
   protected entityToStruct (entity: Building): BuildingProps {
-    return {
-      id: entity.id,
-      address: entity.address,
-      floorArea: entity.floorArea,
-      cadastre: entity.publicIdentifier ? { reference: entity.publicIdentifier } : undefined,
-      location: entity.location,
-      ownerId: entity.featuredOwner?.id,
-      negotiationStatus: entity.negotiationStatus,
-      lead: entity.lead,
-      assignedAgentId: entity.assignedFlipper?.id,
-      use: entity.use,
-      recentProposal: entity.recentProposal,
-      metadata: entity.images
-    }
+    return mapBuildingEntityToStruct(entity)
   }
 
   protected structToEntity (buildingStruct: BuildingProps): Partial<Building> {
@@ -128,6 +115,23 @@ export class PostgresBuildingsRepository
       location: buildingStruct.location,
       use: buildingStruct.use,
     }
+  }
+}
+
+export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
+  return {
+    id: entity.id,
+    address: entity.address,
+    floorArea: entity.floorArea,
+    cadastre: entity.publicIdentifier ? { reference: entity.publicIdentifier } : undefined,
+    location: entity.location,
+    ownerId: entity.featuredOwner?.id,
+    negotiationStatus: entity.negotiationStatus,
+    lead: entity.lead,
+    assignedAgentId: entity.assignedFlipper?.id,
+    use: entity.use,
+    recentProposal: entity.recentProposal,
+    metadata: entity.images
   }
 }
 

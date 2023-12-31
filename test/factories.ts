@@ -1,6 +1,11 @@
 import { Factory } from 'rosie'
 import { BuildingAddressProps, BuildingProps, NegotiationStatus } from '../src/building/building'
 import uuid from 'uuid/v4'
+import { ContactProps } from '../src/owner/owner'
+import { Worksheet } from '../src/worksheet/worksheet.entity'
+
+const EntityFactory = Factory.define<{id: string}>('Entity')
+  .attr('id', () => uuid())
 
 Factory.define('caller')
   .attr('user', () => Factory.attributes('user', {}))
@@ -31,14 +36,14 @@ Factory.define('user-profile')
     email: 'user@email.test',
   })
 
-Factory.define('phone-contact')
+export const phoneContactFactory = Factory.define<Omit<ContactProps, 'id'>>('phone-contact')
   .attrs({
     status: 'UNDEFINED',
     type: 'MOVIL',
     value: '666666666'
   })
 
-Factory.define('email-contact')
+export const emailContactFactory = Factory.define<Omit<ContactProps, 'id'>>('email-contact')
   .attrs({
     status: 'UNDEFINED',
     type: 'EMAIL',

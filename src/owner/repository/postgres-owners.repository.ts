@@ -26,20 +26,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   }
 
   protected entityToStruct (entity: Owner): OwnerProps {
-    return {
-      id: entity.id,
-      status: entity.status,
-      name: entity.person.fullName,
-      buildingId: entity.building.id,
-      person: {
-        name: entity.person.fullName,
-        contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status })),
-      },
-      featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact ? {
-        phoneId: entity.person.featuredPhoneContact?.id,
-        emailId: entity.person.featuredEmailContact?.id,
-      } : null
-    }
+    return ownerEntityToStruct(entity)
   }
 
   protected getEntityTarget (): EntityTarget<Owner> {
@@ -59,5 +46,22 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
         documentNumber: owner.person.documentNumber,
       }
     }
+  }
+}
+
+export function ownerEntityToStruct (entity: Owner) {
+  return {
+    id: entity.id,
+    status: entity.status,
+    name: entity.person.fullName,
+    buildingId: entity.building.id,
+    person: {
+      name: entity.person.fullName,
+      contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status })),
+    },
+    featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact ? {
+      phoneId: entity.person.featuredPhoneContact?.id,
+      emailId: entity.person.featuredEmailContact?.id,
+    } : null
   }
 }
