@@ -2,7 +2,7 @@ import { WorksheetViewProps } from '../repository/worksheet.repository'
 import { CouchbaseWorksheetRepository } from '../repository/couchbase-worksheet.repository'
 import { DataSource } from 'typeorm'
 import { Worksheet } from '../worksheet.entity'
-import { mapEntityToReadModel } from '../../building/repository/postgres-buildings.repository'
+import { buildingEntityToReadModel } from '../../building/repository/postgres-buildings.repository'
 
 export class CallcenterWorksheetService {
   constructor (
@@ -65,7 +65,7 @@ function toView (ws: Worksheet): WorksheetViewProps {
     id: ws.id,
     status: ws.status,
     queueId: ws.queue?.id,
-    building: mapEntityToReadModel(ws.building),
+    building: buildingEntityToReadModel(ws.building),
     relatedOwners: ws.building.owners.map(o => ({
       ...o,
       name: o.person.fullName,

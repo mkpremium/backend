@@ -45,23 +45,12 @@ export class PostgresBuildingsRepository
           }
         },
       )),
-      TE.chain(buildings => TE.of(buildings.map(mapEntityToReadModel)))
+      TE.chain(buildings => TE.of(buildings.map(buildingEntityToReadModel)))
     )
   }
 
   listAssignedToPropertyAgentOfId (agentId): Promise<BuildingReadModel[]> {
     return Promise.reject(new Error('Not implemented'))
-  }
-
-  async listById (ids): Promise<BuildingReadModel[]> {
-    return this.repository.find({
-      where: {
-        id: In(ids)
-      },
-      relations: {
-        images: true,
-      }
-    }).then(buildings => buildings.map(mapEntityToReadModel))
   }
 
   async listProposalsForBuilding (buildingId: string): Promise<ProposalProps[]> {
@@ -136,7 +125,7 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
 }
 
 
-export function mapEntityToReadModel (b: Building): BuildingReadModel {
+export function buildingEntityToReadModel (b: Building): BuildingReadModel {
   return {
     id: b.id,
     lead: b.lead,
