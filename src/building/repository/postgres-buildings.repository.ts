@@ -45,7 +45,7 @@ export class PostgresBuildingsRepository
           }
         },
       )),
-      TE.chain(buildings => TE.of(buildings.map(buildingEntityToReadModel)))
+      TE.chain(buildings => TE.of(buildings.map(b => buildingEntityToReadModel(b))))
     )
   }
 
@@ -125,7 +125,7 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
 }
 
 
-export function buildingEntityToReadModel (b: Building): BuildingReadModel {
+export function buildingEntityToReadModel (b: Building, lastOfferCreatedAt: Date | undefined = undefined): BuildingReadModel {
   return {
     id: b.id,
     lead: b.lead,
@@ -150,7 +150,10 @@ export function buildingEntityToReadModel (b: Building): BuildingReadModel {
     latestProposal: b.recentProposal,
     floorArea: b.floorArea,
     cadastreReference: b.publicIdentifier,
-    stock: null,
+    lastMeeting: (lastOfferCreatedAt && {
+      dateMeeting: moment(lastOfferCreatedAt).format(),
+      inPerson: false,
+    }) || undefined,
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,
@@ -181,10 +184,7 @@ export function buildingEntityToReadModel (b: Building): BuildingReadModel {
     //   contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
     //   featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
     // }) || undefined,
-    // lastMeeting: (lastMeeting && {
-    //   dateMeeting: moment(lastMeeting.eventDate).format(),
-    //   inPerson: lastMeeting.inPerson
-    // }) || undefined,
+    stock: null,
     // salePrice: salePrice || undefined,
     // totalExpensesAmount: totalExpensesAmount || undefined,
   } as BuildingReadModel

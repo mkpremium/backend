@@ -9,21 +9,21 @@ import { Contact } from '../../contacts/contact.entity'
 
 @Entity()
 export class BuildingOfferRequest extends BaseEntity {
-  @ManyToOne(() => Flipper)
+  @ManyToOne(() => Flipper, {nullable: false})
   flipper: Flipper
 
-  @ManyToOne(() => Owner)
-  ownerId: Owner
+  @ManyToOne(() => Owner, {nullable: false})
+  owner: Owner
 
-  @ManyToOne(() => Contact)
+  @ManyToOne(() => Contact, {nullable: false})
   contact: Contact
 
-  @ManyToOne(() => Worksheet)
-  worksheetId: Flipper
+  @ManyToOne(() => Worksheet, {nullable: false})
+  worksheet: Worksheet
 
-  @ManyToOne(() => Building)
+  @ManyToOne(() => Building, {nullable: false})
   building: Building
 
-  @ManyToOne(() => Caller)
+  @ManyToOne(() => Caller, {nullable: false})
   caller: Caller
 }

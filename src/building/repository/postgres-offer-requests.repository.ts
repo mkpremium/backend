@@ -9,10 +9,10 @@ export class PostgresOfferRequestsRepository
     const savedEntity = await this.repository.save({
       flipper: { id: cmd.flipperId },
       caller: { id: cmd.callerId },
-      ownerId: { id: cmd.ownerId },
+      owner: { id: cmd.ownerId },
       contact: { id: cmd.destinationContactId },
-      worksheetId: { id: cmd.worksheetId },
-      buildingId: { id: cmd.buildingId }
+      worksheet: { id: cmd.worksheetId },
+      building: { id: cmd.buildingId }
     })
 
     return {

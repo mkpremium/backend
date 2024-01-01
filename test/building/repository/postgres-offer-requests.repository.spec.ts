@@ -64,8 +64,7 @@ describe('PostgresOfferRequestsRepository', () => {
     await repository.add(testOfferRequest)
     const flipperNegotiations = await listBuildingsService.buildingsOfId([ testBuilding.id ])
     expect(flipperNegotiations).to.be.lengthOf(1)
-    // TODO: how to replace the following two assertions?
-    // expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
+    expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
     // expect(moment(flipperNegotiations[ 0 ].lastMeeting.dateMeeting).isSame(moment(), 'day')).to.be.true
   })
 })
