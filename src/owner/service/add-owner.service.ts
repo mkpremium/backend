@@ -37,11 +37,7 @@ export class AddOwnerService {
   }
 
   private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<Owner> {
-    const owner = await new Promise(async (resolve) => {
-      await this.ormDataSource.transaction(async (entityManager) => {
-        resolve(await this.createEntities(cmd, entityManager))
-      })
-    }) as Owner
+    const owner = await this.ormDataSource.transaction<Owner>(em => this.createEntities(cmd, em))
 
     await this.eventBus.publish({
       name: DomainEventCatalog.OWNER__ADDED,
