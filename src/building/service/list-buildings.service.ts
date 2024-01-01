@@ -42,8 +42,10 @@ export class ListBuildingsService {
     }>()
 
     return buildings.map((building) => {
-      const lastOfferRequest = lastOfferRequests.find(({buildingId}) => buildingId === building.id)
-      return buildingEntityToReadModel(building, lastOfferRequest?.last_offer_created_at)
+      const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
+      return buildingEntityToReadModel(building, {
+        lastOfferCreatedAt: lastOfferRequest?.last_offer_created_at
+      })
     })
   }
 }

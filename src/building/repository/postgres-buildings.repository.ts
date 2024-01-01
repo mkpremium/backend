@@ -124,8 +124,12 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
   }
 }
 
+interface BuildingReadModelData {
+  lastOfferCreatedAt?: Date
+}
 
-export function buildingEntityToReadModel (b: Building, lastOfferCreatedAt: Date | undefined = undefined): BuildingReadModel {
+export function buildingEntityToReadModel (
+  b: Building, extra: BuildingReadModelData = {}): BuildingReadModel {
   return {
     id: b.id,
     lead: b.lead,
@@ -150,8 +154,8 @@ export function buildingEntityToReadModel (b: Building, lastOfferCreatedAt: Date
     latestProposal: b.recentProposal,
     floorArea: b.floorArea,
     cadastreReference: b.publicIdentifier,
-    lastMeeting: (lastOfferCreatedAt && {
-      dateMeeting: moment(lastOfferCreatedAt).format(),
+    lastMeeting: (extra.lastOfferCreatedAt && {
+      dateMeeting: moment(extra.lastOfferCreatedAt).format(),
       inPerson: false,
     }) || undefined,
     // stock: {
