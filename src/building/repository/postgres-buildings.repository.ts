@@ -158,6 +158,7 @@ export function buildingEntityToReadModel (
       dateMeeting: moment(extra.lastOfferCreatedAt).format(),
       inPerson: false,
     }) || undefined,
+    stock: null,
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,
@@ -188,7 +189,6 @@ export function buildingEntityToReadModel (
     //   contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
     //   featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
     // }) || undefined,
-    stock: null,
     // salePrice: salePrice || undefined,
     // totalExpensesAmount: totalExpensesAmount || undefined,
   } as BuildingReadModel
