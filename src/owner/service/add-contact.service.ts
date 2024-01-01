@@ -44,34 +44,32 @@ export class AddContactService {
     return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd)
   }
 
-  private saveInPostgres (cmd: AddContactCommand): Promise<MaybeFeaturedContact> {
+  private async saveInPostgres (cmd: AddContactCommand): Promise<MaybeFeaturedContact> {
     this.recording = []
-    return new Promise<MaybeFeaturedContact>(async (resolve) => {
-      await this.ormDataSource.transaction(async entityManager => {
-        const contact = await this.getOrCreateContact(entityManager, cmd)
+    const savedContact = await this.ormDataSource.transaction<MaybeFeaturedContact>(async entityManager => {
+      const contact = await this.getOrCreateContact(entityManager, cmd)
 
-        const owner = await this.getOwner(entityManager, cmd)
-        const personToContactLink = await this.linkPersonToContact(entityManager, owner, contact, cmd)
+      const owner = await this.getOwner(entityManager, cmd)
+      const personToContactLink = await this.linkPersonToContact(entityManager, owner, contact, cmd)
 
-        resolve({
-          id: contact.id,
-          type: contact.type,
-          value: contact.value,
-          status: personToContactLink.status,
-          isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
-        })
-      })
-    }).then(async (contact) => {
-      await this.eventBus.publish({
-        name: DomainEventCatalog.OWNER__CONTACT_ADDED,
-        version: '1',
-        contactId: contact.id,
-        ownerId: cmd.ownerId,
-        recording: this.recording,
-      })
-
-      return contact
+      return {
+        id: contact.id,
+        type: contact.type,
+        value: contact.value,
+        status: personToContactLink.status,
+        isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
+      }
     })
+
+    await this.eventBus.publish({
+      name: DomainEventCatalog.OWNER__CONTACT_ADDED,
+      version: '1',
+      contactId: savedContact.id,
+      ownerId: cmd.ownerId,
+      recording: this.recording,
+    })
+
+    return savedContact
   }
 
   private async getOwner (entityManager: EntityManager, cmd: AddContactCommand) {
@@ -104,7 +102,7 @@ export class AddContactService {
       person: { id: owner.person.id }
     })
     if (personAndContactLink) {
-      this.recording.push({type: 'person_contact_already_existed'})
+      this.recording.push({ type: 'person_contact_already_existed' })
       personAndContactLink.status = cmd.status
       await entityManager.save(personAndContactLink)
     } else {
