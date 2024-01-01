@@ -5,6 +5,7 @@ import { createTestContainer } from '../../create-test-container'
 import uuid from 'uuid/v4'
 import { buildingBuilder } from '../../building/building.builder'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
+import { worksheetQueueFactory } from '../../factories'
 
 describe('Worksheet scheduled calls', () => {
   let service: CallSchedulerService
@@ -91,9 +92,6 @@ describe('Worksheet scheduled calls', () => {
       id: testWorksheetId,
       relatedBuildingIds: [ testBuilding.id ],
     })
-    testWorksheetQueue = await queuesRepository.save({
-      name: 'test worksheet queue',
-      worksheets: []
-    })
+    testWorksheetQueue = await queuesRepository.save(worksheetQueueFactory.build())
   }
 })

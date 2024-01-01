@@ -1,11 +1,11 @@
 import { Factory } from 'rosie'
-import { BuildingAddressProps, BuildingProps, NegotiationStatus } from '../src/building/building'
+import type { BuildingAddressProps, BuildingProps } from '../src/building/building'
 import uuid from 'uuid/v4'
-import { ContactProps } from '../src/owner/owner'
-import { Worksheet } from '../src/worksheet/worksheet.entity'
-import { Caller } from '../src/caller/caller.entity'
+import type { ContactProps } from '../src/owner/owner'
+import type { Caller } from '../src/caller/caller.entity'
+import type { WorksheetQueueProps } from '../src/worksheet/domain/queue'
 
-const EntityFactory = Factory.define<{id: string}>('Entity')
+const EntityFactory = Factory.define<{ id: string }>('Entity')
   .attr('id', () => uuid())
 
 export const callerFactory = Factory.define<Caller>('caller').extend(EntityFactory)
@@ -68,16 +68,20 @@ export const buildingAddressFactory = Factory.define<BuildingAddressProps>('addr
   .attrs({
     type: 'CL',
     street: 'street, address',
-    province: '',
+    province: 'TEST_BARCELONA',
     neighborhood: '',
     postalCode: {
       number: '0000',
       verified: false,
     },
-    city: 'BARCELONA',
+    city: 'TEST_BARCELONA',
   })
   .sequence('number', (idx) => `${idx}`)
   .after((address) => ({
     ...address,
     fullAddress: `${address.street} ${address.number}, ${address.city}`
   }))
+
+export const worksheetQueueFactory = Factory.define<WorksheetQueueProps>('worksheet-queue')
+  .extend('Entity')
+  .attr('source', { province: 'TEST_BARCELONA' })
