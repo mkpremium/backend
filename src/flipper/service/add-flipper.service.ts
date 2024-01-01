@@ -16,16 +16,14 @@ export class AddFlipperService {
   }
 
   addFlipper (cmd: AddFlipperCommand): Promise<Flipper> {
-    return new Promise(resolve => {
-      this.ormDataSource.transaction(async (em) => {
-        const user = await addUserService({
-          em,
-          password: cmd.password,
-          username: cmd.username,
-          profile: cmd.profile
-        })
-        resolve(em.save(Flipper, { user }))
+    return this.ormDataSource.transaction<Flipper>(async (em) => {
+      const user = await addUserService({
+        em,
+        password: cmd.password,
+        username: cmd.username,
+        profile: cmd.profile
       })
+      return em.save(Flipper, { user })
     })
   }
 }
