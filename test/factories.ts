@@ -84,5 +84,8 @@ export const buildingAddressFactory = Factory.define<BuildingAddressProps>('addr
 
 export const worksheetQueueFactory = Factory.define<WorksheetQueueProps>('worksheet-queue')
   .extend('Entity')
-  .attr('source', { province: 'TEST_BARCELONA' })
   .sequence('name', idx => `test worksheet queue ${idx}`)
+  .attrs({
+    source: { province: 'TEST_BARCELONA' },
+    worksheets: [],
+  })

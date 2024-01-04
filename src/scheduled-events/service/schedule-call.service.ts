@@ -32,6 +32,7 @@ export class ScheduleCallService {
   }
 
   async scheduleCall (cmd: ScheduleCallCommand) {
+    // TODO: wrap it in a transaction.
     const worksheet = await this.worksheetRepository.ofBuildingId(cmd.event.event.buildingId)
     cmd.event.event.worksheetId = worksheet.id
     const scheduledEvent = await this.scheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)

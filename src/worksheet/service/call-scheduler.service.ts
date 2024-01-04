@@ -1,4 +1,4 @@
-import { WorksheetQueueProps } from '../domain/queue'
+import { WorksheetQueue, WorksheetQueueProps } from '../domain/queue'
 import { ScheduledEventProps } from '../../scheduled-events/types'
 import { QueueItem, QueueItemProps, QueueStatus } from '../models/queue-item'
 import { newHttpError } from '../../lib/http-error'
@@ -35,7 +35,7 @@ export class CallSchedulerService {
 
     const updatedItem = schedule(item, operatorId, scheduledEvent)
     const updatedWorksheets = updateList(queue.worksheets, item, updatedItem)
-    const updatedQueue = t.update(queue, { worksheets: { $set: updatedWorksheets } })
+    const updatedQueue = WorksheetQueue.update(queue, { worksheets: { $set: updatedWorksheets } })
 
     this.logger.info('WorksheetQueueRepository#scheduleWorksheetInQueue worksheet from queue', {
       worksheetId: worksheet.id,
@@ -49,7 +49,7 @@ export class CallSchedulerService {
 }
 
 export function addWorksheet (queue: WorksheetQueueProps, worksheet: WorksheetProps): WorksheetQueueProps {
-  return t.update(queue, {
+  return WorksheetQueue.update(queue, {
     worksheets: {
       $push: [
         QueueItem({
@@ -67,7 +67,7 @@ function findItemByWorksheetId (queue: WorksheetQueueProps, worksheetId: string)
 }
 
 function schedule (item: QueueItemProps, operatorId: string, scheduledEvent: ScheduledEventProps): QueueItemProps {
-  return t.update(item, {
+  return QueueItem.update(item, {
     status: { $set: QueueStatus.SCHEDULED },
     operatorId: { $set: operatorId },
     event: {
