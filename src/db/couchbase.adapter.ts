@@ -72,7 +72,7 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync (query: string, params?, opts?: { queryName: string }): Promise<any> {
+  queryAsync (query: string, params?, opts?: { queryName: string }): Promise<any[]> {
     return this.withRetry(() => {
         const beeline = honeycomb()
         const spanInfo = { name: 'couchbase_query' }

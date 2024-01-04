@@ -25,11 +25,11 @@ export class ScheduledCallsService {
       scheduledCallQuery(this.couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
       [ callId ]
     )
-    return rows.map(parseRow)
+    return parseRow(rows[0])
   }
 }
 
-export const parseRow = ({ event, eventDate, building, owner, eventId, createdBy }) => {
+export const parseRow = ({ event, eventDate, building, owner, eventId, createdBy }): ScheduledCallProps => {
   const shapedRow = {
     id: eventId,
     createdBy,
@@ -84,7 +84,7 @@ interface ScheduledCallProps {
   }
 }
 
-const ScheduledCallsView = t.struct({
+const ScheduledCallsView = t.struct<ScheduledCallProps>({
   id: t.String,
   createdBy: t.String,
   buildingId: t.maybe(t.String), // Remove when all clients are using event's property.
