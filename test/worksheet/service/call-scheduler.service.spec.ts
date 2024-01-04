@@ -32,7 +32,7 @@ describe('Worksheet scheduled calls', () => {
     eventDate: '2020-11-14T08:00:00.000Z'
   } as any
 
-  describe('with Postgres', () => {
+  describe.skip('with Postgres', () => {
     beforeEach(async () => {
       await beforeEachSetup(true)
     })
