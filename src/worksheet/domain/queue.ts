@@ -30,7 +30,7 @@ export interface QueueSource {
 }
 
 export interface WorksheetQueueProps {
-  worksheets: any[]; // queue items
+  worksheets: QueueItemProps[]; // queue items
   id: string;
   name: string;
   source: QueueSource;
@@ -56,12 +56,12 @@ export const WorksheetQueue = t.struct<WorksheetQueueProps>(
   }
 )
 
-const calculateWorksheetIdsToDrop = (queue, userId, maxOpenedWorksheetsByUser): string[] => {
-  const userOpenedWorksheets = queue.worksheets
+function calculateWorksheetIdsToDrop (q: WorksheetQueueProps, userId: string, maxToKeep: number): string[] {
+  const userOpenedWorksheets = q.worksheets
     .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
 
   userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
-  return _.map(_.drop(userOpenedWorksheets, maxOpenedWorksheetsByUser), 'worksheetId')
+  return _.map(_.dropRight(userOpenedWorksheets, maxToKeep), 'worksheetId')
 }
 
 export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): [Object, string[]] {
