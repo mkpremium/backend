@@ -42,7 +42,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
           worksheetId: id,
           addedAt: lastViewedAt,
           operatorId: heldBy?.id,
-          status
+          status // TODO: map status
         })
       ),
     }
