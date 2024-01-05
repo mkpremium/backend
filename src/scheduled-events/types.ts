@@ -60,7 +60,7 @@ interface EventProps {
   ownerId: string;
   contactId: string;
   buildingId: string;
-  worksheetId: string;
+  worksheetId?: string;
   inPerson?: boolean
 }
 
