@@ -23,7 +23,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
     return {
       id: struct.id,
       name: struct.name,
-      worksheets: struct.worksheets,
+      worksheets: struct.worksheets.map(({worksheetId}) => ({id: worksheetId})),
       source: struct.source,
       createdAt: struct.createdAt,
       updatedAt: struct.updatedAt,
@@ -35,7 +35,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
       id: entity.id,
       name: entity.name,
       source: entity.source,
-      worksheets: entity.worksheets,
+      worksheets: entity.worksheets.map(({id}) => ({worksheetId: id})),
     }
   }
 
