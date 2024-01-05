@@ -33,13 +33,18 @@ export class WorksheetQueueActionsService {
   }
 
   async removeScheduledCallFromWorksheets (scheduledCallId: string) {
+    // As we use the worksheet as source for the queue in Postgres there is no need to update the queue.
+    if (this.usePostgres) {
+      return
+    }
+
     return this.worksheetQueueRepository.findQueueWithScheduledCallOfId(scheduledCallId)
       .then(queue => {
         if (!queue) {
           return
         }
 
-        return this.worksheetQueueRepository.save(removeScheduledCall(queue, scheduledCallId))
+        this.worksheetQueueRepository.save(removeScheduledCall(queue, scheduledCallId))
       })
   }
 }
