@@ -33,6 +33,7 @@ describe('ScheduleCallService', () => {
       legacyWorksheetQueueRepositoryStub,
       worksheetRepositoryStub,
       eventBusStub,
+      false,
     )
   })
 

@@ -1,6 +1,6 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { CallScheduledProps } from '../types'
+import { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
@@ -28,11 +28,19 @@ export class ScheduleCallService {
     private worksheetQueueRepository: WorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
     private eventBus: EventPublisher,
+    private usePostgres: boolean,
   ) {
   }
 
-  async scheduleCall (cmd: ScheduleCallCommand) {
-    // TODO: wrap it in a transaction.
+  async scheduleCall (cmd: ScheduleCallCommand): Promise<ScheduledEventProps> {
+    return this.usePostgres ? this.doPostgres(cmd) : this.doCouchbase(cmd)
+  }
+
+  private doPostgres (cmd: ScheduleCallCommand): Promise<ScheduledEventProps> {
+    return null
+  }
+
+  private async doCouchbase (cmd: ScheduleCallCommand) {
     const worksheet = await this.worksheetRepository.ofBuildingId(cmd.event.event.buildingId)
     cmd.event.event.worksheetId = worksheet.id
     const scheduledEvent = await this.scheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)

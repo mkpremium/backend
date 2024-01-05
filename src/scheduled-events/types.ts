@@ -64,8 +64,10 @@ interface EventProps {
   inPerson?: boolean
 }
 
+export type ScheduledEventId = string & { _kind: 'ScheduledEventId' }
+
 export interface ScheduledEventProps {
-  id: string;
+  id: ScheduledEventId;
   type: 'CALLS' | 'MEETINGS';
   notifyTo: string;
   eventDate: Date | string;
@@ -84,4 +86,3 @@ export interface CallScheduledProps extends ScheduledEventProps {
   type: 'CALLS'
   event: EventProps & { inPerson: false }
 }
-
