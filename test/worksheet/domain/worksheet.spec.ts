@@ -53,7 +53,9 @@ describe('WorksheetQueue', () => {
       const testQueue = worksheetQueueBuilder({
         worksheets: [ {
           worksheetId: testWorksheet.id,
-          operatorId: 'test-user-id'
+          operatorId: 'test-user-id',
+          status: 'OPENED',
+          addedAt: new Date(),
         } ]
       }).build()
 
