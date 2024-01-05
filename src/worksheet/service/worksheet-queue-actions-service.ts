@@ -12,6 +12,7 @@ export class WorksheetQueueActionsService {
     private worksheetRepository: WorksheetRepository,
     private callcenterWorksheetService: CallcenterWorksheetService,
     private eventBus: EventPublisher,
+    private usePostgres: boolean,
   ) {
   }
 
@@ -22,7 +23,10 @@ export class WorksheetQueueActionsService {
     const [ queueWithWorksheet, worksheetInQueue ] = takeWorksheet(queue, worksheet, userId)
 
     await this.worksheetRepository.save(worksheetInQueue)
-    await this.worksheetQueueRepository.save(queueWithWorksheet)
+    // As we use the worksheet as source for the queue in Postgres there is no need to update the queue.
+    if (!this.usePostgres) {
+      await this.worksheetQueueRepository.save(queueWithWorksheet)
+    }
     await this.eventBus.publish({ name: DomainEventCatalog.WORKSHEET__TAKEN, worksheetId, queueId, by: userId })
 
     return this.callcenterWorksheetService.getWorksheetForCallcenterView(worksheetId)

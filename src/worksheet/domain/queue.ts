@@ -61,7 +61,7 @@ function calculateWorksheetIdsToDrop (q: WorksheetQueueProps, userId: string, ma
     .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
 
   userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
-  return _.map(_.dropRight(userOpenedWorksheets, maxToKeep), 'worksheetId')
+  return _.map(_.drop(userOpenedWorksheets, maxToKeep), 'worksheetId')
 }
 
 export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): [Object, string[]] {
