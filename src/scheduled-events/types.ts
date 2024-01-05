@@ -80,7 +80,7 @@ export interface MeetingProps extends ScheduledEventProps {
   event: EventProps & { inPerson: true }
 }
 
-export interface OfferRequestProps extends ScheduledEventProps {
+export interface CallScheduledProps extends ScheduledEventProps {
   type: 'CALLS'
   event: EventProps & { inPerson: false }
 }

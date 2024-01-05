@@ -9,7 +9,7 @@ import { OperatorStats } from '../../stats/models'
 import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
-import { Event, OfferRequestProps, ScheduledEvent, ScheduledEventProps } from '../types'
+import { CallScheduledProps, Event, ScheduledEvent, ScheduledEventProps } from '../types'
 
 const UpdateScheduledEvent = t.struct<ScheduledEventProps>({
   eventDate: t.maybe(t.Date),
@@ -53,7 +53,7 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     return scheduledEvent
   }
 
-  async addScheduleCallEvent (data: Omit<OfferRequestProps, 'id'>, createdBy: string): Promise<OfferRequestProps> {
+  async addScheduleCallEvent (data: Omit<CallScheduledProps, 'id'>, createdBy: string): Promise<CallScheduledProps> {
     const params = Object.assign({}, data, { createdBy, type: 'CALLS' })
     return this.save(params)
   }
