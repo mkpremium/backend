@@ -52,7 +52,6 @@ describe('ScheduleCallService', () => {
           worksheetId: undefined
         },
         eventDate: undefined,
-        id: '',
         note: '',
         notifyTo: '',
         type: undefined
