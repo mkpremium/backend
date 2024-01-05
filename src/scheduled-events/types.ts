@@ -83,10 +83,12 @@ export interface ScheduledEventProps {
 }
 
 export interface MeetingProps extends ScheduledEventProps {
+  type: 'MEETINGS'
   event: MeetingEventProps
 }
 
 export interface OfferRequestProps extends ScheduledEventProps {
+  type: 'CALLS'
   event: OfferRequestEventProps
 }
 
