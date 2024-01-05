@@ -8,7 +8,9 @@ import { BaseEntity } from '../../infrastructure/entity'
 export class PostgresWorksheetQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
   implements WorksheetQueueRepository {
   relations = {
-    worksheets: true,
+    worksheets: {
+      heldBy: true
+    },
   }
 
   findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps & BaseEntity> {
@@ -23,7 +25,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
     return {
       id: struct.id,
       name: struct.name,
-      worksheets: struct.worksheets.map(({worksheetId}) => ({id: worksheetId})),
+      worksheets: struct.worksheets.map(({ worksheetId }) => ({ id: worksheetId })),
       source: struct.source,
       createdAt: struct.createdAt,
       updatedAt: struct.updatedAt,
@@ -35,7 +37,14 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
       id: entity.id,
       name: entity.name,
       source: entity.source,
-      worksheets: entity.worksheets.map(({id}) => ({worksheetId: id})),
+      worksheets: entity.worksheets.map(
+        ({ id, heldBy, lastViewedAt, status }) => ({
+          worksheetId: id,
+          addedAt: lastViewedAt,
+          operatorId: heldBy?.id,
+          status
+        })
+      ),
     }
   }
 

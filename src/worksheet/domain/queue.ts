@@ -69,6 +69,7 @@ export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, 
 
   return [
     t.update(queue, {
+      // This would not have any effect on the Postgres implementation as it uses the worksheets array as a relation.
       worksheets: {
         $set: queue.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
       }

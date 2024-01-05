@@ -4,6 +4,7 @@ import { WorksheetStatusType } from './domain/worksheet'
 import { Building } from '../building/building.entity'
 import { WorksheetQueue } from './worksheet-queue.entity'
 import { User } from '../user/user.entity'
+import { Caller } from '../caller/caller.entity'
 
 @Entity()
 export class Worksheet extends BaseEntity {
@@ -16,6 +17,9 @@ export class Worksheet extends BaseEntity {
 
     @ManyToOne(() => WorksheetQueue, wq => wq.worksheets)
     queue?: WorksheetQueue
+
+    @ManyToOne(() => Caller, {nullable: true})
+    heldBy?: Caller
 
     @Column({ type: 'text', default: '' })
     statusChangeReason?: string
