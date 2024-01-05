@@ -64,13 +64,6 @@ interface EventProps {
   inPerson?: boolean
 }
 
-interface MeetingEventProps extends EventProps {
-  inPerson: true
-}
-interface OfferRequestEventProps extends EventProps {
-  inPerson: false
-}
-
 export interface ScheduledEventProps {
   id: string;
   type: 'CALLS' | 'MEETINGS';
@@ -84,11 +77,11 @@ export interface ScheduledEventProps {
 
 export interface MeetingProps extends ScheduledEventProps {
   type: 'MEETINGS'
-  event: MeetingEventProps
+  event: EventProps & { inPerson: true }
 }
 
 export interface OfferRequestProps extends ScheduledEventProps {
   type: 'CALLS'
-  event: OfferRequestEventProps
+  event: EventProps & { inPerson: false }
 }
 
