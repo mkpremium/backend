@@ -6,7 +6,6 @@ export const QueueStatus = {
   AVAILABLE: 'AVAILABLE',
   OPENED: 'OPENED',
   SCHEDULED: 'SCHEDULED',
-  CLOSED: 'CLOSED'
 }
 export const WorkSheetQueueStatus = t.enums(QueueStatus, 'WorkSheetQueueStatus')
 
