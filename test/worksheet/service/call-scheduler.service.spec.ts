@@ -41,7 +41,7 @@ describe('Worksheet scheduled calls', () => {
       await testAddCallToQueue()
     })
 
-    it.skip('schedules call and adds worksheet to queue', async () => {
+    it('schedules call and adds worksheet to queue', async () => {
       await testAddWorksheetToQueue()
     })
   })
