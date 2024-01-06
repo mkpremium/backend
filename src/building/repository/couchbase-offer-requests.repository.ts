@@ -1,14 +1,16 @@
 import moment from 'moment'
 import uuid from 'uuid/v4'
 import { ScheduledEvent } from '../../scheduled-events/types'
-import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import { CouchbaseDocumentType } from '../../infrastructure/postgres/couchbase-document.entity'
 import { OfferRequestsRepository } from './offer-requests.repository'
+import {
+  CouchbaseScheduledEventsRepository
+} from '../../scheduled-events/repository/couchbase-schedule-events.repository'
 
 const DbOfferRequest = ScheduledEvent
 
 export class CouchbaseOfferRequestsRepository implements OfferRequestsRepository {
-  constructor (private scheduledEventsRepository: ScheduledEventsRepository) {
+  constructor (private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository) {
   }
 
   async add (offer: {
@@ -38,7 +40,7 @@ export class CouchbaseOfferRequestsRepository implements OfferRequestsRepository
       }
     })
 
-    await this.scheduledEventsRepository.addScheduledMeetingEvent(scheduledEvent, offer.callerId)
+    await this.couchbaseScheduledEventsRepository.addScheduledMeetingEvent(scheduledEvent, offer.callerId)
 
     return { ...offer, id: scheduledEvent.id }
   }
