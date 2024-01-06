@@ -3,9 +3,10 @@ import { createTestContainer } from '../../create-test-container'
 import moment from 'moment'
 import { meetingBuilder } from '../../scheduled-events/meeting.builder'
 import { expect } from 'chai'
+import { CouchbaseScheduledEventsRepository } from '../../../src/scheduled-events/repository/couchbase-schedule-events.repository'
 
-describe('ScheduledEventsRepository', () => {
-  let repository!: ScheduledEventsRepository
+describe('CouchbaseScheduledEventsRepository', () => {
+  let repository!: CouchbaseScheduledEventsRepository
 
   beforeEach(async () => {
     const container = await createTestContainer({couchbase: true, postgres: false})
