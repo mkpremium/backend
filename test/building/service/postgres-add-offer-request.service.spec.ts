@@ -31,6 +31,13 @@ describe('addOfferRequestService', () => {
     }
 
     await deps.addOfferRequestService.addOfferRequest(testCmd)
+
+    const updatedBuilding = await deps.buildingsRepository.get(testBuilding.id)
+    expect(updatedBuilding.assignedAgentId).to.be.equal(testFlipper.id)
+
+    // const flipperNegotiations = await listBuildingsService.buildingsOfId([ testBuilding.id ])
+    // expect(flipperNegotiations).to.be.lengthOf(1)
+    // expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
   })
 })
 

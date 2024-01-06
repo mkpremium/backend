@@ -1,7 +1,6 @@
 import { Promise as Bluebird } from 'bluebird'
 import { expect } from 'chai'
 import moment from 'moment'
-import { OfferRequestsRepository } from '../../../src/building/repository/offer-requests.repository'
 import { ListBuildingsService } from '../../../src/building/service/list-buildings.service'
 import { createTestContainer } from '../../create-test-container'
 import { ownerBuilder } from '../../owner/owner.builder'
@@ -10,11 +9,12 @@ import { buildingBuilder } from '../building.builder'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { WorksheetRepository } from '../../../src/worksheet/repository/worksheet.repository'
+import { CouchbaseOfferRequestsRepository } from '../../../src/building/repository/couchbase-offer-requests.repository'
 
-describe('OfferRequestsRepository', () => {
+describe('CouchbaseOfferRequestsRepository', () => {
   const testBuilding = buildingBuilder().build()
   const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
-  let repository: OfferRequestsRepository
+  let repository: CouchbaseOfferRequestsRepository
   let listBuildingsService: ListBuildingsService
   let buildingsRepository: BuildingsRepository
   let ownersRepository: OwnerRepository

@@ -2,25 +2,18 @@ import moment from 'moment'
 import uuid from 'uuid/v4'
 import { ScheduledEvent } from '../../scheduled-events/types'
 import { CouchbaseDocumentType } from '../../infrastructure/postgres/couchbase-document.entity'
-import { OfferRequestsRepository } from './offer-requests.repository'
 import {
   CouchbaseScheduledEventsRepository
 } from '../../scheduled-events/repository/couchbase-schedule-events.repository'
+import { AddBuildingOfferCommand } from '../service/add-offer-request.service'
 
 const DbOfferRequest = ScheduledEvent
 
-export class CouchbaseOfferRequestsRepository implements OfferRequestsRepository {
+export class CouchbaseOfferRequestsRepository  {
   constructor (private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository) {
   }
 
-  async add (offer: {
-    flipperId: string,
-    callerId: string,
-    ownerId: string,
-    destinationContactId: string,
-    worksheetId: string,
-    buildingId: string
-  }) {
+  async add (offer: AddBuildingOfferCommand): Promise<AddBuildingOfferCommand & {id: string}> {
     const now = moment().toDate()
 
     const scheduledEvent = DbOfferRequest({
