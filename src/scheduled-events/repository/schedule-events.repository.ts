@@ -80,19 +80,6 @@ export class ScheduledEventsRepository extends CouchbaseModel {
     await this.query(qb)
   }
 
-  async weekScheduleEventMeetings (week, year) {
-    const now = utc()
-    const y = year || now.year()
-    const w = week || now.week()
-    const rangeWeek = buildRangeFromWeek(w, y)
-
-    const qb = this.getQueryBuilder()
-    addBetweenQueryToBuilder(qb, 'eventDate', rangeWeek)
-    qb.where('type = ?', 'MEETINGS')
-
-    return this.query(qb)
-  }
-
   lastScheduledEventForBuilding (buildingId): Promise<ScheduledEventProps | undefined> {
     return this.couchbaseAdapter.queryAsync(
       `SELECT event.*
