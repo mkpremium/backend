@@ -1,7 +1,5 @@
 import { AddOfferRequestService } from '../../../src/building/service/add-offer-request.service'
 import { expect } from 'chai'
-import { stub, spy } from 'sinon'
-import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
 import { AddContactService } from '../../../src/owner/service/add-contact.service'
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
@@ -12,12 +10,13 @@ import { createTestContainer } from '../../create-test-container'
 import { buildingFactory, userFactory } from '../../factories'
 import { addCaller, createOwnerWithEmailContact } from '../../helpers'
 import { AddOperatorService } from '../../../src/user/service/add-operator.service'
+import { ListBuildingsService } from '../../../src/building/service/list-buildings.service'
 
 describe('addOfferRequestService', () => {
   it('adds offer request', async () => {
     const deps = await buildDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
-    const [testOwner, testEmailContact] = await createOwnerWithEmailContact(testBuilding, deps)
+    const [ testOwner, testEmailContact ] = await createOwnerWithEmailContact(testBuilding, deps)
     const testFlipper = await deps.addFlipperService.addFlipper(userFactory.build())
     const testCaller = await addCaller(deps)
     const testCmd = {
@@ -35,15 +34,16 @@ describe('addOfferRequestService', () => {
     const updatedBuilding = await deps.buildingsRepository.get(testBuilding.id)
     expect(updatedBuilding.assignedAgentId).to.be.equal(testFlipper.id)
 
-    // const flipperNegotiations = await listBuildingsService.buildingsOfId([ testBuilding.id ])
-    // expect(flipperNegotiations).to.be.lengthOf(1)
-    // expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
+    const flipperNegotiations = await deps.listBuildingsService.buildingsOfId([ testBuilding.id ])
+    expect(flipperNegotiations).to.be.lengthOf(1)
+    expect(flipperNegotiations[ 0 ].lastMeeting).to.include({ inPerson: false })
   })
 })
 
 async function buildDependencies (): Promise<{
   addOfferRequestService: AddOfferRequestService,
-  addOperatorService: AddOperatorService
+  addOperatorService: AddOperatorService,
+  listBuildingsService: ListBuildingsService,
 
   addContactService: AddContactService,
   addFlipperService: AddFlipperService,
@@ -57,6 +57,7 @@ async function buildDependencies (): Promise<{
   return {
     addOfferRequestService: diContainer.resolve('addOfferRequestService'),
     addOperatorService: diContainer.resolve('addOperatorService'),
+    listBuildingsService: diContainer.resolve('listBuildingsService'),
 
     addContactService: diContainer.resolve('addContactService'),
     addFlipperService: diContainer.resolve('addFlipperService'),
