@@ -21,6 +21,8 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     throw new Error('Method not implemented.')
   }
 
+  // Different to one in the Couchbase repository which seem to be intended for the
+  // proposal sender only.
   async lastScheduledEventForBuilding (buildingId: string): Promise<ScheduledEventProps> {
     const lastBuildingScheduledEvent = await this.repository.findOne({
       order: { scheduledFor: 'DESC' },
