@@ -8,6 +8,9 @@ import { AddFlipperService } from '../../../src/flipper/service/add-flipper.serv
 import { ScheduledEventsRepository } from '../../../src/scheduled-events/repository/schedule-events.repository'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { expect } from 'chai'
+import {
+  PostgresScheduledEventsRepository
+} from '../../../src/scheduled-events/repository/postgres-schedule-events.repository'
 
 describe('PostgresScheduleCallService', () => {
   it('schedule a call', async () => {
@@ -34,7 +37,7 @@ describe('PostgresScheduleCallService', () => {
     const actualScheduledCall = await deps.scheduleCallService.scheduleCall(cmd)
 
     expect(actualScheduledCall).to.not.be.null
-    const lastScheduledEventForBuilding = await deps.scheduledEventsRepository.lastScheduledEventForBuilding(testBuilding.id)
+    const lastScheduledEventForBuilding = await deps.postgresScheduledEventsRepository.lastScheduledEventForBuilding(testBuilding.id)
     expect(lastScheduledEventForBuilding).to.include({ id: actualScheduledCall.id, type: 'CALLS' })
   })
 })
@@ -45,7 +48,7 @@ async function buildDependencies (): Promise<{
   addOwnerService: AddOwnerService,
   buildingsRepository: BuildingsRepository,
   scheduleCallService: ScheduleCallService,
-  scheduledEventsRepository: ScheduledEventsRepository,
+  postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
 }> {
   const diContainer = await createTestContainer({ postgres: true, couchbase: false })
 
@@ -55,6 +58,6 @@ async function buildDependencies (): Promise<{
     addOwnerService: diContainer.resolve('addOwnerService'),
     buildingsRepository: diContainer.resolve('buildingsRepository'),
     scheduleCallService: diContainer.resolve('scheduleCall'),
-    scheduledEventsRepository: diContainer.resolve('scheduledEventsRepository'),
+    postgresScheduledEventsRepository: diContainer.resolve('postgresScheduledEventsRepository'),
   }
 }

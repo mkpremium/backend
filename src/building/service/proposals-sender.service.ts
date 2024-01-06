@@ -5,10 +5,12 @@ import { ProposalsRepository } from '../repository/proposals.repository'
 import { EmailSenderService } from '../../email/email-sender.service'
 import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
-import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import moment from 'moment'
 import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
 import { CouchbaseUsersRepository } from '../../user/repository/couchbase-users.repository'
+import {
+  CouchbaseScheduledEventsRepository
+} from '../../scheduled-events/repository/couchbase-schedule-events.repository'
 
 function isFridayOrWeekend (lastScheduledEventDateToInclude: moment.Moment) {
   return [ 5, 6, 7 ].includes(lastScheduledEventDateToInclude.isoWeekday())
@@ -21,7 +23,7 @@ export class ProposalsSenderService {
     private couchbaseUsersRepository: CouchbaseUsersRepository,
     private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
-    private scheduledEventsRepository: ScheduledEventsRepository,
+    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private logger: Logger,
   ) {
@@ -73,7 +75,7 @@ export class ProposalsSenderService {
     const [ building, sender, lastScheduledEvent ] = await Promise.all([
       this.buildingsRepository.get(proposal.buildingId),
       this.couchbaseUsersRepository.get(proposal.createdBy),
-      this.scheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
+      this.couchbaseScheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
     ])
     if (lastScheduledEvent && moment(lastScheduledEvent.eventDate).isAfter(lastScheduledEventDateToInclude)) {
       return false
