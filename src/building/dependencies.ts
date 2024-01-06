@@ -51,6 +51,7 @@ import { PostgresOfferRequestsRepository } from './repository/postgres-offer-req
 import { UpdateProposalService } from './service/update-proposal.service'
 import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.repository'
 import { PostgresProposalsRepository } from './repository/postgres-proposals.repository'
+import { AddBuildingService } from './service/add-building.service'
 
 export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -112,6 +113,7 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
     addOfferRequestController: asFunction(createAddOfferRequestController),
+    addBuildingService: asClass(AddBuildingService).classic().singleton(),
 
     buildingSearcherService: asClass(BuildingSearcherService).classic().singleton(),
 
