@@ -3,10 +3,7 @@ import { WithPostgresRepository } from '../../infrastructure/postgres/postgres-r
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { ScheduledEventProps, CallScheduledProps } from '../types'
 import { EntityTarget } from 'typeorm'
-import { string } from 'fp-ts'
 import Promise from 'bluebird'
-import { Error } from 'tcomb'
-import { Partial } from 'aws-sdk/clients/cloudsearchdomain'
 
 export class PostgresScheduledEventsRepository extends WithPostgresRepository<ScheduledEvent> implements ScheduledEventsRepository {
   addScheduledMeetingEvent (data: Omit<ScheduledEventProps, 'id' | 'type' | '_documentType' | 'createdAt'>, createdBy: string): Promise<CallScheduledProps> {
