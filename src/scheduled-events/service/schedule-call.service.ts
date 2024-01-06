@@ -56,6 +56,8 @@ export class ScheduleCallService {
       owner: { id: cmd.event.event.ownerId },
     }) as ScheduledEvent
 
+    await this.publishCallScheduledEvent(cmd)
+
     return toScheduledCall(savedEntity)
   }
 
@@ -67,6 +69,12 @@ export class ScheduleCallService {
     const queue = await this.worksheetQueueRepository.get(cmd.queueId)
     await this.callSchedulerService.scheduleWorksheetInQueue(queue, scheduledEvent)
 
+    await this.publishCallScheduledEvent(cmd)
+
+    return scheduledEvent
+  }
+
+  private async publishCallScheduledEvent (cmd: ScheduleCallCommand) {
     await this.eventBus.publish({
       name: DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED,
       userId: cmd.userId,
@@ -75,7 +83,5 @@ export class ScheduleCallService {
       buildingId: cmd.event.event.buildingId,
       note: cmd.event.note
     } as CallScheduled)
-
-    return scheduledEvent
   }
 }
