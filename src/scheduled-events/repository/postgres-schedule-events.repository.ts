@@ -25,6 +25,7 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     const lastBuildingScheduledEvent = await this.repository.findOne({
       order: { scheduledFor: 'DESC' },
       relations: {
+        building: true,
         contact: true,
         createdBy: true,
         notifyTo: true,
@@ -35,24 +36,28 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     if (!lastBuildingScheduledEvent)
       return null
 
-    return {
-      id: lastBuildingScheduledEvent.id as ScheduledEventId,
-      type: 'CALLS',
-      createdBy: lastBuildingScheduledEvent.createdBy.id,
-      eventDate: lastBuildingScheduledEvent.scheduledFor,
-      notifyTo: lastBuildingScheduledEvent.notifyTo.id,
-      createdAt: lastBuildingScheduledEvent.createdAt,
-      event: {
-        buildingId,
-        contactId: lastBuildingScheduledEvent.contact.id,
-        ownerId: lastBuildingScheduledEvent.owner.id,
-        worksheetId: undefined,
-        inPerson: undefined,
-      }
-    }
+    return toScheduledCall(lastBuildingScheduledEvent)
   }
 
   protected getEntityTarget (): EntityTarget<ScheduledEvent> {
     return ScheduledEvent
+  }
+}
+
+export function toScheduledCall (se: ScheduledEvent): ScheduledEventProps {
+  return {
+    id: se.id as ScheduledEventId,
+    type: 'CALLS',
+    createdBy: se.createdBy.id,
+    eventDate: se.scheduledFor,
+    notifyTo: se.notifyTo.id,
+    createdAt: se.createdAt,
+    event: {
+      buildingId: se.building.id,
+      contactId: se.contact.id,
+      ownerId: se.owner.id,
+      worksheetId: undefined,
+      inPerson: false,
+    }
   }
 }

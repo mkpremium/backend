@@ -7,6 +7,7 @@ import { CallSchedulerService } from '../../worksheet/service/call-scheduler.ser
 import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
 import { DataSource } from 'typeorm'
 import { ScheduledEvent } from '../scheduled-event.entity'
+import { toScheduledCall } from '../repository/postgres-schedule-events.repository'
 
 export interface ScheduleCallCommand {
   event: Omit<CallScheduledProps, 'id' | 'type' | 'createdAt' | 'createdBy'> & {
@@ -55,20 +56,7 @@ export class ScheduleCallService {
       owner: { id: cmd.event.event.ownerId },
     }) as ScheduledEvent
 
-    return {
-      id: savedEntity.id as ScheduledEventId,
-      type: 'CALLS',
-      createdBy: savedEntity.createdBy.id,
-      createdAt: savedEntity.createdAt,
-      event: {
-        inPerson: false,
-        ownerId: savedEntity.owner.id,
-        contactId: savedEntity.contact.id,
-        buildingId: savedEntity.building.id,
-      },
-      notifyTo: savedEntity.notifyTo.id,
-      eventDate: savedEntity.scheduledFor,
-    }
+    return toScheduledCall(savedEntity)
   }
 
   private async doCouchbase (cmd: ScheduleCallCommand) {
