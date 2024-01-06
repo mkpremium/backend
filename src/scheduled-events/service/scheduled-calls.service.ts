@@ -5,8 +5,11 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { ContactProps } from '../../owner/owner'
-import { DataSource } from 'typeorm'
+import { DataSource, In } from 'typeorm'
 import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
+import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
+import { ownerEntityToStruct } from '../../owner/repository/postgres-owners.repository'
+import { Building } from '../../building/building.entity'
 
 export class ScheduledCallsService {
   constructor (
@@ -17,7 +20,8 @@ export class ScheduledCallsService {
   }
 
   async scheduledCallsFor (userId: string): Promise<ScheduledCallProps[]> {
-    return this.usePostgres ? PostgresScheduledCallsService.scheduledCallsFor(this.ormDataSource, userId) :
+    return this.usePostgres ? PostgresScheduledCallsService.scheduledCallsFor(
+        this.ormDataSource, userId) :
       CouchbaseScheduledCallsService.scheduledCallsFor(this.couchbaseAdapter, userId)
   }
 
@@ -35,22 +39,43 @@ class PostgresScheduledCallsService {
     const offerRequests = await ormDataSource.manager.find(BuildingOfferRequest, {
       where: { flipper: { user: { id: userId } } },
       relations: {
+        building: true,
         caller: true,
         contact: true,
+        owner: {
+          person: {
+            featuredEmailContact: true,
+            featuredPhoneContact: true,
+            contacts: {
+              contact: true
+            }
+          },
+        }
+      },
+    })
+    const buildingIds = offerRequests.map(or => or.building.id)
+    const buildings = await ormDataSource.manager.find(Building, {
+      where: {
+        id: In(buildingIds)
+      },
+      relations: {
+        assignedFlipper: true,
+        featuredOwner: true,
+        images: true,
+        proposals: true,
       }
     })
+
     return offerRequests.map(offerRequest => ({
       createdBy: offerRequest.caller.id,
       eventDate: offerRequest.createdAt,
       event: {
         contactId: offerRequest.contact.id,
         worksheetId: undefined,
-        owner: null,
-        // owner: {
-        //   id: offerRequest.owner.id,
-        //   building: offerRequest.building,
-        //   person: offerRequest.owner.person
-        // }
+        owner: {
+          ...ownerEntityToStruct({ ...offerRequest.owner, building: {id: offerRequest.building.id} as any }),
+          building: mapBuildingEntityToStruct(buildings.find(b => b.id === offerRequest.building.id))
+        },
       }
     }))
   }
@@ -74,7 +99,14 @@ class CouchbaseScheduledCallsService {
   }
 }
 
-export function parseCouchbaseScheduledEventRow ({ event, eventDate, building, owner, eventId, createdBy }): ScheduledCallProps {
+export function parseCouchbaseScheduledEventRow ({
+                                                   event,
+                                                   eventDate,
+                                                   building,
+                                                   owner,
+                                                   eventId,
+                                                   createdBy
+                                                 }): ScheduledCallProps {
   const shapedRow = {
     id: eventId,
     createdBy,

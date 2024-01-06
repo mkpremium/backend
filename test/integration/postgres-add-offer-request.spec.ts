@@ -25,8 +25,8 @@ describe('Add offer request (Integration)', () => {
       destinationContactId: testEmailContact.id,
       reporterContactId: testEmailContact.id,
       buildingId: testBuilding.id,
-      flipperId: testFlipper.id,
-      callerId: testCaller.callerId,
+      flipperId: testFlipper.user.id,
+      callerId: testCaller.id, // caller's user ID
       note: 'test-note'
     }
 

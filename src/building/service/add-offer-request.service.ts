@@ -8,6 +8,8 @@ import { DataSource } from 'typeorm'
 import { CouchbaseOfferRequestsRepository } from '../repository/couchbase-offer-requests.repository'
 import { BuildingOfferRequest } from '../repository/building-offer-request.entity'
 import { Building } from '../building.entity'
+import { Flipper } from '../../flipper/flipper.entity'
+import { Caller } from '../../caller/caller.entity'
 
 
 interface AddOfferRequestCommand {
@@ -81,14 +83,16 @@ export class AddOfferRequestService {
 
   private async doPostgres (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     return this.ormDataSource.transaction(async entityManager => {
+      const flipper = await entityManager.findOneByOrFail(Flipper, { user: { id: cmd.flipperId } })
+      const caller = await entityManager.findOneByOrFail(Caller, {user: {id: cmd.callerId}})
       const savedOffer = await entityManager.save(BuildingOfferRequest, {
-        flipper: { id: cmd.flipperId },
-        caller: { id: cmd.callerId },
+        flipper: flipper,
+        caller: caller,
         owner: { id: cmd.ownerId },
         contact: { id: cmd.destinationContactId },
         building: { id: cmd.buildingId }
       })
-      await entityManager.update(Building, { id: cmd.buildingId }, { assignedFlipper: { id: cmd.flipperId } })
+      await entityManager.update(Building, { id: cmd.buildingId }, { assignedFlipper: flipper })
 
       return {
         id: savedOffer.id,
