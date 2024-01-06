@@ -1,16 +1,11 @@
 import { ScheduledEventsRepository } from './schedule-events.repository'
 import { WithPostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { ScheduledEvent } from '../scheduled-event.entity'
-import { ScheduledEventProps, CallScheduledProps } from '../types'
-import { EntityTarget } from 'typeorm'
-import Promise from 'bluebird'
+import { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
+import { EntityTarget, Equal } from 'typeorm'
 
 export class PostgresScheduledEventsRepository extends WithPostgresRepository<ScheduledEvent> implements ScheduledEventsRepository {
   addScheduledMeetingEvent (data: Omit<ScheduledEventProps, 'id' | 'type' | '_documentType' | 'createdAt'>, createdBy: string): Promise<CallScheduledProps> {
-    throw new Error('Method not implemented.')
-  }
-
-  addScheduleCallEvent (data: Omit<CallScheduledProps, 'id' | 'type'>, createdBy: string): Promise<CallScheduledProps> {
     throw new Error('Method not implemented.')
   }
 
@@ -26,8 +21,35 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     throw new Error('Method not implemented.')
   }
 
-  lastScheduledEventForBuilding (buildingId: any): Promise<ScheduledEventProps> {
-    throw new Error('Method not implemented.')
+  async lastScheduledEventForBuilding (buildingId: string): Promise<ScheduledEventProps> {
+    const lastBuildingScheduledEvent = await this.repository.findOne({
+      order: { scheduledFor: 'DESC' },
+      relations: {
+        contact: true,
+        createdBy: true,
+        notifyTo: true,
+        owner: true,
+      },
+      where: { building: Equal(buildingId) }
+    })
+    if (!lastBuildingScheduledEvent)
+      return null
+
+    return {
+      id: lastBuildingScheduledEvent.id as ScheduledEventId,
+      type: 'CALLS',
+      createdBy: lastBuildingScheduledEvent.createdBy.id,
+      eventDate: lastBuildingScheduledEvent.scheduledFor,
+      notifyTo: lastBuildingScheduledEvent.notifyTo.id,
+      createdAt: lastBuildingScheduledEvent.createdAt,
+      event: {
+        buildingId,
+        contactId: lastBuildingScheduledEvent.contact.id,
+        ownerId: lastBuildingScheduledEvent.owner.id,
+        worksheetId: undefined,
+        inPerson: undefined,
+      }
+    }
   }
 
   protected getEntityTarget (): EntityTarget<ScheduledEvent> {

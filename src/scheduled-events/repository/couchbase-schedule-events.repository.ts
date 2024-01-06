@@ -9,6 +9,7 @@ import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repo
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { CallScheduledProps, ScheduledEvent, ScheduledEventProps } from '../types'
 import { ScheduledEventsRepository, UpdateScheduledEvent } from './schedule-events.repository'
+import { ScheduleCallCommand } from '../service/schedule-call.service'
 
 export class CouchbaseScheduledEventsRepository extends CouchbaseModel
   implements ScheduledEventsRepository {
@@ -47,7 +48,7 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
     return scheduledEvent
   }
 
-  async addScheduleCallEvent (data: Omit<CallScheduledProps, 'id' | 'type'>, createdBy: string): Promise<CallScheduledProps> {
+  async addScheduleCallEvent (data: ScheduleCallCommand["event"], createdBy: string): Promise<CallScheduledProps> {
     const params = Object.assign({}, data, { createdBy, type: 'CALLS' })
     return this.save(params)
   }

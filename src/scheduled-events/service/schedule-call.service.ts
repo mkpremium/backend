@@ -1,5 +1,5 @@
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { CallScheduledProps, ScheduledEventProps } from '../types'
+import type { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
@@ -56,6 +56,7 @@ export class ScheduleCallService {
     }) as ScheduledEvent
 
     return {
+      id: savedEntity.id as ScheduledEventId,
       type: 'CALLS',
       createdBy: savedEntity.createdBy.id,
       createdAt: savedEntity.createdAt,
