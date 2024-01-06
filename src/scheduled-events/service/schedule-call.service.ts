@@ -1,15 +1,22 @@
-import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { CallScheduledProps, ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
 import { CallSchedulerService } from '../../worksheet/service/call-scheduler.service'
+import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
+import { DataSource } from 'typeorm'
+import { ScheduledEvent } from '../scheduled-event.entity'
 
 export interface ScheduleCallCommand {
-  event: Omit<CallScheduledProps, 'id' | 'type'> & { note: string }
+  event: Omit<CallScheduledProps, 'id' | 'type' | 'createdAt' | 'createdBy'> & {
+    note: string
+    eventDate: string
+    createdAt?: Date
+    createdBy?: string
+  }
   userId: string
-  queueId: string
+  queueId?: string
 }
 
 export interface CallScheduled {
@@ -23,12 +30,13 @@ export interface CallScheduled {
 
 export class ScheduleCallService {
   constructor (
-    private scheduledEventsRepository: ScheduledEventsRepository,
+    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
     private callSchedulerService: CallSchedulerService,
     private worksheetQueueRepository: WorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
+    private ormDataSource: DataSource,
   ) {
   }
 
@@ -36,14 +44,36 @@ export class ScheduleCallService {
     return this.usePostgres ? this.doPostgres(cmd) : this.doCouchbase(cmd)
   }
 
-  private doPostgres (cmd: ScheduleCallCommand): Promise<ScheduledEventProps> {
-    return null
+  private async doPostgres (cmd: ScheduleCallCommand): Promise<ScheduledEventProps> {
+    const savedEntity = await this.ormDataSource.manager.save(ScheduledEvent, {
+      type: 'CALLS',
+      scheduledFor: cmd.event.eventDate,
+      notifyTo: { id: cmd.event.notifyTo },
+      createdBy: { id: cmd.userId },
+      building: { id: cmd.event.event.buildingId },
+      contact: { id: cmd.event.event.contactId },
+      owner: { id: cmd.event.event.ownerId },
+    }) as ScheduledEvent
+
+    return {
+      type: 'CALLS',
+      createdBy: savedEntity.createdBy.id,
+      createdAt: savedEntity.createdAt,
+      event: {
+        inPerson: false,
+        ownerId: savedEntity.owner.id,
+        contactId: savedEntity.contact.id,
+        buildingId: savedEntity.building.id,
+      },
+      notifyTo: savedEntity.notifyTo.id,
+      eventDate: savedEntity.scheduledFor,
+    }
   }
 
   private async doCouchbase (cmd: ScheduleCallCommand) {
     const worksheet = await this.worksheetRepository.ofBuildingId(cmd.event.event.buildingId)
     cmd.event.event.worksheetId = worksheet.id
-    const scheduledEvent = await this.scheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)
+    const scheduledEvent = await this.couchbaseScheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)
 
     const queue = await this.worksheetQueueRepository.get(cmd.queueId)
     await this.callSchedulerService.scheduleWorksheetInQueue(queue, scheduledEvent)

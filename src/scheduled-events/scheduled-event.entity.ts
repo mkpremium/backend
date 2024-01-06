@@ -10,18 +10,18 @@ export class ScheduledEvent extends BaseEntity {
   @Column('timestamp')
   scheduledFor: Date
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false })
   notifyTo: User
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false })
   createdBy: User
 
-  @ManyToOne(() => Building)
+  @ManyToOne(() => Building, { nullable: false })
   building: Building
 
-  @ManyToOne(() => Owner)
+  @ManyToOne(() => Owner, { nullable: false })
   owner: Owner
 
-  @ManyToOne(() => Contact)
+  @ManyToOne(() => Contact, { nullable: false })
   contact: Contact
 }
