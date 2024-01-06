@@ -2,7 +2,7 @@ import { ScheduleCallService } from '../../../src/scheduled-events/service/sched
 import { stub } from 'sinon'
 import { expect } from 'chai'
 
-describe('ScheduleCallService', () => {
+describe('ScheduleCallService (Couchbase)', () => {
   let service: ScheduleCallService
   let scheduledEventsRepositoryStub
   let legacyWorksheetQueueRepositoryStub
