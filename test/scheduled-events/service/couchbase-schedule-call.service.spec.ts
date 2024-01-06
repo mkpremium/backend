@@ -34,6 +34,7 @@ describe('ScheduleCallService (Couchbase)', () => {
       worksheetRepositoryStub,
       eventBusStub,
       false,
+      null
     )
   })
 
