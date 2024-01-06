@@ -7,6 +7,9 @@ import { AddProposalForBuildingService } from '../src/building/service/add-propo
 import { MaybeFeaturedContact } from '../src/owner/service/add-contact.service'
 import { Owner } from '../src/owner/owner.entity'
 import { emailContactFactory, phoneContactFactory } from './factories'
+import { AddOperatorService } from '../src/user/service/add-operator.service'
+import { Factory } from 'rosie'
+import { UserProfileProps } from '../src/types/user'
 
 export function orFail () {
   return TE.orElse((error) => {
@@ -69,4 +72,18 @@ async function createOwner (testBuilding: Pick<BuildingProps, 'id'>, { addOwnerS
       contacts: []
     }
   }, 'test-requester-id')
+}
+
+export async function addCaller ({ addOperatorService }: { addOperatorService: AddOperatorService }) {
+  return addUserWithRole(addOperatorService, 'OPERATOR')
+}
+
+export async function addUserWithRole (service: AddOperatorService, role: 'BUSINESS' | 'OPERATOR') {
+  const testCommand = {
+    ...Factory.build<{ username: string, password: string }>('user-credentials'),
+    profile: Factory.build<UserProfileProps>('user-profile'),
+    roles: [ role ],
+    enable: true,
+  }
+  return await service.addOperator(testCommand, { id: 'admin' })
 }

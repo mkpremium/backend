@@ -16,7 +16,10 @@ export class AddOperatorService {
   ) {
   }
 
-  async addOperator (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
+  async addOperator (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps & {
+    callerId?: string,
+    flipperId?: string
+  }> {
     return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd, requester)
   }
 
@@ -39,16 +42,22 @@ export class AddOperatorService {
         isAdmin: cmd.roles.includes(UserRoles.ADMIN),
         profile: cmd.profile,
       })
+      let flipperId: string
+      let callerId: string
       if (cmd.roles.includes(UserRoles.BUSINESS)) {
-        await em.save(Flipper, {user})
+        const flipper = await em.save(Flipper, { user })
+        flipperId = flipper.id
       }
       if (cmd.roles.includes(UserRoles.OPERATOR)) {
-        await em.save(Caller, {user})
+        const caller = await em.save(Caller, { user })
+        callerId = caller.id
       }
 
       return {
         enable: user.enabled,
         roles: cmd.roles,
+        callerId,
+        flipperId,
         ...user
       }
     })

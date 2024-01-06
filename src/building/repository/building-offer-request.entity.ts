@@ -18,9 +18,6 @@ export class BuildingOfferRequest extends BaseEntity {
   @ManyToOne(() => Contact, {nullable: false})
   contact: Contact
 
-  @ManyToOne(() => Worksheet, {nullable: false})
-  worksheet: Worksheet
-
   @ManyToOne(() => Building, {nullable: false})
   building: Building
 

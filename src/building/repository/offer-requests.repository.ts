@@ -3,7 +3,7 @@ export interface AddBuildingOfferCommand {
   callerId: string,
   ownerId: string,
   destinationContactId: string,
-  worksheetId: string,
+  worksheetId?: string,
   buildingId: string
 }
 
