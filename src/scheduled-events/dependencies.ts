@@ -18,15 +18,18 @@ import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled
 import { removeScheduledCallOnDiscardedContact } from './listeners/remove-scheduled-call-on-discarded-contact'
 import { updateScheduledCallController } from './controller/update-schedule-call.controller'
 import { CouchbaseScheduledEventsRepository } from './repository/couchbase-schedule-events.repository'
+import { PostgresScheduledEventsRepository } from './repository/postgres-schedule-events.repository'
 
 export function setupScheduledEventsDependencies (container: AwilixContainer) {
+  const usePostgres = container.resolve('usePostgres')
   container.register({
     meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
     couchbaseScheduledEventsRepository: asClass(CouchbaseScheduledEventsRepository).singleton(),
-    scheduledEventsRepository: aliasTo('couchbaseScheduledEventsRepository'),
+    postgresScheduledEventsRepository: asClass(PostgresScheduledEventsRepository).singleton(),
+    scheduledEventsRepository: aliasTo(usePostgres ? 'postgresScheduledEventsRepository' : 'couchbaseScheduledEventsRepository'),
     selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
     meetingsService: asClass(MeetingsService).singleton(),
 

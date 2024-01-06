@@ -4,29 +4,15 @@ import uuid from 'uuid/v4'
 import type { ContactProps } from '../src/owner/owner'
 import type { Caller } from '../src/caller/caller.entity'
 import type { WorksheetQueueProps } from '../src/worksheet/domain/queue'
+import { WorksheetProps } from '../src/worksheet/domain/worksheet'
+import { Flipper } from '../src/flipper/flipper.entity'
 
 const EntityFactory = Factory.define<{ id: string }>('Entity')
   .attr('id', () => uuid())
 
-export const callerFactory = Factory.define<Caller>('caller').extend(EntityFactory)
-  .attr('user', () => Factory.attributes('user', {}))
-
-export const flipperFactory = Factory.define('flipper').extend(EntityFactory)
-  .attr('user', () => Factory.attributes('user', {}))
-
 Factory.define('user-credentials')
   .sequence('username', idx => `test-user-${idx}`)
   .attr('password', 'test-User-pa$$w0rd')
-
-Factory.define('user')
-  .extend('user-credentials')
-  .option('roles', [])
-  .attrs({
-      profile: () => Factory.attributes('user-profile', {}),
-      enabled: true,
-      roles: []
-    }
-  )
 
 Factory.define('user-profile')
   .attrs({
@@ -36,6 +22,22 @@ Factory.define('user-profile')
     language: 'es',
     email: 'user@email.test',
   })
+
+export const userFactory = Factory.define('user')
+  .extend('user-credentials')
+  .option('roles', [])
+  .attrs({
+      profile: () => Factory.attributes('user-profile', {}),
+      enabled: true,
+      roles: []
+    }
+  )
+
+export const callerFactory = Factory.define<Caller>('caller').extend(EntityFactory)
+  .attr('user', () => userFactory.attributes({}))
+
+export const flipperFactory = Factory.define<Flipper>('flipper').extend(EntityFactory)
+  .attr('user', () => userFactory.attributes({}))
 
 export const phoneContactFactory = Factory.define<ContactProps>('phone-contact').extend('Entity')
   .attrs({
@@ -89,3 +91,9 @@ export const worksheetQueueFactory = Factory.define<WorksheetQueueProps>('worksh
     source: { province: 'TEST_BARCELONA' },
     worksheets: [],
   })
+
+export const worksheetFactory = Factory.define<WorksheetProps>('worksheet')
+  .extend('Entity')
+  .option('buildingId')
+  .attr('relatedBuildingIds', ['buildingId'], buildingId => [ buildingId ])
+  .attr('status', 'OPEN')
