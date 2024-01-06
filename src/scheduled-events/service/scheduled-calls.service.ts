@@ -5,19 +5,20 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { ContactProps } from '../../owner/owner'
+import { DataSource } from 'typeorm'
+import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
 
 export class ScheduledCallsService {
   constructor (
     private couchbaseAdapter: CouchbaseAdapter,
+    private usePostgres: boolean,
+    private ormDataSource: DataSource,
   ) {
   }
 
   async scheduledCallsFor (userId: string): Promise<ScheduledCallProps[]> {
-    const rows = await this.couchbaseAdapter.queryAsync(
-      scheduledCallQuery(this.couchbaseAdapter.bucketName, [ 'se.notifyTo = $1' ]),
-      [ userId ]
-    )
-    return rows.map(parseRow)
+    return this.usePostgres ? PostgresScheduledCallsService.scheduledCallsFor(this.ormDataSource, userId) :
+      CouchbaseScheduledCallsService.scheduledCallsFor(this.couchbaseAdapter, userId)
   }
 
   async getById (callId: string): Promise<ScheduledCallProps> {
@@ -25,11 +26,55 @@ export class ScheduledCallsService {
       scheduledCallQuery(this.couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
       [ callId ]
     )
-    return parseRow(rows[0])
+    return parseCouchbaseScheduledEventRow(rows[ 0 ])
   }
 }
 
-export const parseRow = ({ event, eventDate, building, owner, eventId, createdBy }): ScheduledCallProps => {
+class PostgresScheduledCallsService {
+  static async scheduledCallsFor (ormDataSource: DataSource, userId: string): Promise<ScheduledCallProps[]> {
+    const offerRequests = await ormDataSource.manager.find(BuildingOfferRequest, {
+      where: { flipper: { user: { id: userId } } },
+      relations: {
+        caller: true,
+        contact: true,
+      }
+    })
+    return offerRequests.map(offerRequest => ({
+      createdBy: offerRequest.caller.id,
+      eventDate: offerRequest.createdAt,
+      event: {
+        contactId: offerRequest.contact.id,
+        worksheetId: undefined,
+        owner: null,
+        // owner: {
+        //   id: offerRequest.owner.id,
+        //   building: offerRequest.building,
+        //   person: offerRequest.owner.person
+        // }
+      }
+    }))
+  }
+}
+
+class CouchbaseScheduledCallsService {
+  static async scheduledCallsFor (couchbaseAdapter: CouchbaseAdapter, userId: string): Promise<ScheduledCallProps[]> {
+    const rows = await couchbaseAdapter.queryAsync(
+      scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.notifyTo = $1' ]),
+      [ userId ]
+    )
+    return rows.map(parseCouchbaseScheduledEventRow)
+  }
+
+  static async getById (couchbaseAdapter: CouchbaseAdapter, callId: string): Promise<ScheduledCallProps> {
+    const rows = await couchbaseAdapter.queryAsync(
+      scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
+      [ callId ]
+    )
+    return parseCouchbaseScheduledEventRow(rows[ 0 ])
+  }
+}
+
+export function parseCouchbaseScheduledEventRow ({ event, eventDate, building, owner, eventId, createdBy }): ScheduledCallProps {
   const shapedRow = {
     id: eventId,
     createdBy,

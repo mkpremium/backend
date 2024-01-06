@@ -1,18 +1,19 @@
-import { AddOfferRequestService } from '../../../src/building/service/add-offer-request.service'
+import { AddOfferRequestService } from '../../src/building/service/add-offer-request.service'
 import { expect } from 'chai'
-import { AddContactService } from '../../../src/owner/service/add-contact.service'
-import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
-import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
-import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
-import type { ScheduleCallService } from '../../../src/scheduled-events/service/schedule-call.service'
-import { ScheduledEventsRepository } from '../../../src/scheduled-events/repository/schedule-events.repository'
-import { createTestContainer } from '../../create-test-container'
-import { buildingFactory, userFactory } from '../../factories'
-import { addCaller, createOwnerWithEmailContact } from '../../helpers'
-import { AddOperatorService } from '../../../src/user/service/add-operator.service'
-import { ListBuildingsService } from '../../../src/building/service/list-buildings.service'
+import { AddContactService } from '../../src/owner/service/add-contact.service'
+import { AddFlipperService } from '../../src/flipper/service/add-flipper.service'
+import { AddOwnerService } from '../../src/owner/service/add-owner.service'
+import { BuildingsRepository } from '../../src/building/repository/buildings.repository'
+import type { ScheduleCallService } from '../../src/scheduled-events/service/schedule-call.service'
+import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/schedule-events.repository'
+import { createTestContainer } from '../create-test-container'
+import { buildingFactory, userFactory } from '../factories'
+import { addCaller, createOwnerWithEmailContact } from '../helpers'
+import { AddOperatorService } from '../../src/user/service/add-operator.service'
+import { ListBuildingsService } from '../../src/building/service/list-buildings.service'
+import { ScheduledCallsService } from '../../src/scheduled-events/service/scheduled-calls.service'
 
-describe('addOfferRequestService', () => {
+describe('Add offer request (Integration)', () => {
   it('adds offer request', async () => {
     const deps = await buildDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
@@ -37,6 +38,9 @@ describe('addOfferRequestService', () => {
     const flipperNegotiations = await deps.listBuildingsService.buildingsOfId([ testBuilding.id ])
     expect(flipperNegotiations).to.be.lengthOf(1)
     expect(flipperNegotiations[ 0 ].lastMeeting).to.include({ inPerson: false })
+
+    const flipperScheduledCalls = await deps.scheduledCallsService.scheduledCallsFor(testFlipper.user.id)
+    expect(flipperScheduledCalls).to.be.lengthOf(1)
   })
 })
 
@@ -50,6 +54,7 @@ async function buildDependencies (): Promise<{
   addOwnerService: AddOwnerService,
   buildingsRepository: BuildingsRepository,
   scheduleCallService: ScheduleCallService,
+  scheduledCallsService: ScheduledCallsService,
   scheduledEventsRepository: ScheduledEventsRepository,
 }> {
   const diContainer = await createTestContainer({ postgres: true, couchbase: false })
@@ -64,6 +69,7 @@ async function buildDependencies (): Promise<{
     addOwnerService: diContainer.resolve('addOwnerService'),
     buildingsRepository: diContainer.resolve('buildingsRepository'),
     scheduleCallService: diContainer.resolve('scheduleCall'),
+    scheduledCallsService: diContainer.resolve('scheduledCallsService'),
     scheduledEventsRepository: diContainer.resolve('scheduledEventsRepository'),
   }
 }
