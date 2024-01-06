@@ -2,15 +2,17 @@ import { ScheduledEventsRepository } from '../repository/schedule-events.reposit
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
-const deleteScheduledEvent = (eventBus: EventPublisher) => async (req, res) => {
+interface Deps {
+  scheduledEventsRepository: ScheduledEventsRepository
+  eventBus: EventPublisher
+}
+
+export const createDeleteScheduledEventController = ({ eventBus, scheduledEventsRepository }: Deps) => async (req, res) => {
   const id = req.params.id
-  const repo = new ScheduledEventsRepository()
-  await repo.delete(id)
+  await scheduledEventsRepository.delete(id)
   await eventBus.publish({
     id,
     name: DomainEventCatalog.SCHEDULED_EVENTS__EVENT_DELETED,
   })
   res.status(204).send()
 }
-
-export const createDeleteScheduledEventController = ({ eventBus }) => deleteScheduledEvent(eventBus)

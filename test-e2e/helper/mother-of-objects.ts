@@ -143,6 +143,6 @@ export const createMeeting = (app, {
     'eventDate': meetingDate.toISOString()
   }
 
-  const repo = new ScheduledEventsRepository()
+  const repo = app.locals.diContainer.resolve('scheduledEventsRepository') as ScheduledEventsRepository
   return repo.addScheduledMeetingEvent(meeting, propertyAgentId)
 }

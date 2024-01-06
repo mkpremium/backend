@@ -33,7 +33,7 @@ export const Event = t.struct<EventProps>(
     }
   })
 
-export const ScheduledEvent = t.struct<ScheduledEventProps>(
+export const ScheduledEvent = t.struct<ScheduledEventProps & {_documentType?: CouchbaseDocumentType.SCHEDULED_EVENT}>(
   {
     id: t.maybe(t.String),
     type: ScheduledEventTypeEnum,
@@ -67,13 +67,12 @@ interface EventProps {
 export type ScheduledEventId = string & { _kind: 'ScheduledEventId' }
 
 export interface ScheduledEventProps {
-  id: ScheduledEventId;
+  id?: ScheduledEventId;
   type: 'CALLS' | 'MEETINGS';
   notifyTo: string;
   eventDate: Date | string;
   createdAt: Date;
   createdBy: string;
-  _documentType: 'scheduled-event'
   event: EventProps
 }
 

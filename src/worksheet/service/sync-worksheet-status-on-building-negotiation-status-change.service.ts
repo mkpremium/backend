@@ -9,13 +9,16 @@ import _every from 'lodash/every'
 import { OwnerRepository } from '../../owner/repository/owner.repository'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 import { ScheduledEventType } from '../../scheduled-events/types'
+import {
+  CouchbaseScheduledEventsRepository
+} from '../../scheduled-events/repository/couchbase-schedule-events.repository'
 
 export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   constructor (
     private worksheetRepository: WorksheetRepository,
     private buildingsRepository: BuildingsRepository,
     private ownersRepository: OwnerRepository,
-    private scheduledEventsRepository: ScheduledEventsRepository,
+    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
   ) {
   }
 
@@ -63,10 +66,10 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   }
 
   private async findMeetings (worksheetId: string) {
-    const qb = this.scheduledEventsRepository.getQueryBuilder()
+    const qb = this.couchbaseScheduledEventsRepository.getQueryBuilder()
     qb.where('type = ?', ScheduledEventType.MEETINGS)
     qb.where('event.worksheetId = ?', worksheetId)
-    return this.scheduledEventsRepository.query(qb)
+    return this.couchbaseScheduledEventsRepository.query(qb)
   }
 }
 

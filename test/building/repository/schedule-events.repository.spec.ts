@@ -8,7 +8,7 @@ describe('ScheduledEventsRepository', () => {
   let repository!: ScheduledEventsRepository
 
   beforeEach(async () => {
-    const container = await createTestContainer()
+    const container = await createTestContainer({couchbase: true, postgres: false})
     repository = container.resolve('scheduledEventsRepository')
   })
 

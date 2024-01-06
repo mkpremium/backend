@@ -1,8 +1,8 @@
-import { MeetingProps, ScheduledEvent } from '../../src/scheduled-events/types'
+import { MeetingProps, ScheduledEvent, ScheduledEventId } from '../../src/scheduled-events/types'
 import moment from 'moment'
 
 const meetingPrototype: MeetingProps = {
-  id: 'test-meeting-id',
+  id: 'test-meeting-id' as ScheduledEventId,
   type: 'MEETINGS',
   notifyTo: 'test-meeting-flipper-id',
   eventDate: moment().add(-1, 'day').format(),
@@ -15,7 +15,6 @@ const meetingPrototype: MeetingProps = {
     inPerson: true,
     worksheetId: 'test-meeting-worksheet-id'
   },
-  _documentType: 'scheduled-event',
 }
 
 export const meetingBuilder = (overrides: Partial<MeetingProps> = {}) => ({

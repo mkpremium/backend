@@ -1,9 +1,8 @@
-import { asClass, asFunction, AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
 import { MeetingsRepository } from './repository/meetings.repository'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
 import { ScheduledCallsRepository } from './repository/scheduled-calls.repository'
-import { ScheduledEventsRepository } from './repository/schedule-events.repository'
 import { SelfMeetingsRepository } from './repository/self-meetings.repository'
 import { MeetingsService } from './service/meetings.service'
 import { GetSelfMeetingsService } from './service/get-self-meetings.service'
@@ -18,6 +17,7 @@ import { removeCallsOnNewMeetingOrOfferRequest } from './listeners/remove-calls-
 import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled-calls-on-owner-refusal'
 import { removeScheduledCallOnDiscardedContact } from './listeners/remove-scheduled-call-on-discarded-contact'
 import { updateScheduledCallController } from './controller/update-schedule-call.controller'
+import { CouchbaseScheduledEventsRepository } from './repository/couchbase-schedule-events.repository'
 
 export function setupScheduledEventsDependencies (container: AwilixContainer) {
   container.register({
@@ -25,7 +25,8 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
     createMeetingService: asClass(CreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
-    scheduledEventsRepository: asClass(ScheduledEventsRepository).singleton(),
+    couchbaseScheduledEventsRepository: asClass(CouchbaseScheduledEventsRepository).singleton(),
+    scheduledEventsRepository: aliasTo('couchbaseScheduledEventsRepository'),
     selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
     meetingsService: asClass(MeetingsService).singleton(),
 

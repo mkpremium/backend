@@ -1,13 +1,13 @@
 import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
+import { CallScheduledProps, ScheduledEventProps } from '../types'
 import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
 import { CallSchedulerService } from '../../worksheet/service/call-scheduler.service'
 
 export interface ScheduleCallCommand {
-  event: Omit<CallScheduledProps, 'id'> & { note: string }
+  event: Omit<CallScheduledProps, 'id' | 'type'> & { note: string }
   userId: string
   queueId: string
 }

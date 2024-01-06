@@ -42,7 +42,6 @@ describe('ScheduleCallService (Couchbase)', () => {
       userId: 'test-user-id',
       queueId: 'test-queue-id',
       event: {
-        _documentType: 'scheduled-event',
         createdAt: undefined,
         createdBy: '',
         event: {
@@ -55,7 +54,6 @@ describe('ScheduleCallService (Couchbase)', () => {
         eventDate: undefined,
         note: '',
         notifyTo: '',
-        type: undefined
       }
     })
 
