@@ -1,10 +1,20 @@
 import moment from 'moment'
 import t from 'tcomb'
-import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
 import { Meeting } from '../domain/meeting'
 
-const DbMeeting = t.struct({
+interface DbMeeting {
+  id: string,
+  notifyTo: string,
+  eventDate: Date,
+  event: {
+    buildingId: string,
+    inPerson: boolean
+  },
+  type: 'MEETINGS'
+}
+
+const DbMeeting = t.struct<DbMeeting>({
   id: t.String,
   notifyTo: t.String,
   eventDate: t.Date,
@@ -22,24 +32,27 @@ const DbMeeting = t.struct({
   }
 })
 
-DbMeeting.prototype.couchbaseToDomain = function () {
+function couchbaseToDomain (record: DbMeeting) {
   return Meeting({
-    id: this.id,
-    buildingId: this.event.buildingId,
-    withAgentOfId: this.notifyTo,
-    meetingAt: moment(this.eventDate)
+    id: record.id,
+    buildingId: record.event.buildingId,
+    withAgentOfId: record.notifyTo,
+    meetingAt: moment(record.eventDate)
   })
 }
 
-DbMeeting.fromMeeting = meeting => DbMeeting({
-  id: meeting.id,
-  notifyTo: meeting.withAgentOfId,
-  eventDate: meeting.meetingAt.toDate(),
-  event: {
-    buildingId: meeting.buildingId,
-    inPerson: true
-  }
-})
+function fromMeeting (meeting: Meeting): DbMeeting {
+  return DbMeeting({
+    id: meeting.id,
+    type: 'MEETINGS',
+    notifyTo: meeting.withAgentOfId,
+    eventDate: meeting.meetingAt.toDate(),
+    event: {
+      buildingId: meeting.buildingId,
+      inPerson: true
+    }
+  })
+}
 
 const futureMeetingsForQuery = bucketName => `
 SELECT
@@ -52,19 +65,19 @@ WHERE _documentType = 'scheduled-event' AND type = 'MEETINGS'
   AND notifyTo = $1 AND eventDate > NOW_UTC() AND event.inPerson
 `
 
-export class MeetingsRepository extends CouchbaseRepository {
+export class MeetingsRepository extends CouchbaseRepository<DbMeeting> {
   struct () {
     return DbMeeting
   }
 
   save (meeting) {
-    return super.save(DbMeeting.fromMeeting(meeting))
+    return super.save(fromMeeting(meeting))
   }
 
   futureMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
       futureMeetingsForQuery(this.bucketName),
       [ userId ]
-    ).then(rows => rows.map(r => fromJSON(r, DbMeeting).couchbaseToDomain()))
+    ).then(rows => rows.map(couchbaseToDomain))
   }
 }

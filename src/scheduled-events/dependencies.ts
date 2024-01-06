@@ -31,7 +31,7 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
     postgresScheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
     scheduledEventsRepository: aliasTo(usePostgres ? 'postgresScheduledEventsRepository' : 'couchbaseScheduledEventsRepository'),
     selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
-    meetingsService: asClass(MeetingsService).singleton(),
+    meetingsService: asClass(MeetingsService).classic().singleton(),
 
     getUserMeetingsService: asClass(GetSelfMeetingsService).classic().singleton(),
     scheduleCall: asClass(ScheduleCallService).classic().singleton(),
