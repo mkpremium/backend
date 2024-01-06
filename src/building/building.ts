@@ -206,7 +206,7 @@ export interface BuildingMetadataProps {
 export interface BuildingProps {
   id: string;
   address: BuildingAddressProps;
-  floorArea: string | number;
+  floorArea: number;
   cadastre?: {
     reference: string;
   };
