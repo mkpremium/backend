@@ -1,8 +1,9 @@
 import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { ScheduledEventsRepository } from '../repository/schedule-events.repository'
 import { BuildingsRepository } from '../../building/repository/buildings.repository'
+import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
+import { DataSource } from 'typeorm'
 
 export interface MeetingCreated {
   name: 'meeting.created'
@@ -16,9 +17,11 @@ export interface MeetingCreated {
 
 export class CreateMeetingService {
   constructor (
-    private scheduledEventsRepository: ScheduledEventsRepository,
+    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
     private buildingsRepository: BuildingsRepository,
     private eventBus: EventPublisher,
+    private usePostgres: boolean,
+    private ormDataSource: DataSource,
   ) {
   }
 
@@ -26,8 +29,11 @@ export class CreateMeetingService {
     const meetingAgentId = requestBody.notifyTo
     this.checkOperatorPermissions(operator, meetingAgentId)
 
-    const createdMeeting = await this.scheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
-    await this.buildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
+    const createdMeeting = await (this.usePostgres ? postgresCreateMeeting(requestBody, operator, meetingAgentId, this.ormDataSource) : couchbaseCreateMeeting(requestBody, operator, meetingAgentId, {
+      couchbaseScheduledEventsRepository: this.couchbaseScheduledEventsRepository,
+      buildingsRepository: this.buildingsRepository
+    }))
+
     await this.eventBus.publish({
       name: 'meeting.created',
       meetingId: createdMeeting.id,
@@ -46,4 +52,24 @@ export class CreateMeetingService {
       throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
     }
   }
+}
+
+
+async function postgresCreateMeeting(requestBody, operator, meetingAgentId, ormDataSource: DataSource) {
+
+}
+
+interface CouchbaseDeps {
+  couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
+  buildingsRepository: BuildingsRepository
+}
+
+async function couchbaseCreateMeeting (requestBody, operator, meetingAgentId, {
+  couchbaseScheduledEventsRepository,
+  buildingsRepository
+}: CouchbaseDeps) {
+  const createdMeeting = await couchbaseScheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
+  await buildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
+
+  return createdMeeting
 }
