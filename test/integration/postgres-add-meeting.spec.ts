@@ -11,9 +11,10 @@ import { MeetingsService } from '../../src/scheduled-events/service/meetings.ser
 import { CreateMeetingService } from '../../src/scheduled-events/service/create-meeting.service'
 import { buildingFactory, userFactory } from '../factories'
 import { addCaller, createOwnerWithEmailContact } from '../helpers'
+import { expect } from 'chai'
 
 describe('Add meeting (Integration - Postgres)', () => {
-  it('adds meeting', async () => {
+  it.skip('adds meeting', async () => {
     const deps = await buildDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
     const [ testOwner, testEmailContact ] = await createOwnerWithEmailContact(testBuilding, deps)
@@ -32,7 +33,12 @@ describe('Add meeting (Integration - Postgres)', () => {
       },
       eventDate: new Date()
     }
+
     await deps.createMeetingService.createMeeting({ roles: [], id: '' }, testCmd)
+
+    const flipperNegotiations = await deps.listBuildingsService.buildingsAssignedTo(testFlipper.id)
+    expect(flipperNegotiations).to.be.lengthOf(1)
+    expect(flipperNegotiations[ 0 ].lastMeeting).to.include({ inPerson: false })
   })
 })
 

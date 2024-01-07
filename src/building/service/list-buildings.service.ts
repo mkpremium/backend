@@ -48,4 +48,14 @@ export class ListBuildingsService {
       })
     })
   }
+
+  private async buildingAssignedToInPostgres(flipperId: string) {
+    const buildings = await this.ormDataSource.manager.find(Building, {
+      where: {
+        assignedFlipper: {id: flipperId}
+      },
+    })
+
+    return this.buildingOfIdInPostgres(buildings.map(({id}) => id))
+  }
 }
