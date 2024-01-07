@@ -31,14 +31,14 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
     if (_get(scheduledEvent, 'event.worksheetId')) {
       const worksheetRepo = new LegacyWorksheetRepository()
       const worksheet = await worksheetRepo.findByIdOrThrow(_get(scheduledEvent, 'event.worksheetId'))
-      const { city, province } = _get(worksheet, 'relatedBuildings.0.address', {})
       const updatedWorksheet = t.update(worksheet, {
         lastAddedMeeting: { $set: scheduledEvent },
         status: { $set: WorkSheetStatus.MEETING }
       })
-
       await worksheetRepo.save(updatedWorksheet)
+
       if (worksheet.lastAddedMeeting === null) {
+        const { city, province } = _get(worksheet, 'relatedBuildings.0.address', {})
         const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING
         await OperatorStats.registerAction(createdBy, action, { city, province })
         await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, { city, province })
