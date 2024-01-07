@@ -9,26 +9,30 @@ import { ScheduledEventsRepository } from '../../src/scheduled-events/repository
 import { createTestContainer } from '../create-test-container'
 import { MeetingsService } from '../../src/scheduled-events/service/meetings.service'
 import { CreateMeetingService } from '../../src/scheduled-events/service/create-meeting.service'
+import { buildingFactory, userFactory } from '../factories'
+import { addCaller, createOwnerWithEmailContact } from '../helpers'
 
-describe.skip('Add meeting (Integration - Postgres)', () => {
+describe('Add meeting (Integration - Postgres)', () => {
   it('adds meeting', async () => {
     const deps = await buildDependencies()
+    const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
+    const [ testOwner, testEmailContact ] = await createOwnerWithEmailContact(testBuilding, deps)
+    const testFlipper = await deps.addFlipperService.addFlipper(userFactory.build())
+    const testCaller = await addCaller(deps)
 
-    await deps.createMeetingService.createMeeting({roles: []}, {
-        createdBy: 'testCallerId',
-        notifyTo: 'testAssignedFlipperId',
-        event: {
-          contactId: 'test-contact-id',
-          eventAddress: 'test meeting adddress',
-          ownerId: 'test-owner-id',
-          worksheetId: 'test-worksheet-id',
-          buildingId: 'test-building-id'
-        },
-        notifyAt: 'testMeetingAt',
-        eventDate: 'testMeetingAt'
-      }
-    )
-
+    const testCmd = {
+      createdBy: testCaller.id,
+      notifyTo: testFlipper.user.id,
+      event: {
+        contactId: testEmailContact.id,
+        buildingId: testBuilding.id,
+        ownerId: testOwner.id,
+        eventAddress: '',
+        worksheetId: undefined,
+      },
+      eventDate: new Date()
+    }
+    await deps.createMeetingService.createMeeting({ roles: [], id: '' }, testCmd)
   })
 })
 
