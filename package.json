@@ -14,6 +14,9 @@
     "build": "tsc",
     "typeorm": "typeorm-ts-node-commonjs"
   },
+  "optionalDependencies": {
+    "couchbase": "^2.6.12"
+  },
   "dependencies": {
     "@faker-js/faker": "^8.3.1",
     "awilix": "^4.3.1",
@@ -26,7 +29,6 @@
     "camaro": "^6.1.0",
     "compose-middleware": "^5.0.1",
     "cors": "^2.8.4",
-    "couchbase": "^2.6.12",
     "express": "^4.18.2",
     "express-jwt": "^6.0.0",
     "express-jwt-permissions": "^1.1.0",
