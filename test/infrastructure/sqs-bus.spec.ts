@@ -27,6 +27,7 @@ describe('SqsBus', () => {
       testEventsQueueUrl,
       new ListenersRegistry(),
       eventNamingPolicy,
+      null,
     )
   })
 
