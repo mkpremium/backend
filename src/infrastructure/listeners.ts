@@ -6,6 +6,8 @@ import { worksheetEventListeners } from '../worksheet/listeners'
 import { userEventListeners } from '../user/listeners'
 import { statListeners } from '../stats/listeners'
 import { EventListener } from './event-bus'
+import { DomainEventCatalog } from './postgres/domain-event.entity'
+import { AwilixContainer } from 'awilix'
 
 export function startListeners (diContainer) {
   const eventBus = diContainer.resolve('eventBus') as EventListener
@@ -19,5 +21,18 @@ export function startListeners (diContainer) {
   statListeners(eventBus)
   // TODO: why the test did show the error?
   eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
-  eventBus.on('postgres.save_documents_command', 'postgres.save_documents_command_handler', diContainer.resolve('saveDocumentsCommandHandler'))
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
+    'saveDocumentsCommandHandler',
+    diContainer.resolve('saveDocumentsCommandHandler')
+  )
+}
+
+export function subscribeToCommand (command: DomainEventCatalog, serviceHandlerName: string, container: AwilixContainer) {
+  const eventBus = container.resolve('eventBus') as EventListener
+  eventBus.on(
+    command,
+    `${command}_Handler`,
+    container.resolve(serviceHandlerName)
+  )
 }

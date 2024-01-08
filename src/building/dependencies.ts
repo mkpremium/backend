@@ -51,6 +51,7 @@ import { UpdateProposalService } from './service/update-proposal.service'
 import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.repository'
 import { PostgresProposalsRepository } from './repository/postgres-proposals.repository'
 import { AddBuildingService } from './service/add-building.service'
+import { importBuildingCommandHandler } from './service/import-building-command-handler'
 
 export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -119,5 +120,8 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     portugal2021BuildingsImporterService: asClass(Portugal2021BuildingsImporterService).classic().singleton(),
     portugal2021OwnersImporterService: asClass(Portugal2021OwnersImporterService).classic().singleton(),
     portugal2021WorksheetInitializerService: asClass(Portugal2021WorksheetInitializerService).classic().singleton(),
+
+    // Postgres migration
+    importBuildingCommandHandler: asFunction(importBuildingCommandHandler),
   })
 }

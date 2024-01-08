@@ -27,7 +27,6 @@ import { DataSource } from 'typeorm'
 import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import { setupContactsDependencies } from '../contacts/dependencies'
 import { Database } from './database'
-import { importBuildingCommandHandler } from './postgres/import-building-command-handler'
 
 export async function createDiContainer (database: Database) {
   const container = createContainer()
@@ -76,7 +75,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     eventBus: aliasTo(['test', 'development'].includes(process.env.NODE_ENV) ? 'eventEmitterBus' : 'sqsEventBus'),
     eventRecorderListener: asFunction(createEventRecorderListener),
     saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandler),
-    importBuildingCommandHandler: asFunction(importBuildingCommandHandler),
     logger: asFunction(initLogger).singleton(),
   })
 }

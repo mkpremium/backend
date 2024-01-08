@@ -1,10 +1,10 @@
-import { BuildingProps } from '../../building/building'
+import { BuildingProps } from '../building'
 import { DataSource } from 'typeorm'
-import { Building } from '../../building/building.entity'
-import { mapBuildingStructToEntity } from '../../building/repository/postgres-buildings.repository'
+import { Building } from '../building.entity'
+import { mapBuildingStructToEntity } from '../repository/postgres-buildings.repository'
 import { Logger } from 'winston'
-import { EventPublisher } from '../event-bus'
-import { DomainEventCatalog } from './domain-event.entity'
+import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 interface Deps {
   ormDataSource: DataSource,
