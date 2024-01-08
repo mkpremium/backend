@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 export enum DomainEventCatalog {
-  BUILDING__LEAD_CAPTURED='building.lead_captured',
-  BUILDING__BUILDING_IMPORTED='building.building_imported',
+  BUILDING__LEAD_CAPTURED = 'building.lead_captured',
+  BUILDING__BUILDING_IMPORTED = 'building.building_imported',
   BUILDING__NEGOTIATION_STATUS_CHANGED = 'building.negotiation_status_changed',
   BUILDING__PROPOSAL_SCHEDULED = 'building.proposal_scheduled',
 
@@ -16,6 +16,8 @@ export enum DomainEventCatalog {
   SCHEDULED_EVENTS__CALL_SCHEDULED = 'scheduled_events.call_scheduled',
   SCHEDULED_EVENTS__CALL_UPDATED = 'scheduled_events.call_updated',
   SCHEDULED_EVENTS__EVENT_DELETED = 'scheduled_events.event_deleted',
+
+  USER__OPERATOR_ADDED = 'user.operator_added',
 
   WORKSHEET__INVALID_WORKSHEET_FOUND = 'worksheet.invalid_worksheet_found',
   WORKSHEET__NEXT_IN_QUEUE_TAKEN = 'worksheet.next_in_queue_taken',

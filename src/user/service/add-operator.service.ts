@@ -5,14 +5,17 @@ import { DataSource } from 'typeorm'
 import { addUserService } from './add-user.service'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
+import { EventPublisher } from '../../infrastructure/event-bus'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
-type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'restringedHours' | 'enable'>
+export type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'restringedHours' | 'enable'>
 
 export class AddOperatorService {
   constructor (
     private ormDataSource: DataSource,
     private operatorRepository: OperatorRepository,
     private usePostgres: boolean,
+    private eventBus: EventPublisher,
   ) {
   }
 
@@ -52,6 +55,13 @@ export class AddOperatorService {
         const caller = await em.save(Caller, { user })
         callerId = caller.id
       }
+
+      await this.eventBus.publish({
+        name: DomainEventCatalog.USER__OPERATOR_ADDED,
+        id: user.id,
+        flipperId,
+        callerId,
+      }, em)
 
       return {
         enable: user.enabled,
