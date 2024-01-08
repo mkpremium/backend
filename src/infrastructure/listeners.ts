@@ -23,7 +23,7 @@ export function startListeners (diContainer) {
   subscribeToCommand(
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
     'saveDocumentsCommandHandler',
-    diContainer.resolve('saveDocumentsCommandHandler')
+    diContainer
   )
 }
 
