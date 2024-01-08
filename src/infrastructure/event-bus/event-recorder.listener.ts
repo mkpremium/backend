@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm'
+import { DataSource, EntityManager } from 'typeorm'
 import { DomainEvent } from '../postgres/domain-event.entity'
 
 type PublishedEvent = Pick<DomainEvent, 'name'> & any
@@ -6,9 +6,8 @@ type PublishedEvent = Pick<DomainEvent, 'name'> & any
 export function createEventRecorderListener ({ ormDataSource }: {
   ormDataSource: DataSource
 }) {
-  return async (event: PublishedEvent) => {
-    const repository = ormDataSource.getRepository(DomainEvent)
-    await repository.save({
+  return async (event: PublishedEvent, entityManager?: EntityManager) => {
+    await (entityManager ?? ormDataSource.manager).save(DomainEvent, {
       name: event.name,
       version: event.name || 'unknown',
       body: event,

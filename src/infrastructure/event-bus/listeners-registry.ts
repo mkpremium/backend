@@ -1,6 +1,6 @@
 type EventListener = (event: any) => Promise<any>
 
-interface ListenerRegister {
+export interface ListenerRegister {
   name: string,
   subscriber: EventListener
 }

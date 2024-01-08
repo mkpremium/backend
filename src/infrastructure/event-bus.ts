@@ -1,7 +1,9 @@
+import { EntityManager } from 'typeorm'
+
 export const ALL_EVENTS_LISTENER = '*'
 
 export interface EventPublisher {
-  publish<T extends { name: string }> (event: T): Promise<void>
+  publish<T extends { name: string }> (event: T, entityManager?: EntityManager): Promise<void>
 }
 
 

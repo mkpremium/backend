@@ -3,6 +3,8 @@ import { Logger } from 'winston'
 import { ALL_EVENTS_LISTENER, EventBus } from '../event-bus'
 import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
+import { EntityManager } from 'typeorm'
+import { createEventRecorderListener } from './event-recorder.listener'
 
 export class EventEmitterBus implements EventBus {
   private emitter = new EventEmitter()
@@ -17,6 +19,7 @@ export class EventEmitterBus implements EventBus {
   constructor (
     private logger: Logger,
     private eventNamingPolicy: EventNamingPolicy,
+    private eventRecorderListener: ReturnType<typeof createEventRecorderListener>
   ) {
     this.emitter.setMaxListeners(0)
     this.emitter.on('error', error => {
@@ -24,9 +27,15 @@ export class EventEmitterBus implements EventBus {
     })
   }
 
-  publish<T extends { name: string }> (event: T): Promise<void> {
+  async publish<T extends { name: string }> (event: T, entityManager?: EntityManager): Promise<void> {
     if (!this.eventNamingPolicy.satisfiesEventName(event.name)) {
       throw new WrongEventName(event.name)
+    }
+
+    // The only listener to all events is the event recorder. When the entity manager is provided, want the event to
+    // be persisted within the same transaction as the rest of the business logic.
+    if (entityManager) {
+      await this.eventRecorderListener(event, entityManager)
     }
 
     return new Promise((resolve, reject) => {
