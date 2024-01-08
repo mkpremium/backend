@@ -19,7 +19,6 @@ export function startListeners (diContainer) {
   worksheetEventListeners(eventBus, diContainer)
   userEventListeners(eventBus, diContainer)
   statListeners(eventBus)
-  // TODO: why the test did show the error?
   eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
   subscribeToCommand(
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
