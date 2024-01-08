@@ -3,6 +3,7 @@ import { User } from '../user.entity'
 import { UserProfileProps } from '../../types/user'
 import bcrypt from 'bcrypt'
 import { saltFactor } from '../../../config'
+import { passwordRegex } from '../../operator/operatorRefreshTokenRepository'
 
 interface AddUserCommand {
   em: EntityManager
@@ -15,19 +16,27 @@ interface AddUserCommand {
 export async function addUserService (cmd: AddUserCommand) {
   return cmd.em.save(User, {
     username: cmd.username,
-    password: await hashPassword(cmd.password),
+    password: isHashedPassword(cmd.password) ? cmd.password : await hashPassword(assertPasswordIsSecure(cmd.password)),
     enabled: true,
     isAdmin: cmd.isAdmin ?? false,
     profile: cmd.profile,
   })
 }
 
-async function hashPassword(password: string) {
-  const isAlreadyHashed = /^\$2\w\$\d{2}\$/.test(password)
-  if (isAlreadyHashed) {
+async function hashPassword (password: string) {
+  const salt = await bcrypt.genSalt(saltFactor)
+  return bcrypt.hash(password, salt)
+}
+
+function assertPasswordIsSecure (password: string) {
+  if (passwordRegex.test(password)) {
     return password
   }
 
-  const salt = await bcrypt.genSalt(saltFactor)
-  return bcrypt.hash(password, salt)
+  throw new Error('Password is not secure')
+}
+
+
+function isHashedPassword (password: string) {
+  return /^\$2\w\$\d{2}\$/.test(password)
 }

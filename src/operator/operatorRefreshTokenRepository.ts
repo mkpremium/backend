@@ -75,7 +75,7 @@ export class OperatorRefreshTokenRepository extends CouchbaseModel {
   }
 }
 
-const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
+export const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
 const Password = t.refinement(t.String, n => passwordRegex.test(n), 'Password')
 const NotEmptyString = t.refinement(t.String, n => !_isNil(n), 'NotEmptyString')
 export const OperatorRequest = t.struct(
