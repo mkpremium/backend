@@ -23,7 +23,7 @@ export class AddOperatorService {
     callerId?: string,
     flipperId?: string
   }> {
-    return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd, requester)
+    return this.usePostgres ? this.saveInPostgres(cmd, requester.id) : this.saveInCouchbase(cmd, requester)
   }
 
   private async saveInCouchbase (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
@@ -36,7 +36,7 @@ export class AddOperatorService {
     return operator
   }
 
-  private async saveInPostgres (cmd: AddOperatorCommand) {
+  private async saveInPostgres (cmd: AddOperatorCommand, requesterId: string) {
     return this.ormDataSource.transaction(async em => {
       const user = await addUserService({
         em,
@@ -59,6 +59,7 @@ export class AddOperatorService {
       await this.eventBus.publish({
         name: DomainEventCatalog.USER__OPERATOR_ADDED,
         id: user.id,
+        createdBy: requesterId,
         flipperId,
         callerId,
       }, em)
