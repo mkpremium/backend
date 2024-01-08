@@ -25,7 +25,7 @@ describe('CouchbaseOfferRequestsRepository', () => {
     buildingsRepository = container.resolve('buildingsRepository')
     ownersRepository = container.resolve('ownersRepository')
     worksheetRepository = container.resolve('worksheetRepository')
-    repository = container.resolve('offerRequestsRepository')
+    repository = container.resolve('couchbaseOfferRequestsRepository')
     listBuildingsService = container.resolve('listBuildingsService')
   })
 
