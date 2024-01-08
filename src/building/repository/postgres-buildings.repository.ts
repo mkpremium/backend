@@ -89,19 +89,23 @@ export class PostgresBuildingsRepository
   }
 
   protected structToEntity (buildingStruct: BuildingProps): Partial<Building> {
-    return {
-      id: buildingStruct.id,
-      address: buildingStruct.address,
-      negotiationStatus: buildingStruct.negotiationStatus,
-      // TODO: validate lead IDs (contact, owner, and worksheet)
-      lead: buildingStruct.lead,
-      featuredOwner: { id: buildingStruct.ownerId } as Owner,
-      assignedFlipper: { id: buildingStruct.assignedAgentId } as Flipper,
-      floorArea: typeof buildingStruct.floorArea === 'string' ? parseFloat(buildingStruct.floorArea) : buildingStruct.floorArea,
-      publicIdentifier: buildingStruct.cadastre?.reference,
-      location: buildingStruct.location,
-      use: buildingStruct.use,
-    }
+    return mapBuildingStructToEntity(buildingStruct)
+  }
+}
+
+export function mapBuildingStructToEntity (buildingStruct: BuildingProps) {
+  return {
+    id: buildingStruct.id,
+    address: buildingStruct.address,
+    negotiationStatus: buildingStruct.negotiationStatus,
+    // TODO: validate lead IDs (contact, owner, and worksheet)
+    lead: buildingStruct.lead,
+    featuredOwner: { id: buildingStruct.ownerId } as Owner,
+    assignedFlipper: { id: buildingStruct.assignedAgentId } as Flipper,
+    floorArea: typeof buildingStruct.floorArea === 'string' ? parseFloat(buildingStruct.floorArea) : buildingStruct.floorArea,
+    publicIdentifier: buildingStruct.cadastre?.reference,
+    location: buildingStruct.location,
+    use: buildingStruct.use,
   }
 }
 
