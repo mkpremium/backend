@@ -16,7 +16,8 @@ export function importBuildingCommandHandler ({ ormDataSource, logger, eventBus 
   return async function ({ building }: { building: BuildingProps }) {
     logger.info('Importing building', { building })
     await ormDataSource.transaction(async entityManager => {
-      await entityManager.save(Building, mapBuildingStructToEntity(building))
+      // Ensure there is no building with a featured owner as they aren't imported yet.
+      await entityManager.save(Building, mapBuildingStructToEntity({ ...building, ownerId: undefined }))
 
       await eventBus.publish({
         name: DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
