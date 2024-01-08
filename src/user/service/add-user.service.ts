@@ -23,6 +23,11 @@ export async function addUserService (cmd: AddUserCommand) {
 }
 
 async function hashPassword(password: string) {
+  const isAlreadyHashed = /^\$2\w\$\d{2}\$/.test(password)
+  if (isAlreadyHashed) {
+    return password
+  }
+
   const salt = await bcrypt.genSalt(saltFactor)
   return bcrypt.hash(password, salt)
 }
