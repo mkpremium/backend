@@ -10,6 +10,7 @@ import { createLoginController } from '../operator/controllers'
 import { PostgresUserRepository } from './repository/postgres-user.repository'
 import { AuthTokenIssuerService } from './service/auth-token-issuer.service'
 import { AddOperatorService } from './service/add-operator.service'
+import { importOperatorCommandHandler } from '../infrastructure/postgres/import-operator-command-handler'
 
 export const setupUserDependencies = container => {
   const usePostgres = container.resolve('usePostgres')
@@ -26,6 +27,8 @@ export const setupUserDependencies = container => {
     loginService: asClass(LoginService).classic().singleton(),
     removeFavoriteForNoSaleBuildings: asFunction(removeFavoriteForNoSaleBuildings).singleton(),
     userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService).singleton(),
+
+    importOperatorCommandHandler: asFunction(importOperatorCommandHandler).singleton(),
 
     loginController: asFunction(createLoginController).singleton(),
   })
