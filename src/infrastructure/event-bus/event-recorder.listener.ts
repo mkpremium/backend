@@ -6,11 +6,11 @@ type PublishedEvent = Pick<DomainEvent, 'name'> & any
 export function createEventRecorderListener ({ ormDataSource }: {
   ormDataSource: DataSource
 }) {
-  return async (event: PublishedEvent, entityManager?: EntityManager) => {
+  return async (event: PublishedEvent, entityManager?: EntityManager, isTransactional: boolean = false) => {
     await (entityManager ?? ormDataSource.manager).save(DomainEvent, {
       name: event.name,
       version: event.name || 'unknown',
-      body: event,
+      body: { ...event, _meta: { isTransactional } },
     })
   }
 }

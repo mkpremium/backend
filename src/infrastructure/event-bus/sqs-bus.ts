@@ -49,7 +49,7 @@ export class SqsBus implements EventBus {
     // The only listener to all events is the event recorder. When the entity manager is provided, want the event to
     // be persisted within the same transaction as the rest of the business logic.
     if (entityManager) {
-      await this.eventRecorderListener(event, entityManager)
+      await this.eventRecorderListener(event, entityManager, true)
       allEventsListeners = []
     } else {
       allEventsListeners = this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER) as [ListenerRegister]
