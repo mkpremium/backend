@@ -14,6 +14,13 @@ type CreateOwnerCommand = {
 }
 
 export async function createOwner (entityManager: EntityManager, cmd: CreateOwnerCommand): Promise<[ Owner, Person ]> {
+  if (cmd.person.name !== `${cmd.person.firstName} ${cmd.person.firstSurname}`) {
+    console.warn(`Owner name ${cmd.person.name} does not match first name ${cmd.person.firstName} and first surname ${cmd.person.firstSurname}`, cmd)
+  }
+  if (!cmd.buildingId) {
+    console.warn('Owner does not have a building', cmd)
+  }
+
   // TODO: review and consolidate owner names.
   const person: DeepPartial<Person> = {
     fullName: cmd.person.name,

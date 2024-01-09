@@ -7,6 +7,7 @@ import { PersonContact } from '../person-contact.entity'
 import { createOwner } from './create-owner'
 import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import { Logger } from 'winston'
 
 export interface AddOwnerCommand {
   id?: string,
@@ -30,6 +31,7 @@ export class AddOwnerService {
     private ormDataSource: DataSource,
     private usePostgres: boolean,
     private eventBus: EventBus,
+    private logger: Logger,
   ) {
   }
 
@@ -58,15 +60,18 @@ export class AddOwnerService {
 
     const { contacts } = cmd.person
     for (const c of contacts) {
-      // TODO: Handle duplicated contact case.
-      // TODO: save command note
-      const savedContact = await entityManager.save(Contact, {
-        value: c.value,
-        type: c.type
-      })
+      let contact = await entityManager.findOneBy(Contact, { value: c.value })
+      if (!contact) {
+        this.logger.info('Creating contact', { value: c.value })
+        contact = await entityManager.save(Contact, {
+          value: c.value,
+          type: c.type
+        })
+      }
+
       await entityManager.save(PersonContact, {
+        contact,
         person: savedPerson,
-        contact: savedContact,
         status: c.status,
       })
     }
