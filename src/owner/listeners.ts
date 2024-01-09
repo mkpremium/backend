@@ -1,6 +1,7 @@
 import { AwilixContainer } from 'awilix'
 import { EventListener } from '../infrastructure/event-bus'
 import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.entity'
+import { subscribeToCommand } from '../infrastructure/listeners'
 
 export function ownerEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
@@ -32,5 +33,10 @@ export function ownerEventListeners (eventBus: EventListener, container: AwilixC
     'owner.reset_owner_discarded_contacts_command',
     'owner.reset_owner_discarded_contacts_command_handler',
     container.resolve('resetOwnerBadContactsHandler')
+  )
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OWNER,
+    'importOwnerCommandHandler',
+    container,
   )
 }

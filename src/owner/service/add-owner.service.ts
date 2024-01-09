@@ -9,6 +9,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 export interface AddOwnerCommand {
+  id?: string,
   // verified: boolean,
   buildingId: string,
   status: OwnerStatus,
@@ -37,16 +38,19 @@ export class AddOwnerService {
   }
 
   private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<Owner> {
-    const owner = await this.ormDataSource.transaction<Owner>(em => this.createEntities(cmd, em))
+    return await this.ormDataSource.transaction<Owner>(async em => {
+      const owner = await this.createEntities(cmd, em)
+      await this.eventBus.publish({
+        name: DomainEventCatalog.OWNER__ADDED,
+        version: '1',
+        addedBy: requesterId,
+        ownerId: owner.id,
+        note: cmd.note,
+      }, em)
 
-    await this.eventBus.publish({
-      name: DomainEventCatalog.OWNER__ADDED,
-      version: '1',
-      addedBy: requesterId,
-      ownerId: owner.id,
-      note: cmd.note,
+      return owner
     })
-    return owner
+
   }
 
   private async createEntities (cmd: AddOwnerCommand, entityManager: EntityManager) {

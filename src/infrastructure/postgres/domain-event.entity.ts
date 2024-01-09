@@ -23,9 +23,12 @@ export enum DomainEventCatalog {
   WORKSHEET__NEXT_IN_QUEUE_TAKEN = 'worksheet.next_in_queue_taken',
   WORKSHEET__TAKEN = 'worksheet.taken',
 
+  POSTGRES_MIGRATION__OWNER_IMPORTED = 'postgres_migration.owner_imported',
+
   // Commands, not events.
   CMD__POSTGRES__MIGRATION__IMPORT_BUILDING = 'postgres_migration.import_building',
   CMD__POSTGRES__MIGRATION__IMPORT_OPERATOR = 'postgres_migration.import_operator',
+  CMD__POSTGRES__MIGRATION__IMPORT_OWNER = 'postgres_migration.import_owner',
   CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS = 'postgres.save_documents_command',
 }
 
