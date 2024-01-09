@@ -77,7 +77,7 @@ export const createApp = async (database: Database): Promise<Express> => {
     metadata(app, secured)
     email(app, secured)
 
-    startListeners(diContainer)
+    await startListeners(diContainer)
 
     app.use(appErrorHandler)
     app.set('IS_READY', true)

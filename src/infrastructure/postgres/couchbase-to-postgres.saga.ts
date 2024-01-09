@@ -3,14 +3,22 @@ import { DomainEventCatalog } from './domain-event.entity'
 import { Logger } from 'winston'
 import { DataSource } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
+import { subscribeToCommand } from '../listeners'
+import { saveDocumentsCommandHandler } from './save-documents-command-handler'
 
 interface Deps {
   eventbus: EventBus,
   logger: Logger,
   ormDataSource: DataSource,
+  saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsCommandHandler>
 }
 
-export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { manager }, }: Deps) {
+export function couchbaseToPostgresSaga ({
+                                           eventbus,
+                                           logger,
+                                           ormDataSource: { manager },
+                                           saveDocumentsCommandHandler
+                                         }: Deps) {
   eventbus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration__trigger_building_owners_migration',
@@ -20,7 +28,7 @@ export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { ma
         .createQueryBuilder(CouchbaseDocument, 'owner')
         .where('owner.document ->> buildingId = :buildingId', { buildingId })
         .andWhere('owner.documentType = :documentType', { documentType: CouchbaseDocumentType.OWNER })
-        .select(['owner.id', 'owner.document'])
+        .select([ 'owner.id', 'owner.document' ])
         .getMany()
 
       logger.info('Found owners for building', { buildingId, count: allOwners.length })
@@ -35,6 +43,12 @@ export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { ma
       }
       logger.info('Owner migration triggered for all owners', { buildingId })
     }
+  )
+
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
+    eventbus,
+    saveDocumentsCommandHandler,
   )
 
   return {
