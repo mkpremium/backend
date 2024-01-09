@@ -49,7 +49,7 @@ export function subscribeToCommand (
 
   eventBus.on(
     command,
-    `${command}_Handler`,
+    `${command}_handler`,
     service
   )
 }
