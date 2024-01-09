@@ -28,7 +28,7 @@ export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { ma
         await eventbus.publish({
           name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OWNER,
           buildingId,
-          ownerId: owner.id,
+          owner: owner.document,
         })
       }
     }
