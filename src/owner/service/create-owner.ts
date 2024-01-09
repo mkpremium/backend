@@ -4,6 +4,7 @@ import { Owner } from '../owner.entity'
 import { OwnerStatus } from '../owner'
 
 type CreateOwnerCommand = {
+  id?: string,
   buildingId?: string,
   status: OwnerStatus,
   person: {
@@ -29,6 +30,7 @@ export async function createOwner (entityManager: EntityManager, cmd: CreateOwne
   }
   const savedPerson = await entityManager.save(Person, person)
   const savedOwner = await entityManager.save(Owner, {
+    id: cmd.id,
     person: savedPerson,
     building: cmd.buildingId ? { id: cmd.buildingId } : undefined,
     status: cmd.status
