@@ -8,6 +8,7 @@ import { createOwner } from './create-owner'
 import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { Logger } from 'winston'
+import _ from 'lodash'
 
 export interface AddOwnerCommand {
   id?: string,
@@ -59,6 +60,10 @@ export class AddOwnerService {
     const [ savedOwner, savedPerson ] = await createOwner(entityManager, cmd)
 
     const { contacts } = cmd.person
+    if (_.uniqBy(contacts, 'value').length !== contacts.length) {
+      console.error('Owner with duplicated contacts', { ownerId: savedOwner.id, cmd })
+    }
+
     for (const c of contacts) {
       let contact = await entityManager.findOneBy(Contact, { value: c.value })
       if (!contact) {
