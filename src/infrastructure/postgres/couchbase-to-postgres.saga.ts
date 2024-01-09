@@ -10,7 +10,7 @@ interface Deps {
   ormDataSource: DataSource,
 }
 
-export function couchbaseToPostgresSage ({ eventbus, logger, ormDataSource: { manager }, }: Deps) {
+export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { manager }, }: Deps) {
   eventbus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration__trigger_building_owners_migration',

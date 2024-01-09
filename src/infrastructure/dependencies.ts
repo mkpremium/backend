@@ -27,7 +27,7 @@ import { DataSource } from 'typeorm'
 import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import { setupContactsDependencies } from '../contacts/dependencies'
 import { Database } from './database'
-import { couchbaseToPostgresSage } from './postgres/couchbase-to-postgres.sage'
+import { couchbaseToPostgresSaga } from './postgres/couchbase-to-postgres.saga'
 
 export async function createDiContainer (database: Database) {
   const container = createContainer()
@@ -78,6 +78,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandler),
     logger: asFunction(initLogger).singleton(),
 
-    couchbaseToPostgresSage: asFunction(couchbaseToPostgresSage).singleton(),
+    couchbaseToPostgresSaga: asFunction(couchbaseToPostgresSaga).singleton(),
   })
 }
