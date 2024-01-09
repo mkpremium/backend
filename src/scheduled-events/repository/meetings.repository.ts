@@ -41,6 +41,10 @@ function couchbaseToDomain (record: DbMeeting) {
   })
 }
 
+DbMeeting.prototype.couchbaseToDomain = function () {
+  return couchbaseToDomain(this)
+}
+
 function fromMeeting (meeting: Meeting): DbMeeting {
   return DbMeeting({
     id: meeting.id,
