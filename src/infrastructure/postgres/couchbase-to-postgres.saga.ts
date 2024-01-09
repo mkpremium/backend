@@ -20,6 +20,7 @@ export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { ma
         .createQueryBuilder(CouchbaseDocument, 'owner')
         .where('owner.document ->> buildingId = :buildingId', { buildingId })
         .andWhere('owner.documentType = :documentType', { documentType: 'owner' })
+        .select('owner.document')
         .getMany()
 
       logger.info('Found owners for building', { buildingId, count: allOwners.length })
