@@ -22,4 +22,7 @@ export class Owner extends BaseEntity {
 
   @Column('text', {default: 'PRINCIPAL'})
   type: OwnerType
+
+  @Column('text', { nullable: true })
+  note: string
 }

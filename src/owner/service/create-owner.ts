@@ -1,11 +1,13 @@
 import { DeepPartial, EntityManager } from 'typeorm'
 import { Person } from '../person.entity'
 import { Owner } from '../owner.entity'
-import { OwnerStatus } from '../owner'
+import { OwnerStatus, type OwnerType } from '../owner'
 
 type CreateOwnerCommand = {
   id?: string,
   buildingId?: string,
+  note?: string,
+  type?: OwnerType,
   status: OwnerStatus,
   person: {
     name: string,
@@ -31,9 +33,11 @@ export async function createOwner (entityManager: EntityManager, cmd: CreateOwne
   const savedPerson = await entityManager.save(Person, person)
   const savedOwner = await entityManager.save(Owner, {
     id: cmd.id,
+    type: cmd.type || 'PRINCIPAL',
     person: savedPerson,
     building: cmd.buildingId ? { id: cmd.buildingId } : undefined,
-    status: cmd.status
+    status: cmd.status,
+    note: cmd.note,
   })
   return [ savedOwner, savedPerson ]
 }
