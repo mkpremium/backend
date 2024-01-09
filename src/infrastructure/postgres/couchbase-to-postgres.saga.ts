@@ -2,7 +2,7 @@ import { EventBus } from '../event-bus'
 import { DomainEventCatalog } from './domain-event.entity'
 import { Logger } from 'winston'
 import { DataSource } from 'typeorm'
-import { CouchbaseDocument } from './couchbase-document.entity'
+import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 
 interface Deps {
   eventbus: EventBus,
@@ -19,8 +19,8 @@ export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { ma
       const allOwners = await manager
         .createQueryBuilder(CouchbaseDocument, 'owner')
         .where('owner.document ->> buildingId = :buildingId', { buildingId })
-        .andWhere('owner.documentType = :documentType', { documentType: 'owner' })
-        .select('owner.document')
+        .andWhere('owner.documentType = :documentType', { documentType: CouchbaseDocumentType.OWNER })
+        .select(['owner.id', 'owner.document'])
         .getMany()
 
       logger.info('Found owners for building', { buildingId, count: allOwners.length })
@@ -31,7 +31,25 @@ export function couchbaseToPostgresSaga ({ eventbus, logger, ormDataSource: { ma
           buildingId,
           owner: owner.document,
         })
+        logger.info('Owner migration triggered', { buildingId, ownerId: owner.id })
       }
+      logger.info('Owner migration triggered for all owners', { buildingId })
     }
   )
+
+  return {
+    async triggerBuildingMigration () {
+      logger.info('Triggering building migration')
+      const allBuildings = await manager.findBy(CouchbaseDocument, { documentType: CouchbaseDocumentType.BUILDING })
+      logger.info('Found buildings', { count: allBuildings.length })
+      for (const building of allBuildings) {
+        await eventbus.publish({
+          name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_BUILDING,
+          building: building.document,
+        })
+        logger.info('Building migration triggered', { buildingId: building.id })
+      }
+      logger.info('Building migration triggered for all buildings')
+    }
+  }
 }
