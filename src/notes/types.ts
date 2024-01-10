@@ -39,8 +39,12 @@ export const TNote = t.struct<Note>(
   }
 )
 
+export interface NoteListResponse {
+  total: number,
+  results: Note[],
+}
 
-export const NoteListResponse = t.struct(
+export const NoteListResponse = t.struct<NoteListResponse>(
   {
     total: t.Number,
     results: t.list(TNote)

@@ -13,7 +13,6 @@ import { LegacyBuildingRepository } from './models'
 import { MetadataRepository } from './repository/metadata.repository'
 import { AdminBuildingRepository } from './repository/admin-building.repository'
 import { BuildingDocumentsRepository } from './repository/building-documents.repository'
-import { BuildingNotesRepository } from './repository/building-notes.repository'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
 import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
 import {
@@ -52,6 +51,7 @@ import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.r
 import { PostgresProposalsRepository } from './repository/postgres-proposals.repository'
 import { AddBuildingService } from './service/add-building.service'
 import { importBuildingCommandHandler } from './service/import-building-command-handler'
+import { CouchbaseBuildingNotesRepository } from './repository/couchbase-building-notes.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -86,7 +86,8 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     legacyMetadataRepository: asClass(MetadataRepository).singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
-    buildingNotesRepository: asClass(BuildingNotesRepository).classic().singleton(),
+    couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
+    buildingNotesRepository: aliasTo('couchbaseBuildingNotesRepository'),
     couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
     postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
     proposalsRepository: aliasTo(usePostgres ? 'postgresProposalsRepository' : 'couchbaseProposalsRepository'),
