@@ -7,19 +7,19 @@ import { subscribeToCommand } from '../listeners'
 import { saveDocumentsCommandHandler } from './save-documents-command-handler'
 
 interface Deps {
-  eventbus: EventBus,
+  eventBus: EventBus,
   logger: Logger,
   ormDataSource: DataSource,
   saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsCommandHandler>
 }
 
 export function couchbaseToPostgresSaga ({
-                                           eventbus,
+                                           eventBus,
                                            logger,
                                            ormDataSource: { manager },
                                            saveDocumentsCommandHandler
                                          }: Deps) {
-  eventbus.on(
+  eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration__trigger_building_owners_migration',
     async ({ buildingId }: { buildingId: string }) => {
@@ -34,7 +34,7 @@ export function couchbaseToPostgresSaga ({
       logger.info('Found owners for building', { buildingId, count: allOwners.length })
 
       for (const owner of allOwners) {
-        await eventbus.publish({
+        await eventBus.publish({
           name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OWNER,
           buildingId,
           owner: owner.document,
@@ -47,7 +47,7 @@ export function couchbaseToPostgresSaga ({
 
   subscribeToCommand(
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
-    eventbus,
+    eventBus,
     saveDocumentsCommandHandler,
   )
 
@@ -57,7 +57,7 @@ export function couchbaseToPostgresSaga ({
       const allBuildings = await manager.findBy(CouchbaseDocument, { documentType: CouchbaseDocumentType.BUILDING })
       logger.info('Found buildings', { count: allBuildings.length })
       for (const building of allBuildings) {
-        await eventbus.publish({
+        await eventBus.publish({
           name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_BUILDING,
           building: building.document,
         })
