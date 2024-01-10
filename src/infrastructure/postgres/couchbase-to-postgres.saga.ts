@@ -5,12 +5,14 @@ import { DataSource } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 import { subscribeToCommand } from '../listeners'
 import { saveDocumentsCommandHandler } from './save-documents-command-handler'
+import { importOwnerCommandHandler } from '../../owner/service/import-owner-command-handler'
 
 interface Deps {
   eventBus: EventBus,
   logger: Logger,
   ormDataSource: DataSource,
   saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsCommandHandler>
+  importOwnerCommandHandler:  ReturnType<typeof importOwnerCommandHandler>
 }
 
 export function couchbaseToPostgresSaga ({
@@ -49,6 +51,12 @@ export function couchbaseToPostgresSaga ({
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
     eventBus,
     saveDocumentsCommandHandler,
+  )
+
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OWNER,
+    eventBus,
+    importOwnerCommandHandler,
   )
 
   return {
