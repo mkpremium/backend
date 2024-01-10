@@ -9,10 +9,8 @@ export type Note = {
   note: string,
   createdAt?: Date,
   createdBy: string,
-} & (
-  { context: { buildingId: string } } | // Couchbase
-  { buildingId: string } // Postgres
-)
+  context: { buildingId: string }
+}
 
 export const TNote = t.struct<Note>(
   {

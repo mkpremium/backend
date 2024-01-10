@@ -8,4 +8,5 @@ export interface BuildingNotesRepository {
 
   createNote (params: CreateNoteCommand, createdBy: string): Promise<Note>
 
+  save (note: Omit<Note, 'id'> & { id?: string }): Promise<Note>
 }
