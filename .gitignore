@@ -32,3 +32,4 @@ conf
 
 # Coverage
 .nyc_output
+.*.env
