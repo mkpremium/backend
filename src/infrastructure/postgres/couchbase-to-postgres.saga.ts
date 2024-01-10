@@ -1,25 +1,26 @@
-import { EventBus } from '../event-bus'
+import type { EventBus } from '../event-bus'
 import { DomainEventCatalog } from './domain-event.entity'
-import { Logger } from 'winston'
-import { DataSource } from 'typeorm'
+import type { Logger } from 'winston'
+import type { DataSource } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 import { subscribeToCommand } from '../listeners'
-import { saveDocumentsCommandHandler } from './save-documents-command-handler'
-import { importOwnerCommandHandler } from '../../owner/service/import-owner-command-handler'
+import type { saveDocumentsCommandHandler as saveDocumentsHandlerFactory } from './save-documents-command-handler'
+import type { importOwnerCommandHandler as importOwnerHandlerFactory } from '../../owner/service/import-owner-command-handler'
 
 interface Deps {
   eventBus: EventBus,
   logger: Logger,
   ormDataSource: DataSource,
-  saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsCommandHandler>
-  importOwnerCommandHandler:  ReturnType<typeof importOwnerCommandHandler>
+  saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsHandlerFactory>
+  importOwnerCommandHandler:  ReturnType<typeof importOwnerHandlerFactory>
 }
 
 export function couchbaseToPostgresSaga ({
                                            eventBus,
                                            logger,
                                            ormDataSource: { manager },
-                                           saveDocumentsCommandHandler
+                                           saveDocumentsCommandHandler,
+                                           importOwnerCommandHandler,
                                          }: Deps) {
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
