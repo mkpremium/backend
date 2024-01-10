@@ -1,6 +1,5 @@
 import { wrap } from 'express-promise-wrap'
 import { BuildingNotesRepository } from '../building/repository/building-notes.repository'
-import { NoteRepository } from './models'
 import { History } from '../history/models'
 
 export function listNotesControllerFactory ({ buildingNotesRepository }: {
