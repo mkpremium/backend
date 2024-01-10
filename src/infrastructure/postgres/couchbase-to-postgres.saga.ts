@@ -21,7 +21,7 @@ export function couchbaseToPostgresSaga ({
                                          }: Deps) {
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
-    'postgres_migration__trigger_building_owners_migration',
+    'postgres_migration.trigger_building_owners_migration',
     async ({ buildingId }: { buildingId: string }) => {
       logger.info('Building imported, triggering owners migration', { buildingId })
       const allOwners = await manager
