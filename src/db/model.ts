@@ -43,7 +43,7 @@ export abstract class CouchbaseModel {
   }
 
   getQueryBuilder (method = 'select', prefix = 't', props = this._getMeta().props) {
-    return createQueryBuilder(props, method, prefix)
+    return createQueryBuilder(props, this.getType(), method, prefix)
   }
 
   _getMeta () {
@@ -197,7 +197,7 @@ function withRetry<T> (fn: () => Promise<T>) {
   })
 }
 
-export function createQueryBuilder (props: StructProps, method: string = 'select', prefix: string = 't') {
+export function createQueryBuilder (props: StructProps, documentType: string, method: string = 'select', prefix: string = 't') {
   let qb
 
   switch (method) {
@@ -233,7 +233,7 @@ export function createQueryBuilder (props: StructProps, method: string = 'select
   }
 
   qb
-    .where(`${prefix}.\`_documentType\` = ?`, this.getType())
+    .where(`${prefix}.\`_documentType\` = ?`, documentType)
 
   return qb
 }

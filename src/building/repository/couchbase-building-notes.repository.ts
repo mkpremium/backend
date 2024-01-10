@@ -29,7 +29,7 @@ export class CouchbaseBuildingNotesRepository extends CouchbaseRepository<Note> 
 
   async listNotes (query = {}): Promise<NoteListResponse> {
     const params = fromJSON(query, NoteListQuery)
-    const qb = createQueryBuilder(this.struct().meta.props)
+    const qb = createQueryBuilder(this.struct().meta.props, 'note')
       .limit(params.limit)
       .offset(params.offset)
     const qbCount = createQueryBuilder(this.struct().meta.props, 'count')
