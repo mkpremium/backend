@@ -1,4 +1,4 @@
-import t, { Struct as TcombStruct } from 'tcomb'
+import t, { Struct as TcombStruct, StructProps } from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import uuid from 'uuid/v4'
 import squel from 'squel'
@@ -10,10 +10,10 @@ import { couchbase } from '../../config'
 import { newHttpError } from '../lib/http-error'
 import { WrongStructRecord } from '../infrastructure/wrong-struct-record.error'
 import retry from 'bluebird-retry'
-import { Bucket, N1qlQuery, errors as couchbaseErrors } from 'couchbase'
+import { Bucket, errors as couchbaseErrors, N1qlQuery } from 'couchbase'
 import { promisifyAll } from 'bluebird'
-import Consistency = N1qlQuery.Consistency
 import { CouchbaseAdapter, PromisifiedBucket } from './couchbase.adapter'
+import Consistency = N1qlQuery.Consistency
 
 /**
  * @deprecated use CouchbaseRepository instead.
@@ -43,44 +43,7 @@ export abstract class CouchbaseModel {
   }
 
   getQueryBuilder (method = 'select', prefix = 't', props = this._getMeta().props) {
-    let qb
-
-    switch (method) {
-      case 'let':
-        qb = (squel as any).let().field(`${prefix}.\`id\``)
-        Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
-        break
-      case 'use':
-        qb = (squel as any).useKey().field(`${prefix}.\`id\``)
-        Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
-        break
-      case 'select':
-        qb = squel.select().field(`${prefix}.\`id\``)
-        Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
-        break
-      case 'delete':
-        qb = squel.delete()
-        break
-      case 'update':
-        qb = squel.update()
-        break
-      case 'count':
-        qb = squel.select().field('COUNT(*) as count')
-        break
-      default:
-        throw new Error(`method ${method} not allowed (select, delete)`)
-    }
-
-    if (method === 'update') {
-      qb.table(couchbase.bucket, prefix)
-    } else {
-      qb.from(couchbase.bucket, prefix)
-    }
-
-    qb
-      .where(`${prefix}.\`_documentType\` = ?`, this.getType())
-
-    return qb
+    return createQueryBuilder(props, method, prefix)
   }
 
   _getMeta () {
@@ -115,7 +78,7 @@ export abstract class CouchbaseModel {
 
   async queryRaw (query: string) {
     try {
-      const result = await this.withRetry(() => CouchbaseModel.bucket.queryAsync(N1qlQuery.fromString(query)))
+      const result = await withRetry(() => CouchbaseModel.bucket.queryAsync(N1qlQuery.fromString(query)))
       logger.debug('model#queryRaw', { query, result })
 
       return result
@@ -135,7 +98,7 @@ export abstract class CouchbaseModel {
     try {
       const query = queryParam.text
 
-      const result = await this.withRetry(() => CouchbaseModel.bucket.queryAsync(
+      const result = await withRetry(() => CouchbaseModel.bucket.queryAsync(
         N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS),
         queryParam.values
       ))
@@ -177,7 +140,7 @@ export abstract class CouchbaseModel {
         documentType: this.getDocumentType(),
         id
       })
-      const result = await this.withRetry(() => CouchbaseModel.bucket.getAsync(id))
+      const result = await withRetry(() => CouchbaseModel.bucket.getAsync(id))
 
       if (result) {
         return fromJSON(result.value, this.Struct)
@@ -216,24 +179,63 @@ export abstract class CouchbaseModel {
       throw new WrongStructRecord(this.getType(), validationResult.errors, data)
     }
 
-    await this.withRetry(
-      () => CouchbaseModel.bucket.upsertAsync(dataPreSaved.id, dataPreSaved)
-    )
+    await withRetry(() => CouchbaseModel.bucket.upsertAsync(dataPreSaved.id, dataPreSaved))
 
     return fromJSON(dataPreSaved, this.Struct)
   }
+}
 
-  protected withRetry<T> (fn: () => Promise<T>): Promise<T> {
-    return retry<T>(fn, {
-      max_tries: 5,
-      interval: 1000,
-      backoff: 1.5,
-      predicate: ({
-                    code,
-                    message,
-                  }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
-    })
+function withRetry<T> (fn: () => Promise<T>) {
+  return retry<T>(fn, {
+    max_tries: 5,
+    interval: 1000,
+    backoff: 1.5,
+    predicate: ({
+                  code,
+                  message,
+                }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
+  })
+}
+
+export function createQueryBuilder (props: StructProps, method: string = 'select', prefix: string = 't') {
+  let qb
+
+  switch (method) {
+    case 'let':
+      qb = (squel as any).let().field(`${prefix}.\`id\``)
+      Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
+      break
+    case 'use':
+      qb = (squel as any).useKey().field(`${prefix}.\`id\``)
+      Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
+      break
+    case 'select':
+      qb = squel.select().field(`${prefix}.\`id\``)
+      Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
+      break
+    case 'delete':
+      qb = squel.delete()
+      break
+    case 'update':
+      qb = squel.update()
+      break
+    case 'count':
+      qb = squel.select().field('COUNT(*) as count')
+      break
+    default:
+      throw new Error(`method ${method} not allowed (select, delete)`)
   }
+
+  if (method === 'update') {
+    qb.table(couchbase.bucket, prefix)
+  } else {
+    qb.from(couchbase.bucket, prefix)
+  }
+
+  qb
+    .where(`${prefix}.\`_documentType\` = ?`, this.getType())
+
+  return qb
 }
 
 export class DuplicatedEntity extends Error {

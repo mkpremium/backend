@@ -1,11 +1,16 @@
 import { wrap } from 'express-promise-wrap'
+import { BuildingNotesRepository } from '../building/repository/building-notes.repository'
 import { NoteRepository } from './models'
 import { History } from '../history/models'
 
-export async function listNotes (req, res) {
-  const repo = new NoteRepository()
-  const result = await repo.listNotes(req.query)
-  res.json(result)
+export function listNotesController ({ buildingNotesRepository }: {
+  buildingNotesRepository: BuildingNotesRepository
+}) {
+  return wrap(async function listNotes (req, res) {
+      const result = await buildingNotesRepository.listNotes(req.query)
+      res.json(result)
+    }
+  )
 }
 
 export async function addNote (req, res) {
@@ -17,4 +22,3 @@ export async function addNote (req, res) {
 }
 
 export const addNoteController = wrap(addNote)
-export const listNotesController = wrap(listNotes)

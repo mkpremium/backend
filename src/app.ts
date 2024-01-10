@@ -73,7 +73,7 @@ export const createApp = async (database: Database): Promise<Express> => {
     statRoutes(app, secured)
     historyRoutes(app, secured)
 
-    notes(app, secured)
+    notes(app, diContainer, secured)
     metadata(app, secured)
     email(app, secured)
 
