@@ -27,25 +27,24 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
   }
 
   async createNote (cmd: CreateNoteCommand, createdBy: string): Promise<Note> {
+    return this.save({...cmd, createdBy })
+  }
+
+  async save (cmd: Omit<Note, 'id'> & { id?: string }): Promise<Note> {
     const savedNote = await this.repository.save({
       note: cmd.note,
       building: { id: cmd.context.buildingId },
-      createdBy: { id: createdBy }
     })
 
     return {
       ...cmd,
       id: savedNote.id,
       createdAt: savedNote.createdAt,
-      createdBy,
+      createdBy: cmd.createdBy,
     }
   }
 
-  protected
-
-  getEntityTarget ()
-    :
-    EntityTarget<BuildingNote> {
+  protected getEntityTarget (): EntityTarget<BuildingNote> {
     return BuildingNote
   }
 }
