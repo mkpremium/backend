@@ -52,6 +52,7 @@ import { PostgresProposalsRepository } from './repository/postgres-proposals.rep
 import { AddBuildingService } from './service/add-building.service'
 import { importBuildingCommandHandler } from './service/import-building-command-handler'
 import { CouchbaseBuildingNotesRepository } from './repository/couchbase-building-notes.repository'
+import { PostgresBuildingNotesRepository } from './repository/postgres-building-notes.repository'
 
 export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -87,7 +88,8 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
-    buildingNotesRepository: aliasTo('couchbaseBuildingNotesRepository'),
+    postgresBuildingNotesRepository: asClass(PostgresBuildingNotesRepository).classic().singleton(),
+    buildingNotesRepository: aliasTo(usePostgres ? 'postgresBuildingNotesRepository' : 'couchbaseBuildingNotesRepository'),
     couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
     postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
     proposalsRepository: aliasTo(usePostgres ? 'postgresProposalsRepository' : 'couchbaseProposalsRepository'),
