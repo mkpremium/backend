@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { Note, NoteListQuery, NoteListResponse, TNote } from '../../notes/types'
+import { CreateNoteCommand, Note, NoteBody, NoteListQuery, NoteListResponse, TNote } from '../../notes/types'
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
 import { createQueryBuilder } from '../../db/model'
 
@@ -60,6 +60,11 @@ export class BuildingNotesRepository extends CouchbaseRepository<Note> {
     const results = await this.couchbaseAdapter.queryAsync(qb)
 
     return fromJSON({ total, results }, NoteListResponse)
+  }
+
+  createNote (params: CreateNoteCommand, createdBy: string) {
+    const noteBody = NoteBody(params)
+    return this.save(t.update(noteBody, { $merge: { createdBy } }))
   }
 
 
