@@ -59,6 +59,8 @@ export interface ProposalProps {
   notificationStatus?: 'PENDING' | 'SENT';
   notificationSentAt?: string | moment.Moment | undefined;
   message?: string;
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export const BuildingProposal = t.struct<ProposalProps>(

@@ -8,8 +8,10 @@ import type { saveDocumentsCommandHandler as saveDocumentsHandlerFactory } from 
 import type {
   importOwnerCommandHandler as importOwnerHandlerFactory
 } from '../../owner/service/import-owner-command-handler'
-import { BuildingMetadataProps } from '../../building/building'
+import { BuildingMetadataProps, ProposalProps } from '../../building/building'
 import { BuildingImage } from '../../building/building-image.entity'
+import { Proposal } from '../../building/proposal.entity'
+import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
 
 interface Deps {
   eventBus: EventBus,
@@ -54,9 +56,9 @@ export function couchbaseToPostgresSaga ({
 
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
-    'postgres_migration.trigger_building_images_migration',
+    'postgres_migration.import_building_images',
     async ({ buildingId }: { buildingId: string }) => {
-      logger.info('Building imported, triggering images migration', { buildingId })
+      logger.info('Building imported, starting to import its images', { buildingId })
       const images = await manager
         .createQueryBuilder(CouchbaseDocument, 'metadata')
         .where('metadata.document ->> buildingId = :buildingId', { buildingId })
@@ -84,7 +86,50 @@ export function couchbaseToPostgresSaga ({
         }, em)
       })
 
-      logger.info('Images migration triggered for all images', { buildingId })
+      logger.info('All building images imported', { buildingId })
+    }
+  )
+
+  eventBus.on(
+    DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
+    'postgres_migration.',
+    async ({ buildingId }: { buildingId: string }) => {
+      logger.info('Building imported, triggering images migration', { buildingId })
+      const proposals = await manager
+        .createQueryBuilder(CouchbaseDocument, 'proposal')
+        .where('proposal.document ->> buildingId = :buildingId', { buildingId })
+        .andWhere('proposal.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING_PROPOSAL })
+        .getMany()
+
+      logger.info('Found proposals for building', { buildingId, count: proposals.length })
+
+      await manager.transaction(async em => {
+        for (const proposal of proposals) {
+          const original = proposal.document as ProposalProps
+          await em.save(Proposal, {
+            id: proposal.id,
+            status: oldProposalToEntityStatus(original.state),
+            building: { id: buildingId },
+            owner: {id: original.ownerId},
+            author: {id: original.createdBy },
+            amount: original.proposal,
+            message: original.message,
+            notificationEmail: original.notificationEmail,
+            notificationSentAt: original.notificationSentAt,
+            notificationStatus: original.notificationStatus,
+            createdAt: original.createdAt,
+            updatedAt: original.updatedAt,
+          })
+        }
+
+        await eventBus.publish({
+          name: DomainEventCatalog.BUILDING__BUILDING_IMAGES_IMPORTED,
+          buildingId,
+          proposals: proposals.map(i => i.id),
+        }, em)
+      })
+
+      logger.info('All building proposals imported', { buildingId })
     }
   )
 

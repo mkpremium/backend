@@ -56,7 +56,7 @@ export class PostgresProposalsRepository extends PostgresRepository<ProposalProp
 const oldStates = [ 'aceptada', 'enviada', 'pendiente'] as const
 const newStatus = [ 'PENDING', 'SENT', 'ACCEPTED' ] as const
 
-function oldProposalToEntityStatus (state: 'aceptada' | 'enviada' | 'pendiente') {
+export function oldProposalToEntityStatus (state: 'aceptada' | 'enviada' | 'pendiente') {
   return newStatus[ oldStates.indexOf(state) ]
 }
 
