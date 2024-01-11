@@ -75,18 +75,6 @@
           "value": "production"
         },
         {
-          "name": "SOCKET_ENABLED",
-          "value": "false"
-        },
-        {
-          "name": "SOCKET_PORT",
-          "value": "9002"
-        },
-        {
-          "name": "SOCKET_SERVER",
-          "value": "http://websocket.local"
-        },
-        {
           "name": "EVENTUAL_CONSISTENCY_DELAY",
           "value": "500"
         },
