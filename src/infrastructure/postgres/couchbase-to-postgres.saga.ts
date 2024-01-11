@@ -5,14 +5,18 @@ import type { DataSource } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 import { subscribeToCommand } from '../listeners'
 import type { saveDocumentsCommandHandler as saveDocumentsHandlerFactory } from './save-documents-command-handler'
-import type { importOwnerCommandHandler as importOwnerHandlerFactory } from '../../owner/service/import-owner-command-handler'
+import type {
+  importOwnerCommandHandler as importOwnerHandlerFactory
+} from '../../owner/service/import-owner-command-handler'
+import { BuildingMetadataProps } from '../../building/building'
+import { BuildingImage } from '../../building/building-image.entity'
 
 interface Deps {
   eventBus: EventBus,
   logger: Logger,
   ormDataSource: DataSource,
   saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsHandlerFactory>
-  importOwnerCommandHandler:  ReturnType<typeof importOwnerHandlerFactory>
+  importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
 }
 
 export function couchbaseToPostgresSaga ({
@@ -45,6 +49,42 @@ export function couchbaseToPostgresSaga ({
         logger.info('Owner migration triggered', { buildingId, ownerId: owner.id })
       }
       logger.info('Owner migration triggered for all owners', { buildingId })
+    }
+  )
+
+  eventBus.on(
+    DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
+    'postgres_migration.trigger_building_images_migration',
+    async ({ buildingId }: { buildingId: string }) => {
+      logger.info('Building imported, triggering images migration', { buildingId })
+      const images = await manager
+        .createQueryBuilder(CouchbaseDocument, 'metadata')
+        .where('metadata.document ->> buildingId = :buildingId', { buildingId })
+        .andWhere('metadata.documentType = :documentType', { documentType: CouchbaseDocumentType.METADATA })
+        .getMany()
+
+      logger.info('Found images for building', { buildingId, count: images.length })
+
+      await manager.transaction(async em => {
+        for (const image of images) {
+          const original = image.document as BuildingMetadataProps
+          await em.save(BuildingImage, {
+            id: image.id,
+            name: original.name,
+            mimeType: original.mimeType,
+            previewUrl: original.previewUrl,
+            building: { id: buildingId },
+          })
+        }
+
+        await eventBus.publish({
+          name: DomainEventCatalog.BUILDING__BUILDING_IMAGES_IMPORTED,
+          buildingId,
+          imageIds: images.map(i => i.id),
+        }, em)
+      })
+
+      logger.info('Images migration triggered for all images', { buildingId })
     }
   )
 
