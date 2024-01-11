@@ -92,9 +92,9 @@ export function couchbaseToPostgresSaga ({
 
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
-    'postgres_migration.',
+    'postgres_migration.import_building_proposals',
     async ({ buildingId }: { buildingId: string }) => {
-      logger.info('Building imported, triggering images migration', { buildingId })
+      logger.info('Building imported, importing its proposals', { buildingId })
       const proposals = await manager
         .createQueryBuilder(CouchbaseDocument, 'proposal')
         .where('proposal.document ->> buildingId = :buildingId', { buildingId })
