@@ -15,7 +15,7 @@ export class Building extends BaseEntity {
   @Column('jsonb')
   address: BuildingAddressProps
 
-  @Column()
+  @Column({default: 'PENDIENTE'})
   negotiationStatus: BuildingNegotiationStatus
 
   @Column({ type: 'jsonb', nullable: true })
