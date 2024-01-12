@@ -61,17 +61,3 @@ export const NoteBody = t.struct<CreateNoteCommand>({
   note: t.String,
   context: t.Object
 })
-
-export const NoteListQuery = ListQuery.extend(
-  {
-    context: t.struct({
-      buildingId: t.String
-    })
-  },
-  {
-    name: 'NoteListQuery',
-    defaultProps: {
-      createdBetween: ','
-    }
-  }
-)
