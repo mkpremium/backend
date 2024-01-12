@@ -1,6 +1,5 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
-import { ListQuery } from '../types/params'
 
 
 export type Note = {
