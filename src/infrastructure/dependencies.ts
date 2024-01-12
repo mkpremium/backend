@@ -28,6 +28,7 @@ import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import { setupContactsDependencies } from '../contacts/dependencies'
 import { Database } from './database'
 import { couchbaseToPostgresSaga } from './postgres/couchbase-to-postgres.saga'
+import { BuildingImagesImporterService } from './service/building-images-importer.service'
 
 export async function createDiContainer (database: Database) {
   const container = createContainer()
@@ -64,6 +65,7 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
     ormDataSource: asValue(dataSource),
+    entityManager: asValue(dataSource.manager),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
@@ -79,5 +81,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     logger: asFunction(initLogger).singleton(),
 
     couchbaseToPostgresSaga: asFunction(couchbaseToPostgresSaga).singleton(),
+    buildingImagesImporterService: asClass(BuildingImagesImporterService).classic().singleton(),
   })
 }
