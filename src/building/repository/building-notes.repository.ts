@@ -4,7 +4,7 @@ import { CreateNoteCommand, Note, NoteListResponse } from '../../notes/types'
 export interface BuildingNotesRepository {
   forBuildingOfId (buildingId: string): Promise<Note[]>
 
-  listNotes (query: { limit?: number, offset?: number }): Promise<NoteListResponse>
+  listNotes (query: { context: string }): Promise<NoteListResponse>
 
   createNote (params: CreateNoteCommand, createdBy: string): Promise<Note>
 

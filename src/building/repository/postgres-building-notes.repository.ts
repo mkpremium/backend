@@ -22,7 +22,7 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
     }))
   }
 
-  listNotes (query: { limit?: number, offset?: number }): Promise<NoteListResponse> {
+  listNotes (query: { context: string }): Promise<NoteListResponse> {
     throw new Error('Method not implemented.')
   }
 
