@@ -32,7 +32,7 @@ export class CouchbaseBuildingNotesRepository extends CouchbaseRepository<Note> 
     const qb = createQueryBuilder(this.struct().meta.props, 'note')
       .limit(params.limit)
       .offset(params.offset)
-    const qbCount = createQueryBuilder(this.struct().meta.props, 'count')
+    const qbCount = createQueryBuilder(this.struct().meta.props, 'note', 'count')
 
     if (params.createdBy) {
       qb.where('createdBy = ?', params.createdBy)
