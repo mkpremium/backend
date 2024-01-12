@@ -1,7 +1,7 @@
-import { utc } from '../date'
-import m from 'moment-timezone'
-import { extendMoment } from 'moment-range'
 import moment from 'moment'
+import { extendMoment } from 'moment-range'
+import m from 'moment-timezone'
+import { utc } from '../date'
 
 const mr = extendMoment(m)
 
@@ -11,16 +11,6 @@ export const addDateQueryToBuilder = (queryBuilder, fieldName, value) => {
   const m = utc(value)
   queryBuilder.where(`${fieldName} >= ?`, m.clone().startOf('day').toDate())
   queryBuilder.where(`${fieldName} < ?`, m.clone().endOf('day').toDate())
-}
-
-export const addMinuteBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {
-  const [start, end] = splitDateRange(value)
-  if (start) {
-    queryBuilder.where(`${fieldName} > ?`, start.toDate())
-  }
-  if (end) {
-    queryBuilder.where(`${fieldName} < ?`, end.add(1, 'minutes').toDate())
-  }
 }
 
 export const addBetweenQueryToBuilder = (queryBuilder, fieldName, value) => {

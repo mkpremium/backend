@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { ListQuery } from '../types/params'
-import { StringSplitList } from '../types/refinement'
 
 
 export type Note = {
@@ -68,10 +67,9 @@ export const NoteBody = t.struct<CreateNoteCommand>({
 
 export const NoteListQuery = ListQuery.extend(
   {
-    createdBy: t.maybe(t.String),
-    createdAt: t.maybe(t.Date),
-    createdBetween: t.maybe(StringSplitList),
-    context: t.maybe(t.String)
+    context: t.struct({
+      buildingId: t.String
+    })
   },
   {
     name: 'NoteListQuery',
