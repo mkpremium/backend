@@ -1,7 +1,7 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseRepository } from '../../db/couchbase.repository'
-import { CreateNoteCommand, Note, NoteBody, NoteListQuery, NoteListResponse, TNote } from '../../notes/types'
+import { CreateNoteCommand, Note, NoteBody, NoteListResponse, TNote } from '../../notes/types'
 import { BuildingNotesRepository } from './building-notes.repository'
 
 const notesForBuildingQuery = bucketName => `
