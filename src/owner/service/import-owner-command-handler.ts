@@ -28,7 +28,8 @@ export function importOwnerCommandHandler ({ addOwnerService, eventBus, logger, 
       return
     }
 
-    await addOwnerService.addOwner({ ...owner, note: 'Importado desde Couchase' } as AddOwnerCommand, 'system')
+    const ownerWithNames = ensureOwnerHasNames(owner)
+    await addOwnerService.addOwner({ ...ownerWithNames, note: 'Importado desde Couchase' } as AddOwnerCommand, 'system')
     await markCouchbaseDocumentAsMigrated(entityManager, owner.id)
     await eventBus.publish({
       name: DomainEventCatalog.POSTGRES_MIGRATION__OWNER_IMPORTED,
@@ -58,4 +59,15 @@ export function importOwnerCommandHandler ({ addOwnerService, eventBus, logger, 
 
 function ensureOwnerHasNames (owner: OwnerProps) {
   if (owner.person.firstName && owner.person.firstSurname) return owner
+
+  const [firstName, ...rest] = owner.name.split(' ')
+
+  return {
+    ...owner,
+    person: {
+      ...owner.person,
+      firstName: firstName,
+      firstSurname: rest.join(' '),
+    }
+  }
 }
