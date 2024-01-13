@@ -17,8 +17,7 @@ export class BuildingImportTriggerService {
     this.logger.info('Triggering building migration')
     const allBuildings = await this.entityManager.createQueryBuilder(CouchbaseDocument, 'building')
       .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING })
-      .leftJoin(Building, 'b', 'b.id = building.id')
-      .andWhere('b.id IS NULL')
+      .andWhere('building.migratedAt IS NULL')
       .getMany()
 
     this.logger.info('Found buildings', { count: allBuildings.length })
