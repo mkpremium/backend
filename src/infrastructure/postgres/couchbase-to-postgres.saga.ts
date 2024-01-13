@@ -15,6 +15,7 @@ import { BuildingImagesImporterService } from '../service/building-images-import
 import { importOperatorCommandHandler } from './import-operator-command-handler'
 import { Building } from '../../building/building.entity'
 import { BuildingOwnerImportTriggerService } from '../service/building-owner-import-trigger.service'
+import { BuildingProposalsImporterService } from '../service/building-proposals-importer.service'
 
 interface Deps {
   eventBus: EventBus,
@@ -27,6 +28,7 @@ interface Deps {
   buildingImagesImporterService: BuildingImagesImporterService,
   importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
   buildingOwnerImportTriggerService: BuildingOwnerImportTriggerService,
+  buildingProposalsImporterService: BuildingProposalsImporterService,
 }
 
 export function couchbaseToPostgresSaga ({
@@ -37,6 +39,7 @@ export function couchbaseToPostgresSaga ({
                                            importOwnerCommandHandler,
                                            buildingImagesImporterService,
                                            buildingOwnerImportTriggerService,
+                                           buildingProposalsImporterService,
                                          }: Deps) {
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
@@ -58,42 +61,7 @@ export function couchbaseToPostgresSaga ({
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.import_building_proposals',
     async ({ buildingId }: { buildingId: string }) => {
-      logger.info('Building imported, importing its proposals', { buildingId })
-      const proposals = await entityManager
-        .createQueryBuilder(CouchbaseDocument, 'proposal')
-        .where('proposal.document ->> \'buildingId\' = :buildingId', { buildingId })
-        .andWhere('proposal.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING_PROPOSAL })
-        .getMany()
-
-      logger.info('Found proposals for building', { buildingId, count: proposals.length })
-
-      await entityManager.transaction(async em => {
-        for (const proposal of proposals) {
-          const original = proposal.document as ProposalProps
-          await em.save(Proposal, {
-            id: proposal.id,
-            status: oldProposalToEntityStatus(original.state),
-            building: { id: buildingId },
-            owner: { id: original.ownerId },
-            author: { id: original.createdBy },
-            amount: original.proposal,
-            message: original.message,
-            notificationEmail: original.notificationEmail,
-            notificationSentAt: original.notificationSentAt,
-            notificationStatus: original.notificationStatus,
-            createdAt: original.createdAt,
-            updatedAt: original.updatedAt,
-          })
-        }
-
-        await eventBus.publish({
-          name: DomainEventCatalog.BUILDING__BUILDING_IMAGES_IMPORTED,
-          buildingId,
-          proposals: proposals.map(i => i.id),
-        }, em)
-      })
-
-      logger.info('All building proposals imported', { buildingId })
+      await buildingProposalsImporterService.importBuildingProposal(buildingId)
     }
   )
 

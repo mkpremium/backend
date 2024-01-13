@@ -30,6 +30,7 @@ import { Database } from './database'
 import { couchbaseToPostgresSaga } from './postgres/couchbase-to-postgres.saga'
 import { BuildingImagesImporterService } from './service/building-images-importer.service'
 import { BuildingOwnerImportTriggerService } from './service/building-owner-import-trigger.service'
+import { BuildingProposalsImporterService } from './service/building-proposals-importer.service'
 
 export async function createDiContainer (database: Database) {
   const container = createContainer()
@@ -84,5 +85,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     couchbaseToPostgresSaga: asFunction(couchbaseToPostgresSaga).singleton(),
     buildingImagesImporterService: asClass(BuildingImagesImporterService).classic().singleton(),
     buildingOwnerImportTriggerService: asClass(BuildingOwnerImportTriggerService).classic().singleton(),
+    buildingProposalsImporterService: asClass(BuildingProposalsImporterService).classic().singleton(),
   })
 }
