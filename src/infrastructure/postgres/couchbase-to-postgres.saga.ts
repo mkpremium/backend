@@ -14,6 +14,7 @@ import { oldProposalToEntityStatus } from '../../building/repository/postgres-pr
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
 import { importOperatorCommandHandler } from './import-operator-command-handler'
 import { Building } from '../../building/building.entity'
+import { BuildingOwnerImportTriggerService } from '../service/building-owner-import-trigger.service'
 
 interface Deps {
   eventBus: EventBus,
@@ -25,6 +26,7 @@ interface Deps {
 
   buildingImagesImporterService: BuildingImagesImporterService,
   importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
+  buildingOwnerImportTriggerService: BuildingOwnerImportTriggerService,
 }
 
 export function couchbaseToPostgresSaga ({
@@ -34,30 +36,13 @@ export function couchbaseToPostgresSaga ({
                                            saveDocumentsCommandHandler,
                                            importOwnerCommandHandler,
                                            buildingImagesImporterService,
+                                           buildingOwnerImportTriggerService,
                                          }: Deps) {
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.trigger_building_owners_migration',
     async ({ buildingId }: { buildingId: string }) => {
-      logger.info('Building imported, triggering owners migration', { buildingId })
-      const allOwners = await entityManager
-        .createQueryBuilder(CouchbaseDocument, 'owner')
-        .where('owner.document ->> \'buildingId\' = :buildingId', { buildingId })
-        .andWhere('owner.documentType = :documentType', { documentType: CouchbaseDocumentType.OWNER })
-        .select([ 'owner.id', 'owner.document' ])
-        .getMany()
-
-      logger.info('Found owners for building', { buildingId, count: allOwners.length })
-
-      for (const owner of allOwners) {
-        await eventBus.publish({
-          name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OWNER,
-          buildingId,
-          owner: owner.document,
-        })
-        logger.info('Owner migration triggered', { buildingId, ownerId: owner.id })
-      }
-      logger.info('Owner migration triggered for all owners', { buildingId })
+      await buildingOwnerImportTriggerService.importBuildingOwners(buildingId)
     }
   )
 
