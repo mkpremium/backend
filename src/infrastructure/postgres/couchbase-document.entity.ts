@@ -1,5 +1,5 @@
 import { BaseEntity } from '../entity'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 
 export enum CouchbaseDocumentType {
   BUILDING = 'building',
@@ -46,5 +46,6 @@ export class CouchbaseDocument extends BaseEntity {
   document: object
 
   @Column('timestamp', { nullable: true })
+  @Index()
   migratedAt: Date
 }
