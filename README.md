@@ -4,7 +4,7 @@
 
 ```bash
 nvm use
-npm install
+npm ci
 cp .env.dist .env
 tsx ts-node scripts/init-local-database.ts
 npm start
