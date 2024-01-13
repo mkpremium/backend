@@ -16,6 +16,7 @@ import { importOperatorCommandHandler } from './import-operator-command-handler'
 import { Building } from '../../building/building.entity'
 import { BuildingOwnerImportTriggerService } from '../service/building-owner-import-trigger.service'
 import { BuildingProposalsImporterService } from '../service/building-proposals-importer.service'
+import { BuildingImportTriggerService } from '../service/building-import-trigger.service'
 
 interface Deps {
   eventBus: EventBus,
@@ -25,6 +26,7 @@ interface Deps {
   saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsHandlerFactory>
   importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
 
+  buildingImportTriggerService: BuildingImportTriggerService,
   buildingImagesImporterService: BuildingImagesImporterService,
   importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
   buildingOwnerImportTriggerService: BuildingOwnerImportTriggerService,
@@ -37,6 +39,7 @@ export function couchbaseToPostgresSaga ({
                                            entityManager,
                                            saveDocumentsCommandHandler,
                                            importOwnerCommandHandler,
+                                           buildingImportTriggerService,
                                            buildingImagesImporterService,
                                            buildingOwnerImportTriggerService,
                                            buildingProposalsImporterService,
@@ -79,22 +82,7 @@ export function couchbaseToPostgresSaga ({
 
   return {
     async triggerBuildingMigration () {
-      logger.info('Triggering building migration')
-      const allBuildings = await entityManager.createQueryBuilder(CouchbaseDocument, 'building')
-        .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING })
-        .leftJoin(Building, 'b', 'b.id = building.id')
-        .andWhere('b.id IS NULL')
-        .getMany()
-
-      logger.info('Found buildings', { count: allBuildings.length })
-      for (const building of allBuildings) {
-        await eventBus.publish({
-          name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_BUILDING,
-          building: building.document,
-        })
-        logger.info('Building migration triggered', { buildingId: building.id })
-      }
-      logger.info('Building migration triggered for all buildings')
+      await buildingImportTriggerService.triggerImport()
     },
     async triggerOperatorsMigration () {
       logger.info('Triggering operators migration')
