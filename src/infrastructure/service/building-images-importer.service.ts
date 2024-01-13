@@ -16,13 +16,6 @@ export class BuildingImagesImporterService {
 
   async importBuildingImages (buildingId: string) {
     this.logger.info('Building imported, starting to import its images', { buildingId })
-    console.log(
-      this.entityManager
-      .createQueryBuilder(CouchbaseDocument, 'metadata')
-      .where('metadata.document ->> buildingId = :buildingId', { buildingId })
-      .andWhere('metadata.documentType = :documentType', { documentType: CouchbaseDocumentType.METADATA })
-      .getQuery()
-    )
     const images = await this.entityManager
       .createQueryBuilder(CouchbaseDocument, 'metadata')
       .where("metadata.document ->> 'buildingId' = :buildingId", { buildingId })
