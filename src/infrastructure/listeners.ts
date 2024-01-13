@@ -1,6 +1,5 @@
 import { buildingEventListeners } from '../building/listeners'
 import { ownerEventListeners } from '../owner/listeners'
-import { callsEventListeners } from '../calls/listeners'
 import { scheduledEventsEventListeners } from '../scheduled-events/event-listeners'
 import { worksheetEventListeners } from '../worksheet/listeners'
 import { userEventListeners } from '../user/listeners'
@@ -16,7 +15,6 @@ export async function startListeners (diContainer) {
 
   buildingEventListeners(eventBus, diContainer)
   ownerEventListeners(eventBus, diContainer)
-  callsEventListeners(eventBus, diContainer)
   scheduledEventsEventListeners(eventBus, diContainer)
   worksheetEventListeners(eventBus, diContainer)
   userEventListeners(eventBus, diContainer)
