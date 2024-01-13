@@ -5,8 +5,9 @@
 1. Instalar Node 18. Si tienes `nvm` instalado, ejecuntando `nvm use` va a usar la version definida en `.nvmrc`.
 2. Instalar dependencias con `npm ci`
 3. Copia el archivo de variables de entorno por defecto con `cp .env.dist .env`
-4. Inicializa la base datos ejecutando `npx ts-node scripts/init-local-database.ts`
-5. Arranca la api con `npm start`.
+4. Arranca bases de datos (Couchbase y Postgres) con `docker-compose up`.
+5. Inicializa la base datos de Couchbase ejecutando `npx ts-node scripts/init-local-database.ts`
+6Arranca la api con `npm start`.
 
 
 ## Inicializar base de con datos de prueba
