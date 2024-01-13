@@ -20,7 +20,6 @@ import './types'
 import { worksheetsRoutes } from './worksheet/routing'
 import { connectCouchbaseBucket } from './db/connect-couchbase-bucket'
 import { EventsDiagnostics } from './infrastructure/event-bus'
-import { callsRoutes } from './calls/routing'
 import { setupOwnersRoutes } from './owner/routing'
 import { scheduledEventsRoutes } from './scheduled-events/routing'
 import { flipperRoutes } from './flipper/routing'
@@ -59,7 +58,6 @@ export const createApp = async (database: Database): Promise<Express> => {
     const secured = jwt(diContainer.resolve('usersRepository'))
 
     operator(app, diContainer, secured) // start with login router
-    callsRoutes(diContainer, app, secured)
     setupUserRoutes(app, diContainer, secured)
     buildingRoutes(diContainer, app, secured)
     setupOwnersRoutes(app, diContainer, secured)
