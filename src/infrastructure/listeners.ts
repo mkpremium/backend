@@ -24,8 +24,12 @@ export async function startListeners (diContainer) {
   eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
 
   const migrationSaga = diContainer.resolve('couchbaseToPostgresSaga') as ReturnType<typeof couchbaseToPostgresSaga>
-  if (process.env.TRIGGER_MIGRATION) {
-    const logger = diContainer.resolve('logger') as Logger
+  const logger = diContainer.resolve('logger') as Logger
+  if (process.env.TRIGGER_OPERATORS_MIGRATION) {
+    logger.info('Triggering operators migration')
+    await migrationSaga.triggerOperatorsMigration()
+  }
+  if (process.env.TRIGGER_BUILDINGS_MIGRATION) {
     logger.info('Triggering building migration')
     await migrationSaga.triggerBuildingMigration()
   }

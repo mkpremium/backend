@@ -12,6 +12,7 @@ import { ProposalProps } from '../../building/building'
 import { Proposal } from '../../building/proposal.entity'
 import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
+import { importOperatorCommandHandler } from './import-operator-command-handler'
 
 interface Deps {
   eventBus: EventBus,
@@ -22,6 +23,7 @@ interface Deps {
   importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
 
   buildingImagesImporterService: BuildingImagesImporterService,
+  importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
 }
 
 export function couchbaseToPostgresSaga ({
@@ -39,7 +41,7 @@ export function couchbaseToPostgresSaga ({
       logger.info('Building imported, triggering owners migration', { buildingId })
       const allOwners = await entityManager
         .createQueryBuilder(CouchbaseDocument, 'owner')
-        .where("owner.document ->> 'buildingId' = :buildingId", { buildingId })
+        .where('owner.document ->> \'buildingId\' = :buildingId', { buildingId })
         .andWhere('owner.documentType = :documentType', { documentType: CouchbaseDocumentType.OWNER })
         .select([ 'owner.id', 'owner.document' ])
         .getMany()
@@ -73,7 +75,7 @@ export function couchbaseToPostgresSaga ({
       logger.info('Building imported, importing its proposals', { buildingId })
       const proposals = await entityManager
         .createQueryBuilder(CouchbaseDocument, 'proposal')
-        .where("proposal.document ->> 'buildingId' = :buildingId", { buildingId })
+        .where('proposal.document ->> \'buildingId\' = :buildingId', { buildingId })
         .andWhere('proposal.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING_PROPOSAL })
         .getMany()
 
@@ -134,6 +136,24 @@ export function couchbaseToPostgresSaga ({
         logger.info('Building migration triggered', { buildingId: building.id })
       }
       logger.info('Building migration triggered for all buildings')
-    }
+    },
+    async triggerOperatorsMigration () {
+      logger.info('Triggering operators migration')
+      const allOperators = await entityManager
+        .createQueryBuilder(CouchbaseDocument, 'operator')
+        .andWhere('operator.documentType = :documentType', { documentType: CouchbaseDocumentType.OPERATOR })
+        .select([ 'operator.id', 'owner.document' ])
+        .getMany()
+      logger.info('Found operators', { count: allOperators.length })
+
+      for (const operator of allOperators) {
+        await eventBus.publish({
+          name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OPERATOR,
+          owner: operator.document,
+        })
+        logger.info('Operator migration triggered', { operatorId: operator.id })
+      }
+      logger.info('All operators migration triggered')
+    },
   }
 }
