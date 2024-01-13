@@ -20,7 +20,7 @@ async function init () {
   const container = await createContainer()
   const poller: EventPoller = container.resolve('eventPoller')
   const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
-  startListeners(container)
+  await startListeners(container)
 
   while (true) {
     if (killProcess) {
