@@ -13,6 +13,7 @@ import { Proposal } from '../../building/proposal.entity'
 import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
 import { importOperatorCommandHandler } from './import-operator-command-handler'
+import { Building } from '../../building/building.entity'
 
 interface Deps {
   eventBus: EventBus,
@@ -126,7 +127,12 @@ export function couchbaseToPostgresSaga ({
   return {
     async triggerBuildingMigration () {
       logger.info('Triggering building migration')
-      const allBuildings = await entityManager.findBy(CouchbaseDocument, { documentType: CouchbaseDocumentType.BUILDING })
+      const allBuildings = await entityManager.createQueryBuilder(CouchbaseDocument, 'building')
+        .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING })
+        .leftJoin(Building, 'b', 'b.id = building.id')
+        .andWhere('b.id IS NULL')
+        .getMany()
+
       logger.info('Found buildings', { count: allBuildings.length })
       for (const building of allBuildings) {
         await eventBus.publish({
