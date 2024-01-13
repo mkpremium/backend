@@ -65,7 +65,7 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     couchbaseBucket: asValue(couchbaseBucket),
     couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
     ormDataSource: asValue(dataSource),
-    entityManager: asValue(dataSource.manager),
+    entityManager: asValue(dataSource?.manager),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
