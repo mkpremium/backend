@@ -7,23 +7,22 @@ import { EventPublisher } from '../event-bus'
 import { Logger } from 'winston'
 import { Proposal } from '../../building/proposal.entity'
 import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
+import { BuildingRelatedDocumentMigration } from './building-related-document-migration'
+import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
 
-export class BuildingProposalsImporterService {
+export class BuildingProposalsImporterService extends BuildingRelatedDocumentMigration {
   constructor (
-    private readonly entityManager: EntityManager,
+    protected readonly entityManager: EntityManager,
     private readonly eventBus: EventPublisher,
     private readonly logger: Logger,
   ) {
+    super(entityManager)
   }
 
   async importBuildingProposal (buildingId: string) {
     this.logger.info('Building imported, importing its proposals', { buildingId })
-    const proposals = await this.entityManager
-      .createQueryBuilder(CouchbaseDocument, 'proposal')
-      .where('proposal.document ->> \'buildingId\' = :buildingId', { buildingId })
-      .andWhere('proposal.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING_PROPOSAL })
-      .getMany()
-
+    const proposals = await this.getBuildingNonMigratedRelatedDocuments(
+      CouchbaseDocumentType.BUILDING_PROPOSAL, buildingId)
     this.logger.info('Found proposals for building', { buildingId, count: proposals.length })
 
     await this.entityManager.transaction(async em => {
@@ -43,6 +42,7 @@ export class BuildingProposalsImporterService {
           createdAt: original.createdAt,
           updatedAt: original.updatedAt,
         })
+        await markCouchbaseDocumentAsMigrated(em, proposal.id)
       }
 
       await this.eventBus.publish({
