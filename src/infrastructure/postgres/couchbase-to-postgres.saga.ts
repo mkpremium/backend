@@ -39,7 +39,7 @@ export function couchbaseToPostgresSaga ({
       logger.info('Building imported, triggering owners migration', { buildingId })
       const allOwners = await entityManager
         .createQueryBuilder(CouchbaseDocument, 'owner')
-        .where('owner.document ->> buildingId = :buildingId', { buildingId })
+        .where("owner.document ->> 'buildingId' = :buildingId", { buildingId })
         .andWhere('owner.documentType = :documentType', { documentType: CouchbaseDocumentType.OWNER })
         .select([ 'owner.id', 'owner.document' ])
         .getMany()
@@ -73,7 +73,7 @@ export function couchbaseToPostgresSaga ({
       logger.info('Building imported, importing its proposals', { buildingId })
       const proposals = await entityManager
         .createQueryBuilder(CouchbaseDocument, 'proposal')
-        .where('proposal.document ->> buildingId = :buildingId', { buildingId })
+        .where("proposal.document ->> 'buildingId' = :buildingId", { buildingId })
         .andWhere('proposal.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING_PROPOSAL })
         .getMany()
 
