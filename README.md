@@ -7,7 +7,7 @@
 3. Copia el archivo de variables de entorno por defecto con `cp .env.dist .env`
 4. Arranca bases de datos (Couchbase y Postgres) con `docker-compose up`.
 5. Inicializa la base datos de Couchbase ejecutando `npx ts-node scripts/init-local-database.ts`
-6Arranca la api con `npm start`.
+6. Arranca la api con `npm start`.
 
 
 ## Inicializar base de con datos de prueba

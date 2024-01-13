@@ -1,14 +1,12 @@
 import { CouchbaseAdapter } from '../db/couchbase.adapter'
 import { aliasTo, asClass, asFunction, asValue, AwilixContainer, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
-import { setupCallerDependencies } from '../caller/init'
 import { setupStockDependencies } from '../stock/dependencies'
 import { Bucket } from 'couchbase'
 import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
 import { setupWorksheetDependencies } from '../worksheet/dependencies'
 import { setupEmailDependencies } from '../email/dependencies'
-import { setupCallsDependencies } from '../calls/dependencies'
 import { setupOwnerDependencies } from '../owner/dependencies'
 import { setupScheduledEventsDependencies } from '../scheduled-events/dependencies'
 import { setupFlipperDependencies } from '../flipper/dependencies'
@@ -54,12 +52,10 @@ export function setupContainer (
   setupContactsDependencies(container)
   setupScheduledEventsDependencies(container)
   setupWorksheetDependencies(container, usePostgres)
-  setupCallerDependencies(container)
   setupUserDependencies(container)
   setupStockDependencies(container)
   setupHistoryDependencies(container)
   setupEmailDependencies(container)
-  setupCallsDependencies(container)
   setupFlipperDependencies(container)
 }
 
