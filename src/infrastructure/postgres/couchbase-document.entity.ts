@@ -44,4 +44,7 @@ export class CouchbaseDocument extends BaseEntity {
 
   @Column('jsonb')
   document: object
+
+  @Column('timestamp', { nullable: true })
+  migratedAt: Date
 }
