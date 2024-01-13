@@ -8,7 +8,6 @@ import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
 import { setupWorksheetDependencies } from '../worksheet/dependencies'
 import { setupEmailDependencies } from '../email/dependencies'
-import { setupCallsDependencies } from '../calls/dependencies'
 import { setupOwnerDependencies } from '../owner/dependencies'
 import { setupScheduledEventsDependencies } from '../scheduled-events/dependencies'
 import { setupFlipperDependencies } from '../flipper/dependencies'
@@ -59,7 +58,6 @@ export function setupContainer (
   setupStockDependencies(container)
   setupHistoryDependencies(container)
   setupEmailDependencies(container)
-  setupCallsDependencies(container)
   setupFlipperDependencies(container)
 }
 
