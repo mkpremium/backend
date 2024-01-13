@@ -13,12 +13,7 @@ export class BuildingOwnerImportTriggerService {
 
   async importBuildingOwners (buildingId: string) {
     this.logger.info('Building imported, triggering owners migration', { buildingId })
-    const allOwners = await this.entityManager
-      .createQueryBuilder(CouchbaseDocument, 'owner')
-      .where('owner.document ->> \'buildingId\' = :buildingId', { buildingId })
-      .andWhere('owner.documentType = :documentType', { documentType: CouchbaseDocumentType.OWNER })
-      .select([ 'owner.id', 'owner.document' ])
-      .getMany()
+    const allOwners = await this.getBuildingNonMigratedRelatedDocuments(CouchbaseDocumentType.OWNER, buildingId)
 
     this.logger.info('Found owners for building', { buildingId, count: allOwners.length })
 
@@ -31,5 +26,15 @@ export class BuildingOwnerImportTriggerService {
       this.logger.info('Owner migration triggered', { buildingId, ownerId: owner.id })
     }
     this.logger.info('Owner migration triggered for all owners', { buildingId })
+  }
+
+  private getBuildingNonMigratedRelatedDocuments (documentType: CouchbaseDocumentType, buildingId: string) {
+    return this.entityManager
+      .createQueryBuilder(CouchbaseDocument, documentType)
+      .where(`${documentType}.document ->> 'buildingId' = :buildingId`, { buildingId })
+      .andWhere(`${documentType}.documentType = :documentType`, { documentType: documentType })
+      .andWhere(`${documentType}.migratedAt is NULL`)
+      .select([ `${documentType}.id`, `${documentType}.document` ])
+      .getMany()
   }
 }
