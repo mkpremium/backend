@@ -1,15 +1,18 @@
-import { CouchbaseDocument, CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
+import { CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { EventPublisher } from '../event-bus'
 import { EntityManager } from 'typeorm'
 import { Logger } from 'winston'
+import { BuildingRelatedDocumentMigration } from './building-related-document-migration'
 
-export class BuildingOwnerImportTriggerService {
+export class BuildingOwnerImportTriggerService extends BuildingRelatedDocumentMigration {
   constructor (
     private readonly eventBus: EventPublisher,
-    private readonly entityManager: EntityManager,
+    entityManager: EntityManager,
     private readonly logger: Logger,
-  ) {}
+  ) {
+    super(entityManager)
+  }
 
   async importBuildingOwners (buildingId: string) {
     this.logger.info('Building imported, triggering owners migration', { buildingId })
@@ -27,14 +30,5 @@ export class BuildingOwnerImportTriggerService {
     }
     this.logger.info('Owner migration triggered for all owners', { buildingId })
   }
-
-  private getBuildingNonMigratedRelatedDocuments (documentType: CouchbaseDocumentType, buildingId: string) {
-    return this.entityManager
-      .createQueryBuilder(CouchbaseDocument, documentType)
-      .where(`${documentType}.document ->> 'buildingId' = :buildingId`, { buildingId })
-      .andWhere(`${documentType}.documentType = :documentType`, { documentType: documentType })
-      .andWhere(`${documentType}.migratedAt is NULL`)
-      .select([ `${documentType}.id`, `${documentType}.document` ])
-      .getMany()
-  }
 }
+
