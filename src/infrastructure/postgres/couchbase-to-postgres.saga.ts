@@ -96,7 +96,7 @@ export function couchbaseToPostgresSaga ({
       for (const operator of allOperators) {
         await eventBus.publish({
           name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OPERATOR,
-          owner: operator.document,
+          operator: operator.document,
         })
         logger.info('Operator migration triggered', { operatorId: operator.id })
       }
