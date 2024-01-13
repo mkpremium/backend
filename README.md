@@ -2,18 +2,22 @@
 
 ## Instalación
 
-```bash
-nvm use
-npm ci
-cp .env.dist .env
-tsx ts-node scripts/init-local-database.ts
-npm start
-```
+1. Instalar Node 18. Si tienes `nvm` instalado, ejecuntando `nvm use` va a usar la version definida en `.nvmrc`.
+2. Instalar dependencias con `npm ci`
+3. Copia el archivo de variables de entorno por defecto con `cp .env.dist .env`
+4. Inicializa la base datos ejecutando `npx ts-node scripts/init-local-database.ts`
+5. Arranca la api con `npm start`.
 
-## Inicializar Couchbase con datos de prueba
 
+## Inicializar base de con datos de prueba
+
+**Advertencia 1**: el siguiente comando usa la API para inicializar los datos por lo que es necesario que el backend esté corriendo.
+**Advertencia 2**: el script crea un usuario admin en Couchbase y luego lo usa para pegarle a la API para crear recursos.
+La API guardara los datos en Couchbase solo si la variable de entorno `DATABASE` es `couchbase`. Hay un script
+equivalente para crear un usuario admin en Postgres, en `./scripts/populate-local-database.sh` hay un comentario
+relacionado.
 ```bash
-./populate-local-database.sh
+./scripts/populate-local-database.sh
 ```
 
 El comando creará 20 edificios y los siguientes usuarios.
