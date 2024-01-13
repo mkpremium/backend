@@ -89,7 +89,7 @@ export function couchbaseToPostgresSaga ({
       const allOperators = await entityManager
         .createQueryBuilder(CouchbaseDocument, 'operator')
         .andWhere('operator.documentType = :documentType', { documentType: CouchbaseDocumentType.OPERATOR })
-        .select([ 'operator.id', 'owner.document' ])
+        .select([ 'operator.id', 'operator.document' ])
         .getMany()
       logger.info('Found operators', { count: allOperators.length })
 
