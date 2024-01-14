@@ -22,7 +22,7 @@ El comando creará 20 edificios y los siguientes usuarios.
 
  Nombre de Usuario | Contraseña      | Rol             
 -------------------|-----------------|-----------------
- admin             | admin           | ADMIN           
+ admin             | pa$$w0rd           | ADMIN           
  flipper           | flipper1        | FLIPPER         
  caller            | caller10        | CALLER          
  flipper-caller    | flipper-caller1 | FLIPPER, CALLER 
@@ -59,8 +59,7 @@ En [esta carpeta](https://drive.google.com/drive/folders/1ihrCwLEm63P-uBI12kcbpu
 
 ### Añadir nodo
 
-1.
-Usar [este](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchTemplateDetails:launchTemplateId=lt-0f071d39b784bfdf1) `Launch Template`.
+1. Usar [este](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchTemplateDetails:launchTemplateId=lt-0f071d39b784bfdf1) `Launch Template`.
 2. Añadir servidores desde consola de Couchbase
 3. Crear indices.
 4. Apuntar servicios a nuevas instancias.
