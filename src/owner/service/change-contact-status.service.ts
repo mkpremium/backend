@@ -1,9 +1,14 @@
-import { History } from '../../history/models'
-import { EventPublisher } from '../../infrastructure/event-bus'
-import { OwnerRepository } from '../repository/owner.repository'
-import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
-import { Logger } from 'winston'
-import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import {History} from '../../history/models'
+import {EventPublisher} from '../../infrastructure/event-bus'
+import {OwnerRepository} from '../repository/owner.repository'
+import {changeContactStatus, OwnerProps, OwnerStatus} from '../owner'
+import {Logger} from 'winston'
+import {DomainEventCatalog} from '../../infrastructure/postgres/domain-event.entity'
+import {EntityManager} from "typeorm";
+import {Owner} from "../owner.entity";
+import {PersonContact} from "../person-contact.entity";
+import _ from 'lodash'
+import {ownerEntityToStruct} from "../repository/postgres-owners.repository";
 
 export interface OwnerStatusChangedEvent {
   name: DomainEventCatalog.OWNER__STATUS_CHANGED;
@@ -21,19 +26,56 @@ export interface OwnerContactStatusChanged {
 }
 
 export class ChangeContactStatusService {
-  constructor (
+  constructor(
     private ownersRepository: OwnerRepository,
     private historyRepository: History,
     private eventBus: EventPublisher,
     private logger: Logger,
+    private usePostgres: boolean,
+    private entityManager: EntityManager,
   ) {
   }
 
-  async change ({ ownerId, contactId, status }, user): Promise<OwnerProps> {
-    const contextModel = { _documentType: 'owner-contact', modelId: contactId }
+  async change({ownerId, contactId, status}, user): Promise<OwnerProps> {
+    return this.usePostgres ? this.doPostgres({ownerId, contactId, status}, user) : this.doCouchbase({
+      ownerId,
+      contactId,
+      status
+    }, user)
+  }
+
+  private async doPostgres({ownerId, contactId, status}, user): Promise<OwnerProps> {
+    return this.entityManager.transaction<OwnerProps>(async (em) => {
+      const owner = await em.findOne(Owner, {
+        where: {id: ownerId},
+        relations: {
+          person: {
+            contacts: {
+              contact: true
+            }
+          }
+        }
+      })
+      const personContact = owner.person.contacts.find(pc => pc.contact.id === contactId)!
+      personContact.status = status
+      await em.save(PersonContact, personContact)
+      const restPersonContacts = owner.person.contacts.filter(pc => pc.contact.id !== contactId)
+
+      if (status === 'BAD' &&_.every(restPersonContacts, pc => pc.status === 'BAD')) {
+        owner.status = 'WITHOUT_CONTACT'
+        await em.save(Owner, owner)
+      }
+
+      return ownerEntityToStruct(owner)
+    })
+
+  }
+
+  private async doCouchbase({ownerId, contactId, status}, user): Promise<OwnerProps> {
+    const contextModel = {_documentType: 'owner-contact', modelId: contactId}
 
     const owner = await this.ownersRepository.get(ownerId) as OwnerProps
-    this.logger.debug('Changing owner contact status', { status, ownerId, contactId })
+    this.logger.debug('Changing owner contact status', {status, ownerId, contactId})
     const updatedOwner = await this.ownersRepository.save(
       changeContactStatus(owner, contactId, status)) as OwnerProps
 
