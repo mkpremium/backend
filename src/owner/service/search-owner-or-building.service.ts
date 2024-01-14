@@ -73,7 +73,7 @@ export class SearchOwnerOrBuildingService {
         building,
         worksheetId: building.worksheetId,
         negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
-        matchingContactId: foundOwner.person.contacts[ matchingContactIdx ].id,
+        matchingContactId: foundOwner.person.contacts[ matchingContactIdx ].contact.id,
         scheduledCalls: [], // TODO: add scheduledCalls
         // TODO: add lastEvent
       }
