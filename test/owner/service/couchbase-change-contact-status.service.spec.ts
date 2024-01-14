@@ -4,7 +4,7 @@ import { createTestContainer } from '../../create-test-container'
 import { expect } from 'chai'
 import { OwnerStatus } from '../../../src/owner/owner'
 
-describe('ChangeContactStatusService', () => {
+describe('ChangeContactStatusService(Couchbase)', () => {
   let service: ChangeContactStatusService
   let owner
 
