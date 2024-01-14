@@ -22,7 +22,7 @@ El comando creará 20 edificios y los siguientes usuarios.
 
  Nombre de Usuario | Contraseña      | Rol             
 -------------------|-----------------|-----------------
- admin             | pa$$w0rd           | ADMIN           
+ admin             | pa$$w0rd        | ADMIN           
  flipper           | flipper1        | FLIPPER         
  caller            | caller10        | CALLER          
  flipper-caller    | flipper-caller1 | FLIPPER, CALLER 
