@@ -34,7 +34,6 @@ import { ProposalsSenderService } from './service/proposals-sender.service'
 import { PdfProposalComposer } from './service/pdf-proposal-composer'
 import { createListBuildingsController } from './controller/list-buildings.controller'
 import { createProposalScheduledListener } from './event-listener/proposal-added.listener'
-import { addSmsNoteListener } from './event-listener/add-sms-note.listener'
 import { LeadRecorderService } from './service/lead-recorder.service'
 import { BuildingSearcherService } from './service/building-searcher.service'
 import { Portugal2021BuildingsRepository } from './repository/portugal2021-buildings.repository'
@@ -105,7 +104,6 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
     addProposalController: asFunction(createAddProposalController).singleton(),
     proposalScheduledListener: asFunction(createProposalScheduledListener).singleton(),
-    addSmsNoteListener: asFunction(addSmsNoteListener).singleton(),
 
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),

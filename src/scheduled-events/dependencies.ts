@@ -12,7 +12,6 @@ import { createAddScheduledMeetingEventController } from './controller/add-meeti
 import { createGetUserScheduledCallsController } from './controller/get-user-scheduled-calls.controller'
 import { createDeleteScheduledEventController } from './controller/delete-scheduled-event.controller'
 import { selfMeetingsController } from './controller/get-self-meetings.controller'
-import { scheduledCallFromOwnerMessage } from './listeners/scheduled-call-from-owner-message'
 import { removeCallsOnNewMeetingOrOfferRequest } from './listeners/remove-calls-on-new-meeting-or-offer-request'
 import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled-calls-on-owner-refusal'
 import { removeScheduledCallOnDiscardedContact } from './listeners/remove-scheduled-call-on-discarded-contact'
@@ -43,7 +42,6 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
     deleteScheduledEventController: asFunction(createDeleteScheduledEventController).singleton(),
     selfMeetingsController: asFunction(selfMeetingsController).singleton(),
 
-    scheduledCallFromOwnerMessage: asFunction(scheduledCallFromOwnerMessage).singleton(),
     removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
     removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
     removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
