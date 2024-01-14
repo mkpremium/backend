@@ -22,8 +22,8 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
     }))
   }
 
-  listNotes (query: { context: string }): Promise<NoteListResponse> {
-    throw new Error('Method not implemented.')
+  async listNotes (buildingId: string): Promise<NoteListResponse> {
+    return { results: await this.forBuildingOfId(buildingId) }
   }
 
   async createNote (cmd: CreateNoteCommand, createdBy: string): Promise<Note> {

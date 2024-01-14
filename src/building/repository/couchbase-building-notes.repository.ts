@@ -25,9 +25,7 @@ export class CouchbaseBuildingNotesRepository extends CouchbaseRepository<Note> 
     })
   }
 
-  async listNotes (query: { context: string }): Promise<NoteListResponse> {
-    const { buildingId } = JSON.parse(query.context)
-
+  async listNotes (buildingId: string): Promise<NoteListResponse> {
     return fromJSON({ results: await this.forBuildingOfId(buildingId) }, NoteListResponse)
   }
 

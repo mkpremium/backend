@@ -6,7 +6,8 @@ export function listNotesControllerFactory ({ buildingNotesRepository }: {
   buildingNotesRepository: BuildingNotesRepository
 }) {
   return wrap(async function listNotes (req, res) {
-      const result = await buildingNotesRepository.listNotes(req.query)
+      const { buildingId } = JSON.parse(req.query.context)
+      const result = await buildingNotesRepository.listNotes(buildingId)
       res.json(result)
     }
   )
