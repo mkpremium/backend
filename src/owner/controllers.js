@@ -27,8 +27,6 @@ export function createAddOwnerContactController ({ addContactService }) {
     const ownerId = req.params.id
     const updatedOwner = await addContactService.addContact({ ownerId, ...req.body })
 
-    await History.registerCreate({ contextModel: updatedOwner, user: req.user })
-
     res.json(updatedOwner)
   }
 }
