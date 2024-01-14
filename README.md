@@ -42,6 +42,10 @@ Con ambas bases de datos ejectuta el siguiente comando para ejecutar los tests:
 
 ```npm run test```
 
+## Postman
+
+En [este link puedes](https://blue-escape-550088.postman.co/workspace/MKPremium~c0075d2d-4982-4e8a-a961-2885497d812a/collection/14017492-24f0ce87-1df1-45b6-8bf3-128994f495b8?action=share&creator=14017492&active-environment=14017492-34f4e0c8-106d-4d4f-8840-9439c5c2aea3) ver una colección de Postman con algunos de los endpoints de la API.
+
 ## Migraciones con Postgres
 
 Usamos `typeorm` como ORM para postgres. Para usarlo, necesitamos la variable de entorno `DATABASE_URL`. Para ejecutar
