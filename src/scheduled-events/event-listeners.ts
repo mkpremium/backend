@@ -18,11 +18,11 @@ export function scheduledEventsEventListeners (eventBus: EventListener, containe
     'scheduled_events.remove_call',
     container.resolve('removeScheduledCallsOnOwnerRefusal')
   )
-  eventBus.on(
-    'virtual_caller.sms_received',
-    'scheduled_events.schedule_call',
-    container.resolve('scheduledCallFromOwnerMessage')
-  )
+  // eventBus.on(
+  //   'virtual_caller.sms_received',
+  //   'scheduled_events.schedule_call',
+  //   container.resolve('scheduledCallFromOwnerMessage')
+  // )
   eventBus.on(
     DomainEventCatalog.OWNER__CONTACT_STATUS_CHANGED,
     'scheduled_events.remove_call',
