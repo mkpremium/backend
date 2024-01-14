@@ -1,12 +1,25 @@
 import {ChangeContactStatusService} from '../../../src/owner/service/change-contact-status.service'
-import {createOwner, testPhoneContactId} from '../../../test-e2e/helper/mother-of-objects'
 import {createTestContainer} from '../../create-test-container'
 import {expect} from 'chai'
 import {OwnerStatus} from '../../../src/owner/owner'
+import {buildingFactory} from '../../factories'
+import {BuildingsRepository} from '../../../src/building/repository/buildings.repository'
+import {createOwnerWithPhoneContact} from '../../helpers'
 
 describe('ChangeContactStatusService', () => {
   let service: ChangeContactStatusService
-  let owner
+  let testOwner
+  let testContact
+
+  describe('with Postgres', () => {
+    beforeEach(async () => {
+      await beforeEachSetup(true)
+    })
+
+    it('marks owner as WITHOUT_CONTACT when all contacts are BAD', async () => {
+      await testOwnerChangeToWithoutContact()
+    })
+  })
 
   describe('with Couchbase', () => {
     beforeEach(async () => {
@@ -14,11 +27,11 @@ describe('ChangeContactStatusService', () => {
     })
 
     it('marks owner as VERIFIED when at least one at least one contact is GOOD', async () => {
-      expect(owner.status).to.be.equal(OwnerStatus.NON_VERIFIED)
+      expect(testOwner.status).to.be.equal(OwnerStatus.NON_VERIFIED)
 
       const updatedOwner = await service.change({
-        ownerId: owner.id,
-        contactId: testPhoneContactId,
+        ownerId: testOwner.id,
+        contactId: testContact.id,
         status: 'GOOD'
       }, {id: 'test-caller-id'})
 
@@ -26,20 +39,33 @@ describe('ChangeContactStatusService', () => {
     })
 
     it('marks owner as WITHOUT_CONTACT when all contacts are BAD', async () => {
-      expect(owner.status).to.be.equal(OwnerStatus.NON_VERIFIED)
-
-      const updatedOwner = await service.change({
-        ownerId: owner.id,
-        contactId: testPhoneContactId,
-        status: 'BAD'
-      }, {id: 'test-caller-id'})
-      expect(updatedOwner.status).to.be.equal(OwnerStatus.WITHOUT_CONTACT)
+      await testOwnerChangeToWithoutContact()
     })
   })
 
+  async function testOwnerChangeToWithoutContact() {
+    expect(testOwner.status).to.not.equal(OwnerStatus.WITHOUT_CONTACT)
+
+    const updatedOwner = await service.change({
+      ownerId: testOwner.id,
+      contactId: testContact.id,
+      status: 'BAD'
+    }, {id: 'test-caller-id'})
+    expect(updatedOwner.status).to.be.equal(OwnerStatus.WITHOUT_CONTACT)
+  }
+
   async function beforeEachSetup(usePostgres: boolean) {
     const container = await createTestContainer({postgres: usePostgres, couchbase: !usePostgres})
-    owner = await createOwner(container, {status: undefined})
+    const buildingRepository: BuildingsRepository = await container.resolve('buildingsRepository')
+    const testBuilding = await buildingRepository.save(buildingFactory.build())
+
+    const [owner, phoneContact] = await createOwnerWithPhoneContact(testBuilding, {status: 'NO_VERIFICADO'}, {
+      addOwnerService: container.resolve('addOwnerService'),
+      addContactService: container.resolve('addContactService'),
+    })
+
+    testOwner = owner
+    testContact = phoneContact
 
     service = container.resolve('changeContactStatusService')
   }
