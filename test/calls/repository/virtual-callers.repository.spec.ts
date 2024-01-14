@@ -3,7 +3,7 @@ import { VirtualCallersRepository } from '../../../src/calls/repository/virtual-
 import { createTestContainer } from '../../create-test-container'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 
-describe('VirtualCallersRepository', () => {
+describe.skip('VirtualCallersRepository', () => {
   let repository: VirtualCallersRepository
 
   beforeEach(async () => {

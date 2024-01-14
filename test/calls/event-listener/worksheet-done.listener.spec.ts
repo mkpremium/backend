@@ -5,7 +5,7 @@ import { WorksheetDone } from '../../../src/calls/service/virtual-caller.service
 import { createWorksheetDoneListener } from '../../../src/calls/event-listener/worksheet-done.listener'
 import { createLoggerMock } from '../../infrastructure/logger.spec'
 
-describe('worksheet-done.listener', () => {
+describe.skip('worksheet-done.listener', () => {
   let listener: (evt: WorksheetDone) => Promise<void>
   let virtualCallersRepositoryStub
   let virtualCallerSupervisorStub

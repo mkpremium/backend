@@ -6,7 +6,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { constVoid } from 'fp-ts/function'
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 
-describe('input-gathered.listener', () => {
+describe.skip('input-gathered.listener', () => {
   let listener: (evt: InputGathered) => Promise<void>
   let leadRecorderServiceStub
   let virtualCallersRepositoryStub

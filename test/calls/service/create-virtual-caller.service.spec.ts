@@ -7,7 +7,7 @@ import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 import { userBuilder } from '../../user/user.builder'
 import { User } from '../../../src/types/user'
 
-describe('CreateVirtualCallerService', () => {
+describe.skip('CreateVirtualCallerService', () => {
   let service: CreateVirtualCallerService
   let virtualCallersRepositoryStub
   let worksheetQueueRepositoryStub

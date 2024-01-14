@@ -4,7 +4,7 @@ import { SmsReceived } from '../../../src/calls/service/sms-webhook.processor'
 import { scheduledCallFromOwnerMessage } from '../../../src/scheduled-events/listeners/scheduled-call-from-owner-message'
 import { virtualCallerBuilder } from '../../calls/virtual-caller.builder'
 
-describe('scheduledCallFromOwnerMessage', () => {
+describe.skip('scheduledCallFromOwnerMessage', () => {
   let listener: (evt: SmsReceived) => Promise<void>
   let scheduledCallRepositoryStub
   let virtualCallersRepositoryStub

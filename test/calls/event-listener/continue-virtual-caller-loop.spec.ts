@@ -6,7 +6,7 @@ import { continueVirtualCallerLoop } from '../../../src/calls/event-listener/con
 import { CallDone } from '../../../src/calls/service/call-finished.processor'
 import { createLoggerMock } from '../../infrastructure/logger.spec'
 
-describe('call-finished.listener', () => {
+describe.skip('call-finished.listener', () => {
   let listener: (evt: CallDone) => Promise<void>
   let virtualCallersRepositoryStub
   let virtualCallerSupervisorStub

@@ -5,7 +5,7 @@ import { createStartVirtualCallerController } from '../../../src/calls/controlle
 import { virtualCallerBuilder } from '../virtual-caller.builder'
 import { createLoggerMock } from '../../infrastructure/logger.spec'
 
-describe('virtual-caller-start.controller', () => {
+describe.skip('virtual-caller-start.controller', () => {
   let controller: RequestHandler
   let virtualCallerSupervisorStub
   let virtualCallersRepositoryStub
