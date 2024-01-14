@@ -53,7 +53,8 @@ export class ChangeContactStatusService {
             contacts: {
               contact: true
             }
-          }
+          },
+          building: true,
         }
       })
       const personContact = owner.person.contacts.find(pc => pc.contact.id === contactId)!
@@ -61,8 +62,11 @@ export class ChangeContactStatusService {
       await em.save(PersonContact, personContact)
       const restPersonContacts = owner.person.contacts.filter(pc => pc.contact.id !== contactId)
 
-      if (status === 'BAD' &&_.every(restPersonContacts, pc => pc.status === 'BAD')) {
+      if (status === 'BAD' && _.every(restPersonContacts, pc => pc.status === 'BAD')) {
         owner.status = 'WITHOUT_CONTACT'
+        await em.save(Owner, owner)
+      } else if (status === 'GOOD' || _.some(restPersonContacts, pc => pc.status === 'GOOD')) {
+        owner.status = 'VERIFICADO'
         await em.save(Owner, owner)
       }
 
