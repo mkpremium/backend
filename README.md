@@ -34,6 +34,14 @@ El comando creará 20 edificios y los siguientes usuarios.
 
 - Utilizar endpoint `test-harness => Create Test Building` en Postman.
 
+
+## Correr tests
+
+Antes de correr los tests tienes que crear una base de datos `test_mkpremium` en Postgres.
+Con ambas bases de datos ejectuta el siguiente comando para ejecutar los tests:
+
+```npm run test```
+
 ## Gestión de nodos Couchbase
 
 ### Añadir nodo
