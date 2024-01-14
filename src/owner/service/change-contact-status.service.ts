@@ -62,6 +62,7 @@ export class ChangeContactStatusService {
       await em.save(PersonContact, personContact)
       const restPersonContacts = owner.person.contacts.filter(pc => pc.contact.id !== contactId)
 
+      const oldStatus = owner.status
       if (status === 'BAD' && _.every(restPersonContacts, pc => pc.status === 'BAD')) {
         owner.status = 'WITHOUT_CONTACT'
         await em.save(Owner, owner)
@@ -69,6 +70,15 @@ export class ChangeContactStatusService {
         owner.status = 'VERIFICADO'
         await em.save(Owner, owner)
       }
+
+      await this.publishEvents({
+        ownerId,
+        contactId,
+        newContactStatus: status,
+        owner: {buildingId: owner.building.id, status: oldStatus},
+        updatedOwner: owner,
+        em
+      });
 
       return ownerEntityToStruct(owner)
     })
@@ -83,13 +93,26 @@ export class ChangeContactStatusService {
     const updatedOwner = await this.ownersRepository.save(
       changeContactStatus(owner, contactId, status)) as OwnerProps
 
-    await this.historyRepository.register({ type: 'UPDATE', contextModel, user })
+    await this.historyRepository.register({type: 'UPDATE', contextModel, user})
+    await this.publishEvents({ownerId, contactId, newContactStatus: status, owner, updatedOwner});
+
+    return updatedOwner
+  }
+
+  private async publishEvents({ownerId, contactId, owner, updatedOwner, em, newContactStatus}: {
+    ownerId: string,
+    contactId: string,
+    newContactStatus: string,
+    owner: Pick<OwnerProps, 'status' | 'buildingId'>,
+    updatedOwner: Pick<OwnerProps, 'status'>,
+    em?: EntityManager,
+  }) {
     await this.eventBus.publish({
       name: DomainEventCatalog.OWNER__CONTACT_STATUS_CHANGED,
       ownerId,
       contactId,
-      newContactStatus: status,
-    } as OwnerContactStatusChanged)
+      newContactStatus,
+    } as OwnerContactStatusChanged, em)
 
     if (owner.status !== updatedOwner.status) {
       const event: OwnerStatusChangedEvent = {
@@ -99,9 +122,7 @@ export class ChangeContactStatusService {
         oldStatus: owner.status,
         newStatus: updatedOwner.status
       }
-      await this.eventBus.publish(event)
+      await this.eventBus.publish(event, em)
     }
-
-    return updatedOwner
   }
 }
