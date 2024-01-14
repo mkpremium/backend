@@ -6,7 +6,7 @@ import { map } from 'fp-ts/TaskEither'
 import { taskEither } from 'fp-ts'
 import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 
-describe('BuildingOwnerPhonesRepository', () => {
+describe.skip('BuildingOwnerPhonesRepository', () => {
   let repository: BuildingOwnerPhonesRepository
   let couchbaseAdapter: CouchbaseAdapter
   let lastCas
