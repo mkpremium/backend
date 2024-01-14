@@ -18,7 +18,7 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
       context: {
         buildingId: buildingId,
       },
-      createdBy: n.createdBy as any as string
+      createdBy: n.author.id
     }))
   }
 
@@ -34,6 +34,7 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
     const savedNote = await this.repository.save({
       note: cmd.note,
       building: { id: cmd.context.buildingId },
+      author: {id: cmd.createdBy},
     })
 
     return {

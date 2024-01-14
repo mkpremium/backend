@@ -11,6 +11,6 @@ export class BuildingNote extends BaseEntity {
   @Column({nullable: false})
   note: string
 
-  @Column(() => User)
-  createdBy: User
+  @ManyToOne(() => User)
+  author: User
 }
