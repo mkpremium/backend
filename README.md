@@ -50,6 +50,9 @@ Usamos `typeorm` como ORM para postgres. Para usarlo, necesitamos la variable de
 
 ```npm run typeorm migration:show -- -d src/data-source.ts```
 
+## Grabaciones
+
+En [esta carpeta](https://drive.google.com/drive/folders/1ihrCwLEm63P-uBI12kcbpuYaDA73T-rX) iremos guardando grabaciones como forma de documentación.
 
 ## Gestión de nodos Couchbase
 
