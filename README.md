@@ -12,11 +12,8 @@
 
 ## Inicializar base de con datos de prueba
 
-**Advertencia 1**: el siguiente comando usa la API para inicializar los datos por lo que es necesario que el backend esté corriendo.
-**Advertencia 2**: el script crea un usuario admin en Couchbase y luego lo usa para pegarle a la API para crear recursos.
-La API guardara los datos en Couchbase solo si la variable de entorno `DATABASE` es `couchbase`. Hay un script
-equivalente para crear un usuario admin en Postgres, en `./scripts/populate-local-database.sh` hay un comentario
-relacionado.
+**Advertencia**: el siguiente comando usa la API para inicializar los datos por lo que es necesario que el backend esté corriendo.
+
 ```bash
 ./scripts/populate-local-database.sh
 ```

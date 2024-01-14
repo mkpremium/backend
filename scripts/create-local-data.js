@@ -4,7 +4,7 @@ const baseURL = 'http://localhost:9001'
 
 axios.post(`${baseURL}/operators/login`, {
   username: 'admin',
-  password: 'admin'
+  password: 'pa$$w0rd'
 })
   .then(({ data: { token } }) => {
     return axios.create({
