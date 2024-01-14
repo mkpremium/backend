@@ -1,14 +1,11 @@
-import { expect } from 'chai'
-import { ownerBuilder } from '../owner.builder'
-import { createTestContainer } from '../../create-test-container'
-import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
-import uuid from 'uuid/v4'
-import { Factory } from 'rosie'
-import { ContactProps } from '../../../src/owner/owner'
-import { AddContactService } from '../../../src/owner/service/add-contact.service'
-import { DataSource } from 'typeorm'
-import { createOwner } from '../../../src/owner/service/create-owner'
-import { PersonContact } from '../../../src/owner/person-contact.entity'
+import {expect} from 'chai'
+import {createTestContainer} from '../../create-test-container'
+import {Factory} from 'rosie'
+import {ContactProps} from '../../../src/owner/owner'
+import {AddContactService} from '../../../src/owner/service/add-contact.service'
+import {DataSource} from 'typeorm'
+import {createOwner} from '../../../src/owner/service/create-owner'
+import {PersonContact} from '../../../src/owner/person-contact.entity'
 
 describe('Add Contact service', () => {
   let service: AddContactService
