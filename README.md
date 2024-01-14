@@ -42,6 +42,15 @@ Con ambas bases de datos ejectuta el siguiente comando para ejecutar los tests:
 
 ```npm run test```
 
+## Migraciones con Postgres
+
+Usamos `typeorm` como ORM para postgres. Para usarlo, necesitamos la variable de entorno `DATABASE_URL`. Para ejecutar
+`typeorm` desde la shell lo hacemos con:
+
+
+```npm run typeorm migration:show -- -d src/data-source.ts```
+
+
 ## Gestión de nodos Couchbase
 
 ### Añadir nodo
