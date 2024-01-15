@@ -8,7 +8,9 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: npm ci && npm run build
-    command: npm run start
+  - init: npm ci
+    command: |
+      docker-compose up -d
+      npm run start
 
 
