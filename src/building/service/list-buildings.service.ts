@@ -9,12 +9,14 @@ export class ListBuildingsService {
   constructor (
     private usePostgres: boolean,
     private ormDataSource: DataSource,
-    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository
+    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
   ) {
   }
 
   buildingsOfId (ids: string | string[]): Promise<BuildingReadModel[]> {
-    return this.usePostgres ? this.buildingOfIdInPostgres(ids) : this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ ids ] : ids)
+    return this.usePostgres ?
+      this.buildingOfIdInPostgres(ids) :
+      this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ ids ] : ids)
   }
 
   buildingsAssignedTo (flipperId: string): Promise<BuildingReadModel[]> {
@@ -30,23 +32,28 @@ export class ListBuildingsService {
       where: { id: In(ids) },
       relations: { images: true, }
     })
-    // this.ormDataSource.
-    const queryBuilder = this.ormDataSource.manager.createQueryBuilder(BuildingOfferRequest, 'offer')
-      .select('offer.buildingId', 'buildingId')
-      .addSelect('MAX(offer.createdAt)', 'last_offer_created_at')
-      .where('offer.buildingId IN (:...ids)', { ids })
-      .groupBy('offer.buildingId')
-    const lastOfferRequests = await queryBuilder.getRawMany<{
-      buildingId: string,
-      last_offer_created_at: Date
-    }>()
+
+    const lastOfferRequests = await this.getLastOfferRequestForBuildings(ids);
 
     return buildings.map((building) => {
-      const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
+      const lastOfferRequest = lastOfferRequests.find(({buildingId}) => buildingId === building.id)
       return buildingEntityToReadModel(building, {
-        lastOfferCreatedAt: lastOfferRequest?.last_offer_created_at
+        lastOfferCreatedAt: lastOfferRequest?.lastOfferCreatedAt
       })
     })
+  }
+
+  private async getLastOfferRequestForBuildings(ids: string[]) {
+    const queryBuilder = this.ormDataSource.manager.createQueryBuilder(BuildingOfferRequest, 'offer')
+      .select('offer.buildingId', 'buildingId')
+      .addSelect('MAX(offer.createdAt)', 'lastOfferCreatedAt')
+      .where('offer.buildingId IN (:...ids)', {ids})
+      .groupBy('offer.buildingId')
+
+    return await queryBuilder.getRawMany<{
+      buildingId: string,
+      lastOfferCreatedAt: Date
+    }>();
   }
 
   private async buildingAssignedToInPostgres(flipperId: string) {
