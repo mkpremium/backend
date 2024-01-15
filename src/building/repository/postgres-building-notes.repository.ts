@@ -9,7 +9,8 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
   async forBuildingOfId (buildingId: string): Promise<Note[]> {
     const notes = await this.repository.find({
       where: { building: { id: buildingId } },
-      loadRelationIds: { relations: [ 'createdBy' ] }
+      loadRelationIds: { relations: [ 'createdBy' ] },
+      order: { createdAt: 'DESC' },
     })
     return notes.map(n => ({
       buildingId,
