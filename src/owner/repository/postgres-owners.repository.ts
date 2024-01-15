@@ -1,4 +1,4 @@
-import { BuildingOwnerProps, FoundOwnerProps, OwnerRepository } from './owner.repository'
+import { BuildingOwnerProps, OwnerRepository } from './owner.repository'
 import { OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
@@ -17,8 +17,15 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   }
 
   // Owners repository
-  buildingOwners (buildingId: string): Promise<BuildingOwnerProps[]> {
-    return Promise.reject(new Error('Not implemented'))
+  async buildingOwners(buildingId: string): Promise<BuildingOwnerProps[]> {
+    const owners = await this.repository.find({
+      where: {
+        building: {id: buildingId},
+      },
+      relations: this.relations,
+    });
+
+    return owners.map(ownerEntityToBuildingOwnerProps)
   }
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
@@ -49,7 +56,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   }
 }
 
-export function ownerEntityToStruct (entity: Owner) {
+export function ownerEntityToStruct(entity: Owner): OwnerProps {
   return {
     id: entity.id,
     status: entity.status,
@@ -57,11 +64,24 @@ export function ownerEntityToStruct (entity: Owner) {
     buildingId: entity.building.id,
     person: {
       name: entity.person.fullName,
-      contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status })),
+      contacts: entity.person.contacts.map(cp => ({...cp.contact, status: cp.status})),
     },
     featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact ? {
       phoneId: entity.person.featuredPhoneContact?.id,
       emailId: entity.person.featuredEmailContact?.id,
     } : null
+  }
+}
+
+function ownerEntityToBuildingOwnerProps(entity: Owner): BuildingOwnerProps {
+  const ownerProps = ownerEntityToStruct(entity);
+
+  return {
+    id: entity.id,
+    status: entity.status,
+    name: ownerProps.name,
+    featuredContact: ownerProps.featuredContact,
+    type: entity.type,
+    contacts: ownerProps.person.contacts,
   }
 }
