@@ -9,6 +9,7 @@ const notesForBuildingQuery = bucketName => `
     FROM ${bucketName} notes
     WHERE _documentType = 'note'
       AND context.buildingId = $1
+    ORDER BY createdAt DESC
 `
 
 export class CouchbaseBuildingNotesRepository extends CouchbaseRepository<Note> implements BuildingNotesRepository {
