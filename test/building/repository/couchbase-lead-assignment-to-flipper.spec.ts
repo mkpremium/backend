@@ -273,19 +273,3 @@ describe('mapToPropertyAgentBuildingView', () => {
     })
   })
 })
-
-describe('getOwner', () => {
-  const testFeaturedOwnerId = 'test-featured-owner-id'
-  const testMeeting = {}
-
-  it('returns nothing when no owners are provided', () => {
-    expect(CouchbaseBuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, undefined))
-      .to.be.undefined
-  })
-
-  it('returns nothing when there is no owner with some contact validated', () => {
-    expect(CouchbaseBuildingsReadRepository.getOwner(testFeaturedOwnerId, testMeeting, [ {
-      contacts: []
-    } ])).to.be.undefined
-  })
-})

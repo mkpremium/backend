@@ -6,6 +6,7 @@ import { fromPromise } from '../../infrastructure/fp-utils'
 import moment from 'moment/moment'
 import _ from 'lodash'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
+import { selectBuildingOwner } from '../service/owner-selection.policy'
 
 const listBuildingsByQuery = (bucketName, condition) => `
     SELECT
@@ -145,7 +146,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
-        const featuredOwner = CouchbaseBuildingsReadRepository.getOwner(ownerId, lastMeeting, owners)
+        const featuredOwner = selectBuildingOwner(owners, ownerId, lastMeeting)
         const contacts = featuredOwner ? featuredOwner.contacts : undefined
 
         return {
@@ -198,7 +199,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
             firstName: _.get(featuredOwner, 'firstName'),
             name: _.get(featuredOwner, 'fullName'),
             contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
-            featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
+            featuredContact: _.get(featuredOwner, 'featuredContact')
           }) || undefined,
           lastMeeting: (lastMeeting && {
             dateMeeting: moment(lastMeeting.eventDate).format(),
@@ -210,40 +211,5 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
         } as BuildingReadModel
       }
     )
-  }
-
-  static getOwner (featuredOwnerId, lastMeeting, owners) {
-    if (!owners) {
-      return
-    }
-    if (featuredOwnerId) {
-      const featuredOwner = this.ownerOfId(owners, featuredOwnerId)
-      if (featuredOwner) {
-        return featuredOwner
-      }
-    }
-
-    const lastMeetingOwnerId = _.get(lastMeeting, 'ownerId')
-    const lastMeetingOwner = lastMeetingOwnerId ? CouchbaseBuildingsReadRepository.ownerOfId(owners, lastMeetingOwnerId) : undefined
-    if (lastMeetingOwner) {
-      return lastMeetingOwner
-    }
-
-    const validatedOwners = this.getValidatedOwners(owners)
-    const nonDiscardedOwners = CouchbaseBuildingsReadRepository.getNonDiscardedOwners(owners)
-
-    return validatedOwners[ 0 ] ?? nonDiscardedOwners[ 0 ] ?? undefined
-  }
-
-  private static getNonDiscardedOwners (owners) {
-    return owners.filter(o => _.some(o.contacts || [], c => c.status !== 'BAD'))
-  }
-
-  private static getValidatedOwners (owners) {
-    return (owners || []).filter(({ contacts }) => (contacts || []).find(({ status }) => status === 'GOOD'))
-  }
-
-  static ownerOfId (validatedOwners, ownerId) {
-    return validatedOwners.find(o => o.id === ownerId)
   }
 }
