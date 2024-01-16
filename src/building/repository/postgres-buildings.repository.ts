@@ -12,6 +12,10 @@ import { Flipper } from '../../flipper/flipper.entity'
 import { Proposal } from '../proposal.entity'
 import { entityStatusToOldProposal } from './postgres-proposals.repository'
 import moment from 'moment'
+import { BuildingOwnerProps } from '../../owner/repository/owner.repository'
+import { selectBuildingOwner } from '../service/owner-selection.policy'
+
+import { toOwnerInBuildingRead } from './utils'
 
 export class PostgresBuildingsRepository
   extends PostgresRepository<BuildingProps, Building>
@@ -128,10 +132,13 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
 
 interface BuildingReadModelData {
   lastOfferCreatedAt?: Date
+  owners?: (BuildingOwnerProps & { buildingId: string })[]
 }
 
 export function buildingEntityToReadModel (
   b: Building, extra: BuildingReadModelData = {}): BuildingReadModel {
+  const owner = extra.owners ? selectBuildingOwner(
+    extra.owners!, b.featuredOwner.id) : undefined // TODO: pass last meeting
   return {
     id: b.id,
     lead: b.lead,
@@ -147,6 +154,7 @@ export function buildingEntityToReadModel (
       city: b.address.city ? b.address.city : undefined,
       province: b.address.province
     } : undefined,
+    owner: toOwnerInBuildingRead(owner),
     metadata: b.images.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
@@ -184,13 +192,6 @@ export function buildingEntityToReadModel (
     //   longitude: location.lng ? location.lng : undefined
     // } : undefined,
     // usage: use !== null ? use : undefined,
-    // owner: (featuredOwner && {
-    //   id: featuredOwner.id,
-    //   firstName: _.get(featuredOwner, 'firstName'),
-    //   name: _.get(featuredOwner, 'fullName'),
-    //   contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
-    //   featuredContact: (featuredOwner && featuredOwner.featuredContact) || undefined
-    // }) || undefined,
     // salePrice: salePrice || undefined,
     // totalExpensesAmount: totalExpensesAmount || undefined,
   } as BuildingReadModel

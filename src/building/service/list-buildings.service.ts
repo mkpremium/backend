@@ -4,11 +4,13 @@ import { BuildingReadModel } from '../repository/buildings-read.repository'
 import { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
 import { BuildingOfferRequest } from '../repository/building-offer-request.entity'
 import { buildingEntityToReadModel } from '../repository/postgres-buildings.repository'
+import { PostgresOwnersRepository } from '../../owner/repository/postgres-owners.repository'
 
 export class ListBuildingsService {
   constructor (
     private usePostgres: boolean,
     private ormDataSource: DataSource,
+    private postgresOwnersRepository: PostgresOwnersRepository,
     private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
   ) {
   }
@@ -34,11 +36,15 @@ export class ListBuildingsService {
     })
 
     const lastOfferRequests = await this.getLastOfferRequestForBuildings(ids);
+    const allBuildingOwners = await this.postgresOwnersRepository.buildingOwners(ids)
 
     return buildings.map((building) => {
       const lastOfferRequest = lastOfferRequests.find(({buildingId}) => buildingId === building.id)
+      const buildingOwners = allBuildingOwners.filter(
+        ({buildingId}) => buildingId === building.id)
       return buildingEntityToReadModel(building, {
-        lastOfferCreatedAt: lastOfferRequest?.lastOfferCreatedAt
+        lastOfferCreatedAt: lastOfferRequest?.lastOfferCreatedAt,
+        owners: buildingOwners,
       })
     })
   }

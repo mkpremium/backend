@@ -4,9 +4,9 @@ import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import moment from 'moment/moment'
-import _ from 'lodash'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
 import { selectBuildingOwner } from '../service/owner-selection.policy'
+import { toOwnerInBuildingRead } from './utils'
 
 const listBuildingsByQuery = (bucketName, condition) => `
     SELECT
@@ -147,8 +147,6 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
 
         const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
         const featuredOwner = selectBuildingOwner(owners, ownerId, lastMeeting)
-        const contacts = featuredOwner ? featuredOwner.contacts : undefined
-
         return {
           id,
           metadata: metadata.map(({ id, mimeType, previewUrl }) => ({
@@ -194,13 +192,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
           negotiationStatus: negotiationStatus || undefined,
           floorArea,
           usage: use !== null ? use : undefined,
-          owner: (featuredOwner && {
-            id: featuredOwner.id,
-            firstName: _.get(featuredOwner, 'firstName'),
-            name: _.get(featuredOwner, 'fullName'),
-            contacts: (contacts && contacts.map(({ id, status, type, value }) => ({ id, status, type, value }))),
-            featuredContact: _.get(featuredOwner, 'featuredContact')
-          }) || undefined,
+          owner: toOwnerInBuildingRead(featuredOwner),
           lastMeeting: (lastMeeting && {
             dateMeeting: moment(lastMeeting.eventDate).format(),
             inPerson: lastMeeting.inPerson

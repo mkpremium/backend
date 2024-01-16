@@ -2,7 +2,7 @@ import { BuildingOwnerProps, OwnerRepository } from './owner.repository'
 import { OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
-import { DeepPartial, EntityTarget } from 'typeorm'
+import { DeepPartial, EntityTarget, In } from 'typeorm'
 
 export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Owner> implements OwnerRepository {
   protected relations = {
@@ -17,13 +17,13 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   }
 
   // Owners repository
-  async buildingOwners(buildingId: string): Promise<BuildingOwnerProps[]> {
+  async buildingOwners (buildingId: string | string[]): Promise<(BuildingOwnerProps & { buildingId: string })[]> {
     const owners = await this.repository.find({
       where: {
-        building: {id: buildingId},
+        building: { id: In([].concat(buildingId)) },
       },
       relations: this.relations,
-    });
+    })
 
     return owners.map(ownerEntityToBuildingOwnerProps)
   }
@@ -73,11 +73,12 @@ export function ownerEntityToStruct(entity: Owner): OwnerProps {
   }
 }
 
-function ownerEntityToBuildingOwnerProps(entity: Owner): BuildingOwnerProps {
-  const ownerProps = ownerEntityToStruct(entity);
+function ownerEntityToBuildingOwnerProps (entity: Owner): BuildingOwnerProps & { buildingId: string } {
+  const ownerProps = ownerEntityToStruct(entity)
 
   return {
     id: entity.id,
+    buildingId: entity.building.id,
     status: entity.status,
     name: ownerProps.name,
     featuredContact: ownerProps.featuredContact,
