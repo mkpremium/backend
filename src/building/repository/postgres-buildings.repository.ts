@@ -168,6 +168,11 @@ export function buildingEntityToReadModel (
       dateMeeting: moment(extra.lastOfferCreatedAt).format(),
       inPerson: false,
     }) || undefined,
+    geolocation: (b.location?.lat && b.location?.lng) ? {
+      latitude: b.location.lat,
+      longitude: b.location.lng
+    } : undefined,
+    usage: b.use,
     stock: null,
     // stock: {
     //   purchase: stock && stock.purchase ? {
@@ -187,11 +192,6 @@ export function buildingEntityToReadModel (
     //     transactionDate: moment(stock.close.transactionDate).format()
     //   } : undefined
     // },
-    // geolocation: location && (location.lat || location.lng) ? {
-    //   latitude: location.lat ? location.lat : undefined,
-    //   longitude: location.lng ? location.lng : undefined
-    // } : undefined,
-    // usage: use !== null ? use : undefined,
     // salePrice: salePrice || undefined,
     // totalExpensesAmount: totalExpensesAmount || undefined,
   } as BuildingReadModel
