@@ -65,6 +65,7 @@ export class ListBuildingsService {
   private async buildingAssignedToInPostgres(flipperId: string) {
     const buildings = await this.ormDataSource.manager.find(Building, {
       where: {
+        // TODO: use this method & check if we can exclude NO VENDE buildings to improve performance
         assignedFlipper: {id: flipperId}
       },
     })
