@@ -2,7 +2,7 @@ import { History } from '../history/models'
 import { Owner } from './owner'
 import t from 'tcomb'
 
-export function createUpdateOwnerController ({ ownersRepository }) {
+export function updateOwnerControllerFactory ({ ownersRepository }) {
   return async function updateOwner (req, res) {
     const id = req.params.id
 
@@ -22,7 +22,7 @@ export function createUpdateOwnerController ({ ownersRepository }) {
   }
 }
 
-export function createAddOwnerContactController ({ addContactService }) {
+export function addOwnerContactControllerFactory ({ addContactService }) {
   return async function (req, res) {
     const ownerId = req.params.id
     const updatedOwner = await addContactService.addContact({ ownerId, ...req.body })
