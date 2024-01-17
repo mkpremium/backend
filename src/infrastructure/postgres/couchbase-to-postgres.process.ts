@@ -33,7 +33,7 @@ interface Deps {
   buildingProposalsImporterService: BuildingProposalsImporterService,
 }
 
-export function couchbaseToPostgresSaga ({
+export function couchbaseToPostgresProcess ({
                                            eventBus,
                                            logger,
                                            entityManager,

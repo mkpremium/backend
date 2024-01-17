@@ -26,7 +26,7 @@ import { DataSource } from 'typeorm'
 import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import { setupContactsDependencies } from '../contacts/dependencies'
 import { Database } from './database'
-import { couchbaseToPostgresSaga } from './postgres/couchbase-to-postgres.saga'
+import { couchbaseToPostgresProcess } from './postgres/couchbase-to-postgres.process'
 import { BuildingImagesImporterService } from './service/building-images-importer.service'
 import { BuildingOwnerImportTriggerService } from './service/building-owner-import-trigger.service'
 import { BuildingProposalsImporterService } from './service/building-proposals-importer.service'
@@ -81,7 +81,7 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandler),
     logger: asFunction(initLogger).singleton(),
 
-    couchbaseToPostgresSaga: asFunction(couchbaseToPostgresSaga).singleton(),
+    couchbaseToPostgresProcess: asFunction(couchbaseToPostgresProcess).singleton(),
     buildingImportTriggerService: asClass(BuildingImportTriggerService).classic().singleton(),
     buildingImagesImporterService: asClass(BuildingImagesImporterService).classic().singleton(),
     buildingOwnerImportTriggerService: asClass(BuildingOwnerImportTriggerService).classic().singleton(),

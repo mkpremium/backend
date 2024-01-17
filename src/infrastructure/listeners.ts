@@ -7,7 +7,7 @@ import { statListeners } from '../stats/listeners'
 import { EventListener } from './event-bus'
 import { DomainEventCatalog } from './postgres/domain-event.entity'
 import { AwilixContainer } from 'awilix'
-import { couchbaseToPostgresSaga } from './postgres/couchbase-to-postgres.saga'
+import { couchbaseToPostgresProcess } from './postgres/couchbase-to-postgres.process'
 import { Logger } from 'winston'
 
 export async function startListeners (diContainer) {
@@ -21,14 +21,14 @@ export async function startListeners (diContainer) {
   statListeners(eventBus)
   eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
 
-  const migrationSaga = diContainer.resolve('couchbaseToPostgresSaga') as ReturnType<typeof couchbaseToPostgresSaga>
+  const migrationProcess = diContainer.resolve('couchbaseToPostgresProcess') as ReturnType<typeof couchbaseToPostgresProcess>
   const logger = diContainer.resolve('logger') as Logger
   if (process.env.TRIGGER_OPERATORS_MIGRATION) {
-    await migrationSaga.triggerOperatorsMigration()
+    await migrationProcess.triggerOperatorsMigration()
   }
   if (process.env.TRIGGER_BUILDINGS_MIGRATION) {
     logger.info('Triggering building migration')
-    await migrationSaga.triggerBuildingMigration()
+    await migrationProcess.triggerBuildingMigration()
   }
 }
 
