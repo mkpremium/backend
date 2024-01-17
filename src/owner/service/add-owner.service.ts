@@ -1,4 +1,4 @@
-import { ContactProps, OwnerStatus, OwnerType } from '../owner'
+import { ContactProps, OwnerProps, OwnerStatus, OwnerType } from '../owner'
 import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
 import { DataSource, EntityManager } from 'typeorm'
 import { Owner } from '../owner.entity'
@@ -9,6 +9,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { Logger } from 'winston'
 import _ from 'lodash'
+import { ownerEntityToStruct, PostgresOwnersRepository } from "../repository/postgres-owners.repository";
 
 export interface AddOwnerCommand {
   id?: string,
@@ -29,6 +30,7 @@ export interface AddOwnerCommand {
 export class AddOwnerService {
   constructor (
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
+    private postgresOwnersRepository: PostgresOwnersRepository,
     private ormDataSource: DataSource,
     private usePostgres: boolean,
     private eventBus: EventBus,
@@ -36,12 +38,12 @@ export class AddOwnerService {
   ) {
   }
 
-  addOwner (cmd: AddOwnerCommand, requesterId: string): Promise<{ id: string }> {
+  addOwner (cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
     return this.usePostgres ? this.saveInPostgres(cmd, requesterId) : this.couchbaseOwnersRepository.save(cmd)
   }
 
-  private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<Owner> {
-    return await this.ormDataSource.transaction<Owner>(async em => {
+  private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
+    const savedOwner = await this.ormDataSource.transaction<Owner>(async em => {
       const owner = await this.createEntities(cmd, em)
       await this.eventBus.publish({
         name: DomainEventCatalog.OWNER__ADDED,
@@ -54,6 +56,8 @@ export class AddOwnerService {
       return owner
     })
 
+    // Return the owner with the same structure as the one in Couchbase
+    return this.postgresOwnersRepository.get(savedOwner.id)
   }
 
   private async createEntities (cmd: AddOwnerCommand, entityManager: EntityManager) {
