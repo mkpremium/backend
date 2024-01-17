@@ -9,7 +9,9 @@ export class PostgresUserRepository extends PostgresRepository<UserProps, User>
   implements UsersRepository {
   protected relations = {
     flipper: true,
-    caller: true,
+    caller: {
+      flipper: true
+    },
   }
 
   async getUserWithUsername (username: string) {
