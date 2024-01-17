@@ -138,7 +138,7 @@ interface BuildingReadModelData {
 export function buildingEntityToReadModel (
   b: Building, extra: BuildingReadModelData = {}): BuildingReadModel {
   const owner = extra.owners ? selectBuildingOwner(
-    extra.owners!, b.featuredOwner.id) : undefined // TODO: pass last meeting
+    extra.owners!, b.featuredOwner?.id) : undefined // TODO: pass last meeting
   return {
     id: b.id,
     lead: b.lead,
