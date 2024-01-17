@@ -1,7 +1,7 @@
 import * as TE from 'fp-ts/TaskEither'
 import { expect } from 'chai'
 import { BuildingProps } from '../src/building/building'
-import { ContactProps } from '../src/owner/owner'
+import { ContactProps, OwnerProps } from '../src/owner/owner'
 import { Flipper } from '../src/flipper/flipper.entity'
 import { AddProposalForBuildingService } from '../src/building/service/add-proposal-for-building.service'
 import { AddContactService, MaybeFeaturedContact } from '../src/owner/service/add-contact.service'
@@ -12,13 +12,13 @@ import { Factory } from 'rosie'
 import { UserProfileProps } from '../src/types/user'
 import { AddOwnerCommand, AddOwnerService } from '../src/owner/service/add-owner.service'
 
-export function orFail () {
+export function orFail() {
   return TE.orElse((error) => {
     expect.fail(String(error))
   })
 }
 
-export async function addProposal (testBuilding: BuildingProps, testOwner: {
+export async function addProposal(testBuilding: BuildingProps, testOwner: {
   id: string
 }, testEmailContact: ContactProps & {
   isFeatured: boolean
@@ -44,14 +44,14 @@ type CreateOwnerWithPhoneDeps = CreateOwnerDeps & {
   addContactService: AddContactService,
 };
 
-export async function createOwnerWithPhoneContact (
-  testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerWithPhoneDeps): Promise<[ Owner, MaybeFeaturedContact ]>
-export async function createOwnerWithPhoneContact (
-  testBuilding: Pick<BuildingProps, 'id'>, overwrites: Partial<AddOwnerCommand>, deps: CreateOwnerWithPhoneDeps): Promise<[ Owner, MaybeFeaturedContact ]>
-export async function createOwnerWithPhoneContact (
+export async function createOwnerWithPhoneContact(
+  testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerWithPhoneDeps): Promise<[OwnerProps, MaybeFeaturedContact]>
+export async function createOwnerWithPhoneContact(
+  testBuilding: Pick<BuildingProps, 'id'>, overwrites: Partial<AddOwnerCommand>, deps: CreateOwnerWithPhoneDeps): Promise<[OwnerProps, MaybeFeaturedContact]>
+export async function createOwnerWithPhoneContact(
   testBuilding: Pick<BuildingProps, 'id'>,
   overridesOrDeps: Partial<AddOwnerCommand> | CreateOwnerWithPhoneDeps,
-  deps?: CreateOwnerWithPhoneDeps): Promise<[ Owner, MaybeFeaturedContact ]> {
+  deps?: CreateOwnerWithPhoneDeps): Promise<[OwnerProps, MaybeFeaturedContact]> {
   if (!deps) {
     deps = overridesOrDeps as CreateOwnerWithPhoneDeps
     overridesOrDeps = {}
@@ -64,24 +64,24 @@ export async function createOwnerWithPhoneContact (
     ownerId: testOwner.id,
   }) as MaybeFeaturedContact
 
-  return [ testOwner, testPhoneContact ] as [ Owner, MaybeFeaturedContact ]
+  return [testOwner, testPhoneContact] as [OwnerProps, MaybeFeaturedContact]
 }
 
-export async function createOwnerWithEmailContact (
-  testBuilding: Pick<BuildingProps, 'id'>, { addOwnerService, addContactService }) {
-  const testOwner = await createOwner(testBuilding, { addOwnerService })
+export async function createOwnerWithEmailContact(
+  testBuilding: Pick<BuildingProps, 'id'>, {addOwnerService, addContactService}) {
+  const testOwner = await createOwner(testBuilding, {addOwnerService})
   const testEmailContact = await addContactService.addContact({
     ...emailContactFactory.build(),
     isFeatured: true,
     ownerId: testOwner.id,
   }) as MaybeFeaturedContact
 
-  return [ testOwner, testEmailContact ] as [ Owner, MaybeFeaturedContact ]
+  return [testOwner, testEmailContact] as [OwnerProps, MaybeFeaturedContact]
 }
 
-async function createOwner (testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>
-async function createOwner (testBuilding: Pick<BuildingProps, 'id'>, overwritesOrDeps: Partial<AddOwnerCommand>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>
-async function createOwner (
+async function createOwner(testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>
+async function createOwner(testBuilding: Pick<BuildingProps, 'id'>, overwritesOrDeps: Partial<AddOwnerCommand>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>
+async function createOwner(
   testBuilding: Pick<BuildingProps, 'id'>,
   overwritesOrDeps: Partial<AddOwnerCommand> | CreateOwnerDeps,
   deps?: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>> {
@@ -104,16 +104,16 @@ async function createOwner (
   }, 'test-requester-id')
 }
 
-export async function addCaller ({ addOperatorService }: { addOperatorService: AddOperatorService }) {
+export async function addCaller({addOperatorService}: { addOperatorService: AddOperatorService }) {
   return addUserWithRole(addOperatorService, 'OPERATOR')
 }
 
-export async function addUserWithRole (service: AddOperatorService, role: 'BUSINESS' | 'OPERATOR') {
+export async function addUserWithRole(service: AddOperatorService, role: 'BUSINESS' | 'OPERATOR') {
   const testCommand = {
     ...Factory.build<{ username: string, password: string }>('user-credentials'),
     profile: Factory.build<UserProfileProps>('user-profile'),
-    roles: [ role ],
+    roles: [role],
     enable: true,
   }
-  return await service.addOperator(testCommand, { id: 'admin' })
+  return await service.addOperator(testCommand, {id: 'admin'})
 }
