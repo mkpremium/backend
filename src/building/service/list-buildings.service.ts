@@ -32,7 +32,12 @@ export class ListBuildingsService {
 
     const buildings = await this.ormDataSource.manager.find(Building, {
       where: { id: In(ids) },
-      relations: { images: true, }
+      // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
+      relations: {
+        featuredOwner: true,
+        images: true,
+        proposals: true,
+      }
     })
 
     const lastOfferRequests = await this.getLastOfferRequestForBuildings(ids);
