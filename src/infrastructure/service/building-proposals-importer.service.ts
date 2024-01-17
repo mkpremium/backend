@@ -33,6 +33,12 @@ export class BuildingProposalsImporterService extends BuildingRelatedDocumentMig
         original.createdAt = original.createdAt ?? new Date()
         original.updatedAt = original.updatedAt ?? original.createdAt
 
+        if (!original.notificationEmail) {
+          original.notificationEmail = "jorge.velasco.silva@gmail.com"
+          original.notificationStatus = "DISABLED"
+          original.notificationSentAt = null
+        }
+
         await em.save(Proposal, {
           id: proposal.document["id"],
           status: oldProposalToEntityStatus(original.state),

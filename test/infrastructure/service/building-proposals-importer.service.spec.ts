@@ -37,8 +37,6 @@ describe('BuildingProposalsImporterService', () => {
         buildingId: buildingId,
         state: 'pendiente',
         proposal: 1000,
-        notificationEmail: 'test@test.com',
-        notificationStatus: 'SENT',
         message: 'test',
         createdAt: new Date(),
 
@@ -56,5 +54,10 @@ describe('BuildingProposalsImporterService', () => {
 
     // Make sure the updateAt has been set after the start time.
     expect(found.updatedAt).to.be.greaterThan(start)
+
+    // Make sure the email has been set to default values when not set.
+    expect(found.notificationEmail).to.be.equal('jorge.velasco.silva@gmail.com')
+    expect(found.notificationStatus).to.be.equal('DISABLED')
+    expect(found.notificationSentAt).to.be.null
   })
 })
