@@ -83,7 +83,10 @@ export class AddOfferRequestService {
 
   private async doPostgres (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     return this.ormDataSource.transaction(async entityManager => {
-      const flipper = await entityManager.findOneByOrFail(Flipper, { user: { id: cmd.flipperId } })
+      const flipper = await entityManager.findOneByOrFail(Flipper, [
+        {id: cmd.flipperId},
+        {user: { id: cmd.flipperId } },
+      ])
       const caller = await entityManager.findOneByOrFail(Caller, {user: {id: cmd.callerId}})
       const savedOffer = await entityManager.save(BuildingOfferRequest, {
         flipper: flipper,
