@@ -52,7 +52,12 @@ export class AddOperatorService {
         flipperId = flipper.id
       }
       if (cmd.roles.includes(UserRoles.OPERATOR)) {
-        const caller = await em.save(Caller, { user })
+        const callerPayload = { user };
+        if (cmd.flipperId) {
+          callerPayload["flipper"] = {id: cmd.flipperId}
+        }
+
+        const caller = await em.save(Caller, callerPayload)
         callerId = caller.id
       }
 
