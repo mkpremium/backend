@@ -3,14 +3,12 @@ import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 import { createTestContainer } from '../../create-test-container'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { buildingBuilder } from '../../building/building.builder'
-import uuid from 'uuid/v4'
 
 describe('AddOwnerService Postgres', () => {
   let buildingsRepository: BuildingsRepository
   let service: AddOwnerService
 
   beforeEach(async () => {
-
     const container = await createTestContainer({ couchbase: false, postgres: true })
     buildingsRepository = container.resolve('buildingsRepository')
     service = container.resolve('addOwnerService')
