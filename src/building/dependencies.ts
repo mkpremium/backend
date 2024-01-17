@@ -18,7 +18,7 @@ import { createSetFeaturedOwnerController } from './controller/set-featured-owne
 import {
   createUpdateBuildingNegotiationStatusController
 } from './controller/update-building-negotiation-status.controller'
-import { createAddNegotiationProposalController, createUpdateNegotiationProposalController } from './controllers'
+import { addNegotiationProposalControllerFactory, updateNegotiationProposalControllerFactory } from './controllers'
 import { createSetBuildingExpensesController } from './controller/set-building-expenses.controller'
 import { createScheduledCallListener } from './event-listener/call-scheduled.listener'
 import { createAddNoteToBuildingListener } from './event-listener/add-note-to-building.listener'
@@ -93,13 +93,13 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
     proposalsRepository: aliasTo(usePostgres ? 'postgresProposalsRepository' : 'couchbaseProposalsRepository'),
 
-    updateNegotiationProposalController: asFunction(createUpdateNegotiationProposalController).singleton(),
+    updateNegotiationProposalController: asFunction(updateNegotiationProposalControllerFactory).singleton(),
     createBuildingController: asFunction(createBuildingController).singleton(),
     listBuildingsController: asFunction(createListBuildingsController).singleton(),
     listBuildingOwnersController: asFunction(createListBuildingOwnersController).singleton(),
     setFeaturedOwnerController: asFunction(createSetFeaturedOwnerController).singleton(),
     updateBuildingNegotiationStatusController: asFunction(createUpdateBuildingNegotiationStatusController).singleton(),
-    addNegotiationProposalController: asFunction(createAddNegotiationProposalController).singleton(),
+    addNegotiationProposalController: asFunction(addNegotiationProposalControllerFactory).singleton(),
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
     addProposalController: asFunction(createAddProposalController).singleton(),

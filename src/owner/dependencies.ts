@@ -10,7 +10,7 @@ import { createResetOwnerBadContactsHandler } from './command-handler/reset-owne
 import { CouchbaseOwnersRepository } from './repository/couchbase-owners.repository'
 import { PostgresOwnersRepository } from './repository/postgres-owners.repository'
 import { addOwnerContactControllerFactory, updateOwnerControllerFactory } from './controllers'
-import { createAddOwnerToBuildingController } from '../building/controllers'
+import { addOwnerToBuildingControllerFactory } from '../building/controllers'
 import { AddOwnerService } from './service/add-owner.service'
 import { AddContactService } from './service/add-contact.service'
 import { SearchOwnerOrBuildingService } from './service/search-owner-or-building.service'
@@ -21,7 +21,7 @@ export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: 
     getOwnerController: asFunction(getOwnerController).singleton(),
     updateOwnerController: asFunction(updateOwnerControllerFactory).singleton(),
     addOwnerContactController: asFunction(addOwnerContactControllerFactory).singleton(),
-    addOwnerToBuildingController: asFunction(createAddOwnerToBuildingController).singleton(),
+    addOwnerToBuildingController: asFunction(addOwnerToBuildingControllerFactory).singleton(),
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
     searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
     setFeaturedContactController: asFunction(createSetFeaturedContactController).classic().singleton(),

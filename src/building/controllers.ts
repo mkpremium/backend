@@ -3,18 +3,18 @@ import { getPrivateUploadUrl } from '../aws'
 import { History } from '../history/models'
 import { OwnerRepository } from '../owner/repository/owner.repository'
 
-export function createListBuildingProposalsController (listBuildingProposalsService) {
+export function listBuildingProposalsControllerFactory (listBuildingProposalsService) {
   return wrap(async (req, res) => {
     res.send(await listBuildingProposalsService.forBuilding(req.params.buildingId))
   })
 }
 
-async function createMetadataUploadUrl (req, res) {
+export async function metadataUploadUrlControllerFactory (req, res) {
   const url = getPrivateUploadUrl('metadata', req.body)
   res.json({ url })
 }
 
-export function createAddNegotiationProposalController ({
+export function addNegotiationProposalControllerFactory ({
   addProposalForBuildingService
 }) {
   return async (req, res) => {
@@ -32,14 +32,14 @@ export function createAddNegotiationProposalController ({
   }
 }
 
-export const createSignDocumentsUrlController = getDocumentsSignedURLService => {
+export const signDocumentsUrlControllerFactory = getDocumentsSignedURLService => {
   return wrap(async (req, res) => {
     const signedUrls = await getDocumentsSignedURLService.getDocumentsSignedURL(req.params.buildingId)
     res.json(signedUrls)
   })
 }
 
-export function createUpdateNegotiationProposalController ({ updateProposalService }) {
+export function updateNegotiationProposalControllerFactory ({ updateProposalService }) {
   return async function updateNegotiationProposal (req, res) {
     const proposalId = req.params.id
 
@@ -48,7 +48,7 @@ export function createUpdateNegotiationProposalController ({ updateProposalServi
   }
 }
 
-export function createAddOwnerToBuildingController ({addOwnerService}) {
+export function addOwnerToBuildingControllerFactory ({addOwnerService}) {
   return async function (req, res) {
     const owner = await addOwnerService.addOwner(req.body, req.user)
     await History.registerCreate({ contextModel: owner, user: req.user })
@@ -56,7 +56,7 @@ export function createAddOwnerToBuildingController ({addOwnerService}) {
   }
 }
 
-export const createListVerifiedOwnersController = (ownersRepository: OwnerRepository) => {
+export const listVerifiedOwnersControllerFactory = (ownersRepository: OwnerRepository) => {
   return wrap(async (req, res) => {
     // TODO: review owner props,
     const owners = await ownersRepository.verifiedOwnersOfBuildingWithId(req.params.buildingId)
@@ -74,15 +74,13 @@ export const createListVerifiedOwnersController = (ownersRepository: OwnerReposi
 /**
  * @param adminBuildingRepository AdminBuildingRepository
  */
-export const createAllAgentsStockStatsController = adminBuildingRepository => {
+export const allAgentsStockStatsControllerFactory = adminBuildingRepository => {
   return wrap(async (req, res) => {
     res.json(await adminBuildingRepository.allAgentsStockStats())
   })
 }
 
-export const createMetadataUploadUrlController = wrap(createMetadataUploadUrl)
-
-export const createSetBuildingSalePriceController = setBuildingSalePriceService => {
+export const setBuildingSalePriceControllerFactory = setBuildingSalePriceService => {
   return wrap(async (req, res) => {
     const updatedBuilding = await setBuildingSalePriceService.setBuildingSalePrice({
       buildingId: req.params.buildingId,
