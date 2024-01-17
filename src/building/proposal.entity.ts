@@ -26,7 +26,7 @@ export class Proposal extends BaseEntity {
   notificationEmail: string
 
   @Column('text')
-  notificationStatus: 'PENDING' | 'SENT'
+  notificationStatus: 'PENDING' | 'SENT' | 'DISABLED'
 
   @Column({ type: 'timestamptz', nullable: true })
   notificationSentAt?: Date

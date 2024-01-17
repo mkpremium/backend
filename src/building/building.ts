@@ -56,7 +56,7 @@ export interface ProposalProps {
   createdBy: string;
   proposal: number;
   notificationEmail?: string;
-  notificationStatus?: 'PENDING' | 'SENT';
+  notificationStatus?: 'PENDING' | 'SENT' | 'DISABLED';
   notificationSentAt?: string | moment.Moment | undefined;
   message?: string;
   createdAt?: Date
