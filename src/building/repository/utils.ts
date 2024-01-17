@@ -17,6 +17,6 @@ export function toOwnerInBuildingRead (owner: Pick<OwnerProps, 'id'> & Pick<Pers
       type,
       value
     })),
-    featuredContact: _.get(owner, 'featuredContact', undefined)
+    featuredContact: _.get(owner, 'featuredContact') ?? undefined
   }
 }
