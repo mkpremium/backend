@@ -28,8 +28,13 @@ export class BuildingProposalsImporterService extends BuildingRelatedDocumentMig
     await this.entityManager.transaction(async em => {
       for (const proposal of proposals) {
         const original = proposal.document as ProposalProps
+
+        // Make sure dates are set.
+        original.createdAt = original.createdAt ?? new Date()
+        original.updatedAt = original.updatedAt ?? original.createdAt
+
         await em.save(Proposal, {
-          id: proposal.id,
+          id: proposal.document["id"],
           status: oldProposalToEntityStatus(original.state),
           building: { id: buildingId },
           owner: { id: original.ownerId },
