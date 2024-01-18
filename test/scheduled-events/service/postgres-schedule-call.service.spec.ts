@@ -4,7 +4,7 @@ import type {
   ScheduleCallService
 } from '../../../src/scheduled-events/service/schedule-call.service'
 import { createOwnerWithPhoneContact } from '../../helpers'
-import { buildingFactory, userFactory } from '../../factories'
+import { buildingFactory, userFactory, worksheetFactory } from '../../factories'
 import { AddContactService } from '../../../src/owner/service/add-contact.service'
 import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
 import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
@@ -14,11 +14,13 @@ import {
   PostgresScheduledEventsRepository
 } from '../../../src/scheduled-events/repository/postgres-schedule-events.repository'
 import { ScheduledCallsService } from "../../../src/scheduled-events/service/scheduled-calls.service";
+import { PostgresWorksheetRepository } from "../../../src/worksheet/repository/postgres-worksheet.repository";
 
 describe('PostgresScheduleCallService', () => {
   it('schedule a call', async () => {
     const deps = await buildDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
+    await deps.postgresWorksheetRepository.save(worksheetFactory.build(null, {buildingId: testBuilding.id}))
     const [ testOwner, testPhoneContact ] = await createOwnerWithPhoneContact(testBuilding, deps)
     const testFlipper = await deps.addFlipperService.addFlipper(userFactory.build())
 
@@ -41,7 +43,7 @@ describe('PostgresScheduleCallService', () => {
 
     expect(actualScheduledCall).to.not.be.null
     const lastScheduledEventForBuilding = await deps.postgresScheduledEventsRepository.lastScheduledEventForBuilding(testBuilding.id)
-    expect(lastScheduledEventForBuilding).to.include({ id: actualScheduledCall.id, type: 'CALLS' })
+    expect(lastScheduledEventForBuilding).to.include({id: actualScheduledCall.id, type: 'CALLS'})
 
     const flipperScheduledCalls = await deps.scheduledCallsService.scheduledCallsFor(testFlipper.user.id);
     expect(flipperScheduledCalls).to.have.lengthOf(1)
@@ -56,6 +58,7 @@ async function buildDependencies (): Promise<{
   scheduleCallService: ScheduleCallService,
   scheduledCallsService: ScheduledCallsService,
   postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
+  postgresWorksheetRepository: PostgresWorksheetRepository,
 }> {
   const diContainer = await createTestContainer({ postgres: true, couchbase: false })
 
@@ -67,5 +70,6 @@ async function buildDependencies (): Promise<{
     scheduleCallService: diContainer.resolve('scheduleCall'),
     scheduledCallsService: diContainer.resolve('scheduledCallsService'),
     postgresScheduledEventsRepository: diContainer.resolve('postgresScheduledEventsRepository'),
+    postgresWorksheetRepository: diContainer.resolve('postgresWorksheetRepository'),
   }
 }

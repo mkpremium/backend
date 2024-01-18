@@ -5,11 +5,8 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { ContactProps } from '../../owner/owner'
-import { EntityManager, In } from 'typeorm'
-import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
+import { EntityManager } from 'typeorm'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
-import { ownerEntityToStruct } from '../../owner/repository/postgres-owners.repository'
-import { Building } from '../../building/building.entity'
 import { ScheduledEvent } from "../scheduled-event.entity";
 
 export class ScheduledCallsService {
@@ -34,86 +31,59 @@ export class ScheduledCallsService {
 
 class PostgresScheduledCallsService {
   static async scheduledCallsFor(entityManager: EntityManager, userId: string): Promise<ScheduledCallsView[]> {
-    // TODO: why are we using the offer request here?
-    const offerRequests = await entityManager.find(BuildingOfferRequest, {
-      where: {flipper: {user: {id: userId}}},
-      relations: {
-        building: true,
-        caller: true,
-        contact: true,
-        owner: {
-          person: {
-            featuredEmailContact: true,
-            featuredPhoneContact: true,
-            contacts: {
-              contact: true
-            }
-          },
+    const scheduledEvents = await entityManager.find(ScheduledEvent, {
+      where: {
+        notifyTo: {
+          id: userId
         }
       },
-    })
-    const buildingIds = offerRequests.map(or => or.building.id)
-    const buildings = await entityManager.find(Building, {
-      where: {
-        id: In(buildingIds)
-      },
-      relations: {
-        assignedFlipper: true,
-        featuredOwner: true,
-        images: true,
-        proposals: true,
-      }
+      relations: this.relations,
     })
 
-    return offerRequests.map(offerRequest => ({
-      createdBy: offerRequest.caller.id,
-      eventDate: offerRequest.createdAt,
-      event: {
-        contactId: offerRequest.contact.id,
-        worksheetId: undefined,
-        owner: {
-          ...ownerEntityToStruct({...offerRequest.owner, building: {id: offerRequest.building.id} as any}),
-          building: mapBuildingEntityToStruct(buildings.find(b => b.id === offerRequest.building.id))
-        },
-      }
-    }))
+    return scheduledEvents.map(mapScheduledEventToScheduledCall)
   }
 
   static async getById(entityManager: EntityManager, callId: string): Promise<ScheduledCallsView> {
     const scheduledEvent = await entityManager.findOneOrFail(ScheduledEvent, {
       where: {id: callId},
-      relations: {
-        building: {
-          worksheet: true,
-        },
-        contact: true,
-        createdBy: true,
-        owner: {
-          person: {
-            contacts: {
-              contact: true
-            }
-          }
-        }
-      }
+      relations: this.relations
     })
-    return {
-      createdBy: scheduledEvent.createdBy.id,
-      eventDate: scheduledEvent.scheduledFor,
-      event: {
-        worksheetId: scheduledEvent.building.worksheet.id,
-        contactId: scheduledEvent.contact.id,
-        owner: {
-          id: scheduledEvent.owner.id,
-          building: mapBuildingEntityToStruct(scheduledEvent.building),
-          person: {
-            name: scheduledEvent.owner.person.fullName,
-            contacts: scheduledEvent.owner.person.contacts.map(cp => ({...cp.contact, status: cp.status})),
-          }
+    return mapScheduledEventToScheduledCall(scheduledEvent)
+  }
+
+  private static relations = {
+    building: {
+      worksheet: true,
+    },
+    contact: true,
+    createdBy: true,
+    owner: {
+      person: {
+        contacts: {
+          contact: true
         }
       }
-    } as ScheduledCallsView
-  }
+    }
+  };
+}
+
+function mapScheduledEventToScheduledCall(scheduledEvent: ScheduledEvent): ScheduledCallsView {
+  return {
+    createdBy: scheduledEvent.createdBy.id,
+    eventDate: scheduledEvent.scheduledFor,
+    event: {
+      worksheetId: scheduledEvent.building.worksheet.id,
+      contactId: scheduledEvent.contact.id,
+      owner: {
+        id: scheduledEvent.owner.id,
+        building: mapBuildingEntityToStruct(scheduledEvent.building),
+        person: {
+          name: scheduledEvent.owner.person.fullName,
+          contacts: scheduledEvent.owner.person.contacts.map(cp => ({...cp.contact, status: cp.status})),
+        }
+      }
+    }
+  };
 }
 
 class CouchbaseScheduledCallsService {
