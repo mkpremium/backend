@@ -57,6 +57,9 @@ export class ListBuildingsService {
   }
 
   private async getLastOfferRequestForBuildings(ids: string[]) {
+    if (ids.length === 0) {
+      return []
+    }
     const queryBuilder = this.ormDataSource.manager.createQueryBuilder(BuildingOfferRequest, 'offer')
       .select('offer.buildingId', 'buildingId')
       .addSelect('MAX(offer.createdAt)', 'lastOfferCreatedAt')
