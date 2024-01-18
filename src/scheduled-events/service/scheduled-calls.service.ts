@@ -36,6 +36,7 @@ export class ScheduledCallsService {
 
 class PostgresScheduledCallsService {
   static async scheduledCallsFor (ormDataSource: DataSource, userId: string): Promise<ScheduledCallProps[]> {
+    // TODO: why are we using the offer request here?
     const offerRequests = await ormDataSource.manager.find(BuildingOfferRequest, {
       where: { flipper: { user: { id: userId } } },
       relations: {
