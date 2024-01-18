@@ -5,40 +5,38 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { logger } from '../../infrastructure/logger'
 import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { ContactProps } from '../../owner/owner'
-import { DataSource, In } from 'typeorm'
+import { EntityManager, In } from 'typeorm'
 import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
 import { ownerEntityToStruct } from '../../owner/repository/postgres-owners.repository'
 import { Building } from '../../building/building.entity'
+import { ScheduledEvent } from "../scheduled-event.entity";
 
 export class ScheduledCallsService {
-  constructor (
+  constructor(
     private couchbaseAdapter: CouchbaseAdapter,
     private usePostgres: boolean,
-    private ormDataSource: DataSource,
+    private entityManager: EntityManager,
   ) {
   }
 
-  async scheduledCallsFor (userId: string): Promise<ScheduledCallProps[]> {
-    return this.usePostgres ? PostgresScheduledCallsService.scheduledCallsFor(
-        this.ormDataSource, userId) :
+  async scheduledCallsFor(userId: string): Promise<ScheduledCallsView[]> {
+    return this.usePostgres ? PostgresScheduledCallsService.scheduledCallsFor(this.entityManager, userId) :
       CouchbaseScheduledCallsService.scheduledCallsFor(this.couchbaseAdapter, userId)
   }
 
-  async getById (callId: string): Promise<ScheduledCallProps> {
-    const rows = await this.couchbaseAdapter.queryAsync(
-      scheduledCallQuery(this.couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
-      [ callId ]
-    )
-    return parseCouchbaseScheduledEventRow(rows[ 0 ])
+  async getById(callId: string): Promise<ScheduledCallsView> {
+    return this.usePostgres ? PostgresScheduledCallsService.getById(
+        this.entityManager, callId) :
+      CouchbaseScheduledCallsService.getById(this.couchbaseAdapter, callId)
   }
 }
 
 class PostgresScheduledCallsService {
-  static async scheduledCallsFor (ormDataSource: DataSource, userId: string): Promise<ScheduledCallProps[]> {
+  static async scheduledCallsFor(entityManager: EntityManager, userId: string): Promise<ScheduledCallsView[]> {
     // TODO: why are we using the offer request here?
-    const offerRequests = await ormDataSource.manager.find(BuildingOfferRequest, {
-      where: { flipper: { user: { id: userId } } },
+    const offerRequests = await entityManager.find(BuildingOfferRequest, {
+      where: {flipper: {user: {id: userId}}},
       relations: {
         building: true,
         caller: true,
@@ -55,7 +53,7 @@ class PostgresScheduledCallsService {
       },
     })
     const buildingIds = offerRequests.map(or => or.building.id)
-    const buildings = await ormDataSource.manager.find(Building, {
+    const buildings = await entityManager.find(Building, {
       where: {
         id: In(buildingIds)
       },
@@ -74,16 +72,52 @@ class PostgresScheduledCallsService {
         contactId: offerRequest.contact.id,
         worksheetId: undefined,
         owner: {
-          ...ownerEntityToStruct({ ...offerRequest.owner, building: {id: offerRequest.building.id} as any }),
+          ...ownerEntityToStruct({...offerRequest.owner, building: {id: offerRequest.building.id} as any}),
           building: mapBuildingEntityToStruct(buildings.find(b => b.id === offerRequest.building.id))
         },
       }
     }))
   }
+
+  static async getById(entityManager: EntityManager, callId: string): Promise<ScheduledCallsView> {
+    const scheduledEvent = await entityManager.findOneOrFail(ScheduledEvent, {
+      where: {id: callId},
+      relations: {
+        building: {
+          worksheet: true,
+        },
+        contact: true,
+        createdBy: true,
+        owner: {
+          person: {
+            contacts: {
+              contact: true
+            }
+          }
+        }
+      }
+    })
+    return {
+      createdBy: scheduledEvent.createdBy.id,
+      eventDate: scheduledEvent.scheduledFor,
+      event: {
+        worksheetId: scheduledEvent.building.worksheet.id,
+        contactId: scheduledEvent.contact.id,
+        owner: {
+          id: scheduledEvent.owner.id,
+          building: mapBuildingEntityToStruct(scheduledEvent.building),
+          person: {
+            name: scheduledEvent.owner.person.fullName,
+            contacts: scheduledEvent.owner.person.contacts.map(cp => ({...cp.contact, status: cp.status})),
+          }
+        }
+      }
+    } as ScheduledCallsView
+  }
 }
 
 class CouchbaseScheduledCallsService {
-  static async scheduledCallsFor (couchbaseAdapter: CouchbaseAdapter, userId: string): Promise<ScheduledCallProps[]> {
+  static async scheduledCallsFor (couchbaseAdapter: CouchbaseAdapter, userId: string): Promise<ScheduledCallsView[]> {
     const rows = await couchbaseAdapter.queryAsync(
       scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.notifyTo = $1' ]),
       [ userId ]
@@ -91,7 +125,7 @@ class CouchbaseScheduledCallsService {
     return rows.map(parseCouchbaseScheduledEventRow)
   }
 
-  static async getById (couchbaseAdapter: CouchbaseAdapter, callId: string): Promise<ScheduledCallProps> {
+  static async getById (couchbaseAdapter: CouchbaseAdapter, callId: string): Promise<ScheduledCallsView> {
     const rows = await couchbaseAdapter.queryAsync(
       scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
       [ callId ]
@@ -107,7 +141,7 @@ export function parseCouchbaseScheduledEventRow ({
                                                    owner,
                                                    eventId,
                                                    createdBy
-                                                 }): ScheduledCallProps {
+                                                 }): ScheduledCallsView {
   const shapedRow = {
     id: eventId,
     createdBy,
@@ -145,7 +179,7 @@ const scheduledCallQuery = (bucketName: string, conditions: string[]) => `
       AND se.type = 'CALLS' AND ${conditions.join(' AND ')}
 `
 
-interface ScheduledCallProps {
+interface ScheduledCallsView {
   createdBy: string
   eventDate: Date
   event: {
@@ -162,7 +196,7 @@ interface ScheduledCallProps {
   }
 }
 
-const ScheduledCallsView = t.struct<ScheduledCallProps>({
+const ScheduledCallsView = t.struct<ScheduledCallsView>({
   id: t.String,
   createdBy: t.String,
   buildingId: t.maybe(t.String), // Remove when all clients are using event's property.
