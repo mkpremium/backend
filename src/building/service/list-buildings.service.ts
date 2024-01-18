@@ -21,10 +21,10 @@ export class ListBuildingsService {
       this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ ids ] : ids)
   }
 
-  buildingsAssignedTo (flipperId: string): Promise<BuildingReadModel[]> {
+  buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
     return this.usePostgres ?
-      this.buildingAssignedToInPostgres(flipperId) :
-      this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperId)
+      this.buildingAssignedToInPostgres(flipperUserId) :
+      this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperUserId)
   }
 
   private async buildingOfIdInPostgres (ids: string | string[]): Promise<BuildingReadModel[]> {
@@ -72,10 +72,10 @@ export class ListBuildingsService {
     }>();
   }
 
-  private async buildingAssignedToInPostgres(flipperId: string) {
+  private async buildingAssignedToInPostgres(flipperUserId: string) {
     const buildings = await this.ormDataSource.manager.find(Building, {
       where: {
-        assignedFlipper: {id: flipperId}
+        assignedFlipper: {user: {id: flipperUserId}}
       },
     })
 

@@ -36,7 +36,7 @@ describe('Add meeting (Integration - Postgres)', () => {
 
     await deps.createMeetingService.createMeeting({ roles: [], id: '' }, testCmd)
 
-    const flipperNegotiations = await deps.listBuildingsService.buildingsAssignedTo(testFlipper.id)
+    const flipperNegotiations = await deps.listBuildingsService.buildingsAssignedTo(testFlipper.user.id)
     expect(flipperNegotiations).to.be.lengthOf(1)
     expect(flipperNegotiations[ 0 ].lastMeeting).to.include({ inPerson: false })
   })
