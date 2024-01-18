@@ -17,8 +17,8 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     throw new Error('Method not implemented.')
   }
 
-  delete (id: any): Promise<void> {
-    throw new Error('Method not implemented.')
+  async delete (id: string): Promise<void> {
+    await this.repository.delete(id)
   }
 
   // Different to one in the Couchbase repository which seem to be intended for the
