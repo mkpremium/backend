@@ -22,7 +22,9 @@ export class ListBuildingsService {
   }
 
   buildingsAssignedTo (flipperId: string): Promise<BuildingReadModel[]> {
-    return this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperId)
+    return this.usePostgres ?
+      this.buildingAssignedToInPostgres(flipperId) :
+      this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperId)
   }
 
   private async buildingOfIdInPostgres (ids: string | string[]): Promise<BuildingReadModel[]> {
@@ -70,7 +72,6 @@ export class ListBuildingsService {
   private async buildingAssignedToInPostgres(flipperId: string) {
     const buildings = await this.ormDataSource.manager.find(Building, {
       where: {
-        // TODO: use this method & check if we can exclude NO VENDE buildings to improve performance
         assignedFlipper: {id: flipperId}
       },
     })
