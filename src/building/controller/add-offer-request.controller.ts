@@ -1,6 +1,6 @@
 import { AddOfferRequestService } from "../service/add-offer-request.service";
 
-export const createAddOfferRequestController = ({addOfferRequestService}: {
+export const addOfferRequestControllerFactory = ({addOfferRequestService}: {
   addOfferRequestService: AddOfferRequestService
 }) => async (req, res) => {
   const offerRequest = {
