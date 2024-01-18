@@ -69,6 +69,7 @@ class PostgresScheduledCallsService {
 
 function mapScheduledEventToScheduledCall(scheduledEvent: ScheduledEvent): ScheduledCallsView {
   return {
+    id: scheduledEvent.id,
     createdBy: scheduledEvent.createdBy.id,
     eventDate: scheduledEvent.scheduledFor,
     event: {
@@ -150,6 +151,7 @@ const scheduledCallQuery = (bucketName: string, conditions: string[]) => `
 `
 
 interface ScheduledCallsView {
+  id: string
   createdBy: string
   eventDate: Date
   event: {
