@@ -7,7 +7,7 @@ interface Deps {
   eventBus: EventPublisher
 }
 
-export const createDeleteScheduledEventController = ({ eventBus, scheduledEventsRepository }: Deps) => async (req, res) => {
+export const deleteScheduledEventControllerFactory = ({ eventBus, scheduledEventsRepository }: Deps) => async (req, res) => {
   const id = req.params.id
   await scheduledEventsRepository.delete(id)
   await eventBus.publish({
