@@ -88,7 +88,7 @@ export class AddOfferRequestService {
         {user: { id: cmd.flipperId } },
       ])
       const caller = await entityManager.findOneByOrFail(Caller, {user: {id: cmd.callerId}})
-      const savedOffer = await entityManager.save(BuildingOfferRequest, {
+      const savedOfferRequest = await entityManager.save(BuildingOfferRequest, {
         flipper: flipper,
         caller: caller,
         owner: { id: cmd.ownerId },
@@ -98,7 +98,7 @@ export class AddOfferRequestService {
       await entityManager.update(Building, { id: cmd.buildingId }, { assignedFlipper: flipper })
 
       return {
-        id: savedOffer.id,
+        id: savedOfferRequest.id,
         ...cmd,
       }
     })
