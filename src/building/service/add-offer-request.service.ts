@@ -4,7 +4,7 @@ import { InvalidCommand } from '../../infrastructure/invalid-command.error'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
-import { DataSource } from 'typeorm'
+import { EntityManager } from 'typeorm'
 import { CouchbaseOfferRequestsRepository } from '../repository/couchbase-offer-requests.repository'
 import { BuildingOfferRequest } from '../repository/building-offer-request.entity'
 import { Building } from '../building.entity'
@@ -56,22 +56,14 @@ export class AddOfferRequestService {
     private buildingsRepository: BuildingsRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
-    private ormDataSource: DataSource,
+    private entityManager: EntityManager,
   ) {
   }
 
   async addOfferRequest (cmd: AddOfferRequestCommand) {
     this.assertValidCommand(cmd)
 
-    const offerRequest = await (this.usePostgres ? this.doPostgres(cmd) : this.doCouchbase(cmd))
-
-    await this.eventBus.publish({
-      name: DomainEventCatalog.OFFER_REQUEST__CREATED,
-      note: cmd.note,
-      userId: cmd.callerId,
-      buildingId: cmd.buildingId,
-      request: offerRequest
-    } as OfferRequestCreated)
+    await (this.usePostgres ? this.doPostgres(cmd) : this.doCouchbase(cmd))
   }
 
   private assertValidCommand (command: AddOfferRequestCommand) {
@@ -82,7 +74,7 @@ export class AddOfferRequestService {
   }
 
   private async doPostgres (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
-    return this.ormDataSource.transaction(async entityManager => {
+    return this.entityManager.transaction(async entityManager => {
       const flipper = await entityManager.findOneByOrFail(Flipper, [
         {id: cmd.flipperId},
         {user: { id: cmd.flipperId } },
@@ -97,17 +89,35 @@ export class AddOfferRequestService {
       })
       await entityManager.update(Building, { id: cmd.buildingId }, { assignedFlipper: flipper })
 
-      return {
+      const offerRequest = {
         id: savedOfferRequest.id,
         ...cmd,
-      }
+      };
+      await this.publishOfferRequested(cmd, offerRequest, entityManager);
+
+      return offerRequest
     })
   }
 
   private async doCouchbase (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     const offerRequest = await this.couchbaseOfferRequestsRepository.add(cmd)
     await this.buildingsRepository.assignBuildingToAgent(cmd.buildingId, cmd.flipperId)
+    await this.publishOfferRequested(cmd, offerRequest)
 
     return offerRequest
+  }
+
+  private async publishOfferRequested(
+    cmd: AddOfferRequestCommand,
+    offerRequest: AddBuildingOfferCommand & { id: string },
+    entityManager?: EntityManager
+    ) {
+    await this.eventBus.publish({
+      name: DomainEventCatalog.OFFER_REQUEST__CREATED,
+      note: cmd.note,
+      userId: cmd.callerId,
+      buildingId: cmd.buildingId,
+      request: offerRequest
+    } as OfferRequestCreated, entityManager)
   }
 }
