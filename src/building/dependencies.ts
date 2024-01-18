@@ -26,7 +26,7 @@ import {
   setFeaturedOwnerAndContactFromMeetingListener
 } from './event-listener/set-featured-owner-and-contact-from-meeting.listener'
 import { AddOfferRequestService } from './service/add-offer-request.service'
-import { createSetFeaturedOwnerFromOfferRequestListener } from './event-listener/set-featured-owner-from-offer-request'
+import { setFeaturedOwnerFromOfferRequestListenerFactory } from './event-listener/set-featured-owner-from-offer-request'
 import { addOfferRequestControllerFactory } from './controller/add-offer-request.controller'
 import { createAddProposalController } from './controller/add-proposal.controller'
 import { AddProposalForBuildingService } from './service/add-proposal-for-building.service'
@@ -110,7 +110,7 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
 
     couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
-    setFeaturedOwnerFromOfferRequestListener: asFunction(createSetFeaturedOwnerFromOfferRequestListener).singleton(),
+    setFeaturedOwnerFromOfferRequestListener: asFunction(setFeaturedOwnerFromOfferRequestListenerFactory).singleton(),
     addOfferRequestController: asFunction(addOfferRequestControllerFactory),
     addBuildingService: asClass(AddBuildingService).classic().singleton(),
 
