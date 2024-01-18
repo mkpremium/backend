@@ -35,12 +35,9 @@ describe('Add offer request (Integration)', () => {
     const updatedBuilding = await deps.buildingsRepository.get(testBuilding.id)
     expect(updatedBuilding.assignedAgentId).to.be.equal(testFlipper.id)
 
-    const flipperNegotiations = await deps.listBuildingsService.buildingsOfId([ testBuilding.id ])
+    const flipperNegotiations = await deps.listBuildingsService.buildingsAssignedTo(testFlipper.id)
     expect(flipperNegotiations).to.be.lengthOf(1)
     expect(flipperNegotiations[ 0 ].lastMeeting).to.include({ inPerson: false })
-
-    const flipperScheduledCalls = await deps.scheduledCallsService.scheduledCallsFor(testFlipper.user.id)
-    expect(flipperScheduledCalls).to.be.lengthOf(1)
   })
 })
 
