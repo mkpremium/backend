@@ -17,6 +17,7 @@ export enum DomainEventCatalog {
   SCHEDULED_EVENTS__CALL_SCHEDULED = 'scheduled_events.call_scheduled',
   SCHEDULED_EVENTS__CALL_UPDATED = 'scheduled_events.call_updated',
   SCHEDULED_EVENTS__EVENT_DELETED = 'scheduled_events.event_deleted',
+  SCHEDULED_EVENTS__MEETING_CREATED = 'scheduled_events.meeting.created',
 
   USER__OPERATOR_ADDED = 'user.operator_added',
 

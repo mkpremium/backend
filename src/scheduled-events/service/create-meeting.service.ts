@@ -7,9 +7,10 @@ import { DataSource } from 'typeorm'
 import { UserProps } from '../../types/user'
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { ScheduledEventId, ScheduledEventProps } from '../types'
+import { DomainEventCatalog } from "../../infrastructure/postgres/domain-event.entity";
 
 export interface MeetingCreated {
-  name: 'meeting.created'
+  name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED
   meetingId: string
   userId: string
   ownerId: string
@@ -48,7 +49,7 @@ export class CreateMeetingService {
       }))
 
     await this.eventBus.publish({
-      name: 'meeting.created',
+      name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED,
       meetingId: createdMeeting.id,
       userId: createdMeeting.notifyTo,
       ownerId: createdMeeting.event.ownerId,

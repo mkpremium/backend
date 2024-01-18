@@ -7,8 +7,16 @@ export function buildingEventListeners (eventBus: EventListener, container: Awil
   eventBus.on(DomainEventCatalog.BUILDING__LEAD_CAPTURED, 'building.set_featured_owner', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
   eventBus.on(DomainEventCatalog.BUILDING__PROPOSAL_SCHEDULED, 'building.set_status_to_proposal_scheduled', container.resolve('proposalScheduledListener'))
 
-  eventBus.on('meeting.created', 'building.add_note', container.resolve('addNoteToBuilding'))
-  eventBus.on('meeting.created', 'building.set_featured_owner', container.resolve('setFeaturedOwnerAndContactFromMeeting'))
+  eventBus.on(
+    DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED,
+    'building.add_note',
+    container.resolve('addNoteToBuilding')
+  )
+  eventBus.on(
+    DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED,
+    'building.set_featured_owner',
+    container.resolve('setFeaturedOwnerAndContactFromMeeting')
+  )
   eventBus.on(DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED, 'building.add_note', container.resolve('addNoteToBuilding'))
   eventBus.on(DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED, 'building.set_featured_owner_on_call', container.resolve('scheduledCallListener'))
   eventBus.on(DomainEventCatalog.SCHEDULED_EVENTS__CALL_UPDATED, 'building.add_note', container.resolve('addNoteToBuilding'))

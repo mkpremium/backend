@@ -4,7 +4,7 @@ import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.enti
 
 export function scheduledEventsEventListeners (eventBus: EventListener, container: AwilixContainer) {
   eventBus.on(
-    'meeting.created',
+    DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED,
     'scheduled_events.remove_call',
     container.resolve('removeCallsOnNewMeetingOrOfferRequest')
   )

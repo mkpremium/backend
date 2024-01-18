@@ -11,7 +11,7 @@ import { createAddScheduledCallController } from './controller/add-schedule-call
 import { createAddScheduledMeetingEventController } from './controller/add-meeting.controller'
 import { getUserScheduledCallsControllerFactory } from './controller/get-user-scheduled-calls.controller'
 import { createDeleteScheduledEventController } from './controller/delete-scheduled-event.controller'
-import { selfMeetingsController } from './controller/get-self-meetings.controller'
+import { selfMeetingsControllerFactory } from './controller/get-self-meetings.controller'
 import { removeCallsOnNewMeetingOrOfferRequest } from './listeners/remove-calls-on-new-meeting-or-offer-request'
 import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled-calls-on-owner-refusal'
 import { removeScheduledCallOnDiscardedContact } from './listeners/remove-scheduled-call-on-discarded-contact'
@@ -40,7 +40,7 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
     addMeetingController: asFunction(createAddScheduledMeetingEventController).singleton(),
     getUserScheduledCallsController: asFunction(getUserScheduledCallsControllerFactory).singleton(),
     deleteScheduledEventController: asFunction(createDeleteScheduledEventController).singleton(),
-    selfMeetingsController: asFunction(selfMeetingsController).singleton(),
+    selfMeetingsController: asFunction(selfMeetingsControllerFactory).singleton(),
 
     removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
     removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
