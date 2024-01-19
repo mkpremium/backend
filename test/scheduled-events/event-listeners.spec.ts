@@ -36,7 +36,7 @@ describe('scheduled-events.setupEventListeners', () => {
   })
 
   it('deletes scheduled calls when a visit is scheduled for the building', () => {
-    eventBus.publish({ name: 'meeting.created', buildingId: 'test-building-id' })
+    eventBus.publish({ name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED, buildingId: 'test-building-id' })
 
     expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).to.have.been.calledWith('test-building-id')
   })
