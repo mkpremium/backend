@@ -84,7 +84,7 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
     lat: t.maybe(t.Number)
   })),
   recentProposal: t.maybe(t.struct({
-    createdAt: t.String,
+    createdAt: t.union([ t.Date, DateTimeString ]),
     proposal: t.Number,
   })),
   cadastre: t.maybe(t.struct({
