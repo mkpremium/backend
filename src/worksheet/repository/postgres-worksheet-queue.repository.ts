@@ -13,10 +13,6 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
     },
   }
 
-  findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps & BaseEntity> {
-    throw new Error('Method not implemented.')
-  }
-
   list (): Promise<WorksheetQueueProps[]> {
     throw new Error('Method not implemented.')
   }

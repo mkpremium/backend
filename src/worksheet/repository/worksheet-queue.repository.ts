@@ -2,8 +2,6 @@ import { WorksheetQueueProps } from '../domain/queue'
 import { Repository } from '../../db/repository'
 
 export interface WorksheetQueueRepository extends Repository<WorksheetQueueProps> {
-  findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps>
-
   list(): Promise<WorksheetQueueProps[]>
 }
 
