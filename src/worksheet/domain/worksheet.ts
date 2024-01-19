@@ -103,10 +103,10 @@ export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatus
   return Worksheet.update(worksheet, spec)
 }
 
-export function pullOutFreezer (worksheet, newStatus) {
+export function pullOutFreezer (worksheet: WorksheetProps, newStatus: WorksheetStatusType): WorksheetProps {
   const updated = setStatus(worksheet, newStatus)
 
-  return t.update(updated, {
+  return Worksheet.update(updated, {
     inFreezer: { $set: false },
     queueId: { $set: null },
     lastAddedMeeting: { $set: null }
