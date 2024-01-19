@@ -218,7 +218,7 @@ export interface BuildingProps {
   lead?: Lead
   assignedAgentId?: string;
   use?: string;
-  recentProposal?: any
+  recentProposal?: Pick<ProposalProps, 'proposal' | 'createdAt'>
   metadata: BuildingMetadataProps[]
 }
 

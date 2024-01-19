@@ -116,7 +116,10 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
     lead: entity.lead,
     assignedAgentId: entity.assignedFlipper?.id,
     use: entity.use,
-    recentProposal: entity.recentProposal,
+    recentProposal: entity.recentProposal ? {
+      proposal: entity.recentProposal.amount,
+      createdAt: entity.recentProposal.createdAt,
+    } : undefined,
     metadata: entity.images
   }
 }
