@@ -10,7 +10,7 @@ export function toOwnerInBuildingRead (owner: Pick<OwnerProps, 'id'> & Pick<Pers
   return {
     id: owner.id,
     firstName: _.get(owner, 'firstName'),
-    name: _.get(owner, 'fullName'),
+    name: _.get(owner, 'fullName') || _.get(owner, 'name'),
     contacts: contacts.map(({ id, status, type, value }) => ({
       id,
       status,
