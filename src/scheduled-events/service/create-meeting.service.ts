@@ -1,13 +1,13 @@
 import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { BuildingsRepository } from '../../building/repository/buildings.repository'
 import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
 import { DataSource } from 'typeorm'
 import { UserProps } from '../../types/user'
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { ScheduledEventId, ScheduledEventProps } from '../types'
 import { DomainEventCatalog } from "../../infrastructure/postgres/domain-event.entity";
+import { CouchbaseBuildingsRepository } from "../../building/repository/couchbase-building.repository";
 
 export interface MeetingCreated {
   name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED
@@ -30,7 +30,7 @@ interface AddMeetingCommand {
 export class CreateMeetingService {
   constructor (
     private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
-    private buildingsRepository: BuildingsRepository,
+    private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
     private ormDataSource: DataSource,
@@ -45,7 +45,7 @@ export class CreateMeetingService {
       postgresCreateMeeting(cmd, this.ormDataSource) :
       couchbaseCreateMeeting(cmd, user, meetingAgentId, {
         couchbaseScheduledEventsRepository: this.couchbaseScheduledEventsRepository,
-        buildingsRepository: this.buildingsRepository
+        couchbaseBuildingsRepository: this.couchbaseBuildingsRepository,
       }))
 
     await this.eventBus.publish({
@@ -94,15 +94,15 @@ async function postgresCreateMeeting (cmd: AddMeetingCommand, ormDataSource: Dat
 
 interface CouchbaseDeps {
   couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
-  buildingsRepository: BuildingsRepository
+  couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
 }
 
 async function couchbaseCreateMeeting (requestBody, operator, meetingAgentId, {
   couchbaseScheduledEventsRepository,
-  buildingsRepository
+  couchbaseBuildingsRepository
 }: CouchbaseDeps): Promise<ScheduledEventProps> {
   const createdMeeting = await couchbaseScheduledEventsRepository.addScheduledMeetingEvent(requestBody, operator.id)
-  await buildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
+  await couchbaseBuildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
 
   return createdMeeting
 }

@@ -1,4 +1,4 @@
-import { BuildingOwnerProps, OwnerRepository } from './owner.repository'
+import { BuildingOwnerProps, isVerifiedOwner, OwnerRepository } from './owner.repository'
 import { OwnerProps } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
@@ -28,8 +28,15 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return owners.map(ownerEntityToBuildingOwnerProps)
   }
 
-  verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
-    return Promise.reject(new Error('Not implemented'))
+  async verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
+    const owners = await this.repository.find({
+      where: {
+        building: { id: buildingId },
+      },
+      relations: this.relations,
+    })
+
+    return owners.map(ownerEntityToBuildingOwnerProps).filter(isVerifiedOwner)
   }
 
   protected entityToStruct (entity: Owner): OwnerProps {

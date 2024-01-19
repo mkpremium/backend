@@ -83,6 +83,12 @@ export const BuildingOwner = t.struct<BuildingOwnerProps>({
   status: t.enums.of([ 'NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT' ])
 })
 
+export function isVerifiedOwner (owner: BuildingOwnerProps) {
+  const contacts = owner.contacts
+  const goodContacts = contacts.filter(c => c.status === 'GOOD')
+  return goodContacts.length > 0
+}
+
 
 export interface OwnerRepository extends Repository<OwnerProps> {
   buildingOwners (buildingId: string): Promise<BuildingOwnerProps[]>

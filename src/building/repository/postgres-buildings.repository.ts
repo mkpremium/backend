@@ -28,11 +28,6 @@ export class PostgresBuildingsRepository
   }
 
   // BuildingsRepository
-
-  assignBuildingToAgent (buildingId: string, agentId: string): Promise<void> {
-    return Promise.reject(new Error('Not implemented'))
-  }
-
   pullBuildingsOutOfFreezer (buildingIds: string[]): Promise<void> {
     return Promise.reject(new Error('Not implemented'))
   }
@@ -51,10 +46,6 @@ export class PostgresBuildingsRepository
       )),
       TE.chain(buildings => TE.of(buildings.map(b => buildingEntityToReadModel(b))))
     )
-  }
-
-  listAssignedToPropertyAgentOfId (agentId): Promise<BuildingReadModel[]> {
-    return Promise.reject(new Error('Not implemented'))
   }
 
   async listProposalsForBuilding (buildingId: string): Promise<ProposalProps[]> {

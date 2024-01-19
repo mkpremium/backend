@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import { validate } from 'tcomb-validation'
 import { InvalidCommand } from '../../infrastructure/invalid-command.error'
-import { BuildingsRepository } from '../repository/buildings.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
@@ -10,6 +9,7 @@ import { BuildingOfferRequest } from '../repository/building-offer-request.entit
 import { Building } from '../building.entity'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
+import { CouchbaseBuildingsRepository } from "../repository/couchbase-building.repository";
 
 
 interface AddOfferRequestCommand {
@@ -53,7 +53,7 @@ export interface AddBuildingOfferCommand {
 export class AddOfferRequestService {
   constructor (
     private couchbaseOfferRequestsRepository: CouchbaseOfferRequestsRepository,
-    private buildingsRepository: BuildingsRepository,
+    private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
     private entityManager: EntityManager,
@@ -104,7 +104,7 @@ export class AddOfferRequestService {
 
   private async doCouchbase (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     const offerRequest = await this.couchbaseOfferRequestsRepository.add(cmd)
-    await this.buildingsRepository.assignBuildingToAgent(cmd.buildingId, cmd.flipperId)
+    await this.couchbaseBuildingsRepository.assignBuildingToAgent(cmd.buildingId, cmd.flipperId)
     await this.publishOfferRequested(cmd, offerRequest)
 
     return offerRequest
