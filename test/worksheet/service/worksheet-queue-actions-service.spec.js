@@ -36,9 +36,11 @@ describe('WorksheetQueueActionsService', () => {
 
     service = new WorksheetQueueActionsService(
       queueRepositoryMock,
+      queueRepositoryMock,
       worksheetRepositoryMock,
       callcenterWorksheetServiceMock,
-      eventBusMock
+      eventBusMock,
+      false
     )
   })
 
