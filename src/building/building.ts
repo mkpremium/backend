@@ -61,6 +61,7 @@ export interface ProposalProps {
   message?: string;
   createdAt?: Date
   updatedAt?: Date
+  aspiration?: number
 }
 
 export const BuildingProposal = t.struct<ProposalProps>(

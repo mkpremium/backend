@@ -29,15 +29,13 @@ export class BuildingProposalsImporterService extends BuildingRelatedDocumentMig
       for (const proposal of proposals) {
         const original = proposal.document as ProposalProps
 
-        // Make sure dates are set.
-        original.createdAt = original.createdAt ?? new Date()
-        original.updatedAt = original.updatedAt ?? original.createdAt
-
-        if (!original.notificationEmail) {
-          original.notificationEmail = "jorge.velasco.silva@gmail.com"
-          original.notificationStatus = "DISABLED"
-          original.notificationSentAt = null
-        }
+        // Some fields might be empty on old proposals, so we need to fill them
+        // to avoid database constraint errors.
+        original.createdAt ??= new Date()
+        original.updatedAt ??= original.createdAt
+        original.notificationEmail ??= "jorge.velasco.silva@gmail.com"
+        original.notificationStatus ??= "DISABLED"
+        original.message ??= ""
 
         await em.save(Proposal, {
           id: proposal.document["id"],
@@ -52,6 +50,7 @@ export class BuildingProposalsImporterService extends BuildingRelatedDocumentMig
           notificationStatus: original.notificationStatus,
           createdAt: original.createdAt,
           updatedAt: original.updatedAt,
+          aspiration: original.aspiration,
         })
         await markCouchbaseDocumentAsMigrated(em, proposal.id)
       }
