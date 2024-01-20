@@ -37,7 +37,6 @@ describe('BuildingProposalsImporterService', () => {
         buildingId: buildingId,
         state: 'pendiente',
         proposal: 1000,
-        message: 'test',
         createdAt: new Date(),
 
         // When updatedAt is null, the importer should set it to the createdAt or
@@ -59,5 +58,6 @@ describe('BuildingProposalsImporterService', () => {
     expect(found.notificationEmail).to.be.equal('jorge.velasco.silva@gmail.com')
     expect(found.notificationStatus).to.be.equal('DISABLED')
     expect(found.notificationSentAt).to.be.null
+    expect(found.message).to.be.equal('')
   })
 })

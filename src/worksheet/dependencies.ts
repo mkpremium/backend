@@ -16,12 +16,14 @@ import { CallcenterWorksheetService } from './service/callcenter-worksheet.servi
 import { CouchbaseWorksheetQueueRepository } from './repository/couchbase-worksheet-queue.repository'
 import { CallSchedulerService } from './service/call-scheduler.service'
 import { PostgresWorksheetQueueRepository } from './repository/postgres-worksheet-queue.repository'
+import { FreezerService } from "./service/freezer.service";
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
     callcenterWorksheetService: asClass(CallcenterWorksheetService).classic().singleton(),
+    freezerService:asClass(FreezerService).classic().singleton(),
     syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asClass(
       SyncWorksheetStatusOnBuildingNegotiationStatusChangeService).singleton().classic(),
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
@@ -36,8 +38,8 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
     worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
     couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton(),
-    postgresCouchbaseQueueRepository: asClass(PostgresWorksheetQueueRepository).classic().singleton(),
-    worksheetQueueRepository: aliasTo(usePostgres ? 'postgresCouchbaseQueueRepository' :'couchbaseWorksheetQueueRepository'),
+    postgresQueueRepository: asClass(PostgresWorksheetQueueRepository).classic().singleton(),
+    worksheetQueueRepository: aliasTo(usePostgres ? 'postgresQueueRepository' :'couchbaseWorksheetQueueRepository'),
     legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
   })
 }

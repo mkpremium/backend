@@ -31,6 +31,9 @@ export class Proposal extends BaseEntity {
   @Column({ type: 'timestamptz', nullable: true })
   notificationSentAt?: Date
 
-  @Column('text')
+  @Column({ type: 'text', nullable: true })
   message?: string;
+
+  @Column({ type: 'numeric', nullable: true })
+  aspiration?: number;
 }

@@ -8,6 +8,7 @@ import { validate } from 'tcomb-validation'
 import { CouchbaseWorksheetRepository } from '../../../src/worksheet/repository/couchbase-worksheet.repository'
 import { CouchbaseBuildingsRepository } from '../../../src/building/repository/couchbase-building.repository'
 import { CouchbaseOwnersRepository } from '../../../src/owner/repository/couchbase-owners.repository'
+import { ProposalProps } from '../../../src/building/building'
 
 describe('CouchbaseWorksheetRepository', () => {
   it('gets worksheet with callcenter view', async () => {
@@ -26,9 +27,9 @@ describe('CouchbaseWorksheetRepository', () => {
         buildingId: 'test-building-id',
         ownerId: 'test-owner-id',
         createdBy: 'test-created-by',
-        createdAt: '2021-03-31T11:45:00.000Z',
+        createdAt: new Date(),
         proposal: 100000
-      }
+      } as ProposalProps
     }).build()
 
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
