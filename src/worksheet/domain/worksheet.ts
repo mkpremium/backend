@@ -1,10 +1,8 @@
 import t from 'tcomb'
-import { Building } from '../../building/building'
 import { utc } from '../../lib/date'
-import { OwnerWithInclude } from '../../owner/owner'
 
 import { Address, AddressProp } from '../../types/common'
-import { QueueItem, QueueStatus } from '../models/queue-item'
+import { QueueItem, QueueItemStatus } from '../models/queue-item'
 import { WorksheetQueue, WorksheetQueueProps } from './queue'
 
 export const WorkSheetStatus = {
@@ -133,7 +131,7 @@ export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetPr
         $push: [
           QueueItem({
             worksheetId: worksheet.id,
-            status: QueueStatus.OPENED,
+            status: QueueItemStatus.OPENED,
             addedAt: new Date(),
             operatorId: byUserOfId
           })

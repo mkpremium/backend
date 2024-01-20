@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { QueueItem, QueueItemProps, QueueStatus } from '../models/queue-item'
+import { QueueItem, QueueItemProps, QueueItemStatus } from '../models/queue-item'
 import _ from 'lodash'
 import _get from 'lodash/get'
 
@@ -58,7 +58,7 @@ export const WorksheetQueue = t.struct<WorksheetQueueProps>(
 
 function calculateWorksheetIdsToDrop (q: WorksheetQueueProps, userId: string, maxToKeep: number): string[] {
   const userOpenedWorksheets = q.worksheets
-    .filter(w => w.operatorId === userId && w.status === QueueStatus.OPENED)
+    .filter(w => w.operatorId === userId && w.status === QueueItemStatus.OPENED)
 
   userOpenedWorksheets.sort((a, b) => b.addedAt.valueOf() - a.addedAt.valueOf())
   return _.map(_.drop(userOpenedWorksheets, maxToKeep), 'worksheetId')
@@ -90,10 +90,10 @@ export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId
 }
 
 export function removeScheduledCallFromItem (queueItem: QueueItemProps) {
-  t.assert(queueItem.status === QueueStatus.SCHEDULED, 'worksheet is not scheduled')
+  t.assert(queueItem.status === QueueItemStatus.SCHEDULED, 'worksheet is not scheduled')
 
   return QueueItem.update(queueItem, {
-    status: { $set: queueItem.operatorId !== undefined ? QueueStatus.OPENED : QueueStatus.AVAILABLE },
+    status: { $set: queueItem.operatorId !== undefined ? QueueItemStatus.OPENED : QueueItemStatus.AVAILABLE },
     event: { $set: undefined }
   })
 }

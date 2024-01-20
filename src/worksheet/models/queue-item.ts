@@ -2,19 +2,19 @@ import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { ScheduledEventTypeEnum } from '../../scheduled-events/types'
 
-export enum QueueStatus {
+export enum QueueItemStatus {
   AVAILABLE = 'AVAILABLE',
   OPENED = 'OPENED',
   SCHEDULED = 'SCHEDULED',
 }
 
-export const WorkSheetQueueStatus = t.enums(QueueStatus, 'WorkSheetQueueStatus')
+export const WorkSheetQueueItemStatus = t.enums(QueueItemStatus, 'WorkSheetQueueStatus')
 
 export interface QueueItemProps {
   id?: string
   worksheetId: string
   operatorId?: string
-  status: QueueStatus
+  status: QueueItemStatus
   addedAt: Date
   event?: {
     id: string
@@ -27,7 +27,7 @@ export const QueueItem = t.struct<QueueItemProps>({
     id: t.maybe(t.String),
     worksheetId: t.String,
     operatorId: t.maybe(t.String),
-    status: WorkSheetQueueStatus,
+    status: WorkSheetQueueItemStatus,
     addedAt: t.Date,
     event: t.maybe(t.struct({
       id: t.String,
@@ -38,7 +38,7 @@ export const QueueItem = t.struct<QueueItemProps>({
   {
     name: 'QueueItem',
     defaultProps: {
-      status: QueueStatus.AVAILABLE,
+      status: QueueItemStatus.AVAILABLE,
       get addedAt () {
         return new Date()
       }

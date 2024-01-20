@@ -4,7 +4,7 @@ import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
 import moment from 'moment'
-import { QueueStatus } from '../../../src/worksheet/models/queue-item'
+import { QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 import { worksheetBuilder } from '../worksheet.builder'
 
 describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
@@ -42,19 +42,19 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
         {
           worksheetId: '3-hours-ago-worksheet',
           operatorId: testUserId,
-          status: QueueStatus.OPENED,
+          status: QueueItemStatus.OPENED,
           addedAt: moment().add(-3, 'hours').toDate()
         },
         {
           worksheetId: '2-hours-ago-worksheet',
           operatorId: testUserId,
-          status: QueueStatus.OPENED,
+          status: QueueItemStatus.OPENED,
           addedAt: moment().add(-2, 'hours').toDate()
         },
         {
           worksheetId: '1-hour-ago-worksheet',
           operatorId: testUserId,
-          status: QueueStatus.OPENED,
+          status: QueueItemStatus.OPENED,
           addedAt: moment().add(-1, 'hour').toDate()
         }
       ]

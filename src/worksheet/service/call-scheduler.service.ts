@@ -1,6 +1,6 @@
 import { WorksheetQueue, WorksheetQueueProps } from '../domain/queue'
 import { ScheduledEventProps } from '../../scheduled-events/types'
-import { QueueItem, QueueItemProps, QueueStatus } from '../models/queue-item'
+import { QueueItem, QueueItemProps, QueueItemStatus } from '../models/queue-item'
 import { newHttpError } from '../../lib/http-error'
 import _ from 'lodash'
 import t from 'tcomb'
@@ -54,7 +54,7 @@ export function addWorksheet (queue: WorksheetQueueProps, worksheet: WorksheetPr
       $push: [
         QueueItem({
           worksheetId: worksheet.id,
-          status: QueueStatus.AVAILABLE,
+          status: QueueItemStatus.AVAILABLE,
           addedAt: new Date()
         })
       ]
@@ -68,7 +68,7 @@ function findItemByWorksheetId (queue: WorksheetQueueProps, worksheetId: string)
 
 function schedule (item: QueueItemProps, operatorId: string, scheduledEvent: ScheduledEventProps): QueueItemProps {
   return QueueItem.update(item, {
-    status: { $set: QueueStatus.SCHEDULED },
+    status: { $set: QueueItemStatus.SCHEDULED },
     operatorId: { $set: operatorId },
     event: {
       $set: {

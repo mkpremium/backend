@@ -3,7 +3,7 @@ import { spy, stub } from 'sinon'
 import { utc } from '../../../src/lib/date'
 import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 import { Worksheet } from '../../../src/worksheet/domain/worksheet'
-import { QueueStatus } from '../../../src/worksheet/models/queue-item'
+import { QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 import { WorksheetQueueActionsService } from '../../../src/worksheet/service/worksheet-queue-actions-service'
 
 describe('WorksheetQueueActionsService', () => {
@@ -106,7 +106,7 @@ describe('WorksheetQueueActionsService', () => {
       worksheets: [
         {
           worksheetId: testWorksheetId,
-          status: QueueStatus.SCHEDULED,
+          status: QueueItemStatus.SCHEDULED,
           event: {
             id: testScheduledCallId,
             eventDate: new Date(),
@@ -124,7 +124,7 @@ describe('WorksheetQueueActionsService', () => {
 
       expect(queueRepositoryMock.save).to.have.been.calledOnce
       expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].event).to.be.undefined
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].status).to.be.equal(QueueStatus.AVAILABLE)
+      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].status).to.be.equal(QueueItemStatus.AVAILABLE)
     })
   })
 })
