@@ -40,7 +40,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
           worksheetId: ws.id,
           addedAt: ws.lastViewedAt,
           operatorId: ws.heldBy?.id,
-          status: inferWorksheetQueueItemStatus(ws),
+          status: inferWorksheetQueueItemStatus(ws, false),
         })
       ),
     }
@@ -51,12 +51,12 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
   }
 }
 
-function inferWorksheetQueueItemStatus(worksheet: Worksheet): QueueItemStatus {
+function inferWorksheetQueueItemStatus(worksheet: Worksheet, hasScheduledCall: boolean): QueueItemStatus {
   switch (true) {
-    case !!worksheet.heldBy:
-      return QueueItemStatus.OPENED
-    case worksheet.status === "MEETING": // TODO: is there any other case?
+    case hasScheduledCall:
       return QueueItemStatus.SCHEDULED
+    case worksheet.status === 'TAKEN':
+      return QueueItemStatus.OPENED
     default:
       return QueueItemStatus.AVAILABLE
   }
