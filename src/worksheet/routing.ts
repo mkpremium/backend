@@ -3,7 +3,7 @@ import { Express, Router } from 'express'
 import {
   createQueueController,
   queueListController,
-  updateQueueController, updateWorksheetStatusController,
+  updateQueueController,
   worksheetListController
 } from './controllers'
 import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
@@ -27,8 +27,6 @@ export const worksheetsRoutes = (app: Express, container: AwilixContainer, secur
   ))
 
   router.put('/queues/:id', permissions.manager, updateQueueController(worksheetQueueRepository))
-
-  router.put('/:id/status', updateWorksheetStatusController(container.resolve('worksheetRepository')))
 
   router.post('/status-changed', wrap(
     container.resolve('worksheetStatusChangedController') as ReturnType<typeof createStatusChangedController>
