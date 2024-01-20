@@ -6,17 +6,38 @@ import fromJSON from "tcomb/lib/fromJSON";
 import { Promise as BirdPromise } from "bluebird";
 import _ from "lodash";
 import { CouchbaseBuildingsRepository } from "../../building/repository/couchbase-building.repository";
+import { EntityManager } from "typeorm";
+import { Worksheet as WorksheetEntity } from '../worksheet.entity'
+import moment from "moment";
 
 export class FreezerService {
   constructor(
     private readonly couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
-    private readonly legacyWorksheetRepository: LegacyWorksheetRepository
+    private readonly legacyWorksheetRepository: LegacyWorksheetRepository,
+    private readonly usePostgres: boolean,
+    private readonly entityManager: EntityManager,
   ) {
   }
 
   async moveWorksheetOutOfFreezer(daysInFreezer: number, limit: number) {
     logger.info('starting to move worksheets from freezer settings', {daysInFreezer})
 
+    await (this.usePostgres ? this.doPostgres(daysInFreezer, limit) : this.doCouchbase(daysInFreezer, limit));
+  }
+
+  private async doPostgres(daysInFreezer: number, limit: number) {
+    await this.entityManager.createQueryBuilder(WorksheetEntity, 'worksheet')
+      .update(WorksheetEntity)
+      .set({queue: null, status: WorkSheetStatus.AVAILABLE as WorksheetStatusType})
+      .where('worksheet.status IN (:...statuses)',
+        {statuses: [WorkSheetStatus.NO_SALE, WorkSheetStatus.MEETING]})
+      .andWhere('worksheet."lastStatusChangedAt" IS NOT NULL')
+      .andWhere('worksheet."lastStatusChangedAt" <= :timestampLimit',
+        {timestampLimit: moment().subtract(daysInFreezer, 'days').toDate()})
+      .execute()
+  }
+
+  private async doCouchbase(daysInFreezer: number, limit: number) {
     const dateLimit = utc().subtract(daysInFreezer, 'days').toDate()
     const queryBuilder = this.legacyWorksheetRepository.getQueryBuilder()
       .where('inFreezer = ?', true)
@@ -26,7 +47,7 @@ export class FreezerService {
       .limit(limit)
 
     const worksheets = await this.legacyWorksheetRepository.query(queryBuilder)
-    return pullWorksheetsOutOfFreezer(worksheets, this.couchbaseBuildingsRepository)
+    await pullWorksheetsOutOfFreezer(worksheets, this.couchbaseBuildingsRepository)
   }
 }
 

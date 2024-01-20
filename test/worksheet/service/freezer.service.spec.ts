@@ -23,6 +23,7 @@ describe.skip('FreezerService', () => {
     const testWorksheet = await deps.worksheetRepository.save(worksheetFactory.build({
       statusChangedAt: moment().subtract(testDaysInFreezer, 'days').toDate(),
       queueId: testWorksheetQueue.id,
+      status: "NO_SALE"
     }, {buildingId: testBuilding.id}))
     await createOwnerWithPhoneContact(testBuilding, deps)
 
