@@ -14,7 +14,7 @@ export interface QueueItemProps {
   id?: string
   worksheetId: string
   operatorId?: string
-  status: string
+  status: QueueStatus
   addedAt: Date
   event?: {
     id: string
