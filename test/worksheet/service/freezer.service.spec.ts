@@ -13,7 +13,7 @@ import {
   PostgresWorksheetQueueRepository
 } from "../../../src/worksheet/repository/postgres-worksheet-queue.repository";
 
-describe.skip('FreezerService', () => {
+describe('FreezerService', () => {
   it('makes available buildings in the freezer after the given number of days', async () => {
     const deps = await buildDependencies()
 
