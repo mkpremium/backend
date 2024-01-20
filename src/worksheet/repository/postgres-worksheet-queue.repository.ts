@@ -4,6 +4,8 @@ import { PostgresRepository } from '../../infrastructure/postgres/postgres-repos
 import { WorksheetQueue } from '../worksheet-queue.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
 import { BaseEntity } from '../../infrastructure/entity'
+import { Worksheet } from "../worksheet.entity";
+import { QueueItemStatus } from "../models/queue-item";
 
 export class PostgresWorksheetQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
   implements WorksheetQueueRepository {
@@ -34,11 +36,11 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
       name: entity.name,
       source: entity.source,
       worksheets: entity.worksheets.map(
-        ({ id, heldBy, lastViewedAt, status }) => ({
-          worksheetId: id,
-          addedAt: lastViewedAt,
-          operatorId: heldBy?.id,
-          status // TODO: map status
+        (ws) => ({
+          worksheetId: ws.id,
+          addedAt: ws.lastViewedAt,
+          operatorId: ws.heldBy?.id,
+          status: inferWorksheetQueueItemStatus(ws),
         })
       ),
     }
@@ -46,5 +48,16 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
 
   protected getEntityTarget (): EntityTarget<WorksheetQueue> {
     return WorksheetQueue
+  }
+}
+
+function inferWorksheetQueueItemStatus(worksheet: Worksheet): QueueItemStatus {
+  switch (true) {
+    case !!worksheet.heldBy:
+      return QueueItemStatus.OPENED
+    case worksheet.status === "MEETING": // TODO: is there any other case?
+      return QueueItemStatus.SCHEDULED
+    default:
+      return QueueItemStatus.AVAILABLE
   }
 }
