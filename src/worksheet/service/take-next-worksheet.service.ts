@@ -4,6 +4,7 @@ import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { CallcenterWorksheetService } from './callcenter-worksheet.service'
+import { WorksheetQueueProps } from '../domain/queue'
 
 export interface InvalidWorksheetFound {
   name: DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND;
@@ -24,7 +25,7 @@ export class TakeNextWorksheetService {
     return await this.nextWorksheetInQueue(queue, byUserOfId)
   }
 
-  async nextWorksheetInQueue (queue, byUserOfId): Promise<WorksheetViewProps> {
+  async nextWorksheetInQueue (queue: WorksheetQueueProps, byUserOfId: string): Promise<WorksheetViewProps> {
     let worksheetFromSource
     try {
       worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId)
@@ -54,7 +55,7 @@ export class TakeNextWorksheetService {
     return nextWorksheet
   }
 
-  private getNextWorksheet (queue, byUserOfId, skipWorksheetId?): Promise<WorksheetViewProps> {
+  private getNextWorksheet (queue: WorksheetQueueProps, byUserOfId: string, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     return this.callcenterWorksheetService.nextAvailableWorksheetInSource(queue.source, skipWorksheetId)
       .catch(error => {
         error.queueId = queue.id
