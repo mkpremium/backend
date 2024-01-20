@@ -3,7 +3,9 @@ import { WorksheetQueue, WorksheetQueueProps } from '../../src/worksheet/domain/
 const queuePrototype: WorksheetQueueProps = {
   id: 'test-worksheet-queue-id',
   name: 'test queue',
-  source: {},
+  source: {
+    province: 'TEST_BARCELONA',
+  },
   worksheets: [],
 }
 
