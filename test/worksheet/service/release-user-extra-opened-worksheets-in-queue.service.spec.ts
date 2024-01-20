@@ -34,7 +34,9 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
   it('releases oldest extra worksheet taken by user', async () => {
     const testQueue = WorksheetQueue({
       id: 'test-queue-id',
-      source: {},
+      source: {
+        province: 'TEST_BARCELONA',
+      },
       name: 'test-worksheet-queue',
       worksheets: [
         {
