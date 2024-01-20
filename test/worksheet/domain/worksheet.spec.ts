@@ -5,7 +5,7 @@ import {
   WorksheetStatusType
 } from '../../../src/worksheet/domain/worksheet'
 import { expect } from 'chai'
-import { QueueItem } from '../../../src/worksheet/models/queue-item'
+import { QueueItem, QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 import { worksheetBuilder } from '../worksheet.builder'
 import { worksheetQueueBuilder } from '../worksheet-queue.builder'
 import { removeScheduledCallFromItem } from '../../../src/worksheet/domain/queue'
@@ -54,7 +54,7 @@ describe('WorksheetQueue', () => {
         worksheets: [ {
           worksheetId: testWorksheet.id,
           operatorId: 'test-user-id',
-          status: 'OPENED',
+          status: QueueItemStatus.OPENED,
           addedAt: new Date(),
         } ]
       }).build()
