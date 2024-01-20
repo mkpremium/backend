@@ -2,11 +2,12 @@ import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { ScheduledEventTypeEnum } from '../../scheduled-events/types'
 
-export const QueueStatus = {
-  AVAILABLE: 'AVAILABLE',
-  OPENED: 'OPENED',
-  SCHEDULED: 'SCHEDULED',
+export enum QueueStatus {
+  AVAILABLE = 'AVAILABLE',
+  OPENED = 'OPENED',
+  SCHEDULED = 'SCHEDULED',
 }
+
 export const WorkSheetQueueStatus = t.enums(QueueStatus, 'WorkSheetQueueStatus')
 
 export interface QueueItemProps {
