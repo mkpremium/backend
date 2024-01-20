@@ -1,7 +1,5 @@
 import { takeWorksheet } from '../domain/worksheet'
-import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { WorksheetRepository } from '../repository/worksheet.repository'
 import { removeScheduledCall } from '../domain/queue'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { CallcenterWorksheetService } from './callcenter-worksheet.service'
@@ -9,12 +7,12 @@ import { CouchbaseWorksheetQueueRepository } from "../repository/couchbase-works
 import { EntityManager } from "typeorm";
 import { Worksheet } from "../worksheet.entity";
 import { Caller } from "../../caller/caller.entity";
+import { CouchbaseWorksheetRepository } from "../repository/couchbase-worksheet.repository";
 
 export class WorksheetQueueActionsService {
   constructor(
-    private worksheetQueueRepository: WorksheetQueueRepository,
     private couchbaseWorksheetQueueRepository: CouchbaseWorksheetQueueRepository,
-    private worksheetRepository: WorksheetRepository,
+    private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
     private callcenterWorksheetService: CallcenterWorksheetService,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
@@ -33,12 +31,12 @@ export class WorksheetQueueActionsService {
   }
 
   private async doCouchbase(queueId: string, worksheetId: string, userId: string) {
-    const queue = await this.worksheetQueueRepository.get(queueId)
-    const worksheet = await this.worksheetRepository.get(worksheetId)
+    const queue = await this.couchbaseWorksheetQueueRepository.get(queueId)
+    const worksheet = await this.couchbaseWorksheetRepository.get(worksheetId)
 
     const [queueWithWorksheet, worksheetInQueue] = takeWorksheet(queue, worksheet, userId)
 
-    await this.worksheetRepository.save(worksheetInQueue)
+    await this.couchbaseWorksheetRepository.save(worksheetInQueue)
     await this.couchbaseWorksheetQueueRepository.save(queueWithWorksheet)
     await this.eventBus.publish({name: DomainEventCatalog.WORKSHEET__TAKEN, worksheetId, queueId, by: userId})
   }
