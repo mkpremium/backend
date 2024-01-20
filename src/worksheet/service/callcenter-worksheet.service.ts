@@ -36,6 +36,7 @@ export class CallcenterWorksheetService {
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     let builder = this.getWorksheetQueryBuilder()
       .where('building.address ::jsonb @> :address', { address: { province: source.province } })
+      .andWhere('queue.id IS NULL')
     if (skipWorksheetId) {
       builder = builder.where('worksheet.id != :skipWorksheetId', { skipWorksheetId })
     }
