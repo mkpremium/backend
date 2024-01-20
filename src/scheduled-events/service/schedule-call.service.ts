@@ -1,6 +1,5 @@
 import { EventPublisher } from '../../infrastructure/event-bus'
-import type { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
-import { WorksheetRepository } from '../../worksheet/repository/worksheet.repository'
+import type { CallScheduledProps, ScheduledEventProps } from '../types'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
 import { CallSchedulerService } from '../../worksheet/service/call-scheduler.service'
@@ -8,6 +7,7 @@ import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-sche
 import { DataSource } from 'typeorm'
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { toScheduledCall } from '../repository/postgres-schedule-events.repository'
+import { CouchbaseWorksheetRepository } from "../../worksheet/repository/couchbase-worksheet.repository";
 
 export interface ScheduleCallCommand {
   event: Omit<CallScheduledProps, 'id' | 'type' | 'createdAt' | 'createdBy'> & {
@@ -34,7 +34,7 @@ export class ScheduleCallService {
     private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
     private callSchedulerService: CallSchedulerService,
     private worksheetQueueRepository: WorksheetQueueRepository,
-    private worksheetRepository: WorksheetRepository,
+    private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
     private ormDataSource: DataSource,
@@ -62,7 +62,7 @@ export class ScheduleCallService {
   }
 
   private async doCouchbase (cmd: ScheduleCallCommand) {
-    const worksheet = await this.worksheetRepository.ofBuildingId(cmd.event.event.buildingId)
+    const worksheet = await this.couchbaseWorksheetRepository.ofBuildingId(cmd.event.event.buildingId)
     cmd.event.event.worksheetId = worksheet.id
     const scheduledEvent = await this.couchbaseScheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)
 
