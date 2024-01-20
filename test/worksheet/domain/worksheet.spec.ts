@@ -63,6 +63,15 @@ describe('WorksheetQueue', () => {
 
       expect(queueWithWorksheet.worksheets).to.have.lengthOf(1)
     })
+
+    it('updates the viewedAt field', () => {
+      expect(testWorksheet.viewedAt).to.be.undefined
+      const testQueue = worksheetQueueBuilder().build()
+      const [ _, updatedWorksheet ] = takeWorksheet(testQueue, testWorksheet, 'test-user-id')
+
+
+      expect(updatedWorksheet.viewedAt).to.be.instanceof(Date)
+    })
   })
 })
 
