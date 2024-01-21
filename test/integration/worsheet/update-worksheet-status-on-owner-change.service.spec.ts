@@ -1,6 +1,3 @@
-import {
-  UpdateWorksheetStatusOnOwnerChangeService
-} from '../../../src/worksheet/service/update-worksheet-status-on-owner-change.service'
 import { createTestContainer } from '../../create-test-container'
 import { worksheetBuilder } from '../../worksheet/worksheet.builder'
 import { WorksheetRepository } from '../../../src/worksheet/repository/worksheet.repository'
@@ -11,7 +8,6 @@ import { worksheetEventListeners } from '../../../src/worksheet/listeners'
 import { DomainEventCatalog } from '../../../src/infrastructure/postgres/domain-event.entity'
 
 describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
-  let service: UpdateWorksheetStatusOnOwnerChangeService
   let worksheetRepository: WorksheetRepository
   let eventBus: EventBus
   const testWorksheet = worksheetBuilder().build()
@@ -28,7 +24,6 @@ describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
     const container = await createTestContainer()
     eventBus = container.resolve('eventBus')
     worksheetEventListeners(eventBus, container)
-    service = container.resolve('updateWorksheetStatusOnOwnerChangeService')
     worksheetRepository = container.resolve('worksheetRepository')
 
     await worksheetRepository.save(testWorksheet)
