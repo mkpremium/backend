@@ -219,3 +219,25 @@ export async function resolveDependencies(): Promise<ResolvedDeps> {
     worksheetRepository: container.resolve('worksheetRepository'),
   }
 }
+
+export async function createMeeting(testCaller: UserProps & {
+  callerId?: string;
+  flipperId?: string
+}, testFlipper: Flipper, testEmailContact: ContactProps & {
+  isFeatured: boolean
+}, testBuilding: BuildingProps, testOwner: OwnerProps, deps: ResolvedDeps) {
+  const testCmd = {
+    createdBy: testCaller.id,
+    notifyTo: testFlipper.user.id,
+    event: {
+      contactId: testEmailContact.id,
+      buildingId: testBuilding.id,
+      ownerId: testOwner.id,
+      eventAddress: '',
+      worksheetId: undefined,
+    },
+    eventDate: new Date()
+  }
+
+  await deps.createMeetingService.createMeeting({roles: [], id: ''}, testCmd)
+}

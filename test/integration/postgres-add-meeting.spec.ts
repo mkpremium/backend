@@ -1,5 +1,5 @@
 import { buildingFactory, userFactory } from '../factories'
-import { addCaller, createOwnerWithEmailContact, resolveDependencies } from '../helpers'
+import { addCaller, createMeeting, createOwnerWithEmailContact, resolveDependencies } from '../helpers'
 import { expect } from 'chai'
 
 describe('Add meeting (Integration - Postgres)', () => {
@@ -10,20 +10,7 @@ describe('Add meeting (Integration - Postgres)', () => {
     const testFlipper = await deps.addFlipperService.addFlipper(userFactory.build())
     const testCaller = await addCaller(deps)
 
-    const testCmd = {
-      createdBy: testCaller.id,
-      notifyTo: testFlipper.user.id,
-      event: {
-        contactId: testEmailContact.id,
-        buildingId: testBuilding.id,
-        ownerId: testOwner.id,
-        eventAddress: '',
-        worksheetId: undefined,
-      },
-      eventDate: new Date()
-    }
-
-    await deps.createMeetingService.createMeeting({ roles: [], id: '' }, testCmd)
+    await createMeeting(testCaller, testFlipper, testEmailContact, testBuilding, testOwner, deps);
 
     const flipperNegotiations = await deps.listBuildingsService.buildingsAssignedTo(testFlipper.user.id)
     expect(flipperNegotiations).to.be.lengthOf(1)

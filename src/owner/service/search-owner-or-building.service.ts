@@ -9,13 +9,19 @@ import { Owner } from '../owner.entity'
 import { BuildingProps } from '../../building/building'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
 import { ScheduledEvent } from "../../scheduled-events/scheduled-event.entity";
-import { getLastOfferRequestForBuildings } from "../../building/service/list-buildings.service";
+import { getLastOfferRequestForBuildings, LastBuildingOffer } from "../../building/service/list-buildings.service";
+import {
+  LastBuildingMeeting,
+  PostgresScheduledEventsRepository
+} from "../../scheduled-events/repository/postgres-schedule-events.repository";
+import moment from "moment";
 
 export class SearchOwnerOrBuildingService {
   constructor(
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private entityManager: EntityManager,
     private usePostgres: boolean,
+    private postgresScheduledEventsRepository: PostgresScheduledEventsRepository
   ) {
   }
 
@@ -50,9 +56,38 @@ export class SearchOwnerOrBuildingService {
       return []
     }
 
+    const mappedBuildings = await this.getBuildingsInformation(result);
+
+    return fromJSON(result.map(foundOwner => {
+      const matchingContactIdx = foundOwner.person.contacts.findIndex(cp => cp.contact.value === phoneNumber)
+      const owner = ownerEntityToStruct(foundOwner)
+      const {contacts} = owner.person
+      delete owner.person
+      const {building, lastOfferRequest, lastMeeting, scheduledCalls} = mappedBuildings[owner.buildingId]
+
+      return {
+        ...owner,
+        contacts,
+        building,
+        worksheetId: building.worksheetId,
+        negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
+        matchingContactId: foundOwner.person.contacts[matchingContactIdx].contact.id,
+        scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === building.id)
+          .map(se => ({at: se.scheduledFor.toISOString()})),
+        lastEvent: inferBuildingLastEvent(lastOfferRequest, lastMeeting)
+      } as FoundOwnerProps
+    }), t.list(FoundOwner))
+  }
+
+  private async getBuildingsInformation(foundOwners: Owner[]): Promise<Record<string, {
+    building: BuildingProps & { worksheetId: string },
+    lastOfferRequest?: LastBuildingOffer,
+    lastMeeting?: LastBuildingMeeting,
+    scheduledCalls: ScheduledEvent[]
+  }>> {
     const buildings = await this.entityManager.find(Building, {
       where: {
-        id: In(result.map(fo => fo.building.id))
+        id: In(foundOwners.map(fo => fo.building.id))
       },
       // Same as in PostgresBuildingsRepository#relations plus worksheet
       relations: {
@@ -69,35 +104,52 @@ export class SearchOwnerOrBuildingService {
       loadRelationIds: true,
     })
     const lastBuildingsOfferRequests = await getLastOfferRequestForBuildings(foundBuildingIds, this.entityManager)
-    const mappedBuildings = buildings.reduce((acc, b) => {
-      acc[b.id] = {...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id}
+    const lastMeetings = await this.postgresScheduledEventsRepository.lastMeetingForBuildings(foundBuildingIds)
+
+    return buildings.reduce((acc, b) => {
+      acc[b.id] = {
+        building: {...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id},
+        lastOfferRequest: lastBuildingsOfferRequests.find((offer) => offer.buildingId === b.id),
+        lastMeeting: lastMeetings.find((meeting) => meeting.buildingId === b.id),
+        scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === b.id)
+      }
       return acc
-    }, {} as Record<string, BuildingProps & { worksheetId: string }>)
-
-    return fromJSON(result.map(foundOwner => {
-      const matchingContactIdx = foundOwner.person.contacts.findIndex(cp => cp.contact.value === phoneNumber)
-      const owner = ownerEntityToStruct(foundOwner)
-      const {contacts} = owner.person
-      delete owner.person
-      const building = mappedBuildings[owner.buildingId]
-      const lastOfferRequest = lastBuildingsOfferRequests.find(({buildingId}) => buildingId === building.id)
-
-      return {
-        ...owner,
-        contacts,
-        building,
-        worksheetId: building.worksheetId,
-        negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
-        matchingContactId: foundOwner.person.contacts[matchingContactIdx].contact.id,
-        scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === building.id)
-          .map(se => ({at: se.scheduledFor.toISOString()})),
-        lastEvent: lastOfferRequest ? {
-          eventDate: lastOfferRequest.offer_createdAt.toISOString(),
-          ownerId: lastOfferRequest.ownerId,
-          flipperName: '',
-          type: 'offer-request',
-        } : undefined
-      } as FoundOwnerProps
-    }), t.list(FoundOwner))
+    }, {})
   }
+}
+
+function inferBuildingLastEvent(
+  lastOfferRequest?: LastBuildingOffer,
+  lastMeeting?: LastBuildingMeeting
+): FoundOwnerProps["lastEvent"] | undefined {
+  if (!lastMeeting) {
+    return lastOfferAsLastEvent(lastOfferRequest)
+  }
+  if (!lastOfferRequest) {
+    return lastMeetingAsLastEvent(lastMeeting)
+  }
+
+  if (moment(lastMeeting.meeting_scheduledFor).isAfter(lastOfferRequest.offer_createdAt)) {
+    return lastMeetingAsLastEvent(lastMeeting)
+  } else {
+    return lastOfferAsLastEvent(lastOfferRequest)
+  }
+}
+
+function lastOfferAsLastEvent(lastOfferRequest: LastBuildingOffer) {
+  return {
+    eventDate: lastOfferRequest.offer_createdAt.toISOString(),
+    ownerId: lastOfferRequest.ownerId,
+    flipperName: '',
+    type: 'offer-request',
+  } as FoundOwnerProps['lastEvent']
+}
+
+function lastMeetingAsLastEvent(lastMeeting: LastBuildingMeeting) {
+  return {
+    eventDate: lastMeeting.meeting_scheduledFor.toISOString(),
+    flipperName: "",
+    ownerId: lastMeeting.ownerId,
+    type: 'meeting'
+  } as FoundOwnerProps['lastEvent']
 }

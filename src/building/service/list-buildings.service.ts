@@ -67,7 +67,16 @@ export class ListBuildingsService {
   }
 }
 
-export async function getLastOfferRequestForBuildings(ids: string[], entityManager: EntityManager) {
+export interface LastBuildingOffer {
+  buildingId: string,
+  offer_createdAt: Date,
+  ownerId: string,
+}
+
+export async function getLastOfferRequestForBuildings(
+  ids: string[],
+  entityManager: EntityManager
+): Promise<LastBuildingOffer[]> {
   if (ids.length === 0) {
     return []
   }
@@ -79,9 +88,5 @@ export async function getLastOfferRequestForBuildings(ids: string[], entityManag
     .orderBy('offer.buildingId')
     .addOrderBy('offer.createdAt', 'DESC')
 
-  return await queryBuilder.getRawMany<{
-    buildingId: string,
-    offer_createdAt: Date,
-    ownerId: string,
-  }>();
+  return await queryBuilder.getRawMany<LastBuildingOffer>();
 }

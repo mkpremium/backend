@@ -4,9 +4,26 @@ import { ScheduledEvent } from '../scheduled-event.entity'
 import { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
 import { EntityTarget, Equal } from 'typeorm'
 
+export interface LastBuildingMeeting {
+  meeting_scheduledFor: Date,
+  buildingId: string,
+  ownerId: string
+}
+
 export class PostgresScheduledEventsRepository extends WithPostgresRepository<ScheduledEvent> implements ScheduledEventsRepository {
   addScheduledMeetingEvent (data: Omit<ScheduledEventProps, 'id' | 'type' | '_documentType' | 'createdAt'>, createdBy: string): Promise<CallScheduledProps> {
     throw new Error('Method not implemented.')
+  }
+
+  lastMeetingForBuildings(buildingIds: string[]): Promise<LastBuildingMeeting[]> {
+    return this.repository.createQueryBuilder('meeting')
+      .distinctOn(['meeting.buildingId'])
+      .select(['meeting.scheduledFor', 'meeting.ownerId', 'meeting.buildingId'])
+      .where('meeting.buildingId IN (:...buildingIds)', {buildingIds})
+      .andWhere('meeting.type = :eventType', {eventType: 'MEETING'})
+      .orderBy('meeting.buildingId')
+      .addOrderBy('meeting.buildingId', 'DESC')
+      .getRawMany<LastBuildingMeeting>()
   }
 
   update (id: string, data: Partial<ScheduledEventProps>): Promise<ScheduledEventProps> {

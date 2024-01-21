@@ -5,6 +5,7 @@ import {
   addCaller,
   addEmailToOwner,
   addOfferRequest,
+  createMeeting,
   createOwnerWithPhoneContact,
   resolveDependencies
 } from "../helpers";
@@ -14,7 +15,7 @@ describe('Search owner or building by phone', () => {
   it('found owners with matching phone contact', async () => {
     const deps = await resolveDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
-    await deps.worksheetRepository.save(worksheetBuilder({ relatedBuildingIds: [ testBuilding.id ] }).build())
+    await deps.worksheetRepository.save(worksheetBuilder({relatedBuildingIds: [testBuilding.id]}).build())
 
     const [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps)
     const testCallerUser = await addCaller(deps)
@@ -38,11 +39,17 @@ describe('Search owner or building by phone', () => {
     const testEmailContact = await addEmailToOwner(testOwner, deps)
     await addOfferRequest(testBuilding, testOwner, testEmailContact, testFlipper, testCallerUser, deps)
 
-    const result = await deps.searchOwnerOrBuildingService.search(testPhoneContact.value)
+    let result = await deps.searchOwnerOrBuildingService.search(testPhoneContact.value)
 
     expect(result).to.have.lengthOf(1)
-    const foundBuilding = result[0];
-    expect(foundBuilding.scheduledCalls).to.have.lengthOf(1)
-    expect(foundBuilding.lastEvent).to.be.ok
+    expect(result[0].scheduledCalls).to.have.lengthOf(1)
+    expect(result[0].lastEvent).to.include({type: 'offer-request'},
+      'Return last offer request as the last event')
+
+    await createMeeting(testCallerUser, testFlipper, testEmailContact, testBuilding, testOwner, deps);
+    result = await deps.searchOwnerOrBuildingService.search(testPhoneContact.value)
+
+    expect(result[0].lastEvent).to.include({type: 'meeting'},
+      'Return last meeting as the last event')
   })
 })
