@@ -72,6 +72,7 @@ export class CreateMeetingService {
 async function postgresCreateMeeting (cmd: AddMeetingCommand, ormDataSource: DataSource): Promise<ScheduledEventProps> {
   return ormDataSource.transaction<ScheduledEventProps>(async entityManager => {
     const meeting = await entityManager.save(ScheduledEvent, {
+      type: 'MEETING',
       scheduledFor: cmd.eventDate,
       notifyTo: { id: cmd.notifyTo },
       createdBy: { id: cmd.createdBy },

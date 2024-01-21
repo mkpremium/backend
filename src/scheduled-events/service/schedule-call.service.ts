@@ -47,7 +47,7 @@ export class ScheduleCallService {
 
   private async doPostgres (cmd: ScheduleCallCommand): Promise<ScheduledEventProps> {
     const savedEntity = await this.ormDataSource.manager.save(ScheduledEvent, {
-      type: 'CALLS',
+      type: 'CALL',
       scheduledFor: cmd.event.eventDate,
       notifyTo: { id: cmd.event.notifyTo },
       createdBy: { id: cmd.userId },
