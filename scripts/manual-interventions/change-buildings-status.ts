@@ -1,5 +1,4 @@
 import { initLogger } from '../../src/infrastructure/logger'
-import { BuildingsReadRepository } from '../../src/building/repository/buildings-read.repository'
 import { createDiContainer } from '../../src/infrastructure/dependencies'
 import {
   UpdateBuildingNegotiationStatusService
@@ -8,6 +7,7 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { fromPromise } from '../../src/infrastructure/fp-utils'
 import aws from 'aws-sdk'
+import { CouchbaseBuildingsReadRepository } from "../../src/building/repository/couchbase-buildings-read.repository";
 
 const logger = initLogger()
 const sqsClient = new aws.SQS({ region: 'eu-west-1' })
@@ -28,7 +28,7 @@ function loop (container, counter = { success: 0, error: 0 }, retries = 2) {
   if (retries <= 0) {
     return Promise.resolve()
   }
-  const buildingsReadRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
+  const buildingsReadRepository = container.resolve('couchbaseBuildingsReadRepository') as CouchbaseBuildingsReadRepository
   const updateBuildingNegotiationStatusService = container.resolve('updateBuildingNegotiationStatusService') as UpdateBuildingNegotiationStatusService
 
   return sqsClient.receiveMessage({

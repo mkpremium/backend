@@ -1,7 +1,7 @@
 import { ScheduledEventsRepository } from './schedule-events.repository'
 import { WithPostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { ScheduledEvent } from '../scheduled-event.entity'
-import { CallScheduledProps, ScheduledEventId, ScheduledEventProps } from '../types'
+import { ScheduledEventId, ScheduledEventProps } from '../types'
 import { EntityTarget, Equal } from 'typeorm'
 
 export interface LastBuildingMeeting {
@@ -11,10 +11,6 @@ export interface LastBuildingMeeting {
 }
 
 export class PostgresScheduledEventsRepository extends WithPostgresRepository<ScheduledEvent> implements ScheduledEventsRepository {
-  addScheduledMeetingEvent (data: Omit<ScheduledEventProps, 'id' | 'type' | '_documentType' | 'createdAt'>, createdBy: string): Promise<CallScheduledProps> {
-    throw new Error('Method not implemented.')
-  }
-
   lastMeetingForBuildings(buildingIds: string[]): Promise<LastBuildingMeeting[]> {
     return this.repository.createQueryBuilder('meeting')
       .distinctOn(['meeting.buildingId'])

@@ -64,7 +64,5 @@ export interface BuildingsReadRepository {
   listProposalsForBuilding (buildingId): Promise<unknown[]>
 
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]>
-
-  ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined>
 }
 

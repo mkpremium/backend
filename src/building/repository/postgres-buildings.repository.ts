@@ -26,12 +26,6 @@ export class PostgresBuildingsRepository
     images: true,
     proposals: true,
   }
-
-  // BuildingsRepository
-  pullBuildingsOutOfFreezer (buildingIds: string[]): Promise<void> {
-    return Promise.reject(new Error('Not implemented'))
-  }
-
   //   BuildingsReadRepository
 
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]> {
@@ -69,11 +63,6 @@ export class PostgresBuildingsRepository
       notificationEmail: p.notificationEmail,
     }))
   }
-
-  ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
-    throw new Error('Not implemented')
-  }
-
   protected getEntityTarget (): EntityTarget<Building> {
     return Building
   }

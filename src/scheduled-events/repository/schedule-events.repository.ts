@@ -1,5 +1,5 @@
 import t from 'tcomb'
-import { CallScheduledProps, Event, ScheduledEventProps } from '../types'
+import { Event, ScheduledEventProps } from '../types'
 
 export const UpdateScheduledEvent = t.struct<ScheduledEventProps>({
   eventDate: t.maybe(t.Date),
@@ -8,8 +8,6 @@ export const UpdateScheduledEvent = t.struct<ScheduledEventProps>({
 }, 'UpdateScheduledEvent')
 
 export interface ScheduledEventsRepository {
-  addScheduledMeetingEvent (data: Omit<ScheduledEventProps, 'id' | 'type' | 'createdAt' | '_documentType'>, createdBy: string): Promise<CallScheduledProps>
-
   update (id: string, data: Partial<ScheduledEventProps>): Promise<ScheduledEventProps>
   save (data: Omit<ScheduledEventProps, 'id'>): Promise<ScheduledEventProps>
   delete (id): Promise<void>
