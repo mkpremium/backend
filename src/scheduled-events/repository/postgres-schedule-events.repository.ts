@@ -26,10 +26,6 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     throw new Error('Method not implemented.')
   }
 
-  save (data: Omit<ScheduledEventProps, 'id'>): Promise<ScheduledEventProps> {
-    throw new Error('Method not implemented.')
-  }
-
   async delete (id: string): Promise<void> {
     await this.repository.delete(id)
   }
