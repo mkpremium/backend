@@ -2,7 +2,7 @@ import { EventPublisher } from '../../infrastructure/event-bus'
 import type { CallScheduledProps, ScheduledEventProps } from '../types'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { WorksheetQueueRepository } from '../../worksheet/repository/worksheet-queue.repository'
-import { CallSchedulerService } from '../../worksheet/service/call-scheduler.service'
+import { CouchbaseCallSchedulerService } from '../../worksheet/service/couchbase-call-scheduler.service'
 import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
 import { DataSource } from 'typeorm'
 import { ScheduledEvent } from '../scheduled-event.entity'
@@ -32,7 +32,7 @@ export interface CallScheduled {
 export class ScheduleCallService {
   constructor (
     private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
-    private callSchedulerService: CallSchedulerService,
+    private couchbaseCallSchedulerService: CouchbaseCallSchedulerService,
     private worksheetQueueRepository: WorksheetQueueRepository,
     private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
     private eventBus: EventPublisher,
@@ -67,7 +67,7 @@ export class ScheduleCallService {
     const scheduledEvent = await this.couchbaseScheduledEventsRepository.addScheduleCallEvent(cmd.event, cmd.userId)
 
     const queue = await this.worksheetQueueRepository.get(cmd.queueId)
-    await this.callSchedulerService.scheduleWorksheetInQueue(queue, scheduledEvent)
+    await this.couchbaseCallSchedulerService.scheduleWorksheetInQueue(queue, scheduledEvent)
 
     await this.publishCallScheduledEvent(cmd)
 

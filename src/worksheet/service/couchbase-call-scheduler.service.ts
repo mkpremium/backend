@@ -10,7 +10,7 @@ import { WorksheetRepository } from '../repository/worksheet.repository'
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
 import { Logger } from 'winston'
 
-export class CallSchedulerService {
+export class CouchbaseCallSchedulerService {
   constructor (
     private worksheetRepository: WorksheetRepository,
     private worksheetQueueRepository: WorksheetQueueRepository,

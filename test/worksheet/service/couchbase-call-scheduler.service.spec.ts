@@ -1,15 +1,20 @@
 import { expect } from 'chai'
 
-import { addWorksheet, CallSchedulerService } from '../../../src/worksheet/service/call-scheduler.service'
+import {
+  addWorksheet,
+  CouchbaseCallSchedulerService
+} from '../../../src/worksheet/service/couchbase-call-scheduler.service'
 import { createTestContainer } from '../../create-test-container'
 import uuid from 'uuid/v4'
 import { buildingBuilder } from '../../building/building.builder'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { worksheetQueueFactory } from '../../factories'
+import { WorksheetQueueRepository } from "../../../src/worksheet/repository/worksheet-queue.repository";
+import { QueueItemStatus } from "../../../src/worksheet/models/queue-item";
 
-describe('Worksheet scheduled calls', () => {
-  let service: CallSchedulerService
-  let queuesRepository
+describe('', () => {
+  let service: CouchbaseCallSchedulerService
+  let queuesRepository: WorksheetQueueRepository
   let worksheetRepository
 
   let testWorksheetQueue
@@ -32,42 +37,15 @@ describe('Worksheet scheduled calls', () => {
     eventDate: '2020-11-14T08:00:00.000Z'
   } as any
 
-  describe('with Postgres', () => {
-    beforeEach(async () => {
-      await beforeEachSetup(true)
-    })
+  beforeEach(beforeEachSetup)
 
-    it('schedules call for worksheet in queue', async () => {
-      await testAddCallToQueue()
-    })
-
-    it('schedules call and adds worksheet to queue', async () => {
-      await testAddWorksheetToQueue()
-    })
-  })
-
-  describe('with Couchbase', () => {
-    beforeEach(async () => {
-      await beforeEachSetup(false)
-    })
-
-    it('schedules call for worksheet in queue', async () => {
-      await testAddCallToQueue()
-    })
-
-    it('schedules call and adds worksheet to queue', async () => {
-      await testAddWorksheetToQueue()
-    })
-  })
-
-  async function testAddCallToQueue() {
+  it('schedules call for worksheet in queue', async () => {
     const queueWithWorksheet = await queuesRepository.save(addWorksheet(testWorksheetQueue, testWorksheet))
     const scheduledCall = await service.scheduleWorksheetInQueue(queueWithWorksheet, testCallToSchedule)
-
     expect(scheduledCall).to.not.be.empty
-  }
+  })
 
-  async function testAddWorksheetToQueue() {
+  it('schedules call and adds worksheet to queue', async () => {
     const scheduledCall = await service.scheduleWorksheetInQueue(testWorksheetQueue, testCallToSchedule)
 
     expect(scheduledCall).to.not.be.empty
@@ -75,14 +53,16 @@ describe('Worksheet scheduled calls', () => {
     const updatedQueue = await queuesRepository.get(testWorksheetQueue.id)
 
     expect(updatedQueue.worksheets.length).to.be.equal(1)
-    expect(updatedQueue.worksheets[ 0 ].worksheetId).to.be.equal(testWorksheet.id)
-  }
+    expect(updatedQueue.worksheets[0].worksheetId).to.be.equal(testWorksheet.id)
+    expect(updatedQueue.worksheets[0]).to.include({status: QueueItemStatus.SCHEDULED})
+  })
 
-  async function beforeEachSetup (usePostgres: boolean) {
-    const container = await createTestContainer({ couchbase: !usePostgres, postgres: usePostgres })
+
+  async function beforeEachSetup() {
+    const container = await createTestContainer({couchbase: true, postgres: false})
 
     queuesRepository = container.resolve('worksheetQueueRepository')
-    service = container.resolve('callSchedulerService')
+    service = container.resolve('couchbaseCallSchedulerService')
     worksheetRepository = container.resolve('worksheetRepository')
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const testBuilding = await buildingsRepository.save(buildingBuilder({}).build())
@@ -90,7 +70,7 @@ describe('Worksheet scheduled calls', () => {
 
     testWorksheet = await worksheetRepository.save({
       id: testWorksheetId,
-      relatedBuildingIds: [ testBuilding.id ],
+      relatedBuildingIds: [testBuilding.id],
     })
     testWorksheetQueue = await queuesRepository.save(worksheetQueueFactory.build())
   }
