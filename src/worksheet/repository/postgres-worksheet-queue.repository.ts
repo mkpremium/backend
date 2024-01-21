@@ -11,7 +11,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
   implements WorksheetQueueRepository {
   relations = {
     worksheets: {
-      heldBy: true
+      heldBy: {user: true},
     },
   }
 
@@ -23,7 +23,10 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
     return {
       id: struct.id,
       name: struct.name,
-      worksheets: struct.worksheets?.map(({ worksheetId }) => ({ id: worksheetId })) ?? [],
+      worksheets: struct.worksheets?.map((queueItem) => ({
+        id: queueItem.worksheetId,
+        heldBy: queueItem.operatorId ? {user: {id: queueItem.operatorId}} : null,
+      })) ?? [],
       source: struct.source,
       createdAt: struct.createdAt,
       updatedAt: struct.updatedAt,
@@ -39,7 +42,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
         (ws) => ({
           worksheetId: ws.id,
           addedAt: ws.lastViewedAt,
-          operatorId: ws.heldBy?.id,
+          operatorId: ws.heldBy?.user.id,
           status: inferWorksheetQueueItemStatus(ws, false),
         })
       ),
