@@ -1,4 +1,4 @@
-import { DataSource, In } from 'typeorm'
+import { EntityManager, In } from 'typeorm'
 import type { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
 import { FoundOwner, FoundOwnerProps } from '../repository/owner.repository'
 import { Building } from '../../building/building.entity'
@@ -8,27 +8,28 @@ import t from 'tcomb'
 import { Owner } from '../owner.entity'
 import { BuildingProps } from '../../building/building'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
+import { ScheduledEvent } from "../../scheduled-events/scheduled-event.entity";
 
 export class SearchOwnerOrBuildingService {
-  constructor (
+  constructor(
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
-    private ormDataSource: DataSource,
+    private entityManager: EntityManager,
     private usePostgres: boolean,
   ) {
   }
 
-  search (phoneNumber: string): Promise<FoundOwnerProps[]> {
+  search(phoneNumber: string): Promise<FoundOwnerProps[]> {
     return this.usePostgres ? this.searchByPhoneInPostgres(phoneNumber) : this.couchbaseOwnersRepository.findByPhoneNumber(phoneNumber)
   }
 
-  private async searchByPhoneInPostgres (phoneNumber: string): Promise<FoundOwnerProps[]> {
-    const result = await this.ormDataSource.manager.find(Owner, {
+  private async searchByPhoneInPostgres(phoneNumber: string): Promise<FoundOwnerProps[]> {
+    const result = await this.entityManager.find(Owner, {
       where: {
         person: {
           contacts: {
             contact: {
               value: phoneNumber,
-              type: In([ 'TELEFONO', 'MOVIL' ]),
+              type: In(['TELEFONO', 'MOVIL']),
             },
           },
         },
@@ -42,7 +43,11 @@ export class SearchOwnerOrBuildingService {
         building: true
       }
     })
-    const buildings = await this.ormDataSource.manager.find(Building, {
+    if (result.length === 0) {
+      return []
+    }
+
+    const buildings = await this.entityManager.find(Building, {
       where: {
         id: In(result.map(fo => fo.building.id))
       },
@@ -55,17 +60,21 @@ export class SearchOwnerOrBuildingService {
         worksheet: true,
       }
     })
+    const scheduledCalls = await this.entityManager.find(ScheduledEvent, {
+      where: {building: {id: In(buildings.map(({id}) => id))}},
+      loadRelationIds: true,
+    })
     const mappedBuildings = buildings.reduce((acc, b) => {
-      acc[ b.id ] = { ...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id }
+      acc[b.id] = {...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id}
       return acc
     }, {} as Record<string, BuildingProps & { worksheetId: string }>)
 
     return fromJSON(result.map(foundOwner => {
       const matchingContactIdx = foundOwner.person.contacts.findIndex(cp => cp.contact.value === phoneNumber)
       const owner = ownerEntityToStruct(foundOwner)
-      const { contacts } = owner.person
+      const {contacts} = owner.person
       delete owner.person
-      const building = mappedBuildings[ owner.buildingId ]
+      const building = mappedBuildings[owner.buildingId]
 
       return {
         ...owner,
@@ -73,8 +82,9 @@ export class SearchOwnerOrBuildingService {
         building,
         worksheetId: building.worksheetId,
         negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
-        matchingContactId: foundOwner.person.contacts[ matchingContactIdx ].contact.id,
-        scheduledCalls: [], // TODO: add scheduledCalls
+        matchingContactId: foundOwner.person.contacts[matchingContactIdx].contact.id,
+        scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === building.id)
+          .map(se => ({at: se.scheduledFor.toISOString()})),
         // TODO: add lastEvent
       }
     }), t.list(FoundOwner))
