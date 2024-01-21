@@ -1,6 +1,5 @@
 import { wrap } from 'express-promise-wrap'
 import { getPrivateUploadUrl } from '../aws'
-import { History } from '../history/models'
 import { OwnerRepository } from '../owner/repository/owner.repository'
 
 export function listBuildingProposalsControllerFactory (listBuildingProposalsService) {
