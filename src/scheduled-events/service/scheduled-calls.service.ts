@@ -33,6 +33,7 @@ class PostgresScheduledCallsService {
   static async scheduledCallsFor(entityManager: EntityManager, userId: string): Promise<ScheduledCallsView[]> {
     const scheduledEvents = await entityManager.find(ScheduledEvent, {
       where: {
+        type: 'CALL' as const,
         notifyTo: {
           id: userId
         }
@@ -45,7 +46,7 @@ class PostgresScheduledCallsService {
 
   static async getById(entityManager: EntityManager, callId: string): Promise<ScheduledCallsView> {
     const scheduledEvent = await entityManager.findOneOrFail(ScheduledEvent, {
-      where: {id: callId},
+      where: {id: callId, type: 'CALL' as const},
       relations: this.relations
     })
     return mapScheduledEventToScheduledCall(scheduledEvent)
