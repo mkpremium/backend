@@ -28,6 +28,8 @@ import { ScheduledEventsRepository } from "../src/scheduled-events/repository/sc
 import {
   PostgresScheduledEventsRepository
 } from "../src/scheduled-events/repository/postgres-schedule-events.repository";
+import { CallcenterWorksheetService } from "../src/worksheet/service/callcenter-worksheet.service";
+import { BuildingsReadRepository } from "../src/building/repository/buildings-read.repository";
 
 export function orFail() {
   return TE.orElse((error) => {
@@ -142,18 +144,23 @@ export interface ResolvedDeps {
   addOfferRequestService: AddOfferRequestService,
   addOperatorService: AddOperatorService
   addOwnerService: AddOwnerService
+  addProposalForBuildingService: AddProposalForBuildingService,
+  buildingsReadRepository: BuildingsReadRepository
   buildingsRepository: BuildingsRepository,
+  callcenterWorksheetService: CallcenterWorksheetService,
   listBuildingsService: ListBuildingsService
+
   postgresQueueRepository: PostgresWorksheetQueueRepository,
   postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
-  releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService
 
+  releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService,
   scheduleCallService: ScheduleCallService,
   scheduledCallsService: ScheduledCallsService,
 
   scheduledEventsRepository: ScheduledEventsRepository,
   searchOwnerOrBuildingService: SearchOwnerOrBuildingService,
   takeNextWorksheetService: TakeNextWorksheetService,
+
   worksheetRepository: PostgresWorksheetRepository,
 }
 
@@ -166,18 +173,24 @@ export async function resolveDependencies(): Promise<ResolvedDeps> {
     addOfferRequestService: container.resolve('addOfferRequestService'),
     addOperatorService: container.resolve('addOperatorService'),
     addOwnerService: container.resolve('addOwnerService'),
+    addProposalForBuildingService: container.resolve('addProposalForBuildingService'),
+    buildingsReadRepository: container.resolve('buildingsReadRepository'),
     buildingsRepository: container.resolve('buildingsRepository'),
+    callcenterWorksheetService: container.resolve('callcenterWorksheetService'),
     listBuildingsService: container.resolve('listBuildingsService'),
+
     postgresQueueRepository: container.resolve('postgresQueueRepository'),
     postgresScheduledEventsRepository: container.resolve('postgresScheduledEventsRepository'),
-    releaseUserOtherActiveWorksheetsInQueueService: container.resolve('releaseUserOtherActiveWorksheetsInQueueService'),
 
+    releaseUserOtherActiveWorksheetsInQueueService: container.resolve('releaseUserOtherActiveWorksheetsInQueueService'),
     scheduleCallService: container.resolve('scheduleCall'),
     scheduledCallsService: container.resolve('scheduledCallsService'),
-
     scheduledEventsRepository: container.resolve('scheduledEventsRepository'),
+
     searchOwnerOrBuildingService: container.resolve('searchOwnerOrBuildingService'),
+
     takeNextWorksheetService: container.resolve('takeNextWorksheetService'),
+
     worksheetRepository: container.resolve('worksheetRepository'),
   }
 }

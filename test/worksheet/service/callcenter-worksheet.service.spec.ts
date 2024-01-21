@@ -1,24 +1,15 @@
 import { CallcenterView } from '../../../src/worksheet/repository/worksheet.repository'
-import { createTestContainer } from '../../create-test-container'
 import { expect } from 'chai'
 import { worksheetBuilder } from '../worksheet.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { validate } from 'tcomb-validation'
-import { CallcenterWorksheetService } from '../../../src/worksheet/service/callcenter-worksheet.service'
-import { PostgresWorksheetRepository } from '../../../src/worksheet/repository/postgres-worksheet.repository'
-import { AddContactService } from '../../../src/owner/service/add-contact.service'
-import { AddProposalForBuildingService } from '../../../src/building/service/add-proposal-for-building.service'
-import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
-import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
-import { AddFlipperService } from '../../../src/flipper/service/add-flipper.service'
 import { Factory } from 'rosie'
-import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
-import { addProposal, createOwnerWithEmailContact } from '../../helpers'
+import { addProposal, createOwnerWithEmailContact, resolveDependencies } from '../../helpers'
 import { buildingFactory } from '../../factories'
 
 describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
-    const deps = await buildDependencies()
+    const deps = await resolveDependencies()
 
     const testBuilding = await deps.buildingsRepository.save(buildingBuilder({
       cadastre: {
@@ -30,7 +21,7 @@ describe('CallcenterWorksheetService', () => {
       await createOwnerWithEmailContact(testBuilding, deps)
     const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
-    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps.addProposalForBuildingService)
+    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps)
 
     const testWorksheet = await deps.worksheetRepository.save(worksheetBuilder({
         relatedBuildingIds: [ testBuilding.id ]
@@ -46,7 +37,7 @@ describe('CallcenterWorksheetService', () => {
   })
 
   it('gets next available worksheet in source', async () => {
-    const deps = await buildDependencies()
+    const deps = await resolveDependencies()
 
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
 
@@ -63,32 +54,3 @@ describe('CallcenterWorksheetService', () => {
     expect(nextWorksheet.relatedOwners[0].person.contacts[0].value).to.be.equal(testEmailContact.value)
   })
 })
-
-interface Deps {
-  addContactService: AddContactService,
-  addOwnerService: AddOwnerService,
-  addProposalForBuildingService: AddProposalForBuildingService,
-  callcenterWorksheetService: CallcenterWorksheetService,
-  worksheetRepository: PostgresWorksheetRepository,
-
-  buildingsRepository: BuildingsRepository,
-  buildingsReadRepository: BuildingsReadRepository,
-  addFlipperService: AddFlipperService,
-}
-
-async function buildDependencies (): Promise<Deps> {
-  const container = await createTestContainer({ couchbase: false, postgres: true })
-
-  return {
-    addContactService: container.resolve('addContactService'),
-    addOwnerService: container.resolve('addOwnerService'),
-    addProposalForBuildingService: container.resolve('addProposalForBuildingService'),
-
-    callcenterWorksheetService: container.resolve('callcenterWorksheetService'),
-
-    buildingsRepository: container.resolve('buildingsRepository'),
-    addFlipperService: container.resolve('addFlipperService'),
-    buildingsReadRepository: container.resolve('buildingsReadRepository'),
-    worksheetRepository: container.resolve('worksheetRepository'),
-  }
-}
