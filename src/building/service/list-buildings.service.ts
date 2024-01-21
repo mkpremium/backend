@@ -7,7 +7,7 @@ import { buildingEntityToReadModel } from '../repository/postgres-buildings.repo
 import { PostgresOwnersRepository } from '../../owner/repository/postgres-owners.repository'
 
 export class ListBuildingsService {
-  constructor (
+  constructor(
     private usePostgres: boolean,
     private entityManager: EntityManager,
     private postgresOwnersRepository: PostgresOwnersRepository,
@@ -15,25 +15,25 @@ export class ListBuildingsService {
   ) {
   }
 
-  buildingsOfId (ids: string | string[]): Promise<BuildingReadModel[]> {
+  buildingsOfId(ids: string | string[]): Promise<BuildingReadModel[]> {
     return this.usePostgres ?
       this.buildingOfIdInPostgres(ids) :
-      this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ ids ] : ids)
+      this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ids] : ids)
   }
 
-  buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
+  buildingsAssignedTo(flipperUserId: string): Promise<BuildingReadModel[]> {
     return this.usePostgres ?
       this.buildingAssignedToInPostgres(flipperUserId) :
       this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperUserId)
   }
 
-  private async buildingOfIdInPostgres (ids: string | string[]): Promise<BuildingReadModel[]> {
+  private async buildingOfIdInPostgres(ids: string | string[]): Promise<BuildingReadModel[]> {
     if (typeof ids === 'string') {
-      ids = [ ids ]
+      ids = [ids]
     }
 
     const buildings = await this.entityManager.find(Building, {
-      where: { id: In(ids) },
+      where: {id: In(ids)},
       // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
       relations: {
         featuredOwner: true,
@@ -42,7 +42,7 @@ export class ListBuildingsService {
       }
     })
 
-    const lastOfferRequests = await this.getLastOfferRequestForBuildings(ids);
+    const lastOfferRequests = await getLastOfferRequestForBuildings(ids, this.entityManager);
     const allBuildingOwners = await this.postgresOwnersRepository.buildingOwners(ids)
 
     return buildings.map((building) => {
@@ -50,26 +50,10 @@ export class ListBuildingsService {
       const buildingOwners = allBuildingOwners.filter(
         ({buildingId}) => buildingId === building.id)
       return buildingEntityToReadModel(building, {
-        lastOfferCreatedAt: lastOfferRequest?.lastOfferCreatedAt,
+        lastOfferCreatedAt: lastOfferRequest?.offer_createdAt,
         owners: buildingOwners,
       })
     })
-  }
-
-  private async getLastOfferRequestForBuildings(ids: string[]) {
-    if (ids.length === 0) {
-      return []
-    }
-    const queryBuilder = this.entityManager.createQueryBuilder(BuildingOfferRequest, 'offer')
-      .select('offer.buildingId', 'buildingId')
-      .addSelect('MAX(offer.createdAt)', 'lastOfferCreatedAt')
-      .where('offer.buildingId IN (:...ids)', {ids})
-      .groupBy('offer.buildingId')
-
-    return await queryBuilder.getRawMany<{
-      buildingId: string,
-      lastOfferCreatedAt: Date
-    }>();
   }
 
   private async buildingAssignedToInPostgres(flipperUserId: string) {
@@ -81,4 +65,23 @@ export class ListBuildingsService {
 
     return this.buildingOfIdInPostgres(buildings.map(({id}) => id))
   }
+}
+
+export async function getLastOfferRequestForBuildings(ids: string[], entityManager: EntityManager) {
+  if (ids.length === 0) {
+    return []
+  }
+
+  const queryBuilder = entityManager.createQueryBuilder(BuildingOfferRequest, 'offer')
+    .distinctOn(['offer.buildingId'])
+    .select(['offer.buildingId', 'offer.createdAt', 'offer.ownerId'])
+    .where('offer.buildingId IN (:...ids)', {ids})
+    .orderBy('offer.buildingId')
+    .addOrderBy('offer.createdAt', 'DESC')
+
+  return await queryBuilder.getRawMany<{
+    buildingId: string,
+    offer_createdAt: Date,
+    ownerId: string,
+  }>();
 }
