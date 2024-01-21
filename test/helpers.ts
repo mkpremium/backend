@@ -30,7 +30,6 @@ import {
 } from "../src/scheduled-events/repository/postgres-schedule-events.repository";
 import { CallcenterWorksheetService } from "../src/worksheet/service/callcenter-worksheet.service";
 import { BuildingsReadRepository } from "../src/building/repository/buildings-read.repository";
-import { Caller } from "../src/caller/caller.entity";
 import { CreateMeetingService } from "../src/scheduled-events/service/create-meeting.service";
 
 export function orFail() {
