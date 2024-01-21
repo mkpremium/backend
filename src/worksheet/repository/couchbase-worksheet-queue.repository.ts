@@ -21,10 +21,6 @@ export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<Works
     return fromJSON(rows, t.list(WorksheetQueue))
   }
 
-  delete (id: string): Promise<void> {
-    throw new Error('Method not implemented.')
-  }
-
   struct () {
     return WorksheetQueue
   }
