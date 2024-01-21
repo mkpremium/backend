@@ -49,7 +49,6 @@ export class PostgresBuildingsRepository
   }
 
   async listProposalsForBuilding (buildingId: string): Promise<ProposalProps[]> {
-    // TODO: move to proposals repository
     const proposals = await this.entityManager.find(Proposal, {
       where: { building: Equal(buildingId) },
       relations: {
