@@ -79,32 +79,34 @@ export class SearchOwnerOrBuildingService {
     }), t.list(FoundOwner))
   }
 
-  private async getBuildingsInformation(foundOwners: Owner[]): Promise<Record<string, {
+  private async getBuildingsInformation(owners: Owner[]): Promise<Record<string, {
     building: BuildingProps & { worksheetId: string },
     lastOfferRequest?: LastBuildingOffer,
     lastMeeting?: LastBuildingMeeting,
     scheduledCalls: ScheduledEvent[]
   }>> {
-    const buildings = await this.entityManager.find(Building, {
-      where: {
-        id: In(foundOwners.map(fo => fo.building.id))
-      },
-      // Same as in PostgresBuildingsRepository#relations plus worksheet
-      relations: {
-        assignedFlipper: true,
-        featuredOwner: true,
-        images: true,
-        proposals: true,
-        worksheet: true,
-      }
-    })
-    const foundBuildingIds = buildings.map(({id}) => id);
-    const scheduledCalls = await this.entityManager.find(ScheduledEvent, {
-      where: {building: {id: In(foundBuildingIds)}},
-      loadRelationIds: true,
-    })
-    const lastBuildingsOfferRequests = await getLastOfferRequestForBuildings(foundBuildingIds, this.entityManager)
-    const lastMeetings = await this.postgresScheduledEventsRepository.lastMeetingForBuildings(foundBuildingIds)
+    const buildingIds = owners.map(fo => fo.building.id);
+    const [buildings, scheduledCalls, lastBuildingsOfferRequests, lastMeetings] = await Promise.all([
+      this.entityManager.find(Building, {
+        where: {
+          id: In(buildingIds)
+        },
+        // Same as in PostgresBuildingsRepository#relations plus worksheet
+        relations: {
+          assignedFlipper: true,
+          featuredOwner: true,
+          images: true,
+          proposals: true,
+          worksheet: true,
+        }
+      }),
+      this.entityManager.find(ScheduledEvent, {
+        where: {building: {id: In(buildingIds)}},
+        loadRelationIds: true,
+      }),
+      getLastOfferRequestForBuildings(buildingIds, this.entityManager),
+      this.postgresScheduledEventsRepository.lastMeetingForBuildings(buildingIds),
+    ])
 
     return buildings.reduce((acc, b) => {
       acc[b.id] = {
