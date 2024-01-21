@@ -9,6 +9,7 @@ import { Owner } from '../owner.entity'
 import { BuildingProps } from '../../building/building'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
 import { ScheduledEvent } from "../../scheduled-events/scheduled-event.entity";
+import { getLastOfferRequestForBuildings } from "../../building/service/list-buildings.service";
 
 export class SearchOwnerOrBuildingService {
   constructor(
@@ -62,10 +63,12 @@ export class SearchOwnerOrBuildingService {
         worksheet: true,
       }
     })
+    const foundBuildingIds = buildings.map(({id}) => id);
     const scheduledCalls = await this.entityManager.find(ScheduledEvent, {
-      where: {building: {id: In(buildings.map(({id}) => id))}},
+      where: {building: {id: In(foundBuildingIds)}},
       loadRelationIds: true,
     })
+    const lastBuildingsOfferRequests = await getLastOfferRequestForBuildings(foundBuildingIds, this.entityManager)
     const mappedBuildings = buildings.reduce((acc, b) => {
       acc[b.id] = {...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id}
       return acc
@@ -77,6 +80,7 @@ export class SearchOwnerOrBuildingService {
       const {contacts} = owner.person
       delete owner.person
       const building = mappedBuildings[owner.buildingId]
+      const lastOfferRequest = lastBuildingsOfferRequests.find(({buildingId}) => buildingId === building.id)
 
       return {
         ...owner,
@@ -87,8 +91,13 @@ export class SearchOwnerOrBuildingService {
         matchingContactId: foundOwner.person.contacts[matchingContactIdx].contact.id,
         scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === building.id)
           .map(se => ({at: se.scheduledFor.toISOString()})),
-        // TODO: add lastEvent
-      }
+        lastEvent: lastOfferRequest ? {
+          eventDate: lastOfferRequest.offer_createdAt.toISOString(),
+          ownerId: lastOfferRequest.ownerId,
+          flipperName: '',
+          type: 'offer-request',
+        } : undefined
+      } as FoundOwnerProps
     }), t.list(FoundOwner))
   }
 }

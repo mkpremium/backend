@@ -1,7 +1,14 @@
 import { buildingFactory } from '../factories'
 import { expect } from 'chai'
 import { worksheetBuilder } from '../worksheet/worksheet.builder'
-import { addCaller, createOwnerWithPhoneContact, resolveDependencies } from "../helpers";
+import {
+  addCaller,
+  addEmailToOwner,
+  addOfferRequest,
+  createOwnerWithPhoneContact,
+  resolveDependencies
+} from "../helpers";
+import { Factory } from "rosie";
 
 describe('Search owner or building by phone', () => {
   it('found owners with matching phone contact', async () => {
@@ -27,10 +34,15 @@ describe('Search owner or building by phone', () => {
       }
     )
 
+    const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
+    const testEmailContact = await addEmailToOwner(testOwner, deps)
+    await addOfferRequest(testBuilding, testOwner, testEmailContact, testFlipper, testCallerUser, deps)
+
     const result = await deps.searchOwnerOrBuildingService.search(testPhoneContact.value)
 
     expect(result).to.have.lengthOf(1)
-    expect(result[0].scheduledCalls).to.have.lengthOf(1)
-    // expect(result[0].scheduledCalls.map(({id}) => id)).to.have.lengthOf(1)
+    const foundBuilding = result[0];
+    expect(foundBuilding.scheduledCalls).to.have.lengthOf(1)
+    expect(foundBuilding.lastEvent).to.be.ok
   })
 })
