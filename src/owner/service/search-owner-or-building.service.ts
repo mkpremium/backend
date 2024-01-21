@@ -19,7 +19,9 @@ export class SearchOwnerOrBuildingService {
   }
 
   search(phoneNumber: string): Promise<FoundOwnerProps[]> {
-    return this.usePostgres ? this.searchByPhoneInPostgres(phoneNumber) : this.couchbaseOwnersRepository.findByPhoneNumber(phoneNumber)
+    return this.usePostgres ?
+      this.searchByPhoneInPostgres(phoneNumber) :
+      this.couchbaseOwnersRepository.findByPhoneNumber(phoneNumber)
   }
 
   private async searchByPhoneInPostgres(phoneNumber: string): Promise<FoundOwnerProps[]> {
