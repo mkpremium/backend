@@ -18,7 +18,7 @@ describe('Search owner or building by phone', () => {
 
     const [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps)
     const testCallerUser = await addCaller(deps)
-    const scheduledCall = await deps.scheduleCallService.scheduleCall({
+    await deps.scheduleCallService.scheduleCall({
         event: {
           event: {
             ownerId: testOwner.id,
