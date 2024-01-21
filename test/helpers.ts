@@ -8,7 +8,7 @@ import { AddContactService, MaybeFeaturedContact } from '../src/owner/service/ad
 import { emailContactFactory, phoneContactFactory } from './factories'
 import { AddOperatorService } from '../src/user/service/add-operator.service'
 import { Factory } from 'rosie'
-import { UserProfileProps } from '../src/types/user'
+import { UserProfileProps, UserProps } from '../src/types/user'
 import { AddOwnerCommand, AddOwnerService } from '../src/owner/service/add-owner.service'
 import { BuildingsRepository } from "../src/building/repository/buildings.repository";
 import { PostgresWorksheetQueueRepository } from "../src/worksheet/repository/postgres-worksheet-queue.repository";
@@ -30,6 +30,8 @@ import {
 } from "../src/scheduled-events/repository/postgres-schedule-events.repository";
 import { CallcenterWorksheetService } from "../src/worksheet/service/callcenter-worksheet.service";
 import { BuildingsReadRepository } from "../src/building/repository/buildings-read.repository";
+import { Caller } from "../src/caller/caller.entity";
+import { CreateMeetingService } from "../src/scheduled-events/service/create-meeting.service";
 
 export function orFail() {
   return TE.orElse((error) => {
@@ -53,6 +55,24 @@ export async function addProposal(testBuilding: BuildingProps, testOwner: {
   await addProposalForBuildingService.add(testBuilding.id, testAddProposalCommand)
 
   return testAddProposalCommand
+}
+
+export async function addOfferRequest(testBuilding: BuildingProps, testOwner: {
+  id: string
+}, testEmailContact: ContactProps & {
+  isFeatured: boolean
+}, testFlipper: Flipper, testCaller: UserProps, {addOfferRequestService}) {
+  const testCmd = {
+    ownerId: testOwner.id,
+    destinationContactId: testEmailContact.id,
+    reporterContactId: testEmailContact.id,
+    buildingId: testBuilding.id,
+    flipperId: testFlipper.user.id,
+    callerId: testCaller.id, // caller's user ID
+    note: 'test-note'
+  }
+
+  await addOfferRequestService.addOfferRequest(testCmd)
 }
 
 type CreateOwnerDeps = {
@@ -152,15 +172,16 @@ export interface ResolvedDeps {
   buildingsReadRepository: BuildingsReadRepository
   buildingsRepository: BuildingsRepository,
   callcenterWorksheetService: CallcenterWorksheetService,
-  listBuildingsService: ListBuildingsService
+  createMeetingService: CreateMeetingService
 
+  listBuildingsService: ListBuildingsService,
   postgresQueueRepository: PostgresWorksheetQueueRepository,
-  postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
 
+  postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
   releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService,
   scheduleCallService: ScheduleCallService,
-  scheduledCallsService: ScheduledCallsService,
 
+  scheduledCallsService: ScheduledCallsService,
   scheduledEventsRepository: ScheduledEventsRepository,
   searchOwnerOrBuildingService: SearchOwnerOrBuildingService,
   takeNextWorksheetService: TakeNextWorksheetService,
@@ -181,6 +202,7 @@ export async function resolveDependencies(): Promise<ResolvedDeps> {
     buildingsReadRepository: container.resolve('buildingsReadRepository'),
     buildingsRepository: container.resolve('buildingsRepository'),
     callcenterWorksheetService: container.resolve('callcenterWorksheetService'),
+    createMeetingService: container.resolve('createMeetingService'),
     listBuildingsService: container.resolve('listBuildingsService'),
 
     postgresQueueRepository: container.resolve('postgresQueueRepository'),
