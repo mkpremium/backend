@@ -41,7 +41,7 @@ export async function addProposal(testBuilding: BuildingProps, testOwner: {
   id: string
 }, testEmailContact: ContactProps & {
   isFeatured: boolean
-}, testFlipper: Flipper, addProposalForBuildingService: AddProposalForBuildingService) {
+}, testFlipper: Flipper, {addProposalForBuildingService}) {
   const testAddProposalCommand = {
     buildingId: testBuilding.id,
     ownerId: testOwner.id,
@@ -89,13 +89,17 @@ export async function createOwnerWithPhoneContact(
 export async function createOwnerWithEmailContact(
   testBuilding: Pick<BuildingProps, 'id'>, {addOwnerService, addContactService}) {
   const testOwner = await createOwner(testBuilding, {addOwnerService})
-  const testEmailContact = await addContactService.addContact({
+  const testEmailContact = await addEmailToOwner(testOwner, {addContactService})
+
+  return [testOwner, testEmailContact] as [OwnerProps, MaybeFeaturedContact]
+}
+
+export async function addEmailToOwner(testOwner: OwnerProps, {addContactService}) {
+  return await addContactService.addContact({
     ...emailContactFactory.build(),
     isFeatured: true,
     ownerId: testOwner.id,
-  }) as MaybeFeaturedContact
-
-  return [testOwner, testEmailContact] as [OwnerProps, MaybeFeaturedContact]
+  }) as MaybeFeaturedContact;
 }
 
 async function createOwner(testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>

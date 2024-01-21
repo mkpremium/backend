@@ -23,7 +23,7 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
     const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
     const addProposalCmd =
-      await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps.addProposalForBuildingService)
+      await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps)
 
     const proposals = await deps.buildingsReadRepository.listProposalsForBuilding(testBuilding.id)
     expect(proposals).to.have.lengthOf(1)
