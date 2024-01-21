@@ -42,8 +42,8 @@ export class CreateMeetingService {
     this.checkOperatorPermissions(user, meetingAgentId)
 
     const createdMeeting = await (this.usePostgres ?
-      postgresCreateMeeting(cmd, this.ormDataSource) :
-      couchbaseCreateMeeting(cmd, user, meetingAgentId, {
+      doPostgres(cmd, this.ormDataSource) :
+      doCouchbase(cmd, user, meetingAgentId, {
         couchbaseScheduledEventsRepository: this.couchbaseScheduledEventsRepository,
         couchbaseBuildingsRepository: this.couchbaseBuildingsRepository,
       }))
@@ -69,7 +69,7 @@ export class CreateMeetingService {
 }
 
 
-async function postgresCreateMeeting (cmd: AddMeetingCommand, ormDataSource: DataSource): Promise<ScheduledEventProps> {
+async function doPostgres (cmd: AddMeetingCommand, ormDataSource: DataSource): Promise<ScheduledEventProps> {
   return ormDataSource.transaction<ScheduledEventProps>(async entityManager => {
     const meeting = await entityManager.save(ScheduledEvent, {
       type: 'MEETING',
@@ -98,7 +98,7 @@ interface CouchbaseDeps {
   couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
 }
 
-async function couchbaseCreateMeeting (requestBody, operator, meetingAgentId, {
+async function doCouchbase (requestBody, operator, meetingAgentId, {
   couchbaseScheduledEventsRepository,
   couchbaseBuildingsRepository
 }: CouchbaseDeps): Promise<ScheduledEventProps> {
