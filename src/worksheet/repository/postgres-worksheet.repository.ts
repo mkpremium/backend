@@ -11,16 +11,17 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
     lastViewedBy: true,
   }
 
-  ofBuildingId (buildingId: string): Promise<WorksheetProps> {
-    throw new Error('Method not implemented.')
+  async ofBuildingId(buildingId: string): Promise<WorksheetProps> {
+    const entity = await this.repository.findOne({where: {building: {id: buildingId}}, relations: this.relations})
+    return this.entityToStruct(entity)
   }
 
-  protected entityToStruct (entity: Worksheet): WorksheetProps {
+  protected entityToStruct(entity: Worksheet): WorksheetProps {
     return {
       id: entity.id,
       status: entity.status,
       queueId: entity.queue?.id,
-      relatedBuildingIds: [ entity.building.id ],
+      relatedBuildingIds: [entity.building.id],
       statusChangedAt: entity.lastStatusChangedAt,
       viewedAt: entity.lastViewedAt,
       viewedBy: entity.lastViewedBy?.id,
@@ -29,22 +30,22 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
     }
   }
 
-  protected structToEntity (struct: WorksheetProps): DeepPartial<Worksheet> {
+  protected structToEntity(struct: WorksheetProps): DeepPartial<Worksheet> {
     return this.repository.create({
       id: struct.id,
       status: struct.status,
       lastStatusChangedAt: struct.statusChangedAt,
       statusChangeReason: struct.statusChangeReason,
       lastViewedAt: struct.viewedAt,
-      lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
-      building: { id: struct.relatedBuildingIds[ 0 ] },
+      lastViewedBy: struct.viewedBy ? {id: struct.viewedBy} : null,
+      building: {id: struct.relatedBuildingIds[0]},
       createdAt: new Date(),
       updatedAt: new Date(),
-      queue: struct.queueId ? { id: struct.queueId } : null,
+      queue: struct.queueId ? {id: struct.queueId} : null,
     })
   }
 
-  protected getEntityTarget (): EntityTarget<Worksheet> {
+  protected getEntityTarget(): EntityTarget<Worksheet> {
     return Worksheet
   }
 }
