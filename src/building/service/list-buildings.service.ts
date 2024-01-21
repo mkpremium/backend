@@ -1,4 +1,4 @@
-import { DataSource, In } from 'typeorm'
+import { EntityManager, In } from 'typeorm'
 import { Building } from '../building.entity'
 import { BuildingReadModel } from '../repository/buildings-read.repository'
 import { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
@@ -9,7 +9,7 @@ import { PostgresOwnersRepository } from '../../owner/repository/postgres-owners
 export class ListBuildingsService {
   constructor (
     private usePostgres: boolean,
-    private ormDataSource: DataSource,
+    private entityManager: EntityManager,
     private postgresOwnersRepository: PostgresOwnersRepository,
     private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
   ) {
@@ -32,7 +32,7 @@ export class ListBuildingsService {
       ids = [ ids ]
     }
 
-    const buildings = await this.ormDataSource.manager.find(Building, {
+    const buildings = await this.entityManager.find(Building, {
       where: { id: In(ids) },
       // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
       relations: {
@@ -60,7 +60,7 @@ export class ListBuildingsService {
     if (ids.length === 0) {
       return []
     }
-    const queryBuilder = this.ormDataSource.manager.createQueryBuilder(BuildingOfferRequest, 'offer')
+    const queryBuilder = this.entityManager.createQueryBuilder(BuildingOfferRequest, 'offer')
       .select('offer.buildingId', 'buildingId')
       .addSelect('MAX(offer.createdAt)', 'lastOfferCreatedAt')
       .where('offer.buildingId IN (:...ids)', {ids})
@@ -73,7 +73,7 @@ export class ListBuildingsService {
   }
 
   private async buildingAssignedToInPostgres(flipperUserId: string) {
-    const buildings = await this.ormDataSource.manager.find(Building, {
+    const buildings = await this.entityManager.find(Building, {
       where: {
         assignedFlipper: {user: {id: flipperUserId}}
       },
