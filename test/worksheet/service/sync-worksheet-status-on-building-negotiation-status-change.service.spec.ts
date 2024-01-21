@@ -4,16 +4,16 @@ import {
 } from '../../../src/worksheet/service/sync-worksheet-status-on-building-negotiation-status-change.service'
 import { userBuilder } from '../../user/user.builder'
 import { buildingBuilder } from '../../building/building.builder'
-import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { worksheetBuilder } from '../worksheet.builder'
-import { WorksheetRepository } from '../../../src/worksheet/repository/worksheet.repository'
 import { expect } from 'chai'
+import { CouchbaseBuildingsRepository } from "../../../src/building/repository/couchbase-building.repository";
+import { CouchbaseWorksheetRepository } from "../../../src/worksheet/repository/couchbase-worksheet.repository";
 
 describe('SyncWorksheetStatusOnBuildingNegotiationStatusChangeService', () => {
   it('updates worksheet status', async () => {
     const container = await createTestContainer({ couchbase: true, postgres: false })
-    const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
-    const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
+    const buildingsRepository = container.resolve('couchbaseBuildingsRepository') as CouchbaseBuildingsRepository
+    const worksheetRepository = container.resolve('couchbaseWorksheetRepository') as CouchbaseWorksheetRepository
     const service = container.resolve('syncWorksheetStatusOnBuildingNegotiationStatusChangeService') as SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
     const testUser = userBuilder().build()
     const testBuilding = await buildingsRepository.save(buildingBuilder().build())

@@ -12,24 +12,26 @@ import { ScheduledEventType } from '../../scheduled-events/types'
 import {
   CouchbaseScheduledEventsRepository
 } from '../../scheduled-events/repository/couchbase-schedule-events.repository'
+import { CouchbaseWorksheetRepository } from "../repository/couchbase-worksheet.repository";
+import { CouchbaseBuildingsRepository } from "../../building/repository/couchbase-building.repository";
 
 export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   constructor (
-    private worksheetRepository: WorksheetRepository,
-    private buildingsRepository: BuildingsRepository,
+    private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
+    private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private ownersRepository: OwnerRepository,
     private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
   ) {
   }
 
   async updateWorksheet ({ buildingId }: Pick<BuildingNegotiationStatusChanged, 'buildingId' | 'userId'>) {
-    const worksheet = await this.worksheetRepository.ofBuildingId(buildingId)
-    const building = await this.buildingsRepository.get(buildingId)
+    const worksheet = await this.couchbaseWorksheetRepository.ofBuildingId(buildingId)
+    const building = await this.couchbaseBuildingsRepository.get(buildingId)
     const owners = await this.ownersRepository.buildingOwners(buildingId)
     const newStatus = await this.calculateFixedStatus({ worksheet, building, owners })
     const updatedWorksheet = setStatus(worksheet, newStatus)
 
-    await this.worksheetRepository.save(updatedWorksheet)
+    await this.couchbaseWorksheetRepository.save(updatedWorksheet)
   }
 
   private async calculateFixedStatus ({ building: relatedBuilding, worksheet, owners }) {
