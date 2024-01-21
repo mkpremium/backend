@@ -19,6 +19,12 @@ import {
 import { TakeNextWorksheetService } from "../src/worksheet/service/take-next-worksheet.service";
 import { createTestContainer } from "./create-test-container";
 import { SearchOwnerOrBuildingService } from "../src/owner/service/search-owner-or-building.service";
+import { AddOfferRequestService } from "../src/building/service/add-offer-request.service";
+import { ListBuildingsService } from "../src/building/service/list-buildings.service";
+import { AddFlipperService } from "../src/flipper/service/add-flipper.service";
+import type { ScheduleCallService } from "../src/scheduled-events/service/schedule-call.service";
+import { ScheduledCallsService } from "../src/scheduled-events/service/scheduled-calls.service";
+import { ScheduledEventsRepository } from "../src/scheduled-events/repository/schedule-events.repository";
 
 export function orFail() {
   return TE.orElse((error) => {
@@ -129,28 +135,44 @@ export async function addUserWithRole(service: AddOperatorService, role: 'BUSINE
 
 export interface ResolvedDeps {
   addContactService: AddContactService,
-  addOwnerService: AddOwnerService,
-  addOperatorService: AddOperatorService,
-  buildingsRepository: BuildingsRepository
-  postgresQueueRepository: PostgresWorksheetQueueRepository
-  worksheetRepository: PostgresWorksheetRepository,
+  addFlipperService: AddFlipperService,
+  addOfferRequestService: AddOfferRequestService,
+  addOperatorService: AddOperatorService
+  addOwnerService: AddOwnerService
+  buildingsRepository: BuildingsRepository,
+  listBuildingsService: ListBuildingsService
+  postgresQueueRepository: PostgresWorksheetQueueRepository,
   releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService
+
+  scheduleCallService: ScheduleCallService,
+  scheduledCallsService: ScheduledCallsService,
+
+  scheduledEventsRepository: ScheduledEventsRepository,
   searchOwnerOrBuildingService: SearchOwnerOrBuildingService,
-  takeNextWorksheetService: TakeNextWorksheetService
+  takeNextWorksheetService: TakeNextWorksheetService,
+  worksheetRepository: PostgresWorksheetRepository,
 }
 
 export async function resolveDependencies(): Promise<ResolvedDeps> {
   const container = await createTestContainer({couchbase: false, postgres: true})
 
   return {
-    addOwnerService: container.resolve('addOwnerService'),
     addContactService: container.resolve('addContactService'),
+    addFlipperService: container.resolve('addFlipperService'),
+    addOfferRequestService: container.resolve('addOfferRequestService'),
     addOperatorService: container.resolve('addOperatorService'),
+    addOwnerService: container.resolve('addOwnerService'),
     buildingsRepository: container.resolve('buildingsRepository'),
+    listBuildingsService: container.resolve('listBuildingsService'),
     postgresQueueRepository: container.resolve('postgresQueueRepository'),
-    worksheetRepository: container.resolve('worksheetRepository'),
     releaseUserOtherActiveWorksheetsInQueueService: container.resolve('releaseUserOtherActiveWorksheetsInQueueService'),
+
+    scheduleCallService: container.resolve('scheduleCall'),
+    scheduledCallsService: container.resolve('scheduledCallsService'),
+
+    scheduledEventsRepository: container.resolve('scheduledEventsRepository'),
     searchOwnerOrBuildingService: container.resolve('searchOwnerOrBuildingService'),
     takeNextWorksheetService: container.resolve('takeNextWorksheetService'),
+    worksheetRepository: container.resolve('worksheetRepository'),
   }
 }
