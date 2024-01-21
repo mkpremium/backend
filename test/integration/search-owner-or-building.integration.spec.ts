@@ -1,9 +1,9 @@
-import { buildingFactory } from '../../factories'
+import { buildingFactory } from '../factories'
 import { expect } from 'chai'
-import { worksheetBuilder } from '../../worksheet/worksheet.builder'
-import { addCaller, createOwnerWithPhoneContact, resolveDependencies } from "../../helpers";
+import { worksheetBuilder } from '../worksheet/worksheet.builder'
+import { addCaller, createOwnerWithPhoneContact, resolveDependencies } from "../helpers";
 
-describe('SearchOwnerOrBuildingService', () => {
+describe('Search owner or building by phone', () => {
   it('found owners with matching phone contact', async () => {
     const deps = await resolveDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
