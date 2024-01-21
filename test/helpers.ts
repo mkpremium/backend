@@ -10,6 +10,15 @@ import { AddOperatorService } from '../src/user/service/add-operator.service'
 import { Factory } from 'rosie'
 import { UserProfileProps } from '../src/types/user'
 import { AddOwnerCommand, AddOwnerService } from '../src/owner/service/add-owner.service'
+import { BuildingsRepository } from "../src/building/repository/buildings.repository";
+import { PostgresWorksheetQueueRepository } from "../src/worksheet/repository/postgres-worksheet-queue.repository";
+import { PostgresWorksheetRepository } from "../src/worksheet/repository/postgres-worksheet.repository";
+import {
+  ReleaseUserExtraOpenedWorksheetsInQueueService
+} from "../src/worksheet/service/release-user-extra-opened-worksheets-in-queue.service";
+import { TakeNextWorksheetService } from "../src/worksheet/service/take-next-worksheet.service";
+import { createTestContainer } from "./create-test-container";
+import { SearchOwnerOrBuildingService } from "../src/owner/service/search-owner-or-building.service";
 
 export function orFail() {
   return TE.orElse((error) => {
@@ -115,4 +124,33 @@ export async function addUserWithRole(service: AddOperatorService, role: 'BUSINE
     enable: true,
   }
   return await service.addOperator(testCommand, {id: 'admin'})
+}
+
+
+export interface ResolvedDeps {
+  addContactService: AddContactService,
+  addOwnerService: AddOwnerService,
+  addOperatorService: AddOperatorService,
+  buildingsRepository: BuildingsRepository
+  postgresQueueRepository: PostgresWorksheetQueueRepository
+  worksheetRepository: PostgresWorksheetRepository,
+  releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService
+  searchOwnerOrBuildingService: SearchOwnerOrBuildingService,
+  takeNextWorksheetService: TakeNextWorksheetService
+}
+
+export async function resolveDependencies(): Promise<ResolvedDeps> {
+  const container = await createTestContainer({couchbase: false, postgres: true})
+
+  return {
+    addOwnerService: container.resolve('addOwnerService'),
+    addContactService: container.resolve('addContactService'),
+    addOperatorService: container.resolve('addOperatorService'),
+    buildingsRepository: container.resolve('buildingsRepository'),
+    postgresQueueRepository: container.resolve('postgresQueueRepository'),
+    worksheetRepository: container.resolve('worksheetRepository'),
+    releaseUserOtherActiveWorksheetsInQueueService: container.resolve('releaseUserOtherActiveWorksheetsInQueueService'),
+    searchOwnerOrBuildingService: container.resolve('searchOwnerOrBuildingService'),
+    takeNextWorksheetService: container.resolve('takeNextWorksheetService'),
+  }
 }
