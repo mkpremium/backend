@@ -8,12 +8,8 @@ import type { saveDocumentsCommandHandler as saveDocumentsHandlerFactory } from 
 import type {
   importOwnerCommandHandler as importOwnerHandlerFactory
 } from '../../owner/service/import-owner-command-handler'
-import { ProposalProps } from '../../building/building'
-import { Proposal } from '../../building/proposal.entity'
-import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
 import { importOperatorCommandHandler } from './import-operator-command-handler'
-import { Building } from '../../building/building.entity'
 import { BuildingOwnerImportTriggerService } from '../service/building-owner-import-trigger.service'
 import { BuildingProposalsImporterService } from '../service/building-proposals-importer.service'
 import { BuildingImportTriggerService } from '../service/building-import-trigger.service'
