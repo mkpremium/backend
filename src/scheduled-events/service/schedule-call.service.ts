@@ -6,7 +6,7 @@ import { CouchbaseCallSchedulerService } from '../../worksheet/service/couchbase
 import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
 import { DataSource } from 'typeorm'
 import { ScheduledEvent } from '../scheduled-event.entity'
-import { toScheduledCall } from '../repository/postgres-schedule-events.repository'
+import { toScheduledEventProps } from '../repository/postgres-schedule-events.repository'
 import { CouchbaseWorksheetRepository } from "../../worksheet/repository/couchbase-worksheet.repository";
 
 export interface ScheduleCallCommand {
@@ -58,7 +58,7 @@ export class ScheduleCallService {
 
     await this.publishCallScheduledEvent(cmd)
 
-    return toScheduledCall(savedEntity)
+    return toScheduledEventProps(savedEntity)
   }
 
   private async doCouchbase (cmd: ScheduleCallCommand) {

@@ -28,7 +28,7 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     })
 
     const entity = await this.repository.findOne({where: {id}, relations: this.toScheduledCallRelations})
-    return toScheduledCall(entity)
+    return toScheduledEventProps(entity)
   }
 
   async delete (id: string): Promise<void> {
@@ -47,7 +47,7 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     if (!lastBuildingScheduledEvent)
       return null
 
-    return toScheduledCall(lastBuildingScheduledEvent)
+    return toScheduledEventProps(lastBuildingScheduledEvent)
   }
 
   private readonly toScheduledCallRelations = {
@@ -63,10 +63,10 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
   }
 }
 
-export function toScheduledCall(se: ScheduledEvent): ScheduledEventProps {
+export function toScheduledEventProps(se: ScheduledEvent): ScheduledEventProps {
   return {
     id: se.id as ScheduledEventId,
-    type: 'CALLS',
+    type: se.type === 'CALL' ? 'CALLS' : 'MEETINGS',
     createdBy: se.createdBy.id,
     eventDate: se.scheduledFor,
     notifyTo: se.notifyTo.id,
@@ -76,7 +76,7 @@ export function toScheduledCall(se: ScheduledEvent): ScheduledEventProps {
       contactId: se.contact.id,
       ownerId: se.owner.id,
       worksheetId: undefined,
-      inPerson: false,
+      inPerson: se.type === 'MEETING',
     }
   }
 }
