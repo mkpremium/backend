@@ -1,6 +1,6 @@
 import { CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
 import { BuildingMetadataProps } from '../../building/building'
-import { BuildingDocument } from '../../building/building-document.entity'
+import { BuildingDocument, BuildingDocumentMimeType } from '../../building/building-document.entity'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
 import { EventPublisher } from '../event-bus'
@@ -36,7 +36,7 @@ export class BuildingImagesImporterService extends BuildingRelatedDocumentMigrat
         await em.save(BuildingDocument, {
           id: document.id,
           name: original.name,
-          mimeType: original.mimeType,
+          mimeType: original.mimeType as BuildingDocumentMimeType,
           previewUrl: original.previewUrl,
           building: { id: buildingId },
         })

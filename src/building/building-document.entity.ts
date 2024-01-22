@@ -2,13 +2,15 @@ import { Column, Entity, ManyToOne } from 'typeorm'
 import { Building } from './building.entity'
 import { BaseEntity } from '../infrastructure/entity'
 
+export type BuildingDocumentMimeType = 'application/pdf' | 'image/jpeg'
+
 @Entity()
 export class BuildingDocument extends BaseEntity {
   @Column()
   name: string
 
   @Column()
-  mimeType: string // TODO: specify existing types
+  mimeType: BuildingDocumentMimeType
 
   @Column()
   previewUrl: string
