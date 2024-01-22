@@ -50,7 +50,11 @@ export function subscribeToCommand (
 
   eventBus.on(
     command,
-    `${command}_handler`,
+    commandHandlerName(command),
     service
   )
+}
+
+export function commandHandlerName(command: DomainEventCatalog) {
+  return `${command}_handler`
 }

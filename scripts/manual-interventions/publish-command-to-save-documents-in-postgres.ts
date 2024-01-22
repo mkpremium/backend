@@ -3,6 +3,8 @@ import { N1qlQuery } from 'couchbase'
 import { SQS } from 'aws-sdk'
 import { initLogger } from '../../src/infrastructure/logger'
 import { CommandPublisher } from '../../src/infrastructure/event-bus/command-publisher'
+import { DomainEventCatalog } from "../../src/infrastructure/postgres/domain-event.entity";
+import { commandHandlerName } from "../../src/infrastructure/listeners";
 
 const logger = initLogger()
 const sqsClient = new SQS({
@@ -22,7 +24,7 @@ connectCouchbaseBucket()
       const commandPublisher = new CommandPublisher(
         sqsClient,
         QUEUE_URL,
-        'postgres.save_documents_command_handler',
+        commandHandlerName(DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS),
         logger,
       )
       const allDocumentsQuery = bucket.query(
