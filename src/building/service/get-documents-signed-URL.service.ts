@@ -1,10 +1,13 @@
+import S3 from 'aws-sdk/clients/s3';
 import url from 'url'
+import { BuildingDocumentsRepository } from "../repository/building-documents.repository";
 
 export class GetDocumentsSignedURLService {
-  constructor (buildingDocumentsRepository, s3Client, documentBucket) {
-    this.buildingDocumentsRepository = buildingDocumentsRepository
-    this.s3Client = s3Client
-    this.documentBucket = documentBucket
+  constructor (
+    private buildingDocumentsRepository: BuildingDocumentsRepository,
+    private s3Client: S3,
+    private documentBucket: string,
+  ) {
   }
 
   async getDocumentsSignedURL (buildingId) {
