@@ -1,6 +1,6 @@
-import { CouchbaseDocument, CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
+import { CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
 import { BuildingMetadataProps } from '../../building/building'
-import { BuildingImage } from '../../building/building-image.entity'
+import { BuildingDocument } from '../../building/building-document.entity'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
 import { EventPublisher } from '../event-bus'
@@ -18,39 +18,38 @@ export class BuildingImagesImporterService extends BuildingRelatedDocumentMigrat
   }
 
   async importBuildingImages (buildingId: string) {
-    this.logger.info('Building imported, starting to import its images', { buildingId })
-    const images = await this.getBuildingNonMigratedRelatedDocuments(
+    this.logger.info('Building imported, starting to import its documents', { buildingId })
+    const documents = await this.getBuildingNonMigratedRelatedDocuments(
       CouchbaseDocumentType.METADATA, buildingId)
 
-    this.logger.info('Found images for building', { buildingId, count: images.length })
+    this.logger.info('Found documents for building', { buildingId, count: documents.length })
 
     await this.entityManager.transaction(async em => {
-      for (const image of images) {
-
-        const couchbaseDocument = await getCouchbaseDocument(em, image.id)
+      for (const document of documents) {
+        const couchbaseDocument = await getCouchbaseDocument(em, document.id)
         if (couchbaseDocument.migratedAt) {
-          this.logger.info('Image already migrated, skipping', { buildingId, imageId: image.id })
+          this.logger.info('Image already migrated, skipping', { buildingId, imageId: document.id })
           continue
         }
 
-        const original = image.document as BuildingMetadataProps
-        await em.save(BuildingImage, {
-          id: image.id,
+        const original = document.document as BuildingMetadataProps
+        await em.save(BuildingDocument, {
+          id: document.id,
           name: original.name,
           mimeType: original.mimeType,
           previewUrl: original.previewUrl,
           building: { id: buildingId },
         })
-        await markCouchbaseDocumentAsMigrated(em, image.id)
+        await markCouchbaseDocumentAsMigrated(em, document.id)
       }
 
       await this.eventBus.publish({
         name: DomainEventCatalog.BUILDING__BUILDING_IMAGES_IMPORTED,
         buildingId,
-        imageIds: images.map(i => i.id),
+        imageIds: documents.map(i => i.id),
       }, em)
     })
 
-    this.logger.info('All building images imported', { buildingId })
+    this.logger.info('All building documents imported', { buildingId })
   }
 }

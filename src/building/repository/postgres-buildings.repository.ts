@@ -23,7 +23,7 @@ export class PostgresBuildingsRepository
   protected relations = {
     assignedFlipper: true,
     featuredOwner: true,
-    images: true,
+    documents: true,
     proposals: true,
   }
   //   BuildingsReadRepository
@@ -34,7 +34,7 @@ export class PostgresBuildingsRepository
         {
           where: { assignedFlipper: Equal(flipperId), negotiationStatus: status },
           relations: {
-            images: true,
+            documents: true,
           }
         },
       )),
@@ -108,7 +108,7 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
       proposal: entity.recentProposal.amount,
       createdAt: entity.recentProposal.createdAt,
     } : undefined,
-    metadata: entity.images
+    metadata: entity.documents
   }
 }
 
@@ -137,7 +137,7 @@ export function buildingEntityToReadModel (
       province: b.address.province
     } : undefined,
     owner: toOwnerInBuildingRead(owner),
-    metadata: b.images.map(({ id, mimeType, previewUrl }) => ({
+    metadata: b.documents.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
       previewUrl,

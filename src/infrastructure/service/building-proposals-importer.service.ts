@@ -1,6 +1,5 @@
-import { CouchbaseDocument, CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
-import { BuildingMetadataProps, ProposalProps } from '../../building/building'
-import { BuildingImage } from '../../building/building-image.entity'
+import { CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
+import { ProposalProps } from '../../building/building'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
 import { EventPublisher } from '../event-bus'

@@ -37,7 +37,7 @@ export class ListBuildingsService {
       // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
       relations: {
         featuredOwner: true,
-        images: true,
+        documents: true,
         proposals: true,
       }
     })

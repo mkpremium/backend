@@ -55,7 +55,7 @@ export class CallcenterWorksheetService {
       .innerJoinAndSelect('owners.person', 'person')
       .innerJoinAndSelect('person.contacts', 'contacts')
       .innerJoinAndSelect('contacts.contact', 'contact')
-      .leftJoinAndSelect('building.images', 'images')
+      .leftJoinAndSelect('building.documents', 'documents')
       .leftJoinAndSelect('worksheet.queue', 'queue')
       .leftJoinAndSelect('building.proposals', 'proposals')
   }

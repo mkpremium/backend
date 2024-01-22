@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { BuildingAddressProps, BuildingLocation, BuildingNegotiationStatus, Lead } from './building'
-import { BuildingImage } from './building-image.entity'
+import { BuildingDocument } from './building-document.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { Owner } from '../owner/owner.entity'
 import { Flipper } from '../flipper/flipper.entity'
@@ -43,8 +43,8 @@ export class Building extends BaseEntity {
   @OneToMany(() => Proposal, proposal => proposal.building)
   proposals?: Proposal[]
 
-  @OneToMany(() => BuildingImage, image => image.building)
-  images: BuildingImage[]
+  @OneToMany(() => BuildingDocument, document => document.building)
+  documents: BuildingDocument[]
 
   @OneToMany(() => Owner, owner => owner.building)
   owners: Owner[]

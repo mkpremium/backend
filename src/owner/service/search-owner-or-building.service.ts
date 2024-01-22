@@ -95,7 +95,7 @@ export class SearchOwnerOrBuildingService {
         relations: {
           assignedFlipper: true,
           featuredOwner: true,
-          images: true,
+          documents: true,
           proposals: true,
           worksheet: true,
         }
