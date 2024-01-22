@@ -2,11 +2,13 @@ import moment from 'moment'
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 import { OwnerProps, OwnerStatus } from '../../src/owner/owner'
-import { ScheduledEventsRepository } from '../../src/scheduled-events/repository/schedule-events.repository'
 import { closeSellStock } from '../../src/stock/application'
 import { Worksheet } from '../../src/worksheet/domain/worksheet'
 import { BuildingProps } from '../../src/building/building'
 import { DeepPartial } from 'typeorm'
+import {
+  CouchbaseScheduledEventsRepository
+} from "../../src/scheduled-events/repository/couchbase-schedule-events.repository";
 
 const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
@@ -143,6 +145,6 @@ export const createMeeting = (app, {
     'eventDate': meetingDate.toISOString()
   }
 
-  const repo = app.locals.diContainer.resolve('scheduledEventsRepository') as ScheduledEventsRepository
+  const repo = app.locals.diContainer.resolve('couchbaseScheduledEventsRepository') as CouchbaseScheduledEventsRepository
   return repo.addScheduledMeetingEvent(meeting, propertyAgentId)
 }

@@ -8,6 +8,6 @@ export const UpdateScheduledEvent = t.struct<ScheduledEventProps>({
 }, 'UpdateScheduledEvent')
 
 export interface ScheduledEventsRepository {
-  update (id: string, data: Partial<ScheduledEventProps>): Promise<ScheduledEventProps>
+  update (id: string, data: Pick<ScheduledEventProps, 'eventDate'>): Promise<ScheduledEventProps>
   delete (id): Promise<void>
 }

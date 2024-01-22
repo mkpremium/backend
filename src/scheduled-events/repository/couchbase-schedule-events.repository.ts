@@ -8,7 +8,7 @@ import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { CallScheduledProps, ScheduledEvent, ScheduledEventProps } from '../types'
-import { ScheduledEventsRepository, UpdateScheduledEvent } from './schedule-events.repository'
+import { ScheduledEventsRepository } from './schedule-events.repository'
 import { ScheduleCallCommand } from '../service/schedule-call.service'
 
 export class CouchbaseScheduledEventsRepository extends CouchbaseModel
@@ -53,17 +53,11 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
     return this.save(params)
   }
 
-  async update (id: string, data: ScheduledEventProps) {
+  async update (id: string, data: Pick<ScheduledEventProps, 'eventDate'>) {
     const scheduledEvent = await this.findByIdOrThrow(id)
-    fromJSON(data, UpdateScheduledEvent)
-    const updatedEvent = t.update(scheduledEvent.event, {
-      $merge: data.event
-    })
     const updatedScheduledEventData = t.update(scheduledEvent, {
       $merge: {
         eventDate: data.eventDate,
-        createdBy: data.createdBy,
-        event: updatedEvent,
       }
     })
 

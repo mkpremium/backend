@@ -1,27 +1,26 @@
 import { expect } from 'chai'
-import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
 import { createTestContainer } from '../../create-test-container'
 import { buildingBuilder } from '../building.builder'
-import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { pipe } from 'fp-ts/function'
 import { map } from 'fp-ts/TaskEither'
 import { orFail } from '../../helpers'
-import { OwnerRepository } from '../../../src/owner/repository/owner.repository'
 import { ownerBuilder } from '../../owner/owner.builder'
 import { AwilixContainer } from 'awilix'
 import { CouchbaseBuildingsReadRepository } from '../../../src/building/repository/couchbase-buildings-read.repository'
+import { CouchbaseBuildingsRepository } from '../../../src/building/repository/couchbase-building.repository'
+import { CouchbaseOwnersRepository } from "../../../src/owner/repository/couchbase-owners.repository";
 
 describe('Lead assignment to flipper (Couchbase)', () => {
-  let readRepository: BuildingsReadRepository
-  let writeRepository: BuildingsRepository
-  let ownersRepository: OwnerRepository
+  let readRepository: CouchbaseBuildingsReadRepository
+  let writeRepository: CouchbaseBuildingsRepository
+  let ownersRepository: CouchbaseOwnersRepository
   let container: AwilixContainer
 
   beforeEach(async () => {
     container = await createTestContainer({postgres: false, couchbase: true})
-    writeRepository = container.resolve('buildingsRepository') as BuildingsRepository
-    readRepository = container.resolve('buildingsReadRepository') as BuildingsReadRepository
-    ownersRepository = container.resolve('ownersRepository') as OwnerRepository
+    writeRepository = container.resolve('couchbaseBuildingsRepository') as CouchbaseBuildingsRepository
+    readRepository = container.resolve('couchbaseBuildingsReadRepository') as CouchbaseBuildingsReadRepository
+    ownersRepository = container.resolve('couchbaseOwnersRepository') as CouchbaseOwnersRepository
   })
 
   it('gets flipper leads', async () => {

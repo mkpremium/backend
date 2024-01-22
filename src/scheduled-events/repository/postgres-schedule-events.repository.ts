@@ -22,8 +22,13 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
       .getRawMany<LastBuildingMeeting>()
   }
 
-  update (id: string, data: Partial<ScheduledEventProps>): Promise<ScheduledEventProps> {
-    throw new Error('Method not implemented.')
+  async update(id: string, {eventDate}: Pick<ScheduledEventProps, 'eventDate'>): Promise<ScheduledEventProps> {
+    await this.repository.update({id}, {
+      scheduledFor: eventDate
+    })
+
+    const entity = await this.repository.findOne({where: {id}, relations: this.toScheduledCallRelations})
+    return toScheduledCall(entity)
   }
 
   async delete (id: string): Promise<void> {
@@ -32,17 +37,12 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
 
   // Different to one in the Couchbase repository which seem to be intended for the
   // proposal sender only.
-  async lastScheduledEventForBuilding (buildingId: string): Promise<ScheduledEventProps> {
+
+  async lastScheduledEventForBuilding(buildingId: string): Promise<ScheduledEventProps> {
     const lastBuildingScheduledEvent = await this.repository.findOne({
-      order: { scheduledFor: 'DESC' },
-      relations: {
-        building: true,
-        contact: true,
-        createdBy: true,
-        notifyTo: true,
-        owner: true,
-      },
-      where: { building: Equal(buildingId) }
+      order: {scheduledFor: 'DESC'},
+      relations: this.toScheduledCallRelations,
+      where: {building: Equal(buildingId)}
     })
     if (!lastBuildingScheduledEvent)
       return null
@@ -50,12 +50,20 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     return toScheduledCall(lastBuildingScheduledEvent)
   }
 
-  protected getEntityTarget (): EntityTarget<ScheduledEvent> {
+  private readonly toScheduledCallRelations = {
+    building: true,
+    contact: true,
+    createdBy: true,
+    notifyTo: true,
+    owner: true,
+  };
+
+  protected getEntityTarget(): EntityTarget<ScheduledEvent> {
     return ScheduledEvent
   }
 }
 
-export function toScheduledCall (se: ScheduledEvent): ScheduledEventProps {
+export function toScheduledCall(se: ScheduledEvent): ScheduledEventProps {
   return {
     id: se.id as ScheduledEventId,
     type: 'CALLS',
