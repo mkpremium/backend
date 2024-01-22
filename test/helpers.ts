@@ -31,6 +31,7 @@ import {
 import { CallcenterWorksheetService } from "../src/worksheet/service/callcenter-worksheet.service";
 import { BuildingsReadRepository } from "../src/building/repository/buildings-read.repository";
 import { CreateMeetingService } from "../src/scheduled-events/service/create-meeting.service";
+import { AwilixContainer } from "awilix";
 
 export function orFail() {
   return TE.orElse((error) => {
@@ -162,6 +163,7 @@ export async function addUserWithRole(service: AddOperatorService, role: 'BUSINE
 
 
 export interface ResolvedDeps {
+  container: AwilixContainer,
   addContactService: AddContactService,
   addFlipperService: AddFlipperService,
   addOfferRequestService: AddOfferRequestService,
@@ -192,6 +194,7 @@ export async function resolveDependencies(): Promise<ResolvedDeps> {
   const container = await createTestContainer({couchbase: false, postgres: true})
 
   return {
+    container,
     addContactService: container.resolve('addContactService'),
     addFlipperService: container.resolve('addFlipperService'),
     addOfferRequestService: container.resolve('addOfferRequestService'),
