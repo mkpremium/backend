@@ -1,18 +1,17 @@
-import { Router } from 'express'
-import { wrap } from 'express-promise-wrap'
+import {Router} from 'express'
+import {wrap} from 'express-promise-wrap'
 import {
   allAgentsStockStatsControllerFactory,
   listBuildingProposalsControllerFactory,
   listVerifiedOwnersControllerFactory,
   setBuildingSalePriceControllerFactory,
-  signDocumentsUrlControllerFactory, metadataUploadUrlControllerFactory
+  signDocumentsUrlControllerFactory
 } from './controllers'
 
 export const createBuildingsRoutes = container => {
   const router = Router()
 
   router.post('/', wrap(container.resolve('createBuildingController')))
-  router.post('/create-url', wrap(metadataUploadUrlControllerFactory))
 
   router.post('/:buildingId/documents-signed-urls',
     signDocumentsUrlControllerFactory(container.resolve('getDocumentsSignedURLService')))

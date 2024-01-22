@@ -1,5 +1,4 @@
 import { wrap } from 'express-promise-wrap'
-import { getPrivateUploadUrl } from '../aws'
 import { OwnerRepository } from '../owner/repository/owner.repository'
 import { ListBuildingProposalsService } from "./service/list-building-proposals.service";
 
@@ -7,11 +6,6 @@ export function listBuildingProposalsControllerFactory (listBuildingProposalsSer
   return wrap(async (req, res) => {
     res.send(await listBuildingProposalsService.forBuilding(req.params.buildingId))
   })
-}
-
-export async function metadataUploadUrlControllerFactory (req, res) {
-  const url = getPrivateUploadUrl('metadata', req.body)
-  res.json({ url })
 }
 
 export function addNegotiationProposalControllerFactory ({

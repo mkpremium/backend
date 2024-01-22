@@ -4,38 +4,11 @@ import url from 'url'
 import uuid from 'uuid/v4'
 import { exec } from 'child_process'
 import fs from 'fs-extra'
-import t from 'tcomb'
 import mime from 'mime-types'
 import { logger } from '../infrastructure/logger'
 
 import { metadataS3Config } from '../../config'
 import { PutObjectRequest } from 'aws-sdk/clients/s3'
-
-type SignedUrlRequestProps = {
-  fileName: string;
-  fileType: string;
-}
-const SignedUrlRequest = t.struct<SignedUrlRequestProps>({
-  fileName: t.String,
-  fileType: t.String
-})
-
-export function getPrivateUploadUrl (prefix, config) {
-  const { fileName, fileType } = SignedUrlRequest(config)
-  const s3 = new aws.S3()
-  const Key = keyName(prefix, fileName)
-
-  const params = {
-    Bucket: metadataS3Config.bucket,
-    Region: metadataS3Config.region,
-    Key,
-    Expires: 900,
-    ACL: 'private',
-    ContentType: fileType
-  }
-
-  return s3.getSignedUrl('putObject', params)
-}
 
 export async function uploadFile (prefix, filepath) {
   if (!filepath) {
