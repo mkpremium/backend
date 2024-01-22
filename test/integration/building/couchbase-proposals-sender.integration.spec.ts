@@ -13,7 +13,7 @@ import { userBuilder } from '../../user/user.builder'
 import moment from 'moment-timezone'
 import { CouchbaseUsersRepository } from '../../../src/user/repository/couchbase-users.repository'
 
-describe('ProposalsSenderService - Integration', () => {
+describe('ProposalsSenderService - Integration (Couchbase)', () => {
   let service!: ProposalsSenderService
   let addProposalForBuildingService!: AddProposalForBuildingService
   let mailerSpy
