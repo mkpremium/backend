@@ -140,13 +140,13 @@
       "dockerLabels": null,
       "systemControls": null,
       "privileged": null,
-      "name": "events-worker"
+      "name": "migration-worker"
     }
   ],
   "placementConstraints": [],
   "memory": "1024",
   "taskRoleArn": "backend-role",
-  "family": "events-worker",
+  "family": "migration-worker",
   "pidMode": null,
   "requiresCompatibilities": [
     "FARGATE"
