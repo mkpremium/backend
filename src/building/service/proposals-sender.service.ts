@@ -7,10 +7,8 @@ import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
 import moment from 'moment'
 import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
-import { CouchbaseUsersRepository } from '../../user/repository/couchbase-users.repository'
-import {
-  CouchbaseScheduledEventsRepository
-} from '../../scheduled-events/repository/couchbase-schedule-events.repository'
+import { UsersRepository } from "../../user/repository/users.repository";
+import { ScheduledEventsRepository } from "../../scheduled-events/repository/schedule-events.repository";
 
 function isFridayOrWeekend (lastScheduledEventDateToInclude: moment.Moment) {
   return [ 5, 6, 7 ].includes(lastScheduledEventDateToInclude.isoWeekday())
@@ -20,10 +18,10 @@ export class ProposalsSenderService {
   constructor (
     private proposalsRepository: ProposalsRepository,
     private emailSender: EmailSenderService,
-    private couchbaseUsersRepository: CouchbaseUsersRepository,
+    private usersRepository: UsersRepository,
     private pdfProposalComposer: PdfProposalComposer,
     private buildingsRepository: BuildingsRepository,
-    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
+    private scheduledEventsRepository: ScheduledEventsRepository,
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private logger: Logger,
   ) {
@@ -74,8 +72,8 @@ export class ProposalsSenderService {
   private async processProposal (proposal: ProposalProps, lastScheduledEventDateToInclude: moment.Moment): Promise<boolean> {
     const [ building, sender, lastScheduledEvent ] = await Promise.all([
       this.buildingsRepository.get(proposal.buildingId),
-      this.couchbaseUsersRepository.get(proposal.createdBy),
-      this.couchbaseScheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
+      this.usersRepository.get(proposal.createdBy),
+      this.scheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
     ])
     if (lastScheduledEvent && moment(lastScheduledEvent.eventDate).isAfter(lastScheduledEventDateToInclude)) {
       return false

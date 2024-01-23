@@ -69,29 +69,29 @@ export const BuildingProposal = t.struct<ProposalProps>(
     id: t.String,
     ownerId: t.String,
     buildingId: t.String,
-    createdAt: t.union([ t.Date, DateTimeString ]),
+    createdAt: t.union([t.Date, DateTimeString]),
     createdBy: t.String,
-    updatedAt: t.maybe(t.union([ t.Date, DateTimeString ])),
+    updatedAt: t.maybe(t.union([t.Date, DateTimeString])),
 
     aspiration: t.maybe(t.Number),
     proposal: t.maybe(t.Number),
     state: t.enums.of(Object.values(BuildingProposalStatus)),
     message: t.maybe(t.String),
-    notificationStatus: t.maybe(t.enums.of([ 'PENDING', 'SENT' ])),
-    notificationSentAt: t.maybe(t.union([ t.Date, DateTimeString ])),
+    notificationStatus: t.maybe(t.enums.of(['PENDING', 'SENT'])),
+    notificationSentAt: t.maybe(t.union([t.Date, DateTimeString])),
     notificationEmail: t.maybe(t.String),
 
-    _documentType: t.enums.of([ 'building-proposal' ])
+    _documentType: t.enums.of(['building-proposal'])
   },
   {
     name: 'BuildingProposal',
     defaultProps: {
       state: BuildingProposalStatus.PENDING,
       accepted: false,
-      get id () {
+      get id() {
         return uuid()
       },
-      get createdAt () {
+      get createdAt() {
         return new Date()
       },
       _documentType: 'building-proposal'
@@ -131,10 +131,10 @@ const BuildingEntity = t.struct(
       status: buildingEntitiesDefaultStatus,
       surface: 0,
       rent: 0,
-      get id () {
+      get id() {
         return uuid()
       },
-      get createdBy () {
+      get createdBy() {
         return new Date()
       }
     }
@@ -206,6 +206,8 @@ export interface BuildingMetadataProps {
   previewUrl: string
 }
 
+type RecentBuildingProposal = Pick<ProposalProps, 'proposal' | 'createdAt'>;
+
 export interface BuildingProps {
   id: string;
   address: BuildingAddressProps;
@@ -219,7 +221,7 @@ export interface BuildingProps {
   lead?: Lead
   assignedAgentId?: string;
   use?: string;
-  recentProposal?: Pick<ProposalProps, 'proposal' | 'createdAt'>
+  recentProposal?: RecentBuildingProposal
   metadata: BuildingMetadataProps[]
 }
 
@@ -227,29 +229,34 @@ export const Building = t.struct<BuildingProps>(
   {
     id: t.String,
     address: Address,
-    buildingType: t.maybe(t.enums.of([ 'VERTICAL', 'HORIZONTAL' ])),
+    buildingType: t.maybe(t.enums.of(['VERTICAL', 'HORIZONTAL'])),
     cadastre: t.maybe(BuildingCadastre),
-    floorArea: t.union([ t.Number, t.String ]),
-    landArea: t.union([ t.Number, t.String ]),
-    roofArea: t.union([ t.Number, t.String ]),
-    coefficient: t.union([ t.Number, t.String ]),
+    floorArea: t.union([t.Number, t.String]),
+    landArea: t.union([t.Number, t.String]),
+    roofArea: t.union([t.Number, t.String]),
+    coefficient: t.union([t.Number, t.String]),
     use: t.maybe(t.String),
     propertyType: t.maybe(t.String),
-    buildingDate: t.union([ t.Number, t.String ]),
+    buildingDate: t.union([t.Number, t.String]),
     location: t.maybe(BuildingLocation),
     elements: t.maybe(Elements),
     entities: t.maybe(t.list(t.Any)),
     ownerId: t.maybe(t.String),
     owner: t.maybe(BuildingOwner),
-    state: t.maybe(t.enums.of([ 'BUENO', 'MALO' ])),
+    state: t.maybe(t.enums.of(['BUENO', 'MALO'])),
     proposals: t.list(t.String),
-    recentProposal: t.maybe(BuildingProposal),
+    recentProposal: t.maybe(t.struct<RecentBuildingProposal>({
+        createdAt: t.union([t.Date, DateTimeString]),
+        aspiration: t.maybe(t.Number),
+        proposal: t.maybe(t.Number),
+      },
+      'RecentBuildingProposal')),
     negotiationStatus: NegotiationStatus,
     lead: t.maybe(t.struct({
       worksheetId: t.String,
       ownerId: t.String,
       contactId: t.String,
-      capturedAt: t.union([ t.Date, DateTimeString ])
+      capturedAt: t.union([t.Date, DateTimeString])
     })),
     assignedAgentId: t.maybe(t.String),
     salePrice: t.maybe(t.Number),
@@ -266,7 +273,7 @@ export const Building = t.struct<BuildingProps>(
 
     // fields used for Portugal ingestion 2021
     portugalSpecific: t.maybe(t.struct({
-      militaryGeo:  t.maybe(t.struct({
+      militaryGeo: t.maybe(t.struct({
         x: t.Number,
         y: t.Number,
       })),
@@ -277,7 +284,7 @@ export const Building = t.struct<BuildingProps>(
   {
     name: 'Building',
     defaultProps: {
-      get id () {
+      get id() {
         return uuid()
       },
       floorArea: 0,
@@ -297,7 +304,7 @@ export const Building = t.struct<BuildingProps>(
   }
 )
 
-export function changeNegotiationStatus (building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
+export function changeNegotiationStatus(building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
   return Building.update(building, {
     negotiationStatus: {
       $set: newStatus
@@ -305,7 +312,7 @@ export function changeNegotiationStatus (building: BuildingProps, newStatus: Bui
   })
 }
 
-export function withTotalExpensesAmount (building: BuildingProps, totalAmount: number): BuildingProps {
+export function withTotalExpensesAmount(building: BuildingProps, totalAmount: number): BuildingProps {
   return Building.update(building, {
     totalExpensesAmount: {
       $set: totalAmount
@@ -313,7 +320,7 @@ export function withTotalExpensesAmount (building: BuildingProps, totalAmount: n
   })
 }
 
-export function withFeaturedOwner (building: BuildingProps, ownerId: string): BuildingProps {
+export function withFeaturedOwner(building: BuildingProps, ownerId: string): BuildingProps {
   return Building.update(building, {
     ownerId: {
       $set: ownerId
@@ -321,7 +328,7 @@ export function withFeaturedOwner (building: BuildingProps, ownerId: string): Bu
   })
 }
 
-export function withCapturedLead (
+export function withCapturedLead(
   building: BuildingProps,
   assignToFlipperId: string,
   lead: Omit<Lead, 'capturedAt'>,
@@ -335,7 +342,7 @@ export function withCapturedLead (
       $set: assignToFlipperId,
     },
     lead: {
-      $set: { ...lead, capturedAt: capturedAt || new Date() },
+      $set: {...lead, capturedAt: capturedAt || new Date()},
     },
   })
 }
