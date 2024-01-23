@@ -4,14 +4,6 @@ import { Address, SimpleAddress, SimplePhoneNumber } from '../types/common'
 import { DateTimeString } from '../infrastructure/shared-types'
 import moment from 'moment'
 
-const buildingEntitiesDefaultStatus = 'SIN DATOS'
-const buildingEntitiesStatus = {
-  2: 'VACIO',
-  4: 'INDEFINIDO',
-  5: 'A TERMINO',
-  6: 'OKUPAS'
-}
-
 export const BuildingCadastre = t.struct({
   reference: t.String,
   address: t.maybe(t.String),
@@ -108,38 +100,6 @@ export const proposalSent = (proposal: ProposalProps) => BuildingProposal.update
     $set: new Date()
   }
 })
-
-const BuildingEntity = t.struct(
-  {
-    id: t.String,
-    status: t.enums.of(Object.values(buildingEntitiesStatus).concat(buildingEntitiesDefaultStatus)),
-    name: t.maybe(t.String),
-    type: t.maybe(t.String),
-    surface: t.Number,
-    rent: t.maybe(t.Number),
-    expiration: t.maybe(t.Date),
-
-    plant: t.maybe(t.String),
-    door: t.maybe(t.String),
-
-    _migrateBuildingId: t.maybe(t.String),
-    _migrateIdStatus: t.maybe(t.String)
-  },
-  {
-    name: 'BuildingEntity',
-    defaultProps: {
-      status: buildingEntitiesDefaultStatus,
-      surface: 0,
-      rent: 0,
-      get id() {
-        return uuid()
-      },
-      get createdBy() {
-        return new Date()
-      }
-    }
-  }
-)
 
 export const BuildingMetadataPreview = t.struct({
   id: t.String,
