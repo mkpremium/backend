@@ -3,7 +3,6 @@ import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { EventPublisher } from '../event-bus'
 import { EntityManager } from 'typeorm'
 import { Logger } from 'winston'
-import { Building } from '../../building/building.entity'
 
 export class BuildingImportTriggerService {
   constructor (
@@ -18,6 +17,7 @@ export class BuildingImportTriggerService {
     const allBuildings = await this.entityManager.createQueryBuilder(CouchbaseDocument, 'building')
       .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING })
       .andWhere('building.migratedAt IS NULL')
+      .limit(parseInt(process.env[ "BUILDING_MIGRATION_LIMIT" ]) || 1000)
       .getMany()
 
     this.logger.info('Found buildings', { count: allBuildings.length })
