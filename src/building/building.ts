@@ -206,6 +206,7 @@ export const Building = t.struct<BuildingProps>(
     state: t.maybe(t.enums.of(['BUENO', 'MALO'])),
     proposals: t.list(t.String),
     recentProposal: t.maybe(t.struct<RecentBuildingProposal>({
+        id: t.String,
         createdAt: t.union([t.Date, DateTimeString]),
         aspiration: t.maybe(t.Number),
         proposal: t.maybe(t.Number),
