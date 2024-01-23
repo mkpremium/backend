@@ -190,6 +190,14 @@ jobs:
           container-name: migration-worker
           image: ${{ env.IMAGE_URL }}
 
+      - name: Deploy Amazon ECS Migration Worker task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ events-worker-task-def.outputs.task-definition }}
+          service: migration-worker
+          cluster: prod
+          wait-for-minutes: 5
+
   deploy-scheduled-tasks:
     name: Deploy scheduled tasks (freezer and proposals sender)
     runs-on: ubuntu-latest
