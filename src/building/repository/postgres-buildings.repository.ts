@@ -108,7 +108,9 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
       proposal: entity.recentProposal.amount,
       createdAt: entity.recentProposal.createdAt,
     } : undefined,
-    metadata: entity.documents
+    metadata: entity.documents.map(
+      ({ id, name, mimeType, previewUrl, privateUrl }) =>
+        ({ id, name, mimeType, previewUrl, url: privateUrl }))
   }
 }
 
