@@ -163,6 +163,7 @@ export interface BuildingMetadataProps {
   id: string,
   name: string,
   mimeType: string,
+  url: string,
   previewUrl: string
 }
 

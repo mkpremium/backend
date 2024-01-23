@@ -37,6 +37,7 @@ export class BuildingImagesImporterService extends BuildingRelatedDocumentMigrat
           id: document.id,
           name: original.name,
           mimeType: original.mimeType as BuildingDocumentMimeType,
+          privateUrl: original.url,
           previewUrl: original.previewUrl,
           building: { id: buildingId },
         })
