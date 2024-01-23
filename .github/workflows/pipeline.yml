@@ -183,7 +183,7 @@ jobs:
           aws-region: eu-west-1
 
       - name: Render Amazon ECS task definition for Migration Worker container
-        id: events-worker-task-def
+        id: migration-worker-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: infrastructure/ecs/migration-worker-task-definition.json
@@ -193,7 +193,7 @@ jobs:
       - name: Deploy Amazon ECS Migration Worker task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ events-worker-task-def.outputs.task-definition }}
+          task-definition: ${{ migration-worker-task-def.outputs.task-definition }}
           service: migration-worker
           cluster: prod
           wait-for-minutes: 5
