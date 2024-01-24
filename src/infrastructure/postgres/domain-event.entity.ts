@@ -32,7 +32,6 @@ export enum DomainEventCatalog {
   CMD__POSTGRES__MIGRATION__IMPORT_BUILDING = 'postgres_migration.import_building',
   CMD__POSTGRES__MIGRATION__IMPORT_OPERATOR = 'postgres_migration.import_operator',
   CMD__POSTGRES__MIGRATION__IMPORT_OWNER = 'postgres_migration.import_owner',
-  CMD__POSTGRES__MIGRATION__IMPORT_WORKSHEET = 'postgres_migration.import_worksheet',
   CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS = 'postgres.save_documents_command',
 }
 
