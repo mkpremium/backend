@@ -23,10 +23,10 @@ export async function startListeners (diContainer) {
 
   const migrationProcess = diContainer.resolve('couchbaseToPostgresProcess') as ReturnType<typeof couchbaseToPostgresProcess>
   const logger = diContainer.resolve('logger') as Logger
-  if (process.env.TRIGGER_OPERATORS_MIGRATION) {
+  if (process.env.TRIGGER_OPERATORS_MIGRATION === "true") {
     await migrationProcess.triggerOperatorsMigration()
   }
-  if (process.env.TRIGGER_BUILDINGS_MIGRATION) {
+  if (process.env.TRIGGER_BUILDINGS_MIGRATION === "true") {
     logger.info('Triggering building migration')
     await migrationProcess.triggerBuildingMigration()
   }
