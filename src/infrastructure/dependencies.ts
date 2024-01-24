@@ -32,6 +32,7 @@ import { BuildingOwnerImportTriggerService } from './service/building-owner-impo
 import { BuildingProposalsImporterService } from './service/building-proposals-importer.service'
 import { BuildingWorkSheetsImporterService } from './service/building-worksheets-importer.service'
 import { BuildingImportTriggerService } from './service/building-import-trigger.service'
+import { CouchbaseDocumentRepository } from "./postgres/couchbase-document.repository";
 
 export async function createDiContainer (database: Database) {
   const container = createContainer()
@@ -88,5 +89,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     buildingOwnerImportTriggerService: asClass(BuildingOwnerImportTriggerService).classic().singleton(),
     buildingProposalsImporterService: asClass(BuildingProposalsImporterService).classic().singleton(),
     buildingWorkSheetsImporterService: asClass(BuildingWorkSheetsImporterService).classic().singleton(),
+    couchbaseDocumentRepository: asClass(CouchbaseDocumentRepository).classic().singleton(),
   })
 }

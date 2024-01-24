@@ -5,21 +5,21 @@ import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
 import { EventPublisher } from '../event-bus'
 import { Logger } from 'winston'
-import { BuildingRelatedDocumentMigration } from './building-related-document-migration'
 import { getCouchbaseDocument, markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
+import { CouchbaseDocumentRepository } from "../postgres/couchbase-document.repository";
 
-export class BuildingImagesImporterService extends BuildingRelatedDocumentMigration {
+export class BuildingImagesImporterService {
   constructor (
     protected readonly entityManager: EntityManager,
     private readonly eventBus: EventPublisher,
     private readonly logger: Logger,
+    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
   ) {
-    super(entityManager)
   }
 
   async importBuildingImages (buildingId: string) {
     this.logger.info('Building imported, starting to import its documents', { buildingId })
-    const documents = await this.getBuildingNonMigratedRelatedDocuments(
+    const documents = await this.couchbaseDocumentRepository.getBuildingNonMigratedRelatedDocuments(
       CouchbaseDocumentType.METADATA, buildingId)
 
     this.logger.info('Found documents for building', { buildingId, count: documents.length })

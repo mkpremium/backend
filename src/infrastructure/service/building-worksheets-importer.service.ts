@@ -4,25 +4,25 @@ import { Caller } from '../../caller/caller.entity'
 import { EventPublisher } from '../event-bus'
 import { EntityManager } from 'typeorm'
 import { Logger } from 'winston'
-import { BuildingRelatedDocumentMigration } from './building-related-document-migration'
 import { WorksheetProps } from '../../worksheet/domain/worksheet'
 import { WorksheetQueueProps } from '../../worksheet/domain/queue'
 import { Worksheet } from '../../worksheet/worksheet.entity'
 import { structToEntity } from '../../worksheet/repository/postgres-worksheet.repository'
 import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
+import { CouchbaseDocumentRepository } from "../postgres/couchbase-document.repository";
 
-export class BuildingWorkSheetsImporterService extends BuildingRelatedDocumentMigration {
+export class BuildingWorkSheetsImporterService {
   constructor (
     private readonly eventBus: EventPublisher,
-    entityManager: EntityManager,
+    private readonly entityManager: EntityManager,
     private readonly logger: Logger,
+    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
   ) {
-    super(entityManager)
   }
 
   async importWorkSheets(buildingId: string) {
     this.logger.info('Building imported, importing its worksheets', { buildingId })
-    const worksheet = await this.getDocumentByRelatedBuildingId(
+    const worksheet = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
       CouchbaseDocumentType.WORKSHEET, buildingId)
 
     const original = worksheet.document as WorksheetProps
@@ -33,7 +33,7 @@ export class BuildingWorkSheetsImporterService extends BuildingRelatedDocumentMi
     }
 
     // Find the worksheet queue.
-    const queue = (await this.getNonMigratedDocumentById(
+    const queue = (await this.couchbaseDocumentRepository.getNonMigratedDocumentById(
       CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)).document as WorksheetQueueProps
 
     let operatorId = null
