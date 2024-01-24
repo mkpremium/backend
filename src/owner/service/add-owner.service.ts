@@ -9,7 +9,7 @@ import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { Logger } from 'winston'
 import _ from 'lodash'
-import { ownerEntityToStruct, PostgresOwnersRepository } from "../repository/postgres-owners.repository";
+import { PostgresOwnersRepository } from '../repository/postgres-owners.repository'
 
 export interface AddOwnerCommand {
   id?: string,
@@ -65,7 +65,7 @@ export class AddOwnerService {
 
     const { contacts } = cmd.person
     if (_.uniqBy(contacts, 'value').length !== contacts.length) {
-      console.error('Owner with duplicated contacts', { ownerId: savedOwner.id, cmd })
+      this.logger.error('Owner with duplicated contacts', { ownerId: savedOwner.id, cmd })
     }
 
     for (const c of contacts) {

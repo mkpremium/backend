@@ -2,6 +2,7 @@ import { DeepPartial, EntityManager } from 'typeorm'
 import { Person } from '../person.entity'
 import { Owner } from '../owner.entity'
 import { OwnerStatus, type OwnerType } from '../owner'
+import { logger } from '../../infrastructure/logger'
 
 type CreateOwnerCommand = {
   id?: string,
@@ -18,10 +19,10 @@ type CreateOwnerCommand = {
 
 export async function createOwner (entityManager: EntityManager, cmd: CreateOwnerCommand): Promise<[ Owner, Person ]> {
   if (cmd.person.name !== `${cmd.person.firstName} ${cmd.person.firstSurname}`) {
-    console.warn(`Owner name ${cmd.person.name} does not match first name ${cmd.person.firstName} and first surname ${cmd.person.firstSurname}`, cmd)
+    logger.warn(`Owner name ${cmd.person.name} does not match first name ${cmd.person.firstName} and first surname ${cmd.person.firstSurname}`, cmd)
   }
   if (!cmd.buildingId) {
-    console.warn('Owner does not have a building', cmd)
+    logger.warn('Owner does not have a building', cmd)
   }
 
   // TODO: review and consolidate owner names.

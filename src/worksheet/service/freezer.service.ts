@@ -62,7 +62,7 @@ async function pullWorksheetsOutOfFreezer(worksheets: WorksheetProps[], building
     try {
       return pullOutFreezer(fromJSON(worksheet, Worksheet), WorkSheetStatus.AVAILABLE as WorksheetStatusType)
     } catch (error) {
-      console.log('Could not pull worksheet out of freezer', {
+      logger.log('Could not pull worksheet out of freezer', {
         ...error,
         errorMessage: error.message,
         worksheetId: worksheet.id

@@ -1,7 +1,7 @@
 import { OwnerProps } from '../owner'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
-import { DataSource, EntityManager } from 'typeorm'
+import { EntityManager } from 'typeorm'
 import { AddOwnerCommand, AddOwnerService } from './add-owner.service'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { CouchbaseDocument, CouchbaseDocumentType } from '../../infrastructure/postgres/couchbase-document.entity'
@@ -46,7 +46,7 @@ export function importOwnerCommandHandler ({ addOwnerService, eventBus, logger, 
       id: owner.buildingId,
     })
     if (!couchbaseBuilding) {
-      console.error('Building not found (importing owner)', { buildingId: owner.buildingId })
+      logger.error('Building not found (importing owner)', { buildingId: owner.buildingId })
       return
     }
     const building = couchbaseBuilding.document as BuildingProps
