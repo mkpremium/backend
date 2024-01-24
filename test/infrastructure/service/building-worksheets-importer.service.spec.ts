@@ -9,13 +9,10 @@ import { Caller } from '../../../src/caller/caller.entity'
 import { User } from '../../../src/user/user.entity'
 import { Worksheet } from '../../../src/worksheet/worksheet.entity'
 import { WorksheetQueue } from '../../../src/worksheet/worksheet-queue.entity'
-import { callerFactory } from '../../../test/factories'
 
 import { v4 as uuid } from 'uuid'
 import { EntityManager } from 'typeorm'
 import { QueueSource } from '../../../src/worksheet/domain/queue'
-
-// export class CouchbaseProposalsRepository extends CouchbaseRepository<ProposalProps> implements ProposalsRepository {
 
 describe('BuildingWorkSheetsImporterService', () => {
   it('persists proposals', async () => {

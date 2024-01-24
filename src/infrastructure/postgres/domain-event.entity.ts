@@ -24,6 +24,7 @@ export enum DomainEventCatalog {
   WORKSHEET__INVALID_WORKSHEET_FOUND = 'worksheet.invalid_worksheet_found',
   WORKSHEET__NEXT_IN_QUEUE_TAKEN = 'worksheet.next_in_queue_taken',
   WORKSHEET__TAKEN = 'worksheet.taken',
+  WORKSHEET__WORKSHEET_IMPORTED = 'worksheet.worksheet_imported',
 
   POSTGRES_MIGRATION__OWNER_IMPORTED = 'postgres_migration.owner_imported',
 

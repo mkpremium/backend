@@ -6,6 +6,7 @@ import { EntityManager } from 'typeorm'
 import { Logger } from 'winston'
 import { BuildingRelatedDocumentMigration } from './building-related-document-migration'
 import { WorksheetProps } from '../../worksheet/domain/worksheet'
+import { WorksheetQueueProps } from '../../worksheet/domain/queue'
 import { Worksheet } from '../../worksheet/worksheet.entity'
 import { structToEntity } from '../../worksheet/repository/postgres-worksheet.repository'
 import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
@@ -27,16 +28,17 @@ export class BuildingWorkSheetsImporterService extends BuildingRelatedDocumentMi
     const original = worksheet.document as WorksheetProps
 
     if (!worksheet) {
-      this.logger.info('No worksheets found for building', { buildingId })
+      this.logger.error('No worksheets found for building', { buildingId })
       return
     }
 
     // Find the worksheet queue.
-    const queue = await this.getNonMigratedDocumentById(
-      CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)
+    const queue = (await this.getNonMigratedDocumentById(
+      CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)).document as WorksheetQueueProps
 
     let operatorId = null
-    for (const worksheet of queue.document["worksheets"]) {
+    let queueItems = queue?.worksheets || []
+    for (const worksheet of queueItems) {
       if (worksheet.worksheetId === original.id) {
         operatorId = worksheet.operatorId
         break
@@ -50,12 +52,11 @@ export class BuildingWorkSheetsImporterService extends BuildingRelatedDocumentMi
       const worksheet = { heldBy: caller, ...structToEntity(original) } as Worksheet
       await em.save(Worksheet, worksheet)
       await markCouchbaseDocumentAsMigrated(em, original.id)
+      await this.eventBus.publish({
+        name: DomainEventCatalog.WORKSHEET__WORKSHEET_IMPORTED,
+        em,
+      })
     })
 
-    // TODO: implement
-    await this.eventBus.publish({
-      name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_WORKSHEET,
-      buildingId,
-    })
   }
 }
