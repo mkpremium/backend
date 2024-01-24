@@ -55,6 +55,7 @@ class PostgresScheduledCallsService {
   private static relations = {
     building: {
       worksheet: true,
+      documents: true,
     },
     contact: true,
     createdBy: true,
