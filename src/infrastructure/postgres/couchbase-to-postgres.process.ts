@@ -13,6 +13,7 @@ import { importOperatorCommandHandler } from './import-operator-command-handler'
 import { BuildingOwnerImportTriggerService } from '../service/building-owner-import-trigger.service'
 import { BuildingProposalsImporterService } from '../service/building-proposals-importer.service'
 import { BuildingImportTriggerService } from '../service/building-import-trigger.service'
+import { BuildingWorkSheetsImporterService } from '../service/building-worksheets-importer.service'
 
 interface Deps {
   eventBus: EventBus,
@@ -27,6 +28,7 @@ interface Deps {
   importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
   buildingOwnerImportTriggerService: BuildingOwnerImportTriggerService,
   buildingProposalsImporterService: BuildingProposalsImporterService,
+  buildingWorkSheetsImporterService: BuildingWorkSheetsImporterService,
 }
 
 export function couchbaseToPostgresProcess ({
@@ -39,6 +41,7 @@ export function couchbaseToPostgresProcess ({
                                            buildingImagesImporterService,
                                            buildingOwnerImportTriggerService,
                                            buildingProposalsImporterService,
+                                           buildingWorkSheetsImporterService,
                                          }: Deps) {
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
@@ -61,6 +64,14 @@ export function couchbaseToPostgresProcess ({
     'postgres_migration.import_building_proposals',
     async ({ buildingId }: { buildingId: string }) => {
       await buildingProposalsImporterService.importBuildingProposal(buildingId)
+    }
+  )
+
+  eventBus.on(
+    DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
+    'postgres_migration.import_building_worksheets',
+    async ({ buildingId }: { buildingId: string }) => {
+      await buildingWorkSheetsImporterService.importWorkSheets(buildingId)
     }
   )
 

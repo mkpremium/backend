@@ -5,13 +5,32 @@ export abstract class BuildingRelatedDocumentMigration {
   constructor (protected entityManager: EntityManager) {
   }
 
-  protected getBuildingNonMigratedRelatedDocuments (documentType: CouchbaseDocumentType, buildingId: string) {
+  private getNonMigratedQuery( documentType: CouchbaseDocumentType ) {
     return this.entityManager
       .createQueryBuilder(CouchbaseDocument, documentType)
-      .where(`${documentType}.document ->> 'buildingId' = :buildingId`, { buildingId })
       .andWhere(`${documentType}.documentType = :documentType`, { documentType: documentType })
       .andWhere(`${documentType}.migratedAt is NULL`)
       .select([ `${documentType}.id`, `${documentType}.document` ])
+  }
+
+  protected getBuildingNonMigratedRelatedDocuments (documentType: CouchbaseDocumentType, buildingId: string) {
+    return this.getNonMigratedQuery(documentType)
+      .andWhere(`${documentType}.document ->> 'buildingId' = :buildingId`, { buildingId })
       .getMany()
+  }
+
+  protected getDocumentByRelatedBuildingId (documentType: CouchbaseDocumentType, buildingId: string) {
+    return this.getNonMigratedQuery(documentType)
+      // For some reason using placeholders here doesn't work, so I'm using
+      // string concatenation.
+      .andWhere(`${documentType}.document -> 'relatedBuildingIds' @> '"` + buildingId + `"'`)
+      .getOne()
+  }
+
+  protected getNonMigratedDocumentById(documentType: CouchbaseDocumentType, id: string) {
+    return this.entityManager
+      .createQueryBuilder(CouchbaseDocument, documentType)
+      .where(`id = :id`, { id })
+      .getOne()
   }
 }

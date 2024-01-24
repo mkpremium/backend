@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
   password: parsedDSN.password,
   database: parsedDSN.pathname.substring(1), // remove slash
   synchronize: ['dev', 'test'].includes(process.env.NODE_ENV),
-  logging: false,
+  logging: !!process.env[ 'DATABASE_LOG' ],
   entities: [
     '**/*.entity.ts',
     '**/*.entity.js',
