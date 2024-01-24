@@ -9,6 +9,7 @@ import {
   getCouchbaseDocument,
   markCouchbaseDocumentAsMigrated
 } from '../../infrastructure/postgres/get-couchbase-document'
+import { Flipper } from '../../flipper/flipper.entity'
 
 interface Deps {
   entityManager: EntityManager,
@@ -26,8 +27,15 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
         return
       }
 
+      let flipperId: string | undefined
+      if (building.assignedAgentId) {
+        const flipper = await entityManager.findOneByOrFail(Flipper,
+          { user: { id: building.assignedAgentId } },
+        )
+        flipperId = flipper.id
+      }
       // Ensure there is no building with a featured owner as they aren't imported yet.
-      await em.save(Building, mapBuildingStructToEntity({ ...building, ownerId: undefined }))
+      await em.save(Building, mapBuildingStructToEntity({ ...building, ownerId: undefined, assignedAgentId: flipperId }))
       await markCouchbaseDocumentAsMigrated(em, building.id)
 
       await eventBus.publish({
