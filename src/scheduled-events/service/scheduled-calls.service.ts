@@ -55,6 +55,7 @@ class PostgresScheduledCallsService {
   private static relations = {
     building: {
       worksheet: true,
+      documents: true,
     },
     contact: true,
     createdBy: true,
@@ -89,31 +90,31 @@ function mapScheduledEventToScheduledCall(scheduledEvent: ScheduledEvent): Sched
 }
 
 class CouchbaseScheduledCallsService {
-  static async scheduledCallsFor (couchbaseAdapter: CouchbaseAdapter, userId: string): Promise<ScheduledCallsView[]> {
+  static async scheduledCallsFor(couchbaseAdapter: CouchbaseAdapter, userId: string): Promise<ScheduledCallsView[]> {
     const rows = await couchbaseAdapter.queryAsync(
-      scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.notifyTo = $1' ]),
-      [ userId ]
+      scheduledCallQuery(couchbaseAdapter.bucketName, ['se.notifyTo = $1']),
+      [userId]
     )
     return rows.map(parseCouchbaseScheduledEventRow)
   }
 
-  static async getById (couchbaseAdapter: CouchbaseAdapter, callId: string): Promise<ScheduledCallsView> {
+  static async getById(couchbaseAdapter: CouchbaseAdapter, callId: string): Promise<ScheduledCallsView> {
     const rows = await couchbaseAdapter.queryAsync(
-      scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
-      [ callId ]
+      scheduledCallQuery(couchbaseAdapter.bucketName, ['se.id = $1']),
+      [callId]
     )
-    return parseCouchbaseScheduledEventRow(rows[ 0 ])
+    return parseCouchbaseScheduledEventRow(rows[0])
   }
 }
 
-export function parseCouchbaseScheduledEventRow ({
-                                                   event,
-                                                   eventDate,
-                                                   building,
-                                                   owner,
-                                                   eventId,
-                                                   createdBy
-                                                 }): ScheduledCallsView {
+export function parseCouchbaseScheduledEventRow({
+                                                  event,
+                                                  eventDate,
+                                                  building,
+                                                  owner,
+                                                  eventId,
+                                                  createdBy
+                                                }): ScheduledCallsView {
   const shapedRow = {
     id: eventId,
     createdBy,
@@ -121,34 +122,35 @@ export function parseCouchbaseScheduledEventRow ({
     eventDate,
     event: {
       ...event,
-      owner: { ...owner, building }
+      owner: {...owner, building}
     }
   }
   try {
     return fromJSON(shapedRow, ScheduledCallsView)
   } catch (error) {
-    logger.error('parsing scheduled calls', { errorMessage: error.message, worksheetId: event.worksheetId })
+    logger.error('parsing scheduled calls', {errorMessage: error.message, worksheetId: event.worksheetId})
     return shapedRow
   }
 }
 
 const scheduledCallQuery = (bucketName: string, conditions: string[]) => `
-    SELECT se.id eventId,
-           se.createdBy, {se.event.contactId, se.event.worksheetId, "buildingId": building.id} event, se.eventDate, {
-        building.id, building.address, building.negotiationStatus, building.floorArea, building.location, building.recentProposal, building.\`use\`, building.metadata, building.cadastre, building.lead
-        } building, {owner.id, owner.featuredContact, owner.person} owner
+  SELECT se.id eventId,
+         se.createdBy, {se.event.contactId, se.event.worksheetId, "buildingId": building.id} event, se.eventDate, {
+    building.id, building.address, building.negotiationStatus, building.floorArea, building.location, building.recentProposal, building.\`use\`, building.metadata, building.cadastre, building.lead
+    } building, {owner.id, owner.featuredContact, owner.person} owner
 
-    FROM ${bucketName} se
-        JOIN ${bucketName} worksheet
-    ON worksheet._documentType = 'worksheet'
-        AND meta(worksheet).id = se.event.worksheetId
-        JOIN ${bucketName} building ON building._documentType = 'building'
-        AND meta(building).id = worksheet.relatedBuildingIds[0]
-        JOIN ${bucketName} owner ON owner._documentType = 'owner'
-        AND meta(owner).id = se.event.ownerId
+  FROM ${bucketName} se
+    JOIN ${bucketName} worksheet
+  ON worksheet._documentType = 'worksheet'
+    AND meta(worksheet).id = se.event.worksheetId
+    JOIN ${bucketName} building ON building._documentType = 'building'
+    AND meta(building).id = worksheet.relatedBuildingIds[0]
+    JOIN ${bucketName} owner ON owner._documentType = 'owner'
+    AND meta(owner).id = se.event.ownerId
 
-    WHERE se._documentType = 'scheduled-event'
-      AND se.type = 'CALLS' AND ${conditions.join(' AND ')}
+  WHERE se._documentType = 'scheduled-event'
+    AND se.type = 'CALLS'
+    AND ${conditions.join(' AND ')}
 `
 
 interface ScheduledCallsView {
@@ -185,13 +187,13 @@ const ScheduledCallsView = t.struct<ScheduledCallsView>({
           neighborhood: t.maybe(t.String),
           type: t.maybe(t.String),
           street: t.String,
-          number: t.union([ t.String, t.Number ]),
+          number: t.union([t.String, t.Number]),
           postalCode: t.maybe(t.struct({
-            number: t.maybe(t.union([ t.String, t.Number ]))
+            number: t.maybe(t.union([t.String, t.Number]))
           }))
         }),
         negotiationStatus: t.maybe(NegotiationStatus),
-        floorArea: t.union([ t.String, t.Number ]),
+        floorArea: t.union([t.String, t.Number]),
 
         location: t.maybe(t.struct({
           lat: t.maybe(t.Number),
