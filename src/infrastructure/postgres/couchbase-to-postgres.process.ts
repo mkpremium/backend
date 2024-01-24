@@ -89,7 +89,7 @@ export function couchbaseToPostgresProcess ({
 
   return {
     async triggerBuildingMigration () {
-      await buildingImportTriggerService.triggerImport()
+      await buildingImportTriggerService.triggerImport(parseInt(process.env[ "BUILDING_MIGRATION_LIMIT" ]) || 1000)
     },
     async triggerOperatorsMigration () {
       logger.info('Triggering operators migration')

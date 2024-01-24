@@ -12,12 +12,12 @@ export class BuildingImportTriggerService {
   ) {
   }
 
-  async triggerImport () {
+  async triggerImport (limit: number) {
     this.logger.info('Triggering building migration')
     const allBuildings = await this.entityManager.createQueryBuilder(CouchbaseDocument, 'building')
       .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING })
       .andWhere('building.migratedAt IS NULL')
-      .limit(parseInt(process.env[ "BUILDING_MIGRATION_LIMIT" ]) || 1000)
+      .limit(limit)
       .getMany()
 
     this.logger.info('Found buildings', { count: allBuildings.length })
