@@ -1,4 +1,4 @@
-import { CouchbaseDocument, CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
+import { CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { Caller } from '../../caller/caller.entity'
 import { EventPublisher } from '../event-bus'
