@@ -31,21 +31,25 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
   }
 
   protected structToEntity(struct: WorksheetProps): DeepPartial<Worksheet> {
-    return this.repository.create({
-      id: struct.id,
-      status: struct.status,
-      lastStatusChangedAt: struct.statusChangedAt,
-      statusChangeReason: struct.statusChangeReason,
-      lastViewedAt: struct.viewedAt,
-      lastViewedBy: struct.viewedBy ? {id: struct.viewedBy} : null,
-      building: {id: struct.relatedBuildingIds[0]},
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      queue: struct.queueId ? {id: struct.queueId} : null,
-    })
+    return this.repository.create(structToEntity(struct))
   }
 
   protected getEntityTarget(): EntityTarget<Worksheet> {
     return Worksheet
   }
+}
+
+export function structToEntity  (struct: WorksheetProps): Worksheet {
+  return {
+    id: struct.id,
+    status: struct.status,
+    lastStatusChangedAt: struct.statusChangedAt,
+    statusChangeReason: struct.statusChangeReason,
+    lastViewedAt: struct.viewedAt,
+    lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
+    building: { id: struct.relatedBuildingIds[ 0 ] },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    queue: struct.queueId ? { id: struct.queueId } : null,
+  } as Worksheet
 }

@@ -30,6 +30,7 @@ import { couchbaseToPostgresProcess } from './postgres/couchbase-to-postgres.pro
 import { BuildingImagesImporterService } from './service/building-images-importer.service'
 import { BuildingOwnerImportTriggerService } from './service/building-owner-import-trigger.service'
 import { BuildingProposalsImporterService } from './service/building-proposals-importer.service'
+import { BuildingWorkSheetsImporterService } from './service/building-worksheets-importer.service'
 import { BuildingImportTriggerService } from './service/building-import-trigger.service'
 
 export async function createDiContainer (database: Database) {
@@ -86,5 +87,6 @@ function setupInfrastructureDependencies (container: AwilixContainer, couchbaseB
     buildingImagesImporterService: asClass(BuildingImagesImporterService).classic().singleton(),
     buildingOwnerImportTriggerService: asClass(BuildingOwnerImportTriggerService).classic().singleton(),
     buildingProposalsImporterService: asClass(BuildingProposalsImporterService).classic().singleton(),
+    buildingWorkSheetsImporterService: asClass(BuildingWorkSheetsImporterService).classic().singleton(),
   })
 }
