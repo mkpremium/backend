@@ -53,7 +53,4 @@ export class DomainEvent {
 
   @CreateDateColumn()
   createdAt: Date
-
-  @UpdateDateColumn()
-  updatedAt: Date
 }
