@@ -14,7 +14,7 @@ import { addOwnerToBuildingControllerFactory } from '../building/controllers'
 import { AddOwnerService } from './service/add-owner.service'
 import { AddContactService } from './service/add-contact.service'
 import { SearchOwnerOrBuildingService } from './service/search-owner-or-building.service'
-import { importOwnerCommandHandler } from './service/import-owner-command-handler'
+import { importOwnerHandlerFactory } from './service/import-owner-command-handler'
 
 export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
@@ -39,6 +39,6 @@ export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: 
     ownersRepository: aliasTo(usePostgres ? 'postgresOwnersRepository' : 'couchbaseOwnersRepository'),
 
     resetOwnerBadContactsHandler: asFunction(createResetOwnerBadContactsHandler).singleton(),
-    importOwnerCommandHandler: asFunction(importOwnerCommandHandler).singleton(),
+    importOwnerCommandHandler: asFunction(importOwnerHandlerFactory).singleton(),
   })
 }

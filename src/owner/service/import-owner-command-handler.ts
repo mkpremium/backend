@@ -19,7 +19,7 @@ interface Deps {
   addOwnerService: AddOwnerService,
 }
 
-export function importOwnerCommandHandler ({ addOwnerService, eventBus, logger, entityManager }: Deps) {
+export function importOwnerHandlerFactory ({ addOwnerService, eventBus, logger, entityManager }: Deps) {
   return async function ({ owner }: { owner: OwnerProps }) {
     logger.info('Importing owner', { owner })
     const couchbaseDocument = await getCouchbaseDocument(entityManager, owner.id)

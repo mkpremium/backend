@@ -5,9 +5,7 @@ import type { DataSource, EntityManager } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 import { subscribeToCommand } from '../listeners'
 import type { saveDocumentsCommandHandler as saveDocumentsHandlerFactory } from './save-documents-command-handler'
-import type {
-  importOwnerCommandHandler as importOwnerHandlerFactory
-} from '../../owner/service/import-owner-command-handler'
+import type { importOwnerHandlerFactory } from '../../owner/service/import-owner-command-handler'
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
 import { importOperatorCommandHandler } from './import-operator-command-handler'
 import { BuildingOwnerImportTriggerService } from '../service/building-owner-import-trigger.service'
