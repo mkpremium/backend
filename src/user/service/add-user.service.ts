@@ -7,6 +7,7 @@ import { passwordRegex } from '../../operator/operatorRefreshTokenRepository'
 
 interface AddUserCommand {
   em: EntityManager
+  id?: string
   username: string
   password: string
   profile: UserProfileProps

@@ -8,7 +8,9 @@ import { Caller } from '../../caller/caller.entity'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
-export type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'restringedHours' | 'enable'>
+export type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'restringedHours' | 'enable'> & {
+  id?: string
+}
 
 export class AddOperatorService {
   constructor(
@@ -40,6 +42,7 @@ export class AddOperatorService {
     return this.ormDataSource.transaction(async em => {
       const user = await addUserService({
         em,
+        id: cmd.id,
         username: cmd.username,
         password: cmd.password,
         isAdmin: cmd.roles.includes(UserRoles.ADMIN),
