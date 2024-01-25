@@ -11,6 +11,7 @@ export interface Identifiable {
 
 export interface SaveDocumentCommand {
   name: 'postgres.save_object_command',
+  addOnly: boolean,
   ids: Id[]
 }
 
@@ -26,6 +27,14 @@ export function saveDocumentsCommandHandler ({ couchbaseAdapter, logger, ormData
       logger.info('Saving couchbase document into postgres', { id })
       try {
         const couchbaseDocumentRepository = ormDataSource.getRepository(CouchbaseDocument)
+        if (cmd.addOnly) {
+          const existing = await couchbaseDocumentRepository.findOneBy({ id })
+          if (existing) {
+            logger.info('Couchbase document already exists in postgres, skipping.', { id })
+            continue
+          }
+        }
+
         const { value: document } = await couchbaseAdapter.get(id) as unknown as {
           value: { _documentType: CouchbaseDocumentType, id: string  } & object
         }
