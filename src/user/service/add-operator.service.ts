@@ -13,7 +13,7 @@ export type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'r
 }
 
 export class AddOperatorService {
-  constructor(
+  constructor (
     private ormDataSource: DataSource,
     private operatorRepository: OperatorRepository,
     private usePostgres: boolean,
@@ -21,14 +21,14 @@ export class AddOperatorService {
   ) {
   }
 
-  async addOperator(cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps & {
+  async addOperator (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps & {
     callerId?: string,
     flipperId?: string
   }> {
     return this.usePostgres ? this.saveInPostgres(cmd, requester.id) : this.saveInCouchbase(cmd, requester)
   }
 
-  private async saveInCouchbase(cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
+  private async saveInCouchbase (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
     const operator = await this.operatorRepository.createOperator(cmd)
     await History.registerCreate({
       contextModel: operator,
@@ -38,7 +38,7 @@ export class AddOperatorService {
     return operator
   }
 
-  private async saveInPostgres(cmd: AddOperatorCommand, requesterId: string) {
+  private async saveInPostgres (cmd: AddOperatorCommand, requesterId: string) {
     return this.ormDataSource.transaction(async em => {
       const user = await addUserService({
         em,
@@ -51,16 +51,16 @@ export class AddOperatorService {
       let flipperId: string
       let callerId: string
       if (cmd.roles.includes(UserRoles.BUSINESS)) {
-        const flipper = await em.save(Flipper, {user})
+        const flipper = await em.save(Flipper, { user })
         flipperId = flipper.id
       }
       if (cmd.roles.includes(UserRoles.OPERATOR)) {
-        const callerPayload = {user};
+        const callerPayload = { user }
         if (cmd.flipperId) {
           const flipper = await em.findOneOrFail(Flipper, {
-            where: {user: {id: cmd.flipperId}},
+            where: { user: { id: cmd.flipperId } },
           })
-          callerPayload["flipper"] = {id: flipper.id}
+          callerPayload[ 'flipper' ] = { id: flipper.id }
         }
 
         const caller = await em.save(Caller, callerPayload)
