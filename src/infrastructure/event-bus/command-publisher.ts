@@ -14,6 +14,7 @@ export class CommandPublisher {
     private queueUrl: string,
     private listener: string,
     private logger: Logger,
+    private addOnly: boolean,
   ) {
   }
 
@@ -61,6 +62,7 @@ export class CommandPublisher {
             listener: this.listener,
             event: {
               name: command,
+              addOnly: this.addOnly,
               ids: chunk,
             }
           }),

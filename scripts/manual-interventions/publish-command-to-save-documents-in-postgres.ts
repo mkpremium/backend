@@ -3,20 +3,21 @@ import { N1qlQuery } from 'couchbase'
 import { SQS } from 'aws-sdk'
 import { initLogger } from '../../src/infrastructure/logger'
 import { CommandPublisher } from '../../src/infrastructure/event-bus/command-publisher'
-import { DomainEventCatalog } from "../../src/infrastructure/postgres/domain-event.entity";
-import { commandHandlerName } from "../../src/infrastructure/listeners";
+import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-event.entity'
+import { commandHandlerName } from '../../src/infrastructure/listeners'
 
 const logger = initLogger()
 const sqsClient = new SQS({
   region: 'eu-west-1'
 })
 
-const DOCUMENTS_CONDITION = process.env["DOCUMENTS_CONDITION"]
+const DOCUMENTS_CONDITION = process.env[ 'DOCUMENTS_CONDITION' ]
 if (!DOCUMENTS_CONDITION) {
   throw new Error('Missing DOCUMENTS_CONDITION environment variable.')
 }
 
 const QUEUE_URL = process.env.EVENTS_QUEUE_URL
+const ADD_ONLY = (process.env.ADD_ONLY ?? 'true') === 'true'
 
 connectCouchbaseBucket()
   .then(bucket => {
@@ -26,6 +27,7 @@ connectCouchbaseBucket()
         QUEUE_URL,
         commandHandlerName(DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS),
         logger,
+        ADD_ONLY,
       )
       const allDocumentsQuery = bucket.query(
         N1qlQuery.fromString(`SELECT mkpremium.id
