@@ -23,7 +23,7 @@ export const WorksheetQueueBody = t.struct(
 )
 
 export interface QueueSource {
-  province: string;
+  province: string | string[];
   city?: string;
   zone?: string;
   neighborhood?: string;
