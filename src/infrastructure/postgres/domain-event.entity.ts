@@ -27,6 +27,7 @@ export enum DomainEventCatalog {
   WORKSHEET__WORKSHEET_IMPORTED = 'worksheet.worksheet_imported',
 
   POSTGRES_MIGRATION__OWNER_IMPORTED = 'postgres_migration.owner_imported',
+  POSTGRES_MIGRATION__SCHEDULED_EVENT_IMPORTED='postgres_migration.scheduled_event_imported',
 
   // Commands, not events.
   CMD__POSTGRES__MIGRATION__IMPORT_BUILDING = 'postgres_migration.import_building',
