@@ -28,7 +28,7 @@ export interface AddOwnerCommand {
     firstName: string,
     firstSurname: string,
     secondSurname?: string,
-    contacts: ContactProps[]
+    contacts: (Omit<ContactProps, 'id'> & {id?: string})[]
   }
 }
 
