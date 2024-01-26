@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { AddOwnerService } from '../../../src/owner/service/add-owner.service'
+import { AddOwnerService, conflictContactStatusPolicy } from '../../../src/owner/service/add-owner.service'
 import { createTestContainer } from '../../create-test-container'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { buildingBuilder } from '../../building/building.builder'
@@ -37,5 +37,18 @@ describe('AddOwnerService Postgres', () => {
 
     expect(actualOwner.id).to.exist
     expect(actualOwner.person.contacts).to.have.lengthOf(1)
+  })
+
+  describe('contact status selector policy', () => {
+    it('selects between different statuses', () => {
+      expect(conflictContactStatusPolicy(['UNDEFINED', 'BAD']))
+        .to.be.equal('BAD')
+      expect(conflictContactStatusPolicy(['BAD', 'UNDEFINED']))
+        .to.be.equal('BAD')
+      expect(conflictContactStatusPolicy(['BAD', 'GOOD']))
+        .to.be.equal('UNDEFINED')
+      expect(conflictContactStatusPolicy(['BAD', 'GOOD', 'UNDEFINED']))
+        .to.be.equal('UNDEFINED')
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { ContactProps, OwnerProps, OwnerStatus, OwnerType } from '../owner'
+import { ContactProps, OwnerContactStatus, OwnerProps, OwnerStatus, OwnerType } from '../owner'
 import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
 import { DataSource, EntityManager } from 'typeorm'
 import { Owner } from '../owner.entity'
@@ -76,17 +76,25 @@ export class AddOwnerService {
     const contactsByValue = _.groupBy(contacts, 'value')
     const consolidatedContacts = Object.keys(contactsByValue).map(value => {
       const statuses = _.uniq(contactsByValue[value].map(({status}) => status))
-      // If there is more than one status for the contacts with the current value, log an error.
-      // This indicates that there are contacts with the same value but different statuses.
-      if (statuses.length !== 1) {
-        this.logger.error(`Owner with contact in different statuses`, {id: savedOwner, value, statuses})
-      }
 
       // Return the first contact from the array of contacts with the current value.
       // This effectively removes any duplicate contacts with the same value,
       // leaving only one contact per unique value.
+      const contact = contactsByValue[value][0]
+      // If there is more than one status for the contacts with the current value, log an error.
+      // This indicates that there are contacts with the same value but different statuses.
+      if (statuses.length !== 1) {
+        contact.status = conflictContactStatusPolicy(statuses)
+        this.logger.warning(`Owner with contact in different statuses`, {
+          id: savedOwner,
+          value,
+          statuses,
+          resolvedStatus: contact.status,
+        })
+      }
+
       return {
-        ...contactsByValue[value][0],
+        ...{...contactsByValue[value][0], status: conflictContactStatusPolicy(statuses)},
         isFeatured: contactsByValue[value].find(
           ({id}) => [cmd.featuredContact?.emailId, cmd.featuredContact?.phoneId].includes(id)),
       }
@@ -124,4 +132,17 @@ export class AddOwnerService {
 
     return savedOwner as Owner
   }
+}
+
+export function conflictContactStatusPolicy(statuses: OwnerContactStatus[]) {
+  if (statuses.length === 2) {
+    if (statuses[0] === 'UNDEFINED') {
+      return statuses[1]
+    }
+    if (statuses[1] === 'UNDEFINED') {
+      return statuses[0]
+    }
+  }
+
+  return 'UNDEFINED'
 }
