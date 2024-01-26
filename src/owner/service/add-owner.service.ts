@@ -23,12 +23,12 @@ export interface AddOwnerCommand {
     firstName: string,
     firstSurname: string,
     secondSurname?: string,
-    contacts: Omit<ContactProps, 'id'>[]
+    contacts: ContactProps[]
   }
 }
 
 export class AddOwnerService {
-  constructor (
+  constructor(
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private postgresOwnersRepository: PostgresOwnersRepository,
     private ormDataSource: DataSource,
@@ -38,11 +38,11 @@ export class AddOwnerService {
   ) {
   }
 
-  addOwner (cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
+  addOwner(cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
     return this.usePostgres ? this.saveInPostgres(cmd, requesterId) : this.couchbaseOwnersRepository.save(cmd)
   }
 
-  private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
+  private async saveInPostgres(cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
     const savedOwner = await this.ormDataSource.transaction<Owner>(async em => {
       const owner = await this.createEntities(cmd, em)
       await this.eventBus.publish({
@@ -60,18 +60,28 @@ export class AddOwnerService {
     return this.postgresOwnersRepository.get(savedOwner.id)
   }
 
-  private async createEntities (cmd: AddOwnerCommand, entityManager: EntityManager) {
-    const [ savedOwner, savedPerson ] = await createOwner(entityManager, cmd)
+  private async createEntities(cmd: AddOwnerCommand, entityManager: EntityManager) {
+    const [savedOwner, savedPerson] = await createOwner(entityManager, cmd)
 
-    const { contacts } = cmd.person
+    const {contacts} = cmd.person
     if (_.uniqBy(contacts, 'value').length !== contacts.length) {
-      this.logger.error('Owner with duplicated contacts', { ownerId: savedOwner.id, cmd })
+      this.logger.error('Owner with duplicated contacts', {ownerId: savedOwner.id, cmd})
     }
 
-    for (const c of contacts) {
-      let contact = await entityManager.findOneBy(Contact, { value: c.value })
+    const contactsByValue = _.groupBy(contacts, 'value')
+    const consolidatedContacts = Object.keys(contactsByValue).map(value => {
+      const statuses = _.uniq(contactsByValue[value].map(({status}) => status))
+      if (statuses.length !== 1) { // could be duplicated but both have the same value
+        this.logger.error(`Owner with contact in different statuses`, {id: savedOwner, value, statuses})
+      }
+
+      return contactsByValue[value][0]
+    })
+
+    for (const c of consolidatedContacts) {
+      let contact = await entityManager.findOneBy(Contact, {value: c.value})
       if (!contact) {
-        this.logger.info('Creating contact', { value: c.value })
+        this.logger.info('Creating contact', {value: c.value})
         contact = await entityManager.save(Contact, {
           value: c.value,
           type: c.type
