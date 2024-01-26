@@ -10,6 +10,7 @@ import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.e
 import { Logger } from 'winston'
 import _ from 'lodash'
 import { PostgresOwnersRepository } from '../repository/postgres-owners.repository'
+import { Person } from "../person.entity";
 
 export interface AddOwnerCommand {
   id?: string,
@@ -18,6 +19,10 @@ export interface AddOwnerCommand {
   status: OwnerStatus,
   type: OwnerType,
   note: string,
+  featuredContact?: {
+    phoneId?: string;
+    emailId?: string;
+  }
   person: {
     name: string,
     firstName: string,
@@ -80,7 +85,11 @@ export class AddOwnerService {
       // Return the first contact from the array of contacts with the current value.
       // This effectively removes any duplicate contacts with the same value,
       // leaving only one contact per unique value.
-      return contactsByValue[value][0]
+      return {
+        ...contactsByValue[value][0],
+        isFeatured: contactsByValue[value].find(
+          ({id}) => [cmd.featuredContact?.emailId, cmd.featuredContact?.phoneId].includes(id)),
+      }
     })
 
     for (const c of consolidatedContacts) {
@@ -98,6 +107,19 @@ export class AddOwnerService {
         person: savedPerson,
         status: c.status,
       })
+      if (c.isFeatured) {
+        if (['TELEFONO', 'MOVIL'].includes(c.type)) {
+          await entityManager.save(Person, {
+            ...savedPerson,
+            featuredPhoneContact: {id: contact.id}
+          })
+        } else {
+          await entityManager.save(Person, {
+            ...savedPerson,
+            featuredEmailContact: {id: contact.id}
+          })
+        }
+      }
     }
 
     return savedOwner as Owner

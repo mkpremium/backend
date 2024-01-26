@@ -30,11 +30,7 @@ describe('importOwnerCommandHandler', () => {
 
   it('imports contact with ID reported from callcenter', async () => {
     const testCouchbaseOwner = testOwnerBuilder.withPhoneContact('phone-reported-from-callcenter').build();
-    await entityManager.save(CouchbaseDocument, {
-      documentType: CouchbaseDocumentType.OWNER,
-      document: testCouchbaseOwner,
-      id: testCouchbaseOwner.id,
-    });
+    await saveOwnerCouchbaseDocument(testCouchbaseOwner);
 
     await importer({owner: testCouchbaseOwner});
 
@@ -45,19 +41,47 @@ describe('importOwnerCommandHandler', () => {
     const testCouchbaseOwner = testOwnerBuilder.withPhoneContact(uuid(), 'UNDEFINED', '666666666')
       .withPhoneContact(uuid(), 'UNDEFINED', '666666666')
       .build();
-    await entityManager.save(CouchbaseDocument, {
-      documentType: CouchbaseDocumentType.OWNER,
-      document: testCouchbaseOwner,
-      id: testCouchbaseOwner.id,
-    });
+    await saveOwnerCouchbaseDocument(testCouchbaseOwner);
 
     await importer({owner: testCouchbaseOwner});
 
     await assertOwnerSaved(testCouchbaseOwner)
   });
 
+  it('saves featured contact', async () => {
+    const testCouchbaseOwner = testOwnerBuilder.withPhoneContact('phone-reported-from-callcenter')
+      .withFeaturedPhone('phone-reported-from-callcenter')
+      .build();
+    await saveOwnerCouchbaseDocument(testCouchbaseOwner);
+
+    await importer({owner: testCouchbaseOwner});
+
+    const owner = await entityManager.findOne(Owner, {
+      where: {id: testCouchbaseOwner.id},
+      relations: {
+        person: {
+          featuredPhoneContact: true,
+          contacts: {
+            contact: true
+          }
+        }
+      }
+    })
+    const savedContact = owner.person.contacts[0].contact
+    expect(owner.person.featuredPhoneContact.id).to.be.equal(savedContact.id)
+  });
+
   async function assertOwnerSaved(owner: OwnerProps) {
     const savedOwner = await entityManager.findOneBy(Owner, {id: owner.id});
     expect(savedOwner).to.include({id: owner.id})
+  }
+
+
+  async function saveOwnerCouchbaseDocument(owner: OwnerProps) {
+    await entityManager.save(CouchbaseDocument, {
+      documentType: CouchbaseDocumentType.OWNER,
+      document: owner,
+      id: owner.id,
+    });
   }
 });
