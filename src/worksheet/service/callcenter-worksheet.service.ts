@@ -1,6 +1,6 @@
 import { WorksheetViewProps } from '../repository/worksheet.repository'
 import { CouchbaseWorksheetRepository } from '../repository/couchbase-worksheet.repository'
-import { DataSource, In } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { Worksheet } from '../worksheet.entity'
 import { buildingEntityToReadModel } from '../../building/repository/postgres-buildings.repository'
 
@@ -35,8 +35,8 @@ export class CallcenterWorksheetService {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     let builder = this.getWorksheetQueryBuilder()
-      .where('building.address ::jsonb @> :address',
-        { address: { province: In([].concat(source.province)) } })
+      .where(`building.address ->> 'province' IN (:...provinces)`,
+        { provinces: [].concat(source.province) })
       .andWhere('queue.id IS NULL')
     if (skipWorksheetId) {
       builder = builder.where('worksheet.id != :skipWorksheetId', { skipWorksheetId })
