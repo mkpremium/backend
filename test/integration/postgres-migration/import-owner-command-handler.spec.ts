@@ -9,6 +9,9 @@ import {
 } from "../../../src/infrastructure/postgres/couchbase-document.entity";
 import uuid from "uuid/v4";
 import { BuildingProps } from "../../../src/building/building";
+import { expect } from "chai";
+import { Owner } from "../../../src/owner/owner.entity";
+import { OwnerProps } from "../../../src/owner/owner";
 
 describe('importOwnerCommandHandler', () => {
   let deps: ResolvedDeps;
@@ -32,18 +35,29 @@ describe('importOwnerCommandHandler', () => {
       document: testCouchbaseOwner,
       id: testCouchbaseOwner.id,
     });
+
     await importer({owner: testCouchbaseOwner});
+
+    await assertOwnerSaved(testCouchbaseOwner);
   });
 
   it('imports owner with duplicated contact', async () => {
     const testCouchbaseOwner = testOwnerBuilder.withPhoneContact(uuid(), 'UNDEFINED', '666666666')
       .withPhoneContact(uuid(), 'UNDEFINED', '666666666')
-        .build();
+      .build();
     await entityManager.save(CouchbaseDocument, {
       documentType: CouchbaseDocumentType.OWNER,
       document: testCouchbaseOwner,
       id: testCouchbaseOwner.id,
     });
+
     await importer({owner: testCouchbaseOwner});
+
+    await assertOwnerSaved(testCouchbaseOwner)
   });
+
+  async function assertOwnerSaved(owner: OwnerProps) {
+    const savedOwner = await entityManager.findOneBy(Owner, {id: owner.id});
+    expect(savedOwner).to.include({id: owner.id})
+  }
 });
