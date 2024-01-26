@@ -7,8 +7,6 @@ import {
 } from "../../../src/infrastructure/postgres/couchbase-document.entity";
 import { BuildingProps } from "../../../src/building/building";
 import { expect } from "chai";
-import { Owner } from "../../../src/owner/owner.entity";
-import { OwnerProps } from "../../../src/owner/owner";
 import { ImportScheduledEventHandler } from "../../../src/scheduled-events/service/scheduled-event-importer.service";
 import uuid from "uuid/v4";
 import { ScheduledEvent } from "../../../src/scheduled-events/scheduled-event.entity";
@@ -56,10 +54,35 @@ describe('importOwnerCommandHandler', () => {
     await assertOwnerSaved(testScheduledCall)
   });
 
-  it.skip('imports meetings', async () => {
+  it('imports meetings', async () => {
+    const testScheduledEventId = uuid()
+    const [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps)
+    const testCallerUser = await addCaller(deps)
+
+    const testMeeting = {
+      id: testScheduledEventId,
+      type: 'MEETINGS' as const,
+      event: {
+        ownerId: testOwner.id,
+        inPerson: false,
+        contactId: testPhoneContact.id,
+        buildingId: '',
+      },
+      notifyTo: testCallerUser.id,
+      createdAt: '2021-09-16T12:00:34.091Z',
+      createdBy: testCallerUser.id,
+      eventDate: '2021-09-16T12:00:34.091Z',
+    }
+
+    await saveScheduledEventCouchbaseDocument(testMeeting);
+
+    await importer({scheduledEvent: testMeeting})
+
+    await assertOwnerSaved(testMeeting)
   });
 
   it.skip('imports offer requests')
+  it.skip('imports calls with mapped contact ID')
 
   async function assertOwnerSaved(scheduledEvent: ScheduledEventArg) {
     const savedScheduledEvent = await entityManager.findOneBy(ScheduledEvent, {id: scheduledEvent.id});
