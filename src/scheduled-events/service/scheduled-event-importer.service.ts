@@ -12,6 +12,9 @@ import { Owner } from "../../owner/owner.entity";
 import { BuildingOfferRequest } from "../../building/repository/building-offer-request.entity";
 import { Flipper } from "../../flipper/flipper.entity";
 import { Caller } from "../../caller/caller.entity";
+import { Building } from "../../building/building.entity";
+import { OwnerProps } from "../../owner/owner";
+import { Contact } from "../../contacts/contact.entity";
 
 interface Deps {
   entityManager: EntityManager,
@@ -26,48 +29,27 @@ export function importScheduledEventHandlerFactory({eventBus, logger, entityMana
     scheduledEvent: Omit<ScheduledEventProps, 'createdAt'> & { createdAt: string }
   }) {
     logger.info('Importing scheduled event', {scheduledEvent})
+    const owner = await entityManager.findOneOrFail(Owner, {
+      where: {id: scheduledEvent.event.ownerId},
+      loadRelationIds: true,
+    })
+
+    const couchbaseOwnerDocument = await getCouchbaseDocument(entityManager, owner.id)
+    const couchbaseContact = (couchbaseOwnerDocument.document as OwnerProps).person.contacts
+      .find(c => c.id === scheduledEvent.event.contactId)
+    const contact = await entityManager.findOneBy(Contact, {value: couchbaseContact.value})
+
     await entityManager.transaction(async transactionalManager => {
       const couchbaseDocument = await getCouchbaseDocument(transactionalManager, scheduledEvent.id)
       if (couchbaseDocument.migratedAt) {
         logger.warning('Scheduled event already migrated', {scheduledEventId: scheduledEvent.id})
         return
       }
-
-      const owner = await transactionalManager.findOneOrFail(Owner, {
-        where: {id: scheduledEvent.event.ownerId},
-        loadRelationIds: true,
-      })
-      const createdAt = scheduledEvent.createdAt ?? Date.now();
+      const createdAt = scheduledEvent.createdAt || Date.now();
       if (scheduledEvent.type === 'MEETINGS' && !scheduledEvent.event.inPerson) {
-        const flipper = await transactionalManager.findOneByOrFail(Flipper, [
-          {user: {id: scheduledEvent.notifyTo}},
-        ])
-        const caller = await transactionalManager.findOneByOrFail(Caller, [
-          {user: {id: scheduledEvent.createdBy}},
-        ])
-        await transactionalManager.save(BuildingOfferRequest, {
-          id: scheduledEvent.id,
-          flipper: flipper,
-          caller: caller,
-          owner: {id: owner.id},
-          contact: {id: scheduledEvent.event.contactId},
-          building: {id: owner.building as any as string},
-          createdAt: createdAt,
-          updatedAt: createdAt,
-        })
+        await importBuildingOfferRequest(transactionalManager, scheduledEvent, owner, contact, createdAt as string);
       } else {
-        await transactionalManager.save(ScheduledEvent, {
-          id: scheduledEvent.id,
-          type: scheduledEvent.type === 'CALLS' ? 'CALL' : 'MEETING',
-          scheduledFor: scheduledEvent.eventDate,
-          notifyTo: {id: scheduledEvent.notifyTo},
-          createdBy: {id: scheduledEvent.createdBy},
-          building: {id: owner.building as any as string},
-          contact: {id: scheduledEvent.event.contactId},
-          owner: {id: owner.id},
-          createdAt: createdAt,
-          updatedAt: createdAt,
-        })
+        await importScheduledEvent(transactionalManager, scheduledEvent, owner, contact, createdAt as string);
       }
 
       await markCouchbaseDocumentAsMigrated(transactionalManager, scheduledEvent.id)
@@ -78,4 +60,43 @@ export function importScheduledEventHandlerFactory({eventBus, logger, entityMana
       }, transactionalManager)
     })
   }
+}
+
+async function importBuildingOfferRequest(entityManager: EntityManager, scheduledEvent: Omit<ScheduledEventProps, "createdAt"> & {
+  createdAt: string
+}, owner: { id: string, building: Building }, contact: Contact, createdAt: string) {
+  const flipper = await entityManager.findOneByOrFail(Flipper, [
+    {user: {id: scheduledEvent.notifyTo}},
+  ])
+  const caller = await entityManager.findOneByOrFail(Caller, [
+    {user: {id: scheduledEvent.createdBy}},
+  ])
+
+  await entityManager.save(BuildingOfferRequest, {
+    id: scheduledEvent.id,
+    flipper: flipper,
+    caller: caller,
+    owner: {id: owner.id},
+    building: {id: owner.building as any as string},
+    contact,
+    createdAt: createdAt,
+    updatedAt: createdAt,
+  })
+}
+
+async function importScheduledEvent(transactionalManager: EntityManager, scheduledEvent: Omit<ScheduledEventProps, "createdAt"> & {
+  createdAt: string
+}, owner: { id: string, building: Building }, contact: Contact, createdAt: string) {
+  await transactionalManager.save(ScheduledEvent, {
+    id: scheduledEvent.id,
+    type: scheduledEvent.type === 'CALLS' ? 'CALL' : 'MEETING',
+    scheduledFor: scheduledEvent.eventDate,
+    notifyTo: {id: scheduledEvent.notifyTo},
+    createdBy: {id: scheduledEvent.createdBy},
+    building: {id: owner.building as any as string},
+    contact: contact,
+    owner: {id: owner.id},
+    createdAt: createdAt,
+    updatedAt: createdAt,
+  })
 }
