@@ -16,7 +16,7 @@ import { BuildingOfferRequest } from "../../../src/building/repository/building-
 
 type ScheduledEventArg = Parameters<ImportScheduledEventHandler>[0]['scheduledEvent'];
 
-describe('importOwnerCommandHandler', () => {
+describe('importScheduledEventHandler', () => {
   let deps: ResolvedDeps;
   let testBuilding: BuildingProps;
   let importer: ImportScheduledEventHandler;
