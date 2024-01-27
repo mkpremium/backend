@@ -39,13 +39,16 @@ export enum CouchbaseDocumentType {
 
 @Entity()
 export class CouchbaseDocument extends BaseEntity {
-  @Column({ type: 'enum', enum: CouchbaseDocumentType })
+  @Column({type: 'enum', enum: CouchbaseDocumentType})
   documentType: CouchbaseDocumentType
 
   @Column('jsonb')
   document: object
 
-  @Column('timestamp', { nullable: true })
+  @Column('timestamp', {nullable: true})
   @Index()
   migratedAt: Date
+
+  @Column('text', {default: 'current'})
+  fromCouchbase: string
 }

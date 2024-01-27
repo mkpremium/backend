@@ -18,6 +18,7 @@ if (!DOCUMENTS_CONDITION) {
 
 const QUEUE_URL = process.env.EVENTS_QUEUE_URL
 const ADD_ONLY = (process.env.ADD_ONLY ?? 'true') === 'true'
+const FROM_COUCHBASE = process.env.FROM_COUCHBASE ?? 'current'
 
 connectCouchbaseBucket()
   .then(bucket => {
@@ -28,6 +29,7 @@ connectCouchbaseBucket()
         commandHandlerName(DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS),
         logger,
         ADD_ONLY,
+        FROM_COUCHBASE,
       )
       const allDocumentsQuery = bucket.query(
         N1qlQuery.fromString(`SELECT mkpremium.id

@@ -15,6 +15,7 @@ export class CommandPublisher {
     private listener: string,
     private logger: Logger,
     private addOnly: boolean,
+    private fromCouchbase: string,
   ) {
   }
 
@@ -63,6 +64,7 @@ export class CommandPublisher {
             event: {
               name: command,
               addOnly: this.addOnly,
+              fromCouchbase: this.fromCouchbase,
               ids: chunk,
             }
           }),

@@ -12,6 +12,7 @@ export interface Identifiable {
 export interface SaveDocumentCommand {
   name: 'postgres.save_object_command',
   addOnly: boolean,
+  fromCouchbase: string,
   ids: Id[]
 }
 
@@ -42,7 +43,8 @@ export function saveDocumentsCommandHandlerFactory ({ couchbaseAdapter, logger, 
         await couchbaseDocumentRepository.save({
           id: document.id,
           documentType: document._documentType,
-          document: document
+          document: document,
+          fromCouchbase: cmd.fromCouchbase,
         })
       } catch (e) {
         logger.error('Error saving couchbase document into postgres', { id, error: e.message })
