@@ -13,6 +13,7 @@ import { ScheduledEvent } from "../../../src/scheduled-events/scheduled-event.en
 import { ContactProps, OwnerProps } from "../../../src/owner/owner";
 import { UserProps } from "../../../src/types/user";
 import { BuildingOfferRequest } from "../../../src/building/repository/building-offer-request.entity";
+import { ownerBuilder } from "../../owner/owner.builder";
 
 type ScheduledEventArg = Parameters<ImportScheduledEventHandler>[0]['scheduledEvent'];
 
@@ -33,6 +34,15 @@ describe('importScheduledEventHandler', () => {
 
     [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps);
     testCallerUser = await addCaller(deps);
+
+    const testCouchbaseOwner = ownerBuilder({id: testOwner.id, buildingId: testBuilding.id})
+      .withPhoneContact('phone-reported-from-callcenter', 'UNDEFINED', testPhoneContact.value)
+      .build();
+    await entityManager.save(CouchbaseDocument, {
+      documentType: CouchbaseDocumentType.OWNER,
+      document: testCouchbaseOwner,
+      id: testCouchbaseOwner.id,
+    });
   });
 
   it('imports scheduled calls', async () => {
@@ -42,7 +52,7 @@ describe('importScheduledEventHandler', () => {
       event: {
         ownerId: testOwner.id,
         inPerson: true,
-        contactId: testPhoneContact.id,
+        contactId: 'phone-reported-from-callcenter',
         buildingId: null,
         worksheetId: 'eecdce1a-b5c2-4dac-8303-ce91c5f16e99',
       },
@@ -56,7 +66,7 @@ describe('importScheduledEventHandler', () => {
 
     await importer({scheduledEvent: testScheduledCall})
 
-    await assertScheduledEventSaved(testScheduledCall)
+    await assertScheduledEventSavedFor(testScheduledCall)
   });
 
   it('imports meetings', async () => {
@@ -66,7 +76,7 @@ describe('importScheduledEventHandler', () => {
       event: {
         ownerId: testOwner.id,
         inPerson: true,
-        contactId: testPhoneContact.id,
+        contactId: 'phone-reported-from-callcenter',
         buildingId: '',
       },
       notifyTo: testCallerUser.id,
@@ -79,7 +89,7 @@ describe('importScheduledEventHandler', () => {
 
     await importer({scheduledEvent: testMeeting})
 
-    await assertScheduledEventSaved(testMeeting)
+    await assertScheduledEventSavedFor(testMeeting)
   });
 
   it('imports offer requests', async () => {
@@ -90,7 +100,7 @@ describe('importScheduledEventHandler', () => {
       event: {
         ownerId: testOwner.id,
         inPerson: false,
-        contactId: testPhoneContact.id,
+        contactId: 'phone-reported-from-callcenter',
         buildingId: '',
       },
       notifyAt: '2019-05-09T14:30:00.000Z',
@@ -107,11 +117,7 @@ describe('importScheduledEventHandler', () => {
 
     expect(savedOfferRequest).to.be.ok
   })
-
-
-  it.skip('imports calls with mapped contact ID')
-
-  async function assertScheduledEventSaved(scheduledEvent: ScheduledEventArg) {
+  async function assertScheduledEventSavedFor(scheduledEvent: ScheduledEventArg) {
     const savedScheduledEvent = await entityManager.findOneBy(ScheduledEvent, {id: scheduledEvent.id});
     expect(savedScheduledEvent).to.include({id: scheduledEvent.id})
   }
@@ -123,4 +129,5 @@ describe('importScheduledEventHandler', () => {
       id: scheduledEvent.id,
     });
   }
+
 });
