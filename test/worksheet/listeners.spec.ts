@@ -41,6 +41,7 @@ describe('worksheetEventListeners', () => {
       importWorksheetQueueHandler: asValue(null),
       logger: asValue(noopLogger),
       consistencyDelay: asValue(0),
+      eventBus: asValue(eventBusMock),
     })
     worksheetEventListeners(eventBusMock, testContainer)
   })
