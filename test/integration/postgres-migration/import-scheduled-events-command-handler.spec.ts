@@ -10,6 +10,8 @@ import { expect } from "chai";
 import { ImportScheduledEventHandler } from "../../../src/scheduled-events/service/scheduled-event-importer.service";
 import uuid from "uuid/v4";
 import { ScheduledEvent } from "../../../src/scheduled-events/scheduled-event.entity";
+import { ContactProps, OwnerProps } from "../../../src/owner/owner";
+import { UserProps } from "../../../src/types/user";
 
 type ScheduledEventArg = Parameters<ImportScheduledEventHandler>[0]['scheduledEvent'];
 
@@ -18,21 +20,23 @@ describe('importOwnerCommandHandler', () => {
   let testBuilding: BuildingProps;
   let importer: ImportScheduledEventHandler;
   let entityManager: EntityManager;
+  let testOwner: OwnerProps
+  let testPhoneContact: ContactProps & { isFeatured: boolean }
+  let testCallerUser: UserProps & { callerId?: string; flipperId?: string };
 
   beforeEach(async () => {
     deps = await resolveDependencies();
     testBuilding = await deps.buildingsRepository.save(buildingFactory.build());
     importer = deps.container.resolve('importScheduledEventCommandHandler');
     entityManager = deps.container.resolve('entityManager') as EntityManager;
+
+    [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps);
+    testCallerUser = await addCaller(deps);
   });
 
   it('imports scheduled calls', async () => {
-    const testScheduledEventId = uuid()
-    const [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps)
-    const testCallerUser = await addCaller(deps)
-
     const testScheduledCall = {
-      id: testScheduledEventId,
+      id: uuid(),
       type: 'CALLS' as const,
       event: {
         ownerId: testOwner.id,
@@ -55,12 +59,8 @@ describe('importOwnerCommandHandler', () => {
   });
 
   it('imports meetings', async () => {
-    const testScheduledEventId = uuid()
-    const [testOwner, testPhoneContact] = await createOwnerWithPhoneContact(testBuilding, deps)
-    const testCallerUser = await addCaller(deps)
-
     const testMeeting = {
-      id: testScheduledEventId,
+      id: uuid(),
       type: 'MEETINGS' as const,
       event: {
         ownerId: testOwner.id,
