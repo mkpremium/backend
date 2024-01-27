@@ -26,7 +26,7 @@ export class CouchbaseDocumentRepository {
       .getOne()
   }
 
-  private getNonMigratedQuery(documentType: CouchbaseDocumentType) {
+  getNonMigratedQuery(documentType: CouchbaseDocumentType) {
     return this.entityManager
       .createQueryBuilder(CouchbaseDocument, documentType)
       .andWhere(`${documentType}.documentType = :documentType`, {documentType: documentType})
