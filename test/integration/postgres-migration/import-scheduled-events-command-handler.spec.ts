@@ -1,5 +1,5 @@
 import { addCaller, createOwnerWithPhoneContact, ResolvedDeps, resolveDependencies } from "../../helpers"
-import { buildingFactory } from "../../factories";
+import { buildingFactory, userFactory } from "../../factories";
 import { EntityManager } from "typeorm";
 import {
   CouchbaseDocument,
@@ -12,6 +12,7 @@ import uuid from "uuid/v4";
 import { ScheduledEvent } from "../../../src/scheduled-events/scheduled-event.entity";
 import { ContactProps, OwnerProps } from "../../../src/owner/owner";
 import { UserProps } from "../../../src/types/user";
+import { BuildingOfferRequest } from "../../../src/building/repository/building-offer-request.entity";
 
 type ScheduledEventArg = Parameters<ImportScheduledEventHandler>[0]['scheduledEvent'];
 
@@ -64,7 +65,7 @@ describe('importOwnerCommandHandler', () => {
       type: 'MEETINGS' as const,
       event: {
         ownerId: testOwner.id,
-        inPerson: false,
+        inPerson: true,
         contactId: testPhoneContact.id,
         buildingId: '',
       },
@@ -81,7 +82,33 @@ describe('importOwnerCommandHandler', () => {
     await assertOwnerSaved(testMeeting)
   });
 
-  it.skip('imports offer requests')
+  it('imports offer requests', async () => {
+    const testFlipper = await deps.addFlipperService.addFlipper(userFactory.build())
+    const testOfferRequest = {
+      id: uuid(),
+      type: 'MEETINGS' as const,
+      event: {
+        ownerId: testOwner.id,
+        inPerson: false,
+        contactId: testPhoneContact.id,
+        buildingId: '',
+      },
+      notifyAt: '2019-05-09T14:30:00.000Z',
+      notifyTo: testFlipper.user.id,
+      createdAt: '2019-05-06T14:48:00.845Z',
+      createdBy: testCallerUser.id,
+      eventDate: '2019-05-09T14:30:00.000Z'
+    }
+    await saveScheduledEventCouchbaseDocument(testOfferRequest);
+
+    await importer({scheduledEvent: testOfferRequest})
+
+    const savedOfferRequest = await entityManager.findOneBy(BuildingOfferRequest, {id: testOfferRequest.id})
+
+    expect(savedOfferRequest).to.be.ok
+  })
+
+
   it.skip('imports calls with mapped contact ID')
 
   async function assertOwnerSaved(scheduledEvent: ScheduledEventArg) {
