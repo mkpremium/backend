@@ -38,6 +38,7 @@ describe('worksheetEventListeners', () => {
       legacyWorksheetRepository: asValue(null),
       worksheetQueueActionsService: asValue(null),
       worksheetRepository: asValue(null),
+      importWorksheetQueueHandler: asValue(null),
       logger: asValue(noopLogger),
       consistencyDelay: asValue(0),
     })
