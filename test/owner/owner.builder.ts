@@ -16,7 +16,7 @@ export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
 
     withPhoneContact (id = 'test-phone-id', status = 'UNDEFINED', phoneNumber = '666666666') {
       if (!overwrites.person) {
-        overwrites.person = ownerPrototype.person
+        overwrites.person = {...ownerPrototype.person}
       }
 
       overwrites.person = Person.update(overwrites.person, {
