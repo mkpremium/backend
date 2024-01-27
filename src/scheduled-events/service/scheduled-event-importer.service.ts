@@ -37,6 +37,7 @@ export function importScheduledEventHandlerFactory({eventBus, logger, entityMana
         where: {id: scheduledEvent.event.ownerId},
         loadRelationIds: true,
       })
+      const createdAt = scheduledEvent.createdAt ?? Date.now();
       if (scheduledEvent.type === 'MEETINGS' && !scheduledEvent.event.inPerson) {
         const flipper = await transactionalManager.findOneByOrFail(Flipper, [
           {user: {id: scheduledEvent.notifyTo}},
@@ -50,7 +51,9 @@ export function importScheduledEventHandlerFactory({eventBus, logger, entityMana
           caller: caller,
           owner: {id: owner.id},
           contact: {id: scheduledEvent.event.contactId},
-          building: {id: owner.building as any as string}
+          building: {id: owner.building as any as string},
+          createdAt: createdAt,
+          updatedAt: createdAt,
         })
       } else {
         await transactionalManager.save(ScheduledEvent, {
@@ -62,6 +65,8 @@ export function importScheduledEventHandlerFactory({eventBus, logger, entityMana
           building: {id: owner.building as any as string},
           contact: {id: scheduledEvent.event.contactId},
           owner: {id: owner.id},
+          createdAt: createdAt,
+          updatedAt: createdAt,
         })
       }
 
