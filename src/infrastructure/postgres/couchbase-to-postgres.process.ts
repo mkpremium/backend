@@ -12,6 +12,7 @@ import { BuildingOwnerImportTriggerService } from '../service/building-owner-imp
 import { BuildingProposalsImporterService } from '../service/building-proposals-importer.service'
 import { BuildingImportTriggerService } from '../service/building-import-trigger.service'
 import { BuildingWorkSheetsImporterService } from '../service/building-worksheets-importer.service'
+import { ImportScheduledEventHandler } from "../../scheduled-events/service/scheduled-event-importer.service";
 
 interface Deps {
   eventBus: EventBus,
@@ -20,6 +21,7 @@ interface Deps {
   entityManager: EntityManager,
   saveDocumentsCommandHandler: SaveDocumentsCommandHandler
   importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
+  importScheduledEventCommandHandler: ImportScheduledEventHandler
 
   buildingImportTriggerService: BuildingImportTriggerService,
   buildingImagesImporterService: BuildingImagesImporterService,
@@ -35,6 +37,7 @@ export function couchbaseToPostgresProcess ({
                                            entityManager,
                                            saveDocumentsCommandHandler,
                                            importOwnerCommandHandler,
+                                            importScheduledEventCommandHandler,
                                            buildingImportTriggerService,
                                            buildingImagesImporterService,
                                            buildingOwnerImportTriggerService,
@@ -83,6 +86,12 @@ export function couchbaseToPostgresProcess ({
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OWNER,
     eventBus,
     importOwnerCommandHandler,
+  )
+
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_SCHEDULED_EVENT,
+    eventBus,
+    importScheduledEventCommandHandler,
   )
 
   return {
