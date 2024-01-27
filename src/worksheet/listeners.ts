@@ -15,6 +15,7 @@ import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.enti
 import {
   SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
 } from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
+import { subscribeToCommand } from "../infrastructure/listeners";
 
 export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
@@ -72,6 +73,12 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
       return new Promise(resolve => setTimeout(resolve, consistencyDelay))
         .then(() => updateWorksheetStatusOnOwnerChangeService.updateWorksheet(evt))
     })
+
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES_MIGRATION__IMPORT_WORKSHEET_QUEUE,
+    'importWorksheetQueueHandler',
+    container
+  )
 
   async function invalidateWorksheet ({ worksheetId }: InvalidWorksheetFound) {
     logger.info('Invalid worksheet found, updating status', { worksheetId })

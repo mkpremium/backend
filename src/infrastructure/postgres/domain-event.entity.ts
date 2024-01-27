@@ -24,10 +24,11 @@ export enum DomainEventCatalog {
   WORKSHEET__INVALID_WORKSHEET_FOUND = 'worksheet.invalid_worksheet_found',
   WORKSHEET__NEXT_IN_QUEUE_TAKEN = 'worksheet.next_in_queue_taken',
   WORKSHEET__TAKEN = 'worksheet.taken',
-  WORKSHEET__WORKSHEET_IMPORTED = 'worksheet.worksheet_imported',
 
   POSTGRES_MIGRATION__OWNER_IMPORTED = 'postgres_migration.owner_imported',
   POSTGRES_MIGRATION__SCHEDULED_EVENT_IMPORTED='postgres_migration.scheduled_event_imported',
+  POSTGRES_MIGRATION__WORKSHEET_IMPORTED = 'postgres_migration.worksheet_imported',
+  POSTGRES_MIGRATION__WORKSHEET_QUEUE_IMPORTED = 'postgres_migration.worksheet_queue_imported',
 
   // Commands, not events.
   CMD__POSTGRES__MIGRATION__IMPORT_BUILDING = 'postgres_migration.import_building',
@@ -35,6 +36,7 @@ export enum DomainEventCatalog {
   CMD__POSTGRES__MIGRATION__IMPORT_OWNER = 'postgres_migration.import_owner',
   CMD__POSTGRES__MIGRATION__IMPORT_SCHEDULED_EVENT = 'postgres_migration.scheduled_event',
   CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS = 'postgres.save_documents_command',
+  CMD__POSTGRES_MIGRATION__IMPORT_WORKSHEET_QUEUE = 'postgres_migration.scheduled_event_command',
 }
 
 @Entity()

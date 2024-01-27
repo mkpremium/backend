@@ -17,6 +17,7 @@ import { CouchbaseWorksheetQueueRepository } from './repository/couchbase-worksh
 import { CouchbaseCallSchedulerService } from './service/couchbase-call-scheduler.service'
 import { PostgresWorksheetQueueRepository } from './repository/postgres-worksheet-queue.repository'
 import { FreezerService } from "./service/freezer.service";
+import { importWorksheetQueueHandlerFactory } from "./service/import-worksheet-queue-command-handler.service";
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
@@ -24,6 +25,7 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
 
     callcenterWorksheetService: asClass(CallcenterWorksheetService).classic().singleton(),
     freezerService:asClass(FreezerService).classic().singleton(),
+    importWorksheetQueueHandler: asFunction(importWorksheetQueueHandlerFactory).singleton(),
     syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asClass(
       SyncWorksheetStatusOnBuildingNegotiationStatusChangeService).singleton().classic(),
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),

@@ -53,7 +53,7 @@ export class BuildingWorkSheetsImporterService {
       await em.save(Worksheet, worksheet)
       await markCouchbaseDocumentAsMigrated(em, original.id)
       await this.eventBus.publish({
-        name: DomainEventCatalog.WORKSHEET__WORKSHEET_IMPORTED,
+        name: DomainEventCatalog.POSTGRES_MIGRATION__WORKSHEET_IMPORTED,
         em,
       })
     })
