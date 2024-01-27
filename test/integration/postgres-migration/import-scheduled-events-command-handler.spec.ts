@@ -56,7 +56,7 @@ describe('importScheduledEventHandler', () => {
 
     await importer({scheduledEvent: testScheduledCall})
 
-    await assertOwnerSaved(testScheduledCall)
+    await assertScheduledEventSaved(testScheduledCall)
   });
 
   it('imports meetings', async () => {
@@ -79,7 +79,7 @@ describe('importScheduledEventHandler', () => {
 
     await importer({scheduledEvent: testMeeting})
 
-    await assertOwnerSaved(testMeeting)
+    await assertScheduledEventSaved(testMeeting)
   });
 
   it('imports offer requests', async () => {
@@ -111,11 +111,10 @@ describe('importScheduledEventHandler', () => {
 
   it.skip('imports calls with mapped contact ID')
 
-  async function assertOwnerSaved(scheduledEvent: ScheduledEventArg) {
+  async function assertScheduledEventSaved(scheduledEvent: ScheduledEventArg) {
     const savedScheduledEvent = await entityManager.findOneBy(ScheduledEvent, {id: scheduledEvent.id});
     expect(savedScheduledEvent).to.include({id: scheduledEvent.id})
   }
-
 
   async function saveScheduledEventCouchbaseDocument(scheduledEvent: ScheduledEventArg) {
     await entityManager.save(CouchbaseDocument, {
