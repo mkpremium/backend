@@ -21,8 +21,9 @@ type Deps = {
   logger: Logger
 }
 
-export function saveDocumentsCommandHandler ({ couchbaseAdapter, logger, ormDataSource }: Deps) {
-  return async function (cmd: SaveDocumentCommand) {
+export type SaveDocumentsCommandHandler = ReturnType<typeof saveDocumentsCommandHandlerFactory>
+export function saveDocumentsCommandHandlerFactory ({ couchbaseAdapter, logger, ormDataSource }: Deps) {
+  return async function saveDocumentsCommandHandler (cmd: SaveDocumentCommand) {
     for (const id of cmd.ids) {
       logger.info('Saving couchbase document into postgres', { id })
       try {

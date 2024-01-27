@@ -4,7 +4,7 @@ import type { Logger } from 'winston'
 import type { DataSource, EntityManager } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 import { subscribeToCommand } from '../listeners'
-import type { saveDocumentsCommandHandler as saveDocumentsHandlerFactory } from './save-documents-command-handler'
+import type { SaveDocumentsCommandHandler } from './save-documents-command-handler'
 import type { importOwnerHandlerFactory } from '../../owner/service/import-owner-command-handler'
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
 import { importOperatorCommandHandler } from './import-operator-command-handler'
@@ -18,7 +18,7 @@ interface Deps {
   logger: Logger,
   ormDataSource: DataSource,
   entityManager: EntityManager,
-  saveDocumentsCommandHandler: ReturnType<typeof saveDocumentsHandlerFactory>
+  saveDocumentsCommandHandler: SaveDocumentsCommandHandler
   importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
 
   buildingImportTriggerService: BuildingImportTriggerService,
