@@ -13,6 +13,7 @@ import { BuildingProposalsImporterService } from '../service/building-proposals-
 import { BuildingImportTriggerService } from '../service/building-import-trigger.service'
 import { BuildingWorkSheetsImporterService } from '../service/building-worksheets-importer.service'
 import { ImportScheduledEventHandler } from "../../scheduled-events/service/scheduled-event-importer.service";
+import { ScheduledEventImportTriggerService } from '../service/scheduled-event-import-trigger.service'
 
 interface Deps {
   eventBus: EventBus,
@@ -24,6 +25,7 @@ interface Deps {
   importScheduledEventCommandHandler: ImportScheduledEventHandler
 
   buildingImportTriggerService: BuildingImportTriggerService,
+  scheduledEventImportTriggerService: ScheduledEventImportTriggerService,
   buildingImagesImporterService: BuildingImagesImporterService,
   importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
   buildingOwnerImportTriggerService: BuildingOwnerImportTriggerService,
@@ -39,6 +41,7 @@ export function couchbaseToPostgresProcess({
                                              importOwnerCommandHandler,
                                              importScheduledEventCommandHandler,
                                              buildingImportTriggerService,
+                                             scheduledEventImportTriggerService,
                                              buildingImagesImporterService,
                                              buildingOwnerImportTriggerService,
                                              buildingProposalsImporterService,
@@ -97,6 +100,9 @@ export function couchbaseToPostgresProcess({
   return {
     async triggerBuildingMigration() {
       await buildingImportTriggerService.triggerImport(parseInt(process.env["BUILDING_MIGRATION_LIMIT"]) || 1000)
+    },
+    async triggerScheduledEventMigration() {
+      await scheduledEventImportTriggerService.triggerImport()
     },
     async triggerOperatorsMigration() {
       logger.info('Triggering operators migration')

@@ -30,6 +30,10 @@ export async function startListeners (diContainer) {
     logger.info('Triggering building migration')
     await migrationProcess.triggerBuildingMigration()
   }
+  if (process.env.TRIGGER_SCHEDULED_EVENTS_MIGRATION === "true") {
+    logger.info('Triggering scheduled events migration')
+    await migrationProcess.triggerScheduledEventMigration()
+  }
 }
 
 export function subscribeToCommand (command: DomainEventCatalog, eventBus: EventListener, service: any): void
