@@ -10,6 +10,7 @@ const logger = initLogger()
 const sqsClient = new SQS({
   region: 'eu-west-1'
 })
+const BUCKET_NAME = process.env.COUCHBASE_BUCKET || 'mkpremium'
 
 const DOCUMENTS_CONDITION = process.env[ 'DOCUMENTS_CONDITION' ]
 if (!DOCUMENTS_CONDITION) {
@@ -32,8 +33,8 @@ connectCouchbaseBucket()
         FROM_COUCHBASE,
       )
       const allDocumentsQuery = bucket.query(
-        N1qlQuery.fromString(`SELECT mkpremium.id
-                              FROM mkpremium
+        N1qlQuery.fromString(`SELECT ${BUCKET_NAME}.id
+                              FROM ${BUCKET_NAME}
                               WHERE ${DOCUMENTS_CONDITION}`)
       )
       allDocumentsQuery.on('error', reject)
