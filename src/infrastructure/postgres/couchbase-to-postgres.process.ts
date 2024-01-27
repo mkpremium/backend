@@ -31,23 +31,23 @@ interface Deps {
   buildingWorkSheetsImporterService: BuildingWorkSheetsImporterService,
 }
 
-export function couchbaseToPostgresProcess ({
-                                           eventBus,
-                                           logger,
-                                           entityManager,
-                                           saveDocumentsCommandHandler,
-                                           importOwnerCommandHandler,
-                                            importScheduledEventCommandHandler,
-                                           buildingImportTriggerService,
-                                           buildingImagesImporterService,
-                                           buildingOwnerImportTriggerService,
-                                           buildingProposalsImporterService,
-                                           buildingWorkSheetsImporterService,
-                                         }: Deps) {
+export function couchbaseToPostgresProcess({
+                                             eventBus,
+                                             logger,
+                                             entityManager,
+                                             saveDocumentsCommandHandler,
+                                             importOwnerCommandHandler,
+                                             importScheduledEventCommandHandler,
+                                             buildingImportTriggerService,
+                                             buildingImagesImporterService,
+                                             buildingOwnerImportTriggerService,
+                                             buildingProposalsImporterService,
+                                             buildingWorkSheetsImporterService,
+                                           }: Deps) {
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.trigger_building_owners_migration',
-    async ({ buildingId }: { buildingId: string }) => {
+    async ({buildingId}: { buildingId: string }) => {
       await buildingOwnerImportTriggerService.importBuildingOwners(buildingId)
     }
   )
@@ -55,7 +55,7 @@ export function couchbaseToPostgresProcess ({
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.import_building_images',
-    async ({ buildingId }: { buildingId: string }) => {
+    async ({buildingId}: { buildingId: string }) => {
       await buildingImagesImporterService.importBuildingImages(buildingId)
     }
   )
@@ -63,7 +63,7 @@ export function couchbaseToPostgresProcess ({
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.import_building_proposals',
-    async ({ buildingId }: { buildingId: string }) => {
+    async ({buildingId}: { buildingId: string }) => {
       await buildingProposalsImporterService.importBuildingProposal(buildingId)
     }
   )
@@ -71,7 +71,7 @@ export function couchbaseToPostgresProcess ({
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.import_building_worksheets',
-    async ({ buildingId }: { buildingId: string }) => {
+    async ({buildingId}: { buildingId: string }) => {
       await buildingWorkSheetsImporterService.importWorkSheets(buildingId)
     }
   )
@@ -95,24 +95,24 @@ export function couchbaseToPostgresProcess ({
   )
 
   return {
-    async triggerBuildingMigration () {
-      await buildingImportTriggerService.triggerImport(parseInt(process.env[ "BUILDING_MIGRATION_LIMIT" ]) || 1000)
+    async triggerBuildingMigration() {
+      await buildingImportTriggerService.triggerImport(parseInt(process.env["BUILDING_MIGRATION_LIMIT"]) || 1000)
     },
-    async triggerOperatorsMigration () {
+    async triggerOperatorsMigration() {
       logger.info('Triggering operators migration')
       const allOperators = await entityManager
         .createQueryBuilder(CouchbaseDocument, 'operator')
-        .andWhere('operator.documentType = :documentType', { documentType: CouchbaseDocumentType.OPERATOR })
-        .select([ 'operator.id', 'operator.document' ])
+        .andWhere('operator.documentType = :documentType', {documentType: CouchbaseDocumentType.OPERATOR})
+        .select(['operator.id', 'operator.document'])
         .getMany()
-      logger.info('Found operators', { count: allOperators.length })
+      logger.info('Found operators', {count: allOperators.length})
 
       for (const operator of allOperators) {
         await eventBus.publish({
           name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OPERATOR,
           operator: operator.document,
         })
-        logger.info('Operator migration triggered', { operatorId: operator.id })
+        logger.info('Operator migration triggered', {operatorId: operator.id})
       }
       logger.info('All operators migration triggered')
     },
