@@ -28,7 +28,7 @@ async function sendMessages() {
 
     const params = {
       QueueUrl: QUEUE_URL,
-      MessageBody: JSON.stringify(message),
+      MessageBody: JSON.stringify(message.Body),
     };
 
     try {
