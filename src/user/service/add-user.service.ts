@@ -16,6 +16,7 @@ interface AddUserCommand {
 
 export async function addUserService (cmd: AddUserCommand) {
   return cmd.em.save(User, {
+    id: cmd.id,
     username: cmd.username,
     password: isHashedPassword(cmd.password) ? cmd.password : await hashPassword(assertPasswordIsSecure(cmd.password)),
     enabled: true,
