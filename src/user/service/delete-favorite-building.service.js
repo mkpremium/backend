@@ -3,7 +3,7 @@ export class DeleteFavoriteBuildingService {
     this.usersRepository = usersRepository
   }
 
-  deleteFavoriteBuilding (userId, buildingId) {
-    return this.usersRepository.removeFavoriteBuildingToUserOfId(userId, buildingId)
+  async deleteFavoriteBuilding (userId, buildingId) {
+    await this.usersRepository.removeFavoriteBuildingToUserOfId(userId, buildingId)
   }
 }

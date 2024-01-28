@@ -2,8 +2,8 @@ import { UserProps } from '../../types/user'
 import * as TE from 'fp-ts/TaskEither'
 
 export interface FlipperFavoritesBuildingsService {
-  addFavoriteBuildingToUserOfId (userId: string, buildingId: string): Promise<UserProps>
-  removeFavoriteBuildingToUserOfId (userId: string, buildingId: string): Promise<UserProps>
+  addFavoriteBuildingToUserOfId (userId: string, buildingId: string): Promise<void>
+  removeFavoriteBuildingToUserOfId (userId: string, buildingId: string): Promise<void>
   withFavoriteBuilding (buildingId: string): TE.TaskEither<Error, UserProps | undefined>
 }
 
