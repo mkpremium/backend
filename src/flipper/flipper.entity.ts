@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
+import { Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm'
 import { Building } from '../building/building.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { User } from '../user/user.entity'
@@ -11,4 +11,8 @@ export class Flipper extends BaseEntity {
   @OneToOne(() => User)
   @JoinColumn()
   user: User
+
+  @ManyToMany(() => Building)
+  @JoinTable()
+  favoriteBuildings: Building[]
 }
