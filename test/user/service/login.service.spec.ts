@@ -18,7 +18,7 @@ describe('LoginService#login', () => {
     const result = await service.login(<Credentials>testUser)
 
     expect(result).to.have.keys(
-      [ 'access_token', 'operator', 'refreshToken', 'roles', 'token', 'token_type' ]
+      [ 'access_token', 'operator', 'roles', 'token', 'token_type' ]
     )
   })
 })
