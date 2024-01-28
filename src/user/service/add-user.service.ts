@@ -3,7 +3,6 @@ import { User } from '../user.entity'
 import { UserProfileProps } from '../../types/user'
 import bcrypt from 'bcrypt'
 import { saltFactor } from '../../../config'
-import { passwordRegex } from '../../operator/operatorRefreshTokenRepository'
 
 interface AddUserCommand {
   em: EntityManager
@@ -13,6 +12,8 @@ interface AddUserCommand {
   profile: UserProfileProps
   isAdmin?: boolean
 }
+
+export const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
 
 export async function addUserService (cmd: AddUserCommand) {
   return cmd.em.save(User, {

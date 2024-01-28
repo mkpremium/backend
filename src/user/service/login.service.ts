@@ -69,11 +69,9 @@ export class LoginService {
       }
     }
 
-    const { refreshToken } = await this.authTokenIssuerService.issueRefreshToken(user.id)
     const token = this.authTokenIssuerService.issueToken(tokenPayload)
 
     return AuthenticatedResponse({
-      refreshToken,
       token,
       access_token: token,
       token_type: 'bearer',

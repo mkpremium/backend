@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
+import _isNil from 'lodash/isNil'
 import _omit from 'lodash/omit'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -9,9 +10,36 @@ import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
 import { OperatorStatsRepository } from '../stats/models'
 import { OperatorActions } from '../stats/types'
-import { User as OperatorType, UserRoles } from '../types/user'
-import { OperatorRefreshTokenRepository, OperatorRequest } from './operatorRefreshTokenRepository'
+import { User as OperatorType, UserProfile, UserRole, UserRoles } from '../types/user'
 import { AuthenticatedResponse, OperatorListResponse } from './types'
+
+export const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
+const Password = t.refinement(t.String, n => passwordRegex.test(n), 'Password')
+const NotEmptyString = t.refinement(t.String, n => !_isNil(n), 'NotEmptyString')
+export const OperatorRequest = t.struct(
+  {
+    username: NotEmptyString,
+    password: Password,
+    email: t.maybe(t.String),
+    agentNumber: t.maybe(t.String),
+    level: t.maybe(t.Number),
+    serviceId: t.maybe(t.String),
+    enable: t.Boolean,
+    flipperId: t.maybe(t.String),
+    roles: t.list(UserRole),
+
+    profile: UserProfile
+  },
+  {
+    name: 'OperatorRequest',
+    defaultProps: {
+      enable: true,
+      roles: [],
+      features: [],
+      profile: {}
+    }
+  }
+)
 
 const ListStats = t.struct(
   {
@@ -105,11 +133,9 @@ export class OperatorRepository extends CouchbaseModel {
       }
     }
 
-    const { refreshToken } = await OperatorRefreshTokenRepository.createToken(operator)
     const token = await OperatorRepository.createToken(tokenPayload)
 
     return AuthenticatedResponse({
-      refreshToken,
       token,
       access_token: token,
       token_type: 'bearer',
