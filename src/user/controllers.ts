@@ -1,4 +1,5 @@
 import { UsersRepository } from './repository/users.repository'
+import { FlipperFavoritesBuildingsService } from "../flipper/service/flipper-favorites-buildings.service";
 
 export const meControllerFactory = (usersRepository: UsersRepository) => {
   return async (req, res) => {
@@ -21,9 +22,9 @@ export const meControllerFactory = (usersRepository: UsersRepository) => {
   }
 }
 
-export const addFavoritesControllerFactory = addFavoriteBuildingService => {
+export const addFavoritesControllerFactory = (flipperFavoritesBuildingsService: FlipperFavoritesBuildingsService) => {
   return async (req, res) => {
-    await addFavoriteBuildingService.addFavoriteBuilding(req.user.operator.id, req.body.buildingId)
+    await flipperFavoritesBuildingsService.addFavoriteBuildingToUserOfId(req.user.operator.id, req.body.buildingId)
     res.status(201).json()
   }
 }

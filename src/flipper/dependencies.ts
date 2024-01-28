@@ -1,4 +1,4 @@
-import { asClass, asFunction, AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
 import { FlipperAvailabilityService } from './service/flipper-availability.service'
 import { SetFlipperMaxLineService } from './service/set-flipper-max-line.service'
 import { createFlipperBlockedAvailabilityController } from './controller/flipper-availability.controller'
@@ -14,5 +14,7 @@ export const setupFlipperDependencies = (container: AwilixContainer) => {
     flipperBlockedAvailabilityController: asFunction(createFlipperBlockedAvailabilityController).singleton(),
     setFlipperMaxLineController: asFunction(createSetFlipperMaxLineController).singleton(),
     flippersRepository: asClass(FlipperRepository).classic().singleton(),
+
+    flipperFavoritesBuildingsService: aliasTo('couchbaseUsersRepository'),
   })
 }
