@@ -16,24 +16,25 @@ interface Deps {
 }
 
 export function importWorksheetQueueHandlerFactory ({ eventBus, logger, entityManager }: Deps) {
-  return async function importWorksheetQueueHandler ({ worksheetQueue }: { worksheetQueue: WorksheetQueueProps
+  return async function importWorksheetQueueHandler ({ worksheetQueueId }: { worksheetQueueId: string
     s }) {
-    logger.info('Importing WorksheetQueue', { worksheetQueue })
+    logger.info('Importing WorksheetQueue', { worksheetQueueId })
 
 
     await entityManager.transaction(async em => {
       // Get the Couchbase document for the WorksheetQueue
-      const couchbaseDocument = await getCouchbaseDocument(em, worksheetQueue.id)
+      const couchbaseDocument = await getCouchbaseDocument(em, worksheetQueueId)
 
       // Check if the document has already been migrated
       if (couchbaseDocument.migratedAt) {
         // If it has, log a warning and return early
-        logger.warning('WorksheetQueue already migrated', { worksheetQueueId: worksheetQueue.id })
+        logger.warning('WorksheetQueue already migrated', { worksheetQueueId: worksheetQueueId })
         return
       }
 
+      const worksheetQueue = couchbaseDocument.document as WorksheetQueueProps
       await em.save(WorksheetQueue, {
-        id: worksheetQueue.id,
+        id: couchbaseDocument.id,
         name: worksheetQueue.name,
         source: worksheetQueue.source,
       })

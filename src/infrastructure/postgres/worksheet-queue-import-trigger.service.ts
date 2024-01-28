@@ -1,9 +1,8 @@
 import { EventBus } from '../event-bus'
 import { DomainEventCatalog } from './domain-event.entity'
 import type { Logger } from 'winston'
-import { CouchbaseDocumentRepository } from "./couchbase-document.repository";
-import { CouchbaseDocumentType } from "./couchbase-document.entity";
-import { WorksheetQueueProps } from "../../worksheet/domain/queue";
+import { CouchbaseDocumentRepository } from './couchbase-document.repository'
+import { CouchbaseDocumentType } from './couchbase-document.entity'
 
 export class WorksheetQueueImportTriggerService {
   constructor(
@@ -22,7 +21,7 @@ export class WorksheetQueueImportTriggerService {
     for (const row of worksheetQueuesToMigrate) {
       await this.eventBus.publish({
         name: DomainEventCatalog.CMD__POSTGRES_MIGRATION__IMPORT_WORKSHEET_QUEUE,
-        worksheetQueue: row.document as WorksheetQueueProps,
+        worksheetQueueId: row.id,
       })
       this.logger.info('WorksheetQueue import triggered', {worksheetQueueId: row.id})
     }
