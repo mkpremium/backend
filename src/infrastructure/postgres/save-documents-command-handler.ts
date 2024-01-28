@@ -48,7 +48,6 @@ export function saveDocumentsCommandHandlerFactory ({ couchbaseAdapter, logger, 
         })
       } catch (e) {
         logger.error('Error saving couchbase document into postgres', { id, error: e.message })
-        throw e
       }
     }
   }
