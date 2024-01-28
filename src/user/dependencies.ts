@@ -1,5 +1,4 @@
 import { aliasTo, asClass, asFunction } from 'awilix'
-import { DeleteFavoriteBuildingService } from './service/delete-favorite-building.service'
 import { UserBlockedAvailabilityService } from './service/user-blocked-availability.service'
 import { removeFavoriteForNoSaleBuildings } from './event-listener/remove-favorite-for-no-sale-buildings'
 import { CouchbaseUsersRepository } from './repository/couchbase-users.repository'
@@ -21,7 +20,6 @@ export const setupUserDependencies = container => {
 
     addOperatorService: asClass(AddOperatorService).classic().singleton(),
     authTokenIssuerService: asClass(AuthTokenIssuerService).classic().singleton(),
-    deleteFavoriteBuildingService: asClass(DeleteFavoriteBuildingService).classic().singleton(),
     loginService: asClass(LoginService).classic().singleton(),
     removeFavoriteForNoSaleBuildings: asFunction(removeFavoriteForNoSaleBuildings).singleton(),
     userBlockedAvailabilityService: asClass(UserBlockedAvailabilityService).singleton(),

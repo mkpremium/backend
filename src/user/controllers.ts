@@ -29,9 +29,9 @@ export const addFavoritesControllerFactory = (flipperFavoritesBuildingsService: 
   }
 }
 
-export const deleteFavoriteBuildingControllerFactory = deleteFavoriteBuildingService => {
+export const deleteFavoriteBuildingControllerFactory = (flipperFavoritesBuildingsService: FlipperFavoritesBuildingsService) => {
   return async (req, res) => {
-    await deleteFavoriteBuildingService.deleteFavoriteBuilding(req.user.operator.id, req.params.buildingId)
+    await flipperFavoritesBuildingsService.removeFavoriteBuildingToUserOfId(req.user.operator.id, req.params.buildingId)
     res.json()
   }
 }

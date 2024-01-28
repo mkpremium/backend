@@ -8,7 +8,7 @@ export const setupUserRoutes = (app, container, secured) => {
   router.get('/me', wrap(meControllerFactory(container.resolve('usersRepository'))))
   router.post('/favorites', wrap(addFavoritesControllerFactory(container.resolve('flipperFavoritesBuildingsService'))))
   router.delete('/favorites/:buildingId', wrap(
-    deleteFavoriteBuildingControllerFactory(container.resolve('deleteFavoriteBuildingService'))))
+    deleteFavoriteBuildingControllerFactory(container.resolve('flipperFavoritesBuildingsService'))))
 
 
   app.use('/', secured, router)
