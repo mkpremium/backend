@@ -2,31 +2,23 @@ import { BuildingNegotiationStatusChanged } from '../../building/service/update-
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { fromPromise } from '../../infrastructure/fp-utils'
-import { User, UserProps } from '../../types/user'
-import { CouchbaseUsersRepository } from '../repository/couchbase-users.repository'
+import { FlipperFavoritesBuildingsService } from "../../flipper/service/flipper-favorites-buildings.service";
 
-export function removeFavoriteForNoSaleBuildings ({ couchbaseUsersRepository }: { couchbaseUsersRepository: CouchbaseUsersRepository }) {
+export function removeFavoriteForNoSaleBuildings({flipperFavoritesBuildingsService}: {
+  flipperFavoritesBuildingsService: FlipperFavoritesBuildingsService
+}) {
   return async function removeFavorite(evt: BuildingNegotiationStatusChanged) {
     if (evt.negotiationStatus !== 'NO VENDE') {
       return
     }
     await pipe(
-      couchbaseUsersRepository.withFavoriteBuilding(evt.buildingId),
+      flipperFavoritesBuildingsService.withFavoriteBuilding(evt.buildingId),
       TE.chain((user) => {
         if (!user) {
           return TE.of(undefined)
         }
-        const updatedUser = removeFavoriteBuilding(user, evt.buildingId)
-        return fromPromise(couchbaseUsersRepository.save(updatedUser))
+        return fromPromise(flipperFavoritesBuildingsService.removeFavoriteBuildingToUserOfId(user.id, evt.buildingId))
       })
     )()
   }
-}
-
-function removeFavoriteBuilding (user: UserProps, buildingId: string): UserProps {
-  return User.update(user, {
-    favoriteBuildings: {
-      $set: user.favoriteBuildings.filter(id => id !== buildingId)
-    }
-  })
 }
