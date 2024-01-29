@@ -78,7 +78,7 @@ export function couchbaseToPostgresProcess({
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.import_building_worksheets',
     async ({buildingId}: { buildingId: string }) => {
-      await buildingWorkSheetsImporterService.importWorkSheets(buildingId)
+      await buildingWorkSheetsImporterService.importWorkSheet(buildingId)
     }
   )
 

@@ -20,7 +20,7 @@ export class BuildingWorkSheetsImporterService {
   ) {
   }
 
-  async importWorkSheets(buildingId: string) {
+  async importWorkSheet(buildingId: string) {
     this.logger.info('Building imported, importing its worksheets', { buildingId })
     const worksheet = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
       CouchbaseDocumentType.WORKSHEET, buildingId)

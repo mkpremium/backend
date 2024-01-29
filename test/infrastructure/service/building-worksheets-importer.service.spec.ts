@@ -1,8 +1,13 @@
 import { expect } from 'chai'
 import { createTestContainer } from '../../create-test-container'
 
-import { BuildingWorkSheetsImporterService  } from '../../../src/infrastructure/service/building-worksheets-importer.service'
-import { CouchbaseDocument, CouchbaseDocumentType } from '../../../src/infrastructure/postgres/couchbase-document.entity'
+import {
+  BuildingWorkSheetsImporterService
+} from '../../../src/infrastructure/service/building-worksheets-importer.service'
+import {
+  CouchbaseDocument,
+  CouchbaseDocumentType
+} from '../../../src/infrastructure/postgres/couchbase-document.entity'
 import { buildingBuilder } from '../../building/building.builder'
 import { Building } from '../../../src/building/building.entity'
 import { Caller } from '../../../src/caller/caller.entity'
@@ -13,76 +18,58 @@ import { WorksheetQueue } from '../../../src/worksheet/worksheet-queue.entity'
 import { v4 as uuid } from 'uuid'
 import { EntityManager } from 'typeorm'
 import { QueueSource } from '../../../src/worksheet/domain/queue'
+import { addCaller, ResolvedDeps, resolveDependencies } from "../../helpers";
+import { buildingFactory, worksheetQueueFactory } from "../../factories";
+import { worksheetBuilder } from "../../worksheet/worksheet.builder";
 
 describe('BuildingWorkSheetsImporterService', () => {
   it('persists proposals', async () => {
-    const testContainer = await createTestContainer({ postgres: true, couchbase: false })
+    const [testBuildingId, deps] = await populateDB()
 
-    const service = testContainer.resolve('buildingWorkSheetsImporterService') as BuildingWorkSheetsImporterService
-    const em = testContainer.resolve('entityManager') as EntityManager
-    const buildingId = await populateDB(em)
+    const service = deps.container.resolve('buildingWorkSheetsImporterService') as BuildingWorkSheetsImporterService
+    await service.importWorkSheet(testBuildingId)
 
-    await service.importWorkSheets(buildingId)
-
+    const em = deps.container.resolve('entityManager') as EntityManager
     // Assert that the worksheet was created.
     const ws = await em.findOneBy(Worksheet, [
-      { building: { id: buildingId } },
+      {building: {id: testBuildingId}},
     ])
     expect(ws).to.be.not.null
   })
 })
 
-async function populateDB(em: EntityManager): Promise<string> {
-  const buildingId = uuid()
-  const queueId = uuid()
-  const worksheetId = uuid()
-  const userId = uuid()
+async function populateDB(): Promise<[string, ResolvedDeps]> {
+  const deps = await resolveDependencies()
+  const em = deps.container.resolve('entityManager') as EntityManager
 
-  const worksheet = {
+  const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
+  const testCaller = await addCaller(deps)
+  const testCouchbaseWorksheet = worksheetBuilder({id: uuid()}).build()
+  const testCouchbaseWorksheetQueueItem = {
     status: "OPENED",
     addedAt: "2021-09-16T07:00:46.719Z",
-    operatorId: userId,
-    worksheetId: worksheetId,
+    operatorId: testCaller.id,
+    worksheetId: testCouchbaseWorksheet.id,
   }
-
-  // Create the parent building.
-  await em.save(Building, {
-    ...buildingBuilder({ id: buildingId }).build(),
-  })
-
-  await em.save(User,
-    {id: userId, username: "test", password: "test", enabled: true, profile: {}})
-
-  // Create the caller using operatorId as the userId.
-  await em.save(Caller, {
-    user: {id: userId},
-  })
-
-  await em.save(WorksheetQueue, {
-    id: queueId,
-    name: "test",
-    source: {} as QueueSource,
-  })
+  const testQueue = await deps.postgresQueueRepository.save(worksheetQueueFactory.build())
 
   await em.save(CouchbaseDocument, {
-    id: queueId,
+    id: testQueue.id,
     documentType: CouchbaseDocumentType.WORKSHEET_QUEUE,
     document: {
-      worksheets: [
-        worksheet,
-      ],
+      worksheets: [testCouchbaseWorksheetQueueItem],
     }
   })
 
   await em.save(CouchbaseDocument, {
-    id: worksheetId,
+    id: testCouchbaseWorksheet.id,
     documentType: CouchbaseDocumentType.WORKSHEET,
     document: {
-      id: worksheetId,
-      relatedBuildingIds: [buildingId],
-      queueId: queueId,
+      id: testCouchbaseWorksheet.id,
+      relatedBuildingIds: [testBuilding.id],
+      queueId: testQueue.id,
     },
   })
 
-  return buildingId
+  return [testBuilding.id, deps]
 }
