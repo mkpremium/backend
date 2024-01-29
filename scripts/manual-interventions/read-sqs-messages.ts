@@ -44,7 +44,6 @@ function readMessages () {
           if (err) {
             console.error('An error occurred while writing the file:', err)
           } else {
-            console.log(`Message saved successfully: ${filePath}`)
             const deleteParams = {
               QueueUrl: QUEUE_URL,
               ReceiptHandle: message.ReceiptHandle
@@ -53,14 +52,13 @@ function readMessages () {
               if (err) {
                 console.log('Delete Error', err)
               } else {
-                console.log('Message Deleted', data)
               }
             })
           }
         })
       })
-      console.log('Batch of messages read, waiting before reading next batch...')
-      setTimeout(readMessages, 1000)
+      console.log('Batch of messages read, reading next batch...')
+      readMessages()
     }
   })
 }
