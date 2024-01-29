@@ -12,7 +12,7 @@ import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-docum
 import { CouchbaseDocumentRepository } from "../postgres/couchbase-document.repository";
 
 export class BuildingWorkSheetsImporterService {
-  constructor (
+  constructor(
     private readonly eventBus: EventPublisher,
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,
@@ -21,35 +21,37 @@ export class BuildingWorkSheetsImporterService {
   }
 
   async importWorkSheet(buildingId: string) {
-    this.logger.info('Building imported, importing its worksheets', { buildingId })
-    const worksheet = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
+    this.logger.info('Building imported, importing its worksheets', {buildingId})
+    const couchbaseDocument = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
       CouchbaseDocumentType.WORKSHEET, buildingId)
 
-    const original = worksheet.document as WorksheetProps
+    const original = couchbaseDocument.document as WorksheetProps
 
-    if (!worksheet) {
-      this.logger.error('No worksheets found for building', { buildingId })
+    if (!couchbaseDocument) {
+      this.logger.error('No worksheets found for building', {buildingId})
       return
     }
 
-    // Find the worksheet queue.
-    const queue = (await this.couchbaseDocumentRepository.getNonMigratedDocumentById(
-      CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)).document as WorksheetQueueProps
+    const worksheet = structToEntity(original)
+    if (original.queueId) {
+      // Find the worksheet queue.
+      const queue = (await this.couchbaseDocumentRepository.getNonMigratedDocumentById(
+        CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)).document as WorksheetQueueProps
 
-    let operatorId = null
-    let queueItems = queue?.worksheets || []
-    for (const worksheet of queueItems) {
-      if (worksheet.worksheetId === original.id) {
-        operatorId = worksheet.operatorId
-        break
+      let operatorId = null
+      let queueItems = queue?.worksheets || []
+      for (const worksheet of queueItems) {
+        if (worksheet.worksheetId === original.id) {
+          operatorId = worksheet.operatorId
+          break
+        }
       }
+      worksheet.heldBy = await this.entityManager.findOne(Caller, {
+        where: {user: {id: operatorId}},
+      })
     }
-    const caller = await this.entityManager.findOne(Caller, {
-      where: {user: {id: operatorId}},
-    })
 
     await this.entityManager.transaction(async em => {
-      const worksheet = { heldBy: caller, ...structToEntity(original) } as Worksheet
       await em.save(Worksheet, worksheet)
       await markCouchbaseDocumentAsMigrated(em, original.id)
       await this.eventBus.publish({
