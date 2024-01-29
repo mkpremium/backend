@@ -44,7 +44,7 @@
         },
         {
           "name": "COUCHBASE_USER",
-          "value": "backend"
+          "value": "admin"
         },
         {
           "name": "DATABASE",
@@ -94,7 +94,7 @@
       "workingDirectory": "/app",
       "secrets": [
         {
-          "valueFrom": "backend.couchbase_pass",
+          "valueFrom": "backend.couchbase_admin_pass",
           "name": "COUCHBASE_PASS"
         },
         {
