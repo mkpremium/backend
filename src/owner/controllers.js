@@ -1,6 +1,5 @@
-import { History } from '../history/models'
-import { Owner } from './owner'
 import t from 'tcomb'
+import { Owner } from './owner'
 
 export function updateOwnerControllerFactory ({ ownersRepository }) {
   return async function updateOwner (req, res) {
@@ -14,10 +13,6 @@ export function updateOwnerControllerFactory ({ ownersRepository }) {
     }
 
     await ownersRepository.save(updatedOwner)
-
-    const contextModel = { _documentType: 'owner', id }
-    await History.registerUpdate({ contextModel, user: req.user })
-
     res.status(204).send()
   }
 }

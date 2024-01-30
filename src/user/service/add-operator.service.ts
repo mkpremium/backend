@@ -1,5 +1,4 @@
 import { OperatorRepository } from '../../operator/models'
-import { History } from '../../history/models'
 import { UserProps, UserRoles } from '../../types/user'
 import { DataSource } from 'typeorm'
 import { addUserService } from './add-user.service'
@@ -29,13 +28,7 @@ export class AddOperatorService {
   }
 
   private async saveInCouchbase (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
-    const operator = await this.operatorRepository.createOperator(cmd)
-    await History.registerCreate({
-      contextModel: operator,
-      user: requester
-    })
-
-    return operator
+    return await this.operatorRepository.createOperator(cmd)
   }
 
   private async saveInPostgres (cmd: AddOperatorCommand, requesterId: string) {

@@ -1,6 +1,5 @@
 import { wrap } from 'express-promise-wrap'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { History } from '../history/models'
 import { WorksheetQueueBody } from './domain/queue'
 import { LegacyWorksheetRepository } from './models/worksheet-repository'
 import { WorksheetQueueRepository } from './repository/worksheet-queue.repository'
@@ -15,10 +14,6 @@ async function worksheetList (req, res) {
 const createQueue = (worksheetQueueRepository: WorksheetQueueRepository) => async (req, res) => {
   const params = fromJSON(req.body, WorksheetQueueBody)
   const queue = await worksheetQueueRepository.save(params)
-  await History.registerCreate({
-    contextModel: { ...queue, _documentType: 'worksheet-queue' },
-    user: req.user
-  })
   res.status(201).json(queue)
 }
 
@@ -27,10 +22,6 @@ const updateQueue = (worksheetQueueRepository: WorksheetQueueRepository) => asyn
   const queue = await worksheetQueueRepository.get(queueId)
   const $merge = fromJSON(req.body, WorksheetQueueBody)
   const updatedQueue = await worksheetQueueRepository.save(t.update(queue, { $merge }))
-  await History.registerUpdate({
-    contextModel: updatedQueue,
-    user: req.user
-  })
   res.json(updatedQueue)
 }
 

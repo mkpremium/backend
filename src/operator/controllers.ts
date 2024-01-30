@@ -37,10 +37,6 @@ async function updateOperator (req, res) {
 async function listOperator (req, res) {
   const repo = new OperatorRepository()
   const operators = await repo.list(req.query)
-  await History.registerList({
-    contextModel: 'operator',
-    user: req.user
-  })
   res.json(operators)
 }
 

@@ -16,6 +16,7 @@ export interface OwnerStatusChangedEvent {
   buildingId: string;
   oldStatus: OwnerStatus;
   newStatus: OwnerStatus;
+  byUserId: string;
 }
 
 export interface OwnerContactStatusChanged {
@@ -77,7 +78,8 @@ export class ChangeContactStatusService {
         newContactStatus: status,
         owner: {buildingId: owner.building.id, status: oldStatus},
         updatedOwner: owner,
-        em
+        em,
+        byUserId: user.id,
       });
 
       return ownerEntityToStruct(owner)
@@ -93,19 +95,19 @@ export class ChangeContactStatusService {
     const updatedOwner = await this.ownersRepository.save(
       changeContactStatus(owner, contactId, status)) as OwnerProps
 
-    await this.historyRepository.register({type: 'UPDATE', contextModel, user})
-    await this.publishEvents({ownerId, contactId, newContactStatus: status, owner, updatedOwner});
+    await this.publishEvents({ownerId, contactId, newContactStatus: status, owner, updatedOwner, byUserId: user.id});
 
     return updatedOwner
   }
 
-  private async publishEvents({ownerId, contactId, owner, updatedOwner, em, newContactStatus}: {
+  private async publishEvents({ownerId, contactId, owner, updatedOwner, em, newContactStatus, byUserId}: {
     ownerId: string,
     contactId: string,
     newContactStatus: string,
     owner: Pick<OwnerProps, 'status' | 'buildingId'>,
     updatedOwner: Pick<OwnerProps, 'status'>,
     em?: EntityManager,
+    byUserId: string
   }) {
     await this.eventBus.publish({
       name: DomainEventCatalog.OWNER__CONTACT_STATUS_CHANGED,
@@ -120,7 +122,8 @@ export class ChangeContactStatusService {
         ownerId,
         buildingId: owner.buildingId,
         oldStatus: owner.status,
-        newStatus: updatedOwner.status
+        newStatus: updatedOwner.status,
+        byUserId,
       }
       await this.eventBus.publish(event, em)
     }

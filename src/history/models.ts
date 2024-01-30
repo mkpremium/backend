@@ -8,28 +8,6 @@ import { HistoryListQuery, HistoryListResponse, HistoryStruct } from './types'
 
 export class History extends CouchbaseModel {
   Struct = HistoryStruct
-
-  async register (eventData) {
-    return this.save(getHistoryStruct(eventData))
-  }
-
-  static async registerCreate (eventData) {
-    const history = new History()
-    eventData.type = 'CREATE'
-    return history.register(eventData)
-  }
-
-  static async registerUpdate (eventData) {
-    const history = new History()
-    eventData.type = 'UPDATE'
-    return history.register(eventData)
-  }
-
-  static async registerList (eventData) {
-    const history = new History()
-    eventData.type = 'LIST'
-    return history.register(eventData)
-  }
 }
 
 export class HistoryRepository extends History {
