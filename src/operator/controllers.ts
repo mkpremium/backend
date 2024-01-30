@@ -1,6 +1,5 @@
 import { wrap } from 'express-promise-wrap'
 import { OperatorRepository } from './models'
-import { History } from '../history/models'
 import { canManageOperator } from '../lib/role-operators'
 import { AddOperatorService } from '../user/service/add-operator.service'
 

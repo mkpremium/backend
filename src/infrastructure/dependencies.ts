@@ -3,7 +3,6 @@ import type { AwilixContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
 import { setupStockDependencies } from '../stock/dependencies'
-import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
 import { setupWorksheetDependencies } from '../worksheet/dependencies'
 import { setupEmailDependencies } from '../email/dependencies'
@@ -62,7 +61,6 @@ export async function setupContainer (
   setupCallerDependencies(container)
   setupUserDependencies(container)
   await setupStockDependencies(container, usePostgres)
-  setupHistoryDependencies(container)
   setupEmailDependencies(container)
   setupFlipperDependencies(container)
 }
