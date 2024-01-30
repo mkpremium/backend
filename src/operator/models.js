@@ -8,9 +8,7 @@ import fromJSON from 'tcomb/lib/fromJSON'
 import { jwt, saltFactor } from '../../config'
 import { CouchbaseModel } from '../db/model'
 import { newHttpError } from '../lib/http-error'
-import { OperatorStatsRepository } from '../stats/models'
-import { OperatorActions } from '../stats/types'
-import { User as OperatorType, UserProfile, UserRole, UserRoles } from '../types/user'
+import { User as OperatorType, UserProfile, UserRole } from '../types/user'
 import { AuthenticatedResponse, OperatorListResponse } from './types'
 
 export const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
@@ -40,29 +38,6 @@ export const OperatorRequest = t.struct(
     }
   }
 )
-
-const ListStats = t.struct(
-  {
-    role: t.enums.of([ UserRoles.OPERATOR, UserRoles.BUSINESS ]),
-    view: t.enums.of([ 'day', 'total' ])
-  },
-  {
-    name: 'ListStats',
-    defaultProps: {
-      role: UserRoles.OPERATOR,
-      view: 'total'
-    }
-  }
-)
-
-function defaultCounters () {
-  const mappedCounters = {}
-  Object.values(OperatorActions).map(statKey => {
-    mappedCounters[ statKey ] = 0
-  })
-
-  return mappedCounters
-}
 
 export class OperatorRepository extends CouchbaseModel {
   constructor () {
@@ -189,41 +164,6 @@ export class OperatorRepository extends CouchbaseModel {
     const results = await this.query(qb)
 
     return fromJSON({ total, results }, responseStruct)
-  }
-
-  async listWithStats (params) {
-    const args = ListStats(params)
-    const operators = await this.list({ role: args.role })
-    const statsRepo = new OperatorStatsRepository()
-
-    const results = await statsRepo.getStats(params)
-    const defaultValues = defaultCounters()
-
-    switch (args.view) {
-      case 'day':
-        return operators.results.map(operator => {
-          const counters = results[ operator.id ] || {}
-          return { operator, onLine: operator.online, counters }
-        })
-      case 'total':
-      default:
-        return operators.results.map(operator => {
-          const counters = results[ operator.id ] || defaultValues
-          return { operator, onLine: operator.online, counters }
-        })
-    }
-  }
-
-  async listWithPerformance (params) {
-    const operators = await this.list({ role: UserRoles.OPERATOR })
-    const statsRepo = new OperatorStatsRepository()
-
-    const results = await statsRepo.getPerformance(params)
-
-    return operators.results.map(operator => ({
-      operator,
-      performance: results[ operator.id ]
-    }))
   }
 
   async addAnAward (operator, code) {
