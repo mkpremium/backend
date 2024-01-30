@@ -1,9 +1,8 @@
-import { CouchbaseAdapter } from '../db/couchbase.adapter'
-import { aliasTo, asClass, asFunction, asValue, AwilixContainer, createContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, createContainer } from 'awilix'
+import type { AwilixContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
 import { setupStockDependencies } from '../stock/dependencies'
-import { Bucket } from 'couchbase'
 import { setupHistoryDependencies } from '../history/dependencies'
 import { initLogger } from './logger'
 import { setupWorksheetDependencies } from '../worksheet/dependencies'
@@ -22,10 +21,9 @@ import { EventPoller } from './event-bus/event-poller'
 import { createEventRecorderListener } from './event-bus/event-recorder.listener'
 import { saveDocumentsCommandHandlerFactory } from './postgres/save-documents-command-handler'
 import { initializeDataSource } from '../data-source'
-import { DataSource } from 'typeorm'
-import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
+import type { DataSource } from 'typeorm'
 import { setupContactsDependencies } from '../contacts/dependencies'
-import { Database } from './database'
+import type { Database } from './database'
 import { couchbaseToPostgresProcess } from './postgres/couchbase-to-postgres.process'
 import { BuildingImagesImporterService } from './service/building-images-importer.service'
 import { BuildingOwnerImportTriggerService } from './service/building-owner-import-trigger.service'
@@ -35,24 +33,28 @@ import { BuildingImportTriggerService } from './service/building-import-trigger.
 import { CouchbaseDocumentRepository } from "./postgres/couchbase-document.repository";
 import { ScheduledEventImportTriggerService } from "./service/scheduled-event-import-trigger.service";
 import { WorksheetQueueImportTriggerService } from "./postgres/worksheet-queue-import-trigger.service";
+import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
+import type { Bucket } from 'couchbase'
 
 export async function createDiContainer (database: Database) {
+  const usePostgres: boolean = database === 'postgres'
   const container = createContainer()
-  const [ couchbaseBucket, dataSource ] = await Promise.all([
-    connectCouchbaseBucket(),
-    initializeDataSource()
-  ])
+  const dataSource = await initializeDataSource()
+  let couchbaseBucket = null
+  if (!usePostgres) {
+    couchbaseBucket = await connectCouchbaseBucket()
+  }
 
-  setupContainer(container, couchbaseBucket, dataSource, database === 'postgres')
+  await setupContainer(container, couchbaseBucket, dataSource, usePostgres)
 
   return container
 }
 
-export function setupContainer (
+export async function setupContainer (
   container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource, usePostgres: boolean) {
   container.register('usePostgres', asValue(usePostgres))
-  setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
-  setupBuildingDependencies(container, usePostgres)
+  await setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
+  await setupBuildingDependencies(container, usePostgres)
   setupOwnerDependencies(container, usePostgres)
   setupContactsDependencies(container)
   setupScheduledEventsDependencies(container)
@@ -65,10 +67,16 @@ export function setupContainer (
   setupFlipperDependencies(container)
 }
 
-function setupInfrastructureDependencies (container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource) {
+async function setupInfrastructureDependencies (container: AwilixContainer, couchbaseBucket: Bucket | null, dataSource: DataSource) {
+  if (couchbaseBucket) {
+    const { CouchbaseAdapter } = await import('../db/couchbase.adapter')
+    container.register({
+      couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
+    })
+  }
+
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
-    couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
     ormDataSource: asValue(dataSource),
     entityManager: asValue(dataSource?.manager),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),

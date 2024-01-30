@@ -39,7 +39,7 @@ export async function createTestContainer ({ couchbase, postgres }: {
     } as any),
   ])
   const container = createContainer()
-  setupContainer(container, bucket, dataSource, postgres)
+  await setupContainer(container, bucket, dataSource, postgres)
 
   return container
 }

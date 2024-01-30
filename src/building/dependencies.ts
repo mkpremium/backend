@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, AwilixContainer } from 'awilix'
 import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
 import { FeaturedOwnerService } from './service/featured-owner.service'
 import { AddProposalService } from './service/add-proposal.service'
@@ -9,8 +9,6 @@ import { ListBuildingProposalsService } from './service/list-building-proposals.
 import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL.service'
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
-import { LegacyBuildingRepository } from './models'
-import { MetadataRepository } from './repository/metadata.repository'
 import { AdminBuildingRepository } from './repository/admin-building.repository'
 import { BuildingDocumentsRepository } from './repository/building-documents.repository'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
@@ -41,19 +39,44 @@ import { Portugal2021BuildingsImporterService } from './service/portugal2021-bui
 import { Portugal2021OwnersImporterService } from './service/portugal2021-owners-importer.service'
 import { Portugal2021WorksheetInitializerService } from './service/portugal2021-worksheet-initializer.service'
 import { createBuildingController } from './controller/create-building.controller'
-import { CouchbaseBuildingsRepository } from './repository/couchbase-building.repository'
-import { CouchbaseBuildingsReadRepository } from './repository/couchbase-buildings-read.repository'
 import { PostgresBuildingsRepository } from './repository/postgres-buildings.repository'
-import { CouchbaseOfferRequestsRepository } from './repository/couchbase-offer-requests.repository'
 import { UpdateProposalService } from './service/update-proposal.service'
-import { CouchbaseProposalsRepository } from './repository/couchbase-proposals.repository'
 import { PostgresProposalsRepository } from './repository/postgres-proposals.repository'
 import { AddBuildingService } from './service/add-building.service'
 import { importBuildingCommandHandler } from './service/import-building-command-handler'
-import { CouchbaseBuildingNotesRepository } from './repository/couchbase-building-notes.repository'
 import { PostgresBuildingNotesRepository } from './repository/postgres-building-notes.repository'
 
-export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
+export const setupBuildingDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
+  if (usePostgres) {
+    container.register({
+      couchbaseBuildingsRepository: asValue(null),
+      couchbaseBuildingsReadRepository: asValue(null),
+      couchbaseBuildingNotesRepository: asValue(null),
+      couchbaseProposalsRepository: asValue(null),
+      couchbaseOfferRequestsRepository: asValue(null),
+      legacyBuildingsRepository: asValue(null),
+      legacyMetadataRepository: asValue(null),
+    })
+  } else {
+    const { CouchbaseBuildingsRepository } = await import('./repository/couchbase-building.repository')
+    const { CouchbaseBuildingsReadRepository } = await import('./repository/couchbase-buildings-read.repository')
+    const { CouchbaseOfferRequestsRepository } = await import('./repository/couchbase-offer-requests.repository')
+    const { CouchbaseProposalsRepository } = await import('./repository/couchbase-proposals.repository')
+    const { CouchbaseBuildingNotesRepository } = await import('./repository/couchbase-building-notes.repository')
+    const { LegacyBuildingRepository } = await import('./models')
+    const { MetadataRepository } = await import('./repository/metadata.repository')
+
+    container.register({
+      couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
+      couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
+      couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
+      couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
+      couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
+      legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
+      legacyMetadataRepository: asClass(MetadataRepository).singleton(),
+    })
+  }
+
   container.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).classic().singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
@@ -73,23 +96,17 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     })).singleton().classic(),
     pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
-    couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
     postgresBuildingsRepository: asClass(PostgresBuildingsRepository).singleton().classic(),
     buildingsRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsRepository'),
-    couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
     buildingsReadRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsReadRepository'),
 
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
-    legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
     buyOffersRepository: aliasTo('legacyBuildingsRepository'),
 
-    legacyMetadataRepository: asClass(MetadataRepository).singleton(),
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
-    couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
     postgresBuildingNotesRepository: asClass(PostgresBuildingNotesRepository).classic().singleton(),
     buildingNotesRepository: aliasTo(usePostgres ? 'postgresBuildingNotesRepository' : 'couchbaseBuildingNotesRepository'),
-    couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
     postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
     proposalsRepository: aliasTo(usePostgres ? 'postgresProposalsRepository' : 'couchbaseProposalsRepository'),
 
@@ -108,7 +125,6 @@ export const setupBuildingDependencies = (container: AwilixContainer, usePostgre
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),
 
-    couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
     addOfferRequestService: asClass(AddOfferRequestService).classic().singleton(),
     setFeaturedOwnerFromOfferRequestListener: asFunction(setFeaturedOwnerFromOfferRequestListenerFactory).singleton(),
     addOfferRequestController: asFunction(addOfferRequestControllerFactory),
