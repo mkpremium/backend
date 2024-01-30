@@ -1,7 +1,3 @@
-import _ from 'lodash'
-import _find from 'lodash/find'
-import _get from 'lodash/get'
-import _isNil from 'lodash/isNil'
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 
@@ -10,7 +6,7 @@ import { newHttpError } from '../../lib/http-error'
 import { addBetweenQueryToBuilder, addDateQueryToBuilder } from '../../lib/query/helpers'
 import { ListQuery } from '../../types/params'
 import { StringSplitList } from '../../types/refinement'
-import { Worksheet, WorkSheetStatus, WorkSheetStatusEnum } from '../domain/worksheet'
+import { Worksheet, WorkSheetStatusEnum } from '../domain/worksheet'
 import { QueueRequestAction } from '../types'
 
 export const WorksheetListQuery = ListQuery.extend(
@@ -89,31 +85,6 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     }
 
     return worksheet
-  }
-
-  async worksheetStats () {
-    const bucket = this.getBucketName()
-
-    const query = `SELECT t.buildingAddress.province, t.status, COUNT(*) as count
-                   FROM ${bucket} t
-                   WHERE t._documentType = 'worksheet' AND t.status IS NOT MISSING
-                   GROUP BY t.status, t.buildingAddress.province`
-
-    const result = await this.queryRaw(query)
-
-    const provinces = _.uniq(result.map(r => r.province))
-
-    const totals = {}
-
-    provinces.forEach(province => {
-      totals[ province ] = {}
-      Object.values(WorkSheetStatus).forEach(status => {
-        const total = _find(result, { province: province, status: status }) || { count: 0 }
-        totals[ province ][ status ] = total.count
-      })
-    })
-
-    return totals
   }
 
   async list (query = {}) {

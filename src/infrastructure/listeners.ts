@@ -3,7 +3,6 @@ import { ownerEventListeners } from '../owner/listeners'
 import { scheduledEventsEventListeners } from '../scheduled-events/event-listeners'
 import { worksheetEventListeners } from '../worksheet/listeners'
 import { userEventListeners } from '../user/listeners'
-import { statListeners } from '../stats/listeners'
 import { EventListener } from './event-bus'
 import { DomainEventCatalog } from './postgres/domain-event.entity'
 import { AwilixContainer } from 'awilix'
@@ -18,7 +17,6 @@ export async function startListeners (diContainer) {
   scheduledEventsEventListeners(eventBus, diContainer)
   worksheetEventListeners(eventBus, diContainer)
   userEventListeners(eventBus, diContainer)
-  statListeners(eventBus)
   eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
 
   const migrationProcess = diContainer.resolve('couchbaseToPostgresProcess') as ReturnType<typeof couchbaseToPostgresProcess>

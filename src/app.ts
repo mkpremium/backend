@@ -23,7 +23,6 @@ import {setupOwnersRoutes} from './owner/routing'
 import {scheduledEventsRoutes} from './scheduled-events/routing'
 import {flipperRoutes} from './flipper/routing'
 import {setupUserRoutes} from './user/routing'
-import {statRoutes} from './stats/routing'
 import {historyRoutes} from './history/routing'
 import {startListeners} from './infrastructure/listeners'
 import {Database} from './infrastructure/database'
@@ -67,7 +66,6 @@ export const createApp = async (database: Database): Promise<Express> => {
     setupCallerRoutes(app, diContainer, secured)
     flipperRoutes(app, diContainer, secured)
     setupStockRouter(app, diContainer, secured)
-    statRoutes(app, secured)
     historyRoutes(app, secured)
 
     notes(app, diContainer, secured)

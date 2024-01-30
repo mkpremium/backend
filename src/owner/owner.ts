@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import _find from 'lodash/find'
 import t from 'tcomb'
 import { Building } from '../building/building'
 import { SimpleAddress } from '../types/common'
@@ -77,27 +76,7 @@ export const OwnerType = {
 }
 export const OwnerTypeEnum = t.enums.of(Object.values(OwnerType), 'OwnerType')
 export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStatus')
-export const OwnerBody = t.struct(
-  {
-    type: t.maybe(OwnerTypeEnum),
-    verified: t.maybe(t.Boolean),
-    status: OwnerStatusEnum,
-    person: t.maybe(Person),
-    personId: t.maybe(t.String),
-    buildingId: t.maybe(t.String),
-    note: t.maybe(t.String)
-  },
-  {
-    name: 'OwnerBody',
-    defaultProps: {
-      type: 'NINGUNO',
-      verified: false,
-      status: 'NO_VERIFICADO',
-      personId: '',
-      person: {}
-    }
-  }
-)
+
 export const OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
