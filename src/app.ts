@@ -1,31 +1,30 @@
 import cors from 'cors'
-import express, {Express} from 'express'
+import express, { Express } from 'express'
 import morgan from 'morgan'
-import {buildingRoutes} from './building/routing'
-import {setupCallerRoutes} from './caller/init'
+import { buildingRoutes } from './building/routing'
+import { setupCallerRoutes } from './caller/init'
 
 import email from './email'
-import {createDiContainer} from './infrastructure/dependencies'
+import { createDiContainer } from './infrastructure/dependencies'
 import appErrorHandler from './infrastructure/error-handler'
-import {initLogger} from './infrastructure/logger'
+import { initLogger } from './infrastructure/logger'
 import metadata from './metadata'
 import notes from './notes'
 // modules
 import operator from './operator'
-import {init as initPropertyManager} from './property-manager'
-import {setupStockRouter} from './stock/stock-router'
-import {createTestHarness} from './test-harness/routes'
+import { init as initPropertyManager } from './property-manager'
+import { setupStockRouter } from './stock/stock-router'
+import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
-import {worksheetsRoutes} from './worksheet/routing'
-import {EventsDiagnostics} from './infrastructure/event-bus'
-import {setupOwnersRoutes} from './owner/routing'
-import {scheduledEventsRoutes} from './scheduled-events/routing'
-import {flipperRoutes} from './flipper/routing'
-import {setupUserRoutes} from './user/routing'
-import {historyRoutes} from './history/routing'
-import {startListeners} from './infrastructure/listeners'
-import {Database} from './infrastructure/database'
+import { worksheetsRoutes } from './worksheet/routing'
+import { EventsDiagnostics } from './infrastructure/event-bus'
+import { setupOwnersRoutes } from './owner/routing'
+import { scheduledEventsRoutes } from './scheduled-events/routing'
+import { flipperRoutes } from './flipper/routing'
+import { setupUserRoutes } from './user/routing'
+import { startListeners } from './infrastructure/listeners'
+import { Database } from './infrastructure/database'
 import jwt from './middleware/jwt'
 
 export const createApp = async (database: Database): Promise<Express> => {
@@ -66,7 +65,6 @@ export const createApp = async (database: Database): Promise<Express> => {
     setupCallerRoutes(app, diContainer, secured)
     flipperRoutes(app, diContainer, secured)
     setupStockRouter(app, diContainer, secured)
-    historyRoutes(app, secured)
 
     notes(app, diContainer, secured)
     metadata(app, secured)
