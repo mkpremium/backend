@@ -48,6 +48,20 @@ describe('importOwnerCommandHandler', () => {
     await assertOwnerSaved(testCouchbaseOwner)
   });
 
+  it('imports owner without embedded person', async () => {
+    const testCouchbaseOwner = testOwnerBuilder.withPhoneContact(uuid(), 'UNDEFINED', '666666666')
+      .withPhoneContact(uuid(), 'UNDEFINED', '666666666')
+      .build();
+    const testPerson = await savePersonCouchbaseDocument(testCouchbaseOwner.person)
+
+    const testCouchbaseOwnerWithoutEmbeddedPerson = {...testCouchbaseOwner, person: undefined, personId: testPerson.id};
+    await saveOwnerCouchbaseDocument(testCouchbaseOwnerWithoutEmbeddedPerson);
+
+    await importer({owner: testCouchbaseOwnerWithoutEmbeddedPerson});
+
+    await assertOwnerSaved(testCouchbaseOwner)
+  });
+
   it('saves featured contact', async () => {
     const testCouchbaseOwner = testOwnerBuilder.withPhoneContact('phone-reported-from-callcenter')
       .withFeaturedPhone('phone-reported-from-callcenter')
@@ -82,6 +96,13 @@ describe('importOwnerCommandHandler', () => {
       documentType: CouchbaseDocumentType.OWNER,
       document: owner,
       id: owner.id,
+    });
+  }
+
+  async function savePersonCouchbaseDocument(person: OwnerProps['person']) {
+    return await entityManager.save(CouchbaseDocument, {
+      documentType: CouchbaseDocumentType.PERSON,
+      document: person,
     });
   }
 });

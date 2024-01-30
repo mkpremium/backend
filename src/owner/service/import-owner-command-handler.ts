@@ -1,4 +1,4 @@
-import { OwnerProps } from '../owner'
+import { OwnerProps, PersonProps } from '../owner'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { Logger } from 'winston'
 import { EntityManager } from 'typeorm'
@@ -20,12 +20,16 @@ interface Deps {
 }
 
 export function importOwnerHandlerFactory ({ addOwnerService, eventBus, logger, entityManager }: Deps) {
-  return async function importOwnerHandler ({ owner }: { owner: OwnerProps }) {
+  return async function importOwnerHandler ({ owner }: { owner: OwnerProps & { personId?: string} }) {
     logger.info('Importing owner', { owner })
     const couchbaseDocument = await getCouchbaseDocument(entityManager, owner.id)
     if (couchbaseDocument.migratedAt) {
       logger.warning('Owner already migrated', { ownerId: owner.id })
       return
+    }
+    if (!owner.person) {
+      const personDocument = await getCouchbaseDocument(entityManager, owner.personId)
+      owner.person = personDocument.document as PersonProps
     }
 
     const ownerWithNames = ensureOwnerHasNames(owner)
