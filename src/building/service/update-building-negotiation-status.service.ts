@@ -13,7 +13,7 @@ export interface BuildingNegotiationStatusChanged {
 interface UpdateBuildingNegotiationStatusCommand {
   status: BuildingNegotiationStatus;
   userId: string;
-  sourceOwnerId: string;
+  sourceOwnerId?: string;
 }
 
 export class UpdateBuildingNegotiationStatusService {
