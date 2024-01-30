@@ -55,7 +55,7 @@ import { PostgresBuildingNotesRepository } from './repository/postgres-building-
 
 export const setupBuildingDependencies = (container: AwilixContainer, usePostgres: boolean) => {
   container.register({
-    setBuildingSalePriceService: asClass(SetBuildingSalePriceService).singleton(),
+    setBuildingSalePriceService: asClass(SetBuildingSalePriceService).classic().singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
     addProposalService: asClass(AddProposalService).singleton().classic(),
     addProposalForBuildingService: asClass(AddProposalForBuildingService).singleton().classic(),
