@@ -3,8 +3,6 @@ import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { CouchbaseModel } from '../../db/model'
 import { newHttpError } from '../../lib/http-error'
-import { OperatorStats } from '../../stats/models'
-import { OperatorActions } from '../../stats/types'
 import { LegacyWorksheetRepository } from '../../worksheet/models/worksheet-repository'
 import { WorkSheetStatus } from '../../worksheet/domain/worksheet'
 import { CallScheduledProps, ScheduledEvent, ScheduledEventProps } from '../types'
@@ -36,13 +34,6 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
         status: { $set: WorkSheetStatus.MEETING }
       })
       await worksheetRepo.save(updatedWorksheet)
-
-      if (worksheet.lastAddedMeeting === null) {
-        const { city, province } = _get(worksheet, 'relatedBuildings.0.address', {})
-        const action = _get(scheduledEvent, 'event.inPerson') ? OperatorActions.MEETING : OperatorActions.NON_PRESENTIAL_MEETING
-        await OperatorStats.registerAction(createdBy, action, { city, province })
-        await OperatorStats.registerAction(data.notifyTo, OperatorActions.BUSINESS_MEETING, { city, province })
-      }
     }
 
     return scheduledEvent
