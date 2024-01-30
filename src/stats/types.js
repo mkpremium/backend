@@ -42,28 +42,4 @@ t.OperatorStats = t.struct(
   }
 )
 
-t.OperatorPerformace = t.struct(
-  {
-    id: t.String,
-    operatorId: t.String,
-    daily_mean: t.Number,
-    average_last_two_weeks: t.Number,
-    createdAt: t.Date,
-
-    _documentType: t.enums.of(['operator-stats-performance'])
-  },
-  {
-    name: 'OperatorStats',
-    defaultProps: {
-      get id () {
-        return uuid()
-      },
-      get createdAt () {
-        return new Date()
-      },
-      _documentType: 'operator-stats-performance'
-    }
-  }
-)
-
 export default t
