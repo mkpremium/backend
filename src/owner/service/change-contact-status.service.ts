@@ -1,14 +1,13 @@
-import {History} from '../../history/models'
-import {EventPublisher} from '../../infrastructure/event-bus'
-import {OwnerRepository} from '../repository/owner.repository'
-import {changeContactStatus, OwnerProps, OwnerStatus} from '../owner'
-import {Logger} from 'winston'
-import {DomainEventCatalog} from '../../infrastructure/postgres/domain-event.entity'
-import {EntityManager} from "typeorm";
-import {Owner} from "../owner.entity";
-import {PersonContact} from "../person-contact.entity";
+import { EventPublisher } from '../../infrastructure/event-bus'
+import { OwnerRepository } from '../repository/owner.repository'
+import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
+import { Logger } from 'winston'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import { EntityManager } from 'typeorm'
+import { Owner } from '../owner.entity'
+import { PersonContact } from '../person-contact.entity'
 import _ from 'lodash'
-import {ownerEntityToStruct} from "../repository/postgres-owners.repository";
+import { ownerEntityToStruct } from '../repository/postgres-owners.repository'
 
 export interface OwnerStatusChangedEvent {
   name: DomainEventCatalog.OWNER__STATUS_CHANGED;
@@ -29,7 +28,6 @@ export interface OwnerContactStatusChanged {
 export class ChangeContactStatusService {
   constructor(
     private ownersRepository: OwnerRepository,
-    private historyRepository: History,
     private eventBus: EventPublisher,
     private logger: Logger,
     private usePostgres: boolean,
