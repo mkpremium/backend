@@ -61,7 +61,7 @@ export async function setupContainer (
   setupWorksheetDependencies(container, usePostgres)
   setupCallerDependencies(container)
   setupUserDependencies(container)
-  setupStockDependencies(container)
+  await setupStockDependencies(container, usePostgres)
   setupHistoryDependencies(container)
   setupEmailDependencies(container)
   setupFlipperDependencies(container)
