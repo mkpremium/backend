@@ -18,6 +18,7 @@ describe('UpdateWorksheetStatusOnOwnerChangeService', () => {
     ownerId: testOwnerId,
     oldStatus: 'NO_VERIFICADO',
     newStatus: 'WITHOUT_CONTACT',
+    byUserId: 'test-user-id',
   }
 
   before(async () => {

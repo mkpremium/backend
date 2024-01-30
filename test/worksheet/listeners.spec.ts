@@ -68,6 +68,7 @@ describe('worksheetEventListeners', () => {
       ownerId: testOwner.id,
       oldStatus: 'NO_VERIFICADO',
       newStatus: 'WITHOUT_CONTACT',
+      byUserId: 'test-user-id',
     }
     eventSubscribers[ 'owner.status_changed' ](testEvent)
 
