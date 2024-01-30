@@ -1,5 +1,4 @@
 import t from 'tcomb'
-import { OwnerBusinessStatus } from '../../owner/owner'
 import { createTransaction } from '../application'
 import { StockStatuses } from '../types'
 import {
@@ -7,7 +6,6 @@ import {
 } from '../../building/service/update-building-negotiation-status.service'
 import type { LegacyBuildingRepository } from '../../building/models'
 import type { StockRepository } from '../models'
-import { BuildingNegotiationStatus } from '../../building/building'
 
 export class StockSalesService {
   constructor (
@@ -32,7 +30,7 @@ export class StockSalesService {
       .updateBuildingStatus(
         params.buildingId,
         {
-          status: OwnerBusinessStatus.ALREADY_SOLD as BuildingNegotiationStatus,
+          status: 'VENDIDO',
           userId: operatorId
         }
       )
