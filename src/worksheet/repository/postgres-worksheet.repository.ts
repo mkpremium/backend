@@ -44,7 +44,7 @@ export function structToEntity  (struct: WorksheetProps): Worksheet {
     id: struct.id,
     status: struct.status,
     lastStatusChangedAt: struct.statusChangedAt,
-    statusChangeReason: struct.statusChangeReason,
+    statusChangeReason: struct.statusChangeReason ?? '',
     lastViewedAt: struct.viewedAt,
     lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
     building: { id: struct.relatedBuildingIds[ 0 ] },
