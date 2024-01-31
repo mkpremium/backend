@@ -1,6 +1,5 @@
 import aws from 'aws-sdk'
 import path from 'path'
-import url from 'url'
 import uuid from 'uuid/v4'
 import { exec } from 'child_process'
 import fs from 'fs-extra'
@@ -68,7 +67,7 @@ export async function uploadPreview (prefix, filepath) {
 }
 
 export function dropQueryParams (url) {
-  return url.split('?')[ 0 ]
+  return url.split('?')[0]
 }
 
 export function resolvePublicUrl (privateUrl) {
@@ -80,9 +79,10 @@ export function resolvePublicUrl (privateUrl) {
     signatureVersion: 'v4',
     region: metadataS3Config.region
   })
+  const url = new URL(privateUrl)
   const params = {
     Bucket: metadataS3Config.bucket,
-    Key: url.parse(privateUrl).path.substr(1) // path without first slash
+    Key: url.pathname.substr(1) // path without first slash
   }
 
   logger.info('signing metadata URL', { params })

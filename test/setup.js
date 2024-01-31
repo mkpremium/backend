@@ -1,3 +1,4 @@
+/* eslint-disable */
 require('honeycomb-beeline')({ disableInstrumentation: true })
 
 require('../src/types')

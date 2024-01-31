@@ -18,7 +18,7 @@ import { removeScheduledCallOnDiscardedContact } from './listeners/remove-schedu
 import { updateScheduledCallController } from './controller/update-schedule-call.controller'
 import { CouchbaseScheduledEventsRepository } from './repository/couchbase-schedule-events.repository'
 import { PostgresScheduledEventsRepository } from './repository/postgres-schedule-events.repository'
-import { importScheduledEventHandlerFactory } from "./service/scheduled-event-importer.service";
+import { importScheduledEventHandlerFactory } from './service/scheduled-event-importer.service'
 
 export function setupScheduledEventsDependencies (container: AwilixContainer) {
   const usePostgres = container.resolve('usePostgres')
@@ -46,6 +46,6 @@ export function setupScheduledEventsDependencies (container: AwilixContainer) {
 
     removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
     removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
-    removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
+    removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton()
   })
 }

@@ -11,7 +11,7 @@ export class EventEmitterBus implements EventBus {
 
   get info (): Record<string, number> {
     return this.emitter.eventNames().reduce((acc, name) => {
-      acc[ name ] = this.emitter.listenerCount(name)
+      acc[name] = this.emitter.listenerCount(name)
       return acc
     }, {})
   }
@@ -35,7 +35,8 @@ export class EventEmitterBus implements EventBus {
     // The only listener to all events is the event recorder. When the entity manager is provided, want the event to
     // be persisted within the same transaction as the rest of the business logic.
     if (entityManager) {
-      await this.eventRecorderListener(event, entityManager)
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      await this.eventRecorderListener(event as any, entityManager)
     }
 
     return new Promise((resolve, reject) => {
@@ -48,7 +49,7 @@ export class EventEmitterBus implements EventBus {
     })
   }
 
-  on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
+  on (eventName: string, listenerName: string, subscriber: (event: unknown) => Promise<void>) {
     if (eventName !== ALL_EVENTS_LISTENER) {
       this.assertNamingSatisfiesPolicy(listenerName, eventName)
     }

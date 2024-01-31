@@ -67,7 +67,7 @@ export abstract class CouchbaseModel {
   }
 
   async countQuery (queryBuilder = this.getQueryBuilder('count')) {
-    const [ { count } ] = await this.query(queryBuilder)
+    const [{ count }] = await this.query(queryBuilder)
 
     return count
   }
@@ -112,7 +112,7 @@ export abstract class CouchbaseModel {
   }
 
   async unique (data, field) {
-    const value = data[ field ]
+    const value = data[field]
     const query = this.getQueryBuilder().where(`${field} = ?`, value).limit(1)
 
     const rows = await this.query(query)
@@ -121,12 +121,12 @@ export abstract class CouchbaseModel {
 
     if (rows && rows.length) {
       // we can safely omit data with the same id
-      if (data.id && data.id === rows[ 0 ].id) {
+      if (data.id && data.id === rows[0].id) {
         return
       }
 
       const e = new DuplicatedEntity(data._documentType, field, value)
-      e[ 'code' ] = 400
+      e.code = 400
       throw e
     }
   }
@@ -191,9 +191,9 @@ function withRetry<T> (fn: () => Promise<T>) {
     interval: 1000,
     backoff: 1.5,
     predicate: ({
-                  code,
-                  message,
-                }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
+      code,
+      message
+    }) => code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
   })
 }
 

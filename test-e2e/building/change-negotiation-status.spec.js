@@ -3,15 +3,15 @@ import { createFlipper } from '../../test/common'
 import { createBuilding } from '../helper/mother-of-objects'
 import { authenticatedGet, authenticatedPut, initApplication } from '../helper/rest-api-helper'
 
-describe('negotiation status change', () => {
+describe('negotiation status change', function () {
   let app, businessUser
 
-  before(async () => {
+  before(async function () {
     app = await initApplication()
     businessUser = await createFlipper()
   })
 
-  it('changes building negotiation status', async () => {
+  it('changes building negotiation status', async function () {
     const building = await createBuilding(app, {})
 
     await authenticatedPut(

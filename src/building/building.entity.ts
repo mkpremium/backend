@@ -9,51 +9,50 @@ import _ from 'lodash'
 import { Worksheet } from '../worksheet/worksheet.entity'
 import { BuildingNote } from './building-note.entity'
 
-
 @Entity()
 export class Building extends BaseEntity {
   @Column('jsonb')
-  address: BuildingAddressProps
+    address: BuildingAddressProps
 
-  @Column({default: 'PENDIENTE'})
-  negotiationStatus: BuildingNegotiationStatus
+  @Column({ default: 'PENDIENTE' })
+    negotiationStatus: BuildingNegotiationStatus
 
   @Column({ type: 'jsonb', nullable: true })
-  lead?: Lead
+    lead?: Lead
 
   @ManyToOne(() => Owner, owner => owner.featuredInBuildings, { nullable: true })
-  featuredOwner?: Owner
+    featuredOwner?: Owner
 
   @ManyToOne(() => Flipper, flipper => flipper.assignedBuildings)
-  assignedFlipper?: Flipper
+    assignedFlipper?: Flipper
 
   @Column({ type: 'float', nullable: true })
-  floorArea: number
+    floorArea: number
 
   // Spanish "Referencia Catastral". It's a unique identifier for a building.
   @Column({ nullable: true, unique: true })
-  publicIdentifier?: string
+    publicIdentifier?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  location?: BuildingLocation
+    location?: BuildingLocation
 
   @Column({ nullable: true })
-  use?: string
+    use?: string
 
   @OneToMany(() => Proposal, proposal => proposal.building)
-  proposals?: Proposal[]
+    proposals?: Proposal[]
 
   @OneToMany(() => BuildingDocument, document => document.building)
-  documents: BuildingDocument[]
+    documents: BuildingDocument[]
 
   @OneToMany(() => Owner, owner => owner.building)
-  owners: Owner[]
+    owners: Owner[]
 
   @OneToOne(() => Worksheet, worksheet => worksheet.building)
-  worksheet: Worksheet
+    worksheet: Worksheet
 
   @OneToMany(() => BuildingNote, note => note.building)
-  notes: BuildingNote[]
+    notes: BuildingNote[]
 
   get recentProposal () {
     return _.sortBy(this.proposals || [], '.createdAt').at(-1)

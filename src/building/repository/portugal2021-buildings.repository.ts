@@ -4,7 +4,7 @@ import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 
 export class Portugal2021BuildingsRepository {
-  constructor (private couchbaseAdapter: CouchbaseAdapter,) {
+  constructor (private couchbaseAdapter: CouchbaseAdapter) {
   }
 
   pendingWithSlug (slug: string): TE.TaskEither<Error, Portugal2021SourceBuilding[]> {
@@ -20,11 +20,11 @@ export class Portugal2021BuildingsRepository {
               floorArea: isNaN(address.floorArea) ? address.floorArea : parseInt(address.floorArea),
               militaryGeo: {
                 x: isNaN(address.x) ? address.x : parseInt(address.x),
-                y: isNaN(address.y) ? address.y : parseInt(address.y),
+                y: isNaN(address.y) ? address.y : parseInt(address.y)
               },
-              number: isNaN(address.number) ? address.number : parseInt(address.number),
+              number: isNaN(address.number) ? address.number : parseInt(address.number)
             },
-            statusChangedAt: new Date(Date.parse(b.statusChangedAt)),
+            statusChangedAt: new Date(Date.parse(b.statusChangedAt))
           })
         })
       })
@@ -33,9 +33,9 @@ export class Portugal2021BuildingsRepository {
 
   save (building: Portugal2021SourceBuilding): TE.TaskEither<Error, void> {
     return fromPromise(this.couchbaseAdapter.upsert(
-        building.id,
-        building
-      )
+      building.id,
+      building
+    )
     )
   }
 
@@ -57,7 +57,7 @@ export class Portugal2021BuildingsRepository {
                      AND status = 'INBOX'
                      AND slug = $1`
 
-    return fromPromise(this.couchbaseAdapter.queryAsync(query, [ slug ]))
+    return fromPromise(this.couchbaseAdapter.queryAsync(query, [slug]))
   }
 
   private phoneNumberForDNIQuery (ownerDNIs: string[]) {
@@ -66,7 +66,7 @@ export class Portugal2021BuildingsRepository {
                    WHERE phone._documentType = 'portugal-2021-owner-phone'
                      AND META(phone).id IN $1`
 
-    return fromPromise(this.couchbaseAdapter.queryAsync(query, [ ownerDNIs ]))
+    return fromPromise(this.couchbaseAdapter.queryAsync(query, [ownerDNIs]))
   }
 }
 

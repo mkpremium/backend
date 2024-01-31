@@ -3,7 +3,7 @@ import '../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../src/infrastructure/logger'
 import '../src/types'
 import { createContainer } from './create-container'
-import { FreezerService } from "../src/worksheet/service/freezer.service";
+import { FreezerService } from '../src/worksheet/service/freezer.service'
 
 const logger = initLogger()
 logger.info('starting freezer')
@@ -13,7 +13,7 @@ createContainer()
     const freezerService = diContainer.resolve('freezerService') as FreezerService
     await freezerService.moveWorksheetOutOfFreezer(
       parseInt(process.env.DAYS_IN_FREEZER) || 90,
-      500,
+      500
     )
     logger.info('freezer finished correctly')
     process.exit(0)

@@ -3,7 +3,7 @@ import { Portugal2021SourceBuilding } from '../../../src/building/repository/por
 export function buildSourceBuilding (overrides: Partial<Portugal2021SourceBuilding> = {}) {
   return {
     ...sourceBuildingPrototype,
-    ...overrides,
+    ...overrides
   }
 }
 
@@ -28,5 +28,5 @@ const sourceBuildingPrototype: Portugal2021SourceBuilding = {
   owners: [],
   slug: '5433-nan-RUA-Antonio_da_Silva_Marinho-3-RAMALDE-PORTO',
   status: 'INBOX',
-  statusChangedAt: new Date(),
+  statusChangedAt: new Date()
 }

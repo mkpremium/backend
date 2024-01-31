@@ -11,7 +11,7 @@ export class StockSalesService {
   constructor (
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private legacyBuildingsRepository: LegacyBuildingRepository,
-    private legacyStockRepository: StockRepository,
+    private legacyStockRepository: StockRepository
   ) {
   }
 

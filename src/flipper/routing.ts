@@ -6,7 +6,6 @@ export function flipperRoutes (app, container, secured) {
   app.use('/flipper', secured, createRouter(container))
 }
 
-
 function createRouter (container) {
   const router = Router()
   router.get('/:flipperId/blocked-availability', wrap(container.resolve('flipperBlockedAvailabilityController')))

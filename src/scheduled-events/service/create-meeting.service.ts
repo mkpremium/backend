@@ -6,8 +6,8 @@ import { EntityManager } from 'typeorm'
 import { UserProps } from '../../types/user'
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { ScheduledEventId, ScheduledEventProps } from '../types'
-import { DomainEventCatalog } from "../../infrastructure/postgres/domain-event.entity";
-import { CouchbaseBuildingsRepository } from "../../building/repository/couchbase-building.repository";
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import { CouchbaseBuildingsRepository } from '../../building/repository/couchbase-building.repository'
 
 export interface MeetingCreated {
   name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED
@@ -28,40 +28,40 @@ interface AddMeetingCommand {
 }
 
 export class CreateMeetingService {
-  constructor(
+  constructor (
     private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
     private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
-    private entityManager: EntityManager,
+    private entityManager: EntityManager
   ) {
   }
 
-  async createMeeting(user: Pick<UserProps, 'id' | 'roles'>, cmd: AddMeetingCommand) {
+  async createMeeting (user: Pick<UserProps, 'id' | 'roles'>, cmd: AddMeetingCommand) {
     const meetingAgentId = cmd.notifyTo
     this.checkOperatorPermissions(user, meetingAgentId)
 
-    return await (this.usePostgres ?
-      this.doPostgres(cmd) :
-      this.doCouchbase(cmd, user, meetingAgentId))
+    return await (this.usePostgres
+      ? this.doPostgres(cmd)
+      : this.doCouchbase(cmd, user, meetingAgentId))
   }
 
-  private checkOperatorPermissions(user: Pick<UserProps, 'id' | 'roles'>, meetingOperatorId) {
+  private checkOperatorPermissions (user: Pick<UserProps, 'id' | 'roles'>, meetingOperatorId) {
     if (isBusiness(user.roles) && user.id !== meetingOperatorId) {
       throw newHttpError(403, 'No tiene los permisos suficientes para esta operación')
     }
   }
 
-  private async doPostgres(cmd: AddMeetingCommand): Promise<ScheduledEventProps> {
+  private async doPostgres (cmd: AddMeetingCommand): Promise<ScheduledEventProps> {
     return this.entityManager.transaction<ScheduledEventProps>(async entityManager => {
       const meeting = await entityManager.save(ScheduledEvent, {
         type: 'MEETING',
         scheduledFor: cmd.eventDate,
-        notifyTo: {id: cmd.notifyTo},
-        createdBy: {id: cmd.createdBy},
-        contact: {id: cmd.event.contactId},
-        building: {id: cmd.event.buildingId},
-        owner: {id: cmd.event.ownerId},
+        notifyTo: { id: cmd.notifyTo },
+        createdBy: { id: cmd.createdBy },
+        contact: { id: cmd.event.contactId },
+        building: { id: cmd.event.buildingId },
+        owner: { id: cmd.event.ownerId }
       })
 
       const createdMeeting = {
@@ -71,15 +71,15 @@ export class CreateMeetingService {
         createdBy: cmd.createdBy,
         createdAt: meeting.createdAt,
         notifyTo: cmd.notifyTo,
-        event: cmd.event,
+        event: cmd.event
       } as ScheduledEventProps
-      await this.publishEvent(createdMeeting, cmd, entityManager);
+      await this.publishEvent(createdMeeting, cmd, entityManager)
 
       return createdMeeting
     })
   }
 
-  private async doCouchbase(requestBody, operator, meetingAgentId): Promise<ScheduledEventProps> {
+  private async doCouchbase (requestBody, operator, meetingAgentId): Promise<ScheduledEventProps> {
     const createdMeeting = await this.couchbaseScheduledEventsRepository
       .addScheduledMeetingEvent(requestBody, operator.id)
     await this.couchbaseBuildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
@@ -88,7 +88,7 @@ export class CreateMeetingService {
     return createdMeeting
   }
 
-  private async publishEvent(createdMeeting: ScheduledEventProps, cmd: AddMeetingCommand, entityManager?: EntityManager) {
+  private async publishEvent (createdMeeting: ScheduledEventProps, cmd: AddMeetingCommand, entityManager?: EntityManager) {
     await this.eventBus.publish({
       name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED,
       meetingId: createdMeeting.id,
@@ -99,5 +99,4 @@ export class CreateMeetingService {
       note: cmd.note
     } as MeetingCreated, entityManager)
   }
-
 }

@@ -65,4 +65,3 @@ export interface BuildingsReadRepository {
 
   assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]>
 }
-

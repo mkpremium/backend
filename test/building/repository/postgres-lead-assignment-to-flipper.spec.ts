@@ -20,7 +20,7 @@ describe('Lead assignment to flipper (Postgres)', () => {
   let container: AwilixContainer
 
   beforeEach(async () => {
-    container = await createTestContainer({postgres: true, couchbase: false})
+    container = await createTestContainer({ postgres: true, couchbase: false })
     buildingsRepository = container.resolve('postgresBuildingsRepository')
     ownersRepository = container.resolve('postgresOwnersRepository')
     flippersRepository = container.resolve('flippersRepository')
@@ -39,7 +39,7 @@ describe('Lead assignment to flipper (Postgres)', () => {
         capturedAt: new Date(),
         ownerId: featuredOwnerId,
         contactId: ownerContactId,
-        worksheetId: worksheetId,
+        worksheetId
       }
     }).build()
     const ownerLeadBuilding = await ownersRepository.save(ownerBuilder().build())
@@ -55,8 +55,8 @@ describe('Lead assignment to flipper (Postgres)', () => {
       buildingsRepository.assignedToFlipperAndWithStatus(flipper.id, 'LEAD'),
       map(buildings => {
         expect(buildings).to.have.lengthOf(1)
-        expect(buildings[ 0 ].id).to.eql(leadBuilding.id)
-        expect(buildings[ 0 ].lead).to.be.ok
+        expect(buildings[0].id).to.eql(leadBuilding.id)
+        expect(buildings[0].lead).to.be.ok
       }),
       orFail()
     )()

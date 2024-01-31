@@ -31,14 +31,17 @@ export const SimplePhoneNumber = t.struct(
   }
 )
 
-export interface AddressProp  {
+export interface AddressProp {
   street: string
   number: number | string
   city: string
   type?: string
   fullAddress?: string
   registerNumber?: string
-  postalCode?: any
+  postalCode?: {
+    number?: string | number
+    verified: boolean
+  }
   province?: string
   zone?: string
   neighborhood?: string

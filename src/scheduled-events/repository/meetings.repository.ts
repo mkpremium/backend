@@ -81,7 +81,7 @@ export class MeetingsRepository extends CouchbaseRepository<DbMeeting> {
   futureMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
       futureMeetingsForQuery(this.bucketName),
-      [ userId ]
+      [userId]
     ).then(rows => rows.map(couchbaseToDomain))
   }
 }

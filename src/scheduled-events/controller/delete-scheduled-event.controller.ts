@@ -12,7 +12,7 @@ export const deleteScheduledEventControllerFactory = ({ eventBus, scheduledEvent
   await scheduledEventsRepository.delete(id)
   await eventBus.publish({
     id,
-    name: DomainEventCatalog.SCHEDULED_EVENTS__EVENT_DELETED,
+    name: DomainEventCatalog.SCHEDULED_EVENTS__EVENT_DELETED
   })
   res.status(204).send()
 }

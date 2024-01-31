@@ -3,12 +3,12 @@ import { stub } from 'sinon'
 import { expect } from 'chai'
 import { buildingBuilder } from '../building.builder'
 
-describe('SetBuildingExpensesService', () => {
+describe('SetBuildingExpensesService', function () {
   let service
   let buildingsRepositoryStub
   const testBuilding = buildingBuilder().build()
 
-  beforeEach(() => {
+  beforeEach(function () {
     buildingsRepositoryStub = {
       get: stub(),
       save: stub()
@@ -16,7 +16,7 @@ describe('SetBuildingExpensesService', () => {
     service = new SetBuildingExpensesService({ buildingsRepository: buildingsRepositoryStub })
   })
 
-  it('sets total expenses in building', () => {
+  it('sets total expenses in building', function () {
     buildingsRepositoryStub.get.withArgs(testBuilding.id).resolves(testBuilding)
     buildingsRepositoryStub.save.resolves()
     return service.setTotalExpensesAmount(testBuilding.id, 1000)

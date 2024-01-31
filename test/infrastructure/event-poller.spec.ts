@@ -12,21 +12,21 @@ describe('EventPoller', () => {
   const testEventsQueueUrl = 'https://sqs.region.aws.com/events-queue.fifo'
   const testEvent = {
     name: 'test_event.name',
-    testProperty: 'value',
+    testProperty: 'value'
   }
   const testListenerName = 'test.listener_name'
   const testMessage = {
     ReceiptHandle: 'test-message-receipt-handle',
     Body: JSON.stringify({
       event: testEvent,
-      listener: testListenerName,
+      listener: testListenerName
     })
   }
 
   beforeEach(() => {
     sqsClientStub = {
-      receiveMessage: stub().returns({ promise: () => Promise.resolve({ Messages: [ testMessage ] }) }),
-      deleteMessage: stub().returns({ promise: () => Promise.resolve() }),
+      receiveMessage: stub().returns({ promise: () => Promise.resolve({ Messages: [testMessage] }) }),
+      deleteMessage: stub().returns({ promise: () => Promise.resolve() })
     }
     loggerStub = createLoggerMock()
     listenersRegistry = new ListenersRegistry()
@@ -35,7 +35,7 @@ describe('EventPoller', () => {
       sqsClientStub,
       listenersRegistry,
       loggerStub,
-      testEventsQueueUrl,
+      testEventsQueueUrl
     )
   })
 
@@ -45,7 +45,7 @@ describe('EventPoller', () => {
     expect(sqsClientStub.receiveMessage).to.have.been.calledWithMatch({
       QueueUrl: testEventsQueueUrl,
       MaxNumberOfMessages: 10,
-      WaitTimeSeconds: 20,
+      WaitTimeSeconds: 20
     })
   })
 
@@ -80,7 +80,7 @@ describe('EventPoller', () => {
 
     expect(sqsClientStub.deleteMessage).to.have.been.calledWith({
       QueueUrl: testEventsQueueUrl,
-      ReceiptHandle: testMessage.ReceiptHandle,
+      ReceiptHandle: testMessage.ReceiptHandle
     })
   })
 })

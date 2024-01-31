@@ -12,15 +12,15 @@ import {
 } from '../helper/mother-of-objects'
 import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
-describe('Users Meetings', () => {
+describe('Users Meetings', function () {
   let app, businessUser
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     app = await initApplication()
     businessUser = await createFlipper()
   })
 
-  it('exposes endpoint to get user\'s meetings', async () => {
+  it('exposes endpoint to get user\'s meetings', async function () {
     await authenticatedGet('/me/meetings', businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
@@ -28,7 +28,7 @@ describe('Users Meetings', () => {
       })
   })
 
-  it('retrieves users\'s meetings', async () => {
+  it('retrieves users\'s meetings', async function () {
     const owner = await createOwner(app)
     const building = await createBuilding(app)
     await associateBuildingWithOwner(app, owner, building.id)

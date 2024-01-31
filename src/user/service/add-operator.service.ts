@@ -1,6 +1,6 @@
 import { OperatorRepository } from '../../operator/models'
 import { UserProps, UserRoles } from '../../types/user'
-import { DataSource } from 'typeorm'
+import { DataSource, type DeepPartial } from 'typeorm'
 import { addUserService } from './add-user.service'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
@@ -16,7 +16,7 @@ export class AddOperatorService {
     private ormDataSource: DataSource,
     private operatorRepository: OperatorRepository,
     private usePostgres: boolean,
-    private eventBus: EventPublisher,
+    private eventBus: EventPublisher
   ) {
   }
 
@@ -24,10 +24,10 @@ export class AddOperatorService {
     callerId?: string,
     flipperId?: string
   }> {
-    return this.usePostgres ? this.saveInPostgres(cmd, requester.id) : this.saveInCouchbase(cmd, requester)
+    return this.usePostgres ? this.saveInPostgres(cmd, requester.id) : this.saveInCouchbase(cmd)
   }
 
-  private async saveInCouchbase (cmd: AddOperatorCommand, requester: { id: string }): Promise<UserProps> {
+  private async saveInCouchbase (cmd: AddOperatorCommand): Promise<UserProps> {
     return await this.operatorRepository.createOperator(cmd)
   }
 
@@ -39,7 +39,7 @@ export class AddOperatorService {
         username: cmd.username,
         password: cmd.password,
         isAdmin: cmd.roles.includes(UserRoles.ADMIN),
-        profile: cmd.profile,
+        profile: cmd.profile
       })
       let flipperId: string
       let callerId: string
@@ -48,12 +48,12 @@ export class AddOperatorService {
         flipperId = flipper.id
       }
       if (cmd.roles.includes(UserRoles.OPERATOR)) {
-        const callerPayload = { user }
+        const callerPayload = { user } as DeepPartial<Caller>
         if (cmd.flipperId) {
           const flipper = await em.findOneOrFail(Flipper, {
-            where: { user: { id: cmd.flipperId } },
+            where: { user: { id: cmd.flipperId } }
           })
-          callerPayload[ 'flipper' ] = { id: flipper.id }
+          callerPayload.flipper = { id: flipper.id }
         }
 
         const caller = await em.save(Caller, callerPayload)
@@ -65,7 +65,7 @@ export class AddOperatorService {
         id: user.id,
         createdBy: requesterId,
         flipperId,
-        callerId,
+        callerId
       }, em)
 
       return {
@@ -76,6 +76,5 @@ export class AddOperatorService {
         ...user
       }
     })
-
   }
 }

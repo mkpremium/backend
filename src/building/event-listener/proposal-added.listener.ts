@@ -10,17 +10,16 @@ interface Deps {
 }
 
 export const createProposalScheduledListener = ({
-                                                  updateBuildingNegotiationStatusService,
-                                                  proposalsSenderService,
-                                                  logger,
-                                                }: Deps) => (event: ProposalForBuildingScheduled) => {
+  updateBuildingNegotiationStatusService,
+  proposalsSenderService,
+  logger
+}: Deps) => (event: ProposalForBuildingScheduled) => {
   return updateBuildingNegotiationStatusService.updateBuildingStatus(event.buildingId, {
     status: 'PROPOSAL_SCHEDULED',
     sourceOwnerId: event.ownerId,
-    userId: event.createdBy,
+    userId: event.createdBy
   }).then(async () => {
     const stats = await proposalsSenderService.checkAndSendProposals()
     logger.info('Proposals processed from proposal created listener', stats)
   })
 }
-

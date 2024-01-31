@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { Contact } from '../contacts/contact.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { Owner } from './owner.entity'
@@ -7,28 +7,28 @@ import { PersonContact } from './person-contact.entity'
 @Entity()
 export class Person extends BaseEntity {
   @Column('text')
-  fullName: string
+    fullName: string
 
   @Column('text')
-  firstName: string
+    firstName: string
 
   @Column('text')
-  lastName?: string
+    lastName?: string
 
   @Column('text', { unique: true, nullable: true })
-  documentNumber?: string
+    documentNumber?: string
 
   @OneToMany(() => PersonContact, oc => oc.person)
-  contacts: PersonContact[]
+    contacts: PersonContact[]
 
   // TODO: add constrain in type
   @ManyToOne(() => Contact, { nullable: true })
-  featuredPhoneContact?: Contact
+    featuredPhoneContact?: Contact
 
   // TODO: add constrain in type
   @ManyToOne(() => Contact, { nullable: true })
-  featuredEmailContact?: Contact
+    featuredEmailContact?: Contact
 
   @OneToOne(() => Owner, owner => owner.person)
-  owner: Owner
+    owner: Owner
 }

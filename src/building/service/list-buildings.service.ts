@@ -7,63 +7,63 @@ import { buildingEntityToReadModel } from '../repository/postgres-buildings.repo
 import { PostgresOwnersRepository } from '../../owner/repository/postgres-owners.repository'
 
 export class ListBuildingsService {
-  constructor(
+  constructor (
     private usePostgres: boolean,
     private entityManager: EntityManager,
     private postgresOwnersRepository: PostgresOwnersRepository,
-    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
+    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository
   ) {
   }
 
-  buildingsOfId(ids: string | string[]): Promise<BuildingReadModel[]> {
-    return this.usePostgres ?
-      this.buildingOfIdInPostgres(ids) :
-      this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ids] : ids)
+  buildingsOfId (ids: string | string[]): Promise<BuildingReadModel[]> {
+    return this.usePostgres
+      ? this.buildingOfIdInPostgres(ids)
+      : this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ids] : ids)
   }
 
-  buildingsAssignedTo(flipperUserId: string): Promise<BuildingReadModel[]> {
-    return this.usePostgres ?
-      this.buildingAssignedToInPostgres(flipperUserId) :
-      this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperUserId)
+  buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
+    return this.usePostgres
+      ? this.buildingAssignedToInPostgres(flipperUserId)
+      : this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperUserId)
   }
 
-  private async buildingOfIdInPostgres(ids: string | string[]): Promise<BuildingReadModel[]> {
+  private async buildingOfIdInPostgres (ids: string | string[]): Promise<BuildingReadModel[]> {
     if (typeof ids === 'string') {
       ids = [ids]
     }
 
     const buildings = await this.entityManager.find(Building, {
-      where: {id: In(ids)},
+      where: { id: In(ids) },
       // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
       relations: {
         featuredOwner: true,
         documents: true,
-        proposals: true,
+        proposals: true
       }
     })
 
-    const lastOfferRequests = await getLastOfferRequestForBuildings(ids, this.entityManager);
+    const lastOfferRequests = await getLastOfferRequestForBuildings(ids, this.entityManager)
     const allBuildingOwners = await this.postgresOwnersRepository.buildingOwners(ids)
 
     return buildings.map((building) => {
-      const lastOfferRequest = lastOfferRequests.find(({buildingId}) => buildingId === building.id)
+      const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
       const buildingOwners = allBuildingOwners.filter(
-        ({buildingId}) => buildingId === building.id)
+        ({ buildingId }) => buildingId === building.id)
       return buildingEntityToReadModel(building, {
         lastOfferCreatedAt: lastOfferRequest?.offer_createdAt,
-        owners: buildingOwners,
+        owners: buildingOwners
       })
     })
   }
 
-  private async buildingAssignedToInPostgres(flipperUserId: string) {
+  private async buildingAssignedToInPostgres (flipperUserId: string) {
     const buildings = await this.entityManager.find(Building, {
       where: {
-        assignedFlipper: {user: {id: flipperUserId}}
-      },
+        assignedFlipper: { user: { id: flipperUserId } }
+      }
     })
 
-    return this.buildingOfIdInPostgres(buildings.map(({id}) => id))
+    return this.buildingOfIdInPostgres(buildings.map(({ id }) => id))
   }
 }
 
@@ -73,7 +73,7 @@ export interface LastBuildingOffer {
   ownerId: string,
 }
 
-export async function getLastOfferRequestForBuildings(
+export async function getLastOfferRequestForBuildings (
   ids: string[],
   entityManager: EntityManager
 ): Promise<LastBuildingOffer[]> {
@@ -84,9 +84,9 @@ export async function getLastOfferRequestForBuildings(
   const queryBuilder = entityManager.createQueryBuilder(BuildingOfferRequest, 'offer')
     .distinctOn(['offer.buildingId'])
     .select(['offer.buildingId', 'offer.createdAt', 'offer.ownerId'])
-    .where('offer.buildingId IN (:...ids)', {ids})
+    .where('offer.buildingId IN (:...ids)', { ids })
     .orderBy('offer.buildingId')
     .addOrderBy('offer.createdAt', 'DESC')
 
-  return await queryBuilder.getRawMany<LastBuildingOffer>();
+  return await queryBuilder.getRawMany<LastBuildingOffer>()
 }

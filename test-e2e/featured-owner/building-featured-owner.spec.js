@@ -3,8 +3,8 @@ import { associateBuildingWithOwner, createBuilding, createOwner } from '../help
 import { authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 import { expect } from 'chai'
 
-describe('Building featured owner', () => {
-  it('sets featured owner for a building', async () => {
+describe('Building featured owner', function () {
+  it('sets featured owner for a building', async function () {
     const app = await initApplication()
 
     const businessUser = await createFlipper()

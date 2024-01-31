@@ -33,7 +33,7 @@ describe('AddProposalForBuildingService', () => {
     service = new AddProposalForBuildingService(
       legacyAddProposalServiceStub,
       ownersRepositoryStub,
-      eventBusStub,
+      eventBusStub
     )
 
     await service.add(testBuildingId, {
@@ -41,7 +41,7 @@ describe('AddProposalForBuildingService', () => {
       contactId: testContactId,
       amount: testProposalAmount,
       createdBy: testFlipperId,
-      message: testEmailMessage,
+      message: testEmailMessage
     })
   })
 
@@ -53,7 +53,7 @@ describe('AddProposalForBuildingService', () => {
         proposal: testProposalAmount,
         notificationStatus: 'PENDING',
         notificationEmail: testNotificationEmailAddress,
-        message: testEmailMessage,
+        message: testEmailMessage
       }
     )
   })

@@ -39,7 +39,7 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
     return scheduledEvent
   }
 
-  async addScheduleCallEvent (data: ScheduleCallCommand["event"], createdBy: string): Promise<CallScheduledProps> {
+  async addScheduleCallEvent (data: ScheduleCallCommand['event'], createdBy: string): Promise<CallScheduledProps> {
     const params = Object.assign({}, data, { createdBy, type: 'CALLS' })
     return this.save(params)
   }
@@ -48,7 +48,7 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
     const scheduledEvent = await this.findByIdOrThrow(id)
     const updatedScheduledEventData = t.update(scheduledEvent, {
       $merge: {
-        eventDate: data.eventDate,
+        eventDate: data.eventDate
       }
     })
 
@@ -68,7 +68,7 @@ export class CouchbaseScheduledEventsRepository extends CouchbaseModel
          AND event.event.buildingId = $1
        ORDER BY event.eventDate DESC
        LIMIT 1
-      `, [ buildingId ]
-    ).then(rows => rows.length === 1 ? fromJSON(rows[ 0 ], ScheduledEvent) : undefined)
+      `, [buildingId]
+    ).then(rows => rows.length === 1 ? fromJSON(rows[0], ScheduledEvent) : undefined)
   }
 }

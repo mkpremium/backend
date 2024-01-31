@@ -7,14 +7,14 @@ import { Logger } from 'winston'
 import { Proposal } from '../../building/proposal.entity'
 import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
 import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
-import { CouchbaseDocumentRepository } from "../postgres/couchbase-document.repository";
+import { CouchbaseDocumentRepository } from '../postgres/couchbase-document.repository'
 
 export class BuildingProposalsImporterService {
   constructor (
     protected readonly entityManager: EntityManager,
     private readonly eventBus: EventPublisher,
     private readonly logger: Logger,
-    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
+    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository
   ) {
   }
 
@@ -32,12 +32,12 @@ export class BuildingProposalsImporterService {
         // to avoid database constraint errors.
         original.createdAt ??= new Date()
         original.updatedAt ??= original.createdAt
-        original.notificationEmail ??= "jorge.velasco.silva@gmail.com"
-        original.notificationStatus ??= "DISABLED"
-        original.message ??= ""
+        original.notificationEmail ??= 'jorge.velasco.silva@gmail.com'
+        original.notificationStatus ??= 'DISABLED'
+        original.message ??= ''
 
         await em.save(Proposal, {
-          id: proposal.document["id"],
+          id: proposal.document.id,
           status: oldProposalToEntityStatus(original.state),
           building: { id: buildingId },
           owner: { id: original.ownerId },
@@ -49,7 +49,7 @@ export class BuildingProposalsImporterService {
           notificationStatus: original.notificationStatus,
           createdAt: original.createdAt,
           updatedAt: original.updatedAt,
-          aspiration: original.aspiration,
+          aspiration: original.aspiration
         })
         await markCouchbaseDocumentAsMigrated(em, proposal.id)
       }
@@ -57,7 +57,7 @@ export class BuildingProposalsImporterService {
       await this.eventBus.publish({
         name: DomainEventCatalog.BUILDING__BUILDING_IMAGES_IMPORTED,
         buildingId,
-        proposals: proposals.map(i => i.id),
+        proposals: proposals.map(i => i.id)
       }, em)
     })
 

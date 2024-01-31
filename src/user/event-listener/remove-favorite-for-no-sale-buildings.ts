@@ -2,12 +2,12 @@ import { BuildingNegotiationStatusChanged } from '../../building/service/update-
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { fromPromise } from '../../infrastructure/fp-utils'
-import { FlipperFavoritesBuildingsService } from "../../flipper/service/flipper-favorites-buildings.service";
+import { FlipperFavoritesBuildingsService } from '../../flipper/service/flipper-favorites-buildings.service'
 
-export function removeFavoriteForNoSaleBuildings({flipperFavoritesBuildingsService}: {
+export function removeFavoriteForNoSaleBuildings ({ flipperFavoritesBuildingsService }: {
   flipperFavoritesBuildingsService: FlipperFavoritesBuildingsService
 }) {
-  return async function removeFavorite(evt: BuildingNegotiationStatusChanged) {
+  return async function removeFavorite (evt: BuildingNegotiationStatusChanged) {
     if (evt.negotiationStatus !== 'NO VENDE') {
       return
     }

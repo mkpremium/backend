@@ -8,7 +8,7 @@ const matchingMoment = (momentToMatch) => sinon.match(
   (actual) => actual.toString() === momentToMatch.toString()
 )
 
-describe('PropertyManagerRankingService', () => {
+describe('PropertyManagerRankingService', function () {
   const now = () => moment('2020-01-12') // January 12, 2020
   const firstMomentCurrentYear = moment('2020-01-01')
   const lastMomentCurrentYear = moment('2020-12-31').endOf('day')
@@ -28,7 +28,7 @@ describe('PropertyManagerRankingService', () => {
 
   let rankingService
 
-  beforeEach(() => {
+  beforeEach(function () {
     propertyManagersRepository.getActivePropertyManagers = sinon.stub().returns(Promise.resolve([]))
     stockRepository.getTotalProfitInPeriodByPropertyManager = sinon.stub().returns(Promise.resolve([]))
 
@@ -39,20 +39,20 @@ describe('PropertyManagerRankingService', () => {
     )
   })
 
-  it('gets all active property managers from users repository', async () => {
+  it('gets all active property managers from users repository', async function () {
     await rankingService.ranking()
 
     expect(propertyManagersRepository.getActivePropertyManagers).to.have.been.calledWith()
   })
 
-  it('gets closed stock grouped by property manager', async () => {
+  it('gets closed stock grouped by property manager', async function () {
     await rankingService.ranking()
 
     expect(stockRepository.getTotalProfitInPeriodByPropertyManager).to.have.been
       .calledWith(matchingMoment(firstMomentCurrentYear), matchingMoment(lastMomentCurrentYear))
   })
 
-  it('returns property manager user information', async () => {
+  it('returns property manager user information', async function () {
     propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
 
     const ranking = await rankingService.ranking()
@@ -64,13 +64,13 @@ describe('PropertyManagerRankingService', () => {
     })
   })
 
-  describe('property manager profit goal', () => {
+  describe('property manager profit goal', function () {
     const generalProfitGoal = 500000
     const lisbonProfitGoal = 700000
 
     it(
       'applies general default goal for property manager without goal in a city different than Lisbon',
-      async () => {
+      async function () {
         propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
         const ranking = await rankingService.ranking()
 
@@ -78,7 +78,7 @@ describe('PropertyManagerRankingService', () => {
       }
     )
 
-    it('applies Lisbon default goal for property manager without goal in Lisbon', async () => {
+    it('applies Lisbon default goal for property manager without goal in Lisbon', async function () {
       const lisbonPropertyManagerWithoutProfitGoal = { ...barcelonaPropertyManagerWithoutProfitGoal, city: 'Lisboa' }
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([lisbonPropertyManagerWithoutProfitGoal]))
 
@@ -87,7 +87,7 @@ describe('PropertyManagerRankingService', () => {
       expect(ranking[0].goal).to.be.equal(lisbonProfitGoal)
     })
 
-    it('applies property manager profit goal', async () => {
+    it('applies property manager profit goal', async function () {
       const propertyManagerProfitGoal = 100000
       const propertyManagerWithProfitGoal = { ...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: propertyManagerProfitGoal }
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([propertyManagerWithProfitGoal]))
@@ -98,8 +98,8 @@ describe('PropertyManagerRankingService', () => {
     })
   })
 
-  describe('profit calculation', () => {
-    it('gets profits from property manager stocks total gains', async () => {
+  describe('profit calculation', function () {
+    it('gets profits from property manager stocks total gains', async function () {
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
       stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
@@ -114,8 +114,8 @@ describe('PropertyManagerRankingService', () => {
     })
   })
 
-  describe('ranking calculation', () => {
-    it('calculates percentageGoal based on profit calculation and property manager profit goal', async () => {
+  describe('ranking calculation', function () {
+    it('calculates percentageGoal based on profit calculation and property manager profit goal', async function () {
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([
         { ...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: 120 }
       ]))
@@ -131,7 +131,7 @@ describe('PropertyManagerRankingService', () => {
       expect(ranking[0].percentageGoal).to.be.closeTo(0.5, 0.001)
     })
 
-    it('calculates ranking based on achieved percentage goal', async () => {
+    it('calculates ranking based on achieved percentage goal', async function () {
       const propertyManagerWith20PercentAchievedProfitGoal = {
         ...barcelonaPropertyManagerWithoutProfitGoal,
         id: '20%',

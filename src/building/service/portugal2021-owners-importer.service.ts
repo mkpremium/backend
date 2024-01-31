@@ -18,7 +18,7 @@ export class Portugal2021OwnersImporterService {
   constructor (
     private portugal2021BuildingsRepository: Portugal2021BuildingsRepository,
     private ownersRepository: OwnerRepository,
-    private logger: Logger,
+    private logger: Logger
   ) {
   }
 
@@ -28,7 +28,7 @@ export class Portugal2021OwnersImporterService {
       this.portugal2021BuildingsRepository.get(cmd.sourceBuildingId),
       TE.chain((sourceBuilding) => {
         const { importedWithBuildingId, owners: sourceOwners } = sourceBuilding
-        const uniqueOwners = uniqBy(sourceOwners, o => [ o.dni, o.name, o.address ].join())
+        const uniqueOwners = uniqBy(sourceOwners, o => [o.dni, o.name, o.address].join())
         return pipe(
           this.portugal2021BuildingsRepository.phoneNumbersFor(uniqueOwners.map(({ dni }) => dni)),
           TE.chain((phoneNumbers) => {
@@ -63,7 +63,7 @@ export class Portugal2021OwnersImporterService {
         type: 'TELEFONO' as const
       }))
 
-      // @ts-ignore
+      /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
       // @ts-ignore
       return Owner({
         id: uuid(),
@@ -75,9 +75,10 @@ export class Portugal2021OwnersImporterService {
         person: {
           name: sourceOwner.name,
           documentNumber: sourceOwner.dni,
+          /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
           // @ts-ignore
-          addresses: [ { fullAddress: sourceOwner.address } ],
-          contacts,
+          addresses: [{ fullAddress: sourceOwner.address }],
+          contacts
         }
       })
     }
@@ -88,9 +89,9 @@ export class Portugal2021OwnersImporterService {
       return this.portugal2021BuildingsRepository.save({
         ...sourceBuilding,
         status: 'OWNERS_IMPORTED',
-        importedOwners: importedOwners,
+        importedOwners,
         statusChangedAt: new Date(),
-        failure: undefined,
+        failure: undefined
       })
     }
   }
@@ -104,7 +105,7 @@ export class Portugal2021OwnersImporterService {
         status: 'FAILED',
         previousStatus: sourceBuilding.status,
         statusChangedAt: new Date(),
-        failure: error.message,
+        failure: error.message
       })
     }
   }
@@ -112,6 +113,6 @@ export class Portugal2021OwnersImporterService {
 
 class NoOwnersWithContactFoundForBuilding extends Error {
   constructor (readonly sourceBuildingId: string) {
-    super(`No owners with contact found for building`)
+    super('No owners with contact found for building')
   }
 }

@@ -30,7 +30,7 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
       let flipperId: string | undefined
       if (building.assignedAgentId) {
         const flipper = await entityManager.findOneByOrFail(Flipper,
-          { user: { id: building.assignedAgentId } },
+          { user: { id: building.assignedAgentId } }
         )
         flipperId = flipper.id
       }

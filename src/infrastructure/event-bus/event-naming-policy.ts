@@ -1,5 +1,3 @@
-import { ALL_EVENTS_LISTENER } from '../event-bus'
-
 export interface EventNamingPolicy {
   satisfiesEventName (name: string): boolean
 

@@ -7,7 +7,7 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
   constructor (
     private worksheetQueueRepository: WorksheetQueueRepository,
     private worksheetRepository: WorksheetRepository,
-    private maxOpenedWorksheetPerQueueAndUser: number,
+    private maxOpenedWorksheetPerQueueAndUser: number
   ) {
   }
 
@@ -17,7 +17,7 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
       return
     }
 
-    const [ queueWithMaxWorksheetForUser, releasedWorksheetIds ] = keepOnlyUserNewestOpenedWorksheets(
+    const [queueWithMaxWorksheetForUser, releasedWorksheetIds] = keepOnlyUserNewestOpenedWorksheets(
       queue, userId, this.maxOpenedWorksheetPerQueueAndUser
     )
 

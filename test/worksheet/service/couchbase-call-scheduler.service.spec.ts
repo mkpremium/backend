@@ -9,10 +9,10 @@ import uuid from 'uuid/v4'
 import { buildingBuilder } from '../../building/building.builder'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { worksheetQueueFactory } from '../../factories'
-import { WorksheetQueueRepository } from "../../../src/worksheet/repository/worksheet-queue.repository";
-import { QueueItemStatus } from "../../../src/worksheet/models/queue-item";
+import { WorksheetQueueRepository } from '../../../src/worksheet/repository/worksheet-queue.repository'
+import { QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 
-describe('', () => {
+describe('CouchbaseCallSchedulerService', () => {
   let service: CouchbaseCallSchedulerService
   let queuesRepository: WorksheetQueueRepository
   let worksheetRepository
@@ -31,7 +31,7 @@ describe('', () => {
         buildingId: uuid(),
         contactId: uuid(),
         worksheetId: testWorksheetId,
-        ownerId: uuid(),
+        ownerId: uuid()
       },
     notifyAt: '2020-11-14T08:00:00.000Z',
     eventDate: '2020-11-14T08:00:00.000Z'
@@ -54,12 +54,11 @@ describe('', () => {
 
     expect(updatedQueue.worksheets.length).to.be.equal(1)
     expect(updatedQueue.worksheets[0].worksheetId).to.be.equal(testWorksheet.id)
-    expect(updatedQueue.worksheets[0]).to.include({status: QueueItemStatus.SCHEDULED})
+    expect(updatedQueue.worksheets[0]).to.include({ status: QueueItemStatus.SCHEDULED })
   })
 
-
-  async function beforeEachSetup() {
-    const container = await createTestContainer({couchbase: true, postgres: false})
+  async function beforeEachSetup () {
+    const container = await createTestContainer({ couchbase: true, postgres: false })
 
     queuesRepository = container.resolve('worksheetQueueRepository')
     service = container.resolve('couchbaseCallSchedulerService')
@@ -67,10 +66,9 @@ describe('', () => {
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const testBuilding = await buildingsRepository.save(buildingBuilder({}).build())
 
-
     testWorksheet = await worksheetRepository.save({
       id: testWorksheetId,
-      relatedBuildingIds: [testBuilding.id],
+      relatedBuildingIds: [testBuilding.id]
     })
     testWorksheetQueue = await queuesRepository.save(worksheetQueueFactory.build())
   }

@@ -2,11 +2,11 @@ import { createAddNoteToBuildingListener } from '../../../src/building/event-lis
 import { expect } from 'chai'
 import { stub } from 'sinon'
 
-describe('add-meeting-note-to-building.listener', () => {
+describe('add-meeting-note-to-building.listener', function () {
   let listener
   let buildingNotesRepositoryStub
 
-  beforeEach(() => {
+  beforeEach(function () {
     buildingNotesRepositoryStub = {
       save: stub()
     }
@@ -14,7 +14,7 @@ describe('add-meeting-note-to-building.listener', () => {
     listener = createAddNoteToBuildingListener({ buildingNotesRepository: buildingNotesRepositoryStub })
   })
 
-  it('creates note in building with meeting note text', () => {
+  it('creates note in building with meeting note text', function () {
     const testMeetingCreatedEvent = {
       buildingId: 'test-building-id',
       userId: 'test-user-id',
@@ -31,7 +31,7 @@ describe('add-meeting-note-to-building.listener', () => {
       })
   })
 
-  it('does nothing when no note is given', () => {
+  it('does nothing when no note is given', function () {
     const testMeetingCreatedEvent = {
       buildingId: 'test-building-id',
       userId: 'test-user-id',

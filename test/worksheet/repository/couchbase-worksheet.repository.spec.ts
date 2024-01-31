@@ -20,7 +20,7 @@ describe('CouchbaseWorksheetRepository', () => {
     const testWorksheetId = 'test-worksheet-id'
     const testBuilding = buildingBuilder({
       cadastre: {
-        reference: 'test-cadastre-reference',
+        reference: 'test-cadastre-reference'
       },
       recentProposal: {
         id: 'test-proposal-id',
@@ -35,7 +35,7 @@ describe('CouchbaseWorksheetRepository', () => {
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).build()
     const testWorksheet = worksheetBuilder({
       id: testWorksheetId,
-      relatedBuildingIds: [ testBuilding.id ]
+      relatedBuildingIds: [testBuilding.id]
     }).build()
 
     await Promise.all([

@@ -6,7 +6,7 @@ import { Worksheet } from '../../../src/worksheet/domain/worksheet'
 import { QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 import { WorksheetQueueActionsService } from '../../../src/worksheet/service/worksheet-queue-actions-service'
 
-describe('WorksheetQueueActionsService', () => {
+describe('WorksheetQueueActionsService', function () {
   const testQueueId = 'test-queue-id'
   const testWorksheetId = 'test-worksheet-id'
   const testUserId = 'test-user-id'
@@ -17,7 +17,7 @@ describe('WorksheetQueueActionsService', () => {
   let callcenterWorksheetServiceMock
   let eventBusMock
 
-  beforeEach(() => {
+  beforeEach(function () {
     queueRepositoryMock = {
       get: stub(),
       findQueueWithScheduledCallOfId: stub(),
@@ -44,7 +44,7 @@ describe('WorksheetQueueActionsService', () => {
     )
   })
 
-  describe('takeWorksheetInQueue', () => {
+  describe('takeWorksheetInQueue', function () {
     const testWorksheet = Worksheet({ id: testWorksheetId })
     const testWorksheetForCallcenterView = { id: testWorksheetId, relatedBuildings: [], relatedOwners: [] }
     const emptyQueue = WorksheetQueue({
@@ -57,7 +57,7 @@ describe('WorksheetQueueActionsService', () => {
     })
     let takenWorksheet
 
-    beforeEach(async () => {
+    beforeEach(async function () {
       queueRepositoryMock.get.withArgs(testQueueId).resolves(emptyQueue)
       worksheetRepositoryMock.get.withArgs(testWorksheetId).resolves(testWorksheet)
       callcenterWorksheetServiceMock.getWorksheetForCallcenterView.withArgs(testWorksheetId).resolves(testWorksheetForCallcenterView)
@@ -65,7 +65,7 @@ describe('WorksheetQueueActionsService', () => {
       takenWorksheet = await service.takeWorksheetInQueue(testQueueId, testWorksheetId, testUserId)
     })
 
-    it('adds worksheet to queue', () => {
+    it('adds worksheet to queue', function () {
       expect(queueRepositoryMock.save).to.have.been.calledOnce
       expect(queueRepositoryMock.save.firstCall.args[0].worksheets).to.have.lengthOf(1)
       expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].worksheetId).to.equal(testWorksheetId)
@@ -73,7 +73,7 @@ describe('WorksheetQueueActionsService', () => {
       expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].status).to.equal('OPENED')
     })
 
-    it('updates worksheet with assigned queue and view timestamp', () => {
+    it('updates worksheet with assigned queue and view timestamp', function () {
       expect(worksheetRepositoryMock.save).to.have.been.calledOnce
       expect(worksheetRepositoryMock.save.firstCall.args[0].viewedAt.valueOf())
         .to.be.closeTo(utc().toDate().valueOf(), 100)
@@ -81,11 +81,11 @@ describe('WorksheetQueueActionsService', () => {
         .to.be.equal(testQueueId)
     })
 
-    it('returns updated worksheet', () => {
+    it('returns updated worksheet', function () {
       expect(takenWorksheet).to.equal(testWorksheetForCallcenterView)
     })
 
-    it('publishes WorksheetTaken event', () => {
+    it('publishes WorksheetTaken event', function () {
       expect(eventBusMock.publish).to.have.been.calledWith({
         name: 'worksheet.taken',
         worksheetId: testWorksheetId,
@@ -95,7 +95,7 @@ describe('WorksheetQueueActionsService', () => {
     })
   })
 
-  describe('removeScheduledCallFromWorksheets', () => {
+  describe('removeScheduledCallFromWorksheets', function () {
     const testScheduledCallId = 'test-scheduled-call-id'
     const testQueueWithScheduledCall = WorksheetQueue({
       id: testQueueId,
@@ -116,7 +116,7 @@ describe('WorksheetQueueActionsService', () => {
       ]
     })
 
-    it('removes scheduled call from worksheet', async () => {
+    it('removes scheduled call from worksheet', async function () {
       queueRepositoryMock.findQueueWithScheduledCallOfId.withArgs(testScheduledCallId)
         .resolves(testQueueWithScheduledCall)
 

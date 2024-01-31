@@ -9,26 +9,26 @@ import { WorksheetQueueProps } from '../../worksheet/domain/queue'
 import { Worksheet } from '../../worksheet/worksheet.entity'
 import { structToEntity } from '../../worksheet/repository/postgres-worksheet.repository'
 import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
-import { CouchbaseDocumentRepository } from "../postgres/couchbase-document.repository";
+import { CouchbaseDocumentRepository } from '../postgres/couchbase-document.repository'
 
 export class BuildingWorkSheetsImporterService {
-  constructor(
+  constructor (
     private readonly eventBus: EventPublisher,
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,
-    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
+    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository
   ) {
   }
 
-  async importWorkSheet(buildingId: string) {
-    this.logger.info('Building imported, importing its worksheets', {buildingId})
+  async importWorkSheet (buildingId: string) {
+    this.logger.info('Building imported, importing its worksheets', { buildingId })
     const couchbaseDocument = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
       CouchbaseDocumentType.WORKSHEET, buildingId)
 
     const original = couchbaseDocument.document as WorksheetProps
 
     if (!couchbaseDocument) {
-      this.logger.error('No worksheets found for building', {buildingId})
+      this.logger.error('No worksheets found for building', { buildingId })
       return
     }
 
@@ -39,7 +39,7 @@ export class BuildingWorkSheetsImporterService {
         CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)).document as WorksheetQueueProps
 
       let operatorId = null
-      let queueItems = queue?.worksheets || []
+      const queueItems = queue?.worksheets || []
       for (const worksheet of queueItems) {
         if (worksheet.worksheetId === original.id) {
           operatorId = worksheet.operatorId
@@ -47,7 +47,7 @@ export class BuildingWorkSheetsImporterService {
         }
       }
       worksheet.heldBy = await this.entityManager.findOne(Caller, {
-        where: {user: {id: operatorId}},
+        where: { user: { id: operatorId } }
       })
     }
 
@@ -56,9 +56,8 @@ export class BuildingWorkSheetsImporterService {
       await markCouchbaseDocumentAsMigrated(em, original.id)
       await this.eventBus.publish({
         name: DomainEventCatalog.POSTGRES_MIGRATION__WORKSHEET_IMPORTED,
-        em,
+        em
       })
     })
-
   }
 }

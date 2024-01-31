@@ -3,20 +3,20 @@ import { UserBlockedAvailabilityService } from '../../../src/user/service/user-b
 import { stub } from 'sinon'
 import moment from 'moment'
 
-describe('UserBlockedAvailabilityService', () => {
+describe('UserBlockedAvailabilityService', function () {
   /** @var {UserBlockedAvailabilityService} service **/
   let service
   const usersRepositoryStub = {
     get: stub()
   }
 
-  beforeEach(() => {
+  beforeEach(function () {
     service = new UserBlockedAvailabilityService({
       usersRepository: usersRepositoryStub
     })
   })
 
-  it('maps restrictions to blocked availability', () => {
+  it('maps restrictions to blocked availability', function () {
     usersRepositoryStub.get.withArgs('test-user-id').resolves({
       restringedHours: {
         '2020-12-23': [

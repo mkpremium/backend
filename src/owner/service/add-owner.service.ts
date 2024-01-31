@@ -10,7 +10,7 @@ import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.e
 import { Logger } from 'winston'
 import _ from 'lodash'
 import { PostgresOwnersRepository } from '../repository/postgres-owners.repository'
-import { Person } from "../person.entity";
+import { Person } from '../person.entity'
 
 export interface AddOwnerCommand {
   id?: string,
@@ -33,21 +33,21 @@ export interface AddOwnerCommand {
 }
 
 export class AddOwnerService {
-  constructor(
+  constructor (
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private postgresOwnersRepository: PostgresOwnersRepository,
     private ormDataSource: DataSource,
     private usePostgres: boolean,
     private eventBus: EventBus,
-    private logger: Logger,
+    private logger: Logger
   ) {
   }
 
-  addOwner(cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
+  addOwner (cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
     return this.usePostgres ? this.saveInPostgres(cmd, requesterId) : this.couchbaseOwnersRepository.save(cmd)
   }
 
-  private async saveInPostgres(cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
+  private async saveInPostgres (cmd: AddOwnerCommand, requesterId: string): Promise<OwnerProps> {
     const savedOwner = await this.ormDataSource.transaction<Owner>(async em => {
       const owner = await this.createEntities(cmd, em)
       await this.eventBus.publish({
@@ -55,7 +55,7 @@ export class AddOwnerService {
         version: '1',
         addedBy: requesterId,
         ownerId: owner.id,
-        note: cmd.note,
+        note: cmd.note
       }, em)
 
       return owner
@@ -65,17 +65,17 @@ export class AddOwnerService {
     return this.postgresOwnersRepository.get(savedOwner.id)
   }
 
-  private async createEntities(cmd: AddOwnerCommand, entityManager: EntityManager) {
+  private async createEntities (cmd: AddOwnerCommand, entityManager: EntityManager) {
     const [savedOwner, savedPerson] = await createOwner(entityManager, cmd)
 
-    const {contacts} = cmd.person
+    const { contacts } = cmd.person
     if (_.uniqBy(contacts, 'value').length !== contacts.length) {
-      this.logger.error('Owner with duplicated contacts', {ownerId: savedOwner.id, cmd})
+      this.logger.error('Owner with duplicated contacts', { ownerId: savedOwner.id, cmd })
     }
 
     const contactsByValue = _.groupBy(contacts, 'value')
     const consolidatedContacts = Object.keys(contactsByValue).map(value => {
-      const statuses = _.uniq(contactsByValue[value].map(({status}) => status))
+      const statuses = _.uniq(contactsByValue[value].map(({ status }) => status))
 
       // Return the first contact from the array of contacts with the current value.
       // This effectively removes any duplicate contacts with the same value,
@@ -85,25 +85,25 @@ export class AddOwnerService {
       // This indicates that there are contacts with the same value but different statuses.
       if (statuses.length !== 1) {
         contact.status = conflictContactStatusPolicy(statuses)
-        this.logger.warning(`Owner with contact in different statuses`, {
+        this.logger.warning('Owner with contact in different statuses', {
           id: savedOwner,
           value,
           statuses,
-          resolvedStatus: contact.status,
+          resolvedStatus: contact.status
         })
       }
 
       return {
-        ...{...contactsByValue[value][0], status: conflictContactStatusPolicy(statuses)},
+        ...{ ...contactsByValue[value][0], status: conflictContactStatusPolicy(statuses) },
         isFeatured: contactsByValue[value].find(
-          ({id}) => [cmd.featuredContact?.emailId, cmd.featuredContact?.phoneId].includes(id)),
+          ({ id }) => [cmd.featuredContact?.emailId, cmd.featuredContact?.phoneId].includes(id))
       }
     })
 
     for (const c of consolidatedContacts) {
-      let contact = await entityManager.findOneBy(Contact, {value: c.value})
+      let contact = await entityManager.findOneBy(Contact, { value: c.value })
       if (!contact) {
-        this.logger.info('Creating contact', {value: c.value})
+        this.logger.info('Creating contact', { value: c.value })
         contact = await entityManager.save(Contact, {
           value: c.value,
           type: c.type
@@ -113,18 +113,18 @@ export class AddOwnerService {
       await entityManager.save(PersonContact, {
         contact,
         person: savedPerson,
-        status: c.status,
+        status: c.status
       })
       if (c.isFeatured) {
         if (['TELEFONO', 'MOVIL'].includes(c.type)) {
           await entityManager.save(Person, {
             ...savedPerson,
-            featuredPhoneContact: {id: contact.id}
+            featuredPhoneContact: { id: contact.id }
           })
         } else {
           await entityManager.save(Person, {
             ...savedPerson,
-            featuredEmailContact: {id: contact.id}
+            featuredEmailContact: { id: contact.id }
           })
         }
       }
@@ -134,7 +134,7 @@ export class AddOwnerService {
   }
 }
 
-export function conflictContactStatusPolicy(statuses: OwnerContactStatus[]) {
+export function conflictContactStatusPolicy (statuses: OwnerContactStatus[]) {
   if (statuses.length === 2) {
     if (statuses[0] === 'UNDEFINED') {
       return statuses[1]

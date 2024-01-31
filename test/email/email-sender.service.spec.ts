@@ -10,7 +10,7 @@ describe('EmailSenderService', () => {
 
   beforeEach(() => {
     emailTransportStub = {
-      sendMail: stub(),
+      sendMail: stub()
     }
     emailSender = new EmailSenderService(emailTransportStub, testMailerUsername)
   })
@@ -21,7 +21,7 @@ describe('EmailSenderService', () => {
         profile: userProfileBuilder({
           firstName: 'Flipper-Name',
           lastName: 'Flipper-Surname',
-          email: 'flipper@test.email',
+          email: 'flipper@test.email'
         }).build()
       }).build(),
       to: 'owner@test.email',
@@ -30,7 +30,7 @@ describe('EmailSenderService', () => {
         filename: 'propuesta.pdf'
       },
       message: 'test message',
-      subject: 'test subject',
+      subject: 'test subject'
     }
     await emailSender.sendMail(testEmail)
 
@@ -42,7 +42,7 @@ describe('EmailSenderService', () => {
       subject: testEmail.subject,
       html: testEmail.message,
       text: testEmail.message,
-      attachments: [ testEmail.attachment ]
+      attachments: [testEmail.attachment]
     })
   })
 })

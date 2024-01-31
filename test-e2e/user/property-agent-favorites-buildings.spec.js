@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { createFlipper } from '../../test/common'
 import { authenticatedDelete, authenticatedGet, authenticatedPost, initApplication } from '../helper/rest-api-helper'
 
-describe('Property agent favourite buildings', () => {
-  it('stores property agent favourite buildings', async () => {
+describe('Property agent favourite buildings', function () {
+  it('stores property agent favourite buildings', async function () {
     const app = await initApplication()
 
     const businessUser = await createFlipper()

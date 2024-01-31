@@ -4,14 +4,14 @@ import jwtMiddleware from 'express-jwt'
 import jwtPermissions from 'express-jwt-permissions'
 import _get from 'lodash/get'
 import { jwt as jwtConfig } from '../../config'
-import { OperatorRepository } from '../operator/models'
 import { UserRoles } from '../types/user'
-import { logger } from '../infrastructure/logger'
 import honeycomb from 'honeycomb-beeline'
 import { UsersRepository } from '../user/repository/users.repository'
 
 function jwtMiddlewareAdapter (usersRepository: UsersRepository) {
-  const jwtInstance: any = jwtMiddleware({ ...jwtConfig, bearerTokenExtractor, algorithms: [ 'HS256' ] })
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const jwtInstance: any = jwtMiddleware({ ...jwtConfig, bearerTokenExtractor, algorithms: ['HS256'] })
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const composedJwt: any = compose(jwtInstance, wrap(addUserInfoFactory(usersRepository)))
   composedJwt.UnauthorizedError = jwtInstance.UnauthorizedError
   composedJwt.unless = jwtInstance.unless
@@ -33,13 +33,11 @@ function addUserInfoFactory (usersRepository: UsersRepository) {
     honeycomb().addContext({ userId: user.id })
     next()
   }
-
 }
-
 
 export function bearerTokenExtractor (req) {
   const authorization = _get(req, 'headers.authorization', '')
-  const [ scheme, credentials ] = authorization.split(' ')
+  const [scheme, credentials] = authorization.split(' ')
   if (scheme && /^Bearer$/i.test(scheme)) {
     return credentials
   } else if (scheme) {
@@ -58,18 +56,18 @@ const guard = jwtPermissions()
 export const permissions = {
   admin: guard.check(UserRoles.ADMIN),
   operator: guard.check([
-    [ UserRoles.ADMIN ],
-    [ UserRoles.MANAGER ],
-    [ UserRoles.OPERATOR ]
+    [UserRoles.ADMIN],
+    [UserRoles.MANAGER],
+    [UserRoles.OPERATOR]
   ]),
   manager: guard.check([
-    [ UserRoles.ADMIN ],
-    [ UserRoles.MANAGER ]
+    [UserRoles.ADMIN],
+    [UserRoles.MANAGER]
   ]),
   allManagers: guard.check([
-    [ UserRoles.ADMIN ],
-    [ UserRoles.MANAGER ],
-    [ UserRoles.STREET_MANAGER ],
-    [ UserRoles.STREET_ADMIN ]
+    [UserRoles.ADMIN],
+    [UserRoles.MANAGER],
+    [UserRoles.STREET_MANAGER],
+    [UserRoles.STREET_ADMIN]
   ])
 }

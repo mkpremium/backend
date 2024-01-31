@@ -5,14 +5,14 @@ import { buildUser } from '../../common'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { User } from '../../../src/types/user'
 
-describe('SetFlipperMaxLineService', () => {
+describe('SetFlipperMaxLineService', function () {
   const testMaxLine = 1000000
   const testFlipperId = 'test-flipper-id'
 
   let service
   let usersRepositoryStub
 
-  beforeEach(() => {
+  beforeEach(function () {
     usersRepositoryStub = {
       get: stub(),
       save: stub()
@@ -20,7 +20,7 @@ describe('SetFlipperMaxLineService', () => {
     service = new SetFlipperMaxLineService({ usersRepository: usersRepositoryStub })
   })
 
-  it('save flipper with setup max line', async () => {
+  it('save flipper with setup max line', async function () {
     const testFlipper = fromJSON(buildUser({ id: testFlipperId, roles: ['BUSINESS'] }), User)
     usersRepositoryStub.get.withArgs(testFlipperId).resolves(testFlipper)
     usersRepositoryStub.save.resolves()

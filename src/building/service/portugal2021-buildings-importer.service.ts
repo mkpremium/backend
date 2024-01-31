@@ -11,7 +11,7 @@ export interface ImportSlugCommand {
 export class Portugal2021BuildingsImporterService {
   constructor (
     private portugal2021BuildingsRepository: Portugal2021BuildingsRepository,
-    private buildingsRepository: BuildingsRepository,
+    private buildingsRepository: BuildingsRepository
   ) {
   }
 
@@ -32,7 +32,7 @@ export class Portugal2021BuildingsImporterService {
               ...sourceBuilding,
               status: 'BUILDING_IMPORTED',
               importedWithBuildingId: building.id,
-              statusChangedAt: new Date(),
+              statusChangedAt: new Date()
             })
           }),
           TE.chain(() => {
@@ -44,7 +44,7 @@ export class Portugal2021BuildingsImporterService {
                 ...b,
                 status: 'MERGED',
                 mergeWith: sourceBuilding.id,
-                statusChangedAt: new Date(),
+                statusChangedAt: new Date()
               }))
             )
           }),
@@ -53,23 +53,23 @@ export class Portugal2021BuildingsImporterService {
               ...sourceBuilding,
               status: 'FAILED',
               failure: error.message,
-              statusChangedAt: new Date(),
+              statusChangedAt: new Date()
             })
           }),
           TE.chain(() => TE.of(sourceBuilding))
         )
-      }),
+      })
     )
   }
 
   private mergeBuildings (buildings) {
-    const sourceBuilding = buildings[ 0 ]
+    const sourceBuilding = buildings[0]
     buildings.slice(1).forEach(b => {
       sourceBuilding.address.floorArea = sourceBuilding.address.floorArea || b.address.floorArea
       sourceBuilding.address.usage = sourceBuilding.address.usage || b.address.usage
       sourceBuilding.address.militaryGeo = {
         x: sourceBuilding.address.militaryGeo.x || b.address.militaryGeo.x,
-        y: sourceBuilding.address.militaryGeo.y || b.address.militaryGeo.y,
+        y: sourceBuilding.address.militaryGeo.y || b.address.militaryGeo.y
       }
       sourceBuilding.owners = sourceBuilding.owners.concat(b.owners)
     })
@@ -89,7 +89,7 @@ export class Portugal2021BuildingsImporterService {
         type,
         floorArea,
         militaryGeo,
-        usage,
+        usage
       }
     } = building
 
@@ -101,27 +101,27 @@ export class Portugal2021BuildingsImporterService {
         city,
         neighborhood,
         fullAddress: `${type} ${street} ${number}, ${city}`,
-        province: Portugal2021BuildingsImporterService.inferProvince(city),
+        province: Portugal2021BuildingsImporterService.inferProvince(city)
       },
       floorArea: floorArea || '',
       use: usage,
       portugalSpecific: {
         militaryGeo,
         artigo: cadastreReferenceA,
-        artigoMatricial: cadastreReferenceAM,
+        artigoMatricial: cadastreReferenceAM
       }
     }
   }
 
   private static inferProvince (city) {
-    return provincesCityMap[ city ] || ''
+    return provincesCityMap[city] || ''
   }
 }
 
 const provincesCityMap = {
-  'BONFIM': 'PORTO',
-  'PORTO': 'PORTO',
-  'LISBOA': 'LISBOA',
+  BONFIM: 'PORTO',
+  PORTO: 'PORTO',
+  LISBOA: 'LISBOA',
   'VILA NOVA DE GAIA': 'PORTO',
-  'PARQUE DAS NACOES': 'LISBOA',
+  'PARQUE DAS NACOES': 'LISBOA'
 }

@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { AssignFlipperToCallerService } from '../../../src/caller/service/assign-flipper-to-caller.service'
 import { spy, stub, match } from 'sinon'
 
-describe('AssignFlipperToCallerService', () => {
+describe('AssignFlipperToCallerService', function () {
   const testCallerId = 'test-caller-id'
   const testCaller = {
     id: testCallerId,
@@ -29,7 +29,7 @@ describe('AssignFlipperToCallerService', () => {
   let scheduledCallsServiceStub
   let usersRepositoryStub
 
-  beforeEach(() => {
+  beforeEach(function () {
     scheduledCallsServiceStub = {
       scheduledCallsFor: stub()
     }
@@ -43,13 +43,13 @@ describe('AssignFlipperToCallerService', () => {
     service = new AssignFlipperToCallerService(scheduledCallsServiceStub, usersRepositoryStub)
   })
 
-  it('does not assign caller with scheduled calls', () => {
+  it('does not assign caller with scheduled calls', function () {
     scheduledCallsServiceStub.scheduledCallsFor.withArgs(testCallerId).resolves([{}])
 
     return expect(service.assign(testCallerId, testFlipperId)).to.be.rejectedWith('scheduled calls')
   })
 
-  it('does not assign caller working on a queue different that flipper', () => {
+  it('does not assign caller working on a queue different that flipper', function () {
     usersRepositoryStub.get.withArgs(testCallerId).resolves({
       ...testCaller,
       profile: {
@@ -61,7 +61,7 @@ describe('AssignFlipperToCallerService', () => {
     return expect(service.assign(testCallerId, testFlipperId)).to.be.rejectedWith('queues mismatch')
   })
 
-  it('assigns caller to flipper', () => {
+  it('assigns caller to flipper', function () {
     scheduledCallsServiceStub.scheduledCallsFor.withArgs(testCallerId).resolves([])
 
     return service.assign(testCallerId, testFlipperId)

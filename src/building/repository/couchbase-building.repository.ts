@@ -25,19 +25,19 @@ export class CouchbaseBuildingsRepository extends CouchbaseRepository<BuildingPr
   async setBuildingFeaturedOwner (buildingId, ownerId) {
     await this.couchbaseAdapter.queryAsync(
       setBuildingFeaturedOwner(this.bucketName),
-      [ buildingId, ownerId ]
+      [buildingId, ownerId]
     )
   }
 
   async assignBuildingToAgent (buildingId, agentId) {
     await this.couchbaseAdapter.queryAsync(
-      assignBuildingToAgentQuery(this.bucketName), [ buildingId, agentId ]
+      assignBuildingToAgentQuery(this.bucketName), [buildingId, agentId]
     )
   }
 
   async pullBuildingsOutOfFreezer (buildingIds) {
     await this.couchbaseAdapter.queryAsync(
-      pullBuildingOutOfFreezerQuery(this.bucketName), [ buildingIds ]
+      pullBuildingOutOfFreezerQuery(this.bucketName), [buildingIds]
     )
   }
 

@@ -3,7 +3,7 @@ import { OperatorRepository } from './models'
 import { canManageOperator } from '../lib/role-operators'
 import { AddOperatorService } from '../user/service/add-operator.service'
 
-export function createLoginController ({loginService}) {
+export function createLoginController ({ loginService }) {
   return async function (req, res) {
     const response = await loginService.login(req.body)
 

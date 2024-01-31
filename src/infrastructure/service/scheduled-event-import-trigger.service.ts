@@ -8,7 +8,7 @@ export class ScheduledEventImportTriggerService {
   constructor (
     private readonly eventBus: EventPublisher,
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: Logger
   ) {
   }
 
@@ -23,7 +23,7 @@ export class ScheduledEventImportTriggerService {
     for (const scheduledEvent of allScheduledEvents) {
       await this.eventBus.publish({
         name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_SCHEDULED_EVENT,
-        scheduledEvent: scheduledEvent.document,
+        scheduledEvent: scheduledEvent.document
       })
       this.logger.info('Scheduled event migration triggered', { scheduledEventId: scheduledEvent.id })
     }

@@ -19,7 +19,7 @@ describe('BuildingSearcherService', () => {
 
   beforeEach(() => {
     buildingsReadRepositoryStub = {
-      ofCadastreReference: stub(),
+      ofCadastreReference: stub()
     }
     service = new BuildingSearcherService(buildingsReadRepositoryStub)
   })
@@ -33,7 +33,7 @@ describe('BuildingSearcherService', () => {
       map((building) => {
         expect(building).to.be.equal(testBuilding)
       }),
-      orFail(),
+      orFail()
     )()
   })
 })

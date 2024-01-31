@@ -6,11 +6,11 @@ import { QueueSource } from './domain/queue'
 @Entity()
 export class WorksheetQueue extends BaseEntity {
   @Column()
-  name: string
+    name: string
 
   @OneToMany(() => Worksheet, ws => ws.queue)
-  worksheets: Worksheet[]
+    worksheets: Worksheet[]
 
   @Column('jsonb')
-  source: QueueSource
+    source: QueueSource
 }

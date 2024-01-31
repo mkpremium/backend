@@ -45,14 +45,14 @@ NEST ${bucketName} owners ON owners._documentType = 'owner' AND owners.buildingI
 WHERE worksheet._documentType = 'worksheet' AND ${conditions.join(' AND ')}
 `
 
-const worksheetByIdQuery = bucketName => worksheetForCallcenterViewQuery(bucketName, [ 'worksheet.id = $1' ])
+const worksheetByIdQuery = bucketName => worksheetForCallcenterViewQuery(bucketName, ['worksheet.id = $1'])
 
 const nextWorksheetAvailableInSourceQuery = (bucketName, source, skipWorksheetId) => {
-  const sourceMatchCondition = Object.keys(source).filter(k => !!source[ k ])
+  const sourceMatchCondition = Object.keys(source).filter(k => !!source[k])
     .map(k => {
-      const expr = Array.isArray(source[ k ]) ?
-        `IN [${source[ k ].map(val => `"${val}"`).join(',')}]` :
-        `= "${source[ k ]}"`
+      const expr = Array.isArray(source[k])
+        ? `IN [${source[k].map(val => `"${val}"`).join(',')}]`
+        : `= "${source[k]}"`
       return `worksheet.buildingAddress.${k} ` + expr
     })
 
@@ -73,7 +73,7 @@ export class CouchbaseWorksheetRepository extends CouchbaseRepository<WorksheetP
   implements WorksheetRepository {
   getForCallcenterView (worksheetId: string): Promise<WorksheetViewProps> {
     return this.couchbaseAdapter.queryAsync(
-      worksheetByIdQuery(this.bucketName), [ worksheetId ], { queryName: 'worksheet_view' }
+      worksheetByIdQuery(this.bucketName), [worksheetId], { queryName: 'worksheet_view' }
     )
       .catch(error => {
         error.worksheetId = worksheetId
@@ -97,7 +97,7 @@ export class CouchbaseWorksheetRepository extends CouchbaseRepository<WorksheetP
   }
 
   static prepareRowsForParsing (rows) {
-    const record = rows[ 0 ]
+    const record = rows[0]
     if (record.building.recentProposal) {
       record.building.latestProposal = {
         amount: record.building.recentProposal.proposal,
@@ -118,7 +118,7 @@ export class CouchbaseWorksheetRepository extends CouchbaseRepository<WorksheetP
     if (result.length === 0) {
       return
     }
-    return this.getForCallcenterView(result[ 0 ].id)
+    return this.getForCallcenterView(result[0].id)
   }
 
   ofBuildingId (buildingId): Promise<WorksheetProps> {
@@ -127,13 +127,13 @@ export class CouchbaseWorksheetRepository extends CouchbaseRepository<WorksheetP
         FROM ${this.bucketName} worksheet
         WHERE worksheet._documentType = 'worksheet'
           AND worksheet.relatedBuildingIds[0] = $1
-    `, [ buildingId ])
+    `, [buildingId])
       .then(rows => {
         if (!rows || rows.length === 0) {
           throw new EntityNotFound(`worksheet.buildingId=${buildingId}`, this.struct())
         }
 
-        return fromJSON(rows[ 0 ], this.struct())
+        return fromJSON(rows[0], this.struct())
       })
   }
 

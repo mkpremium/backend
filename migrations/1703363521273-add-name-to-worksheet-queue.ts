@@ -9,7 +9,6 @@ export class AddNameToWorksheetQueue1703363521273 implements MigrationInterface 
   }
 
   public async down (queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "worksheet_queue" DROP COLUMN "name"`)
+    await queryRunner.query('ALTER TABLE "worksheet_queue" DROP COLUMN "name"')
   }
-
 }

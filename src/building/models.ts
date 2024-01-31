@@ -5,7 +5,6 @@ import { newHttpError } from '../lib/http-error'
 import { toJSON } from '../lib/tcomb'
 import { Building } from './building'
 
-
 export class LegacyBuildingRepository extends CouchbaseModel {
   protected Struct = Building
 

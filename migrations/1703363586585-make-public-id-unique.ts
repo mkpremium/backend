@@ -9,7 +9,6 @@ export class MakePublicIdUnique1703363586585 implements MigrationInterface {
   }
 
   public async down (queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "building" DROP CONSTRAINT "UQ_7b13d552bdbd1f6d8608ab6054e"`)
+    await queryRunner.query('ALTER TABLE "building" DROP CONSTRAINT "UQ_7b13d552bdbd1f6d8608ab6054e"')
   }
-
 }

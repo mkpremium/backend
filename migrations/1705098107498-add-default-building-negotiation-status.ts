@@ -12,5 +12,4 @@ export class AddDefaultBuildingNegotiationStatus1705098107498 implements Migrati
     await queryRunner.query(`ALTER TABLE "building"
         ALTER COLUMN "negotiationStatus" DROP DEFAULT`)
   }
-
 }

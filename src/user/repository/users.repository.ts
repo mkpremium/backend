@@ -1,6 +1,4 @@
 import { UserProps } from '../../types/user'
-import { EntityNotFound } from '../../db/errors'
-
 
 interface Signature {
   id: string

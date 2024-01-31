@@ -11,12 +11,12 @@ export class PostgresUserRepository extends PostgresRepository<UserProps, User>
     flipper: true,
     caller: {
       flipper: true
-    },
+    }
   }
 
-  async getUserWithUsername(username: string) {
+  async getUserWithUsername (username: string) {
     const user = await this.repository.findOne({
-      where: {username},
+      where: { username },
       relations: this.relations
     })
     if (!user) {
@@ -26,20 +26,21 @@ export class PostgresUserRepository extends PostgresRepository<UserProps, User>
     return this.entityToStruct(user)
   }
 
-  protected structToEntity(struct: UserProps): DeepPartial<User> {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  protected structToEntity (struct: UserProps): DeepPartial<User> {
     throw new Error('Method not implemented.')
   }
 
-  protected entityToStruct(entity: User): UserProps {
+  protected entityToStruct (entity: User): UserProps {
     return mapUserEntityToStruct(entity)
   }
 
-  protected getEntityTarget(): EntityTarget<User> {
+  protected getEntityTarget (): EntityTarget<User> {
     return User
   }
 }
 
-export function mapUserEntityToStruct(entity: User) {
+export function mapUserEntityToStruct (entity: User) {
   return {
     roles: deriveRoles(entity),
     favoriteBuildings: [],
@@ -48,14 +49,13 @@ export function mapUserEntityToStruct(entity: User) {
     password: entity.password,
     enable: entity.enabled,
     flipperId: entity.caller?.flipperId,
-    profile: entity.profile,
-  };
+    profile: entity.profile
+  }
 }
 
-function deriveRoles(user: User) {
-  return [user.flipper!! && UserRoles.BUSINESS,
-    user.caller!! && UserRoles.OPERATOR,
-    user.isAdmin && UserRoles.ADMIN,
+function deriveRoles (user: User) {
+  return [user.flipper! && UserRoles.BUSINESS,
+    user.caller! && UserRoles.OPERATOR,
+    user.isAdmin && UserRoles.ADMIN
   ].filter(Boolean)
 }
-

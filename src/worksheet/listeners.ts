@@ -15,7 +15,7 @@ import { DomainEventCatalog } from '../infrastructure/postgres/domain-event.enti
 import {
   SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
 } from './service/sync-worksheet-status-on-building-negotiation-status-change.service'
-import { subscribeToCommand } from "../infrastructure/listeners";
+import { subscribeToCommand } from '../infrastructure/listeners'
 
 export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
@@ -63,7 +63,7 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
   eventBus.on(
     'virtual-caller.worksheet_not_found',
     'worksheet.invalidate_worksheet',
-    invalidateWorksheet,
+    invalidateWorksheet
   )
 
   eventBus.on(

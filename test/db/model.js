@@ -3,13 +3,13 @@ import { expect } from 'chai'
 import squel from 'squel'
 import t from 'tcomb'
 
-describe('getQueryBuilder', () => {
+describe('getQueryBuilder', function () {
   let fixture
-  beforeEach(() => {
+  beforeEach(function () {
     fixture = new ModelFixture()
   })
 
-  it('creates count query builder', () => {
+  it('creates count query builder', function () {
     const expectedBuilder = squel.select()
       .field('COUNT(*) as count')
       .from('mkpremium_test', 't')

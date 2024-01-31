@@ -29,7 +29,7 @@ import jwt from './middleware/jwt'
 
 export const createApp = async (database: Database): Promise<Express> => {
   const logger = initLogger()
-  logger.info('starting app', {database})
+  logger.info('starting app', { database })
 
   const app = express()
 
@@ -81,7 +81,7 @@ export const createApp = async (database: Database): Promise<Express> => {
 
     return app
   } catch (error) {
-    logger.error('error starting application', { error: error, stack: error.stack, errorMessage: error.messge })
+    logger.error('error starting application', { error, stack: error.stack, errorMessage: error.messge })
     process.exit(1)
   }
 }

@@ -10,7 +10,7 @@ async function delayForConsistency () {
   await Promise.delay(500)
 }
 
-describe('AddOfferRequest', () => {
+describe('AddOfferRequest', function () {
   const testCmd = {
     ownerId: 'owner-id',
     destinationContactId: 'email-contact-id',
@@ -28,7 +28,7 @@ describe('AddOfferRequest', () => {
   let buildingsRepository
   let worksheetRepository
 
-  before(async () => {
+  before(async function () {
     const diContainer = await createTestContainer()
     buildingEventListeners(diContainer.resolve('eventBus'), diContainer)
     addOfferRequestService = diContainer.resolve('addOfferRequestService')
@@ -49,26 +49,26 @@ describe('AddOfferRequest', () => {
     await delayForConsistency()
   })
 
-  it('sets destination contact id as featured email', async () => {
+  it('sets destination contact id as featured email', async function () {
     const owner = await ownersRepository.get(testCmd.ownerId)
 
     expect(owner.featuredContact.phoneId).to.be.equal(testCmd.reporterContactId)
   })
 
-  it('adds note to building', async () => {
+  it('adds note to building', async function () {
     const notes = await buildingNotesRepository.forBuildingOfId(testCmd.buildingId)
 
     expect(notes).to.be.lengthOf(1)
     expect(notes[0].note).to.be.equal(testCmd.note)
   })
 
-  it('sets owner as featured for building', async () => {
+  it('sets owner as featured for building', async function () {
     const building = await buildingsRepository.get(testCmd.buildingId)
 
     expect(building.ownerId).to.be.equal(testCmd.ownerId)
   })
 
-  it('add request as last meeting in worksheet', async () => {
+  it('add request as last meeting in worksheet', async function () {
     const worksheet = await worksheetRepository.get(testCmd.worksheetId)
 
     expect(worksheet.lastAddedMeeting).to.not.be.null

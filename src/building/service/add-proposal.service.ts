@@ -14,23 +14,23 @@ export class AddProposalService {
   }
 
   async addProposal (buildingId: string, userId: string, partialProposal: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
-    return this.usePostgres ?
-      this.addProposalToPostgres(buildingId, userId, partialProposal) :
-      this.addProposalToCouchbase(buildingId, userId, partialProposal)
+    return this.usePostgres
+      ? this.addProposalToPostgres(buildingId, userId, partialProposal)
+      : this.addProposalToCouchbase(buildingId, userId, partialProposal)
   }
 
   private async addProposalToPostgres (buildingId: string, userId: string, partialProposal: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
     return this.postgresProposalsRepository.save({
       ...partialProposal,
       buildingId,
-      createdBy: userId,
+      createdBy: userId
     })
   }
 
   private async addProposalToCouchbase (buildingId: string, userId: string, props: Omit<ProposalProps, 'id' | 'createdBy' | 'buildingId'>) {
     const building = await this.couchbaseBuildingsRepository.get(buildingId) as any
     const proposal = await this.couchbaseProposalsRepository.save({ buildingId, createdBy: userId, ...props })
-    const updatedProposals = t.update(building.proposals || [], { $push: [ proposal.id ] })
+    const updatedProposals = t.update(building.proposals || [], { $push: [proposal.id] })
     const updatedBuilding = t.update(building, {
       proposals: { $set: updatedProposals },
       recentProposal: { $set: proposal }

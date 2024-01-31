@@ -3,11 +3,11 @@ import { stub } from 'sinon'
 import { expect } from 'chai'
 import { ownerBuilder } from '../owner.builder'
 
-describe('SetOwnerFeaturedContactService', () => {
+describe('SetOwnerFeaturedContactService', function () {
   let service
   let ownersRepositoryStub
 
-  beforeEach(() => {
+  beforeEach(function () {
     ownersRepositoryStub = {
       get: stub(),
       save: stub().resolves()
@@ -15,7 +15,7 @@ describe('SetOwnerFeaturedContactService', () => {
     service = new SetOwnerFeaturedContactService(ownersRepositoryStub)
   })
 
-  it('sets featured contact object', () => {
+  it('sets featured contact object', function () {
     const testPhoneId = 'test-phone-id'
     const testOwner = ownerBuilder().withPhoneContact(testPhoneId).build()
     ownersRepositoryStub.get.withArgs(testOwner.id).resolves(testOwner)
@@ -27,7 +27,7 @@ describe('SetOwnerFeaturedContactService', () => {
     })
   })
 
-  it('features email of given ID', () => {
+  it('features email of given ID', function () {
     const testEmailId = 'test-email-id'
     const testOwner = ownerBuilder().withEmailContact(testEmailId).build()
     ownersRepositoryStub.get.withArgs(testOwner.id).resolves(testOwner)
@@ -39,7 +39,7 @@ describe('SetOwnerFeaturedContactService', () => {
     })
   })
 
-  it('features phone of given ID', () => {
+  it('features phone of given ID', function () {
     const testPhoneId = 'test-phone-id'
     const testOwner = ownerBuilder().withPhoneContact(testPhoneId).build()
     ownersRepositoryStub.get.withArgs(testOwner.id).resolves(testOwner)

@@ -2,8 +2,8 @@ import { createFlipperBlockedAvailabilityController } from '../../../src/flipper
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 
-describe('Flipper Availability Controller', () => {
-  it('returns flipper availability from service', () => {
+describe('Flipper Availability Controller', function () {
+  it('returns flipper availability from service', function () {
     const flipperAvailability = []
     const flipperAvailabilityServiceStub = { blockedAvailabilityForFlipper: stub() }
     flipperAvailabilityServiceStub.blockedAvailabilityForFlipper.withArgs('test-flipper-id').resolves(flipperAvailability)

@@ -12,19 +12,19 @@ describe('ScheduleCallService (Couchbase)', () => {
 
   beforeEach(() => {
     scheduledEventsRepositoryStub = {
-      addScheduleCallEvent: stub(),
+      addScheduleCallEvent: stub()
     }
     callSchedulerServiceStub = {
-      scheduleWorksheetInQueue: stub(),
+      scheduleWorksheetInQueue: stub()
     }
     legacyWorksheetQueueRepositoryStub = {
-      get: stub(),
+      get: stub()
     }
     eventBusStub = {
-      publish: stub(),
+      publish: stub()
     }
     worksheetRepositoryStub = {
-      ofBuildingId: stub().resolves({ id: 'test-worksheet-id' }),
+      ofBuildingId: stub().resolves({ id: 'test-worksheet-id' })
     }
 
     service = new ScheduleCallService(
@@ -38,7 +38,7 @@ describe('ScheduleCallService (Couchbase)', () => {
     )
   })
 
-  it(`saves scheduled event with building's worksheetID`, async () => {
+  it('saves scheduled event with building\'s worksheetID', async () => {
     await service.scheduleCall({
       userId: 'test-user-id',
       queueId: 'test-queue-id',
@@ -54,7 +54,7 @@ describe('ScheduleCallService (Couchbase)', () => {
         },
         eventDate: undefined,
         note: '',
-        notifyTo: '',
+        notifyTo: ''
       }
     })
 

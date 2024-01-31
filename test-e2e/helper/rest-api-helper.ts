@@ -15,7 +15,7 @@ export function initApplication (database: Database = 'couchbase'): Promise<Appl
       const bucket = diContainer.resolve('couchbaseBucket') as Bucket
       return new Promise(resolve => {
         bucket.manager().flush(
-          () => setTimeout(() => resolve(database === 'postgres' ? [ app, diContainer ] : app), 500)
+          () => setTimeout(() => resolve(database === 'postgres' ? [app, diContainer] : app), 500)
         )
       })
     })

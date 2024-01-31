@@ -11,9 +11,9 @@ describe('Owner selection policy', () => {
   })
 
   it('returns nothing when there is no owner with some contact validated', () => {
-    expect(selectBuildingOwner([ {
+    expect(selectBuildingOwner([{
       id: 'test-owner-id',
       contacts: []
-    } ], testFeaturedOwnerId, testMeeting)).to.be.undefined
+    }], testFeaturedOwnerId, testMeeting)).to.be.undefined
   })
 })

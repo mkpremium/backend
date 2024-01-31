@@ -3,4 +3,3 @@ import { BuildingProps } from '../building'
 
 export interface BuildingsRepository extends Repository<BuildingProps> {
 }
-

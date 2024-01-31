@@ -6,8 +6,8 @@ import { userBuilder } from '../../user/user.builder'
 import { buildingBuilder } from '../../building/building.builder'
 import { worksheetBuilder } from '../worksheet.builder'
 import { expect } from 'chai'
-import { CouchbaseBuildingsRepository } from "../../../src/building/repository/couchbase-building.repository";
-import { CouchbaseWorksheetRepository } from "../../../src/worksheet/repository/couchbase-worksheet.repository";
+import { CouchbaseBuildingsRepository } from '../../../src/building/repository/couchbase-building.repository'
+import { CouchbaseWorksheetRepository } from '../../../src/worksheet/repository/couchbase-worksheet.repository'
 
 describe('SyncWorksheetStatusOnBuildingNegotiationStatusChangeService', () => {
   it('updates worksheet status', async () => {
@@ -18,7 +18,7 @@ describe('SyncWorksheetStatusOnBuildingNegotiationStatusChangeService', () => {
     const testUser = userBuilder().build()
     const testBuilding = await buildingsRepository.save(buildingBuilder().build())
     await worksheetRepository.save(
-      worksheetBuilder({ relatedBuildingIds: [ testBuilding.id ] }).build())
+      worksheetBuilder({ relatedBuildingIds: [testBuilding.id] }).build())
 
     expect(
       async () => await service.updateWorksheet({ buildingId: testBuilding.id, userId: testUser.id })

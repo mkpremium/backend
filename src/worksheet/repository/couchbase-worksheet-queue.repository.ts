@@ -8,14 +8,14 @@ import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<WorksheetQueueProps>
   implements WorksheetQueueRepository {
   constructor (
-    protected couchbaseAdapter: CouchbaseAdapter,
+    protected couchbaseAdapter: CouchbaseAdapter
   ) {
     super(couchbaseAdapter)
   }
 
   async list (): Promise<WorksheetQueueProps[]> {
     const rows = await this.couchbaseAdapter.queryAsync(
-      this.getQueuesMatchingConditionsQuery([ '1=1' ])
+      this.getQueuesMatchingConditionsQuery(['1=1'])
     )
 
     return fromJSON(rows, t.list(WorksheetQueue))
@@ -27,7 +27,7 @@ export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<Works
 
   async findQueueWithScheduledCallOfId (scheduledCallId: string): Promise<WorksheetQueueProps> {
     const rows = await this.couchbaseAdapter.queryAsync(
-      this.queueWithScheduledCallOfIdQuery(), [ scheduledCallId ]
+      this.queueWithScheduledCallOfIdQuery(), [scheduledCallId]
     )
 
     if (rows.length === 0) {
@@ -36,11 +36,11 @@ export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<Works
     if (rows.length > 1) {
       throw new ScheduledCallInMultipleQueues(scheduledCallId)
     }
-    return fromJSON(rows[ 0 ], WorksheetQueue)
+    return fromJSON(rows[0], WorksheetQueue)
   }
 
   private queueWithScheduledCallOfIdQuery () {
-    return this.getQueuesMatchingConditionsQuery([ 'ANY w IN worksheets SATISFIES w.event.id = $1 END' ])
+    return this.getQueuesMatchingConditionsQuery(['ANY w IN worksheets SATISFIES w.event.id = $1 END'])
   }
 
   private getQueuesMatchingConditionsQuery (conditions: string[]) {
@@ -55,4 +55,3 @@ export class CouchbaseWorksheetQueueRepository extends CouchbaseRepository<Works
     `
   }
 }
-

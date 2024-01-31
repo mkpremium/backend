@@ -1,18 +1,18 @@
 import { expect } from 'chai'
 import { stub, spy } from 'sinon'
 
-const { createSetFlipperMaxLineController } = require('../../../src/flipper/controller/set-flipper-max-line.controller')
+import { createSetFlipperMaxLineController } from '../../../src/flipper/controller/set-flipper-max-line.controller'
 
-describe('set-flipper-max-line.controller', () => {
+describe('set-flipper-max-line.controller', function () {
   let controller
   let setFlipperMaxLineServiceStub
-  beforeEach(() => {
+  beforeEach(function () {
     setFlipperMaxLineServiceStub = { setFlipperMaxLine: stub() }
 
     controller = createSetFlipperMaxLineController({ setFlipperMaxLineService: setFlipperMaxLineServiceStub })
   })
 
-  it('sets flippers max line', () => {
+  it('sets flippers max line', function () {
     const testMaxLine = 1000000
     const testRequest = {
       params: {

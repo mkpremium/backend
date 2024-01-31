@@ -34,10 +34,10 @@ export async function operatorCreate () {
 }
 
 const defaultOperatorPrototype = {
-  username: `operator`,
+  username: 'operator',
   password: defaultPassword,
-  agentNumber: `operator`,
-  roles: [ 'OPERATOR' ],
+  agentNumber: 'operator',
+  roles: ['OPERATOR'],
   profile: {
     queueId: 'queueId',
     firstName: 'operator',
@@ -75,7 +75,7 @@ export async function createAdminUser () {
 
 export async function createAdminUserWithPostgres (container: AwilixContainer) {
   const dataSource = container.resolve('ormDataSource') as DataSource
-  const [ existingAdmin ] = await dataSource.manager.findBy(User, { username: 'admin' })
+  const [existingAdmin] = await dataSource.manager.findBy(User, { username: 'admin' })
   if (existingAdmin) {
     return existingAdmin
   }

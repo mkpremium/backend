@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { spy, stub } from 'sinon'
 import { createTakeWorksheetInQueueController } from '../../../src/caller/controller/take-worksheet-in-queue.controller'
 
-describe('Take Worksheet In Queue Controller', () => {
-  it('take worksheet in caller assigned queue', async () => {
+describe('Take Worksheet In Queue Controller', function () {
+  it('take worksheet in caller assigned queue', async function () {
     const testCallerId = 'test-caller-id'
     const testCallerAssignedQueueId = 'test-caller-assigned-queue-id'
     const testWorksheetId = 'test-worksheet-id'

@@ -1,4 +1,4 @@
-import { Request, Response, } from 'express'
+import { Request, Response } from 'express'
 import { AddProposalForBuildingService } from '../service/add-proposal-for-building.service'
 
 export const createAddProposalController = ({ addProposalForBuildingService }: { addProposalForBuildingService: AddProposalForBuildingService }) =>

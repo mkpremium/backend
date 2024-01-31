@@ -10,7 +10,7 @@ export class EventPoller {
     private sqsClient: SQS,
     private listenersRegistry: ListenersRegistry,
     private logger: Logger,
-    private eventsQueueUrl: string,
+    private eventsQueueUrl: string
   ) {
   }
 
@@ -22,12 +22,11 @@ export class EventPoller {
 
     const messageEvent: {
       listener: string,
-      event: any,
+      event: {name: string} & object,
     } = JSON.parse(message.Body)
 
-
     const listener = this.listenersRegistry.listeningTo(messageEvent.event.name)
-        .find(({ name }) => name === messageEvent.listener) ||
+      .find(({ name }) => name === messageEvent.listener) ||
       this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER).find(({ name }) => name === messageEvent.listener)
     if (!listener) {
       this.logger.error('Subscriber not found', messageEvent)
@@ -38,7 +37,7 @@ export class EventPoller {
 
     await this.sqsClient.deleteMessage({
       QueueUrl: this.eventsQueueUrl,
-      ReceiptHandle: message.ReceiptHandle,
+      ReceiptHandle: message.ReceiptHandle
     }).promise().catch(error => {
       this.logger.error('Could not delete event', { error: error.message, ...messageEvent })
     })
@@ -52,7 +51,7 @@ export class EventPoller {
         QueueUrl: this.eventsQueueUrl,
         MaxNumberOfMessages: 10,
         WaitTimeSeconds: 20,
-        VisibilityTimeout: 60,
+        VisibilityTimeout: 60
       }).promise()
       if (!Messages || Messages.length === 0) {
         return 'no-event-received'

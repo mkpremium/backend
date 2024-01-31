@@ -9,7 +9,7 @@ import { AddBuildingOfferCommand } from '../service/add-offer-request.service'
 
 const DbOfferRequest = ScheduledEvent
 
-export class CouchbaseOfferRequestsRepository  {
+export class CouchbaseOfferRequestsRepository {
   constructor (private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository) {
   }
 

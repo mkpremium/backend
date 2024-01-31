@@ -8,7 +8,7 @@ import { BuildingProps } from '../../src/building/building'
 import { DeepPartial } from 'typeorm'
 import {
   CouchbaseScheduledEventsRepository
-} from "../../src/scheduled-events/repository/couchbase-schedule-events.repository";
+} from '../../src/scheduled-events/repository/couchbase-schedule-events.repository'
 
 const testBuildingId = 'test-building-id'
 export const testPhoneContactId = 'test-contact-id'
@@ -46,7 +46,7 @@ export const createWorksheetForBuilding = (app, building) => {
   const legacyWorksheetRepository = app.locals.diContainer.resolve('legacyWorksheetRepository')
   return legacyWorksheetRepository.save(Worksheet({
     id: uuid(),
-    relatedBuildingIds: [ building.id ],
+    relatedBuildingIds: [building.id],
     buildingAddress: building.address,
     status: 'INVALID' as const,
     queueId: null
@@ -130,19 +130,19 @@ export const createMeeting = (app, {
 }) => {
   const meetingDate = moment().add(1, 'day').hour(12).minute(0)
   const meeting = {
-    'createdBy': propertyAgentId,
-    'notifyTo': propertyAgentId,
-    'event': {
-      'contactId': contactId,
-      'ownerId': ownerId,
-      'buildingId': buildingId,
-      'worksheetId': undefined,
-      'eventAddress': 'Event Address',
-      'eventLocation': { lat: 0, long: 0 },
-      'inPerson': true
+    createdBy: propertyAgentId,
+    notifyTo: propertyAgentId,
+    event: {
+      contactId,
+      ownerId,
+      buildingId,
+      worksheetId: undefined,
+      eventAddress: 'Event Address',
+      eventLocation: { lat: 0, long: 0 },
+      inPerson: true
     },
-    'notifyAt': meetingDate.toISOString(),
-    'eventDate': meetingDate.toISOString()
+    notifyAt: meetingDate.toISOString(),
+    eventDate: meetingDate.toISOString()
   }
 
   const repo = app.locals.diContainer.resolve('couchbaseScheduledEventsRepository') as CouchbaseScheduledEventsRepository

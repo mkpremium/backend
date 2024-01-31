@@ -6,7 +6,7 @@ export function ownerEventListeners (eventBus: EventListener, container: AwilixC
   eventBus.on(
     DomainEventCatalog.SCHEDULED_EVENTS__CALL_SCHEDULED,
     'owner.flag_good_contact',
-    container.resolve('markGoodContactOnCallScheduled'),
+    container.resolve('markGoodContactOnCallScheduled')
   )
   eventBus.on(
     'owner.reset_owner_discarded_contacts_command',

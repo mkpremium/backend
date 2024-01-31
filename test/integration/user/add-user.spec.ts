@@ -23,7 +23,7 @@ describe('AddOperatorService', () => {
       ...Factory.build<{ username: string, password: string }>('user-credentials'),
       profile: Factory.build('user-profile'),
       roles: ['ADMIN'],
-      enable: true,
+      enable: true
     }
     const response = await request(app)
       .post('/operators/')

@@ -40,7 +40,7 @@ export const OwnerStatus = {
   ERROR: 'ERRONEO',
   PUBLIC: 'ENTE_PUBLICO',
   WITHOUT_CONTACT: 'WITHOUT_CONTACT',
-  WITHOUT_PHONE_CONTACT: 'WITHOUT_PHONE_CONTACT',
+  WITHOUT_PHONE_CONTACT: 'WITHOUT_PHONE_CONTACT'
 }
 
 export type OwnerType =
@@ -69,7 +69,7 @@ export const OwnerStatusEnum = t.enums.of(Object.values(OwnerStatus), 'OwnerStat
 export const OwnerConfirmed = t.struct({
   value: t.Boolean,
   confirmedBy: t.maybe(t.String),
-  confirmedAt: t.maybe(t.union([ t.Date, DateTimeString ]))
+  confirmedAt: t.maybe(t.union([t.Date, DateTimeString]))
 }, 'confirmed')
 export const FeaturedContact = t.struct({
   phoneId: t.maybe(t.String),
@@ -121,7 +121,6 @@ Owner.prototype.setStatus = function ($set) {
   return t.update(this, { status: { $set } })
 }
 
-
 Owner.prototype.verifyOwner = function (confirmedBy, value = true, extra = {}) {
   return t.update(this, {
     $merge: Object.assign({}, extra, {
@@ -152,7 +151,7 @@ export const changeContactStatus = (owner, contactId, newStatus): OwnerProps => 
   }
   const otherContacts = owner.person.contacts.filter(c => c.id !== contactId)
 
-  const contacts = [ { ...contact, status: newStatus, id: contactId }, ...otherContacts ]
+  const contacts = [{ ...contact, status: newStatus, id: contactId }, ...otherContacts]
   const updatedStatus = calculateStatusFromContacts(contacts, owner)
 
   return t.update(owner, {
@@ -171,10 +170,12 @@ function calculateStatusFromContacts (contacts: ContactProps[], owner) {
     case _.some(phoneContacts, c => c.status === 'GOOD'):
       return OwnerStatus.VERIFIED
     case _.every(phoneContacts, c => c.status === 'BAD'):
+      /* eslint-disable-next-line no-case-declarations */
       const emailContacts = contacts.filter(isEmailContact)
-      return _.every(emailContacts, c => c.status === 'BAD') ?
-        OwnerStatus.WITHOUT_CONTACT : OwnerStatus.WITHOUT_PHONE_CONTACT
-    case [ OwnerStatus.WITHOUT_CONTACT, OwnerStatus.WITHOUT_PHONE_CONTACT ].includes(owner.status):
+      return _.every(emailContacts, c => c.status === 'BAD')
+        ? OwnerStatus.WITHOUT_CONTACT
+        : OwnerStatus.WITHOUT_PHONE_CONTACT
+    case [OwnerStatus.WITHOUT_CONTACT, OwnerStatus.WITHOUT_PHONE_CONTACT].includes(owner.status):
       if (_.some(phoneContacts, c => isPhoneContact(c) && c.status !== 'BAD')) {
         return OwnerStatus.NON_VERIFIED
       }
@@ -185,7 +186,7 @@ function calculateStatusFromContacts (contacts: ContactProps[], owner) {
 }
 
 export function isPhoneContact (c: Pick<ContactProps, 'type'>) {
-  return [ 'TELEFONO', 'MOVIL' ].includes(c.type)
+  return ['TELEFONO', 'MOVIL'].includes(c.type)
 }
 
 function isEmailContact (c: ContactProps) {
@@ -212,7 +213,6 @@ export const mergeFeaturedContact = (owner: OwnerProps, featuredContact) => {
 }
 export const contactOfId = (owner, contactId) => {
   return owner.person.contacts.find(({ id }) => id === contactId)
-
 }
 
 const getOwnerContact = (o, contactId) => o.person.contacts.find(({ id }) => id === contactId)
@@ -222,7 +222,7 @@ export class WrongFeaturedContact extends Error {
 
   constructor (
     readonly ownerId: string,
-    readonly featuredContact: any,
+    readonly featuredContact: object,
     validationErrors
   ) {
     super('Wrong Featured Contact provided')

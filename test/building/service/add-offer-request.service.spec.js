@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { stub, spy } from 'sinon'
 import { InvalidCommand } from '../../../src/infrastructure/invalid-command.error'
 
-describe('addOfferRequestService', () => {
+describe('addOfferRequestService', function () {
   let service
   let offerRequestsRepositoryStub
   let buildingsRepositoryStub
@@ -20,7 +20,7 @@ describe('addOfferRequestService', () => {
     note: 'test-note'
   }
 
-  beforeEach(() => {
+  beforeEach(function () {
     offerRequestsRepositoryStub = {
       add: stub().resolves()
     }
@@ -38,21 +38,21 @@ describe('addOfferRequestService', () => {
     )
   })
 
-  it('adds offer request to repository', () => {
+  it('adds offer request to repository', function () {
     return service.addOfferRequest(testCmd)
       .then(() => {
         expect(offerRequestsRepositoryStub.add).to.have.been.calledWith(testCmd)
       })
   })
 
-  it('assigns building to evaluator flipper', () => {
+  it('assigns building to evaluator flipper', function () {
     return service.addOfferRequest(testCmd)
       .then(() => {
         expect(buildingsRepositoryStub.assignBuildingToAgent).to.have.been.calledWith(testCmd.buildingId, testCmd.flipperId)
       })
   })
 
-  it('publishes event when done', () => {
+  it('publishes event when done', function () {
     const storedOfferRequest = {}
     offerRequestsRepositoryStub.add.resolves(storedOfferRequest)
 
@@ -68,7 +68,7 @@ describe('addOfferRequestService', () => {
       })
   })
 
-  it('fails on invalid command', () => {
+  it('fails on invalid command', function () {
     return expect(service.addOfferRequest({})).to.be.rejectedWith(InvalidCommand)
   })
 })

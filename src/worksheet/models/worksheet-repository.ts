@@ -113,7 +113,7 @@ export class LegacyWorksheetRepository extends CouchbaseModel {
     }
 
     const total = await this.countQuery(qbCount)
-    let results = await this.query(qb)
+    const results = await this.query(qb)
 
     return fromJSON({ total, results }, WorkSheetListResponse)
   }

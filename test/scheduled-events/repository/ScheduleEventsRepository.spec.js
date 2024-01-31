@@ -2,18 +2,18 @@ import { expect } from 'chai'
 import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
 import { createTestContainer } from '../../create-test-container'
 
-describe('ScheduleEventsRepository', () => {
+describe('ScheduleEventsRepository', function () {
   let repository
   let worksheetRepository
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     const container = await createTestContainer()
     repository = container.resolve('scheduledEventsRepository')
     worksheetRepository = container.resolve('legacyWorksheetRepository')
   })
 
-  describe('addScheduledMeetingEvent', () => {
-    it('schedules meeting for worksheet', async () => {
+  describe('addScheduledMeetingEvent', function () {
+    it('schedules meeting for worksheet', async function () {
       await worksheetRepository.save({
         id: 'test-worksheet-id',
         relatedBuildingIds: ['test-building-id'],

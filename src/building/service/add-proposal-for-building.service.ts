@@ -20,10 +20,10 @@ export interface ProposalForBuildingScheduled {
 }
 
 export class AddProposalForBuildingService {
-  constructor(
+  constructor (
     private addProposalService: AddProposalService,
     private ownersRepository: OwnerRepository,
-    private eventBus: EventPublisher,
+    private eventBus: EventPublisher
   ) {
   }
 
@@ -35,12 +35,12 @@ export class AddProposalForBuildingService {
       proposal: cmd.amount,
       message: cmd.message,
       notificationStatus: 'PENDING',
-      notificationEmail: contactOfId(owner, cmd.contactId).value,
+      notificationEmail: contactOfId(owner, cmd.contactId).value
     })
 
     const event: ProposalForBuildingScheduled = {
       name: DomainEventCatalog.BUILDING__PROPOSAL_SCHEDULED,
-      buildingId: buildingId,
+      buildingId,
       createdBy: cmd.createdBy,
       ownerId: cmd.ownerId
     }

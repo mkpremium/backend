@@ -14,7 +14,7 @@ const meetingPrototype: MeetingProps = {
     contactId: 'test-meeting-contact-id',
     inPerson: true,
     worksheetId: 'test-meeting-worksheet-id'
-  },
+  }
 }
 
 export const meetingBuilder = (overrides: Partial<MeetingProps> = {}) => ({

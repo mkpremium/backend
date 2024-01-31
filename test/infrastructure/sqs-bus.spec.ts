@@ -18,7 +18,7 @@ describe('SqsBus', () => {
   beforeEach(() => {
     loggerStub = createLoggerMock()
     sqsClientStub = {
-      sendMessageBatch: stub().returns({ promise: () => Promise.resolve({ Successful: [], Failed: [] }) }),
+      sendMessageBatch: stub().returns({ promise: () => Promise.resolve({ Successful: [], Failed: [] }) })
     }
 
     service = new SqsBus(
@@ -27,7 +27,7 @@ describe('SqsBus', () => {
       testEventsQueueUrl,
       new ListenersRegistry(),
       eventNamingPolicy,
-      null,
+      null
     )
   })
 
@@ -78,10 +78,10 @@ describe('SqsBus', () => {
     service.on(testEvent.name, 'test.listener', noopListener)
     sqsClientStub.sendMessageBatch.returns({
       promise: () => Promise.resolve({
-        Failed: [ {
+        Failed: [{
           ...sqsErrorResponse,
           SenderFault: false
-        } ]
+        }]
       })
     })
 
@@ -94,10 +94,10 @@ describe('SqsBus', () => {
     service.on(testEvent.name, 'test.listener', noopListener)
     sqsClientStub.sendMessageBatch.returns({
       promise: () => Promise.resolve({
-        Failed: [ {
+        Failed: [{
           ...sqsErrorResponse,
           SenderFault: true
-        } ]
+        }]
       })
     })
 

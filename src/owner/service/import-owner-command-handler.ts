@@ -37,7 +37,7 @@ export function importOwnerHandlerFactory ({ addOwnerService, eventBus, logger, 
     await markCouchbaseDocumentAsMigrated(entityManager, owner.id)
     await eventBus.publish({
       name: DomainEventCatalog.POSTGRES_MIGRATION__OWNER_IMPORTED,
-      ownerId: owner.id,
+      ownerId: owner.id
     }, entityManager)
 
     if (!owner.buildingId) {
@@ -47,7 +47,7 @@ export function importOwnerHandlerFactory ({ addOwnerService, eventBus, logger, 
 
     const couchbaseBuilding = await entityManager.findOneBy(CouchbaseDocument, {
       documentType: CouchbaseDocumentType.BUILDING,
-      id: owner.buildingId,
+      id: owner.buildingId
     })
     if (!couchbaseBuilding) {
       logger.error('Building not found (importing owner)', { buildingId: owner.buildingId })
@@ -70,8 +70,8 @@ function ensureOwnerHasNames (owner: OwnerProps) {
     ...owner,
     person: {
       ...owner.person,
-      firstName: firstName,
-      firstSurname: rest.join(' '),
+      firstName,
+      firstSurname: rest.join(' ')
     }
   }
 }

@@ -1,6 +1,6 @@
-import { AddOfferRequestService } from "../service/add-offer-request.service";
+import { AddOfferRequestService } from '../service/add-offer-request.service'
 
-export const addOfferRequestControllerFactory = ({addOfferRequestService}: {
+export const addOfferRequestControllerFactory = ({ addOfferRequestService }: {
   addOfferRequestService: AddOfferRequestService
 }) => async (req, res) => {
   const offerRequest = {
@@ -11,5 +11,5 @@ export const addOfferRequestControllerFactory = ({addOfferRequestService}: {
   return addOfferRequestService.addOfferRequest(offerRequest)
     .then(() => {
       res.status(201).json({})
-    });
+    })
 }

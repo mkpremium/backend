@@ -7,30 +7,32 @@ import { CouchbaseAdapter } from '../../db/couchbase.adapter'
 import { ContactProps } from '../../owner/owner'
 import { EntityManager } from 'typeorm'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
-import { ScheduledEvent } from "../scheduled-event.entity";
+import { ScheduledEvent } from '../scheduled-event.entity'
 
 export class ScheduledCallsService {
-  constructor(
+  constructor (
     private couchbaseAdapter: CouchbaseAdapter,
     private usePostgres: boolean,
-    private entityManager: EntityManager,
+    private entityManager: EntityManager
   ) {
   }
 
-  async scheduledCallsFor(userId: string): Promise<ScheduledCallsView[]> {
-    return this.usePostgres ? PostgresScheduledCallsService.scheduledCallsFor(this.entityManager, userId) :
-      CouchbaseScheduledCallsService.scheduledCallsFor(this.couchbaseAdapter, userId)
+  async scheduledCallsFor (userId: string): Promise<ScheduledCallsView[]> {
+    return this.usePostgres
+      ? PostgresScheduledCallsService.scheduledCallsFor(this.entityManager, userId)
+      : CouchbaseScheduledCallsService.scheduledCallsFor(this.couchbaseAdapter, userId)
   }
 
-  async getById(callId: string): Promise<ScheduledCallsView> {
-    return this.usePostgres ? PostgresScheduledCallsService.getById(
-        this.entityManager, callId) :
-      CouchbaseScheduledCallsService.getById(this.couchbaseAdapter, callId)
+  async getById (callId: string): Promise<ScheduledCallsView> {
+    return this.usePostgres
+      ? PostgresScheduledCallsService.getById(
+        this.entityManager, callId)
+      : CouchbaseScheduledCallsService.getById(this.couchbaseAdapter, callId)
   }
 }
 
 class PostgresScheduledCallsService {
-  static async scheduledCallsFor(entityManager: EntityManager, userId: string): Promise<ScheduledCallsView[]> {
+  static async scheduledCallsFor (entityManager: EntityManager, userId: string): Promise<ScheduledCallsView[]> {
     const scheduledEvents = await entityManager.find(ScheduledEvent, {
       where: {
         type: 'CALL' as const,
@@ -38,15 +40,15 @@ class PostgresScheduledCallsService {
           id: userId
         }
       },
-      relations: this.relations,
+      relations: this.relations
     })
 
     return scheduledEvents.map(mapScheduledEventToScheduledCall)
   }
 
-  static async getById(entityManager: EntityManager, callId: string): Promise<ScheduledCallsView> {
+  static async getById (entityManager: EntityManager, callId: string): Promise<ScheduledCallsView> {
     const scheduledEvent = await entityManager.findOneOrFail(ScheduledEvent, {
-      where: {id: callId, type: 'CALL' as const},
+      where: { id: callId, type: 'CALL' as const },
       relations: this.relations
     })
     return mapScheduledEventToScheduledCall(scheduledEvent)
@@ -55,7 +57,7 @@ class PostgresScheduledCallsService {
   private static relations = {
     building: {
       worksheet: true,
-      documents: true,
+      documents: true
     },
     contact: true,
     createdBy: true,
@@ -66,10 +68,10 @@ class PostgresScheduledCallsService {
         }
       }
     }
-  };
+  }
 }
 
-function mapScheduledEventToScheduledCall(scheduledEvent: ScheduledEvent): ScheduledCallsView {
+function mapScheduledEventToScheduledCall (scheduledEvent: ScheduledEvent): ScheduledCallsView {
   return {
     id: scheduledEvent.id,
     createdBy: scheduledEvent.createdBy.id,
@@ -82,39 +84,39 @@ function mapScheduledEventToScheduledCall(scheduledEvent: ScheduledEvent): Sched
         building: mapBuildingEntityToStruct(scheduledEvent.building),
         person: {
           name: scheduledEvent.owner.person.fullName,
-          contacts: scheduledEvent.owner.person.contacts.map(cp => ({...cp.contact, status: cp.status})),
+          contacts: scheduledEvent.owner.person.contacts.map(cp => ({ ...cp.contact, status: cp.status }))
         }
       }
     }
-  };
+  }
 }
 
 class CouchbaseScheduledCallsService {
   static async scheduledCallsFor (couchbaseAdapter: CouchbaseAdapter, userId: string): Promise<ScheduledCallsView[]> {
     const rows = await couchbaseAdapter.queryAsync(
-      scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.notifyTo = $1' ]),
-      [ userId ]
+      scheduledCallQuery(couchbaseAdapter.bucketName, ['se.notifyTo = $1']),
+      [userId]
     )
     return rows.map(parseCouchbaseScheduledEventRow)
   }
 
   static async getById (couchbaseAdapter: CouchbaseAdapter, callId: string): Promise<ScheduledCallsView> {
     const rows = await couchbaseAdapter.queryAsync(
-      scheduledCallQuery(couchbaseAdapter.bucketName, [ 'se.id = $1' ]),
-      [ callId ]
+      scheduledCallQuery(couchbaseAdapter.bucketName, ['se.id = $1']),
+      [callId]
     )
-    return parseCouchbaseScheduledEventRow(rows[ 0 ])
+    return parseCouchbaseScheduledEventRow(rows[0])
   }
 }
 
 export function parseCouchbaseScheduledEventRow ({
-                                                   event,
-                                                   eventDate,
-                                                   building,
-                                                   owner,
-                                                   eventId,
-                                                   createdBy
-                                                 }): ScheduledCallsView {
+  event,
+  eventDate,
+  building,
+  owner,
+  eventId,
+  createdBy
+}): ScheduledCallsView {
   const shapedRow = {
     id: eventId,
     createdBy,
@@ -170,6 +172,7 @@ interface ScheduledCallsView {
   }
 }
 
+/* eslint-disable no-unused-vars */
 const ScheduledCallsView = t.struct<ScheduledCallsView>({
   id: t.String,
   createdBy: t.String,
@@ -186,13 +189,13 @@ const ScheduledCallsView = t.struct<ScheduledCallsView>({
           neighborhood: t.maybe(t.String),
           type: t.maybe(t.String),
           street: t.String,
-          number: t.union([ t.String, t.Number ]),
+          number: t.union([t.String, t.Number]),
           postalCode: t.maybe(t.struct({
-            number: t.maybe(t.union([ t.String, t.Number ]))
+            number: t.maybe(t.union([t.String, t.Number]))
           }))
         }),
         negotiationStatus: t.maybe(NegotiationStatus),
-        floorArea: t.union([ t.String, t.Number ]),
+        floorArea: t.union([t.String, t.Number]),
 
         location: t.maybe(t.struct({
           lat: t.maybe(t.Number),

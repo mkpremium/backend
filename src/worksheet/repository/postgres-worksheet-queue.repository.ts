@@ -4,15 +4,15 @@ import { PostgresRepository } from '../../infrastructure/postgres/postgres-repos
 import { WorksheetQueue } from '../worksheet-queue.entity'
 import { DeepPartial, EntityTarget } from 'typeorm'
 import { BaseEntity } from '../../infrastructure/entity'
-import { Worksheet } from "../worksheet.entity";
-import { QueueItemStatus } from "../models/queue-item";
+import { Worksheet } from '../worksheet.entity'
+import { QueueItemStatus } from '../models/queue-item'
 
 export class PostgresWorksheetQueueRepository extends PostgresRepository<WorksheetQueueProps & Partial<BaseEntity>, WorksheetQueue>
   implements WorksheetQueueRepository {
   relations = {
     worksheets: {
-      heldBy: {user: true},
-    },
+      heldBy: { user: true }
+    }
   }
 
   list (): Promise<WorksheetQueueProps[]> {
@@ -25,11 +25,11 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
       name: struct.name,
       worksheets: struct.worksheets?.map((queueItem) => ({
         id: queueItem.worksheetId,
-        heldBy: queueItem.operatorId ? {user: {id: queueItem.operatorId}} : null,
+        heldBy: queueItem.operatorId ? { user: { id: queueItem.operatorId } } : null
       })) ?? [],
       source: struct.source,
       createdAt: struct.createdAt,
-      updatedAt: struct.updatedAt,
+      updatedAt: struct.updatedAt
     }
   }
 
@@ -43,9 +43,9 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
           worksheetId: ws.id,
           addedAt: ws.lastViewedAt,
           operatorId: ws.heldBy?.user.id,
-          status: inferWorksheetQueueItemStatus(ws, false),
+          status: inferWorksheetQueueItemStatus(ws, false)
         })
-      ),
+      )
     }
   }
 
@@ -54,7 +54,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
   }
 }
 
-function inferWorksheetQueueItemStatus(worksheet: Worksheet, hasScheduledCall: boolean): QueueItemStatus {
+function inferWorksheetQueueItemStatus (worksheet: Worksheet, hasScheduledCall: boolean): QueueItemStatus {
   switch (true) {
     case hasScheduledCall:
       return QueueItemStatus.SCHEDULED

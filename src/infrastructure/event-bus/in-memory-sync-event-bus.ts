@@ -4,21 +4,20 @@ export class InMemorySyncEventBus implements EventBus {
   private subscribers = {}
   info: Record<string, number>
 
-
   publish (event): Promise<void> {
-    if (!this.subscribers[ event.name ]) {
+    if (!this.subscribers[event.name]) {
       return
     }
 
-    this.subscribers[ event.name ].forEach(sub => {
+    this.subscribers[event.name].forEach(sub => {
       sub(event)
     })
   }
 
   on (eventName, listenerName, subscriber) {
-    if (!this.subscribers[ eventName ]) {
-      this.subscribers[ eventName ] = []
+    if (!this.subscribers[eventName]) {
+      this.subscribers[eventName] = []
     }
-    this.subscribers[ eventName ].push(subscriber)
+    this.subscribers[eventName].push(subscriber)
   }
 }

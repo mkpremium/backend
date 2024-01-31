@@ -16,7 +16,7 @@ describe('LeadRecorderService', () => {
     contactId: 'test-contact-id',
     ownerId: 'test-owner-id',
     worksheetId: 'test-worksheet-id',
-    toFlipperId: 'test-flipper-id',
+    toFlipperId: 'test-flipper-id'
   }
 
   beforeEach(() => {
@@ -37,7 +37,7 @@ describe('LeadRecorderService', () => {
       map(() => {
         expect(buildingsRepositoryStub.save).to.have.been.calledWithMatch(b => !!b.lead)
       }),
-      orFail(),
+      orFail()
     )()
   })
 
@@ -49,10 +49,10 @@ describe('LeadRecorderService', () => {
           name: DomainEventCatalog.BUILDING__LEAD_CAPTURED,
           buildingId: testCmd.buildingId,
           ownerId: testCmd.ownerId,
-          contactId: testCmd.contactId,
+          contactId: testCmd.contactId
         }))
       }),
-      orFail(),
+      orFail()
     )()
   })
 
@@ -66,7 +66,7 @@ describe('LeadRecorderService', () => {
       map(() => {
         expect(buildingsRepositoryStub.save).to.not.have.been.called
       }),
-      orFail(),
+      orFail()
     )()
   })
 })

@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { createGetNextCallerWorksheetController } from '../../../src/caller/controller/get-next-worksheet.controller'
 import { spy, stub } from 'sinon'
 
-describe('Get Next Caller Worksheet Controller', () => {
-  it('gets next worksheet from caller assigned queue', async () => {
+describe('Get Next Caller Worksheet Controller', function () {
+  it('gets next worksheet from caller assigned queue', async function () {
     const testCallerId = 'test-caller-id'
     const testCallerAssignedQueueId = 'test-caller-assigned-queue-id'
     const nextWorksheetInCallerAssignedQueue = {}
@@ -37,7 +37,7 @@ describe('Get Next Caller Worksheet Controller', () => {
     })
   })
 
-  it('rejects requests for users without a queue assigned', () => {
+  it('rejects requests for users without a queue assigned', function () {
     const controller = createGetNextCallerWorksheetController({})
 
     const testRequest = {

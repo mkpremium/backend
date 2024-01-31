@@ -5,9 +5,9 @@ import {
   getCouchbaseDocument,
   markCouchbaseDocumentAsMigrated
 } from '../../infrastructure/postgres/get-couchbase-document'
-import { WorksheetQueueProps } from "../domain/queue";
-import { WorksheetQueue } from "../worksheet-queue.entity";
-import { DomainEventCatalog } from "../../infrastructure/postgres/domain-event.entity";
+import { WorksheetQueueProps } from '../domain/queue'
+import { WorksheetQueue } from '../worksheet-queue.entity'
+import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
 interface Deps {
   entityManager: EntityManager,
@@ -20,7 +20,6 @@ export function importWorksheetQueueHandlerFactory ({ eventBus, logger, entityMa
     s }) {
     logger.info('Importing WorksheetQueue', { worksheetQueueId })
 
-
     await entityManager.transaction(async em => {
       // Get the Couchbase document for the WorksheetQueue
       const couchbaseDocument = await getCouchbaseDocument(em, worksheetQueueId)
@@ -28,7 +27,7 @@ export function importWorksheetQueueHandlerFactory ({ eventBus, logger, entityMa
       // Check if the document has already been migrated
       if (couchbaseDocument.migratedAt) {
         // If it has, log a warning and return early
-        logger.warning('WorksheetQueue already migrated', { worksheetQueueId: worksheetQueueId })
+        logger.warning('WorksheetQueue already migrated', { worksheetQueueId })
         return
       }
 
@@ -36,13 +35,13 @@ export function importWorksheetQueueHandlerFactory ({ eventBus, logger, entityMa
       await em.save(WorksheetQueue, {
         id: couchbaseDocument.id,
         name: worksheetQueue.name,
-        source: worksheetQueue.source,
+        source: worksheetQueue.source
       })
       await markCouchbaseDocumentAsMigrated(em, worksheetQueue.id)
 
       await eventBus.publish({
         name: DomainEventCatalog.POSTGRES_MIGRATION__WORKSHEET_QUEUE_IMPORTED,
-        worksheetQueueId: worksheetQueue.id,
+        worksheetQueueId: worksheetQueue.id
       }, em)
     })
   }

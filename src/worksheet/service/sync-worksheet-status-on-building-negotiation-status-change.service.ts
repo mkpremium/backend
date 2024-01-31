@@ -8,15 +8,15 @@ import { ScheduledEventType } from '../../scheduled-events/types'
 import {
   CouchbaseScheduledEventsRepository
 } from '../../scheduled-events/repository/couchbase-schedule-events.repository'
-import { WorksheetRepository } from "../repository/worksheet.repository";
-import { BuildingsRepository } from "../../building/repository/buildings.repository";
+import { WorksheetRepository } from '../repository/worksheet.repository'
+import { BuildingsRepository } from '../../building/repository/buildings.repository'
 
 export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   constructor (
     private worksheetRepository: WorksheetRepository,
     private buildingsRepository: BuildingsRepository,
     private ownersRepository: OwnerRepository,
-    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
+    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository
   ) {
   }
 
@@ -36,9 +36,9 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
     }
 
     const ownersStatus = (owners || []).map(owner => ({
-        status: owner.status,
-        isConfirmedByOperator: !!owner.confirmedByOperator.value
-      })
+      status: owner.status,
+      isConfirmedByOperator: !!owner.confirmedByOperator.value
+    })
     )
 
     switch (true) {
@@ -48,12 +48,13 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
       case _every(ownersStatus, ({ status }) => [
         OwnerStatus.ERROR,
         OwnerStatus.WITHOUT_CONTACT,
-        OwnerStatus.WITHOUT_PHONE_CONTACT ].includes(status)):
+        OwnerStatus.WITHOUT_PHONE_CONTACT].includes(status)):
         return WorkSheetStatus.INVALID
       case _some(ownersStatus,
         ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
         return WorkSheetStatus.AVAILABLE
       default:
+        // eslint-disable-next-line no-case-declarations
         const meetings = await this.findMeetings(worksheet.id)
         if (meetings.length > 0) {
           return WorkSheetStatus.MEETING

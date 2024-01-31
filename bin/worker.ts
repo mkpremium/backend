@@ -14,7 +14,9 @@ init().catch(error => {
 })
 
 let killProcess = false
-process.on('SIGTERM', () => killProcess = true)
+process.on('SIGTERM', () => {
+  killProcess = true
+})
 
 async function init () {
   const container = await createContainer()

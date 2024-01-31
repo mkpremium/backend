@@ -42,19 +42,19 @@ export enum DomainEventCatalog {
 @Entity()
 export class DomainEvent {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+    id: string
 
   @Column('text')
-  name: DomainEventCatalog
+    name: DomainEventCatalog
 
   @Column({ default: 'unknwon' })
-  version: String
+    version: string
 
   @Column({
     type: 'jsonb'
   })
-  body: object
+    body: object
 
   @CreateDateColumn()
-  createdAt: Date
+    createdAt: Date
 }

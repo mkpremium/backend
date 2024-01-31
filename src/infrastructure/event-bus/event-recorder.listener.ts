@@ -1,7 +1,7 @@
 import { DataSource, EntityManager } from 'typeorm'
 import { DomainEvent } from '../postgres/domain-event.entity'
 
-type PublishedEvent = Pick<DomainEvent, 'name'> & any
+type PublishedEvent = Pick<DomainEvent, 'name'> & unknown
 
 export function createEventRecorderListener ({ ormDataSource }: {
   ormDataSource: DataSource
@@ -10,7 +10,7 @@ export function createEventRecorderListener ({ ormDataSource }: {
     await (entityManager ?? ormDataSource.manager).save(DomainEvent, {
       name: event.name,
       version: event.name || 'unknown',
-      body: { ...event, _meta: { isTransactional } },
+      body: { ...event, _meta: { isTransactional } }
     })
   }
 }

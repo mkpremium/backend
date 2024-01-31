@@ -1,5 +1,5 @@
 import { UsersRepository } from './repository/users.repository'
-import { FlipperFavoritesBuildingsService } from "../flipper/service/flipper-favorites-buildings.service";
+import { FlipperFavoritesBuildingsService } from '../flipper/service/flipper-favorites-buildings.service'
 
 export const meControllerFactory = (usersRepository: UsersRepository) => {
   return async (req, res) => {

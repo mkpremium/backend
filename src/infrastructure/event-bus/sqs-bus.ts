@@ -25,11 +25,11 @@ export class SqsBus implements EventBus {
   ) {
   }
 
-  get info (): any {
+  get info (): ListenersRegistry['listeners'] {
     return this.listenersRegistry.listeners
   }
 
-  on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
+  on (eventName: string, listenerName: string, subscriber: (event: unknown) => Promise<void>) {
     if (eventName === ALL_EVENTS_LISTENER) {
       this.listenersRegistry.registry(eventName, listenerName, subscriber)
       return
@@ -49,7 +49,8 @@ export class SqsBus implements EventBus {
     // The only listener to all events is the event recorder. When the entity manager is provided, want the event to
     // be persisted within the same transaction as the rest of the business logic.
     if (entityManager) {
-      await this.eventRecorderListener(event, entityManager, true)
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      await this.eventRecorderListener(event as any, entityManager, true)
       allEventsListeners = []
     } else {
       allEventsListeners = this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER) as [ListenerRegister]
@@ -64,18 +65,18 @@ export class SqsBus implements EventBus {
     await this.sqsClient.sendMessageBatch({
       QueueUrl: this.eventsQueueUrl,
       Entries: listeners.map(({ name }) => ({
-          Id: name.replace('.', '-'),
-          // MessageGroupId: event.messageGroupId || uuid(),
-          // MessageDeduplicationId: event.messageDeduplicationId || uuid(),
-          MessageBody: JSON.stringify({ event, listener: name }),
-        } as SendMessageBatchRequestEntry)
+        Id: name.replace('.', '-'),
+        // MessageGroupId: event.messageGroupId || uuid(),
+        // MessageDeduplicationId: event.messageDeduplicationId || uuid(),
+        MessageBody: JSON.stringify({ event, listener: name })
+      } as SendMessageBatchRequestEntry)
       )
     }).promise()
       .then((response) => {
         response.Failed.forEach(error => {
-          error.SenderFault ?
-            this.logger.error('Error sending event into SQS', error) :
-            this.logger.warning('Event not saved in SQS', error)
+          error.SenderFault
+            ? this.logger.error('Error sending event into SQS', error)
+            : this.logger.warning('Event not saved in SQS', error)
         })
       })
   }

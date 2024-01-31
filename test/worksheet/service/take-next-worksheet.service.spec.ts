@@ -62,13 +62,13 @@ describe('TakeNextWorksheetService', () => {
     worksheetsRepositoryMock.nextAvailableWorksheetInSource.withArgs(testQueue.source, 'worksheet-without-valid-owners-id')
       .resolves(testNextWorksheet)
 
-    const actualWorksheet = await service.nextWorksheetInQueue(testQueue, testUserId)
+    await service.nextWorksheetInQueue(testQueue, testUserId)
 
     expect(takeWorksheetServiceMock.takeWorksheetInQueue).to.have.been
       .calledWith(testQueue.id, testNextWorksheet.id, testUserId)
     expect(eventBusSpy.publish).to.have.been.calledWith({
       name: 'worksheet.invalid_worksheet_found',
-      worksheetId: 'worksheet-without-valid-owners-id',
+      worksheetId: 'worksheet-without-valid-owners-id'
     })
   })
 

@@ -8,23 +8,23 @@ import { Contact } from '../contacts/contact.entity'
 @Entity()
 export class ScheduledEvent extends BaseEntity {
   @Column('timestamp')
-  scheduledFor: Date
+    scheduledFor: Date
 
-  @Column('text', {nullable: false})
-  type: 'MEETING' | 'CALL'
+  @Column('text', { nullable: false })
+    type: 'MEETING' | 'CALL'
 
-  @ManyToOne(() => User, {nullable: false})
-  notifyTo: User
+  @ManyToOne(() => User, { nullable: false })
+    notifyTo: User
 
-  @ManyToOne(() => User, {nullable: false})
-  createdBy: User
+  @ManyToOne(() => User, { nullable: false })
+    createdBy: User
 
-  @ManyToOne(() => Building, {nullable: false})
-  building: Building
+  @ManyToOne(() => Building, { nullable: false })
+    building: Building
 
-  @ManyToOne(() => Owner, {nullable: false})
-  owner: Owner
+  @ManyToOne(() => Owner, { nullable: false })
+    owner: Owner
 
-  @ManyToOne(() => Contact, {nullable: false})
-  contact: Contact
+  @ManyToOne(() => Contact, { nullable: false })
+    contact: Contact
 }

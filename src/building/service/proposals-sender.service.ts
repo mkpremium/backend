@@ -7,11 +7,11 @@ import { PdfProposalComposer } from './pdf-proposal-composer'
 import { Logger } from 'winston'
 import moment from 'moment'
 import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
-import { UsersRepository } from "../../user/repository/users.repository";
-import { ScheduledEventsRepository } from "../../scheduled-events/repository/schedule-events.repository";
+import { UsersRepository } from '../../user/repository/users.repository'
+import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
 
 function isFridayOrWeekend (lastScheduledEventDateToInclude: moment.Moment) {
-  return [ 5, 6, 7 ].includes(lastScheduledEventDateToInclude.isoWeekday())
+  return [5, 6, 7].includes(lastScheduledEventDateToInclude.isoWeekday())
 }
 
 export class ProposalsSenderService {
@@ -23,7 +23,7 @@ export class ProposalsSenderService {
     private buildingsRepository: BuildingsRepository,
     private scheduledEventsRepository: ScheduledEventsRepository,
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
-    private logger: Logger,
+    private logger: Logger
   ) {
   }
 
@@ -45,10 +45,10 @@ export class ProposalsSenderService {
       sent: [],
       skipped: [],
       success: 0,
-      errors: 0,
+      errors: 0
     }
 
-    for (let proposal of proposals) {
+    for (const proposal of proposals) {
       try {
         const wasSent = await this.processProposal(proposal, lastScheduledEventDateToInclude)
         stats.success++
@@ -61,7 +61,7 @@ export class ProposalsSenderService {
         this.logger.crit('pending proposal not sent', {
           errorMessage: error.message,
           stack: error.stack,
-          proposalId: proposal.id,
+          proposalId: proposal.id
         })
         stats.errors++
       }
@@ -70,7 +70,7 @@ export class ProposalsSenderService {
   }
 
   private async processProposal (proposal: ProposalProps, lastScheduledEventDateToInclude: moment.Moment): Promise<boolean> {
-    const [ building, sender, lastScheduledEvent ] = await Promise.all([
+    const [building, sender, lastScheduledEvent] = await Promise.all([
       this.buildingsRepository.get(proposal.buildingId),
       this.usersRepository.get(proposal.createdBy),
       this.scheduledEventsRepository.lastScheduledEventForBuilding(proposal.buildingId)
@@ -85,13 +85,13 @@ export class ProposalsSenderService {
 
     await this.emailSender.sendMail({
       to: proposal.notificationEmail,
-      subject: emailCopies[ sender.profile.language ].mailSubject,
+      subject: emailCopies[sender.profile.language].mailSubject,
       message: proposal.message,
       from: sender,
       attachment: {
         content: proposalPDF,
         filename: 'propuesta.pdf'
-      },
+      }
     })
 
     await this.proposalsRepository.save(proposalSent(proposal))
@@ -100,7 +100,7 @@ export class ProposalsSenderService {
       {
         status: 'PROPUESTA ENVIADA',
         sourceOwnerId: proposal.ownerId,
-        userId: proposal.createdBy,
+        userId: proposal.createdBy
       }
     )
 
@@ -110,5 +110,5 @@ export class ProposalsSenderService {
 
 function isOutsideWorkingHours () {
   const now = moment().tz('Europe/Madrid')
-  return now.hours() < 9 || now.hours() >= 20 || [ 6, 7 ].includes(now.isoWeekday())
+  return now.hours() < 9 || now.hours() >= 20 || [6, 7].includes(now.isoWeekday())
 }

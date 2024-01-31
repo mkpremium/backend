@@ -13,11 +13,11 @@ export const setupEmailDependencies = (container: AwilixContainer) => {
         auth: {
           user: process.env.MAILER_USER,
           pass: process.env.MAILER_PASS
-        },
+        }
       })
     }).singleton(),
     emailSender: asClass(EmailSenderService).inject(() => ({
-      mailerUsername: process.env.MAILER_USER,
-    })).classic().singleton(),
+      mailerUsername: process.env.MAILER_USER
+    })).classic().singleton()
   })
 }

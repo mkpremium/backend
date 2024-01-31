@@ -12,7 +12,6 @@ import {
   OwnerRepository
 } from './owner.repository'
 
-
 const findOwnerByContactValueQuery = bucketName => `
 SELECT
 meta(owner).id,
@@ -77,14 +76,14 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
   async findByPhoneNumber (phoneNumber: string): Promise<FoundOwnerProps[]> {
     return this.couchbaseAdapter.queryAsync(
       findOwnerByContactValueQuery(this.bucketName),
-      [ phoneNumber ]
+      [phoneNumber]
     ).then(parseFoundPhones(phoneNumber))
   }
 
   async buildingOwners (buildingId): Promise<BuildingOwnerProps[]> {
     return this.couchbaseAdapter.queryAsync(
       buildingOwnersQuery(this.bucketName),
-      [ buildingId ]
+      [buildingId]
     ).then(rawOwners => rawOwners.map(o => {
       try {
         return fromJSON(o, BuildingOwner)
@@ -106,10 +105,11 @@ export class CouchbaseOwnersRepository extends CouchbaseRepository<OwnerProps> i
   }
 
   struct () {
-    return Owner as any
+    return Owner
   }
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export function parseFoundPhones (phoneNumber): (result: any[]) => FoundOwnerProps[] {
   return function (result) {
     return fromJSON(result.map(rec => {
@@ -131,13 +131,15 @@ export function parseFoundPhones (phoneNumber): (result: any[]) => FoundOwnerPro
         ...rec,
         building,
         negotiationStatus: rec.negotiationStatus || 'PENDIENTE',
-        lastEvent: rec.lastEvent.eventDate !== undefined ? {
-          eventDate: rec.lastEvent.eventDate,
-          type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
-          ownerId: rec.lastEvent.ownerId,
-          flipperName: rec.lastEvent.flipperName
-        } : undefined,
-        matchingContactId: rec.contacts[ matchingContactIdx ].id
+        lastEvent: rec.lastEvent.eventDate !== undefined
+          ? {
+              eventDate: rec.lastEvent.eventDate,
+              type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
+              ownerId: rec.lastEvent.ownerId,
+              flipperName: rec.lastEvent.flipperName
+            }
+          : undefined,
+        matchingContactId: rec.contacts[matchingContactIdx].id
       }
     }), t.list(FoundOwner))
   }

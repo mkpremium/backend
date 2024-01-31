@@ -13,8 +13,8 @@ export class AddBuildingService {
     return await this.ormDataSource.transaction(async manager => {
       const building = await manager.save(Building, cmd)
       const worksheetData = {
-        building: {id: building.id },
-        status: 'LOOKING_MEETING' as const,
+        building: { id: building.id },
+        status: 'LOOKING_MEETING' as const
       }
       const worksheet = await manager.save(Worksheet, worksheetData)
 

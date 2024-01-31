@@ -8,16 +8,16 @@ import t from 'tcomb'
 import { Owner } from '../owner.entity'
 import { BuildingProps } from '../../building/building'
 import { mapBuildingEntityToStruct } from '../../building/repository/postgres-buildings.repository'
-import { ScheduledEvent } from "../../scheduled-events/scheduled-event.entity";
-import { getLastOfferRequestForBuildings, LastBuildingOffer } from "../../building/service/list-buildings.service";
+import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
+import { getLastOfferRequestForBuildings, LastBuildingOffer } from '../../building/service/list-buildings.service'
 import {
   LastBuildingMeeting,
   PostgresScheduledEventsRepository
-} from "../../scheduled-events/repository/postgres-schedule-events.repository";
-import moment from "moment";
+} from '../../scheduled-events/repository/postgres-schedule-events.repository'
+import moment from 'moment'
 
 export class SearchOwnerOrBuildingService {
-  constructor(
+  constructor (
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private entityManager: EntityManager,
     private usePostgres: boolean,
@@ -25,29 +25,29 @@ export class SearchOwnerOrBuildingService {
   ) {
   }
 
-  search(phoneNumber: string): Promise<FoundOwnerProps[]> {
-    return this.usePostgres ?
-      this.searchByPhoneInPostgres(phoneNumber) :
-      this.couchbaseOwnersRepository.findByPhoneNumber(phoneNumber)
+  search (phoneNumber: string): Promise<FoundOwnerProps[]> {
+    return this.usePostgres
+      ? this.searchByPhoneInPostgres(phoneNumber)
+      : this.couchbaseOwnersRepository.findByPhoneNumber(phoneNumber)
   }
 
-  private async searchByPhoneInPostgres(phoneNumber: string): Promise<FoundOwnerProps[]> {
+  private async searchByPhoneInPostgres (phoneNumber: string): Promise<FoundOwnerProps[]> {
     const result = await this.entityManager.find(Owner, {
       where: {
         person: {
           contacts: {
             contact: {
               value: phoneNumber,
-              type: In(['TELEFONO', 'MOVIL']),
-            },
-          },
-        },
+              type: In(['TELEFONO', 'MOVIL'])
+            }
+          }
+        }
       },
       relations: {
         person: {
           contacts: {
             contact: true
-          },
+          }
         },
         building: true
       }
@@ -56,14 +56,14 @@ export class SearchOwnerOrBuildingService {
       return []
     }
 
-    const mappedBuildings = await this.getBuildingsInformation(result);
+    const mappedBuildings = await this.getBuildingsInformation(result)
 
     return fromJSON(result.map(foundOwner => {
       const matchingContactIdx = foundOwner.person.contacts.findIndex(cp => cp.contact.value === phoneNumber)
       const owner = ownerEntityToStruct(foundOwner)
-      const {contacts} = owner.person
+      const { contacts } = owner.person
       delete owner.person
-      const {building, lastOfferRequest, lastMeeting, scheduledCalls} = mappedBuildings[owner.buildingId]
+      const { building, lastOfferRequest, lastMeeting, scheduledCalls } = mappedBuildings[owner.buildingId]
 
       return {
         ...owner,
@@ -72,20 +72,20 @@ export class SearchOwnerOrBuildingService {
         worksheetId: building.worksheetId,
         negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
         matchingContactId: foundOwner.person.contacts[matchingContactIdx].contact.id,
-        scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === building.id)
-          .map(se => ({at: se.scheduledFor.toISOString()})),
+        scheduledCalls: scheduledCalls.filter(se => (se.building as unknown as string) === building.id)
+          .map(se => ({ at: se.scheduledFor.toISOString() })),
         lastEvent: inferBuildingLastEvent(lastOfferRequest, lastMeeting)
       } as FoundOwnerProps
     }), t.list(FoundOwner))
   }
 
-  private async getBuildingsInformation(owners: Owner[]): Promise<Record<string, {
+  private async getBuildingsInformation (owners: Owner[]): Promise<Record<string, {
     building: BuildingProps & { worksheetId: string },
     lastOfferRequest?: LastBuildingOffer,
     lastMeeting?: LastBuildingMeeting,
     scheduledCalls: ScheduledEvent[]
   }>> {
-    const buildingIds = owners.map(fo => fo.building.id);
+    const buildingIds = owners.map(fo => fo.building.id)
     const [buildings, scheduledCalls, lastBuildingsOfferRequests, lastMeetings] = await Promise.all([
       this.entityManager.find(Building, {
         where: {
@@ -97,33 +97,33 @@ export class SearchOwnerOrBuildingService {
           featuredOwner: true,
           documents: true,
           proposals: true,
-          worksheet: true,
+          worksheet: true
         }
       }),
       this.entityManager.find(ScheduledEvent, {
-        where: {building: {id: In(buildingIds)}},
-        loadRelationIds: true,
+        where: { building: { id: In(buildingIds) } },
+        loadRelationIds: true
       }),
       getLastOfferRequestForBuildings(buildingIds, this.entityManager),
-      this.postgresScheduledEventsRepository.lastMeetingForBuildings(buildingIds),
+      this.postgresScheduledEventsRepository.lastMeetingForBuildings(buildingIds)
     ])
 
     return buildings.reduce((acc, b) => {
       acc[b.id] = {
-        building: {...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id},
+        building: { ...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id },
         lastOfferRequest: lastBuildingsOfferRequests.find((offer) => offer.buildingId === b.id),
         lastMeeting: lastMeetings.find((meeting) => meeting.buildingId === b.id),
-        scheduledCalls: scheduledCalls.filter(se => (se.building as any as string) === b.id)
+        scheduledCalls: scheduledCalls.filter(se => (se.building as unknown as string) === b.id)
       }
       return acc
     }, {})
   }
 }
 
-function inferBuildingLastEvent(
+function inferBuildingLastEvent (
   lastOfferRequest?: LastBuildingOffer,
   lastMeeting?: LastBuildingMeeting
-): FoundOwnerProps["lastEvent"] | undefined {
+): FoundOwnerProps['lastEvent'] | undefined {
   if (!lastMeeting) {
     return lastOfferAsLastEvent(lastOfferRequest)
   }
@@ -138,19 +138,19 @@ function inferBuildingLastEvent(
   }
 }
 
-function lastOfferAsLastEvent(lastOfferRequest: LastBuildingOffer) {
+function lastOfferAsLastEvent (lastOfferRequest: LastBuildingOffer) {
   return {
     eventDate: lastOfferRequest.offer_createdAt.toISOString(),
     ownerId: lastOfferRequest.ownerId,
     flipperName: '',
-    type: 'offer-request',
+    type: 'offer-request'
   } as FoundOwnerProps['lastEvent']
 }
 
-function lastMeetingAsLastEvent(lastMeeting: LastBuildingMeeting) {
+function lastMeetingAsLastEvent (lastMeeting: LastBuildingMeeting) {
   return {
     eventDate: lastMeeting.meeting_scheduledFor.toISOString(),
-    flipperName: "",
+    flipperName: '',
     ownerId: lastMeeting.ownerId,
     type: 'meeting'
   } as FoundOwnerProps['lastEvent']

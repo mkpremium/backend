@@ -1,6 +1,5 @@
 import { expect } from 'chai'
-import sinon from 'sinon'
-import Sinon, { fake, spy } from 'sinon'
+import sinon, { fake, spy } from 'sinon'
 import { asValue, createContainer } from 'awilix'
 import { worksheetEventListeners } from '../../src/worksheet/listeners'
 import { ownerBuilder } from '../owner/owner.builder'
@@ -10,7 +9,7 @@ import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-eve
 describe('worksheetEventListeners', () => {
   let eventSubscribers
   let eventBusMock
-  let releaseUserOtherActiveWorksheetsInQueueServiceMock: { release: Sinon.SinonSpy }
+  let releaseUserOtherActiveWorksheetsInQueueServiceMock: { release: sinon.SinonSpy }
   let syncWorksheetStatusOnBuildingNegotiationStatusChangeServiceSpy
   let updateWorksheetStatusOnOwnerChangeSpy
 
@@ -18,7 +17,7 @@ describe('worksheetEventListeners', () => {
     eventSubscribers = {}
     eventBusMock = {
       on: fake((eventName, listenerName, subscriber) => {
-        eventSubscribers[ eventName ] = subscriber
+        eventSubscribers[eventName] = subscriber
       })
     }
     releaseUserOtherActiveWorksheetsInQueueServiceMock = { release: spy() }
@@ -27,7 +26,7 @@ describe('worksheetEventListeners', () => {
     const noopLogger = {
       info: spy(),
       error: spy(),
-      crit: spy(),
+      crit: spy()
     }
 
     const testContainer = createContainer()
@@ -41,7 +40,7 @@ describe('worksheetEventListeners', () => {
       importWorksheetQueueHandler: asValue(null),
       logger: asValue(noopLogger),
       consistencyDelay: asValue(0),
-      eventBus: asValue(eventBusMock),
+      eventBus: asValue(eventBusMock)
     })
     worksheetEventListeners(eventBusMock, testContainer)
   })
@@ -50,7 +49,7 @@ describe('worksheetEventListeners', () => {
     expect(eventBusMock.on).to.have.been.calledWith('worksheet.taken', sinon.match.string, sinon.match.func)
     const testWorksheetTakenEvent = { queueId: 'test-queue-id', by: 'test-user-id' }
 
-    eventSubscribers[ 'worksheet.taken' ](testWorksheetTakenEvent)
+    eventSubscribers['worksheet.taken'](testWorksheetTakenEvent)
 
     expect(releaseUserOtherActiveWorksheetsInQueueServiceMock.release).to.have.been
       .calledWith(testWorksheetTakenEvent.by, testWorksheetTakenEvent.queueId)
@@ -68,9 +67,9 @@ describe('worksheetEventListeners', () => {
       ownerId: testOwner.id,
       oldStatus: 'NO_VERIFICADO',
       newStatus: 'WITHOUT_CONTACT',
-      byUserId: 'test-user-id',
+      byUserId: 'test-user-id'
     }
-    eventSubscribers[ 'owner.status_changed' ](testEvent)
+    eventSubscribers['owner.status_changed'](testEvent)
 
     setTimeout(() => {
       expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)

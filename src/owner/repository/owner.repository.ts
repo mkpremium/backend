@@ -1,10 +1,9 @@
-import { ContactProps, ContactType, OwnerContactStatus, OwnerProps, OwnerStatus, OwnerType } from '../owner'
+import { ContactProps, OwnerContactStatus, OwnerProps, OwnerStatus, OwnerType } from '../owner'
 import t from 'tcomb'
 import { DateTimeString } from '../../infrastructure/shared-types'
 import { BuildingNegotiationStatus, NegotiationStatus } from '../../building/building'
-import { WorksheetBuilding, WorksheetBuildingProps, } from '../../worksheet/repository/worksheet.repository'
+import { WorksheetBuilding, WorksheetBuildingProps } from '../../worksheet/repository/worksheet.repository'
 import { Repository } from '../../db/repository'
-
 
 export interface FoundOwnerProps {
   id: string
@@ -29,7 +28,6 @@ export interface FoundOwnerProps {
   building: WorksheetBuildingProps,
 }
 
-
 export const FoundOwner = t.struct<FoundOwnerProps>({
   id: t.String,
   buildingId: t.String,
@@ -43,12 +41,12 @@ export const FoundOwner = t.struct<FoundOwnerProps>({
   contacts: t.list(t.struct({
     id: t.String,
     value: t.String,
-    type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
-    status: t.enums.of([ 'UNDEFINED', 'GOOD', 'BAD' ])
+    type: t.enums.of(['TELEFONO', 'MOVIL', 'EMAIL']),
+    status: t.enums.of(['UNDEFINED', 'GOOD', 'BAD'])
   })),
   lastEvent: t.maybe(t.struct({
     eventDate: DateTimeString,
-    type: t.enums.of([ 'meeting', 'offer-request' ]),
+    type: t.enums.of(['meeting', 'offer-request']),
     ownerId: t.String,
     flipperName: t.String
   })),
@@ -72,15 +70,15 @@ export const BuildingOwner = t.struct<BuildingOwnerProps>({
   name: t.String,
   contacts: t.list(t.struct({
     id: t.String,
-    status: t.enums.of([ 'GOOD', 'BAD', 'UNDEFINED' ]),
-    type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
+    status: t.enums.of(['GOOD', 'BAD', 'UNDEFINED']),
+    type: t.enums.of(['TELEFONO', 'MOVIL', 'EMAIL']),
     value: t.String
   })),
   featuredContact: t.maybe(t.struct({
     phoneId: t.maybe(t.String),
     emailId: t.maybe(t.String)
   })),
-  status: t.enums.of([ 'NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT' ])
+  status: t.enums.of(['NO_VERIFICADO', 'VERIFICADO', 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT'])
 })
 
 export function isVerifiedOwner (owner: BuildingOwnerProps) {
@@ -88,7 +86,6 @@ export function isVerifiedOwner (owner: BuildingOwnerProps) {
   const goodContacts = contacts.filter(c => c.status === 'GOOD')
   return goodContacts.length > 0
 }
-
 
 export interface OwnerRepository extends Repository<OwnerProps> {
   buildingOwners (buildingId: string): Promise<BuildingOwnerProps[]>

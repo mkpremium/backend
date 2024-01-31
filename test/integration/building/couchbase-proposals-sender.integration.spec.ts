@@ -50,7 +50,7 @@ describe('ProposalsSenderService - Integration (Couchbase)', () => {
       amount: 100000,
       ownerId: testOwner.id,
       contactId: 'test-email-id',
-      createdBy: testCaller.id,
+      createdBy: testCaller.id
     }
 
     await addProposalForBuildingService.add(testBuilding.id, testAddProposalCmd)

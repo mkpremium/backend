@@ -15,7 +15,7 @@ export class Portugal2021WorksheetInitializerService {
   constructor (
     private portugal2021BuildingsRepository: Portugal2021BuildingsRepository,
     private buildingsRepository: BuildingsRepository,
-    private worksheetRepository: WorksheetRepository,
+    private worksheetRepository: WorksheetRepository
   ) {
   }
 
@@ -30,25 +30,25 @@ export class Portugal2021WorksheetInitializerService {
               this.worksheetRepository.save(Worksheet({
                 id: uuid(),
                 status: 'OPEN',
-                relatedBuildingIds: [ sourceBuilding.importedWithBuildingId ],
-                buildingAddress: building.address,
+                relatedBuildingIds: [sourceBuilding.importedWithBuildingId],
+                buildingAddress: building.address
               }))
             )
           }),
           TE.chain(() => this.portugal2021BuildingsRepository.save({
-              ...sourceBuilding,
-              status: 'WORKSHEET_CREATED',
-            })
+            ...sourceBuilding,
+            status: 'WORKSHEET_CREATED'
+          })
           ),
           TE.orElse(error => {
             this.portugal2021BuildingsRepository.save({
               ...sourceBuilding,
               failure: error.message,
               previousStatus: sourceBuilding.status,
-              status: 'FAILED',
+              status: 'FAILED'
             })
             return TE.left(error)
-          }),
+          })
         )
       })
     )

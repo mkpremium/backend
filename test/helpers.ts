@@ -10,40 +10,40 @@ import { AddOperatorService } from '../src/user/service/add-operator.service'
 import { Factory } from 'rosie'
 import { UserProfileProps, UserProps } from '../src/types/user'
 import { AddOwnerCommand, AddOwnerService } from '../src/owner/service/add-owner.service'
-import { BuildingsRepository } from "../src/building/repository/buildings.repository";
-import { PostgresWorksheetQueueRepository } from "../src/worksheet/repository/postgres-worksheet-queue.repository";
-import { PostgresWorksheetRepository } from "../src/worksheet/repository/postgres-worksheet.repository";
+import { BuildingsRepository } from '../src/building/repository/buildings.repository'
+import { PostgresWorksheetQueueRepository } from '../src/worksheet/repository/postgres-worksheet-queue.repository'
+import { PostgresWorksheetRepository } from '../src/worksheet/repository/postgres-worksheet.repository'
 import {
   ReleaseUserExtraOpenedWorksheetsInQueueService
-} from "../src/worksheet/service/release-user-extra-opened-worksheets-in-queue.service";
-import { TakeNextWorksheetService } from "../src/worksheet/service/take-next-worksheet.service";
-import { createTestContainer } from "./create-test-container";
-import { SearchOwnerOrBuildingService } from "../src/owner/service/search-owner-or-building.service";
-import { AddOfferRequestService } from "../src/building/service/add-offer-request.service";
-import { ListBuildingsService } from "../src/building/service/list-buildings.service";
-import { AddFlipperService } from "../src/flipper/service/add-flipper.service";
-import type { ScheduleCallService } from "../src/scheduled-events/service/schedule-call.service";
-import { ScheduledCallsService } from "../src/scheduled-events/service/scheduled-calls.service";
-import { ScheduledEventsRepository } from "../src/scheduled-events/repository/schedule-events.repository";
+} from '../src/worksheet/service/release-user-extra-opened-worksheets-in-queue.service'
+import { TakeNextWorksheetService } from '../src/worksheet/service/take-next-worksheet.service'
+import { createTestContainer } from './create-test-container'
+import { SearchOwnerOrBuildingService } from '../src/owner/service/search-owner-or-building.service'
+import { AddOfferRequestService } from '../src/building/service/add-offer-request.service'
+import { ListBuildingsService } from '../src/building/service/list-buildings.service'
+import { AddFlipperService } from '../src/flipper/service/add-flipper.service'
+import type { ScheduleCallService } from '../src/scheduled-events/service/schedule-call.service'
+import { ScheduledCallsService } from '../src/scheduled-events/service/scheduled-calls.service'
+import { ScheduledEventsRepository } from '../src/scheduled-events/repository/schedule-events.repository'
 import {
   PostgresScheduledEventsRepository
-} from "../src/scheduled-events/repository/postgres-schedule-events.repository";
-import { CallcenterWorksheetService } from "../src/worksheet/service/callcenter-worksheet.service";
-import { BuildingsReadRepository } from "../src/building/repository/buildings-read.repository";
-import { CreateMeetingService } from "../src/scheduled-events/service/create-meeting.service";
-import { AwilixContainer } from "awilix";
+} from '../src/scheduled-events/repository/postgres-schedule-events.repository'
+import { CallcenterWorksheetService } from '../src/worksheet/service/callcenter-worksheet.service'
+import { BuildingsReadRepository } from '../src/building/repository/buildings-read.repository'
+import { CreateMeetingService } from '../src/scheduled-events/service/create-meeting.service'
+import { AwilixContainer } from 'awilix'
 
-export function orFail() {
+export function orFail () {
   return TE.orElse((error) => {
     expect.fail(String(error))
   })
 }
 
-export async function addProposal(testBuilding: BuildingProps, testOwner: {
+export async function addProposal (testBuilding: BuildingProps, testOwner: {
   id: string
 }, testEmailContact: ContactProps & {
   isFeatured: boolean
-}, testFlipper: Flipper, {addProposalForBuildingService}) {
+}, testFlipper: Flipper, { addProposalForBuildingService }) {
   const testAddProposalCommand = {
     buildingId: testBuilding.id,
     ownerId: testOwner.id,
@@ -57,11 +57,11 @@ export async function addProposal(testBuilding: BuildingProps, testOwner: {
   return testAddProposalCommand
 }
 
-export async function addOfferRequest(testBuilding: BuildingProps, testOwner: {
+export async function addOfferRequest (testBuilding: BuildingProps, testOwner: {
   id: string
 }, testEmailContact: ContactProps & {
   isFeatured: boolean
-}, testFlipper: Flipper, testCaller: UserProps, {addOfferRequestService}) {
+}, testFlipper: Flipper, testCaller: UserProps, { addOfferRequestService }) {
   const testCmd = {
     ownerId: testOwner.id,
     destinationContactId: testEmailContact.id,
@@ -87,7 +87,7 @@ export async function createOwnerWithPhoneContact(
   testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerWithPhoneDeps): Promise<[OwnerProps, MaybeFeaturedContact]>
 export async function createOwnerWithPhoneContact(
   testBuilding: Pick<BuildingProps, 'id'>, overwrites: Partial<AddOwnerCommand>, deps: CreateOwnerWithPhoneDeps): Promise<[OwnerProps, MaybeFeaturedContact]>
-export async function createOwnerWithPhoneContact(
+export async function createOwnerWithPhoneContact (
   testBuilding: Pick<BuildingProps, 'id'>,
   overridesOrDeps: Partial<AddOwnerCommand> | CreateOwnerWithPhoneDeps,
   deps?: CreateOwnerWithPhoneDeps): Promise<[OwnerProps, MaybeFeaturedContact]> {
@@ -100,31 +100,31 @@ export async function createOwnerWithPhoneContact(
   const testPhoneContact = await deps.addContactService.addContact({
     ...phoneContactFactory.build(),
     isFeatured: true,
-    ownerId: testOwner.id,
+    ownerId: testOwner.id
   }) as MaybeFeaturedContact
 
   return [testOwner, testPhoneContact] as [OwnerProps, MaybeFeaturedContact]
 }
 
-export async function createOwnerWithEmailContact(
-  testBuilding: Pick<BuildingProps, 'id'>, {addOwnerService, addContactService}) {
-  const testOwner = await createOwner(testBuilding, {addOwnerService})
-  const testEmailContact = await addEmailToOwner(testOwner, {addContactService})
+export async function createOwnerWithEmailContact (
+  testBuilding: Pick<BuildingProps, 'id'>, { addOwnerService, addContactService }) {
+  const testOwner = await createOwner(testBuilding, { addOwnerService })
+  const testEmailContact = await addEmailToOwner(testOwner, { addContactService })
 
   return [testOwner, testEmailContact] as [OwnerProps, MaybeFeaturedContact]
 }
 
-export async function addEmailToOwner(testOwner: OwnerProps, {addContactService}) {
+export async function addEmailToOwner (testOwner: OwnerProps, { addContactService }) {
   return await addContactService.addContact({
     ...emailContactFactory.build(),
     isFeatured: true,
-    ownerId: testOwner.id,
-  }) as MaybeFeaturedContact;
+    ownerId: testOwner.id
+  }) as MaybeFeaturedContact
 }
 
 async function createOwner(testBuilding: Pick<BuildingProps, 'id'>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>
 async function createOwner(testBuilding: Pick<BuildingProps, 'id'>, overwritesOrDeps: Partial<AddOwnerCommand>, deps: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>>
-async function createOwner(
+async function createOwner (
   testBuilding: Pick<BuildingProps, 'id'>,
   overwritesOrDeps: Partial<AddOwnerCommand> | CreateOwnerDeps,
   deps?: CreateOwnerDeps): Promise<ReturnType<AddOwnerService['addOwner']>> {
@@ -147,20 +147,19 @@ async function createOwner(
   }, 'test-requester-id')
 }
 
-export async function addCaller({addOperatorService}: { addOperatorService: AddOperatorService }) {
+export async function addCaller ({ addOperatorService }: { addOperatorService: AddOperatorService }) {
   return addUserWithRole(addOperatorService, 'OPERATOR')
 }
 
-export async function addUserWithRole(service: AddOperatorService, role: 'BUSINESS' | 'OPERATOR') {
+export async function addUserWithRole (service: AddOperatorService, role: 'BUSINESS' | 'OPERATOR') {
   const testCommand = {
     ...Factory.build<{ username: string, password: string }>('user-credentials'),
     profile: Factory.build<UserProfileProps>('user-profile'),
     roles: [role],
-    enable: true,
+    enable: true
   }
-  return await service.addOperator(testCommand, {id: 'admin'})
+  return await service.addOperator(testCommand, { id: 'admin' })
 }
-
 
 export interface ResolvedDeps {
   container: AwilixContainer,
@@ -190,8 +189,8 @@ export interface ResolvedDeps {
   worksheetRepository: PostgresWorksheetRepository,
 }
 
-export async function resolveDependencies(): Promise<ResolvedDeps> {
-  const container = await createTestContainer({couchbase: false, postgres: true})
+export async function resolveDependencies (): Promise<ResolvedDeps> {
+  const container = await createTestContainer({ couchbase: false, postgres: true })
 
   return {
     container,
@@ -219,11 +218,11 @@ export async function resolveDependencies(): Promise<ResolvedDeps> {
 
     takeNextWorksheetService: container.resolve('takeNextWorksheetService'),
 
-    worksheetRepository: container.resolve('worksheetRepository'),
+    worksheetRepository: container.resolve('worksheetRepository')
   }
 }
 
-export async function createMeeting(testCaller: UserProps & {
+export async function createMeeting (testCaller: UserProps & {
   callerId?: string;
   flipperId?: string
 }, testFlipper: Flipper, testEmailContact: ContactProps & {
@@ -237,10 +236,10 @@ export async function createMeeting(testCaller: UserProps & {
       buildingId: testBuilding.id,
       ownerId: testOwner.id,
       eventAddress: '',
-      worksheetId: undefined,
+      worksheetId: undefined
     },
     eventDate: new Date()
   }
 
-  await deps.createMeetingService.createMeeting({roles: [], id: ''}, testCmd)
+  await deps.createMeetingService.createMeeting({ roles: [], id: '' }, testCmd)
 }

@@ -38,13 +38,13 @@ export function saveDocumentsCommandHandlerFactory ({ couchbaseAdapter, logger, 
         }
 
         const { value: document } = await couchbaseAdapter.get(id) as unknown as {
-          value: { _documentType: CouchbaseDocumentType, id: string  } & object
+          value: { _documentType: CouchbaseDocumentType, id: string } & object
         }
         await couchbaseDocumentRepository.save({
           id: document.id,
           documentType: document._documentType,
-          document: document,
-          fromCouchbase: cmd.fromCouchbase,
+          document,
+          fromCouchbase: cmd.fromCouchbase
         })
       } catch (e) {
         logger.error('Error saving couchbase document into postgres', { id, error: e.message })

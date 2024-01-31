@@ -14,13 +14,13 @@ const buildingPrototype: Omit<BuildingProps, 'id'> = {
     neighborhood: '',
     postalCode: {
       number: '0000',
-      verified: false,
+      verified: false
     },
-    city: 'BARCELONA',
+    city: 'BARCELONA'
   },
   location: {
     lat: 0,
-    lng: 0,
+    lng: 0
   }
 }
 

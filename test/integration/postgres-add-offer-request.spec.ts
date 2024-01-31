@@ -6,7 +6,7 @@ describe('Add offer request (Integration)', () => {
   it('adds offer request', async () => {
     const deps = await resolveDependencies()
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
-    const [ testOwner, testEmailContact ] = await createOwnerWithEmailContact(testBuilding, deps)
+    const [testOwner, testEmailContact] = await createOwnerWithEmailContact(testBuilding, deps)
     const testFlipper = await deps.addFlipperService.addFlipper(userFactory.build())
     const testCaller = await addCaller(deps)
     const testCmd = {
@@ -26,6 +26,6 @@ describe('Add offer request (Integration)', () => {
 
     const flipperNegotiations = await deps.listBuildingsService.buildingsAssignedTo(testFlipper.user.id)
     expect(flipperNegotiations).to.be.lengthOf(1)
-    expect(flipperNegotiations[ 0 ].lastMeeting).to.include({ inPerson: false })
+    expect(flipperNegotiations[0].lastMeeting).to.include({ inPerson: false })
   })
 })

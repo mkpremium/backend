@@ -11,7 +11,7 @@ export function createResetOwnerBadContactsHandler ({ ownersRepository, logger, 
 }) {
   return async function ({ ownerId }: { ownerId: string }) {
     logger.info('Command to reset owner discarded phones', { ownerId })
-    let owner = await ownersRepository.get(ownerId)
+    const owner = await ownersRepository.get(ownerId)
     const contacts = _.get(owner, 'person.contacts', [])
     if (contacts.length === 0) {
       logger.warning('Owner without contacts', { ownerId })

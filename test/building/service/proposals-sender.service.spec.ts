@@ -19,7 +19,7 @@ describe('ProposalsSenderService', () => {
   let clock: SinonFakeTimers
 
   const testBuilding = buildingBuilder().build()
-  const testProposal = proposalBuilder({buildingId: testBuilding.id}).build()
+  const testProposal = proposalBuilder({ buildingId: testBuilding.id }).build()
   const testFlipper = {
     id: testProposal.createdBy,
     profile: {
@@ -46,7 +46,7 @@ describe('ProposalsSenderService', () => {
       lastScheduledEventForBuilding: stub()
     }
     updateBuildingNegotiationStatusServiceStub = {
-      updateBuildingStatus: stub().resolves(),
+      updateBuildingStatus: stub().resolves()
     }
     const lastMondayMorning = moment().tz('Europe/Madrid').startOf('isoWeek').hours(9).minutes(0)
     clock = sinon.useFakeTimers(lastMondayMorning.toDate())
@@ -67,7 +67,7 @@ describe('ProposalsSenderService', () => {
 
     usersRepositoryStub.get.withArgs(testFlipper.id).resolves(testFlipper)
     buildingsRepositoryStub.get.withArgs(testProposal.buildingId).resolves(testBuilding)
-    proposalsRepositoryStub.pendingProposals.resolves([ testProposal ])
+    proposalsRepositoryStub.pendingProposals.resolves([testProposal])
     emailSenderStub.sendMail.resolves()
     pdfProposalComposerStub.composeProposal.withArgs(testBuilding, testProposal.proposal, testFlipper.profile)
       .resolves(testProposalPdf)
@@ -81,10 +81,10 @@ describe('ProposalsSenderService', () => {
 
     expect(emailSenderStub.sendMail).to.have.been.calledWith({
       to: testProposal.notificationEmail,
-      subject: emailCopies[ testFlipper.profile.language ][ 'mailSubject' ],
+      subject: emailCopies[testFlipper.profile.language].mailSubject,
       from: testFlipper,
       message: testProposal.message,
-      attachment: { content: testProposalPdf, filename: 'propuesta.pdf' },
+      attachment: { content: testProposalPdf, filename: 'propuesta.pdf' }
     })
   })
 
@@ -98,7 +98,7 @@ describe('ProposalsSenderService', () => {
   it('does not send proposal for building with last scheduled event within last 3 days', async () => {
     const testYesterdayMeeting = meetingBuilder({
       eventDate: moment().add(-1, 'day').format(),
-      createdAt: moment().add(-7, 'day').toDate(),
+      createdAt: moment().add(-7, 'day').toDate()
     }).build()
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId)
       .resolves(testYesterdayMeeting)
@@ -112,7 +112,7 @@ describe('ProposalsSenderService', () => {
     const lastMonday = moment().startOf('isoWeek')
     const testLastFridayMeeting = meetingBuilder({
       eventDate: lastMonday.clone().add(-3, 'days').toDate(),
-      createdAt: moment().add(-7, 'day').toDate(),
+      createdAt: moment().add(-7, 'day').toDate()
     }).build()
     scheduledEventsRepositoryStub.lastScheduledEventForBuilding.withArgs(testProposal.buildingId)
       .resolves(testLastFridayMeeting)
@@ -133,7 +133,7 @@ describe('ProposalsSenderService', () => {
       {
         status: 'PROPUESTA ENVIADA',
         sourceOwnerId: testProposal.ownerId,
-        userId: testFlipper.id,
+        userId: testFlipper.id
       }
     )
   })
@@ -146,10 +146,10 @@ describe('ProposalsSenderService', () => {
 
     expect(emailSenderStub.sendMail).to.not.have.been.calledWith({
       to: testProposal.notificationEmail,
-      subject: emailCopies[ testFlipper.profile.language ][ 'mailSubject' ],
+      subject: emailCopies[testFlipper.profile.language].mailSubject,
       from: testFlipper,
       message: testProposal.message,
-      attachment: { content: testProposalPdf, filename: 'propuesta.pdf' },
+      attachment: { content: testProposalPdf, filename: 'propuesta.pdf' }
     })
   })
 })

@@ -30,7 +30,7 @@ describe('scheduled-events.setupEventListeners', () => {
       scheduledCallFromOwnerMessage: asValue(undefined),
       removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
       removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
-      removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
+      removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton()
     })
     scheduledEventsEventListeners(eventBus, container)
   })

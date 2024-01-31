@@ -5,7 +5,7 @@ import { createFlipperBlockedAvailabilityController } from './controller/flipper
 import { createSetFlipperMaxLineController } from './controller/set-flipper-max-line.controller'
 import { FlipperRepository } from './flipper.repository'
 import { AddFlipperService } from './service/add-flipper.service'
-import { PostgresFlippersFavoritesBuildingsService } from "./service/postgres-flipper-favorites-buildings.service";
+import { PostgresFlippersFavoritesBuildingsService } from './service/postgres-flipper-favorites-buildings.service'
 
 export const setupFlipperDependencies = (container: AwilixContainer) => {
   const usePostgres = container.resolve('usePostgres') as boolean
@@ -18,6 +18,6 @@ export const setupFlipperDependencies = (container: AwilixContainer) => {
     flippersRepository: asClass(FlipperRepository).classic().singleton(),
 
     postgresFlippersFavoritesBuildingsService: asClass(PostgresFlippersFavoritesBuildingsService).classic().singleton(),
-    flipperFavoritesBuildingsService: aliasTo(usePostgres ? 'postgresFlippersFavoritesBuildingsService' : 'couchbaseUsersRepository'),
+    flipperFavoritesBuildingsService: aliasTo(usePostgres ? 'postgresFlippersFavoritesBuildingsService' : 'couchbaseUsersRepository')
   })
 }

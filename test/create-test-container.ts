@@ -7,14 +7,8 @@ import { AppDataSource } from '../src/data-source'
 let cachedBucket: Bucket
 
 async function setupCouchbaseBucket () {
-  const bucketPromise: Promise<Bucket> = new Promise(async resolve => {
-    if (!cachedBucket) {
-      cachedBucket = await connectCouchbaseBucket()
-    }
-    resolve(cachedBucket)
-  })
+  const bucket = await (cachedBucket ? Promise.resolve(cachedBucket) : connectCouchbaseBucket())
 
-  const bucket = await bucketPromise
   await flushBucket(bucket)
   return bucket
 }
@@ -32,11 +26,13 @@ export async function createTestContainer ({ couchbase, postgres }: {
   couchbase: boolean,
   postgres: boolean
 } = { couchbase: true, postgres: false }) {
-  const [ bucket, dataSource ] = await Promise.all([
+  const [bucket, dataSource] = await Promise.all([
     couchbase ? setupCouchbaseBucket() : Promise.resolve(null),
-    postgres ? setupPostgres() : Promise.resolve({
-      getRepository: () => null
-    } as any),
+    postgres
+      ? setupPostgres()
+      : Promise.resolve({
+        getRepository: () => null
+      } as any)
   ])
   const container = createContainer()
   await setupContainer(container, bucket, dataSource, postgres)

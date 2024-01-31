@@ -1,6 +1,6 @@
 import { ScheduledCallsRepository } from '../repository/scheduled-calls.repository'
 
-const buildingStatusesThatCancelScheduledCalls = [ 'NO VENDE', 'DESCARTADO' ]
+const buildingStatusesThatCancelScheduledCalls = ['NO VENDE', 'DESCARTADO']
 
 interface Deps {
   scheduledCallsRepository: ScheduledCallsRepository

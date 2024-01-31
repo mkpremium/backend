@@ -8,12 +8,12 @@ export class PostgresProposalsRepository extends PostgresRepository<ProposalProp
   async pendingProposals (): Promise<ProposalProps[]> {
     const pendingProposals = await this.repository.find({
       where: {
-        notificationStatus: 'PENDING',
+        notificationStatus: 'PENDING'
       },
       relations: {
         building: true,
         owner: true,
-        author: true,
+        author: true
       }
     })
 
@@ -30,7 +30,7 @@ export class PostgresProposalsRepository extends PostgresRepository<ProposalProp
       amount: struct.proposal,
       notificationEmail: struct.notificationEmail,
       notificationStatus: struct.notificationStatus,
-      message: struct.message,
+      message: struct.message
     }
   }
 
@@ -44,7 +44,7 @@ export class PostgresProposalsRepository extends PostgresRepository<ProposalProp
       proposal: entity.amount,
       notificationEmail: entity.notificationEmail,
       notificationStatus: entity.notificationStatus,
-      message: entity.message,
+      message: entity.message
     }
   }
 
@@ -53,13 +53,13 @@ export class PostgresProposalsRepository extends PostgresRepository<ProposalProp
   }
 }
 
-const oldStates = [ 'pendiente', 'aceptada', 'enviada'] as const
-const newStatus = [ 'PENDING', 'SENT', 'ACCEPTED' ] as const
+const oldStates = ['pendiente', 'aceptada', 'enviada'] as const
+const newStatus = ['PENDING', 'SENT', 'ACCEPTED'] as const
 
 export function oldProposalToEntityStatus (state: 'aceptada' | 'enviada' | 'pendiente') {
-  return newStatus[ oldStates.indexOf(state) ]
+  return newStatus[oldStates.indexOf(state)]
 }
 
 export function entityStatusToOldProposal (status: 'ACCEPTED' | 'SENT' | 'PENDING') {
-  return oldStates[ newStatus.indexOf(status) ]
+  return oldStates[newStatus.indexOf(status)]
 }

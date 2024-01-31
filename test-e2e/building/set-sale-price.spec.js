@@ -3,15 +3,15 @@ import { createFlipper } from '../../test/common'
 import { createBuilding } from '../helper/mother-of-objects'
 import { expect } from 'chai'
 
-describe('set building sale price', () => {
+describe('set building sale price', function () {
   let app, businessUser
 
-  before(async () => {
+  before(async function () {
     app = await initApplication()
     businessUser = await createFlipper()
   })
 
-  it('sets building sale price', async () => {
+  it('sets building sale price', async function () {
     const building = await createBuilding(app, {})
 
     const salePrice = 1000

@@ -38,8 +38,8 @@ export const ScheduledEvent = t.struct<ScheduledEventProps & {_documentType?: Co
     id: t.maybe(t.String),
     type: ScheduledEventTypeEnum,
     notifyTo: t.String,
-    eventDate: t.union([ t.Date, DateTimeString ]),
-    createdAt: t.union([ t.Date, DateTimeString ]),
+    eventDate: t.union([t.Date, DateTimeString]),
+    createdAt: t.union([t.Date, DateTimeString]),
     createdBy: t.maybe(t.String),
     _documentType: t.String,
     event: Event

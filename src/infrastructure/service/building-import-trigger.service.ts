@@ -8,7 +8,7 @@ export class BuildingImportTriggerService {
   constructor (
     private readonly eventBus: EventPublisher,
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: Logger
   ) {
   }
 
@@ -24,7 +24,7 @@ export class BuildingImportTriggerService {
     for (const building of allBuildings) {
       await this.eventBus.publish({
         name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_BUILDING,
-        building: building.document,
+        building: building.document
       })
       this.logger.info('Building migration triggered', { buildingId: building.id })
     }

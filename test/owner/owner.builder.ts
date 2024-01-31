@@ -16,16 +16,17 @@ export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
 
     withPhoneContact (id = 'test-phone-id', status = 'UNDEFINED', phoneNumber = '666666666') {
       if (!overwrites.person) {
-        overwrites.person = {...ownerPrototype.person}
+        overwrites.person = { ...ownerPrototype.person }
       }
 
       overwrites.person = Person.update(overwrites.person, {
         contacts: {
-          $push: [ {
+          $push: [{
             id,
             type: 'TELEFONO',
-            value: phoneNumber
-          } ]
+            value: phoneNumber,
+            status
+          }]
         }
       }) as PersonProps
 
@@ -48,11 +49,12 @@ export const ownerBuilder = (overwrites: Partial<OwnerProps> = {}) => {
 
       overwrites.person = Person.update(overwrites.person, {
         contacts: {
-          $push: [ {
+          $push: [{
             id,
             type: 'EMAIL',
-            value: email
-          } ]
+            value: email,
+            status
+          }]
         }
       }) as PersonProps
 

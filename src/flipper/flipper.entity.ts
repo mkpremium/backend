@@ -6,13 +6,13 @@ import { User } from '../user/user.entity'
 @Entity()
 export class Flipper extends BaseEntity {
   @OneToMany(() => Building, building => building.assignedFlipper)
-  assignedBuildings: Building
+    assignedBuildings: Building
 
   @OneToOne(() => User)
   @JoinColumn()
-  user: User
+    user: User
 
   @ManyToMany(() => Building)
   @JoinTable()
-  favoriteBuildings: Building[]
+    favoriteBuildings: Building[]
 }

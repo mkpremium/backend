@@ -24,12 +24,11 @@ export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps>
        FROM ${this.bucketName} as operator
        WHERE _documentType = 'operator'
          AND username = $1`,
-      [ username ]
+      [username]
     )
-    if (rows.length === 0)
-      throw new UserNotFound(username)
+    if (rows.length === 0) { throw new UserNotFound(username) }
 
-    return fromJSON(rows[ 0 ], User)
+    return fromJSON(rows[0], User)
   }
 
   async addFavoriteBuildingToUserOfId (userId, buildingId) {
@@ -43,10 +42,11 @@ export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps>
 
     const updatedUser = User.update(user, {
       favoriteBuildings: {
-        $set: [ ...favoriteBuildings, buildingId ]
+        $set: [...favoriteBuildings, buildingId]
       }
     })
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     return this.couchbaseAdapter.save(updatedUser as any, User)
   }
 
@@ -65,6 +65,7 @@ export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps>
       }
     })
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     return this.couchbaseAdapter.save(updatedUser as any, User)
   }
 
@@ -76,13 +77,13 @@ export class CouchbaseUsersRepository extends CouchbaseRepository<UserProps>
           AND $1 IN favoriteBuildings
     `
     return pipe(
-      fromPromise(this.couchbaseAdapter.queryAsync(query, [ buildingId ])),
+      fromPromise(this.couchbaseAdapter.queryAsync(query, [buildingId])),
       map(rows => {
         if (rows.length === 0) {
           return undefined
         }
 
-        return fromJSON(rows[ 0 ], User)
+        return fromJSON(rows[0], User)
       })
     )
   }

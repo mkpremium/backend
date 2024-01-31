@@ -1,17 +1,16 @@
 import { expect } from 'chai'
 import { stub } from 'sinon'
 import { Meeting } from '../../../src/scheduled-events/domain/meeting'
+import { FlipperAvailabilityService } from '../../../src/flipper/service/flipper-availability.service'
 import moment from 'moment'
 
-const { FlipperAvailabilityService } = require('../../../src/flipper/service/flipper-availability.service')
-
-describe('FlipperAvailabilityService', () => {
+describe('FlipperAvailabilityService', function () {
   /** @var {FlipperAvailabilityService} service **/
   let service
   let meetingsServiceStub
   let userBlockedAvailabilityServiceStub
 
-  beforeEach(() => {
+  beforeEach(function () {
     meetingsServiceStub = {
       futureMeetingsFor: stub()
     }
@@ -27,7 +26,7 @@ describe('FlipperAvailabilityService', () => {
     })
   })
 
-  it('returns meetings as a one hour blocked availability', () => {
+  it('returns meetings as a one hour blocked availability', function () {
     const testMeeting = Meeting({
       id: 'test-meeting-id',
       buildingId: 'test-building-id',
@@ -47,7 +46,7 @@ describe('FlipperAvailabilityService', () => {
       })
   })
 
-  it('returns restrictions as blocked availability', () => {
+  it('returns restrictions as blocked availability', function () {
     const startsAt = moment()
     const testUserBlockedAvailability = {
       startsAt,
@@ -64,7 +63,7 @@ describe('FlipperAvailabilityService', () => {
       })
   })
 
-  it('doesnt return passed restrictions as blocked availability', () => {
+  it('doesnt return passed restrictions as blocked availability', function () {
     const startsAt = moment().add(-1, 'day')
     const testUserBlockedAvailability = {
       startsAt,

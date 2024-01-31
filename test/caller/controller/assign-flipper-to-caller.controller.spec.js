@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { createAssignFlipperToCallerController } from '../../../src/caller/controller/assign-flipper-to-caller.controller'
 import { CallerToFlipperAssignationRejected } from '../../../src/caller/service/caller-to-flipper-assignation-rejected.error'
 
-describe('Assign Flipper To Caller Controller', () => {
+describe('Assign Flipper To Caller Controller', function () {
   const testCallerId = 'test-caller-id'
   const testFlipperId = 'test-flipper-id'
   const testRequest = {
@@ -13,7 +13,7 @@ describe('Assign Flipper To Caller Controller', () => {
     }
   }
 
-  it('returns OK on a successful assignation', () => {
+  it('returns OK on a successful assignation', function () {
     const assignFlipperStub = stub()
     const controller = createAssignFlipperToCallerController({
       assignFlipperToCallerService: { assign: assignFlipperStub }
@@ -28,7 +28,7 @@ describe('Assign Flipper To Caller Controller', () => {
     })
   })
 
-  it('returns error when caller has pending scheduled calls', () => {
+  it('returns error when caller has pending scheduled calls', function () {
     const assignFlipperStub = stub()
     const controller = createAssignFlipperToCallerController({
       assignFlipperToCallerService: { assign: assignFlipperStub }

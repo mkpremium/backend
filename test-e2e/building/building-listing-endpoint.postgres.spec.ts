@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import moment from 'moment'
-import { buildUser, createFullOperator } from '../../test/common'
 import {
   closeBuildingStock,
   createBuilding,
@@ -9,7 +8,10 @@ import {
   createWorksheetForBuilding,
   purchaseBuilding,
   sellBuilding,
-  testContactPhone, testOwnerFirstName, testOwnerName, testPhoneContactId
+  testContactPhone,
+  testOwnerFirstName,
+  testOwnerName,
+  testPhoneContactId
 } from '../helper/mother-of-objects'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 import { Promise as BluePromise } from 'bluebird'
@@ -24,7 +26,7 @@ describe.skip('Building listing endpoint (Postgres)', () => {
   let flipper: any
 
   beforeEach(async () => {
-    const [ createdApp, container ] = await initApplication('postgres') as [ Application, AwilixContainer ]
+    const [createdApp, container] = await initApplication('postgres') as [ Application, AwilixContainer ]
     app = createdApp
     flipper = await createFlipper(container)
   })
@@ -33,12 +35,12 @@ describe.skip('Building listing endpoint (Postgres)', () => {
     const testMetadataId = uuid()
     const building1 = await createBuilding(app, {
       id: uuid(),
-      metadata: [ {
+      metadata: [{
         id: testMetadataId,
         name: '5325108TG3452E0001YT.jpg',
         mimeType: 'image/jpeg',
         previewUrl: 'https://mkpremium-files.s3.eu-west-2.amazonaws.com/preview/ffe6fa34-28bf-4da8-9695-53b7bf421648.jpg'
-      } ],
+      }],
       cadastre: {
         reference: 'test-building1-cadastre-reference'
       },
@@ -194,14 +196,13 @@ describe.skip('Building listing endpoint (Postgres)', () => {
   })
 })
 
-
 async function createFlipper (container: AwilixContainer<any>) {
   const service = container.resolve('addOperatorService') as AddOperatorService
   const addFlipperCommand = {
     ...Factory.build<{ username: string, password: string }>('user-credentials'),
     profile: Factory.build('user-profile'),
-    roles: [ 'ADMIN' ],
-    enable: true,
+    roles: ['ADMIN'],
+    enable: true
   } as any
 
   return service.addOperator(addFlipperCommand, { id: uuid() })

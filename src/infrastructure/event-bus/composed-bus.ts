@@ -4,21 +4,21 @@ import { SqsBus } from './sqs-bus'
 import { Logger } from '../logger'
 
 export class ComposedBus implements EventBus {
-  get info(): any {
+  get info (): any {
     return {
       eventEmitter: this.eventEmitterBus.info,
-      sqs: this.sqsEventBus.info,
+      sqs: this.sqsEventBus.info
     }
   }
 
   constructor (
     private sqsEventBus: SqsBus,
     private eventEmitterBus: EventEmitterBus,
-    private logger: Logger,
+    private logger: Logger
   ) {
   }
 
-  on (eventName: string, listenerName: string, subscriber: (event: any) => Promise<any>) {
+  on (eventName: string, listenerName: string, subscriber: (event: unknown) => Promise<void>) {
     this.eventEmitterBus.on(eventName, listenerName, subscriber)
     try {
       this.sqsEventBus.on(eventName, listenerName, subscriber)

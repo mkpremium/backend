@@ -16,7 +16,7 @@ export class TakeNextWorksheetService {
     private takeWorksheetService: WorksheetQueueActionsService,
     private callcenterWorksheetService: CallcenterWorksheetService,
     private worksheetQueueRepository: WorksheetQueueRepository,
-    private eventBus: EventPublisher,
+    private eventBus: EventPublisher
   ) {
   }
 
@@ -33,7 +33,7 @@ export class TakeNextWorksheetService {
       if (error instanceof WorksheetNotFound) {
         await this.eventBus.publish({
           name: DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND,
-          worksheetId: error.worksheetId,
+          worksheetId: error.worksheetId
         } as InvalidWorksheetFound)
         worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId, error.worksheetId)
       } else {

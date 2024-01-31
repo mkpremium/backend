@@ -1,7 +1,6 @@
 import { BuildingProposal, ProposalProps } from '../../src/building/building'
 import uuid from 'uuid/v4'
 
-
 const proposalPrototype: Omit<ProposalProps, 'buildingId'> = {
   id: 'test-proposal-id',
   state: 'pendiente',
@@ -10,7 +9,7 @@ const proposalPrototype: Omit<ProposalProps, 'buildingId'> = {
   notificationStatus: 'PENDING',
   createdBy: 'test-flipper-id',
   message: 'test proposal message',
-  proposal: 1_000_000,
+  proposal: 1_000_000
 }
 
 export const proposalBuilder = (overrides: Partial<ProposalProps> = {}) => ({

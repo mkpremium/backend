@@ -20,18 +20,19 @@ describe('PdfProposalComposer', () => {
       province: undefined
     },
     cadastre: {
-      reference: '123456789',
+      reference: '123456789'
     }
   }).build()
   const testFlipper: UserProfileProps = userProfileBuilder({
     firstName: 'Flipper-Name',
     lastName: 'Flipper-Surname',
     city: 'FLIPPER CITY',
-    language: 'es',
+    language: 'es'
   }).build()
 
   it('composes PDF file', async () => {
     const composer = new PdfProposalComposer()
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     const composedPdf = await composer.composeProposal(testBuilding, 1000, testFlipper)
 
     // fs.writeFileSync('/tmp/proposal.pdf', composedPdf)

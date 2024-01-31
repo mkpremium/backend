@@ -3,8 +3,8 @@ import { addBetweenQueryToBuilder } from '../../../src/lib/query/helpers'
 import squel from 'squel'
 import moment from 'moment'
 
-describe('addBetweenQueryToBuilder', () => {
-  it('adds between query to query builder', () => {
+describe('addBetweenQueryToBuilder', function () {
+  it('adds between query to query builder', function () {
     const expectedQueryBuilder = squel.select()
       .where('createdAt >= ?', moment.utc('2021-01-21').startOf('day').toDate())
       .where('createdAt < ?', moment.utc('2021-01-21').endOf('day').toDate())

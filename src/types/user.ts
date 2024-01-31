@@ -40,7 +40,7 @@ UserProfile.prototype.fullName = function () {
 export const ProfitGoal = t.struct(
   {
     amount: t.Number,
-    updatedAt: t.union([ t.Date, DateTimeString ])
+    updatedAt: t.union([t.Date, DateTimeString])
   }
 )
 
@@ -111,11 +111,11 @@ export const User = t.struct<UserProps>(
       ownerId: t.String
     }))),
     awards: t.list(Award),
-    createdAt: t.union([ t.Date, DateTimeString ]),
+    createdAt: t.union([t.Date, DateTimeString]),
     disabledAt: t.maybe(t.Date),
     favoriteBuildings: t.maybe(t.list(t.String)),
     signatures: t.maybe(UserSignatures),
-    _documentType: t.enums.of([ 'operator' ])
+    _documentType: t.enums.of(['operator'])
   },
   {
     name: 'User',

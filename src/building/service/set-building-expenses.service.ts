@@ -4,11 +4,11 @@ import { withTotalExpensesAmount } from '../building'
 export class SetBuildingExpensesService {
   private buildingsRepository: BuildingsRepository
 
-  constructor({ buildingsRepository }) {
+  constructor ({ buildingsRepository }) {
     this.buildingsRepository = buildingsRepository
   }
 
-  async setTotalExpensesAmount(buildingId, totalAmount) {
+  async setTotalExpensesAmount (buildingId, totalAmount) {
     const updatedBuilding = withTotalExpensesAmount(
       await this.buildingsRepository.get(buildingId),
       totalAmount

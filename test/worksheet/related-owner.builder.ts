@@ -9,19 +9,19 @@ const prototype: WorksheetOwnerProps = {
         id: 'test-worksheet-contact-id',
         status: 'UNDEFINED',
         type: 'TELEFONO',
-        value: '666666667',
-      },
-    ],
+        value: '666666667'
+      }
+    ]
   },
   status: 'NO_VERIFICADO',
-  type: 'NINGUNO',
+  type: 'NINGUNO'
 }
 
 export function relatedOwnerBuilder (overrides: Partial<WorksheetOwnerProps> = {}) {
   return function () {
     return {
       ...prototype,
-      ...overrides,
+      ...overrides
     }
   }
 }

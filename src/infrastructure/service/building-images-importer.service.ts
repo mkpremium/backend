@@ -6,14 +6,14 @@ import { EntityManager } from 'typeorm'
 import { EventPublisher } from '../event-bus'
 import { Logger } from 'winston'
 import { getCouchbaseDocument, markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
-import { CouchbaseDocumentRepository } from "../postgres/couchbase-document.repository";
+import { CouchbaseDocumentRepository } from '../postgres/couchbase-document.repository'
 
 export class BuildingImagesImporterService {
   constructor (
     protected readonly entityManager: EntityManager,
     private readonly eventBus: EventPublisher,
     private readonly logger: Logger,
-    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
+    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository
   ) {
   }
 
@@ -39,7 +39,7 @@ export class BuildingImagesImporterService {
           mimeType: original.mimeType as BuildingDocumentMimeType,
           privateUrl: original.url,
           previewUrl: original.previewUrl,
-          building: { id: buildingId },
+          building: { id: buildingId }
         })
         await markCouchbaseDocumentAsMigrated(em, document.id)
       }
@@ -47,7 +47,7 @@ export class BuildingImagesImporterService {
       await this.eventBus.publish({
         name: DomainEventCatalog.BUILDING__BUILDING_IMAGES_IMPORTED,
         buildingId,
-        imageIds: documents.map(i => i.id),
+        imageIds: documents.map(i => i.id)
       }, em)
     })
 

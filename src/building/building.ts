@@ -6,7 +6,7 @@ import moment from 'moment'
 
 export const BuildingCadastre = t.struct({
   reference: t.String,
-  address: t.maybe(t.String),
+  address: t.maybe(t.String)
 }, 'Cadastre')
 
 export const BuildingLocation = t.struct({
@@ -37,7 +37,7 @@ const BuildingOwner = t.struct(
 const BuildingProposalStatus = {
   DEAL: 'aceptada',
   SENT: 'enviada',
-  PENDING: 'pendiente',
+  PENDING: 'pendiente'
 }
 
 export interface ProposalProps {
@@ -80,17 +80,16 @@ export const BuildingProposal = t.struct<ProposalProps>(
     defaultProps: {
       state: BuildingProposalStatus.PENDING,
       accepted: false,
-      get id() {
+      get id () {
         return uuid()
       },
-      get createdAt() {
+      get createdAt () {
         return new Date()
       },
       _documentType: 'building-proposal'
     }
   }
 ) as Struct<ProposalProps>
-
 
 export const proposalSent = (proposal: ProposalProps) => BuildingProposal.update(proposal, {
   notificationStatus: {
@@ -117,7 +116,7 @@ export const buildingNegotiationStatus = [
   'VENDIDO',
   'NO VENDE',
   'DESCARTADO',
-  'YA VENDIO',
+  'YA VENDIO'
 ]
 
 export const NegotiationStatus = t.enums.of(buildingNegotiationStatus)
@@ -207,12 +206,12 @@ export const Building = t.struct<BuildingProps>(
     state: t.maybe(t.enums.of(['BUENO', 'MALO'])),
     proposals: t.list(t.String),
     recentProposal: t.maybe(t.struct<RecentBuildingProposal>({
-        id: t.String,
-        createdAt: t.union([t.Date, DateTimeString]),
-        aspiration: t.maybe(t.Number),
-        proposal: t.maybe(t.Number),
-      },
-      'RecentBuildingProposal')),
+      id: t.String,
+      createdAt: t.union([t.Date, DateTimeString]),
+      aspiration: t.maybe(t.Number),
+      proposal: t.maybe(t.Number)
+    },
+    'RecentBuildingProposal')),
     negotiationStatus: NegotiationStatus,
     lead: t.maybe(t.struct({
       worksheetId: t.String,
@@ -237,16 +236,16 @@ export const Building = t.struct<BuildingProps>(
     portugalSpecific: t.maybe(t.struct({
       militaryGeo: t.maybe(t.struct({
         x: t.Number,
-        y: t.Number,
+        y: t.Number
       })),
       artigo: t.maybe(t.String),
-      artigoMatricial: t.maybe(t.String),
+      artigoMatricial: t.maybe(t.String)
     }))
   },
   {
     name: 'Building',
     defaultProps: {
-      get id() {
+      get id () {
         return uuid()
       },
       floorArea: 0,
@@ -266,7 +265,7 @@ export const Building = t.struct<BuildingProps>(
   }
 )
 
-export function changeNegotiationStatus(building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
+export function changeNegotiationStatus (building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
   return Building.update(building, {
     negotiationStatus: {
       $set: newStatus
@@ -274,7 +273,7 @@ export function changeNegotiationStatus(building: BuildingProps, newStatus: Buil
   })
 }
 
-export function withTotalExpensesAmount(building: BuildingProps, totalAmount: number): BuildingProps {
+export function withTotalExpensesAmount (building: BuildingProps, totalAmount: number): BuildingProps {
   return Building.update(building, {
     totalExpensesAmount: {
       $set: totalAmount
@@ -282,7 +281,7 @@ export function withTotalExpensesAmount(building: BuildingProps, totalAmount: nu
   })
 }
 
-export function withFeaturedOwner(building: BuildingProps, ownerId: string): BuildingProps {
+export function withFeaturedOwner (building: BuildingProps, ownerId: string): BuildingProps {
   return Building.update(building, {
     ownerId: {
       $set: ownerId
@@ -290,21 +289,21 @@ export function withFeaturedOwner(building: BuildingProps, ownerId: string): Bui
   })
 }
 
-export function withCapturedLead(
+export function withCapturedLead (
   building: BuildingProps,
   assignToFlipperId: string,
   lead: Omit<Lead, 'capturedAt'>,
-  capturedAt?: Date | string,
+  capturedAt?: Date | string
 ): BuildingProps {
   return Building.update(building, {
     negotiationStatus: {
-      $set: 'LEAD',
+      $set: 'LEAD'
     },
     assignedAgentId: {
-      $set: assignToFlipperId,
+      $set: assignToFlipperId
     },
     lead: {
-      $set: {...lead, capturedAt: capturedAt || new Date()},
-    },
+      $set: { ...lead, capturedAt: capturedAt || new Date() }
+    }
   })
 }

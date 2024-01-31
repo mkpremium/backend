@@ -19,7 +19,7 @@ interface UpdateBuildingNegotiationStatusCommand {
 export class UpdateBuildingNegotiationStatusService {
   constructor (
     private buildingsRepository: BuildingsRepository,
-    private eventBus: EventPublisher,
+    private eventBus: EventPublisher
   ) {
   }
 

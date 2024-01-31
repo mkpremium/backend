@@ -16,7 +16,7 @@ export const worksheetViewPrototype: WorksheetViewProps = {
       street: 'TEST STREET',
       type: 'CL'
     },
-    metadata: [],
+    metadata: []
   },
   relatedOwners: [
     {
@@ -28,12 +28,12 @@ export const worksheetViewPrototype: WorksheetViewProps = {
             id: 'test-worksheet-contact-id',
             status: 'UNDEFINED',
             type: 'TELEFONO',
-            value: '666666667',
-          },
-        ],
+            value: '666666667'
+          }
+        ]
       },
       status: 'NO_VERIFICADO',
-      type: 'NINGUNO',
+      type: 'NINGUNO'
     }
   ]
 }

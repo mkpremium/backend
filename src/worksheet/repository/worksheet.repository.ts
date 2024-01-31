@@ -57,16 +57,16 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
   negotiationStatus: t.String,
   latestProposal: t.maybe(t.struct({
     amount: t.Number,
-    createdAt: t.union([DateTimeString, t.Date]),
+    createdAt: t.union([DateTimeString, t.Date])
   })),
   cadastreReference: t.maybe(t.String),
   address: t.struct({
-    number: t.union([ t.String, t.Number ]),
+    number: t.union([t.String, t.Number]),
     city: t.String,
     province: t.String,
     street: t.String,
     postalCode: t.maybe(t.struct({
-      number: t.union([ t.String, t.Number ])
+      number: t.union([t.String, t.Number])
     })),
     neighborhood: t.maybe(t.String),
     type: t.maybe(t.String)
@@ -84,13 +84,13 @@ export const WorksheetBuilding = t.struct<WorksheetBuildingProps>({
     lat: t.maybe(t.Number)
   })),
   recentProposal: t.maybe(t.struct({
-    createdAt: t.union([ t.Date, DateTimeString ]),
-    proposal: t.Number,
+    createdAt: t.union([t.Date, DateTimeString]),
+    proposal: t.Number
   })),
   cadastre: t.maybe(t.struct({
-    reference: t.String,
+    reference: t.String
   })),
-  floorArea: t.maybe(t.union([ t.Number, t.String ])),
+  floorArea: t.maybe(t.union([t.Number, t.String])),
   featuredOwnerId: t.maybe(t.String)
 })
 
@@ -105,8 +105,8 @@ export const CallcenterView = t.struct<WorksheetViewProps>({
     person: t.struct({
       contacts: t.list(t.struct({
         id: t.String,
-        status: t.enums.of([ 'GOOD', 'BAD', 'UNDEFINED' ]),
-        type: t.enums.of([ 'TELEFONO', 'MOVIL', 'EMAIL' ]),
+        status: t.enums.of(['GOOD', 'BAD', 'UNDEFINED']),
+        type: t.enums.of(['TELEFONO', 'MOVIL', 'EMAIL']),
         value: t.String
       }))
     }),
@@ -123,7 +123,7 @@ export class WorksheetNotFound extends Error {
   readonly _type = 'WorksheetNotFound'
 
   constructor (
-    readonly worksheetId,
+    readonly worksheetId
   ) {
     super('Worksheet not found')
   }

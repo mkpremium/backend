@@ -2,11 +2,11 @@ import { expect } from 'chai'
 import { createUpdateBuildingNegotiationStatusController } from '../../../src/building/controller/update-building-negotiation-status.controller'
 import { spy, stub } from 'sinon'
 
-describe('Update Building Negotiation Status Controller', () => {
+describe('Update Building Negotiation Status Controller', function () {
   let controller
   let updateBuildingNegotiationStatusServiceSpy
 
-  beforeEach(() => {
+  beforeEach(function () {
     updateBuildingNegotiationStatusServiceSpy = {
       updateBuildingStatus: stub()
     }
@@ -15,7 +15,7 @@ describe('Update Building Negotiation Status Controller', () => {
     })
   })
 
-  it('update building negotiation status using service', () => {
+  it('update building negotiation status using service', function () {
     const testBuildingId = 'test-building-id'
     const testRequest = {
       params: {

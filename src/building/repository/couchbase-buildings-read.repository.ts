@@ -82,7 +82,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
   listById (ids): Promise<BuildingReadModel[]> {
     return this.couchbaseAdapter.queryAsync(
       listBuildingsByIdQuery(this.couchbaseAdapter.bucketName),
-      [ ids ],
+      [ids],
       { queryName: 'list_buildings_by_id' }
     ).then(CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView)
   }
@@ -95,7 +95,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
   listProposalsForBuilding (buildingId) {
     return this.couchbaseAdapter.queryAsync(
       listProposalsForBuildingIdQuery(this.couchbaseAdapter.bucketName),
-      [ buildingId ]
+      [buildingId]
     )
   }
 
@@ -108,7 +108,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
           AND negotiationStatus = $2
     `
     return pipe(
-      fromPromise(this.couchbaseAdapter.queryAsync(query, [ flipperId, status ])),
+      fromPromise(this.couchbaseAdapter.queryAsync(query, [flipperId, status])),
       TE.chain(ids => fromPromise(this.listById(ids.map(({ id }) => id))))
     )
   }
@@ -116,36 +116,36 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
   ofCadastreReference (cadastreReference: string): TE.TaskEither<Error, BuildingReadModel | undefined> {
     return pipe(
       fromPromise(this.couchbaseAdapter.queryAsync(
-          listBuildingsByQuery(this.couchbaseAdapter.bucketName, 'building.cadastre.reference = $1'),
-          [ cadastreReference ]
-        )
+        listBuildingsByQuery(this.couchbaseAdapter.bucketName, 'building.cadastre.reference = $1'),
+        [cadastreReference]
+      )
       ),
       TE.chain(rows => {
         if (rows.length === 0) {
           return TE.of(undefined)
         }
 
-        return TE.of(CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView(rows)[ 0 ])
+        return TE.of(CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView(rows)[0])
       })
     )
   }
 
   private allAssignedBuildingsId (flipperId): Promise<string[]> {
     return this.couchbaseAdapter
-      .queryAsync(assignedBuildingsIdForFlipperQuery(this.couchbaseAdapter.bucketName), [ flipperId ])
+      .queryAsync(assignedBuildingsIdForFlipperQuery(this.couchbaseAdapter.bucketName), [flipperId])
       .then(result => result.map(({ buildingId }) => buildingId))
   }
 
   static mapToPropertyAgentBuildingView (buildings): BuildingReadModel[] {
     return buildings.map(
       ({
-         id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
-         ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount,
-         lead
-       }) => {
+        id, metadata, stock, latestProposal, cadastreReference, address, location, use, floorArea,
+        ownerId, buildingMeetings = [], owners, negotiationStatus, salePrice, totalExpensesAmount,
+        lead
+      }) => {
         buildingMeetings.sort((a, b) => moment(a.eventDate).unix() - moment(b.eventDate).unix())
 
-        const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[ buildingMeetings.length - 1 ] : undefined
+        const lastMeeting = buildingMeetings.length > 0 ? buildingMeetings[buildingMeetings.length - 1] : undefined
         const featuredOwner = selectBuildingOwner(owners, ownerId, lastMeeting)
         return {
           id,
@@ -155,39 +155,51 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
             thumbnailUrl: previewUrl
           })),
           stock: {
-            purchase: stock && stock.purchase ? {
-              reservationAmount: stock.purchase.reservationAmount,
-              reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
-              transactionAmount: stock.purchase.transactionAmount,
-              transactionDate: moment(stock.purchase.transactionDate).format()
-            } : undefined,
-            sell: stock && stock.sell ? {
-              reservationAmount: stock.sell.reservationAmount,
-              reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
-              transactionAmount: stock.sell.transactionAmount,
-              transactionDate: moment(stock.sell.transactionDate).format()
-            } : undefined,
-            close: stock && stock.close ? {
-              gain: stock.close.gain,
-              transactionDate: moment(stock.close.transactionDate).format()
-            } : undefined
+            purchase: stock && stock.purchase
+              ? {
+                  reservationAmount: stock.purchase.reservationAmount,
+                  reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
+                  transactionAmount: stock.purchase.transactionAmount,
+                  transactionDate: moment(stock.purchase.transactionDate).format()
+                }
+              : undefined,
+            sell: stock && stock.sell
+              ? {
+                  reservationAmount: stock.sell.reservationAmount,
+                  reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
+                  transactionAmount: stock.sell.transactionAmount,
+                  transactionDate: moment(stock.sell.transactionDate).format()
+                }
+              : undefined,
+            close: stock && stock.close
+              ? {
+                  gain: stock.close.gain,
+                  transactionDate: moment(stock.close.transactionDate).format()
+                }
+              : undefined
           },
           latestProposal: latestProposal && latestProposal.amount ? latestProposal : undefined,
-          address: address ? {
-            neighborhood: address.neighborhood ? address.neighborhood : undefined,
-            type: address.type ? address.type : undefined,
-            street: address.street ? address.street : undefined,
-            number: address.number ? address.number : undefined,
-            postalCode: address.postalCode && address.postalCode.number ? {
-              number: address.postalCode.number
-            } : undefined,
-            city: address.city ? address.city : undefined,
-            province: address.province ? address.province : undefined
-          } : undefined,
-          geolocation: location && (location.lat || location.lng) ? {
-            latitude: location.lat ? location.lat : undefined,
-            longitude: location.lng ? location.lng : undefined
-          } : undefined,
+          address: address
+            ? {
+                neighborhood: address.neighborhood ? address.neighborhood : undefined,
+                type: address.type ? address.type : undefined,
+                street: address.street ? address.street : undefined,
+                number: address.number ? address.number : undefined,
+                postalCode: address.postalCode && address.postalCode.number
+                  ? {
+                      number: address.postalCode.number
+                    }
+                  : undefined,
+                city: address.city ? address.city : undefined,
+                province: address.province ? address.province : undefined
+              }
+            : undefined,
+          geolocation: location && (location.lat || location.lng)
+            ? {
+                latitude: location.lat ? location.lat : undefined,
+                longitude: location.lng ? location.lng : undefined
+              }
+            : undefined,
           cadastreReference: cadastreReference || undefined,
           negotiationStatus: negotiationStatus || undefined,
           floorArea,
@@ -199,7 +211,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
           }) || undefined,
           salePrice: salePrice || undefined,
           totalExpensesAmount: totalExpensesAmount || undefined,
-          lead,
+          lead
         } as BuildingReadModel
       }
     )

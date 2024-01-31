@@ -12,7 +12,7 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
         contact: true
       },
       featuredPhoneContact: true,
-      featuredEmailContact: true,
+      featuredEmailContact: true
     }
   }
 
@@ -20,9 +20,9 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   async buildingOwners (buildingId: string | string[]): Promise<(BuildingOwnerProps & { buildingId: string })[]> {
     const owners = await this.repository.find({
       where: {
-        building: { id: In([].concat(buildingId)) },
+        building: { id: In([].concat(buildingId)) }
       },
-      relations: this.relations,
+      relations: this.relations
     })
 
     return owners.map(ownerEntityToBuildingOwnerProps)
@@ -31,9 +31,9 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
   async verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
     const owners = await this.repository.find({
       where: {
-        building: { id: buildingId },
+        building: { id: buildingId }
       },
-      relations: this.relations,
+      relations: this.relations
     })
 
     return owners.map(ownerEntityToBuildingOwnerProps).filter(isVerifiedOwner)
@@ -51,19 +51,19 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     return {
       id: owner.id,
       status: owner.status,
-      building: owner.buildingId ? {id: owner.buildingId} : null,
+      building: owner.buildingId ? { id: owner.buildingId } : null,
       person: {
         fullName: owner.person.name,
         contacts: owner.person.contacts,
         featuredPhoneContact: owner.featuredContact?.phoneId ? { id: owner.featuredContact?.phoneId } : null,
         featuredEmailContact: owner.featuredContact?.emailId ? { id: owner.featuredContact?.emailId } : null,
-        documentNumber: owner.person.documentNumber,
+        documentNumber: owner.person.documentNumber
       }
     }
   }
 }
 
-export function ownerEntityToStruct(entity: Owner): OwnerProps {
+export function ownerEntityToStruct (entity: Owner): OwnerProps {
   return {
     id: entity.id,
     status: entity.status,
@@ -71,12 +71,14 @@ export function ownerEntityToStruct(entity: Owner): OwnerProps {
     buildingId: entity.building.id,
     person: {
       name: entity.person.fullName,
-      contacts: entity.person.contacts.map(cp => ({...cp.contact, status: cp.status})),
+      contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status }))
     },
-    featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact ? {
-      phoneId: entity.person.featuredPhoneContact?.id,
-      emailId: entity.person.featuredEmailContact?.id,
-    } : null
+    featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact
+      ? {
+          phoneId: entity.person.featuredPhoneContact?.id,
+          emailId: entity.person.featuredEmailContact?.id
+        }
+      : null
   }
 }
 
@@ -90,6 +92,6 @@ function ownerEntityToBuildingOwnerProps (entity: Owner): BuildingOwnerProps & {
     name: ownerProps.name,
     featuredContact: ownerProps.featuredContact,
     type: entity.type,
-    contacts: ownerProps.person.contacts,
+    contacts: ownerProps.person.contacts
   }
 }

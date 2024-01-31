@@ -1,4 +1,4 @@
-import { createDiContainer, setupContainer } from '../../src/infrastructure/dependencies'
+import { setupContainer } from '../../src/infrastructure/dependencies'
 import { expect } from 'chai'
 import { createContainer } from 'awilix'
 

@@ -29,7 +29,7 @@ export async function createOwner (entityManager: EntityManager, cmd: CreateOwne
   const person: DeepPartial<Person> = {
     fullName: cmd.person.name,
     firstName: cmd.person.firstName,
-    lastName: cmd.person.firstSurname,
+    lastName: cmd.person.firstSurname
   }
   const savedPerson = await entityManager.save(Person, person)
   const savedOwner = await entityManager.save(Owner, {
@@ -38,7 +38,7 @@ export async function createOwner (entityManager: EntityManager, cmd: CreateOwne
     person: savedPerson,
     building: cmd.buildingId ? { id: cmd.buildingId } : undefined,
     status: cmd.status,
-    note: cmd.note,
+    note: cmd.note
   })
-  return [ savedOwner, savedPerson ]
+  return [savedOwner, savedPerson]
 }

@@ -7,15 +7,15 @@ import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 
 export class ScheduledCallsRepository extends CouchbaseRepository<ScheduledEventProps> {
-  protected struct (): Struct<any> & Partial<RecordToDomain> {
-    return ScheduledEvent;
+  protected struct (): Struct<ScheduledEventProps> & Partial<RecordToDomain> {
+    return ScheduledEvent
   }
 
   removeScheduledCallsForBuilding (buildingId) {
     return this.couchbaseAdapter.queryAsync(
       `DELETE FROM ${this.bucketName} WHERE _documentType = 'scheduled-event'
         AND type = 'CALLS' AND event.buildingId = $1`,
-      [ buildingId ]
+      [buildingId]
     )
   }
 
@@ -23,11 +23,11 @@ export class ScheduledCallsRepository extends CouchbaseRepository<ScheduledEvent
     return this.couchbaseAdapter.queryAsync(
       `DELETE FROM ${this.bucketName} WHERE _documentType = 'scheduled-event'
         AND type = 'CALLS' AND event.contactId = $1`,
-      [ contactId ]
+      [contactId]
     )
   }
 
-  forBuilding (buildingId: string): TE.TaskEither<Error, string | undefined>{
+  forBuilding (buildingId: string): TE.TaskEither<Error, string | undefined> {
     return pipe(
       fromPromise(this.couchbaseAdapter.queryAsync(
         `SELECT scheduledCall.* FROM ${this.bucketName} WHERE _documentType = 'scheduled-event'
@@ -36,6 +36,7 @@ export class ScheduledCallsRepository extends CouchbaseRepository<ScheduledEvent
       )),
       TE.map(rows => {
         if (!rows || rows.length === 0) {
+          /* eslint-disable-next-line array-callback-return */
           return
         }
         return rows[0].id

@@ -32,34 +32,33 @@ describe('Portugal2021BuildingsRepository', () => {
       repository.pendingWithSlug('test-slug'),
       map(buildings => {
         expect(buildings).to.have.lengthOf(1)
-        expect(buildings[ 0 ].id).to.be.equal(testPendingBuilding.id)
+        expect(buildings[0].id).to.be.equal(testPendingBuilding.id)
       }),
-      orFail(),
+      orFail()
     )()
   })
 
   it('gets owners phone numbers', async () => {
     await couchbaseAdapter.upsert('dni-1', {
       id: 'dni-1',
-      phones: [ '666666666' ],
-      _documentType: 'portugal-2021-owner-phone',
+      phones: ['666666666'],
+      _documentType: 'portugal-2021-owner-phone'
     })
     await couchbaseAdapter.upsert('dni-2', {
       id: 'dni-2',
-      phones: [ '666666667' ],
-      _documentType: 'portugal-2021-owner-phone',
+      phones: ['666666667'],
+      _documentType: 'portugal-2021-owner-phone'
     })
 
     return pipe(
-      repository.phoneNumbersFor([ 'dni-1', 'dni-2' ]),
+      repository.phoneNumbersFor(['dni-1', 'dni-2']),
       map((foundPhones) => {
         expect(foundPhones).to.have.deep.members([
-          { id: 'dni-1', phones: [ '666666666' ] },
-          { id: 'dni-2', phones: [ '666666667' ] },
+          { id: 'dni-1', phones: ['666666666'] },
+          { id: 'dni-2', phones: ['666666667'] }
         ])
       }),
-      orFail(),
+      orFail()
     )()
   })
 })
-

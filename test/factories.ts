@@ -20,17 +20,17 @@ Factory.define('user-profile')
     lastName: 'User-Surname',
     city: 'User CITY',
     language: 'es',
-    email: 'user@email.test',
+    email: 'user@email.test'
   })
 
 export const userFactory = Factory.define('user')
   .extend('user-credentials')
   .option('roles', [])
   .attrs({
-      profile: () => Factory.attributes('user-profile', {}),
-      enabled: true,
-      roles: []
-    }
+    profile: () => Factory.attributes('user-profile', {}),
+    enabled: true,
+    roles: []
+  }
   )
 
 export const callerFactory = Factory.define<Caller>('caller').extend(EntityFactory)
@@ -50,7 +50,7 @@ export const emailContactFactory = Factory.define<Omit<ContactProps, 'id'>>('ema
   .attrs({
     status: 'UNDEFINED',
     type: 'EMAIL',
-    value: 'test@email.org',
+    value: 'test@email.org'
   })
 
 export const buildingFactory = Factory.define<BuildingProps>('building')
@@ -62,7 +62,7 @@ export const buildingFactory = Factory.define<BuildingProps>('building')
     metadata: [],
     location: {
       lat: 0,
-      lng: 0,
+      lng: 0
     }
   })
 
@@ -74,9 +74,9 @@ export const buildingAddressFactory = Factory.define<BuildingAddressProps>('addr
     neighborhood: '',
     postalCode: {
       number: '0000',
-      verified: false,
+      verified: false
     },
-    city: 'TEST_BARCELONA',
+    city: 'TEST_BARCELONA'
   })
   .sequence('number', (idx) => `${idx}`)
   .after((address) => ({
@@ -89,11 +89,11 @@ export const worksheetQueueFactory = Factory.define<WorksheetQueueProps>('worksh
   .sequence('name', idx => `test worksheet queue ${idx}`)
   .attrs({
     source: { province: 'TEST_BARCELONA' },
-    worksheets: [],
+    worksheets: []
   })
 
 export const worksheetFactory = Factory.define<WorksheetProps>('worksheet')
   .extend('Entity')
   .option('buildingId')
-  .attr('relatedBuildingIds', ['buildingId'], buildingId => [ buildingId ])
+  .attr('relatedBuildingIds', ['buildingId'], buildingId => [buildingId])
   .attr('status', 'OPEN')

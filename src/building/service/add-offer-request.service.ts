@@ -9,8 +9,7 @@ import { BuildingOfferRequest } from '../repository/building-offer-request.entit
 import { Building } from '../building.entity'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
-import { CouchbaseBuildingsRepository } from "../repository/couchbase-building.repository";
-
+import { CouchbaseBuildingsRepository } from '../repository/couchbase-building.repository'
 
 interface AddOfferRequestCommand {
   ownerId: string,
@@ -56,7 +55,7 @@ export class AddOfferRequestService {
     private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
-    private entityManager: EntityManager,
+    private entityManager: EntityManager
   ) {
   }
 
@@ -76,16 +75,16 @@ export class AddOfferRequestService {
   private async doPostgres (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
     return this.entityManager.transaction(async entityManager => {
       const flipper = await entityManager.findOneByOrFail(Flipper, [
-        {id: cmd.flipperId},
-        {user: { id: cmd.flipperId } },
+        { id: cmd.flipperId },
+        { user: { id: cmd.flipperId } }
       ])
       const caller = await entityManager.findOneByOrFail(Caller, [
-        {id: cmd.callerId},
-        {user: {id: cmd.callerId}},
+        { id: cmd.callerId },
+        { user: { id: cmd.callerId } }
       ])
       const savedOfferRequest = await entityManager.save(BuildingOfferRequest, {
-        flipper: flipper,
-        caller: caller,
+        flipper,
+        caller,
         owner: { id: cmd.ownerId },
         contact: { id: cmd.destinationContactId },
         building: { id: cmd.buildingId }
@@ -94,9 +93,9 @@ export class AddOfferRequestService {
 
       const offerRequest = {
         id: savedOfferRequest.id,
-        ...cmd,
-      };
-      await this.publishOfferRequested(cmd, offerRequest, entityManager);
+        ...cmd
+      }
+      await this.publishOfferRequested(cmd, offerRequest, entityManager)
 
       return offerRequest
     })
@@ -110,11 +109,11 @@ export class AddOfferRequestService {
     return offerRequest
   }
 
-  private async publishOfferRequested(
+  private async publishOfferRequested (
     cmd: AddOfferRequestCommand,
     offerRequest: AddBuildingOfferCommand & { id: string },
     entityManager?: EntityManager
-    ) {
+  ) {
     await this.eventBus.publish({
       name: DomainEventCatalog.OFFER_REQUEST__CREATED,
       note: cmd.note,

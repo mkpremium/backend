@@ -22,7 +22,7 @@ describe('OwnerRepository (Couchbase)', () => {
 
   it('finds owner by its phone contact', async function () {
     const testBuilding = buildingBuilder().build()
-    const testWorksheet = worksheetBuilder({ relatedBuildingIds: [ testBuilding.id ] }).build()
+    const testWorksheet = worksheetBuilder({ relatedBuildingIds: [testBuilding.id] }).build()
     const testOwner = ownerBuilder({ buildingId: testBuilding.id }).withPhoneContact().build()
 
     return BluebirdPromise.all([
@@ -33,7 +33,7 @@ describe('OwnerRepository (Couchbase)', () => {
       .then(() => repository.findByPhoneNumber('666666666'))
       .then(result => {
         expect(result.length).to.be.equal(1)
-        expect(validate(result[ 0 ].building, WorksheetBuilding).errors).to.be.deep.equal([])
+        expect(validate(result[0].building, WorksheetBuilding).errors).to.be.deep.equal([])
       })
   })
 })

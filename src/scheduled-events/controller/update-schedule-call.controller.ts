@@ -8,9 +8,9 @@ interface Deps {
 }
 
 export const updateScheduledCallController = ({
-                                                scheduledEventsRepository,
-                                                eventBus
-                                              }: Deps) =>
+  scheduledEventsRepository,
+  eventBus
+}: Deps) =>
   async (req, res) => {
     const id = req.params.id
     const cmd = { ...req.body, createdBy: req.user.id }
@@ -20,7 +20,7 @@ export const updateScheduledCallController = ({
       name: DomainEventCatalog.SCHEDULED_EVENTS__CALL_UPDATED,
       buildingId: updatedCall.event.buildingId,
       userId: req.user.id,
-      note: cmd.note,
+      note: cmd.note
     })
 
     res.status(204).send()

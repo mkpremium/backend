@@ -19,15 +19,13 @@ describe('AddOperatorService', () => {
     const operator = await addUserWithRole(service, UserRoles.BUSINESS as 'BUSINESS')
 
     const user = await postgresUsersRepository.get(operator.id)
-    expect(user.roles).to.eql([ UserRoles.BUSINESS ])
+    expect(user.roles).to.eql([UserRoles.BUSINESS])
   })
 
   it('adds caller', async () => {
     const operator = await addUserWithRole(service, UserRoles.OPERATOR as 'OPERATOR')
 
     const user = await postgresUsersRepository.get(operator.id)
-    expect(user.roles).to.eql([ UserRoles.OPERATOR ])
+    expect(user.roles).to.eql([UserRoles.OPERATOR])
   })
-
 })
-

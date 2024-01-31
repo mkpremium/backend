@@ -3,7 +3,7 @@ import { SQS } from 'aws-sdk'
 import _ from 'lodash'
 import { Logger } from 'winston'
 
-const BATCH_SIZE = parseInt(process.env[ 'BATCH_SIZE' ]) || 1_000
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE) || 1_000
 
 export class CommandPublisher {
   private buffer: Id[] = []
@@ -15,7 +15,7 @@ export class CommandPublisher {
     private listener: string,
     private logger: Logger,
     private addOnly: boolean,
-    private fromCouchbase: string,
+    private fromCouchbase: string
   ) {
   }
 
@@ -65,9 +65,9 @@ export class CommandPublisher {
               name: command,
               addOnly: this.addOnly,
               fromCouchbase: this.fromCouchbase,
-              ids: chunk,
+              ids: chunk
             }
-          }),
+          })
         }))
       }).promise().then(batchResult => {
         batchResult.Failed.forEach(console.error)

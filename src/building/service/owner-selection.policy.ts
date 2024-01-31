@@ -18,8 +18,9 @@ export function selectBuildingOwner<T extends OwnerRelevantToSelectionProps> (
     }
   }
 
-  const lastMeetingOwner = lastMeeting?.ownerId ?
-    ownerOfId(owners, lastMeeting?.ownerId) : undefined
+  const lastMeetingOwner = lastMeeting?.ownerId
+    ? ownerOfId(owners, lastMeeting?.ownerId)
+    : undefined
   if (lastMeetingOwner) {
     return lastMeetingOwner as T
   }
@@ -27,7 +28,7 @@ export function selectBuildingOwner<T extends OwnerRelevantToSelectionProps> (
   const validatedOwners = getValidatedOwners(owners) as T[]
   const nonDiscardedOwners = getNonDiscardedOwners(owners) as T[]
 
-  return validatedOwners[ 0 ] ?? nonDiscardedOwners[ 0 ] ?? undefined
+  return validatedOwners[0] ?? nonDiscardedOwners[0] ?? undefined
 }
 
 function ownerOfId (owners: OwnerRelevantToSelectionProps[], ownerId: string) {

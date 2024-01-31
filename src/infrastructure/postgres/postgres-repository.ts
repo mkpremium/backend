@@ -22,6 +22,7 @@ export abstract class PostgresRepository<S extends { id?: string }, E extends {
   async get (id: string): Promise<S> {
     const entity = await this.repository.findOne({
       where: {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         id: id as any
       },
       relations: this.relations

@@ -10,7 +10,7 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
     const deps = await resolveDependencies()
 
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
-    const [ testOwner, testEmailContact ] =
+    const [testOwner, testEmailContact] =
       await createOwnerWithEmailContact(testBuilding, deps)
     const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
@@ -19,15 +19,15 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
 
     const proposals = await deps.buildingsReadRepository.listProposalsForBuilding(testBuilding.id)
     expect(proposals).to.have.lengthOf(1)
-    expect(proposals[ 0 ]).to.be.deep.contains({
+    expect(proposals[0]).to.be.deep.contains({
       ownerId: testOwner.id,
       createdBy: testFlipper.user.id,
       message: 'test email message',
       notificationStatus: 'PENDING',
-      notificationEmail: testEmailContact.value,
+      notificationEmail: testEmailContact.value
     })
-    expect((proposals[ 0 ] as ProposalProps).proposal).to.be.closeTo(addProposalCmd.amount, 0.001)
-    expect(moment((proposals[ 0 ] as any).createdAt).isSame(moment(), 'day'))
+    expect((proposals[0] as ProposalProps).proposal).to.be.closeTo(addProposalCmd.amount, 0.001)
+    expect(moment((proposals[0] as any).createdAt).isSame(moment(), 'day'))
       .to.be.true
   })
 })

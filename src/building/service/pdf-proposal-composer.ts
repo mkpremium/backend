@@ -14,7 +14,7 @@ export class PdfProposalComposer {
   ): Promise<Buffer> {
     const { city, number, street, type } = building.address
     return createPdf(
-      `${abbrevationTranslations[ type ] || type} ${street} ${number}, ${city}`,
+      `${abbrevationTranslations[type] || type} ${street} ${number}, ${city}`,
       building.cadastre ? building.cadastre.reference : 'XXXXXXXXXXXXX',
       proposalAmount,
       sender
@@ -45,11 +45,11 @@ const createPdf = (
     const lang = sender.language
     const pdf = printer.createPdfKitDocument({
       pageSize: 'A4',
-      pageMargins: [ 40, 15, 40, 0 ], // [left, top, right, bottom]
+      pageMargins: [40, 15, 40, 0], // [left, top, right, bottom]
       content: [
         {
           image: mkpremiumHeaderLogo,
-          fit: [ 150, 150 ],
+          fit: [150, 150],
           style: 'header'
         },
         {
@@ -57,40 +57,40 @@ const createPdf = (
           style: 'dateText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText1' ],
+          text: emailCopies[lang].bodyText1,
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText2' ].replace('%%address%%', address),
+          text: emailCopies[lang].bodyText2.replace('%%address%%', address),
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText3' ],
+          text: emailCopies[lang].bodyText3,
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText4' ].replace('%%address%%', address)
+          text: emailCopies[lang].bodyText4.replace('%%address%%', address)
             .replace('%%cadastre%%', cadastreReference),
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText5' ],
+          text: emailCopies[lang].bodyText5,
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'offer' ].replace('%%offer%%', formatProposalAmount(proposalAmount)),
+          text: emailCopies[lang].offer.replace('%%offer%%', formatProposalAmount(proposalAmount)),
           style: 'offer'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText6' ],
+          text: emailCopies[lang].bodyText6,
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText7' ],
+          text: emailCopies[lang].bodyText7,
           style: 'bodyText'
         },
         {
-          text: emailCopies[ lang ][ 'bodyText8' ],
+          text: emailCopies[lang].bodyText8,
           style: 'bodyText'
         },
         {
@@ -102,49 +102,49 @@ const createPdf = (
           style: 'signText'
         },
         {
-          text: emailCopies[ lang ][ 'footer' ],
+          text: emailCopies[lang].footer,
           style: 'directorText'
         },
         {
           image: mkpremiumStamp,
-          style: 'signImage',
-        },
+          style: 'signImage'
+        }
       ],
       styles: {
         header: {
           alignment: 'center',
-          margin: [ 0, 0, 0, 23 ] // [left, top, right, bottom]
+          margin: [0, 0, 0, 23] // [left, top, right, bottom]
         },
         dateText: {
           alignment: 'left',
           fontSize: 11,
-          margin: [ 30, 10, 30, 18 ] // [left, top, right, bottom]
+          margin: [30, 10, 30, 18] // [left, top, right, bottom]
         },
         bodyText: {
           fontSize: 11,
           alignment: 'justify',
-          margin: [ 30, 10, 30, 10 ]
+          margin: [30, 10, 30, 10]
         },
         offer: {
           fontSize: 11,
           bold: true,
           alignment: 'justify',
-          margin: [ 30, 10, 30, 10 ]
+          margin: [30, 10, 30, 10]
         },
         signText: {
           fontSize: 11,
           alignment: 'left',
-          margin: [ 30, 10, 30, 0 ]
+          margin: [30, 10, 30, 0]
         },
         directorText: {
           fontSize: 11,
           alignment: 'left',
-          margin: [ 30, 0, 30, 10 ]
+          margin: [30, 0, 30, 10]
         },
         signImage: {
           alignment: 'left',
-          margin: [ 30, 0, 0, 0 ]
-        },
+          margin: [30, 0, 0, 0]
+        }
       }
     })
 

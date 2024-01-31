@@ -4,20 +4,20 @@ import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/applic
 import { defaultPassword, operatorCreate, createFlipper, operatorLogin } from '../../common'
 import { createTestApp } from '../../integration/create-test-app'
 
-describe('profit goals', () => {
+describe('profit goals', function () {
   let salesAgent
   let app
 
   const salesAgentProfitGoal = 1500
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     app = await createTestApp()
 
     salesAgent = await createFlipper()
   })
 
-  describe('setProfitGoalToOperator', () => {
-    it('defines goal for an existing sales agent', async () => {
+  describe('setProfitGoalToOperator', function () {
+    it('defines goal for an existing sales agent', async function () {
       const now = new Date()
       const nowStub = () => now
 
@@ -26,7 +26,7 @@ describe('profit goals', () => {
       expect(result.profitGoal).to.deep.equal({ amount: 1500, updatedAt: now })
     })
 
-    it('throws an error when setting profit goal for an non existing sales agent', async () => {
+    it('throws an error when setting profit goal for an non existing sales agent', async function () {
       let error
       try {
         await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
@@ -40,8 +40,8 @@ describe('profit goals', () => {
     })
   })
 
-  describe('endpoint', () => {
-    it('sets profit goal to a sales agent', async () => {
+  describe('endpoint', function () {
+    it('sets profit goal to a sales agent', async function () {
       const operator = await operatorCreate()
       const authenticatedOperator = await operatorLogin(app,
         { username: operator.username, password: defaultPassword })

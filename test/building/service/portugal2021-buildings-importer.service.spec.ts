@@ -15,21 +15,21 @@ describe('Portugal2021BuildingsImporterService', () => {
   let portugal20210BuildingsRepositoryStub
   let buildingsRepositoryStub
   const testCmd: ImportSlugCommand = {
-    slug: 'test-slug',
+    slug: 'test-slug'
   }
 
   beforeEach(() => {
     portugal20210BuildingsRepositoryStub = {
-      pendingWithSlug: stub().withArgs(testCmd.slug).returns(TE.of([ buildSourceBuilding() ])),
-      save: stub().returns(TE.of(undefined)),
+      pendingWithSlug: stub().withArgs(testCmd.slug).returns(TE.of([buildSourceBuilding()])),
+      save: stub().returns(TE.of(undefined))
     }
     buildingsRepositoryStub = {
-      save: stub().resolves({ id: 'test-imported-id' }),
+      save: stub().resolves({ id: 'test-imported-id' })
     }
 
     service = new Portugal2021BuildingsImporterService(
       portugal20210BuildingsRepositoryStub,
-      buildingsRepositoryStub,
+      buildingsRepositoryStub
     )
   })
 
@@ -39,10 +39,10 @@ describe('Portugal2021BuildingsImporterService', () => {
       map(() => {
         expect(buildingsRepositoryStub.save).to.have.been.called
         expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
-          status: 'BUILDING_IMPORTED',
+          status: 'BUILDING_IMPORTED'
         })
       }),
-      orFail(),
+      orFail()
     )()
   })
 
@@ -58,14 +58,14 @@ describe('Portugal2021BuildingsImporterService', () => {
           failure: testSaveFailure.message
         })
       }),
-      orFail(),
+      orFail()
     )()
   })
 
   it('merges buildings with same slug', () => {
     portugal20210BuildingsRepositoryStub.pendingWithSlug.returns(TE.of([
       buildSourceBuilding({ id: 'test-source-building-1' }),
-      buildSourceBuilding({ id: 'test-source-building-2' }),
+      buildSourceBuilding({ id: 'test-source-building-2' })
     ]))
 
     return pipe(
@@ -76,15 +76,14 @@ describe('Portugal2021BuildingsImporterService', () => {
         expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
           id: 'test-source-building-2',
           status: 'MERGED',
-          mergeWith: 'test-source-building-1',
+          mergeWith: 'test-source-building-1'
         })
         expect(portugal20210BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
           id: 'test-source-building-1',
-          status: 'BUILDING_IMPORTED',
+          status: 'BUILDING_IMPORTED'
         })
       }),
-      orFail(),
+      orFail()
     )()
-
   })
 })

@@ -5,14 +5,14 @@ import { OwnerContactStatus } from './owner'
 import { Person } from './person.entity'
 
 @Entity()
-@Index([ 'person', 'contact' ], { unique: true })
+@Index(['person', 'contact'], { unique: true })
 export class PersonContact extends BaseEntity {
   @ManyToOne(() => Person)
-  person: Person
+    person: Person
 
   @ManyToOne(() => Contact)
-  contact: Contact
+    contact: Contact
 
   @Column('text')
-  status: OwnerContactStatus
+    status: OwnerContactStatus
 }

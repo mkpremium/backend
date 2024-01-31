@@ -14,15 +14,15 @@ import {
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 import { Promise } from 'bluebird'
 
-describe('Building listing endpoint (Couchbase)', () => {
+describe('Building listing endpoint (Couchbase)', function () {
   let app, businessUser
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     app = await initApplication()
     businessUser = await createFlipper()
   })
 
-  it('returns list of given building IDs', async () => {
+  it('returns list of given building IDs', async function () {
     const testMetadataId = 'test-metadata-1'
     const building1 = await createBuilding(app, {
       id: 'test-building1',

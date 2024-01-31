@@ -24,7 +24,7 @@ export class PostgresBuildingsRepository
     assignedFlipper: true,
     featuredOwner: true,
     documents: true,
-    proposals: true,
+    proposals: true
   }
   //   BuildingsReadRepository
 
@@ -34,9 +34,9 @@ export class PostgresBuildingsRepository
         {
           where: { assignedFlipper: Equal(flipperId), negotiationStatus: status },
           relations: {
-            documents: true,
+            documents: true
           }
-        },
+        }
       )),
       TE.chain(buildings => TE.of(buildings.map(b => buildingEntityToReadModel(b))))
     )
@@ -47,7 +47,7 @@ export class PostgresBuildingsRepository
       where: { building: Equal(buildingId) },
       relations: {
         author: true,
-        owner: true,
+        owner: true
       }
     })
     return proposals.map(p => ({
@@ -60,9 +60,10 @@ export class PostgresBuildingsRepository
       notificationSentAt: moment(p.notificationSentAt),
       ownerId: p.owner.id,
       state: entityStatusToOldProposal(p.status),
-      notificationEmail: p.notificationEmail,
+      notificationEmail: p.notificationEmail
     }))
   }
+
   protected getEntityTarget (): EntityTarget<Building> {
     return Building
   }
@@ -88,7 +89,7 @@ export function mapBuildingStructToEntity (buildingStruct: BuildingProps) {
     floorArea: typeof buildingStruct.floorArea === 'string' ? parseFloat(buildingStruct.floorArea) : buildingStruct.floorArea,
     publicIdentifier: buildingStruct.cadastre?.reference,
     location: buildingStruct.location,
-    use: buildingStruct.use,
+    use: buildingStruct.use
   }
 }
 
@@ -104,10 +105,12 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
     lead: entity.lead,
     assignedAgentId: entity.assignedFlipper?.id,
     use: entity.use,
-    recentProposal: entity.recentProposal ? {
-      proposal: entity.recentProposal.amount,
-      createdAt: entity.recentProposal.createdAt,
-    } : undefined,
+    recentProposal: entity.recentProposal
+      ? {
+          proposal: entity.recentProposal.amount,
+          createdAt: entity.recentProposal.createdAt
+        }
+      : undefined,
     metadata: entity.documents.map(
       ({ id, name, mimeType, previewUrl, privateUrl }) =>
         ({ id, name, mimeType, previewUrl, url: privateUrl }))
@@ -121,43 +124,51 @@ interface BuildingReadModelData {
 
 export function buildingEntityToReadModel (
   b: Building, extra: BuildingReadModelData = {}): BuildingReadModel {
-  const owner = extra.owners ? selectBuildingOwner(
-    extra.owners!, b.featuredOwner?.id) : undefined // TODO: pass last meeting
+  const owner = extra.owners
+    ? selectBuildingOwner(
+    extra.owners!, b.featuredOwner?.id)
+    : undefined // TODO: pass last meeting
   return {
     id: b.id,
     lead: b.lead,
     negotiationStatus: b.negotiationStatus || undefined,
-    address: b.address ? {
-      neighborhood: b.address.neighborhood ? b.address.neighborhood : undefined,
-      type: b.address.type ? b.address.type : undefined,
-      street: b.address.street ? b.address.street : undefined,
-      number: b.address.number ? b.address.number : undefined,
-      postalCode: b.address.postalCode && b.address.postalCode.number ? {
-        number: b.address.postalCode.number
-      } : undefined,
-      city: b.address.city ? b.address.city : undefined,
-      province: b.address.province
-    } : undefined,
+    address: b.address
+      ? {
+          neighborhood: b.address.neighborhood ? b.address.neighborhood : undefined,
+          type: b.address.type ? b.address.type : undefined,
+          street: b.address.street ? b.address.street : undefined,
+          number: b.address.number ? b.address.number : undefined,
+          postalCode: b.address.postalCode && b.address.postalCode.number
+            ? {
+                number: b.address.postalCode.number
+              }
+            : undefined,
+          city: b.address.city ? b.address.city : undefined,
+          province: b.address.province
+        }
+      : undefined,
     owner: toOwnerInBuildingRead(owner),
     metadata: b.documents.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
       previewUrl,
-      thumbnailUrl: previewUrl,
+      thumbnailUrl: previewUrl
     })),
     latestProposal: b.recentProposal,
     floorArea: b.floorArea,
     cadastreReference: b.publicIdentifier,
     lastMeeting: (extra.lastOfferCreatedAt && {
       dateMeeting: moment(extra.lastOfferCreatedAt).format(),
-      inPerson: false,
+      inPerson: false
     }) || undefined,
-    geolocation: (b.location?.lat && b.location?.lng) ? {
-      latitude: b.location.lat,
-      longitude: b.location.lng
-    } : undefined,
+    geolocation: (b.location?.lat && b.location?.lng)
+      ? {
+          latitude: b.location.lat,
+          longitude: b.location.lng
+        }
+      : undefined,
     usage: b.use,
-    stock: null,
+    stock: null
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,

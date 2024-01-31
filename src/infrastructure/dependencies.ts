@@ -29,9 +29,9 @@ import { BuildingOwnerImportTriggerService } from './service/building-owner-impo
 import { BuildingProposalsImporterService } from './service/building-proposals-importer.service'
 import { BuildingWorkSheetsImporterService } from './service/building-worksheets-importer.service'
 import { BuildingImportTriggerService } from './service/building-import-trigger.service'
-import { CouchbaseDocumentRepository } from "./postgres/couchbase-document.repository";
-import { ScheduledEventImportTriggerService } from "./service/scheduled-event-import-trigger.service";
-import { WorksheetQueueImportTriggerService } from "./postgres/worksheet-queue-import-trigger.service";
+import { CouchbaseDocumentRepository } from './postgres/couchbase-document.repository'
+import { ScheduledEventImportTriggerService } from './service/scheduled-event-import-trigger.service'
+import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-import-trigger.service'
 import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import type { Bucket } from 'couchbase'
 
@@ -69,7 +69,7 @@ async function setupInfrastructureDependencies (container: AwilixContainer, couc
   if (couchbaseBucket) {
     const { CouchbaseAdapter } = await import('../db/couchbase.adapter')
     container.register({
-      couchbaseAdapter: asClass(CouchbaseAdapter).classic(),
+      couchbaseAdapter: asClass(CouchbaseAdapter).classic()
     })
   }
 
@@ -99,6 +99,6 @@ async function setupInfrastructureDependencies (container: AwilixContainer, couc
     buildingOwnerImportTriggerService: asClass(BuildingOwnerImportTriggerService).classic().singleton(),
     buildingProposalsImporterService: asClass(BuildingProposalsImporterService).classic().singleton(),
     buildingWorkSheetsImporterService: asClass(BuildingWorkSheetsImporterService).classic().singleton(),
-    couchbaseDocumentRepository: asClass(CouchbaseDocumentRepository).classic().singleton(),
+    couchbaseDocumentRepository: asClass(CouchbaseDocumentRepository).classic().singleton()
   })
 }

@@ -18,7 +18,6 @@ import t from 'tcomb'
 import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
-
 export interface AddContactCommand {
   ownerId: string
   isFeatured: boolean
@@ -36,7 +35,7 @@ export class AddContactService {
     private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private ormDataSource: DataSource,
     private usePostgres: boolean,
-    private eventBus: EventBus,
+    private eventBus: EventBus
   ) {
   }
 
@@ -66,7 +65,7 @@ export class AddContactService {
       version: '1',
       contactId: savedContact.id,
       ownerId: cmd.ownerId,
-      recording: this.recording,
+      recording: this.recording
     })
 
     return savedContact
@@ -92,7 +91,7 @@ export class AddContactService {
 
     return entityManager.save(Contact, {
       value: cmd.value,
-      type: cmd.type,
+      type: cmd.type
     })
   }
 
@@ -109,7 +108,7 @@ export class AddContactService {
       personAndContactLink = await entityManager.save(PersonContact, {
         person: owner.person,
         contact,
-        status: cmd.status,
+        status: cmd.status
       })
     }
 
@@ -128,12 +127,13 @@ export class AddContactService {
   private async saveInCouchbase (cmd: AddContactCommand): Promise<OwnerProps> {
     const owner = await this.couchbaseOwnersRepository.get(cmd.ownerId)
     let featuredContact = owner.featuredContact
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const newContact = TypedContactInfo(cmd as any)
 
     const { isFeatured } = cmd
     if (isFeatured) {
       featuredContact = FeaturedContact.update(featuredContact || FeaturedContact({}), {
-        [ cmd.type === 'EMAIL' ? 'emailId' : 'phoneId' ]: {
+        [cmd.type === 'EMAIL' ? 'emailId' : 'phoneId']: {
           $set: newContact.id
         }
       })
@@ -145,7 +145,7 @@ export class AddContactService {
         person: PersonStruct.update(owner.person, {
           $merge: {
             contacts: t.update(owner.person.contacts, {
-              $push: [ newContact ]
+              $push: [newContact]
             })
           }
         })
@@ -154,5 +154,4 @@ export class AddContactService {
 
     return await this.couchbaseOwnersRepository.save(updatedOwner)
   }
-
 }

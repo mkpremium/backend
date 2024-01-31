@@ -1,7 +1,6 @@
 import t from 'tcomb'
 import uuid from 'uuid/v4'
 
-
 export type Note = {
   id: string,
   note: string,
@@ -19,7 +18,7 @@ export const TNote = t.struct<Note>(
     context: t.struct({
       buildingId: t.String
     }),
-    _documentType: t.enums.of([ 'note' ])
+    _documentType: t.enums.of(['note'])
   },
   {
     name: 'Note',

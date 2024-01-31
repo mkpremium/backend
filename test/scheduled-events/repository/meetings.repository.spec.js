@@ -4,17 +4,17 @@ import { Meeting } from '../../../src/scheduled-events/domain/meeting'
 import moment from 'moment'
 import { createTestContainer } from '../../create-test-container'
 
-describe('MeetingsRepository', () => {
+describe('MeetingsRepository', function () {
   let scheduledEventsRepository
   let repository
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     const container = await createTestContainer()
     scheduledEventsRepository = container.resolve('scheduledEventsRepository')
     repository = new MeetingsRepository(container.resolve('couchbaseAdapter'))
   })
 
-  it('gets meeting saved by scheduled events repository', async () => {
+  it('gets meeting saved by scheduled events repository', async function () {
     const now = moment()
     const testScheduledEvent = {
       id: 'test-meeting-id',
@@ -42,8 +42,8 @@ describe('MeetingsRepository', () => {
     }))
   })
 
-  describe('futureMeetingsFor', () => {
-    it('returns  only future meetings for user', async () => {
+  describe('futureMeetingsFor', function () {
+    it('returns  only future meetings for user', async function () {
       const pastMeeting = Meeting({
         id: 'test-past-meeting',
         buildingId: 'test-building-id',

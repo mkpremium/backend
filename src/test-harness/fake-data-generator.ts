@@ -11,8 +11,8 @@ export function createOwnerCmd (buildingId: string): AddOwnerCommand {
 
   return {
     buildingId,
-    status: faker.helpers.shuffle([ 'VERIFICADO' as const, 'NO_VERIFICADO' as const ])[ 0 ],
-    type: faker.helpers.shuffle(Object.values(OwnerType))[ 0 ] as OwnerType,
+    status: faker.helpers.shuffle(['VERIFICADO' as const, 'NO_VERIFICADO' as const])[0],
+    type: faker.helpers.shuffle(Object.values(OwnerType))[0] as OwnerType,
     note: 'fake owner',
     person: {
       name: `${ownerFirstName} ${ownerLastName}`,
@@ -22,19 +22,19 @@ export function createOwnerCmd (buildingId: string): AddOwnerCommand {
         id: uuid(),
         type: 'TELEFONO',
         value: '6' + faker.string.numeric(8), // Spanish Mobile Phone Number.
-        status: faker.helpers.shuffle([ 'UNDEFINED' as const, 'GOOD' as const ])[ 0 ]
+        status: faker.helpers.shuffle(['UNDEFINED' as const, 'GOOD' as const])[0]
       }))
-    },
+    }
   }
 }
 
 export const createBuildingReq = () => {
   const streetNumber = faker.number.int().toString()
-  const [ province, city ] = generateCityAndProvince()
+  const [province, city] = generateCityAndProvince()
 
   return ({
     building: {
-      buildingType: faker.helpers.shuffle([ 'VERTICAL', 'HORIZONTAL' ])[ 0 ],
+      buildingType: faker.helpers.shuffle(['VERTICAL', 'HORIZONTAL'])[0],
       address: {
         street: faker.location.street(),
         number: streetNumber,
@@ -42,10 +42,10 @@ export const createBuildingReq = () => {
           number: faker.location.zipCode()
         },
         province,
-        city,
+        city
       },
       location: {}
-    },
+    }
   })
 }
 
@@ -55,20 +55,20 @@ function generateCityAndProvince () {
       'BARCELONA',
       [
         {
-          'weight': 76,
-          'city': 'BADALONA'
+          weight: 76,
+          city: 'BADALONA'
         },
         {
-          'weight': 866,
-          'city': 'L\'HOSPITALET DE LLOBREGAT'
+          weight: 866,
+          city: 'L\'HOSPITALET DE LLOBREGAT'
         },
         {
-          'weight': 62,
-          'city': 'SANTA COLOMA DE GRAMENET'
+          weight: 62,
+          city: 'SANTA COLOMA DE GRAMENET'
         },
         {
-          'weight': 7817,
-          'city': 'BARCELONA'
+          weight: 7817,
+          city: 'BARCELONA'
         }
       ]
     ],
@@ -76,8 +76,8 @@ function generateCityAndProvince () {
       'ILLES BALEARS',
       [
         {
-          'weight': 2657,
-          'city': 'PALMA'
+          weight: 2657,
+          city: 'PALMA'
         }
       ]
     ],
@@ -85,8 +85,8 @@ function generateCityAndProvince () {
       'LISBOA',
       [
         {
-          'weight': 10477,
-          'city': 'LISBOA'
+          weight: 10477,
+          city: 'LISBOA'
         }
       ]
     ],
@@ -94,8 +94,8 @@ function generateCityAndProvince () {
       'LISBOA.',
       [
         {
-          'weight': 7,
-          'city': 'LISBOA.'
+          weight: 7,
+          city: 'LISBOA.'
         }
       ]
     ],
@@ -103,8 +103,8 @@ function generateCityAndProvince () {
       'Lisboa',
       [
         {
-          'weight': 1763,
-          'city': 'Lisboa'
+          weight: 1763,
+          city: 'Lisboa'
         }
       ]
     ],
@@ -112,8 +112,8 @@ function generateCityAndProvince () {
       'MADRID',
       [
         {
-          'weight': 7354,
-          'city': 'MADRID'
+          weight: 7354,
+          city: 'MADRID'
         }
       ]
     ],
@@ -121,8 +121,8 @@ function generateCityAndProvince () {
       'MÁLAGA',
       [
         {
-          'weight': 7216,
-          'city': 'MALAGA'
+          weight: 7216,
+          city: 'MALAGA'
         }
       ]
     ],
@@ -130,12 +130,12 @@ function generateCityAndProvince () {
       'PORTO',
       [
         {
-          'weight': 12244,
-          'city': 'PORTO'
+          weight: 12244,
+          city: 'PORTO'
         },
         {
-          'weight': 878,
-          'city': 'VILA NOVA DE GAIA'
+          weight: 878,
+          city: 'VILA NOVA DE GAIA'
         }
       ]
     ],
@@ -143,8 +143,8 @@ function generateCityAndProvince () {
       'PORTO.',
       [
         {
-          'weight': 17,
-          'city': 'PORTO.'
+          weight: 17,
+          city: 'PORTO.'
         }
       ]
     ],
@@ -152,8 +152,8 @@ function generateCityAndProvince () {
       'Porto',
       [
         {
-          'weight': 4286,
-          'city': 'Porto'
+          weight: 4286,
+          city: 'Porto'
         }
       ]
     ],
@@ -161,8 +161,8 @@ function generateCityAndProvince () {
       'SEVILLA',
       [
         {
-          'weight': 6468,
-          'city': 'SEVILLA'
+          weight: 6468,
+          city: 'SEVILLA'
         }
       ]
     ],
@@ -170,22 +170,22 @@ function generateCityAndProvince () {
       'VALENCIA',
       [
         {
-          'weight': 5926,
-          'city': 'VALENCIA'
+          weight: 5926,
+          city: 'VALENCIA'
         }
       ]
     ]
   ] as [ string, { weight: number, city: string }[] ][]
   const weightedProvinces = weightedCitiesAndProvinces.map(
-    ([ province, cities ]) => ({
-        value: province,
-        weight:
+    ([province, cities]) => ({
+      value: province,
+      weight:
           cities.reduce((count, { weight }) => count + weight, 0)
-      }
+    }
     ))
   const province = faker.helpers.weightedArrayElement(weightedProvinces)
-  const cities = weightedCitiesAndProvinces.find(([ p ]) => p === province)![ 1 ]
+  const cities = weightedCitiesAndProvinces.find(([p]) => p === province)![1]
   const city = faker.helpers.weightedArrayElement(cities.map(({ city, weight }) => ({ value: city, weight })))
 
-  return [ `TEST_${province}`, `TEST_${city}` ]
+  return [`TEST_${province}`, `TEST_${city}`]
 }

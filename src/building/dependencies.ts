@@ -55,7 +55,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
       couchbaseProposalsRepository: asValue(null),
       couchbaseOfferRequestsRepository: asValue(null),
       legacyBuildingsRepository: asValue(null),
-      legacyMetadataRepository: asValue(null),
+      legacyMetadataRepository: asValue(null)
     })
   } else {
     const { CouchbaseBuildingsRepository } = await import('./repository/couchbase-building.repository')
@@ -73,7 +73,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
       couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
       couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
       legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
-      legacyMetadataRepository: asClass(MetadataRepository).singleton(),
+      legacyMetadataRepository: asClass(MetadataRepository).singleton()
     })
   }
 
@@ -139,6 +139,6 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     portugal2021WorksheetInitializerService: asClass(Portugal2021WorksheetInitializerService).classic().singleton(),
 
     // Postgres migration
-    importBuildingCommandHandler: asFunction(importBuildingCommandHandler),
+    importBuildingCommandHandler: asFunction(importBuildingCommandHandler)
   })
 }

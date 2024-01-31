@@ -1,6 +1,6 @@
 import { wrap } from 'express-promise-wrap'
 import { OwnerRepository } from '../owner/repository/owner.repository'
-import { ListBuildingProposalsService } from "./service/list-building-proposals.service";
+import { ListBuildingProposalsService } from './service/list-building-proposals.service'
 
 export function listBuildingProposalsControllerFactory (listBuildingProposalsService: ListBuildingProposalsService) {
   return wrap(async (req, res) => {
@@ -42,7 +42,7 @@ export function updateNegotiationProposalControllerFactory ({ updateProposalServ
   }
 }
 
-export function addOwnerToBuildingControllerFactory ({addOwnerService}) {
+export function addOwnerToBuildingControllerFactory ({ addOwnerService }) {
   return async function (req, res) {
     const owner = await addOwnerService.addOwner(req.body, req.user)
     res.status(201).json(owner)

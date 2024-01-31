@@ -34,6 +34,6 @@ describe('ProposalsRepository(Postgres)', () => {
     await proposalsRepository.save(testPendingProposal)
     const proposalsToBeSend = await proposalsRepository.pendingProposals()
 
-    expect(proposalsToBeSend[ 0 ].id).to.equal(testPendingProposal.id)
+    expect(proposalsToBeSend[0].id).to.equal(testPendingProposal.id)
   })
 })

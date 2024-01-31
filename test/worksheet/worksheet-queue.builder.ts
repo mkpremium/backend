@@ -4,9 +4,9 @@ const queuePrototype: WorksheetQueueProps = {
   id: 'test-worksheet-queue-id',
   name: 'test queue',
   source: {
-    province: 'TEST_BARCELONA',
+    province: 'TEST_BARCELONA'
   },
-  worksheets: [],
+  worksheets: []
 }
 
 export function worksheetQueueBuilder (overrides: Partial<WorksheetQueueProps> = {}) {

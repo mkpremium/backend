@@ -14,4 +14,3 @@ export function createBuildingController (deps: Deps): RequestHandler {
       })
   }
 }
-

@@ -1,11 +1,10 @@
-import {ChangeContactStatusService} from '../../../src/owner/service/change-contact-status.service'
-import {createTestContainer} from '../../create-test-container'
-import {expect} from 'chai'
-import {OwnerStatus} from '../../../src/owner/owner'
-import {buildingFactory} from '../../factories'
-import {BuildingsRepository} from '../../../src/building/repository/buildings.repository'
-import {createOwnerWithPhoneContact} from '../../helpers'
-
+import { ChangeContactStatusService } from '../../../src/owner/service/change-contact-status.service'
+import { createTestContainer } from '../../create-test-container'
+import { expect } from 'chai'
+import { OwnerStatus } from '../../../src/owner/owner'
+import { buildingFactory } from '../../factories'
+import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
+import { createOwnerWithPhoneContact } from '../../helpers'
 
 describe('ChangeContactStatusService(Postgres)', () => {
   let service: ChangeContactStatusService
@@ -13,13 +12,13 @@ describe('ChangeContactStatusService(Postgres)', () => {
   let testContact
 
   beforeEach(async () => {
-    const container = await createTestContainer({postgres: true, couchbase: false})
+    const container = await createTestContainer({ postgres: true, couchbase: false })
     const buildingRepository: BuildingsRepository = await container.resolve('buildingsRepository')
     const testBuilding = await buildingRepository.save(buildingFactory.build())
 
-    const [owner, phoneContact] = await createOwnerWithPhoneContact(testBuilding, {status: 'NO_VERIFICADO'}, {
+    const [owner, phoneContact] = await createOwnerWithPhoneContact(testBuilding, { status: 'NO_VERIFICADO' }, {
       addOwnerService: container.resolve('addOwnerService'),
-      addContactService: container.resolve('addContactService'),
+      addContactService: container.resolve('addContactService')
     })
 
     testOwner = owner
@@ -35,7 +34,7 @@ describe('ChangeContactStatusService(Postgres)', () => {
       ownerId: testOwner.id,
       contactId: testContact.id,
       status: 'GOOD'
-    }, {id: 'test-caller-id'})
+    }, { id: 'test-caller-id' })
 
     expect(updatedOwner.status).to.be.equal(OwnerStatus.VERIFIED)
   })
@@ -47,7 +46,7 @@ describe('ChangeContactStatusService(Postgres)', () => {
       ownerId: testOwner.id,
       contactId: testContact.id,
       status: 'BAD'
-    }, {id: 'test-caller-id'})
+    }, { id: 'test-caller-id' })
     expect(updatedOwner.status).to.be.equal(OwnerStatus.WITHOUT_CONTACT)
   })
 })

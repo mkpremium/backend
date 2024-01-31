@@ -27,6 +27,6 @@ export function buildingEventListeners (eventBus: EventListener, container: Awil
   subscribeToCommand(
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_BUILDING,
     'importBuildingCommandHandler',
-    container,
+    container
   )
 }

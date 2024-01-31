@@ -25,16 +25,16 @@ describe('Portugal2021WorksheetInitializerService', () => {
     }
     portugal2021BuildingsRepositoryStub = {
       get: stub().returns(of(testSourceBuilding)),
-      save: stub().returns(of(undefined)),
+      save: stub().returns(of(undefined))
     }
     worksheetRepositoryStub = {
-      save: stub().resolves(undefined),
+      save: stub().resolves(undefined)
     }
 
     service = new Portugal2021WorksheetInitializerService(
       portugal2021BuildingsRepositoryStub,
       buildingsRepositoryStub,
-      worksheetRepositoryStub,
+      worksheetRepositoryStub
     )
   })
 
@@ -43,10 +43,10 @@ describe('Portugal2021WorksheetInitializerService', () => {
       service.createWorksheetFor(testCmd),
       map(() => {
         expect(worksheetRepositoryStub.save).to.have.been.calledWithMatch({
-          relatedBuildingIds: [ testBuilding.id ]
+          relatedBuildingIds: [testBuilding.id]
         })
       }),
-      orFail(),
+      orFail()
     )()
   })
 
@@ -55,10 +55,10 @@ describe('Portugal2021WorksheetInitializerService', () => {
       service.createWorksheetFor(testCmd),
       map(() => {
         expect(portugal2021BuildingsRepositoryStub.save).to.have.been.calledWithMatch({
-          status: 'WORKSHEET_CREATED',
+          status: 'WORKSHEET_CREATED'
         })
       }),
-      orFail(),
+      orFail()
     )()
   })
 })

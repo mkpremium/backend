@@ -15,7 +15,7 @@ const notesForBuildingQuery = bucketName => `
 export class CouchbaseBuildingNotesRepository extends CouchbaseRepository<Note> implements BuildingNotesRepository {
   forBuildingOfId (buildingId: string): Promise<Note[]> {
     return this.couchbaseAdapter.queryAsync(
-      notesForBuildingQuery(this.bucketName), [ buildingId ]
+      notesForBuildingQuery(this.bucketName), [buildingId]
     ).then(notes => {
       try {
         return fromJSON(notes.map(({ notes }) => notes), t.list(TNote))
@@ -34,7 +34,6 @@ export class CouchbaseBuildingNotesRepository extends CouchbaseRepository<Note> 
     const noteBody = NoteBody(params)
     return this.save(t.update(noteBody, { $merge: { createdBy } }))
   }
-
 
   struct () {
     return TNote

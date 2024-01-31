@@ -9,7 +9,6 @@ import { AwilixContainer } from 'awilix'
 import { Bucket } from 'couchbase'
 import { getDatabase } from './create-container'
 
-
 createApp(getDatabase())
   .then(app => {
     const server = http.createServer(app)

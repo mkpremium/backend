@@ -2,8 +2,7 @@ import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import urlparse from 'url-parse'
 
-
-const parsedDSN = urlparse(process.env[ 'DATABASE_URL' ])
+const parsedDSN = urlparse(process.env.DATABASE_URL)
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: parsedDSN.hostname,
@@ -12,16 +11,16 @@ export const AppDataSource = new DataSource({
   password: parsedDSN.password,
   database: parsedDSN.pathname.substring(1), // remove slash
   synchronize: ['dev', 'test'].includes(process.env.NODE_ENV),
-  logging: !!process.env[ 'DATABASE_LOG' ],
+  logging: !!process.env.DATABASE_LOG,
   entities: [
     '**/*.entity.ts',
-    '**/*.entity.js',
+    '**/*.entity.js'
   ],
   migrations: [
     'migrations/*.ts',
-    'migrations/*.js',
+    'migrations/*.js'
   ],
-  subscribers: [],
+  subscribers: []
 })
 
 export async function initializeDataSource () {

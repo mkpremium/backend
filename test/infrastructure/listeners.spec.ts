@@ -5,7 +5,7 @@ import { Logger } from 'winston'
 import { createContainer } from 'awilix'
 
 describe('startListeners', () => {
-  [ true, false ].forEach(usePostgres => it(`start all listeners without errors (usePostgres=${usePostgres}`, () => {
+  [true, false].forEach(usePostgres => it(`start all listeners without errors (usePostgres=${usePostgres}`, () => {
     const container = createContainer()
     setupContainer(container, null, null, usePostgres)
 

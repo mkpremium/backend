@@ -8,7 +8,7 @@ export class CallcenterWorksheetService {
   constructor (
     private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
     private usePostgres: boolean,
-    private ormDataSource: DataSource,
+    private ormDataSource: DataSource
   ) {
   }
 
@@ -19,8 +19,9 @@ export class CallcenterWorksheetService {
   nextAvailableWorksheetInSource (source: {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    return this.usePostgres ? this.nextAvailableWorksheetInSourcePostgres(source, skipWorksheetId) :
-      this.couchbaseWorksheetRepository.nextAvailableWorksheetInSource(source, skipWorksheetId)
+    return this.usePostgres
+      ? this.nextAvailableWorksheetInSourcePostgres(source, skipWorksheetId)
+      : this.couchbaseWorksheetRepository.nextAvailableWorksheetInSource(source, skipWorksheetId)
   }
 
   private async getPostgresWorksheet (worksheetId: string): Promise<WorksheetViewProps> {
@@ -35,7 +36,7 @@ export class CallcenterWorksheetService {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     let builder = this.getWorksheetQueryBuilder()
-      .where(`building.address ->> 'province' IN (:...provinces)`,
+      .where('building.address ->> \'province\' IN (:...provinces)',
         { provinces: [].concat(source.province) })
       .andWhere('queue.id IS NULL')
     if (skipWorksheetId) {
@@ -72,8 +73,8 @@ function toView (ws: Worksheet): WorksheetViewProps {
       ...o,
       name: o.person.fullName,
       person: {
-        contacts: o.person.contacts.map(oc => ({ ...oc.contact, status: oc.status })),
+        contacts: o.person.contacts.map(oc => ({ ...oc.contact, status: oc.status }))
       }
-    })),
+    }))
   }
 }

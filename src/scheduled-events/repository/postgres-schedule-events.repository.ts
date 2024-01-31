@@ -11,23 +11,23 @@ export interface LastBuildingMeeting {
 }
 
 export class PostgresScheduledEventsRepository extends WithPostgresRepository<ScheduledEvent> implements ScheduledEventsRepository {
-  lastMeetingForBuildings(buildingIds: string[]): Promise<LastBuildingMeeting[]> {
+  lastMeetingForBuildings (buildingIds: string[]): Promise<LastBuildingMeeting[]> {
     return this.repository.createQueryBuilder('meeting')
       .distinctOn(['meeting.buildingId'])
       .select(['meeting.scheduledFor', 'meeting.ownerId', 'meeting.buildingId'])
-      .where('meeting.buildingId IN (:...buildingIds)', {buildingIds})
-      .andWhere('meeting.type = :eventType', {eventType: 'MEETING'})
+      .where('meeting.buildingId IN (:...buildingIds)', { buildingIds })
+      .andWhere('meeting.type = :eventType', { eventType: 'MEETING' })
       .orderBy('meeting.buildingId')
       .addOrderBy('meeting.buildingId', 'DESC')
       .getRawMany<LastBuildingMeeting>()
   }
 
-  async update(id: string, {eventDate}: Pick<ScheduledEventProps, 'eventDate'>): Promise<ScheduledEventProps> {
-    await this.repository.update({id}, {
+  async update (id: string, { eventDate }: Pick<ScheduledEventProps, 'eventDate'>): Promise<ScheduledEventProps> {
+    await this.repository.update({ id }, {
       scheduledFor: eventDate
     })
 
-    const entity = await this.repository.findOne({where: {id}, relations: this.toScheduledCallRelations})
+    const entity = await this.repository.findOne({ where: { id }, relations: this.toScheduledCallRelations })
     return toScheduledEventProps(entity)
   }
 
@@ -38,14 +38,13 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
   // Different to one in the Couchbase repository which seem to be intended for the
   // proposal sender only.
 
-  async lastScheduledEventForBuilding(buildingId: string): Promise<ScheduledEventProps> {
+  async lastScheduledEventForBuilding (buildingId: string): Promise<ScheduledEventProps> {
     const lastBuildingScheduledEvent = await this.repository.findOne({
-      order: {scheduledFor: 'DESC'},
+      order: { scheduledFor: 'DESC' },
       relations: this.toScheduledCallRelations,
-      where: {building: Equal(buildingId)}
+      where: { building: Equal(buildingId) }
     })
-    if (!lastBuildingScheduledEvent)
-      return null
+    if (!lastBuildingScheduledEvent) { return null }
 
     return toScheduledEventProps(lastBuildingScheduledEvent)
   }
@@ -55,15 +54,15 @@ export class PostgresScheduledEventsRepository extends WithPostgresRepository<Sc
     contact: true,
     createdBy: true,
     notifyTo: true,
-    owner: true,
-  };
+    owner: true
+  }
 
-  protected getEntityTarget(): EntityTarget<ScheduledEvent> {
+  protected getEntityTarget (): EntityTarget<ScheduledEvent> {
     return ScheduledEvent
   }
 }
 
-export function toScheduledEventProps(se: ScheduledEvent): ScheduledEventProps {
+export function toScheduledEventProps (se: ScheduledEvent): ScheduledEventProps {
   return {
     id: se.id as ScheduledEventId,
     type: se.type === 'CALL' ? 'CALLS' : 'MEETINGS',
@@ -76,7 +75,7 @@ export function toScheduledEventProps(se: ScheduledEvent): ScheduledEventProps {
       contactId: se.contact.id,
       ownerId: se.owner.id,
       worksheetId: undefined,
-      inPerson: se.type === 'MEETING',
+      inPerson: se.type === 'MEETING'
     }
   }
 }

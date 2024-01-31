@@ -2,8 +2,8 @@ import { createFlipper } from '../../test/common'
 import { authenticatedGet, initApplication } from '../helper/rest-api-helper'
 import { expect } from 'chai'
 
-describe('Property manager profit ranking', () => {
-  it('list property managers ranking with default profit goal', async () => {
+describe('Property manager profit ranking', function () {
+  it('list property managers ranking with default profit goal', async function () {
     const app = await initApplication()
 
     const businessUser = await createFlipper()

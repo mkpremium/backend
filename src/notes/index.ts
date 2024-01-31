@@ -7,7 +7,7 @@ import { asFunction, AwilixContainer } from 'awilix'
 export default (app, diContainer: AwilixContainer, secured) => {
   diContainer.register({
     addNoteController: asFunction(addNoteControllerFactory),
-    listNotesController: asFunction(listNotesControllerFactory),
+    listNotesController: asFunction(listNotesControllerFactory)
   })
 
   const router = Router()

@@ -35,7 +35,7 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
     const testQueue = WorksheetQueue({
       id: 'test-queue-id',
       source: {
-        province: 'TEST_BARCELONA',
+        province: 'TEST_BARCELONA'
       },
       name: 'test-worksheet-queue',
       worksheets: [
@@ -60,13 +60,13 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
       ]
     })
     worksheetQueueRepositoryMock.get.withArgs(testQueueId).resolves(testQueue)
-    const testOpenedWorksheet = worksheetBuilder({id: '3-hours-ago-worksheet'}).build()
+    const testOpenedWorksheet = worksheetBuilder({ id: '3-hours-ago-worksheet' }).build()
     worksheetRepositoryMock.get.withArgs('3-hours-ago-worksheet').resolves(testOpenedWorksheet)
     worksheetRepositoryMock.save.resolves()
 
     await service.release(testUserId, testQueueId)
 
-    const savedQueue = worksheetQueueRepositoryMock.save.lastCall.args[ 0 ]
+    const savedQueue = worksheetQueueRepositoryMock.save.lastCall.args[0]
     expect(savedQueue.worksheets).to.have.lengthOf(2)
     expect(savedQueue.worksheets.find(w => w.id === '3-hours-ago-worksheet')).to.be.undefined
 

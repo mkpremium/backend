@@ -10,13 +10,13 @@ const buildingDocumentsQuery = bucketName => `
 `
 
 export class BuildingDocumentsRepository {
-  constructor(private couchbaseAdapter: CouchbaseAdapter) {
+  constructor (private couchbaseAdapter: CouchbaseAdapter) {
   }
 
-  documentsOfBuilding(buildingId: string): Promise<{ documentId: string, privateUrl: string, mimeType: string }[]> {
+  documentsOfBuilding (buildingId: string): Promise<{ documentId: string, privateUrl: string, mimeType: string }[]> {
     return this.couchbaseAdapter.queryAsync(
       buildingDocumentsQuery(this.couchbaseAdapter.bucketName),
       [buildingId]
-    ).then(docs => docs.map(({id, url, mimeType}) => ({documentId: id, privateUrl: url, mimeType})))
+    ).then(docs => docs.map(({ id, url, mimeType }) => ({ documentId: id, privateUrl: url, mimeType })))
   }
 }

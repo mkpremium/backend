@@ -39,6 +39,6 @@ export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: 
     ownersRepository: aliasTo(usePostgres ? 'postgresOwnersRepository' : 'couchbaseOwnersRepository'),
 
     resetOwnerBadContactsHandler: asFunction(createResetOwnerBadContactsHandler).singleton(),
-    importOwnerCommandHandler: asFunction(importOwnerHandlerFactory).singleton(),
+    importOwnerCommandHandler: asFunction(importOwnerHandlerFactory).singleton()
   })
 }

@@ -26,7 +26,7 @@ describe('BuildingProposalsImporterService', () => {
 
     // Create the parent building.
     await em.save(Building, {
-      ...buildingBuilder({id: buildingId }).build(),
+      ...buildingBuilder({ id: buildingId }).build()
     })
 
     // Create a test proposal document that relates to the parent building.
@@ -34,22 +34,22 @@ describe('BuildingProposalsImporterService', () => {
       documentType: CouchbaseDocumentType.BUILDING_PROPOSAL,
       document: {
         id: proposalId,
-        buildingId: buildingId,
+        buildingId,
         state: 'pendiente',
         proposal: 1000,
         createdAt: new Date(),
 
         // When updatedAt is null, the importer should set it to the createdAt or
         // fallback to the current date.
-        updatedAt: null,
-      },
+        updatedAt: null
+      }
     })
 
     // Execute the import.
     await service.importBuildingProposal(buildingId)
 
     // Retrieve the proposal from the database.
-    const found = await em.findOneByOrFail(Proposal, {id: proposalId})
+    const found = await em.findOneByOrFail(Proposal, { id: proposalId })
 
     // Make sure the updateAt has been set after the start time.
     expect(found.updatedAt).to.be.greaterThan(start)

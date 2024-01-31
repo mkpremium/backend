@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { GetDocumentsSignedURLService } from '../../../src/building/service/get-documents-signed-URL.service'
 import { stub } from 'sinon'
 
-describe('GetDocumentsSignedURLService', () => {
+describe('GetDocumentsSignedURLService', function () {
   const testSignedURL = 'https://bucket.s3.aws.com/document/path?signature'
   const testDocumentPathWithoutInitialSlash = 'document/path'
   const testDocumentPrivateURL = 'https://bucket.s3.aws.com/' + testDocumentPathWithoutInitialSlash
@@ -20,7 +20,7 @@ describe('GetDocumentsSignedURLService', () => {
   let s3ClientMock
   let buildingDocumentsRepositoryMock
 
-  beforeEach(() => {
+  beforeEach(function () {
     s3ClientMock = {
       getSignedUrlPromise: stub()
     }
@@ -34,7 +34,7 @@ describe('GetDocumentsSignedURLService', () => {
     )
   })
 
-  it('returns signed URL', async () => {
+  it('returns signed URL', async function () {
     buildingDocumentsRepositoryMock.documentsOfBuilding.withArgs(testBuildingId).resolves(testBuildingDocuments)
     s3ClientMock.getSignedUrlPromise.withArgs('getObject', {
       Bucket: testDocumentBucket,

@@ -16,7 +16,7 @@ export class LoginService {
     private couchbaseUsersRepository: CouchbaseUsersRepository,
     private postgresUsersRepository: PostgresUserRepository,
     private authTokenIssuerService: AuthTokenIssuerService,
-    private usePostgres: boolean,
+    private usePostgres: boolean
   ) {
   }
 
@@ -60,7 +60,7 @@ export class LoginService {
       flipperId: user.flipperId,
       operator: {
         id: user.id,
-        name: [ user.profile.firstName, user.profile.lastName ].join(' '),
+        name: [user.profile.firstName, user.profile.lastName].join(' '),
         username: user.username,
         city: user.profile.city,
         queueId: user.profile.queueId,

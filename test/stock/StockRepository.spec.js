@@ -6,19 +6,19 @@ import { LegacyBuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 import { createTestContainer } from '../create-test-container'
 
-describe('StockRepository', () => {
+describe('StockRepository', function () {
   let container, stockRepository, stockService
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     container = await createTestContainer()
     stockService = container.resolve('stockService')
     stockRepository = container.resolve('stockRepository')
   })
 
-  describe('getTotalProfitInPeriodByPropertyManager', () => {
-    it('returns total profit made by property owners', async () => {
+  describe('getTotalProfitInPeriodByPropertyManager', function () {
+    it('returns total profit made by property owners', async function () {
       const propertyManager = await createFlipper()
 
       const testBuilding = await LegacyBuildingRepository.createNewBuilding(buildingData)

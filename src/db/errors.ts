@@ -16,7 +16,7 @@ export class EntityNotFound extends Error {
 
 export class KeyNotFound extends Error {
   constructor (readonly key: string) {
-    super(`Key not found ${key}`);
+    super(`Key not found ${key}`)
   }
 }
 

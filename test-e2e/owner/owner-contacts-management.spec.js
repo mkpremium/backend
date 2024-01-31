@@ -10,10 +10,10 @@ import {
 } from '../helper/mother-of-objects'
 import { authenticatedPost, authenticatedPut, initApplication } from '../helper/rest-api-helper'
 
-describe('Building owner contacts management', () => {
+describe('Building owner contacts management', function () {
   let app, businessUser, owner
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     app = await initApplication()
     businessUser = await createFlipper()
     owner = await createOwner(app)
@@ -24,7 +24,7 @@ describe('Building owner contacts management', () => {
     await associateBuildingWithOwner(app, owner, building.id)
   })
 
-  it('updates contact status', async () => {
+  it('updates contact status', async function () {
     await authenticatedPut(`/owners/${owner.id}/contacts/${testPhoneContactId}/status`, businessUser, app, { status: 'BAD' })
       .then(async (response) => {
         expect(response.status).to.be.equal(204)
@@ -42,7 +42,7 @@ describe('Building owner contacts management', () => {
       })
   })
 
-  it('adds a contact', async () => {
+  it('adds a contact', async function () {
     const contactInfoToAdd = {
       type: 'EMAIL',
       value: 'test@example.org',
@@ -60,7 +60,7 @@ describe('Building owner contacts management', () => {
       })
   })
 
-  it('list owners with matching phone number', async () => {
+  it('list owners with matching phone number', async function () {
     await authenticatedPost('/owners/search', businessUser, app, { phoneNumber: testContactPhone })
       .then(async (response) => {
         expect(response.status).to.be.equal(200)

@@ -57,7 +57,7 @@ export const mailer = {
     auth: {
       user: process.env.MAILER_USER,
       pass: process.env.MAILER_PASS
-    },
+    }
   })
 }
 

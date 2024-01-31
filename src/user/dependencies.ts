@@ -26,6 +26,6 @@ export const setupUserDependencies = container => {
 
     importOperatorCommandHandler: asFunction(importOperatorCommandHandler).singleton(),
 
-    loginController: asFunction(createLoginController).singleton(),
+    loginController: asFunction(createLoginController).singleton()
   })
 }

@@ -10,6 +10,5 @@ export const setupUserRoutes = (app, container, secured) => {
   router.delete('/favorites/:buildingId', wrap(
     deleteFavoriteBuildingControllerFactory(container.resolve('flipperFavoritesBuildingsService'))))
 
-
   app.use('/', secured, router)
 }

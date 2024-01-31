@@ -4,11 +4,11 @@ import { UpdateBuildingNegotiationStatusService } from '../../../src/building/se
 import { Building } from '../../../src/building/building'
 import { buildingBuilder } from '../building.builder'
 
-describe('UpdateBuildingNegotiationStatusService', () => {
+describe('UpdateBuildingNegotiationStatusService', function () {
   let buildingsRepository, service, eventBus
   const testBuilding = buildingBuilder().build()
 
-  beforeEach(() => {
+  beforeEach(function () {
     buildingsRepository = {
       get: stub(),
       save: spy()
@@ -30,7 +30,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     'DESCARTADO'
   ]
   validNegotiationStatuses.forEach((status) => {
-    it(`[${status}] saves building with new negotiation status`, async () => {
+    it(`[${status}] saves building with new negotiation status`, async function () {
       await service.updateBuildingStatus(testBuilding.id, { status, userId: 'operator-id' })
 
       expect(buildingsRepository.save).to.have.been
@@ -38,12 +38,12 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     })
   })
 
-  it('rejects invalid negotiation statuses', () => {
+  it('rejects invalid negotiation statuses', function () {
     return expect(service.updateBuildingStatus(testBuilding.id, { status: 'UNKNOWN STATUS', userId: 'operator-id' }))
       .to.be.rejected
   })
 
-  it('publishes negotiation status changed event', async () => {
+  it('publishes negotiation status changed event', async function () {
     await service.updateBuildingStatus(testBuilding.id, { status: 'COMPRADO', userId: 'operator-id' })
 
     expect(eventBus.publish).to.have.been.deep.calledWith({
@@ -54,7 +54,7 @@ describe('UpdateBuildingNegotiationStatusService', () => {
     })
   })
 
-  it('saves source owner as featured owner', async () => {
+  it('saves source owner as featured owner', async function () {
     await service.updateBuildingStatus(testBuilding.id, {
       status: 'COMPRADO',
       userId: 'operator-id',

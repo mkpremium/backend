@@ -61,10 +61,10 @@ export const Worksheet = t.struct<WorksheetProps>({
   _relatedTo: t.maybe(t.String),
 
   lastAddedMeeting: t.maybe(t.struct({
-    id: t.String,
+    id: t.String
   })),
 
-  _documentType: t.enums.of([ 'worksheet' ]),
+  _documentType: t.enums.of(['worksheet']),
 
   buildingAddress: t.maybe(Address),
 
@@ -94,9 +94,9 @@ export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatus
     status: { $set: newStatus },
     statusChangedAt: { $set: utc().toDate() },
     inFreezer: { $set: newStatus === WorkSheetStatus.NO_SALE }
-  }
+  } as any
   if (reason) {
-    spec["statusChangeReason"] = {$set: reason}
+    spec.statusChangeReason = { $set: reason }
   }
   return Worksheet.update(worksheet, spec)
 }
@@ -110,7 +110,6 @@ export function pullOutFreezer (worksheet: WorksheetProps, newStatus: WorksheetS
     lastAddedMeeting: { $set: null }
   })
 }
-
 
 export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string): [ WorksheetQueueProps, WorksheetProps ] => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
@@ -146,13 +145,13 @@ export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetPr
   ]
 }
 
-const takenWorksheetStatuses = [ WorkSheetStatus.TAKEN, WorkSheetStatus.DEFAULT ]
+const takenWorksheetStatuses = [WorkSheetStatus.TAKEN, WorkSheetStatus.DEFAULT]
 
 export function releaseWorksheet (worksheet: WorksheetProps) {
   const worksheetWithoutQueue = Worksheet.update(worksheet, { queueId: { $set: null } })
-  return takenWorksheetStatuses.includes(worksheetWithoutQueue.status) ?
-    setStatus(worksheetWithoutQueue, WorkSheetStatus.AVAILABLE as 'LOOKING_MEETING') :
-    worksheetWithoutQueue
+  return takenWorksheetStatuses.includes(worksheetWithoutQueue.status)
+    ? setStatus(worksheetWithoutQueue, WorkSheetStatus.AVAILABLE as 'LOOKING_MEETING')
+    : worksheetWithoutQueue
 }
 
 export type WorksheetStatusType = 'OPEN'

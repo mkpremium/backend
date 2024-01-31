@@ -13,7 +13,7 @@ interface AddUserCommand {
   isAdmin?: boolean
 }
 
-export const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
+export const passwordRegex = /^(?=.*[A-Za-z])(?=.*\\d).{8,}$/
 
 export async function addUserService (cmd: AddUserCommand) {
   return cmd.em.save(User, {
@@ -22,7 +22,7 @@ export async function addUserService (cmd: AddUserCommand) {
     password: isHashedPassword(cmd.password) ? cmd.password : await hashPassword(assertPasswordIsSecure(cmd.password)),
     enabled: true,
     isAdmin: cmd.isAdmin ?? false,
-    profile: cmd.profile,
+    profile: cmd.profile
   })
 }
 
@@ -38,7 +38,6 @@ function assertPasswordIsSecure (password: string) {
 
   throw new Error('Password is not secure')
 }
-
 
 function isHashedPassword (password: string) {
   return /^\$2\w\$\d{2}\$/.test(password)

@@ -1,4 +1,4 @@
-type EventListener = (event: any) => Promise<any>
+type EventListener = (event: unknown) => Promise<void>
 
 export interface ListenerRegister {
   name: string,
@@ -9,10 +9,10 @@ export class ListenersRegistry {
   readonly listeners: Record<string, ListenerRegister[]> = {}
 
   registry (eventName: string, name: string, subscriber: EventListener) {
-    if (this.listeners[ eventName ] === undefined) {
-      this.listeners[ eventName ] = []
+    if (this.listeners[eventName] === undefined) {
+      this.listeners[eventName] = []
     }
-    this.listeners[ eventName ].push({ name, subscriber })
+    this.listeners[eventName].push({ name, subscriber })
   }
 
   listeningTo (eventName: string): ListenerRegister[] {

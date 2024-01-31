@@ -8,15 +8,15 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
   protected relations = {
     building: true,
     queue: true,
-    lastViewedBy: true,
+    lastViewedBy: true
   }
 
-  async ofBuildingId(buildingId: string): Promise<WorksheetProps> {
-    const entity = await this.repository.findOne({where: {building: {id: buildingId}}, relations: this.relations})
+  async ofBuildingId (buildingId: string): Promise<WorksheetProps> {
+    const entity = await this.repository.findOne({ where: { building: { id: buildingId } }, relations: this.relations })
     return this.entityToStruct(entity)
   }
 
-  protected entityToStruct(entity: Worksheet): WorksheetProps {
+  protected entityToStruct (entity: Worksheet): WorksheetProps {
     return {
       id: entity.id,
       status: entity.status,
@@ -26,20 +26,20 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
       viewedAt: entity.lastViewedAt,
       viewedBy: entity.lastViewedBy?.id,
       statusChangeReason: entity.statusChangeReason,
-      buildingAddress: entity.building.address,
+      buildingAddress: entity.building.address
     }
   }
 
-  protected structToEntity(struct: WorksheetProps): DeepPartial<Worksheet> {
+  protected structToEntity (struct: WorksheetProps): DeepPartial<Worksheet> {
     return this.repository.create(structToEntity(struct))
   }
 
-  protected getEntityTarget(): EntityTarget<Worksheet> {
+  protected getEntityTarget (): EntityTarget<Worksheet> {
     return Worksheet
   }
 }
 
-export function structToEntity  (struct: WorksheetProps): Worksheet {
+export function structToEntity (struct: WorksheetProps): Worksheet {
   return {
     id: struct.id,
     status: struct.status,
@@ -47,9 +47,9 @@ export function structToEntity  (struct: WorksheetProps): Worksheet {
     statusChangeReason: struct.statusChangeReason ?? '',
     lastViewedAt: struct.viewedAt,
     lastViewedBy: struct.viewedBy ? { id: struct.viewedBy } : null,
-    building: { id: struct.relatedBuildingIds[ 0 ] },
+    building: { id: struct.relatedBuildingIds[0] },
     createdAt: new Date(),
     updatedAt: new Date(),
-    queue: struct.queueId ? { id: struct.queueId } : null,
+    queue: struct.queueId ? { id: struct.queueId } : null
   } as Worksheet
 }

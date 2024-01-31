@@ -37,7 +37,7 @@ class UseKeyBlock extends squel.cls.Block {
     this._keyName = name
   }
 
-  _toParamString (options) {
+  _toParamString () {
     if (!this._keyName) {
       return {
         text: '',
@@ -61,7 +61,7 @@ class LetBlock extends squel.cls.Block {
     this._exprs.push({ name, expr })
   }
 
-  _toParamString (options) {
+  _toParamString () {
     if (!this._exprs.length === 0) {
       return {
         text: '',

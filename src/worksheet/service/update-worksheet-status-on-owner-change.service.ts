@@ -4,12 +4,12 @@ import { OwnerRepository } from '../../owner/repository/owner.repository'
 import { some } from 'lodash'
 import { setStatus } from '../domain/worksheet'
 
-const discardedOwnerStatus = [ 'ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT' ]
+const discardedOwnerStatus = ['ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT']
 
 export class UpdateWorksheetStatusOnOwnerChangeService {
   constructor (
     private worksheetRepository: WorksheetRepository,
-    private ownersRepository: OwnerRepository,
+    private ownersRepository: OwnerRepository
   ) {
   }
 

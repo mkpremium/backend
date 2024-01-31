@@ -44,7 +44,7 @@ export const WorksheetQueue = t.struct<WorksheetQueueProps>(
     worksheets: t.list(QueueItem),
     worksheetIndex: t.maybe(t.Number),
 
-    _documentType: t.enums.of([ 'worksheet-queue' ])
+    _documentType: t.enums.of(['worksheet-queue'])
   },
   {
     name: 'WorksheetQueue',
@@ -64,7 +64,7 @@ function calculateWorksheetIdsToDrop (q: WorksheetQueueProps, userId: string, ma
   return _.map(_.drop(userOpenedWorksheets, maxToKeep), 'worksheetId')
 }
 
-export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): [Object, string[]] {
+export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): [object, string[]] {
   const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
 
   return [

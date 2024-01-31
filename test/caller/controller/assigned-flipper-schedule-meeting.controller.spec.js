@@ -4,8 +4,8 @@ import moment from 'moment'
 import { createAssignedFlipperScheduleMeetingController } from '../../../src/caller/controller/assigned-flipper-schedule-meeting.controller'
 import { ClientError } from '../../../src/infrastructure/http'
 
-describe('Assigned Flipper Schedule Meeting Controller', () => {
-  it('schedules meeting for assigned flipper', () => {
+describe('Assigned Flipper Schedule Meeting Controller', function () {
+  it('schedules meeting for assigned flipper', function () {
     const createMeetingSpy = stub().resolves(undefined)
 
     const controller = createAssignedFlipperScheduleMeetingController({
@@ -56,7 +56,7 @@ describe('Assigned Flipper Schedule Meeting Controller', () => {
     })
   })
 
-  it('returns client error on bad request body', () => {
+  it('returns client error on bad request body', function () {
     const controller = createAssignedFlipperScheduleMeetingController({})
 
     const testCallerId = 'test-caller-id'

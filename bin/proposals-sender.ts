@@ -20,4 +20,3 @@ createContainer()
     logger.crit('Starting proposals sender', { message: error.message, stack: error.stack })
     process.exit(1)
   })
-

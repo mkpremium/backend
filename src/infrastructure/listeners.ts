@@ -21,18 +21,18 @@ export async function startListeners (diContainer) {
 
   const migrationProcess = diContainer.resolve('couchbaseToPostgresProcess') as ReturnType<typeof couchbaseToPostgresProcess>
   const logger = diContainer.resolve('logger') as Logger
-  if (process.env.TRIGGER_OPERATORS_MIGRATION === "true") {
+  if (process.env.TRIGGER_OPERATORS_MIGRATION === 'true') {
     await migrationProcess.triggerOperatorsMigration()
   }
-  if (process.env.TRIGGER_BUILDINGS_MIGRATION === "true") {
+  if (process.env.TRIGGER_BUILDINGS_MIGRATION === 'true') {
     logger.info('Triggering building migration')
     await migrationProcess.triggerBuildingMigration()
   }
-  if (process.env.TRIGGER_SCHEDULED_EVENTS_MIGRATION === "true") {
+  if (process.env.TRIGGER_SCHEDULED_EVENTS_MIGRATION === 'true') {
     logger.info('Triggering scheduled events migration')
     await migrationProcess.triggerScheduledEventMigration()
   }
-  if (process.env.TRIGGER_WORKSHEET_QUEUES_MIGRATION === "true") {
+  if (process.env.TRIGGER_WORKSHEET_QUEUES_MIGRATION === 'true') {
     logger.info('Triggering worksheet queues migration')
     await migrationProcess.triggerWorksheetQueueImport()
   }
@@ -43,14 +43,14 @@ export function subscribeToCommand (command: DomainEventCatalog, serviceHandlerN
 export function subscribeToCommand (
   command: DomainEventCatalog,
   serviceHandlerNameOrEventBus: string | EventListener,
-  containerOrService: AwilixContainer | any) {
-  let service: any
+  containerOrService: AwilixContainer | unknown) {
+  let service: (event: unknown) => Promise<void>
   let eventBus: EventListener
   if (typeof serviceHandlerNameOrEventBus === 'string') {
-    service = containerOrService.resolve(serviceHandlerNameOrEventBus)
-    eventBus = containerOrService.resolve('eventBus') as EventListener
+    service = (containerOrService as AwilixContainer).resolve(serviceHandlerNameOrEventBus)
+    eventBus = (containerOrService as AwilixContainer).resolve('eventBus') as EventListener
   } else {
-    service = containerOrService
+    service = containerOrService as (event: unknown) => Promise<void>
     eventBus = serviceHandlerNameOrEventBus
   }
 
@@ -61,6 +61,6 @@ export function subscribeToCommand (
   )
 }
 
-export function commandHandlerName(command: DomainEventCatalog) {
+export function commandHandlerName (command: DomainEventCatalog) {
   return `${command}_handler`
 }

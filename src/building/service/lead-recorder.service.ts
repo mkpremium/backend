@@ -1,5 +1,5 @@
 import { BuildingsRepository } from '../repository/buildings.repository'
-import { constVoid, pipe } from 'fp-ts/function'
+import { pipe } from 'fp-ts/function'
 import { fromPromise } from '../../infrastructure/fp-utils'
 import * as TE from 'fp-ts/TaskEither'
 import { withCapturedLead } from '../building'
@@ -24,7 +24,7 @@ export interface LeadCaptured {
 export class LeadRecorderService {
   constructor (
     private buildingsRepository: BuildingsRepository,
-    private eventBus: EventPublisher,
+    private eventBus: EventPublisher
   ) {
   }
 
@@ -40,14 +40,14 @@ export class LeadRecorderService {
           const lead = withCapturedLead(building, cmd.toFlipperId, {
             ownerId: cmd.ownerId,
             contactId: cmd.contactId,
-            worksheetId: cmd.worksheetId,
+            worksheetId: cmd.worksheetId
           })
           return fromPromise(this.buildingsRepository.save(lead))
         }
       ),
       TE.chain(() => fromPromise(this.eventBus.publish({
         name: DomainEventCatalog.BUILDING__LEAD_CAPTURED,
-        ...cmd,
+        ...cmd
       } as LeadCaptured)))
     )
   }

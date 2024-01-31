@@ -9,7 +9,7 @@ const userPrototype: UserProps = {
     lastName: 'User-Surname',
     city: 'User CITY',
     language: 'es',
-    email: 'user@email.test',
+    email: 'user@email.test'
   },
   enable: true,
   roles: []

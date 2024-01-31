@@ -16,15 +16,15 @@ import { CallcenterWorksheetService } from './service/callcenter-worksheet.servi
 import { CouchbaseWorksheetQueueRepository } from './repository/couchbase-worksheet-queue.repository'
 import { CouchbaseCallSchedulerService } from './service/couchbase-call-scheduler.service'
 import { PostgresWorksheetQueueRepository } from './repository/postgres-worksheet-queue.repository'
-import { FreezerService } from "./service/freezer.service";
-import { importWorksheetQueueHandlerFactory } from "./service/import-worksheet-queue-command-handler.service";
+import { FreezerService } from './service/freezer.service'
+import { importWorksheetQueueHandlerFactory } from './service/import-worksheet-queue-command-handler.service'
 
 export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) => {
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
     callcenterWorksheetService: asClass(CallcenterWorksheetService).classic().singleton(),
-    freezerService:asClass(FreezerService).classic().singleton(),
+    freezerService: asClass(FreezerService).classic().singleton(),
     importWorksheetQueueHandler: asFunction(importWorksheetQueueHandlerFactory).singleton(),
     syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asClass(
       SyncWorksheetStatusOnBuildingNegotiationStatusChangeService).singleton().classic(),
@@ -41,7 +41,7 @@ export const setupWorksheetDependencies = (diContainer, usePostgres: boolean) =>
     worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
     couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton(),
     postgresQueueRepository: asClass(PostgresWorksheetQueueRepository).classic().singleton(),
-    worksheetQueueRepository: aliasTo(usePostgres ? 'postgresQueueRepository' :'couchbaseWorksheetQueueRepository'),
-    legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton(),
+    worksheetQueueRepository: aliasTo(usePostgres ? 'postgresQueueRepository' : 'couchbaseWorksheetQueueRepository'),
+    legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton()
   })
 }

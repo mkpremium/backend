@@ -3,7 +3,7 @@ import { createAssignedFlipperBlockedAvailabilityController } from '../../../src
 import { spy, stub } from 'sinon'
 
 describe('Assigned Flipper Blocked Availability Controller', function () {
-  it('returns client error when caller does not have a flipper assigned', () => {
+  it('returns client error when caller does not have a flipper assigned', function () {
     const controller = createAssignedFlipperBlockedAvailabilityController({})
     const testRequest = {
       user: {
@@ -18,7 +18,7 @@ describe('Assigned Flipper Blocked Availability Controller', function () {
     })
   })
 
-  it('returns assigned flipper blocked availability', () => {
+  it('returns assigned flipper blocked availability', function () {
     const blockedAvailabilityForFlipperStub = stub()
     const flipperBlockedAvailabilityFromService = []
     const testAssignedFlipperId = 'test-assigned-flipper-id'

@@ -6,6 +6,7 @@ import { validate } from 'tcomb-validation'
 import { Factory } from 'rosie'
 import { addProposal, createOwnerWithEmailContact, resolveDependencies } from '../../helpers'
 import { buildingFactory } from '../../factories'
+import type { MaybeFeaturedContact } from '../../../src/owner/service/add-contact.service'
 
 describe('CallcenterWorksheetService', () => {
   it('gets worksheet with callcenter view', async () => {
@@ -13,19 +14,19 @@ describe('CallcenterWorksheetService', () => {
 
     const testBuilding = await deps.buildingsRepository.save(buildingBuilder({
       cadastre: {
-        reference: 'test-cadastre-reference',
-      },
+        reference: 'test-cadastre-reference'
+      }
     }).build())
 
-    const [ testOwner, testEmailContact ] =
+    const [testOwner, testEmailContact] =
       await createOwnerWithEmailContact(testBuilding, deps)
     const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
     await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps)
 
     const testWorksheet = await deps.worksheetRepository.save(worksheetBuilder({
-        relatedBuildingIds: [ testBuilding.id ]
-      }).build()
+      relatedBuildingIds: [testBuilding.id]
+    }).build()
     )
 
     const result =
@@ -41,14 +42,14 @@ describe('CallcenterWorksheetService', () => {
 
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
 
-    const [ _, testEmailContact ] =
-      await createOwnerWithEmailContact(testBuilding, deps)
+    const result = await createOwnerWithEmailContact(testBuilding, deps)
+    const testEmailContact = result.pop() as MaybeFeaturedContact
 
     const testWorksheet = await deps.worksheetRepository.save(worksheetBuilder({
-        relatedBuildingIds: [ testBuilding.id ]
-      }).build())
+      relatedBuildingIds: [testBuilding.id]
+    }).build())
 
-    const nextWorksheet = await deps.callcenterWorksheetService.nextAvailableWorksheetInSource({province: testBuilding.address.province})
+    const nextWorksheet = await deps.callcenterWorksheetService.nextAvailableWorksheetInSource({ province: testBuilding.address.province })
 
     expect(nextWorksheet.id).to.be.equal(testWorksheet.id)
     expect(nextWorksheet.relatedOwners[0].person.contacts[0].value).to.be.equal(testEmailContact.value)

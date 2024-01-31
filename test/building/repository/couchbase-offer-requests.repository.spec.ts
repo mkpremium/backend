@@ -21,7 +21,7 @@ describe('CouchbaseOfferRequestsRepository', () => {
   let worksheetRepository: WorksheetRepository
 
   before(async () => {
-    const container = await createTestContainer({postgres: false, couchbase: true})
+    const container = await createTestContainer({ postgres: false, couchbase: true })
     buildingsRepository = container.resolve('buildingsRepository')
     ownersRepository = container.resolve('ownersRepository')
     worksheetRepository = container.resolve('worksheetRepository')
@@ -50,8 +50,8 @@ describe('CouchbaseOfferRequestsRepository', () => {
       .then(async () => {
         const flipperNegotiations = await listBuildingsService.buildingsOfId(testBuilding.id)
         expect(flipperNegotiations).to.be.lengthOf(1)
-        expect(flipperNegotiations[ 0 ].lastMeeting.inPerson).to.be.false
-        expect(moment(flipperNegotiations[ 0 ].lastMeeting.dateMeeting).isSame(moment(), 'day')).to.be.true
+        expect(flipperNegotiations[0].lastMeeting.inPerson).to.be.false
+        expect(moment(flipperNegotiations[0].lastMeeting.dateMeeting).isSame(moment(), 'day')).to.be.true
       })
   })
 })

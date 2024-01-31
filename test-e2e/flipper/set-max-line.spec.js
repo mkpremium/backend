@@ -2,8 +2,8 @@ import { authenticatedGet, authenticatedPut, initApplication } from '../helper/r
 import { createAdminUser, createFlipper } from '../../test/common'
 import { expect } from 'chai'
 
-describe('Flipper Max Line', () => {
-  it('sets max line allow to flipper', async () => {
+describe('Flipper Max Line', function () {
+  it('sets max line allow to flipper', async function () {
     const app = await initApplication()
 
     const flipper = await createFlipper()

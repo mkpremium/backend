@@ -14,7 +14,7 @@ export const createAddScheduledCallController = ({ scheduleCall, scheduledCallsS
     const scheduledEvent = await scheduleCall.scheduleCall({
       event: req.body,
       userId: req.user.id,
-      queueId: req.user.operator.profile.queueId,
+      queueId: req.user.operator.profile.queueId
     })
 
     const fullScheduledEvent = await scheduledCallsService.getById(scheduledEvent.id)

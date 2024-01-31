@@ -1,6 +1,6 @@
 import * as TE from 'fp-ts/TaskEither'
 import { BuildingReadModel } from '../repository/buildings-read.repository'
-import { CouchbaseBuildingsReadRepository } from "../repository/couchbase-buildings-read.repository";
+import { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
 
 export interface ByCadastreReferenceCommand {
   cadastreReference: string
@@ -8,7 +8,7 @@ export interface ByCadastreReferenceCommand {
 
 export class BuildingSearcherService {
   constructor (
-    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
+    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository
   ) {
   }
 

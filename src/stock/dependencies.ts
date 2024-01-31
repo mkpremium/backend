@@ -1,4 +1,3 @@
-
 import { asClass, asValue, type AwilixContainer } from 'awilix'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 
@@ -8,7 +7,7 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       stockRepository: asValue(null),
       legacyStockRepository: asValue(null),
       propertyManagersRepository: asValue(null),
-      stockService: asValue(null),
+      stockService: asValue(null)
     })
   } else {
     const { PropertyManagerRepository } = await import('../property-manager/PropertyManagerRepository')
@@ -22,11 +21,11 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       legacyStockRepository: asClass(LegacyStockRepository).singleton(),
       propertyManagersRepository: asClass(PropertyManagerRepository).classic().singleton(),
       stockService: asClass(StockService).classic().singleton(),
-      stockSalesService: asClass(StockSalesService).classic().singleton(),
+      stockSalesService: asClass(StockSalesService).classic().singleton()
     })
   }
 
   container.register({
-    propertyManagerRankingService: asClass(PropertyManagerRankingService).classic().singleton(),
+    propertyManagerRankingService: asClass(PropertyManagerRankingService).classic().singleton()
   })
 }

@@ -16,7 +16,7 @@ describe('UsersRepository (Couchbase)', () => {
 
   it('finds operator with favorite building', async () => {
     const testBuildingId = 'test-building-id'
-    const testFlipper = userBuilder({ favoriteBuildings: [ testBuildingId ] }).build()
+    const testFlipper = userBuilder({ favoriteBuildings: [testBuildingId] }).build()
     await repository.save(testFlipper)
 
     await pipe(
@@ -24,8 +24,7 @@ describe('UsersRepository (Couchbase)', () => {
       map(foundFlipper => {
         expect(foundFlipper.id).to.eql(testFlipper.id)
       }),
-      orFail(),
+      orFail()
     )()
   })
 })
-

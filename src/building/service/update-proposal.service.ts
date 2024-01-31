@@ -19,7 +19,7 @@ export class UpdateProposalService {
     const cmd: UpdateProposalCommand = {
       proposalId,
       callerId,
-      patch: proposalUpdate,
+      patch: proposalUpdate
     }
 
     return this.usePostgres ? this.updateProposalInPostgres(cmd) : this.updateProposalInCouchbase(cmd)
@@ -28,7 +28,7 @@ export class UpdateProposalService {
   private updateProposalInPostgres (cmd: UpdateProposalCommand) {
     return this.postgresProposalsRepository.save({
       ...cmd.patch,
-      id: cmd.proposalId,
+      id: cmd.proposalId
     } as ProposalProps)
   }
 

@@ -24,7 +24,7 @@ export class EmailSenderService {
       subject: email.subject,
       html: email.message,
       text: email.message,
-      attachments: [ email.attachment ]
+      attachments: [email.attachment]
     })
   }
 }

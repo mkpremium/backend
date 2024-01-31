@@ -7,14 +7,14 @@ import t from 'tcomb'
 import _find from 'lodash/find'
 import { WorksheetProps } from '../domain/worksheet'
 import { Logger } from 'winston'
-import { CouchbaseWorksheetRepository } from "../repository/couchbase-worksheet.repository";
-import { CouchbaseWorksheetQueueRepository } from "../repository/couchbase-worksheet-queue.repository";
+import { CouchbaseWorksheetRepository } from '../repository/couchbase-worksheet.repository'
+import { CouchbaseWorksheetQueueRepository } from '../repository/couchbase-worksheet-queue.repository'
 
 export class CouchbaseCallSchedulerService {
   constructor (
     private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
     private couchbaseWorksheetQueueRepository: CouchbaseWorksheetQueueRepository,
-    private logger: Logger,
+    private logger: Logger
   ) {
   }
 
@@ -28,7 +28,7 @@ export class CouchbaseCallSchedulerService {
     const operatorId = scheduledEvent.notifyTo
     let item = findItemByWorksheetId(queue, worksheetId)
     if (!item) {
-      this.logger.warning('Worksheet added to queue while scheduling', {worksheetId: worksheet.id, queueId: queue.id})
+      this.logger.warning('Worksheet added to queue while scheduling', { worksheetId: worksheet.id, queueId: queue.id })
       queue = addWorksheet(queue, worksheet)
       item = _.find(queue.worksheets, i => i.worksheetId === worksheetId)
     }

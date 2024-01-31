@@ -2,8 +2,8 @@ import { createScheduledCallListener } from '../../../src/building/event-listene
 import { expect } from 'chai'
 import { stub } from 'sinon'
 
-describe('call-scheduled.listener', () => {
-  it('sets owner with call scheduled as featured owner', () => {
+describe('call-scheduled.listener', function () {
+  it('sets owner with call scheduled as featured owner', function () {
     const featuredOwnerServiceStub = {
       setBuildingFeaturedOwner: stub()
     }

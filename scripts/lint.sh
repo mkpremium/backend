@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-npx eslint './**/*.+(js)' "$@"
+npx eslint './**/*.+([tj]s)' "$@"

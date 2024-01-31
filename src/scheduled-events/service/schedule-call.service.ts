@@ -7,7 +7,7 @@ import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-sche
 import { DataSource } from 'typeorm'
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { toScheduledEventProps } from '../repository/postgres-schedule-events.repository'
-import { CouchbaseWorksheetRepository } from "../../worksheet/repository/couchbase-worksheet.repository";
+import { CouchbaseWorksheetRepository } from '../../worksheet/repository/couchbase-worksheet.repository'
 
 export interface ScheduleCallCommand {
   event: Omit<CallScheduledProps, 'id' | 'type' | 'createdAt' | 'createdBy'> & {
@@ -37,7 +37,7 @@ export class ScheduleCallService {
     private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
     private eventBus: EventPublisher,
     private usePostgres: boolean,
-    private ormDataSource: DataSource,
+    private ormDataSource: DataSource
   ) {
   }
 
@@ -53,7 +53,7 @@ export class ScheduleCallService {
       createdBy: { id: cmd.userId },
       building: { id: cmd.event.event.buildingId },
       contact: { id: cmd.event.event.contactId },
-      owner: { id: cmd.event.event.ownerId },
+      owner: { id: cmd.event.event.ownerId }
     }) as ScheduledEvent
 
     await this.publishCallScheduledEvent(cmd)

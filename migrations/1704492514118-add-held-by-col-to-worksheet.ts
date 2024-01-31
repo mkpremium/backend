@@ -11,7 +11,7 @@ export class AddHeldByColToWorksheet1704492514118 implements MigrationInterface 
   }
 
   public async down (queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "worksheet" DROP CONSTRAINT "FK_2981287144270cebf03bfe13714"`)
-    await queryRunner.query(`ALTER TABLE "worksheet" DROP COLUMN "heldById"`)
+    await queryRunner.query('ALTER TABLE "worksheet" DROP CONSTRAINT "FK_2981287144270cebf03bfe13714"')
+    await queryRunner.query('ALTER TABLE "worksheet" DROP COLUMN "heldById"')
   }
 }

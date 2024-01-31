@@ -74,16 +74,16 @@ export class CouchbaseAdapter {
 
   queryAsync (query: string, params?, opts?: { queryName: string }): Promise<any[]> {
     return this.withRetry(() => {
-        const beeline = honeycomb()
-        const spanInfo = { name: 'couchbase_query' }
-        if (opts) {
-          spanInfo[ 'query_name' ] = opts.queryName
-        }
-
-        const span = beeline.startSpan(spanInfo)
-        return this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
-          .finally(() => beeline.finishSpan(span))
+      const beeline = honeycomb()
+      const spanInfo = { name: 'couchbase_query' }
+      if (opts) {
+        spanInfo.query_name = opts.queryName
       }
+
+      const span = beeline.startSpan(spanInfo)
+      return this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
+        .finally(() => beeline.finishSpan(span))
+    }
     ).catch(error => {
       throw new QueryError(query, error.message, params, error.code)
     })
@@ -129,10 +129,10 @@ export class CouchbaseAdapter {
       interval: 1000,
       backoff: 1.5,
       predicate: ({
-                    code,
-                    message,
-                    isOperational,
-                  }) => isOperational || code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
+        code,
+        message,
+        isOperational
+      }) => isOperational || code === couchbaseErrors.temporaryError || message.includes('Indexer rollback from')
     })
   }
 }
