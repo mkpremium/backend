@@ -8,8 +8,7 @@ describe('Flipper Availability Controller', () => {
     const flipperAvailabilityServiceStub = { blockedAvailabilityForFlipper: stub() }
     flipperAvailabilityServiceStub.blockedAvailabilityForFlipper.withArgs('test-flipper-id').resolves(flipperAvailability)
 
-    const controller = createFlipperBlockedAvailabilityController({
-      flipperAvailabilityService: flipperAvailabilityServiceStub })
+    const controller = createFlipperBlockedAvailabilityController({ flipperAvailabilityService: flipperAvailabilityServiceStub })
 
     const testRequest = { params: { flipperId: 'test-flipper-id' } }
     const testResponse = { json: spy() }

@@ -15,7 +15,7 @@ describe('Flipper Max Line', () => {
         expect(response.status).to.be.equal(200)
       })
 
-    return authenticatedGet(`/me`, flipper, app)
+    return authenticatedGet('/me', flipper, app)
       .then(response => {
         expect(response.body.maxLine).to.be.equal(testMaxLine)
       })

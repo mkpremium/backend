@@ -43,7 +43,7 @@ describe('AddOfferRequest', () => {
       .build()
     )
     await buildingsRepository.save(buildingBuilder({ id: testCmd.buildingId }).build())
-    await worksheetRepository.save(worksheetBuilder({id: testCmd.worksheetId}).build())
+    await worksheetRepository.save(worksheetBuilder({ id: testCmd.worksheetId }).build())
     await addOfferRequestService.addOfferRequest(testCmd)
 
     await delayForConsistency()
@@ -59,7 +59,7 @@ describe('AddOfferRequest', () => {
     const notes = await buildingNotesRepository.forBuildingOfId(testCmd.buildingId)
 
     expect(notes).to.be.lengthOf(1)
-    expect(notes[ 0 ].note).to.be.equal(testCmd.note)
+    expect(notes[0].note).to.be.equal(testCmd.note)
   })
 
   it('sets owner as featured for building', async () => {

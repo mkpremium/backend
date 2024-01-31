@@ -7,7 +7,7 @@ import { SuperSellAward } from '../operator/Awards/SuperSellAward'
 
 export function createTransaction (params = {}, operatorId) {
   return Transaction({
-    operatorId: operatorId,
+    operatorId,
     reservationAmount: params.reservationAmount,
     reservationDate: new Date(params.reservationDate),
     transactionAmount: params.transactionAmount,
@@ -79,7 +79,7 @@ export async function closeSellStock (params, operatorId) {
 
   const close = {
     operatorId,
-    gain: gain,
+    gain,
     transactionDate: new Date()
   }
   const updatedStock = t.update(stock, { close: { $set: close }, currentStatus: { $set: StockStatuses.CLOSE } })

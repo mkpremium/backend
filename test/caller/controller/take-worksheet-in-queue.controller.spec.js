@@ -32,7 +32,7 @@ describe('Take Worksheet In Queue Controller', () => {
       json: spy()
     }
 
-    const takenWorksheet = {id: 'taken-worksheet'}
+    const takenWorksheet = { id: 'taken-worksheet' }
     worksheetQueueActionsServiceMock.takeWorksheetInQueue.withArgs(
       testCallerAssignedQueueId,
       testWorksheetId,

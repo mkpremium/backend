@@ -32,7 +32,7 @@ export class PropertyManagerRankingService {
         maxLine: pm.maxLine
       }
     }).sort((a, b) => b.percentageGoal - a.percentageGoal)
-      .map((elem, idx) => ({...elem, rank: idx + 1}))
+      .map((elem, idx) => ({ ...elem, rank: idx + 1 }))
   }
 }
 

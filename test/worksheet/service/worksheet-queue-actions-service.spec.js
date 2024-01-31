@@ -67,17 +67,17 @@ describe('WorksheetQueueActionsService', () => {
 
     it('adds worksheet to queue', () => {
       expect(queueRepositoryMock.save).to.have.been.calledOnce
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets).to.have.lengthOf(1)
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].worksheetId).to.equal(testWorksheetId)
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].operatorId).to.equal(testUserId)
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].status).to.equal('OPENED')
+      expect(queueRepositoryMock.save.firstCall.args[0].worksheets).to.have.lengthOf(1)
+      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].worksheetId).to.equal(testWorksheetId)
+      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].operatorId).to.equal(testUserId)
+      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].status).to.equal('OPENED')
     })
 
     it('updates worksheet with assigned queue and view timestamp', () => {
       expect(worksheetRepositoryMock.save).to.have.been.calledOnce
-      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].viewedAt.valueOf())
+      expect(worksheetRepositoryMock.save.firstCall.args[0].viewedAt.valueOf())
         .to.be.closeTo(utc().toDate().valueOf(), 100)
-      expect(worksheetRepositoryMock.save.firstCall.args[ 0 ].queueId)
+      expect(worksheetRepositoryMock.save.firstCall.args[0].queueId)
         .to.be.equal(testQueueId)
     })
 
@@ -123,8 +123,8 @@ describe('WorksheetQueueActionsService', () => {
       await service.removeScheduledCallFromWorksheets(testScheduledCallId)
 
       expect(queueRepositoryMock.save).to.have.been.calledOnce
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].event).to.be.undefined
-      expect(queueRepositoryMock.save.firstCall.args[ 0 ].worksheets[ 0 ].status).to.be.equal(QueueItemStatus.AVAILABLE)
+      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].event).to.be.undefined
+      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].status).to.be.equal(QueueItemStatus.AVAILABLE)
     })
   })
 })

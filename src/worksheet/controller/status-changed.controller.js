@@ -2,7 +2,8 @@ import { setStatus } from '../domain/worksheet'
 
 export const createStatusChangedController = ({ worksheetRepository }) => (req, res) => {
   const worksheetsId = typeof req.query.worksheetId === 'string'
-    ? [ req.query.worksheetId ] : req.query.worksheetId
+    ? [req.query.worksheetId]
+    : req.query.worksheetId
 
   return Promise.all(
     worksheetsId.map(async worksheetId => {

@@ -34,43 +34,43 @@ describe('FlipperAvailabilityService', () => {
       withAgentOfId: 'test-flipper-id',
       meetingAt: moment()
     })
-    meetingsServiceStub.futureMeetingsFor.withArgs('test-flipper-id').resolves([ testMeeting ])
+    meetingsServiceStub.futureMeetingsFor.withArgs('test-flipper-id').resolves([testMeeting])
 
     return service.blockedAvailabilityForFlipper('test-flipper-id')
       .then(blockedAvailability => {
         expect(blockedAvailability).to.have.length(1)
-        expect(blockedAvailability[ 0 ].type).to.be.equal('MEETING')
-        expect(blockedAvailability[ 0 ].meetingId).to.be.equal(testMeeting.id)
-        expect(blockedAvailability[ 0 ].buildingId).to.be.equal(testMeeting.buildingId)
-        expect(blockedAvailability[ 0 ].startsAt).to.be.equal(testMeeting.meetingAt)
-        expect(blockedAvailability[ 0 ].endsAt).to.satisfies(m => testMeeting.meetingAt.add(1, 'hour').isSame(m, 'minute'))
+        expect(blockedAvailability[0].type).to.be.equal('MEETING')
+        expect(blockedAvailability[0].meetingId).to.be.equal(testMeeting.id)
+        expect(blockedAvailability[0].buildingId).to.be.equal(testMeeting.buildingId)
+        expect(blockedAvailability[0].startsAt).to.be.equal(testMeeting.meetingAt)
+        expect(blockedAvailability[0].endsAt).to.satisfies(m => testMeeting.meetingAt.add(1, 'hour').isSame(m, 'minute'))
       })
   })
 
   it('returns restrictions as blocked availability', () => {
     const startsAt = moment()
     const testUserBlockedAvailability = {
-      startsAt: startsAt,
+      startsAt,
       endsAt: startsAt.clone().add(1, 'hour')
     }
-    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([ testUserBlockedAvailability ])
+    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([testUserBlockedAvailability])
 
     return service.blockedAvailabilityForFlipper('test-flipper-id')
       .then(blockedAvailability => {
         expect(blockedAvailability).to.have.length(1)
-        expect(blockedAvailability[ 0 ].type).to.be.equal('BLOCKED-AVAILABILITY')
-        expect(blockedAvailability[ 0 ].startsAt).to.be.equal(testUserBlockedAvailability.startsAt)
-        expect(blockedAvailability[ 0 ].endsAt).to.be.equal(testUserBlockedAvailability.endsAt)
+        expect(blockedAvailability[0].type).to.be.equal('BLOCKED-AVAILABILITY')
+        expect(blockedAvailability[0].startsAt).to.be.equal(testUserBlockedAvailability.startsAt)
+        expect(blockedAvailability[0].endsAt).to.be.equal(testUserBlockedAvailability.endsAt)
       })
   })
 
   it('doesnt return passed restrictions as blocked availability', () => {
     const startsAt = moment().add(-1, 'day')
     const testUserBlockedAvailability = {
-      startsAt: startsAt,
+      startsAt,
       endsAt: startsAt.clone().add(1, 'hour')
     }
-    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([ testUserBlockedAvailability ])
+    userBlockedAvailabilityServiceStub.blockedAvailabilityForUser.withArgs('test-flipper-id').resolves([testUserBlockedAvailability])
 
     return service.blockedAvailabilityForFlipper('test-flipper-id')
       .then(blockedAvailability => {

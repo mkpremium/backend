@@ -24,7 +24,7 @@ describe('set building sale price', () => {
     await authenticatedGet(`/buildings?id=${building.id}`, businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
-        expect(response.body[ 0 ].salePrice).to.be.equal(salePrice)
+        expect(response.body[0].salePrice).to.be.equal(salePrice)
       })
   })
 })

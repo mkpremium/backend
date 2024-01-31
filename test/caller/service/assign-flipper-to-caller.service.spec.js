@@ -44,7 +44,7 @@ describe('AssignFlipperToCallerService', () => {
   })
 
   it('does not assign caller with scheduled calls', () => {
-    scheduledCallsServiceStub.scheduledCallsFor.withArgs(testCallerId).resolves([ {} ])
+    scheduledCallsServiceStub.scheduledCallsFor.withArgs(testCallerId).resolves([{}])
 
     return expect(service.assign(testCallerId, testFlipperId)).to.be.rejectedWith('scheduled calls')
   })

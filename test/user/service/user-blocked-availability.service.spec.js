@@ -6,7 +6,7 @@ import moment from 'moment'
 describe('UserBlockedAvailabilityService', () => {
   /** @var {UserBlockedAvailabilityService} service **/
   let service
-  let usersRepositoryStub = {
+  const usersRepositoryStub = {
     get: stub()
   }
 
@@ -31,7 +31,7 @@ describe('UserBlockedAvailabilityService', () => {
     return service.blockedAvailabilityForUser('test-user-id')
       .then(userBlockedAvailability => {
         expect(userBlockedAvailability).to.have.length(1)
-        expect(userBlockedAvailability[ 0 ]).to.be.eql({
+        expect(userBlockedAvailability[0]).to.be.eql({
           startsAt: moment('2020-12-23T10:00'),
           endsAt: moment('2020-12-23T11:00')
         })

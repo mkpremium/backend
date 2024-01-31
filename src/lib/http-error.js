@@ -1,4 +1,3 @@
-
 export function newHttpError (code, message) {
   return new HttpError(code, message)
 }

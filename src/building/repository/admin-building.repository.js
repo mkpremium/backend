@@ -38,18 +38,22 @@ export class AdminBuildingRepository {
             landArea,
             buildingAddress,
             stock: {
-              purchase: stock.purchase ? {
-                reservationAmount: stock.purchase.reservationAmount,
-                reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
-                transactionAmount: stock.purchase.transactionAmount,
-                transactionDate: moment(stock.purchase.transactionDate).format()
-              } : undefined,
-              sell: stock && stock.sell ? {
-                reservationAmount: stock.sell.reservationAmount,
-                reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
-                transactionAmount: stock.sell.transactionAmount,
-                transactionDate: moment(stock.sell.transactionDate).format()
-              } : undefined
+              purchase: stock.purchase
+                ? {
+                    reservationAmount: stock.purchase.reservationAmount,
+                    reservationDate: stock.purchase.reservationDate ? moment(stock.purchase.reservationDate).format() : undefined,
+                    transactionAmount: stock.purchase.transactionAmount,
+                    transactionDate: moment(stock.purchase.transactionDate).format()
+                  }
+                : undefined,
+              sell: stock && stock.sell
+                ? {
+                    reservationAmount: stock.sell.reservationAmount,
+                    reservationDate: stock.sell.reservationDate ? moment(stock.sell.reservationDate).format() : undefined,
+                    transactionAmount: stock.sell.transactionAmount,
+                    transactionDate: moment(stock.sell.transactionDate).format()
+                  }
+                : undefined
             }
           })
         ))

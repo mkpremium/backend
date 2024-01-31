@@ -7,7 +7,7 @@ module.exports = {
     {
       files: [
         'test/**/*.js',
-        'test-e2e/**/*.js',
+        'test-e2e/**/*.js'
       ],
       rules: {
         'no-unused-expressions': 'off'

@@ -20,15 +20,15 @@ describe('Users Meetings', () => {
     businessUser = await createFlipper()
   })
 
-  it(`exposes endpoint to get user's meetings`, async () => {
-    await authenticatedGet(`/me/meetings`, businessUser, app)
+  it('exposes endpoint to get user\'s meetings', async () => {
+    await authenticatedGet('/me/meetings', businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         expect(response.body).to.be.deep.equal([])
       })
   })
 
-  it(`retrieves users's meetings`, async () => {
+  it('retrieves users\'s meetings', async () => {
     const owner = await createOwner(app)
     const building = await createBuilding(app)
     await associateBuildingWithOwner(app, owner, building.id)
@@ -39,29 +39,29 @@ describe('Users Meetings', () => {
 
     const meetingDate = moment().add(1, 'day').hour(12).minute(0)
     const meeting = {
-      'createdBy': businessUser.id,
-      'notifyTo': businessUser.id,
-      'event': {
-        'contactId': testPhoneContactId,
-        'ownerId': owner.id,
-        'buildingId': building.id,
-        'worksheetId': undefined,
-        'eventAddress': 'Event Address',
-        'eventLocation': { lat: 0, long: 0 },
-        'inPerson': true
+      createdBy: businessUser.id,
+      notifyTo: businessUser.id,
+      event: {
+        contactId: testPhoneContactId,
+        ownerId: owner.id,
+        buildingId: building.id,
+        worksheetId: undefined,
+        eventAddress: 'Event Address',
+        eventLocation: { lat: 0, long: 0 },
+        inPerson: true
       },
-      'notifyAt': meetingDate.toISOString(),
-      'eventDate': meetingDate.toISOString()
+      notifyAt: meetingDate.toISOString(),
+      eventDate: meetingDate.toISOString()
     }
 
     let meetingId
-    await authenticatedPost(`/scheduled-events/meeting`, businessUser, app, meeting)
+    await authenticatedPost('/scheduled-events/meeting', businessUser, app, meeting)
       .then(response => {
         expect(response.status).to.be.equal(201)
         meetingId = response.body.id
       })
 
-    await authenticatedGet(`/me/meetings`, businessUser, app)
+    await authenticatedGet('/me/meetings', businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
         const expectedMeeting = {
@@ -74,7 +74,7 @@ describe('Users Meetings', () => {
           phoneNumber: testContactPhone,
           contactName: testOwnerName
         }
-        expect(response.body).to.be.deep.equal([ expectedMeeting ])
+        expect(response.body).to.be.deep.equal([expectedMeeting])
       })
   })
 })

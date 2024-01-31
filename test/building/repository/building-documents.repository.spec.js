@@ -28,10 +28,10 @@ describe('BuildingDocumentsRepository', () => {
     await metadataRepository.save(buildingDocument)
 
     const buildingDocuments = await buildingDocumentsRepository.documentsOfBuilding(testBuildingId)
-    expect(buildingDocuments).to.deep.equal([ {
+    expect(buildingDocuments).to.deep.equal([{
       documentId: testBuildingDocumentId,
       privateUrl: testDocumentPath,
       mimeType: 'image/jpg'
-    } ])
+    }])
   })
 })

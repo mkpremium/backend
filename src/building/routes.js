@@ -1,5 +1,5 @@
-import {Router} from 'express'
-import {wrap} from 'express-promise-wrap'
+import { Router } from 'express'
+import { wrap } from 'express-promise-wrap'
 import {
   allAgentsStockStatsControllerFactory,
   listBuildingProposalsControllerFactory,

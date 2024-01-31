@@ -31,7 +31,7 @@ export class SelfMeetingsRepository {
 
   getMeetingsFor (userId) {
     return this.couchbaseAdapter.queryAsync(
-      getUserMeetingsQuery(this.couchbaseAdapter.bucketName), [ userId ]
+      getUserMeetingsQuery(this.couchbaseAdapter.bucketName), [userId]
     ).then(meetings =>
       meetings.map(
         ({
@@ -51,7 +51,7 @@ export class SelfMeetingsRepository {
             mimeType,
             thumbnailUrl: previewUrl
           }))
-          const phoneContact = contacts ? contacts.find(c => [ 'TELEFONO', 'MOVIL' ].indexOf(c.type) !== -1 && (!contactId || c.id === contactId)) : undefined
+          const phoneContact = contacts ? contacts.find(c => ['TELEFONO', 'MOVIL'].indexOf(c.type) !== -1 && (!contactId || c.id === contactId)) : undefined
           const emailContact = contacts ? contacts.find(c => c.type === 'EMAIL' && (!contactId || c.id === contactId)) : undefined
           return {
             id,
@@ -63,7 +63,7 @@ export class SelfMeetingsRepository {
             contactName,
             phoneNumber: phoneContact ? phoneContact.value : undefined,
             email: emailContact ? emailContact.value : undefined,
-            thumbnail: thumbnails.length > 0 ? thumbnails[ 0 ] : undefined
+            thumbnail: thumbnails.length > 0 ? thumbnails[0] : undefined
           }
         })
     )

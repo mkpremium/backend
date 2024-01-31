@@ -56,12 +56,12 @@ describe('MeetingsRepository', () => {
         withAgentOfId: 'test-user-id',
         meetingAt: moment().add(1, 'minute')
       })
-      await Promise.all([ repository.save(pastMeeting), repository.save(futureMeeting) ])
+      await Promise.all([repository.save(pastMeeting), repository.save(futureMeeting)])
 
       return repository.futureMeetingsFor('test-user-id')
         .then(result => {
           expect(result).to.have.length(1)
-          expect(result[ 0 ].id).to.be.equal('test-future-meeting')
+          expect(result[0].id).to.be.equal('test-future-meeting')
         })
     })
   })

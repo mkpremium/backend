@@ -43,10 +43,10 @@ describe('GetDocumentsSignedURLService', () => {
 
     const signedURLs = await service.getDocumentsSignedURL(testBuildingId)
 
-    expect(signedURLs).to.deep.equal([ {
+    expect(signedURLs).to.deep.equal([{
       url: testSignedURL,
       mimeType: undefined,
       documentId: testDocumentId
-    } ])
+    }])
   })
 })

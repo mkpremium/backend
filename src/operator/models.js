@@ -11,7 +11,7 @@ import { newHttpError } from '../lib/http-error'
 import { User as OperatorType, UserProfile, UserRole } from '../types/user'
 import { AuthenticatedResponse, OperatorListResponse } from './types'
 
-export const passwordRegex = new RegExp('^(?=.*[A-Za-z])(?=.*\\d).{8,}$')
+export const passwordRegex = /^(?=.*[A-Za-z])(?=.*\\d).{8,}$/
 const Password = t.refinement(t.String, n => passwordRegex.test(n), 'Password')
 const NotEmptyString = t.refinement(t.String, n => !_isNil(n), 'NotEmptyString')
 export const OperatorRequest = t.struct(
@@ -85,7 +85,7 @@ export class OperatorRepository extends CouchbaseModel {
       $merge: data.profile || {}
     })
     const updateOperator = t.update(operator, {
-      $merge: _omit(data, [ 'profile', 'id' ]),
+      $merge: _omit(data, ['profile', 'id']),
       profile: { $set: updatedProfile }
     })
 
@@ -168,14 +168,14 @@ export class OperatorRepository extends CouchbaseModel {
 
   async addAnAward (operator, code) {
     const newAward = {
-      code: code,
+      code,
       awardedAt: new Date()
     }
     let updatedOperator
     if (operator.awards) {
-      updatedOperator = t.update(operator, { awards: { $push: [ newAward ] } })
+      updatedOperator = t.update(operator, { awards: { $push: [newAward] } })
     } else {
-      updatedOperator = t.update(operator, { awards: { $set: [ newAward ] } })
+      updatedOperator = t.update(operator, { awards: { $set: [newAward] } })
     }
 
     return this.save(updatedOperator)

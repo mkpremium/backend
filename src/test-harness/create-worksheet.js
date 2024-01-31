@@ -14,7 +14,7 @@ export const createBuildingWorksheetFactory = worksheetRepository => req => {
   const { building, ownersId, status } = req
   return worksheetRepository.save(Worksheet({
     id: uuid(),
-    relatedBuildingIds: [ building.id ],
+    relatedBuildingIds: [building.id],
     buildingId: building.id,
     buildingAddress: building.address,
     relatedOwnerIds: ownersId,

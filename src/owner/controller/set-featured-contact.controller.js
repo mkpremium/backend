@@ -11,10 +11,10 @@ export const createSetFeaturedContactController = setOwnerFeaturedContactService
       res.json()
     } catch (e) {
       if (e instanceof WrongFeaturedContact) {
-        throw newHttpError(400, `Invalid featured contact request.`)
+        throw newHttpError(400, 'Invalid featured contact request.')
       } else {
         logger.error(e)
-        throw newHttpError(500, `Some error occurred while setting featured contact.`)
+        throw newHttpError(500, 'Some error occurred while setting featured contact.')
       }
     }
   }

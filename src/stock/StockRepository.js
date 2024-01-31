@@ -40,7 +40,7 @@ export class StockRepository {
   getTotalProfitInPeriodByPropertyManager (since, until) {
     return this.couchbaseAdapter.queryAsync(
       statsByPropertyManagerInPeriodQuery(this.couchbaseAdapter.bucketName),
-      [ since.format('YYYY-MM-DD'), until.format('YYYY-MM-DD') ]
+      [since.format('YYYY-MM-DD'), until.format('YYYY-MM-DD')]
     ).catch(error => {
       throw error
     })
@@ -49,7 +49,7 @@ export class StockRepository {
   async getPropertyManagerProfitInPeriod (propertyManagerId, since, until) {
     const result = await this.couchbaseAdapter.queryAsync(
       propertyManagerProfitInPeriodQuery(this.couchbaseAdapter.bucketName),
-      [ propertyManagerId, since.format('YYYY-MM-DD'), until.format('YYYY-MM-DD') ]
+      [propertyManagerId, since.format('YYYY-MM-DD'), until.format('YYYY-MM-DD')]
     )
 
     if (!result || result.length === 0) {
@@ -57,8 +57,8 @@ export class StockRepository {
     }
 
     return {
-      profitAmount: result[ 0 ].profitAmount,
-      goal: result[ 0 ].profitGoal || cityGoal(result[ 0 ][ 'agentCity' ])
+      profitAmount: result[0].profitAmount,
+      goal: result[0].profitGoal || cityGoal(result[0].agentCity)
     }
   }
 }

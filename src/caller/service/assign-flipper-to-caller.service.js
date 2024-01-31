@@ -16,7 +16,7 @@ export class AssignFlipperToCallerService {
       this.scheduledCallsService.scheduledCallsFor(callerId),
       this.usersRepository.get(callerId),
       this.usersRepository.get(flipperId)
-    ]).then(([ callerScheduledCalls, caller, flipper ]) => {
+    ]).then(([callerScheduledCalls, caller, flipper]) => {
       if (callerScheduledCalls.length > 0) {
         throw new CallerToFlipperAssignationRejected(
           'Caller with scheduled calls cannot change flipper'

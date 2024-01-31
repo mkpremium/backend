@@ -1,6 +1,6 @@
 import t from 'tcomb'
 import { inferStatusCode } from '../../src/infrastructure/error-handler'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import { newHttpError } from '../../src/lib/http-error'
 
 describe('inferStatusCode', () => {

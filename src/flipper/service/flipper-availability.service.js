@@ -13,7 +13,7 @@ export class FlipperAvailabilityService {
     return Promise.all([
       this.meetingsService.futureMeetingsFor(flipperId),
       this.userBlockedAvailabilityService.blockedAvailabilityForUser(flipperId)
-    ]).then(([ flipperMeetings, flipperBlockedAvailability ]) => {
+    ]).then(([flipperMeetings, flipperBlockedAvailability]) => {
       const now = moment()
       return flipperMeetings.map(({ id: meetingId, buildingId, meetingAt }) => ({
         type: 'MEETING',

@@ -23,7 +23,7 @@ describe('negotiation status change', () => {
     await authenticatedGet(`/buildings?id=${building.id}`, businessUser, app)
       .then(response => {
         expect(response.status).to.be.equal(200)
-        expect(response.body[ 0 ].negotiationStatus).to.be.equal('COMPRADO')
+        expect(response.body[0].negotiationStatus).to.be.equal('COMPRADO')
       })
   })
 })

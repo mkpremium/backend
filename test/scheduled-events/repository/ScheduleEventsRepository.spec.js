@@ -16,8 +16,8 @@ describe('ScheduleEventsRepository', () => {
     it('schedules meeting for worksheet', async () => {
       await worksheetRepository.save({
         id: 'test-worksheet-id',
-        relatedBuildingIds: [ 'test-building-id' ],
-        relatedOwnerIds: [ 'test-owner-id' ],
+        relatedBuildingIds: ['test-building-id'],
+        relatedOwnerIds: ['test-owner-id'],
         status: WorkSheetStatus.DEFAULT
       })
 

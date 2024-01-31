@@ -32,7 +32,7 @@ describe('Building owner contacts management', () => {
         const savedOwner = await ownerRepository.get(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(1)
-        expect(savedOwner.person.contacts[ 0 ]).to.be.deep.equal({
+        expect(savedOwner.person.contacts[0]).to.be.deep.equal({
           id: testPhoneContactId,
           note: null,
           type: 'TELEFONO',
@@ -56,12 +56,12 @@ describe('Building owner contacts management', () => {
         const savedOwner = await ownerRepository.get(owner.id)
 
         expect(savedOwner.person.contacts.length).to.be.equal(2)
-        expect(savedOwner.person.contacts[ 1 ]).to.include(contactInfoToAdd)
+        expect(savedOwner.person.contacts[1]).to.include(contactInfoToAdd)
       })
   })
 
   it('list owners with matching phone number', async () => {
-    await authenticatedPost(`/owners/search`, businessUser, app, { phoneNumber: testContactPhone })
+    await authenticatedPost('/owners/search', businessUser, app, { phoneNumber: testContactPhone })
       .then(async (response) => {
         expect(response.status).to.be.equal(200)
 

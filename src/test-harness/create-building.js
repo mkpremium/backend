@@ -42,9 +42,9 @@ export const createBuildingFactory = (buildingsRepository, addOwnerService, crea
   const owners = await Promise.all(addOwnerCommands.map(cmd => addOwnerService.addOwner(cmd)))
 
   const worksheet = await createBuildingWorksheet(CreateWorksheetRequest({
-    building: building,
+    building,
     ownersId: owners.map(({ id }) => id)
   }))
 
-  return { building: building, owners, worksheet }
+  return { building, owners, worksheet }
 }

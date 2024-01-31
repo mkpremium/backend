@@ -5,10 +5,10 @@ const baseAPIUrl = 'http://localhost:9001'
 
 const failRate = new Rate('failed requests')
 
-export let options = {
+export const options = {
   thresholds: {
-    'failed requests': [ 'rate<0.1' ],
-    http_req_duration: [ 'p(95)<500' ]
+    'failed requests': ['rate<0.1'],
+    http_req_duration: ['p(95)<500']
   }
 }
 
@@ -48,7 +48,7 @@ export default function ({ token }) {
   const res = http.post(`${baseAPIUrl}/caller/next-worksheet`, {}, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`
     },
     timeout: 5000
   })

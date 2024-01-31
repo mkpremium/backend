@@ -50,4 +50,4 @@ async function createEmail (req, res) {
   res.status(201).send()
 }
 
-export const createEmailController = compose(attachment, [ wrap(createEmail) ])
+export const createEmailController = compose(attachment, [wrap(createEmail)])

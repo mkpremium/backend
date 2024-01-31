@@ -34,7 +34,7 @@ describe('PropertyManagerRepository', () => {
           lastName: 'ignored',
           city: 'Barcelona'
         },
-        roles: [ UserRoles.BUSINESS ],
+        roles: [UserRoles.BUSINESS],
         profitGoal: {
           amount: 100,
           updatedAt: new Date()
@@ -44,7 +44,7 @@ describe('PropertyManagerRepository', () => {
       const result = await propertyManagerRepository.getActivePropertyManagers()
 
       expect(result).to.have.lengthOf(1)
-      expect(result[ 0 ]).to.be.deep.equal({
+      expect(result[0]).to.be.deep.equal({
         id: 'property-manager-user-id',
         userName: 'property-manager-user-name',
         city: 'Barcelona',

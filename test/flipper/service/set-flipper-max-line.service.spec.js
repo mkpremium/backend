@@ -21,7 +21,7 @@ describe('SetFlipperMaxLineService', () => {
   })
 
   it('save flipper with setup max line', async () => {
-    const testFlipper = fromJSON(buildUser({ id: testFlipperId, roles: [ 'BUSINESS' ] }), User)
+    const testFlipper = fromJSON(buildUser({ id: testFlipperId, roles: ['BUSINESS'] }), User)
     usersRepositoryStub.get.withArgs(testFlipperId).resolves(testFlipper)
     usersRepositoryStub.save.resolves()
 
