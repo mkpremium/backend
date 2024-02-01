@@ -63,7 +63,7 @@ export const createApp = async (database: Database): Promise<Express> => {
     initPropertyManager(app, diContainer, secured)
     setupCallerRoutes(app, diContainer, secured)
     flipperRoutes(app, diContainer, secured)
-    setupStockRouter(app, diContainer, secured)
+    await setupStockRouter(app, diContainer, secured)
 
     notes(app, diContainer, secured)
     email(app, secured)

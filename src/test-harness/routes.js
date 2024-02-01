@@ -1,6 +1,5 @@
 import { wrap } from 'express-promise-wrap'
 import { permissions } from '../middleware/jwt'
-import { OperatorRepository } from '../operator/models'
 import { createBuildingFactory, CreateBuildingRequest } from './create-building'
 import { createBuildingWorksheetFactory } from './create-worksheet'
 
@@ -11,6 +10,7 @@ export function createTestHarness (app, awilixContainer, secured) {
     awilixContainer.resolve('addOwnerService'),
     createWorksheet
   )
+  const operatorRepository = awilixContainer.resolve('operatorRepository')
 
   app.post(
     '/test-harness/create-building',
@@ -29,10 +29,9 @@ export function createTestHarness (app, awilixContainer, secured) {
     secured,
     permissions.admin,
     wrap(async (req, res) => {
-      const repo = new OperatorRepository()
       const { userId } = req.query
-      const user = await repo.findByIdOrThrow(userId)
-      const response = await repo.createAuthenticatedResponse(user)
+      const user = await operatorRepository.findByIdOrThrow(userId)
+      const response = await operatorRepository.createAuthenticatedResponse(user)
 
       res.json(response)
     }))
