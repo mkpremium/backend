@@ -53,7 +53,7 @@ export const createApp = async (database: Database): Promise<Express> => {
 
     const secured = jwt(diContainer.resolve('usersRepository'))
 
-    operator(app, diContainer, secured) // start with login router
+    await operator(app, diContainer, secured) // start with login router
     setupUserRoutes(app, diContainer, secured)
     buildingRoutes(diContainer, app, secured)
     setupOwnersRoutes(app, diContainer, secured)
