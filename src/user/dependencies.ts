@@ -1,21 +1,32 @@
-import { aliasTo, asClass, asFunction } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, type AwilixContainer } from 'awilix'
 import { UserBlockedAvailabilityService } from './service/user-blocked-availability.service'
 import { removeFavoriteForNoSaleBuildings } from './event-listener/remove-favorite-for-no-sale-buildings'
-import { CouchbaseUsersRepository } from './repository/couchbase-users.repository'
-import { OperatorRepository } from '../operator/models'
 import { LoginService } from './service/login.service'
-import { createLoginController } from '../operator/controllers'
+import {
+  createLoginController,
+  listOperatorControllerFactory,
+  updateOperatorControllerFactory
+} from '../operator/controllers'
 import { PostgresUserRepository } from './repository/postgres-user.repository'
 import { AuthTokenIssuerService } from './service/auth-token-issuer.service'
 import { AddOperatorService } from './service/add-operator.service'
 import { importOperatorCommandHandler } from '../infrastructure/postgres/import-operator-command-handler'
 
-export const setupUserDependencies = container => {
-  const usePostgres = container.resolve('usePostgres')
+export const setupUserDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
+  if (usePostgres) {
+    container.register({
+      couchbaseUsersRepository: asValue(null)
+    })
+  } else {
+    const { CouchbaseUsersRepository } = await import('./repository/couchbase-users.repository')
+    const { OperatorRepository } = await import('../operator/models')
+    container.register({
+      operatorRepository: asClass(OperatorRepository).singleton(),
+      couchbaseUsersRepository: asClass(CouchbaseUsersRepository).classic().singleton()
+    })
+  }
   container.register({
-    operatorRepository: asClass(OperatorRepository).singleton(),
     postgresUsersRepository: asClass(PostgresUserRepository).classic().singleton(),
-    couchbaseUsersRepository: asClass(CouchbaseUsersRepository).classic().singleton(),
     usersRepository: aliasTo(usePostgres ? 'postgresUsersRepository' : 'couchbaseUsersRepository'),
 
     addOperatorService: asClass(AddOperatorService).classic().singleton(),
@@ -26,6 +37,8 @@ export const setupUserDependencies = container => {
 
     importOperatorCommandHandler: asFunction(importOperatorCommandHandler).singleton(),
 
-    loginController: asFunction(createLoginController).singleton()
+    loginController: asFunction(createLoginController).singleton(),
+    updateOperatorController: asFunction(updateOperatorControllerFactory).singleton(),
+    listOperatorController: asFunction(listOperatorControllerFactory).singleton()
   })
 }

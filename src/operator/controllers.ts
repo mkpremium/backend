@@ -1,7 +1,6 @@
-import { wrap } from 'express-promise-wrap'
-import { OperatorRepository } from './models'
+import type { OperatorRepository } from './models'
 import { canManageOperator } from '../lib/role-operators'
-import { AddOperatorService } from '../user/service/add-operator.service'
+import type { AddOperatorService } from '../user/service/add-operator.service'
 
 export function createLoginController ({ loginService }) {
   return async function (req, res) {
@@ -22,29 +21,21 @@ export function createAddOperatorController (addOperatorService: AddOperatorServ
   }
 }
 
-async function updateOperator (req, res) {
-  const repo = new OperatorRepository()
-  const operatorId = req.params.id
-  const operator = await repo.findByIdOrThrow(operatorId)
+export function updateOperatorControllerFactory ({ operatorRepository }: {operatorRepository: OperatorRepository}) {
+  return async function updateOperatorController (req, res) {
+    const operatorId = req.params.id
+    const operator = await operatorRepository.findByIdOrThrow(operatorId)
 
-  canManageOperator(req.user.operator, operator)
+    canManageOperator(req.user.operator, operator)
 
-  await repo.updateOperator(operator, req.body)
-  res.status(204).send()
+    await operatorRepository.updateOperator(operator, req.body)
+    res.status(204).send()
+  }
 }
 
-async function listOperator (req, res) {
-  const repo = new OperatorRepository()
-  const operators = await repo.list(req.query)
-  res.json(operators)
+export function listOperatorControllerFactory ({ operatorRepository }: {operatorRepository: OperatorRepository}) {
+  return async function listOperatorController (req, res) {
+    const operators = await operatorRepository.list(req.query)
+    res.json(operators)
+  }
 }
-
-async function limitedListOperator (req, res) {
-  const repo = new OperatorRepository()
-  const operators = await repo.listView(req.query)
-  res.json(operators)
-}
-
-export const listOperatorController = wrap(listOperator)
-export const limitedListOperatorController = wrap(limitedListOperator)
-export const updateOperatorController = wrap(updateOperator)

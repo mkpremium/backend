@@ -1,5 +1,5 @@
-import { aliasTo, asClass, asFunction, asValue, createContainer } from 'awilix'
 import type { AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, createContainer } from 'awilix'
 import { setupBuildingDependencies } from '../building/dependencies'
 import { setupCallerDependencies } from '../caller/init'
 import { setupStockDependencies } from '../stock/dependencies'
@@ -32,7 +32,6 @@ import { BuildingImportTriggerService } from './service/building-import-trigger.
 import { CouchbaseDocumentRepository } from './postgres/couchbase-document.repository'
 import { ScheduledEventImportTriggerService } from './service/scheduled-event-import-trigger.service'
 import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-import-trigger.service'
-import { connectCouchbaseBucket } from '../db/connect-couchbase-bucket'
 import type { Bucket } from 'couchbase'
 
 export async function createDiContainer (database: Database) {
@@ -41,6 +40,7 @@ export async function createDiContainer (database: Database) {
   const dataSource = await initializeDataSource()
   let couchbaseBucket = null
   if (!usePostgres) {
+    const { connectCouchbaseBucket } = await import('../db/connect-couchbase-bucket')
     couchbaseBucket = await connectCouchbaseBucket()
   }
 
@@ -59,7 +59,7 @@ export async function setupContainer (
   await setupScheduledEventsDependencies(container)
   await setupWorksheetDependencies(container, usePostgres)
   setupCallerDependencies(container)
-  setupUserDependencies(container)
+  await setupUserDependencies(container, usePostgres)
   await setupStockDependencies(container, usePostgres)
   setupEmailDependencies(container)
   setupFlipperDependencies(container)
