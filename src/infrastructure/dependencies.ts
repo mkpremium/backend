@@ -71,6 +71,10 @@ async function setupInfrastructureDependencies (container: AwilixContainer, couc
     container.register({
       couchbaseAdapter: asClass(CouchbaseAdapter).classic()
     })
+  } else {
+    container.register({
+      couchbaseAdapter: asValue(null)
+    })
   }
 
   container.register({
