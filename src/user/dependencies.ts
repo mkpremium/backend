@@ -15,7 +15,8 @@ import { importOperatorCommandHandler } from '../infrastructure/postgres/import-
 export const setupUserDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
   if (usePostgres) {
     container.register({
-      couchbaseUsersRepository: asValue(null)
+      couchbaseUsersRepository: asValue(null),
+      operatorRepository: asValue(null)
     })
   } else {
     const { CouchbaseUsersRepository } = await import('./repository/couchbase-users.repository')
