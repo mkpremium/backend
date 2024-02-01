@@ -6,15 +6,16 @@ import type { Caller } from '../src/caller/caller.entity'
 import type { WorksheetQueueProps } from '../src/worksheet/domain/queue'
 import { WorksheetProps } from '../src/worksheet/domain/worksheet'
 import { Flipper } from '../src/flipper/flipper.entity'
+import { UserProfileProps } from '../src/types/user'
 
 const EntityFactory = Factory.define<{ id: string }>('Entity')
   .attr('id', () => uuid())
 
-Factory.define('user-credentials')
+export const userCredentialsFactory = Factory.define<{username: string, password: string}>('user-credentials')
   .sequence('username', idx => `test-user-${idx}`)
   .attr('password', 'test-User-pa$$w0rd')
 
-Factory.define('user-profile')
+export const userProfileFactory = Factory.define<UserProfileProps>('user-profile')
   .attrs({
     firstName: 'User-Name',
     lastName: 'User-Surname',

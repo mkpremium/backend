@@ -5,10 +5,9 @@ import { ContactProps, OwnerProps } from '../src/owner/owner'
 import { Flipper } from '../src/flipper/flipper.entity'
 import { AddProposalForBuildingService } from '../src/building/service/add-proposal-for-building.service'
 import { AddContactService, MaybeFeaturedContact } from '../src/owner/service/add-contact.service'
-import { emailContactFactory, phoneContactFactory } from './factories'
+import { emailContactFactory, phoneContactFactory, userCredentialsFactory, userProfileFactory } from './factories'
 import { AddOperatorService } from '../src/user/service/add-operator.service'
-import { Factory } from 'rosie'
-import { UserProfileProps, UserProps } from '../src/types/user'
+import { UserProps } from '../src/types/user'
 import { AddOwnerCommand, AddOwnerService } from '../src/owner/service/add-owner.service'
 import { BuildingsRepository } from '../src/building/repository/buildings.repository'
 import { PostgresWorksheetQueueRepository } from '../src/worksheet/repository/postgres-worksheet-queue.repository'
@@ -153,8 +152,8 @@ export async function addCaller ({ addOperatorService }: { addOperatorService: A
 
 export async function addUserWithRole (service: AddOperatorService, role: 'BUSINESS' | 'OPERATOR') {
   const testCommand = {
-    ...Factory.build<{ username: string, password: string }>('user-credentials'),
-    profile: Factory.build<UserProfileProps>('user-profile'),
+    ...userCredentialsFactory.build(),
+    profile: userProfileFactory.build(),
     roles: [role],
     enable: true
   }
