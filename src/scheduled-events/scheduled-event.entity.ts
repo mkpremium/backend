@@ -7,7 +7,7 @@ import { Contact } from '../contacts/contact.entity'
 
 @Entity()
 export class ScheduledEvent extends BaseEntity {
-  @Column('timestamp')
+  @Column('timestamp with time zone')
   scheduledFor: Date
 
   @Column('text', { nullable: false })
