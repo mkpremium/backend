@@ -14,7 +14,7 @@ import {
   LastBuildingMeeting,
   PostgresScheduledEventsRepository
 } from '../../scheduled-events/repository/postgres-schedule-events.repository'
-import moment from 'moment'
+import { utc } from '../../lib/date'
 
 export class SearchOwnerOrBuildingService {
   constructor (
@@ -131,7 +131,9 @@ function inferBuildingLastEvent (
     return lastMeetingAsLastEvent(lastMeeting)
   }
 
-  if (moment(lastMeeting.meeting_scheduledFor).isAfter(lastOfferRequest.offer_createdAt)) {
+  const meetingUtc = utc(lastMeeting.meeting_scheduledFor)
+  const offerRequestUTC = utc(lastOfferRequest.offer_createdAt)
+  if (meetingUtc.isAfter(offerRequestUTC)) {
     return lastMeetingAsLastEvent(lastMeeting)
   } else {
     return lastOfferAsLastEvent(lastOfferRequest)
