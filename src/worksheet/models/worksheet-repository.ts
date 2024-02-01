@@ -58,20 +58,20 @@ export const QueueRequestParams = t.union([
 
 QueueRequestParams.dispatch = function (x) {
   switch (x.action) {
-    case QueueRequestAction.NEXT:
-      return QueueRequestParamsBase
-    case QueueRequestAction.RELEASE:
-      return QueueRequestParamsBase.extend(
-        {
-          worksheetId: t.String
-        }
-      )
-    default:
-      return QueueRequestParamsBase.extend(
-        {
-          queueItemId: t.String
-        }
-      )
+  case QueueRequestAction.NEXT:
+    return QueueRequestParamsBase
+  case QueueRequestAction.RELEASE:
+    return QueueRequestParamsBase.extend(
+      {
+        worksheetId: t.String
+      }
+    )
+  default:
+    return QueueRequestParamsBase.extend(
+      {
+        queueItemId: t.String
+      }
+    )
   }
 }
 

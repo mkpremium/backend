@@ -94,14 +94,14 @@ export async function makePreview (rawUrl) {
   const extension = path.extname(url)
   logger.debug('aws#makePreview', { extension, url })
   switch (extension) {
-    case '.pdf':
-    case '.png':
-    case '.jpg':
-    case '.jpeg':
-    case '.gif':
-      return previewCMD(url)
-    default:
-      return null
+  case '.pdf':
+  case '.png':
+  case '.jpg':
+  case '.jpeg':
+  case '.gif':
+    return previewCMD(url)
+  default:
+    return null
   }
 }
 

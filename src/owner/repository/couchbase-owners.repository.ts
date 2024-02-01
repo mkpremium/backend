@@ -133,11 +133,11 @@ export function parseFoundPhones (phoneNumber): (result: any[]) => FoundOwnerPro
         negotiationStatus: rec.negotiationStatus || 'PENDIENTE',
         lastEvent: rec.lastEvent.eventDate !== undefined
           ? {
-              eventDate: rec.lastEvent.eventDate,
-              type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
-              ownerId: rec.lastEvent.ownerId,
-              flipperName: rec.lastEvent.flipperName
-            }
+            eventDate: rec.lastEvent.eventDate,
+            type: rec.lastEvent.inPerson ? 'meeting' : 'offer-request',
+            ownerId: rec.lastEvent.ownerId,
+            flipperName: rec.lastEvent.flipperName
+          }
           : undefined,
         matchingContactId: rec.contacts[matchingContactIdx].id
       }

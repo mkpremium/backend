@@ -201,29 +201,29 @@ export function createQueryBuilder (props: StructProps, documentType: string, me
   let qb
 
   switch (method) {
-    case 'let':
-      qb = (squel as any).let().field(`${prefix}.\`id\``)
-      Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
-      break
-    case 'use':
-      qb = (squel as any).useKey().field(`${prefix}.\`id\``)
-      Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
-      break
-    case 'select':
-      qb = squel.select().field(`${prefix}.\`id\``)
-      Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
-      break
-    case 'delete':
-      qb = squel.delete()
-      break
-    case 'update':
-      qb = squel.update()
-      break
-    case 'count':
-      qb = squel.select().field('COUNT(*) as count')
-      break
-    default:
-      throw new Error(`method ${method} not allowed (select, delete)`)
+  case 'let':
+    qb = (squel as any).let().field(`${prefix}.\`id\``)
+    Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
+    break
+  case 'use':
+    qb = (squel as any).useKey().field(`${prefix}.\`id\``)
+    Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
+    break
+  case 'select':
+    qb = squel.select().field(`${prefix}.\`id\``)
+    Object.keys(props).forEach(key => qb.field(`${prefix}.\`${key}\``))
+    break
+  case 'delete':
+    qb = squel.delete()
+    break
+  case 'update':
+    qb = squel.update()
+    break
+  case 'count':
+    qb = squel.select().field('COUNT(*) as count')
+    break
+  default:
+    throw new Error(`method ${method} not allowed (select, delete)`)
   }
 
   if (method === 'update') {

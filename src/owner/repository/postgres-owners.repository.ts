@@ -75,9 +75,9 @@ export function ownerEntityToStruct (entity: Owner): OwnerProps {
     },
     featuredContact: entity.person.featuredEmailContact || entity.person.featuredPhoneContact
       ? {
-          phoneId: entity.person.featuredPhoneContact?.id,
-          emailId: entity.person.featuredEmailContact?.id
-        }
+        phoneId: entity.person.featuredPhoneContact?.id,
+        emailId: entity.person.featuredEmailContact?.id
+      }
       : null
   }
 }

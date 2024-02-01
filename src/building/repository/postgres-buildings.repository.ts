@@ -107,9 +107,9 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
     use: entity.use,
     recentProposal: entity.recentProposal
       ? {
-          proposal: entity.recentProposal.amount,
-          createdAt: entity.recentProposal.createdAt
-        }
+        proposal: entity.recentProposal.amount,
+        createdAt: entity.recentProposal.createdAt
+      }
       : undefined,
     metadata: entity.documents.map(
       ({ id, name, mimeType, previewUrl, privateUrl }) =>
@@ -134,18 +134,18 @@ export function buildingEntityToReadModel (
     negotiationStatus: b.negotiationStatus || undefined,
     address: b.address
       ? {
-          neighborhood: b.address.neighborhood ? b.address.neighborhood : undefined,
-          type: b.address.type ? b.address.type : undefined,
-          street: b.address.street ? b.address.street : undefined,
-          number: b.address.number ? b.address.number : undefined,
-          postalCode: b.address.postalCode && b.address.postalCode.number
-            ? {
-                number: b.address.postalCode.number
-              }
-            : undefined,
-          city: b.address.city ? b.address.city : undefined,
-          province: b.address.province
-        }
+        neighborhood: b.address.neighborhood ? b.address.neighborhood : undefined,
+        type: b.address.type ? b.address.type : undefined,
+        street: b.address.street ? b.address.street : undefined,
+        number: b.address.number ? b.address.number : undefined,
+        postalCode: b.address.postalCode && b.address.postalCode.number
+          ? {
+            number: b.address.postalCode.number
+          }
+          : undefined,
+        city: b.address.city ? b.address.city : undefined,
+        province: b.address.province
+      }
       : undefined,
     owner: toOwnerInBuildingRead(owner),
     metadata: b.documents.map(({ id, mimeType, previewUrl }) => ({
@@ -163,9 +163,9 @@ export function buildingEntityToReadModel (
     }) || undefined,
     geolocation: (b.location?.lat && b.location?.lng)
       ? {
-          latitude: b.location.lat,
-          longitude: b.location.lng
-        }
+        latitude: b.location.lat,
+        longitude: b.location.lng
+      }
       : undefined,
     usage: b.use,
     stock: null

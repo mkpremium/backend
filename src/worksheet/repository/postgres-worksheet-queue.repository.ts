@@ -56,11 +56,11 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
 
 function inferWorksheetQueueItemStatus (worksheet: Worksheet, hasScheduledCall: boolean): QueueItemStatus {
   switch (true) {
-    case hasScheduledCall:
-      return QueueItemStatus.SCHEDULED
-    case worksheet.status === 'TAKEN':
-      return QueueItemStatus.OPENED
-    default:
-      return QueueItemStatus.AVAILABLE
+  case hasScheduledCall:
+    return QueueItemStatus.SCHEDULED
+  case worksheet.status === 'TAKEN':
+    return QueueItemStatus.OPENED
+  default:
+    return QueueItemStatus.AVAILABLE
   }
 }

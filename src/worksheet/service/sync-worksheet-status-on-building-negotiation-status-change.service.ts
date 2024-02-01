@@ -42,25 +42,25 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
     )
 
     switch (true) {
-      case _some(ownersStatus,
-        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.PUBLIC):
-        return WorkSheetStatus.PUBLIC
-      case _every(ownersStatus, ({ status }) => [
-        OwnerStatus.ERROR,
-        OwnerStatus.WITHOUT_CONTACT,
-        OwnerStatus.WITHOUT_PHONE_CONTACT].includes(status)):
-        return WorkSheetStatus.INVALID
-      case _some(ownersStatus,
-        ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
-        return WorkSheetStatus.AVAILABLE
-      default:
-        // eslint-disable-next-line no-case-declarations
-        const meetings = await this.findMeetings(worksheet.id)
-        if (meetings.length > 0) {
-          return WorkSheetStatus.MEETING
-        }
+    case _some(ownersStatus,
+      ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.PUBLIC):
+      return WorkSheetStatus.PUBLIC
+    case _every(ownersStatus, ({ status }) => [
+      OwnerStatus.ERROR,
+      OwnerStatus.WITHOUT_CONTACT,
+      OwnerStatus.WITHOUT_PHONE_CONTACT].includes(status)):
+      return WorkSheetStatus.INVALID
+    case _some(ownersStatus,
+      ({ status, isConfirmedByOperator }) => isConfirmedByOperator && status === OwnerStatus.VERIFIED):
+      return WorkSheetStatus.AVAILABLE
+    default:
+      // eslint-disable-next-line no-case-declarations
+      const meetings = await this.findMeetings(worksheet.id)
+      if (meetings.length > 0) {
+        return WorkSheetStatus.MEETING
+      }
 
-        return worksheet.status
+      return worksheet.status
     }
   }
 
@@ -74,15 +74,15 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
 
 function mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
   switch (negotiationStatus) {
-    case 'DESCARTADO':
-      return WorkSheetStatus.PUBLIC
-    case 'NO VENDE':
-      return WorkSheetStatus.NO_SALE
-    case 'YA VENDIO':
-      return WorkSheetStatus.ALREADY_SOLD
-    case 'VENDIDO':
-      return WorkSheetStatus.INVALID
-    default:
-      return WorkSheetStatus.MEETING
+  case 'DESCARTADO':
+    return WorkSheetStatus.PUBLIC
+  case 'NO VENDE':
+    return WorkSheetStatus.NO_SALE
+  case 'YA VENDIO':
+    return WorkSheetStatus.ALREADY_SOLD
+  case 'VENDIDO':
+    return WorkSheetStatus.INVALID
+  default:
+    return WorkSheetStatus.MEETING
   }
 }

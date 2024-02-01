@@ -34,14 +34,14 @@ export function appErrorHandler (error, req, res, next) {
 
 export function inferStatusCode (error) {
   switch (true) {
-    case error.message.substring(0, 7) === '[tcomb]':
-      return 400
-    case error instanceof HttpError:
-      return error.statusCode
-    case !!error.status:
-      return error.status
-    default:
-      return 500
+  case error.message.substring(0, 7) === '[tcomb]':
+    return 400
+  case error instanceof HttpError:
+    return error.statusCode
+  case !!error.status:
+    return error.status
+  default:
+    return 500
   }
 }
 

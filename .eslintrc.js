@@ -7,8 +7,7 @@ module.exports = {
     node: true
   },
   rules: {
-    // indent: ['error', 2],
-    indent: ['off', 2],
+    indent: ['error', 2],
     'no-useless-constructor': 'off',
     'no-use-before-define': 'off',
     '@typescript-eslint/no-explicit-any': 'off'

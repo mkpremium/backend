@@ -167,21 +167,21 @@ export const changeContactStatus = (owner, contactId, newStatus): OwnerProps => 
 function calculateStatusFromContacts (contacts: ContactProps[], owner) {
   const phoneContacts = contacts.filter(isPhoneContact)
   switch (true) {
-    case _.some(phoneContacts, c => c.status === 'GOOD'):
-      return OwnerStatus.VERIFIED
-    case _.every(phoneContacts, c => c.status === 'BAD'):
-      /* eslint-disable-next-line no-case-declarations */
-      const emailContacts = contacts.filter(isEmailContact)
-      return _.every(emailContacts, c => c.status === 'BAD')
-        ? OwnerStatus.WITHOUT_CONTACT
-        : OwnerStatus.WITHOUT_PHONE_CONTACT
-    case [OwnerStatus.WITHOUT_CONTACT, OwnerStatus.WITHOUT_PHONE_CONTACT].includes(owner.status):
-      if (_.some(phoneContacts, c => isPhoneContact(c) && c.status !== 'BAD')) {
-        return OwnerStatus.NON_VERIFIED
-      }
-      return owner.status
-    default:
-      return owner.status
+  case _.some(phoneContacts, c => c.status === 'GOOD'):
+    return OwnerStatus.VERIFIED
+  case _.every(phoneContacts, c => c.status === 'BAD'):
+    /* eslint-disable-next-line no-case-declarations */
+    const emailContacts = contacts.filter(isEmailContact)
+    return _.every(emailContacts, c => c.status === 'BAD')
+      ? OwnerStatus.WITHOUT_CONTACT
+      : OwnerStatus.WITHOUT_PHONE_CONTACT
+  case [OwnerStatus.WITHOUT_CONTACT, OwnerStatus.WITHOUT_PHONE_CONTACT].includes(owner.status):
+    if (_.some(phoneContacts, c => isPhoneContact(c) && c.status !== 'BAD')) {
+      return OwnerStatus.NON_VERIFIED
+    }
+    return owner.status
+  default:
+    return owner.status
   }
 }
 
