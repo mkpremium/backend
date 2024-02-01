@@ -166,7 +166,7 @@ export interface BuildingMetadataProps {
   previewUrl: string
 }
 
-type RecentBuildingProposal = Pick<ProposalProps, 'proposal' | 'createdAt'>;
+type RecentBuildingProposal = Pick<ProposalProps, 'id' | 'proposal' | 'createdAt'>;
 
 export interface BuildingProps {
   id: string;
@@ -204,7 +204,7 @@ export const Building = t.struct<BuildingProps>(
     ownerId: t.maybe(t.String),
     owner: t.maybe(BuildingOwner),
     state: t.maybe(t.enums.of(['BUENO', 'MALO'])),
-    proposals: t.list(t.String),
+    proposals: t.maybe(t.list(t.String)),
     recentProposal: t.maybe(t.struct<RecentBuildingProposal>({
       id: t.String,
       createdAt: t.union([t.Date, DateTimeString]),
