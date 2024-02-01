@@ -1,14 +1,10 @@
 import t from 'tcomb'
 import fromJSON from 'tcomb/lib/fromJSON'
-import { OperatorRepository } from '../models'
 
 import { ProfitGoalRequest } from './types'
 
-// TODO Should validate that operator has ADMIN role
-export async function setProfitGoalToOperator (data, now = () => new Date()) {
+export async function setProfitGoalToOperator (data, operatorRepository, now = () => new Date()) {
   const { operatorId, profitAmount } = fromJSON(data, ProfitGoalRequest)
-
-  const operatorRepository = new OperatorRepository()
 
   const operator = await operatorRepository.findByIdOrThrow(operatorId)
 

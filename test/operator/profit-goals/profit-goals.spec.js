@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import request from 'supertest'
+import { OperatorRepository } from '../../../src/operator/models'
 import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/application'
 import { defaultPassword, operatorCreate, createFlipper, operatorLogin } from '../../common'
 import { createTestApp } from '../../integration/create-test-app'
@@ -7,11 +8,13 @@ import { createTestApp } from '../../integration/create-test-app'
 describe('profit goals', function () {
   let salesAgent
   let app
+  let operatorRepository
 
   const salesAgentProfitGoal = 1500
 
   beforeEach(async function () {
     app = await createTestApp()
+    operatorRepository = new OperatorRepository()
 
     salesAgent = await createFlipper()
   })
@@ -21,7 +24,10 @@ describe('profit goals', function () {
       const now = new Date()
       const nowStub = () => now
 
-      const result = await setProfitGoalToOperator({ operatorId: salesAgent.id, profitAmount: 1500 }, nowStub)
+      const result = await setProfitGoalToOperator({
+        operatorId: salesAgent.id,
+        profitAmount: 1500
+      }, operatorRepository, nowStub)
 
       expect(result.profitGoal).to.deep.equal({ amount: 1500, updatedAt: now })
     })
@@ -29,7 +35,7 @@ describe('profit goals', function () {
     it('throws an error when setting profit goal for an non existing sales agent', async function () {
       let error
       try {
-        await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 })
+        await setProfitGoalToOperator({ operatorId: 'fakeId', profitAmount: 1500 }, operatorRepository)
       } catch (err) {
         error = err
       }

@@ -1,7 +1,8 @@
-import profitGoalsRoutes from './ProfitGoal/routes'
-import restringedHoursRoutes from './restringed-hours/routes'
+import { wrap } from 'express-promise-wrap'
 
 import './types'
+import { setProfitGoalToOperatorControllerFactory } from './ProfitGoal/controllers'
+import restringedHoursRoutes from './restringed-hours/routes'
 import { operatorRouter } from './routes'
 
 export default (app, diContainer, jwt) => {
@@ -14,5 +15,6 @@ export default (app, diContainer, jwt) => {
 
   app.use('/operators', secured, operatorRouter(diContainer))
   app.use('/operators/restringed-hours', secured, restringedHoursRoutes)
-  app.use('/operators/profit', secured, profitGoalsRoutes)
+  app.post('/operators/profit/goal', secured, wrap(
+    setProfitGoalToOperatorControllerFactory(diContainer.resolve('operatorRepository'))))
 }

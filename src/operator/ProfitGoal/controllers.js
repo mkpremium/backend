@@ -1,10 +1,8 @@
-import { wrap } from 'express-promise-wrap'
-
 import { setProfitGoalToOperator } from './application'
 
-async function setProfitGoalToOperatorFromRequest (req, res) {
-  const result = await setProfitGoalToOperator(req.body)
-  res.status(201).json(result)
+export function setProfitGoalToOperatorControllerFactory (operatorRepository) {
+  return async function setProfitGoalToOperatorController (req, res) {
+    const result = await setProfitGoalToOperator(req.body, operatorRepository)
+    res.status(201).json(result)
+  }
 }
-
-export const setProfitGoalToOperatorController = wrap(setProfitGoalToOperatorFromRequest)
