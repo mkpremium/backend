@@ -1,12 +1,12 @@
 import { setupContainer } from '../src/infrastructure/dependencies'
-import { connectCouchbaseBucket } from '../src/db/connect-couchbase-bucket'
-import { Bucket, N1qlQuery } from 'couchbase'
+import type { Bucket } from 'couchbase'
 import { createContainer } from 'awilix'
 import { AppDataSource } from '../src/data-source'
 
 let cachedBucket: Bucket
 
 async function setupCouchbaseBucket () {
+  const { connectCouchbaseBucket } = await import('../src/db/connect-couchbase-bucket')
   const bucket = await (cachedBucket ? Promise.resolve(cachedBucket) : connectCouchbaseBucket())
 
   await flushBucket(bucket)
@@ -40,7 +40,8 @@ export async function createTestContainer ({ couchbase, postgres }: {
   return container
 }
 
-export function flushBucket (bucket: Bucket) {
+export async function flushBucket (bucket: Bucket) {
+  const { N1qlQuery } = await import('couchbase')
   return new Promise((resolve, reject) => {
     console.time('deleteDocs')
     bucket.query(N1qlQuery.fromString('DELETE FROM mkpremium_test'), (error) => {
