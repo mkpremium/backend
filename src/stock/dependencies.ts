@@ -7,7 +7,8 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       stockRepository: asValue(null),
       legacyStockRepository: asValue(null),
       propertyManagersRepository: asValue(null),
-      stockService: asValue(null)
+      stockService: asValue(null),
+      stockSalesService: asValue(null)
     })
   } else {
     const { PropertyManagerRepository } = await import('../property-manager/PropertyManagerRepository')
