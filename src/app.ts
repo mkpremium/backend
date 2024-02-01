@@ -8,7 +8,6 @@ import email from './email'
 import { createDiContainer } from './infrastructure/dependencies'
 import appErrorHandler from './infrastructure/error-handler'
 import { initLogger } from './infrastructure/logger'
-import metadata from './metadata'
 import notes from './notes'
 // modules
 import operator from './operator'
@@ -67,7 +66,6 @@ export const createApp = async (database: Database): Promise<Express> => {
     setupStockRouter(app, diContainer, secured)
 
     notes(app, diContainer, secured)
-    metadata(app, secured)
     email(app, secured)
 
     await startListeners(diContainer)
