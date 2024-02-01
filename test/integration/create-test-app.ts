@@ -4,7 +4,9 @@ import { flushBucket, setupPostgres } from '../create-test-container'
 
 export const createTestApp = (database: 'couchbase' | 'postgres' = 'couchbase'): Promise<Express> => createApp(database)
   .then(async app => {
-    await flushBucket(app.locals.diContainer.resolve('couchbaseBucket'))
+    if (database === 'couchbase') {
+      await flushBucket(app.locals.diContainer.resolve('couchbaseBucket'))
+    }
     await setupPostgres()
 
     return app
