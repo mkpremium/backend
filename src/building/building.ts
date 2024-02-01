@@ -266,11 +266,10 @@ export const Building = t.struct<BuildingProps>(
 )
 
 export function changeNegotiationStatus (building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
-  return Building.update(building, {
-    negotiationStatus: {
-      $set: newStatus
-    }
-  })
+  return {
+    ...building,
+    negotiationStatus: newStatus
+  }
 }
 
 export function withTotalExpensesAmount (building: BuildingProps, totalAmount: number): BuildingProps {
