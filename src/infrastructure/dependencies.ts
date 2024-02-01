@@ -56,7 +56,7 @@ export async function setupContainer (
   await setupBuildingDependencies(container, usePostgres)
   setupOwnerDependencies(container, usePostgres)
   setupContactsDependencies(container)
-  setupScheduledEventsDependencies(container)
+  await setupScheduledEventsDependencies(container)
   await setupWorksheetDependencies(container, usePostgres)
   setupCallerDependencies(container)
   setupUserDependencies(container)

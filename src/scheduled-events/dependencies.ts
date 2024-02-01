@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, asValue, AwilixContainer } from 'awilix'
 import { MeetingsRepository } from './repository/meetings.repository'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
@@ -16,18 +16,26 @@ import { removeCallsOnNewMeetingOrOfferRequest } from './listeners/remove-calls-
 import { removeScheduledCallsOnOwnerRefusal } from './listeners/remove-scheduled-calls-on-owner-refusal'
 import { removeScheduledCallOnDiscardedContact } from './listeners/remove-scheduled-call-on-discarded-contact'
 import { updateScheduledCallController } from './controller/update-schedule-call.controller'
-import { CouchbaseScheduledEventsRepository } from './repository/couchbase-schedule-events.repository'
 import { PostgresScheduledEventsRepository } from './repository/postgres-schedule-events.repository'
 import { importScheduledEventHandlerFactory } from './service/scheduled-event-importer.service'
 
-export function setupScheduledEventsDependencies (container: AwilixContainer) {
+export async function setupScheduledEventsDependencies (container: AwilixContainer) {
   const usePostgres = container.resolve('usePostgres')
+  if (usePostgres) {
+    container.register({
+      couchbaseScheduledEventsRepository: asValue(null)
+    })
+  } else {
+    const { CouchbaseScheduledEventsRepository } = await import('./repository/couchbase-schedule-events.repository')
+    container.register({
+      couchbaseScheduledEventsRepository: asClass(CouchbaseScheduledEventsRepository).classic().singleton()
+    })
+  }
   container.register({
     meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
-    couchbaseScheduledEventsRepository: asClass(CouchbaseScheduledEventsRepository).classic().singleton(),
     postgresScheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
     scheduledEventsRepository: aliasTo(usePostgres ? 'postgresScheduledEventsRepository' : 'couchbaseScheduledEventsRepository'),
     selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
