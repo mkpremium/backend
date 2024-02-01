@@ -8,7 +8,7 @@ import { UserNotFound } from '../../flipper/service/flipper-favorites-buildings.
 export class PostgresUserRepository extends PostgresRepository<UserProps, User>
   implements UsersRepository {
   protected relations = {
-    flipper: true,
+    flipper: { favoriteBuildings: true },
     caller: {
       flipper: true
     }
@@ -43,7 +43,7 @@ export class PostgresUserRepository extends PostgresRepository<UserProps, User>
 export function mapUserEntityToStruct (entity: User) {
   return {
     roles: deriveRoles(entity),
-    favoriteBuildings: [],
+    favoriteBuildings: entity.flipper?.favoriteBuildings?.map(({ id }) => id) ?? [],
     id: entity.id,
     username: entity.username,
     password: entity.password,
