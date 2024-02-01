@@ -13,7 +13,7 @@ export default async (app, diContainer, jwt) => {
   })
   const usePostgres = diContainer.resolve('usePostgres')
   if (!usePostgres) {
-    const { restringedHoursRoutes } = await import('./restringed-hours/routes')
+    const restringedHoursRoutes = await import('./restringed-hours/routes')
     app.use('/operators/restringed-hours', secured, restringedHoursRoutes)
   }
 
