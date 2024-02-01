@@ -7,23 +7,23 @@ import { UserProfileProps } from '../types/user'
 @Entity()
 export class User extends BaseEntity {
   @Column({ unique: true })
-    username: string
+  username: string
 
   @Column()
-    password: string
+  password: string
 
   @Column()
-    enabled: boolean
+  enabled: boolean
 
   @OneToOne(() => Flipper, flipper => flipper.user)
-    flipper?: Flipper
+  flipper?: Flipper
 
   @OneToOne(() => Caller, caller => caller.user)
-    caller?: Caller
+  caller?: Caller
 
   @Column('jsonb')
-    profile: UserProfileProps
+  profile: UserProfileProps
 
   @Column({ default: false })
-    isAdmin: boolean
+  isAdmin: boolean
 }

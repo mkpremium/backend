@@ -7,17 +7,17 @@ export type BuildingDocumentMimeType = 'application/pdf' | 'image/jpeg'
 @Entity()
 export class BuildingDocument extends BaseEntity {
   @Column()
-    name: string
+  name: string
 
   @Column()
-    mimeType: BuildingDocumentMimeType
+  mimeType: BuildingDocumentMimeType
 
   @Column()
-    previewUrl: string
+  previewUrl: string
 
   @Column()
-    privateUrl: string
+  privateUrl: string
 
   @ManyToOne(() => Building, (building) => building.documents)
-    building: Building
+  building: Building
 }

@@ -5,8 +5,8 @@ import { ContactType } from '../owner/owner'
 @Entity()
 export class Contact extends BaseEntity {
   @Column({ unique: true })
-    value: string
+  value: string
 
   @Column('text')
-    type: ContactType
+  type: ContactType
 }

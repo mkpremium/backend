@@ -8,11 +8,11 @@ import { Person } from './person.entity'
 @Index(['person', 'contact'], { unique: true })
 export class PersonContact extends BaseEntity {
   @ManyToOne(() => Person)
-    person: Person
+  person: Person
 
   @ManyToOne(() => Contact)
-    contact: Contact
+  contact: Contact
 
   @Column('text')
-    status: OwnerContactStatus
+  status: OwnerContactStatus
 }

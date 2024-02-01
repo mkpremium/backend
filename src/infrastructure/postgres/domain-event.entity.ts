@@ -26,7 +26,7 @@ export enum DomainEventCatalog {
   WORKSHEET__TAKEN = 'worksheet.taken',
 
   POSTGRES_MIGRATION__OWNER_IMPORTED = 'postgres_migration.owner_imported',
-  POSTGRES_MIGRATION__SCHEDULED_EVENT_IMPORTED='postgres_migration.scheduled_event_imported',
+  POSTGRES_MIGRATION__SCHEDULED_EVENT_IMPORTED = 'postgres_migration.scheduled_event_imported',
   POSTGRES_MIGRATION__WORKSHEET_IMPORTED = 'postgres_migration.worksheet_imported',
   POSTGRES_MIGRATION__WORKSHEET_QUEUE_IMPORTED = 'postgres_migration.worksheet_queue_imported',
 
@@ -42,19 +42,19 @@ export enum DomainEventCatalog {
 @Entity()
 export class DomainEvent {
   @PrimaryGeneratedColumn('uuid')
-    id: string
+  id: string
 
   @Column('text')
-    name: DomainEventCatalog
+  name: DomainEventCatalog
 
   @Column({ default: 'unknwon' })
-    version: string
+  version: string
 
   @Column({
     type: 'jsonb'
   })
-    body: object
+  body: object
 
   @CreateDateColumn()
-    createdAt: Date
+  createdAt: Date
 }

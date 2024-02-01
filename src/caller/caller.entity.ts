@@ -7,10 +7,10 @@ import { Flipper } from '../flipper/flipper.entity'
 export class Caller extends BaseEntity {
   @OneToOne(() => User)
   @JoinColumn()
-    user: User
+  user: User
 
   @ManyToOne(() => Flipper)
-    flipper?: Flipper
+  flipper?: Flipper
 
   get flipperId () {
     return this.flipper?.id

@@ -6,11 +6,11 @@ import { User } from '../user/user.entity'
 @Entity()
 export class BuildingNote extends BaseEntity {
   @ManyToOne(() => Building, building => building.notes)
-    building: Building
+  building: Building
 
   @Column({ nullable: false })
-    note: string
+  note: string
 
   @ManyToOne(() => User)
-    author: User
+  author: User
 }

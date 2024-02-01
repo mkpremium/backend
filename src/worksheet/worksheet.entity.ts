@@ -8,30 +8,30 @@ import { Caller } from '../caller/caller.entity'
 
 @Entity()
 export class Worksheet extends BaseEntity {
-    @Column({ type: 'text', default: 'LOOKING_MEETING' })
-      status: WorksheetStatusType
+  @Column({ type: 'text', default: 'LOOKING_MEETING' })
+  status: WorksheetStatusType
 
-    @OneToOne(() => Building, building => building.worksheet)
-    @JoinColumn()
-      building: Building
+  @OneToOne(() => Building, building => building.worksheet)
+  @JoinColumn()
+  building: Building
 
-    @ManyToOne(() => WorksheetQueue, wq => wq.worksheets)
-      queue?: WorksheetQueue
+  @ManyToOne(() => WorksheetQueue, wq => wq.worksheets)
+  queue?: WorksheetQueue
 
-    @ManyToOne(() => Caller, { nullable: true })
-      heldBy?: Caller
+  @ManyToOne(() => Caller, { nullable: true })
+  heldBy?: Caller
 
-    @Column({ type: 'text', default: '' })
-      statusChangeReason?: string
+  @Column({ type: 'text', default: '' })
+  statusChangeReason?: string
 
-    @Column({ type: 'timestamptz', nullable: true })
-      lastStatusChangedAt?: Date
+  @Column({ type: 'timestamptz', nullable: true })
+  lastStatusChangedAt?: Date
 
-    @Column({ type: 'timestamptz', nullable: true })
-      lastViewedAt?: Date
+  @Column({ type: 'timestamptz', nullable: true })
+  lastViewedAt?: Date
 
-    @ManyToOne(() => User, { nullable: true })
-      lastViewedBy?: User
+  @ManyToOne(() => User, { nullable: true })
+  lastViewedBy?: User
 
   // lastMeeting
 }

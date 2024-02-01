@@ -9,20 +9,20 @@ import { OwnerStatus } from './owner'
 export class Owner extends BaseEntity {
   @OneToOne(() => Person, person => person.owner)
   @JoinColumn()
-    person: Person
+  person: Person
 
   @OneToMany(() => Building, building => building.featuredOwner)
-    featuredInBuildings: Building[]
+  featuredInBuildings: Building[]
 
   @ManyToOne(() => Building)
-    building: Building
+  building: Building
 
   @Column('text', { default: 'NO_VERIFICADO' })
-    status: OwnerStatus
+  status: OwnerStatus
 
   @Column('text', { default: 'PRINCIPAL' })
-    type: OwnerType
+  type: OwnerType
 
   @Column('text', { nullable: true })
-    note: string
+  note: string
 }

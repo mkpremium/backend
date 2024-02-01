@@ -8,32 +8,32 @@ import { DecimalColumnTransformer } from '../infrastructure/postgres/decimal-col
 @Entity()
 export class Proposal extends BaseEntity {
   @Column('text')
-    status: 'ACCEPTED' | 'SENT' | 'PENDING'
+  status: 'ACCEPTED' | 'SENT' | 'PENDING'
 
   @ManyToOne(() => Building, building => building.proposals)
-    building: Building
+  building: Building
 
   @ManyToOne(() => Owner)
-    owner: Owner
+  owner: Owner
 
   @ManyToOne(() => User)
-    author: User
+  author: User
 
   @Column({ type: 'decimal', precision: 10, scale: 2, transformer: new DecimalColumnTransformer() })
-    amount: number
+  amount: number
 
   @Column()
-    notificationEmail: string
+  notificationEmail: string
 
   @Column('text')
-    notificationStatus: 'PENDING' | 'SENT' | 'DISABLED'
+  notificationStatus: 'PENDING' | 'SENT' | 'DISABLED'
 
   @Column({ type: 'timestamptz', nullable: true })
-    notificationSentAt?: Date
+  notificationSentAt?: Date
 
   @Column({ type: 'text', nullable: true })
-    message?: string
+  message?: string
 
   @Column({ type: 'numeric', nullable: true })
-    aspiration?: number
+  aspiration?: number
 }
