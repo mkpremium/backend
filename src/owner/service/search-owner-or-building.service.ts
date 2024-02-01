@@ -125,7 +125,7 @@ function inferBuildingLastEvent (
   lastMeeting?: LastBuildingMeeting
 ): FoundOwnerProps['lastEvent'] | undefined {
   if (!lastMeeting) {
-    return lastOfferAsLastEvent(lastOfferRequest)
+    return lastOfferRequest ? lastOfferAsLastEvent(lastOfferRequest) : undefined
   }
   if (!lastOfferRequest) {
     return lastMeetingAsLastEvent(lastMeeting)
