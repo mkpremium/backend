@@ -125,7 +125,7 @@ export abstract class CouchbaseModel {
         return
       }
 
-      const e = new DuplicatedEntity(data._documentType, field, value)
+      const e = new DuplicatedEntity(data._documentType, field, value) as DuplicatedEntity & {code: number}
       e.code = 400
       throw e
     }

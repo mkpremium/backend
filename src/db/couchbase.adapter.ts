@@ -75,7 +75,7 @@ export class CouchbaseAdapter {
   queryAsync (query: string, params?, opts?: { queryName: string }): Promise<any[]> {
     return this.withRetry(() => {
       const beeline = honeycomb()
-      const spanInfo = { name: 'couchbase_query' }
+      const spanInfo = { name: 'couchbase_query' } as Record<string, unknown>
       if (opts) {
         spanInfo.query_name = opts.queryName
       }

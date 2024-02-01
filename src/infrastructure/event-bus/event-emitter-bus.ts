@@ -5,11 +5,12 @@ import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
 import { EntityManager } from 'typeorm'
 import { createEventRecorderListener } from './event-recorder.listener'
+import type { ListenersRegistry } from './listeners-registry'
 
 export class EventEmitterBus implements EventBus {
   private emitter = new EventEmitter()
 
-  get info (): Record<string, number> {
+  get info (): ListenersRegistry['listeners'] {
     return this.emitter.eventNames().reduce((acc, name) => {
       acc[name] = this.emitter.listenerCount(name)
       return acc

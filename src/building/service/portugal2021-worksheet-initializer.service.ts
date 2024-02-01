@@ -31,7 +31,7 @@ export class Portugal2021WorksheetInitializerService {
                 id: uuid(),
                 status: 'OPEN',
                 relatedBuildingIds: [sourceBuilding.importedWithBuildingId],
-                buildingAddress: building.address
+                buildingAddress: building.address as any
               }))
             )
           }),

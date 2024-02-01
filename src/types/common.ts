@@ -40,7 +40,7 @@ export interface AddressProp {
   registerNumber?: string
   postalCode?: {
     number?: string | number
-    verified: boolean
+    verified?: boolean
   }
   province?: string
   zone?: string

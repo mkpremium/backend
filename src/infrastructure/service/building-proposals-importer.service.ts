@@ -37,7 +37,7 @@ export class BuildingProposalsImporterService {
         original.message ??= ''
 
         await em.save(Proposal, {
-          id: proposal.document.id,
+          id: (proposal.document as {id: string}).id,
           status: oldProposalToEntityStatus(original.state),
           building: { id: buildingId },
           owner: { id: original.ownerId },

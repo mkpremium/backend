@@ -1,8 +1,9 @@
 import { EventBus } from '../event-bus'
+import { ListenersRegistry } from './listeners-registry'
 
 export class InMemorySyncEventBus implements EventBus {
   private subscribers = {}
-  info: Record<string, number>
+  info: ListenersRegistry['listeners']
 
   publish (event): Promise<void> {
     if (!this.subscribers[event.name]) {
