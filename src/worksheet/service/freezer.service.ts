@@ -22,10 +22,10 @@ export class FreezerService {
   async moveWorksheetOutOfFreezer (daysInFreezer: number, limit: number) {
     logger.info('starting to move worksheets from freezer settings', { daysInFreezer })
 
-    await (this.usePostgres ? this.doPostgres(daysInFreezer, limit) : this.doCouchbase(daysInFreezer, limit))
+    await (this.usePostgres ? this.doPostgres(daysInFreezer) : this.doCouchbase(daysInFreezer, limit))
   }
 
-  private async doPostgres (daysInFreezer: number, limit: number) {
+  private async doPostgres (daysInFreezer: number) {
     await this.entityManager.createQueryBuilder(WorksheetEntity, 'worksheet')
       .update(WorksheetEntity)
       .set({ queue: null, status: WorkSheetStatus.AVAILABLE as WorksheetStatusType })
@@ -34,7 +34,6 @@ export class FreezerService {
       .andWhere('worksheet."lastStatusChangedAt" IS NOT NULL')
       .andWhere('worksheet."lastStatusChangedAt" <= :timestampLimit',
         { timestampLimit: moment().subtract(daysInFreezer, 'days').toDate() })
-      .limit(limit)
       .execute()
   }
 
