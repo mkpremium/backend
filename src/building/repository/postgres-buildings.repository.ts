@@ -107,6 +107,7 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
     use: entity.use,
     recentProposal: entity.recentProposal
       ? {
+        id: entity.recentProposal.id,
         proposal: entity.recentProposal.amount,
         createdAt: entity.recentProposal.createdAt
       }
