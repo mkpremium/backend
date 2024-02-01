@@ -1,16 +1,23 @@
 import { EntityManager, In } from 'typeorm'
 import { Building } from '../building.entity'
 import { BuildingReadModel } from '../repository/buildings-read.repository'
-import { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
+import type { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
 import { BuildingOfferRequest } from '../repository/building-offer-request.entity'
-import { buildingEntityToReadModel } from '../repository/postgres-buildings.repository'
+import { buildingEntityToReadModel, mapBuildingEntityToStruct } from '../repository/postgres-buildings.repository'
 import { PostgresOwnersRepository } from '../../owner/repository/postgres-owners.repository'
+import { BuildingProps } from '../building'
+import {
+  LastBuildingMeeting,
+  PostgresScheduledEventsRepository
+} from '../../scheduled-events/repository/postgres-schedule-events.repository'
+import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
 
 export class ListBuildingsService {
   constructor (
     private usePostgres: boolean,
     private entityManager: EntityManager,
     private postgresOwnersRepository: PostgresOwnersRepository,
+    private postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
     private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository
   ) {
   }
@@ -25,6 +32,45 @@ export class ListBuildingsService {
     return this.usePostgres
       ? this.buildingAssignedToInPostgres(flipperUserId)
       : this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperUserId)
+  }
+
+  async getBuildingFullInformation (buildingIds: string[]): Promise<Record<string, {
+    building: BuildingProps & { worksheetId: string },
+    lastOfferRequest?: LastBuildingOffer,
+    lastMeeting?: LastBuildingMeeting,
+    scheduledCalls: ScheduledEvent[]
+  }>> {
+    const [buildings, scheduledCalls, lastBuildingsOfferRequests, lastMeetings] = await Promise.all([
+      this.entityManager.find(Building, {
+        where: {
+          id: In(buildingIds)
+        },
+        // Same as in PostgresBuildingsRepository#relations plus worksheet
+        relations: {
+          assignedFlipper: true,
+          featuredOwner: true,
+          documents: true,
+          proposals: true,
+          worksheet: true
+        }
+      }),
+      this.entityManager.find(ScheduledEvent, {
+        where: { building: { id: In(buildingIds) } },
+        loadRelationIds: true
+      }),
+      getLastOfferRequestForBuildings(buildingIds, this.entityManager),
+      this.postgresScheduledEventsRepository.lastMeetingForBuildings(buildingIds)
+    ])
+
+    return buildings.reduce((acc, b) => {
+      acc[b.id] = {
+        building: { ...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id },
+        lastOfferRequest: lastBuildingsOfferRequests.find((offer) => offer.buildingId === b.id),
+        lastMeeting: lastMeetings.find((meeting) => meeting.buildingId === b.id),
+        scheduledCalls: scheduledCalls.filter(se => (se.building as unknown as string) === b.id)
+      }
+      return acc
+    }, {})
   }
 
   private async buildingOfIdInPostgres (ids: string | string[]): Promise<BuildingReadModel[]> {
