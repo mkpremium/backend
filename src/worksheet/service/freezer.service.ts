@@ -1,12 +1,12 @@
 import { logger } from '../../infrastructure/logger'
 import { utc } from '../../lib/date'
-import { LegacyWorksheetRepository } from '../models/worksheet-repository'
+import type { LegacyWorksheetRepository } from '../models/worksheet-repository'
 import { pullOutFreezer, Worksheet, WorksheetProps, WorkSheetStatus, WorksheetStatusType } from '../domain/worksheet'
 import fromJSON from 'tcomb/lib/fromJSON'
 import { Promise as BirdPromise } from 'bluebird'
 import _ from 'lodash'
-import { CouchbaseBuildingsRepository } from '../../building/repository/couchbase-building.repository'
-import { EntityManager } from 'typeorm'
+import type { CouchbaseBuildingsRepository } from '../../building/repository/couchbase-building.repository'
+import type { EntityManager } from 'typeorm'
 import { Worksheet as WorksheetEntity } from '../worksheet.entity'
 import moment from 'moment'
 
@@ -48,16 +48,19 @@ export class FreezerService {
       .limit(limit)
 
     const worksheets = await this.legacyWorksheetRepository.query(queryBuilder)
-    await pullWorksheetsOutOfFreezer(worksheets, this.couchbaseBuildingsRepository)
+    await pullWorksheetsOutOfFreezer(worksheets, this.couchbaseBuildingsRepository, this.legacyWorksheetRepository)
   }
 }
 
-async function pullWorksheetsOutOfFreezer (worksheets: WorksheetProps[], buildingsRepository: CouchbaseBuildingsRepository) {
+async function pullWorksheetsOutOfFreezer (
+  worksheets: WorksheetProps[],
+  buildingsRepository: CouchbaseBuildingsRepository,
+  repository: LegacyWorksheetRepository
+) {
   if (!worksheets || worksheets.length === 0) {
     return
   }
 
-  const repository = new LegacyWorksheetRepository()
   const updatedWorksheets = worksheets.map(worksheet => {
     logger.info('moving worksheet out freezer', { statusChangedAt: worksheet.statusChangedAt, id: worksheet.id })
     try {
