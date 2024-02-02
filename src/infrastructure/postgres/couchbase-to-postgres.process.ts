@@ -68,14 +68,6 @@ export function couchbaseToPostgresProcess ({
 
   eventBus.on(
     DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
-    'postgres_migration.import_building_proposals',
-    async ({ buildingId }: { buildingId: string }) => {
-      await buildingProposalsImporterService.importBuildingProposal(buildingId)
-    }
-  )
-
-  eventBus.on(
-    DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
     'postgres_migration.import_building_worksheets',
     async ({ buildingId }: { buildingId: string }) => {
       await buildingWorkSheetsImporterService.importWorkSheet(buildingId)
@@ -98,6 +90,14 @@ export function couchbaseToPostgresProcess ({
     DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_SCHEDULED_EVENT,
     eventBus,
     importScheduledEventCommandHandler
+  )
+
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES_MIGRATION__IMPORT_BUILDING_PROPOSAL,
+    eventBus,
+    async ({ buildingId }: { buildingId: string }) => {
+      await buildingProposalsImporterService.importBuildingProposal(buildingId)
+    }
   )
 
   return {
