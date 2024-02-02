@@ -30,7 +30,9 @@ describe('scheduled-events.setupEventListeners', () => {
       scheduledCallFromOwnerMessage: asValue(undefined),
       removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
       removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
-      removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton()
+      removeScheduledCallOnDiscardedContact: asFunction(removeScheduledCallOnDiscardedContact).singleton(),
+      usePostgres: asValue(false),
+      entityManager: asValue(undefined)
     })
     scheduledEventsEventListeners(eventBus, container)
   })
