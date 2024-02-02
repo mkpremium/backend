@@ -33,6 +33,7 @@ import { CouchbaseDocumentRepository } from './postgres/couchbase-document.repos
 import { ScheduledEventImportTriggerService } from './service/scheduled-event-import-trigger.service'
 import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-import-trigger.service'
 import type { Bucket } from 'couchbase'
+import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
 
 export async function createDiContainer (database: Database) {
   const usePostgres: boolean = database === 'postgres'
@@ -102,6 +103,7 @@ async function setupInfrastructureDependencies (container: AwilixContainer, couc
     buildingImagesImporterService: asClass(BuildingImagesImporterService).classic().singleton(),
     buildingOwnerImportTriggerService: asClass(BuildingOwnerImportTriggerService).classic().singleton(),
     buildingProposalsImporterService: asClass(BuildingProposalsImporterService).classic().singleton(),
+    buildingProposalsImportTriggerService: asClass(BuildingProposalsImportTriggerService).classic().singleton(),
     buildingWorkSheetsImporterService: asClass(BuildingWorkSheetsImporterService).classic().singleton(),
     couchbaseDocumentRepository: asClass(CouchbaseDocumentRepository).classic().singleton()
   })

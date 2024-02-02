@@ -15,6 +15,7 @@ import { BuildingWorkSheetsImporterService } from '../service/building-worksheet
 import { ImportScheduledEventHandler } from '../../scheduled-events/service/scheduled-event-importer.service'
 import { ScheduledEventImportTriggerService } from '../service/scheduled-event-import-trigger.service'
 import { WorksheetQueueImportTriggerService } from './worksheet-queue-import-trigger.service'
+import type { BuildingProposalsImportTriggerService } from '../service/building-proposals-importer-trigger.service'
 
 interface Deps {
   eventBus: EventBus,
@@ -32,6 +33,7 @@ interface Deps {
   importOperatorCommandHandler: ReturnType<typeof importOperatorCommandHandler>,
   buildingOwnerImportTriggerService: BuildingOwnerImportTriggerService,
   buildingProposalsImporterService: BuildingProposalsImporterService,
+  buildingProposalsImportTriggerService: BuildingProposalsImportTriggerService,
   buildingWorkSheetsImporterService: BuildingWorkSheetsImporterService,
 }
 
@@ -48,6 +50,7 @@ export function couchbaseToPostgresProcess ({
   buildingImagesImporterService,
   buildingOwnerImportTriggerService,
   buildingProposalsImporterService,
+  buildingProposalsImportTriggerService,
   buildingWorkSheetsImporterService
 }: Deps) {
   eventBus.on(
@@ -106,6 +109,9 @@ export function couchbaseToPostgresProcess ({
     },
     async triggerScheduledEventMigration () {
       await scheduledEventImportTriggerService.triggerImport()
+    },
+    async triggerBuildingProposalsImport () {
+      await buildingProposalsImportTriggerService.triggerImport()
     },
     async triggerWorksheetQueueImport () {
       await worksheetQueueImportTriggerService.triggerImport()
