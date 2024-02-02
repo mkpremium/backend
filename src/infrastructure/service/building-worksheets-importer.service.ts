@@ -54,10 +54,7 @@ export class BuildingWorkSheetsImporterService {
     await this.entityManager.transaction(async em => {
       await em.save(Worksheet, worksheet)
       await markCouchbaseDocumentAsMigrated(em, original.id)
-      await this.eventBus.publish({
-        name: DomainEventCatalog.POSTGRES_MIGRATION__WORKSHEET_IMPORTED,
-        em
-      })
+      await this.eventBus.publish({ name: DomainEventCatalog.POSTGRES_MIGRATION__WORKSHEET_IMPORTED }, em)
     })
   }
 }
