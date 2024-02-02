@@ -1,8 +1,8 @@
 import { EventBus } from '../event-bus'
 import { EntityManager } from 'typeorm'
 import type { Logger } from 'winston'
-import { CouchbaseDocument, CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
+import { Building } from '../../building/building.entity'
 
 export class BuildingProposalsImportTriggerService {
   constructor (
@@ -14,15 +14,14 @@ export class BuildingProposalsImportTriggerService {
   async triggerImport () {
     this.logger.info('Triggering building proposals import')
 
-    const allBuildings = await this.entityManager
-      .createQueryBuilder(CouchbaseDocument, 'building')
-      .andWhere('building.documentType = :documentType', { documentType: CouchbaseDocumentType.BUILDING })
-      .select(['building.id', 'building.document'])
+    const allMigratedBuildings = await this.entityManager
+      .createQueryBuilder(Building, 'building')
+      .select(['building.id'])
       .getMany()
 
-    this.logger.info('Found buildings', { count: allBuildings.length })
+    this.logger.info('Found buildings', { count: allMigratedBuildings.length })
 
-    for (const building of allBuildings) {
+    for (const building of allMigratedBuildings) {
       await this.eventBus.publish({
         name: DomainEventCatalog.CMD__POSTGRES_MIGRATION__IMPORT_BUILDING_PROPOSAL,
         buildingId: building.id
