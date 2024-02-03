@@ -1,4 +1,4 @@
-import { CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
+import { CouchbaseDocument, CouchbaseDocumentType } from '../postgres/couchbase-document.entity'
 import { DomainEventCatalog } from '../postgres/domain-event.entity'
 import { Caller } from '../../caller/caller.entity'
 import { EventPublisher } from '../event-bus'
@@ -22,15 +22,14 @@ export class BuildingWorkSheetsImporterService {
 
   async importWorkSheet (buildingId: string) {
     this.logger.info('Building imported, importing its worksheets', { buildingId })
-    const couchbaseDocument = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
-      CouchbaseDocumentType.WORKSHEET, buildingId)
-
-    const original = couchbaseDocument.document as WorksheetProps
+    const couchbaseDocument = await this.getCouchbaseWorksheet(buildingId)
 
     if (!couchbaseDocument) {
       this.logger.error('No worksheets found for building', { buildingId })
       return
     }
+
+    const original = couchbaseDocument.document as WorksheetProps
 
     const worksheet = structToEntity(original)
     if (original.queueId) {
@@ -56,5 +55,16 @@ export class BuildingWorkSheetsImporterService {
       await markCouchbaseDocumentAsMigrated(em, original.id)
       await this.eventBus.publish({ name: DomainEventCatalog.POSTGRES_MIGRATION__WORKSHEET_IMPORTED }, em)
     })
+  }
+
+  private async getCouchbaseWorksheet (buildingId: string): Promise<CouchbaseDocument> {
+    let worksheetDocument = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
+      CouchbaseDocumentType.WORKSHEET, buildingId)
+    if (!worksheetDocument) {
+      worksheetDocument = await this.couchbaseDocumentRepository.getDocumentByRelatedBuildingId(
+        CouchbaseDocumentType.WORKSHEET_WO_BUILDINGS, buildingId)
+    }
+
+    return worksheetDocument
   }
 }
