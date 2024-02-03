@@ -46,7 +46,7 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
           publicIdentifier: building.cadastre.reference
         })
         if (existingBuilding) {
-          logger.warning('Building with same "Numero de Catatro" found', {
+          logger.warning('Building with same "Numero de Catastro" found', {
             buildingId: building.id,
             publicIdentifier: building.cadastre.reference
           })
