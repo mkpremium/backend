@@ -41,9 +41,25 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
           })
         }
       }
+      if (building.cadastre?.reference) {
+        const existingBuilding = await entityManager.findOneBy(Building, {
+          publicIdentifier: building.cadastre.reference
+        })
+        if (existingBuilding) {
+          logger.warning('Building with same "Numero de Catatro" found', {
+            buildingId: building.id,
+            publicIdentifier: building.cadastre.reference
+          })
+          delete building.cadastre
+        }
+      }
 
       // Ensure there is no building with a featured owner as they aren't imported yet.
-      await em.save(Building, mapBuildingStructToEntity({ ...building, ownerId: undefined, assignedAgentId: flipperId }))
+      await em.save(Building, mapBuildingStructToEntity({
+        ...building,
+        ownerId: undefined,
+        assignedAgentId: flipperId
+      }))
       await markCouchbaseDocumentAsMigrated(em, building.id)
 
       await eventBus.publish({
