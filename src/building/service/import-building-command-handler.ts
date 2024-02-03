@@ -35,7 +35,7 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
         if (flipper) {
           flipperId = flipper.id
         } else {
-          this.logger.error('Building has an assigned agent that does not exist', {
+          logger.error('Building has an assigned agent that does not exist', {
             buildingId: building.id,
             assignedAgentId: building.assignedAgentId
           })
