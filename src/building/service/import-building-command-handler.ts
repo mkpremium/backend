@@ -29,11 +29,19 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
 
       let flipperId: string | undefined
       if (building.assignedAgentId) {
-        const flipper = await entityManager.findOneByOrFail(Flipper,
+        const flipper = await entityManager.findOneBy(Flipper,
           { user: { id: building.assignedAgentId } }
         )
-        flipperId = flipper.id
+        if (flipper) {
+          flipperId = flipper.id
+        } else {
+          this.logger.error('Building has an assigned agent that does not exist', {
+            buildingId: building.id,
+            assignedAgentId: building.assignedAgentId
+          })
+        }
       }
+
       // Ensure there is no building with a featured owner as they aren't imported yet.
       await em.save(Building, mapBuildingStructToEntity({ ...building, ownerId: undefined, assignedAgentId: flipperId }))
       await markCouchbaseDocumentAsMigrated(em, building.id)
@@ -42,6 +50,7 @@ export function importBuildingCommandHandler ({ entityManager, logger, eventBus 
         name: DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
         buildingId: building.id
       }, em)
-    })
+    }
+    )
   }
 }
