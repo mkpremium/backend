@@ -6,6 +6,7 @@ export enum DomainEventCatalog {
   BUILDING__BUILDING_IMAGES_IMPORTED = 'building.building_images_imported',
   BUILDING__NEGOTIATION_STATUS_CHANGED = 'building.negotiation_status_changed',
   BUILDING__PROPOSAL_SCHEDULED = 'building.proposal_scheduled',
+  BUILDING__PROPOSAL_IMPORTED = 'building.proposal_imported',
 
   OFFER_REQUEST__CREATED = 'offer_request.created',
 
