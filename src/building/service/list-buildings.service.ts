@@ -106,7 +106,7 @@ export class ListBuildingsService {
     const buildings = await this.entityManager.find(Building, {
       where: {
         assignedFlipper: { user: { id: flipperUserId } },
-        negotiationStatus: Not('DESCARTADO' as const)
+        negotiationStatus: Not(In(['DESCARTADO' as const, 'NO VENDE' as const]))
       }
     })
 
