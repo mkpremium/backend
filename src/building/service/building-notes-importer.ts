@@ -15,7 +15,10 @@ export class BuildingNotesImporterService {
 
   async importBuildingNotes (buildingId: string) {
     this.logger.info('Building imported, importing its notes', { buildingId })
-    const couchbaseDocuments = await this.couchbaseDocumentRepository.getBuildingNonMigratedRelatedDocuments(CouchbaseDocumentType.NOTE, buildingId)
+    const couchbaseDocuments = await this.couchbaseDocumentRepository
+      .getNonMigratedQuery(CouchbaseDocumentType.NOTE)
+      .andWhere('document -> \'context\' ->> \'buildingId\' = :buildingId', { buildingId })
+      .getMany()
     this.logger.info('Found notes for building', { buildingId, count: couchbaseDocuments.length })
 
     for (const couchbaseDocument of couchbaseDocuments) {
