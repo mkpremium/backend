@@ -40,6 +40,7 @@ export class CallcenterWorksheetService {
       .where('building.address ->> \'province\' IN (:...provinces)',
         { provinces: [].concat(source.province) })
       .andWhere('worksheet.queueId IS NULL')
+      .andWhere('worksheet.status IN (:...statuses)', { statuses: ['OPEN', 'LOOKING_MEETING'] })
     if (skipWorksheetId) {
       builder = builder.where('worksheet.id != :skipWorksheetId', { skipWorksheetId })
     }
