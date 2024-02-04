@@ -8,13 +8,16 @@ import { Proposal } from '../../building/proposal.entity'
 import { oldProposalToEntityStatus } from '../../building/repository/postgres-proposals.repository'
 import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
 import { CouchbaseDocumentRepository } from '../postgres/couchbase-document.repository'
+import { Owner } from '../../owner/owner.entity'
+import { type AddOwnerCommand, AddOwnerService } from '../../owner/service/add-owner.service'
 
 export class BuildingProposalsImporterService {
   constructor (
     protected readonly entityManager: EntityManager,
     private readonly eventBus: EventPublisher,
     private readonly logger: Logger,
-    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository
+    private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
+    private readonly addOwnerService: AddOwnerService
   ) {
   }
 
@@ -37,11 +40,12 @@ export class BuildingProposalsImporterService {
 
       try {
         await this.entityManager.transaction(async em => {
+          const owner = await this.getOwner(em, original)
           await em.save(Proposal, {
             id: (proposal.document as { id: string }).id,
             status: oldProposalToEntityStatus(original.state),
             building: { id: buildingId },
-            owner: { id: original.ownerId },
+            owner,
             author: { id: original.createdBy },
             amount: original.proposal,
             message: original.message,
@@ -70,5 +74,35 @@ export class BuildingProposalsImporterService {
     }
 
     this.logger.info('All building proposals imported', { buildingId })
+  }
+
+  private async getOwner (entityManager: EntityManager, original: ProposalProps): Promise<{ id: string }> {
+    const existingOwner = await entityManager.findOneBy(Owner, { id: original.ownerId })
+    if (existingOwner) {
+      return existingOwner
+    }
+    const addOwnerCommand: AddOwnerCommand = {
+      buildingId: original.buildingId,
+      id: original.ownerId,
+      note: 'Creado por importador de propuestas',
+      status: 'VERIFICADO',
+      type: 'PRINCIPAL',
+      person: {
+        name: 'Propietario',
+        firstName: 'Propietario',
+        firstSurname: 'Propietario',
+        secondSurname: 'Propietario',
+        contacts: []
+      }
+    }
+    if (original.notificationEmail) {
+      addOwnerCommand.person.contacts.push({
+        type: 'EMAIL',
+        status: 'GOOD',
+        value: original.notificationEmail
+      })
+    }
+
+    return await this.addOwnerService.addOwner(addOwnerCommand, 'building-proposals-importer')
   }
 }
