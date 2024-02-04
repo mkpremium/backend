@@ -47,10 +47,7 @@ export class CallcenterWorksheetService {
     const nextWorksheet = await builder
       .orderBy('worksheet.lastViewedAt')
       .getOneOrFail()
-    const worksheet = await this.getWorksheetQueryBuilder()
-      .where('worksheet.id = :id', { id: nextWorksheet.id }).getOneOrFail()
-
-    return toView(worksheet)
+    return this.getPostgresWorksheet(nextWorksheet.id)
   }
 
   private getWorksheetQueryBuilder () {
