@@ -1,4 +1,3 @@
-import '../../../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../../../src/infrastructure/logger'
 import { CouchbaseAdapter } from '../../../src/db/couchbase.adapter'
 import { createDiContainer } from '../../../src/infrastructure/dependencies'

@@ -1,4 +1,3 @@
-import '../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../src/infrastructure/logger'
 import { EventPoller } from '../src/infrastructure/event-bus/event-poller'
 import { Bucket } from 'couchbase'

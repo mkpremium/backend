@@ -1,5 +1,3 @@
-import '../src/infrastructure/o11y/honeycomb'
-
 import http, { Server } from 'http'
 import { logger } from '../src/infrastructure/logger'
 

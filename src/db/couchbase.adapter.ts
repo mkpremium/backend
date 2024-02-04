@@ -9,7 +9,6 @@ import { Bucket, errors as couchbaseErrors, errors, N1qlQuery } from 'couchbase'
 import { CouchbaseRecordToDomain, RecordToDomain } from '../infrastructure/couchbase/record-to-domain'
 import { promisifyAll } from 'bluebird'
 import Consistency = N1qlQuery.Consistency
-import honeycomb from 'honeycomb-beeline'
 
 export type PromisifiedBucket = Bucket & {
   queryAsync: (query: N1qlQuery, params?: { [ param: string ]: any } | any[]) => Promise<any[] | null>,
@@ -50,10 +49,7 @@ export class CouchbaseAdapter {
   getEntity<T> (structType: t.Type<T> & Partial<RecordToDomain>, entityId): Promise<T> {
     return this.withRetry(
       () => {
-        const beeline = honeycomb()
-        const span = beeline.startSpan({ name: 'couchbase_get', key: entityId })
         return this.couchbaseBucket.getAsync(entityId)
-          .finally(() => beeline.finishSpan(span))
           .catch(error => {
             if (error.code === errors.keyNotFound) {
               throw new EntityNotFound(entityId, structType)
@@ -72,17 +68,9 @@ export class CouchbaseAdapter {
     )
   }
 
-  queryAsync (query: string, params?, opts?: { queryName: string }): Promise<any[]> {
+  queryAsync (query: string, params?): Promise<any[]> {
     return this.withRetry(() => {
-      const beeline = honeycomb()
-      const spanInfo = { name: 'couchbase_query' } as Record<string, unknown>
-      if (opts) {
-        spanInfo.query_name = opts.queryName
-      }
-
-      const span = beeline.startSpan(spanInfo)
       return this.couchbaseBucket.queryAsync(N1qlQuery.fromString(query).consistency(Consistency.REQUEST_PLUS), params)
-        .finally(() => beeline.finishSpan(span))
     }
     ).catch(error => {
       throw new QueryError(query, error.message, params, error.code)
@@ -104,11 +92,7 @@ export class CouchbaseAdapter {
   }
 
   upsert (key: string, obj: object, cas?: any) {
-    const beeline = honeycomb()
-    const span = beeline.startSpan({ name: 'couchbase_upsert', key })
-
     return (cas ? this.couchbaseBucket.upsertAsync(key, obj, { cas }) : this.couchbaseBucket.upsertAsync(key, obj))
-      .finally(() => beeline.finishSpan(span))
   }
 
   insert (id: string, value: any) {

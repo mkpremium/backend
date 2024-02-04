@@ -1,4 +1,3 @@
-import '../src/infrastructure/o11y/honeycomb'
 import { initLogger } from '../src/infrastructure/logger'
 import { ProposalsSenderService } from '../src/building/service/proposals-sender.service'
 import { createContainer } from './create-container'

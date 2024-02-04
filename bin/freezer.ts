@@ -1,5 +1,3 @@
-import '../src/infrastructure/o11y/honeycomb'
-
 import { initLogger } from '../src/infrastructure/logger'
 import '../src/types'
 import { createContainer } from './create-container'
