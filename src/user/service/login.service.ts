@@ -29,31 +29,7 @@ export class LoginService {
     return await this.createAuthenticatedResponse(user)
   }
 
-  private getPostgresUser (username: string) {
-    return this.postgresUsersRepository.getUserWithUsername(username)
-  }
-
-  private getCouchbaseUser (username: string) {
-    return this.couchbaseUsersRepository.getUserWithUsername(username)
-  }
-
-  private async validateUserPassword (user: Pick<UserProps, 'enable' | 'password'>, password: string) {
-    if (!user) {
-      throw newHttpError(401, 'Contraseña o usuario incorrecto')
-    }
-
-    if (!user.enable) {
-      throw newHttpError(401, 'Cuenta desactivada, comuníquese con el administrador')
-    }
-
-    const valid = await bcrypt.compare(password, user.password)
-
-    if (!valid) {
-      throw newHttpError(401, 'Contraseña o usuario incorrecto')
-    }
-  }
-
-  private async createAuthenticatedResponse (user: UserProps) {
+  async createAuthenticatedResponse (user: UserProps) {
     const tokenPayload = {
       id: user.id,
       permissions: user.roles,
@@ -78,5 +54,29 @@ export class LoginService {
       roles: user.roles,
       operator: tokenPayload.operator
     })
+  }
+
+  private getPostgresUser (username: string) {
+    return this.postgresUsersRepository.getUserWithUsername(username)
+  }
+
+  private getCouchbaseUser (username: string) {
+    return this.couchbaseUsersRepository.getUserWithUsername(username)
+  }
+
+  private async validateUserPassword (user: Pick<UserProps, 'enable' | 'password'>, password: string) {
+    if (!user) {
+      throw newHttpError(401, 'Contraseña o usuario incorrecto')
+    }
+
+    if (!user.enable) {
+      throw newHttpError(401, 'Cuenta desactivada, comuníquese con el administrador')
+    }
+
+    const valid = await bcrypt.compare(password, user.password)
+
+    if (!valid) {
+      throw newHttpError(401, 'Contraseña o usuario incorrecto')
+    }
   }
 }

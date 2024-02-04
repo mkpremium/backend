@@ -10,8 +10,8 @@ export function createTestHarness (app, awilixContainer, secured) {
     awilixContainer.resolve('addOwnerService'),
     createWorksheet
   )
-  const operatorRepository = awilixContainer.resolve('operatorRepository')
-  const postgresUserRepository = awilixContainer.resolve('postgresUserRepository')
+  const postgresUserRepository = awilixContainer.resolve('postgresUsersRepository')
+  const loginService = awilixContainer.resolve('loginService')
 
   app.post(
     '/test-harness/create-building',
@@ -32,7 +32,7 @@ export function createTestHarness (app, awilixContainer, secured) {
     wrap(async (req, res) => {
       const { userId } = req.query
       const user = await postgresUserRepository.get(userId)
-      const response = await operatorRepository.createAuthenticatedResponse(user)
+      const response = await loginService.createAuthenticatedResponse(user)
 
       res.json(response)
     }))
