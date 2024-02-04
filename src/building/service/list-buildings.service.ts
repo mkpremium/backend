@@ -1,4 +1,4 @@
-import { EntityManager, In } from 'typeorm'
+import { EntityManager, In, Not } from 'typeorm'
 import { Building } from '../building.entity'
 import { BuildingReadModel } from '../repository/buildings-read.repository'
 import type { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
@@ -105,7 +105,8 @@ export class ListBuildingsService {
   private async buildingAssignedToInPostgres (flipperUserId: string) {
     const buildings = await this.entityManager.find(Building, {
       where: {
-        assignedFlipper: { user: { id: flipperUserId } }
+        assignedFlipper: { user: { id: flipperUserId } },
+        negotiationStatus: Not('DESCARTADO' as const)
       }
     })
 
