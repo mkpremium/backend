@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm'
+import { EntityManager, In } from 'typeorm'
 import { Logger } from 'winston'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
@@ -15,6 +15,7 @@ import { Caller } from '../../caller/caller.entity'
 import { Building } from '../../building/building.entity'
 import { OwnerProps } from '../../owner/owner'
 import { Contact } from '../../contacts/contact.entity'
+import { PersonContact } from '../../owner/person-contact.entity'
 
 interface Deps {
   entityManager: EntityManager,
@@ -35,9 +36,31 @@ export function importScheduledEventHandlerFactory ({ eventBus, logger, entityMa
     })
 
     const couchbaseOwnerDocument = await getCouchbaseDocument(entityManager, owner.id)
-    const couchbaseContact = (couchbaseOwnerDocument.document as OwnerProps).person.contacts
-      .find(c => c.id === scheduledEvent.event.contactId)
-    const contact = await entityManager.findOneBy(Contact, { value: couchbaseContact.value })
+    let contact: Contact
+    if (scheduledEvent.event.contactId) {
+      const couchbaseContact = (couchbaseOwnerDocument.document as OwnerProps).person.contacts
+        .find(c => c.id === scheduledEvent.event.contactId)
+      contact = await entityManager.findOneBy(Contact, { value: couchbaseContact.value })
+    }
+
+    if (!contact) {
+      logger.warning('No contact found for scheduled event, trying to find a good one', { scheduledEventId: scheduledEvent.id })
+      const pc = await entityManager.findOne(PersonContact, {
+        where: {
+          person: { id: owner.person as unknown as string },
+          status: 'GOOD',
+          contact: {
+            type: In(['TELEFONO', 'MOVIL'])
+          }
+        },
+        relations: { contact: true }
+      })
+      if (!pc) {
+        logger.error('No contact found for owner, skipping scheduled event', { ownerId: owner.id, scheduledEventId: scheduledEvent.id })
+        return
+      }
+      contact = pc.contact
+    }
 
     await entityManager.transaction(async transactionalManager => {
       const couchbaseDocument = await getCouchbaseDocument(transactionalManager, scheduledEvent.id)
@@ -63,8 +86,8 @@ export function importScheduledEventHandlerFactory ({ eventBus, logger, entityMa
 }
 
 async function importBuildingOfferRequest (entityManager: EntityManager, scheduledEvent: Omit<ScheduledEventProps, 'createdAt'> & {
-  createdAt: string
-}, owner: { id: string, building: Building }, contact: Contact, createdAt: string) {
+    createdAt: string
+  }, owner: { id: string, building: Building }, contact: Contact, createdAt: string) {
   const flipper = await entityManager.findOneByOrFail(Flipper, [
     { user: { id: scheduledEvent.notifyTo } }
   ])
@@ -85,8 +108,8 @@ async function importBuildingOfferRequest (entityManager: EntityManager, schedul
 }
 
 async function importScheduledEvent (transactionalManager: EntityManager, scheduledEvent: Omit<ScheduledEventProps, 'createdAt'> & {
-  createdAt: string
-}, owner: { id: string, building: Building }, contact: Contact, createdAt: string) {
+    createdAt: string
+  }, owner: { id: string, building: Building }, contact: Contact, createdAt: string) {
   await transactionalManager.save(ScheduledEvent, {
     id: scheduledEvent.id,
     type: scheduledEvent.type === 'CALLS' ? 'CALL' : 'MEETING',
