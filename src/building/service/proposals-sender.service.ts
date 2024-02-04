@@ -78,6 +78,10 @@ export class ProposalsSenderService {
     if (lastScheduledEvent && moment(lastScheduledEvent.eventDate).isAfter(lastScheduledEventDateToInclude)) {
       return false
     }
+    if (moment().add(-7, 'days').isAfter(proposal.createdAt)) {
+      this.logger.warning('Proposal was not sent because it was created more than 7 days ago', { proposalId: proposal.id })
+      return false
+    }
 
     const proposalPDF = await this.pdfProposalComposer.composeProposal(
       building, proposal.proposal, sender.profile
