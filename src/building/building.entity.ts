@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm'
+import { Column, Entity, Index, ManyToOne, OneToMany, OneToOne } from 'typeorm'
 import { BuildingAddressProps, BuildingLocation, BuildingNegotiationStatus, Lead } from './building'
 import { BuildingDocument } from './building-document.entity'
 import { BaseEntity } from '../infrastructure/entity'
@@ -12,6 +12,7 @@ import { BuildingNote } from './building-note.entity'
 @Entity()
 export class Building extends BaseEntity {
   @Column('jsonb')
+  @Index()
   address: BuildingAddressProps
 
   @Column({ default: 'PENDIENTE' })
