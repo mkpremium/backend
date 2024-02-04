@@ -16,6 +16,7 @@ import { ImportScheduledEventHandler } from '../../scheduled-events/service/sche
 import { ScheduledEventImportTriggerService } from '../service/scheduled-event-import-trigger.service'
 import { WorksheetQueueImportTriggerService } from './worksheet-queue-import-trigger.service'
 import type { BuildingProposalsImportTriggerService } from '../service/building-proposals-importer-trigger.service'
+import type { BuildingNotesImporterService } from '../../building/service/building-notes-importer'
 
 interface Deps {
   eventBus: EventBus,
@@ -25,6 +26,7 @@ interface Deps {
   saveDocumentsCommandHandler: SaveDocumentsCommandHandler
   importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
   importScheduledEventCommandHandler: ImportScheduledEventHandler
+  buildingNotesImporterService: BuildingNotesImporterService,
 
   buildingImportTriggerService: BuildingImportTriggerService,
   scheduledEventImportTriggerService: ScheduledEventImportTriggerService,
@@ -43,6 +45,7 @@ export function couchbaseToPostgresProcess ({
   entityManager,
   saveDocumentsCommandHandler,
   importOwnerCommandHandler,
+  buildingNotesImporterService,
   importScheduledEventCommandHandler,
   buildingImportTriggerService,
   worksheetQueueImportTriggerService,
@@ -74,6 +77,14 @@ export function couchbaseToPostgresProcess ({
     'postgres_migration.import_building_worksheets',
     async ({ buildingId }: { buildingId: string }) => {
       await buildingWorkSheetsImporterService.importWorkSheet(buildingId)
+    }
+  )
+
+  eventBus.on(
+    DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
+    'postgres_migration.import_building_notes',
+    async ({ buildingId }: { buildingId: string }) => {
+      await buildingNotesImporterService.importBuildingNotes(buildingId)
     }
   )
 

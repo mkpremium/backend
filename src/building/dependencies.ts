@@ -45,6 +45,7 @@ import { PostgresProposalsRepository } from './repository/postgres-proposals.rep
 import { AddBuildingService } from './service/add-building.service'
 import { importBuildingCommandHandler } from './service/import-building-command-handler'
 import { PostgresBuildingNotesRepository } from './repository/postgres-building-notes.repository'
+import { BuildingNotesImporterService } from './service/building-notes-importer'
 
 export const setupBuildingDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
   if (usePostgres) {
@@ -139,6 +140,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     portugal2021WorksheetInitializerService: asClass(Portugal2021WorksheetInitializerService).classic().singleton(),
 
     // Postgres migration
-    importBuildingCommandHandler: asFunction(importBuildingCommandHandler)
+    importBuildingCommandHandler: asFunction(importBuildingCommandHandler),
+    buildingNotesImporterService: asClass(BuildingNotesImporterService).classic().singleton()
   })
 }
