@@ -35,19 +35,22 @@ export class CallcenterWorksheetService {
   private async nextAvailableWorksheetInSourcePostgres (source: {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    let builder = this.getWorksheetQueryBuilder()
+    let builder = this.ormDataSource.manager.createQueryBuilder(Worksheet, 'worksheet')
+      .innerJoinAndSelect('worksheet.building', 'building')
       .where('building.address ->> \'province\' IN (:...provinces)',
         { provinces: [].concat(source.province) })
-      .andWhere('queue.id IS NULL')
+      .andWhere('worksheet.queueId IS NULL')
     if (skipWorksheetId) {
       builder = builder.where('worksheet.id != :skipWorksheetId', { skipWorksheetId })
     }
 
-    const ws = await builder
+    const nextWorksheet = await builder
       .orderBy('worksheet.lastViewedAt')
       .getOneOrFail()
+    const worksheet = await this.getWorksheetQueryBuilder()
+      .where('worksheet.id = :id', { id: nextWorksheet.id }).getOneOrFail()
 
-    return toView(ws)
+    return toView(worksheet)
   }
 
   private getWorksheetQueryBuilder () {
