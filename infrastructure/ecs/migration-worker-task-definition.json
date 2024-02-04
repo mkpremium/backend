@@ -79,11 +79,23 @@
           "value": "500"
         },
         {
-          "name": "TWILIO_ACCOUNT_SID",
-          "value": "AC95e4259a869744c6a62258dd3950ee50"
+          "name": "TRIGGER_BUILDINGS_MIGRATION",
+          "value": "false"
         },
         {
-          "name": "TRIGGER_BUILDINGS_MIGRATION",
+          "name": "BUILDING_MIGRATION_LIMIT",
+          "value": "10000"
+        },
+        {
+          "name": "TRIGGER_OPERATORS_MIGRATION",
+          "value": "false"
+        },
+        {
+          "name": "TRIGGER_BUILDING_PROPOSALS_MIGRATION",
+          "value": "false"
+        },
+        {
+          "name": "TRIGGER_WORKSHEET_QUEUES_MIGRATION",
           "value": "false"
         }
       ],
@@ -108,14 +120,6 @@
         {
           "valueFrom": "backend.jwt_secret",
           "name": "JWT_SECRET"
-        },
-        {
-          "valueFrom": "backend.twilio_account_token",
-          "name": "TWILIO_ACCOUNT_TOKEN"
-        },
-        {
-          "valueFrom": "backend.honeycomb_write_key",
-          "name": "HONEYCOMB_WRITE_KEY"
         }
       ],
       "dockerSecurityOptions": null,

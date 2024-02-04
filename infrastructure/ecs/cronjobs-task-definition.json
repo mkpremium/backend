@@ -43,7 +43,7 @@
         },
         {
           "name": "DATABASE",
-          "value": "couchbase"
+          "value": "postgres"
         },
         {
           "name": "NODE_ENV",
@@ -56,10 +56,6 @@
         {
           "name": "DAYS_IN_FREEZER",
           "value": "90"
-        },
-        {
-          "name": "TWILIO_ACCOUNT_SID",
-          "value": "AC95e4259a869744c6a62258dd3950ee50"
         }
       ],
       "resourceRequirements": null,
@@ -75,14 +71,6 @@
         {
           "valueFrom": "backend.database_url",
           "name": "DATABASE_URL"
-        },
-        {
-          "valueFrom": "backend.twilio_account_token",
-          "name": "TWILIO_ACCOUNT_TOKEN"
-        },
-        {
-          "valueFrom": "backend.honeycomb_write_key",
-          "name": "HONEYCOMB_WRITE_KEY"
         }
       ],
       "dockerSecurityOptions": null,
