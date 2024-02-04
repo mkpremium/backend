@@ -81,6 +81,7 @@ export class BuildingProposalsImporterService {
     if (existingOwner) {
       return existingOwner
     }
+    this.logger.warning('Owner not found, creating a new one', { ownerId: original.ownerId, proposalId: original.id })
     const addOwnerCommand: AddOwnerCommand = {
       buildingId: original.buildingId,
       id: original.ownerId,
