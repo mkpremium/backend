@@ -82,8 +82,7 @@ export class CouchbaseBuildingsReadRepository implements BuildingsReadRepository
   listById (ids): Promise<BuildingReadModel[]> {
     return this.couchbaseAdapter.queryAsync(
       listBuildingsByIdQuery(this.couchbaseAdapter.bucketName),
-      [ids],
-      { queryName: 'list_buildings_by_id' }
+      [ids]
     ).then(CouchbaseBuildingsReadRepository.mapToPropertyAgentBuildingView)
   }
 

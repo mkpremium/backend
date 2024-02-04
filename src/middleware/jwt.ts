@@ -5,7 +5,6 @@ import jwtPermissions from 'express-jwt-permissions'
 import _get from 'lodash/get'
 import { jwt as jwtConfig } from '../../config'
 import { UserRoles } from '../types/user'
-import honeycomb from 'honeycomb-beeline'
 import { UsersRepository } from '../user/repository/users.repository'
 
 function jwtMiddlewareAdapter (usersRepository: UsersRepository) {
@@ -30,7 +29,6 @@ function addUserInfoFactory (usersRepository: UsersRepository) {
       return
     }
     req.user.operator = user
-    honeycomb().addContext({ userId: user.id })
     next()
   }
 }
