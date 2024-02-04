@@ -35,7 +35,6 @@
     "express-promise-wrap": "^0.2.2",
     "fp-ts": "^2.11.1",
     "fs-extra": "^5.0.0",
-    "honeycomb-beeline": "^2.8.1",
     "io-ts": "^2.2.20",
     "io-ts-types": "^0.5.19",
     "jsonwebtoken": "^8.2.1",
