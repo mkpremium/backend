@@ -26,7 +26,9 @@ async function init () {
   while (true) {
     if (killProcess) {
       logger.info('SIGTERM received, stopping process')
-      couchbaseBucket.disconnect()
+      if (couchbaseBucket) {
+        couchbaseBucket.disconnect()
+      }
       process.exit()
       return
     }

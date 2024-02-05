@@ -41,7 +41,9 @@ function setupGracefulShutdown (server: Server, diContainer: AwilixContainer) {
   process.on('SIGTERM', () => {
     const couchbaseBucket: Bucket = diContainer.resolve('couchbaseBucket')
     server.close(() => {
-      couchbaseBucket.disconnect()
+      if (couchbaseBucket) {
+        couchbaseBucket.disconnect()
+      }
       process.exit()
     })
   })
