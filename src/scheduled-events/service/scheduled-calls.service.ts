@@ -78,6 +78,7 @@ function mapScheduledEventToScheduledCall (scheduledEvent: ScheduledEvent): Sche
     eventDate: scheduledEvent.scheduledFor,
     event: {
       worksheetId: scheduledEvent.building.worksheet.id,
+      buildingId: scheduledEvent.building.id,
       contactId: scheduledEvent.contact.id,
       owner: {
         id: scheduledEvent.owner.id,
@@ -159,6 +160,7 @@ interface ScheduledCallsView {
   createdBy: string
   eventDate: Date
   event: {
+    buildingId: string
     worksheetId: string
     contactId: string
     owner: {
