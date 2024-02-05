@@ -1,5 +1,5 @@
 import { initLogger } from '../src/infrastructure/logger'
-import { ProposalsSenderService } from '../src/building/service/proposals-sender.service'
+import type { ProposalsSenderService } from '../src/building/service/proposals-sender.service'
 import { createContainer } from './create-container'
 
 const logger = initLogger()
