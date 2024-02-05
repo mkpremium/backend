@@ -18,6 +18,7 @@ export class PostgresBuildingNotesRepository extends WithPostgresRepository<Buil
       context: {
         buildingId
       },
+      createdAt: n.createdAt,
       createdBy: n.author as any as string
     }))
   }
