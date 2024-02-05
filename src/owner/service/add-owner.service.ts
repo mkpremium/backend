@@ -143,6 +143,9 @@ export function conflictContactStatusPolicy (statuses: OwnerContactStatus[]) {
       return statuses[0]
     }
   }
+  if (statuses.length === 1) {
+    return statuses[0]
+  }
 
   return 'UNDEFINED'
 }
