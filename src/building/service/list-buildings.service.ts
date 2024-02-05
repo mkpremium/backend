@@ -11,6 +11,7 @@ import {
   PostgresScheduledEventsRepository
 } from '../../scheduled-events/repository/postgres-schedule-events.repository'
 import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
+import type { Logger } from 'winston'
 
 export class ListBuildingsService {
   constructor (
@@ -18,7 +19,8 @@ export class ListBuildingsService {
     private entityManager: EntityManager,
     private postgresOwnersRepository: PostgresOwnersRepository,
     private postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
-    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository
+    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
+    private logger: Logger
   ) {
   }
 
@@ -95,11 +97,17 @@ export class ListBuildingsService {
       const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
       const buildingOwners = allBuildingOwners.filter(
         ({ buildingId }) => buildingId === building.id)
-      return buildingEntityToReadModel(building, {
+      const mappedBuilding: BuildingReadModel = buildingEntityToReadModel(building, {
         lastOfferCreatedAt: lastOfferRequest?.offer_createdAt,
         owners: buildingOwners
       })
-    })
+      if (!mappedBuilding.owner) {
+        this.logger.error('Building without owner', { buildingId: building.id })
+        return undefined
+      }
+
+      return mappedBuilding
+    }).filter(Boolean)
   }
 
   private async buildingAssignedToInPostgres (flipperUserId: string) {
