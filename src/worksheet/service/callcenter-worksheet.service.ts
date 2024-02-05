@@ -41,6 +41,11 @@ export class CallcenterWorksheetService {
         { provinces: [].concat(source.province) })
       .andWhere('worksheet.queueId IS NULL')
       .andWhere('worksheet.status IN (:...statuses)', { statuses: ['OPEN', 'LOOKING_MEETING'] })
+      .andWhere(`exists (select *
+              from owner
+              where "buildingId" = building.id
+                and owner.status not in ('ERRONEO', 'ENTE_PUBLICO', 'WITHOUT_CONTACT', 'WITHOUT_PHONE_CONTACT'))`)
+
     if (skipWorksheetId) {
       builder = builder.where('worksheet.id != :skipWorksheetId', { skipWorksheetId })
     }
