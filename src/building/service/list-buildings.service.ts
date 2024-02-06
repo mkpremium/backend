@@ -65,6 +65,11 @@ export class ListBuildingsService {
     ])
 
     return buildings.reduce((acc, b) => {
+      if (!b.worksheet) {
+        this.logger.error('Building without worksheet', { buildingId: b.id })
+        return acc
+      }
+
       acc[b.id] = {
         building: { ...mapBuildingEntityToStruct(b), worksheetId: b.worksheet.id },
         lastOfferRequest: lastBuildingsOfferRequests.find((offer) => offer.buildingId === b.id),
