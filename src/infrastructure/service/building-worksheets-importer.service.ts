@@ -32,19 +32,23 @@ export class BuildingWorkSheetsImporterService {
     const original = couchbaseDocument.document as WorksheetProps
 
     const worksheet = structToEntity(original)
+    let operatorId = null
     if (original.queueId) {
       // Find the worksheet queue.
-      const queue = (await this.couchbaseDocumentRepository.getNonMigratedDocumentById(
-        CouchbaseDocumentType.WORKSHEET_QUEUE, original.queueId)).document as WorksheetQueueProps
+      const queue = await this.entityManager
+        .createQueryBuilder(CouchbaseDocument, 'queue')
+        .andWhere('queue.documentType = :documentType', { documentType: CouchbaseDocumentType.WORKSHEET_QUEUE })
+        .andWhere('queue.id = :id', { id: original.queueId })
+        .getOne()
 
-      let operatorId = null
-      const queueItems = queue?.worksheets || []
+      const queueItems = (queue.document as WorksheetQueueProps)?.worksheets || []
       for (const worksheet of queueItems) {
         if (worksheet.worksheetId === original.id) {
           operatorId = worksheet.operatorId
           break
         }
       }
+
       worksheet.heldBy = await this.entityManager.findOne(Caller, {
         where: { user: { id: operatorId } }
       })
