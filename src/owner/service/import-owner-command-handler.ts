@@ -61,10 +61,10 @@ export function importOwnerHandlerFactory ({ addOwnerService, eventBus, logger, 
   }
 }
 
-function ensureOwnerHasNames (owner: OwnerProps) {
+export function ensureOwnerHasNames (owner: OwnerProps) {
   if (owner.person.firstName && owner.person.firstSurname) return owner
 
-  const [firstName, ...rest] = owner.name.split(' ')
+  const [firstName, ...rest] = (owner.name ?? owner.person.name).split(' ')
 
   return {
     ...owner,
