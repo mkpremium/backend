@@ -52,6 +52,9 @@ export class SearchOwnerOrBuildingService {
       owners.map(fo => fo.building.id))
 
     return fromJSON(owners.map(foundOwner => {
+      if (!mappedBuildings[foundOwner.building.id]) {
+        return undefined
+      }
       const matchingContactIdx = foundOwner.person.contacts.findIndex(cp => cp.contact.value === phoneNumber)
       const owner = ownerEntityToStruct(foundOwner)
       const { contacts } = owner.person
@@ -69,6 +72,6 @@ export class SearchOwnerOrBuildingService {
           .map(se => ({ at: se.scheduledFor.toISOString() })),
         lastEvent: inferBuildingLastEvent(lastOfferRequest, lastMeeting)
       } as FoundOwnerProps
-    }), t.list(FoundOwner))
+    }).filter(Boolean), t.list(FoundOwner))
   }
 }
