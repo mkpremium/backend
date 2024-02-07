@@ -1,28 +1,16 @@
-import { ScheduledCallsRepository } from '../repository/scheduled-calls.repository'
-import { type EntityManager } from 'typeorm'
-import { ScheduledEvent } from '../scheduled-event.entity'
+import type { RemoveScheduledCallsService } from '../service/remove-scheduled-calls.service'
 
 const buildingStatusesThatCancelScheduledCalls = ['NO VENDE', 'DESCARTADO']
 
 interface Deps {
-  scheduledCallsRepository: ScheduledCallsRepository,
-  usePostgres: boolean,
-  entityManager: EntityManager
+  removeScheduledCallsService: RemoveScheduledCallsService
 }
 
-export function removeScheduledCallsOnOwnerRefusal ({ scheduledCallsRepository, usePostgres, entityManager }: Deps) {
+export function removeScheduledCallsOnOwnerRefusal ({ removeScheduledCallsService }: Deps) {
   return async function ({ buildingId, negotiationStatus }) {
     if (!buildingStatusesThatCancelScheduledCalls.includes(negotiationStatus)) {
       return Promise.resolve()
     }
-
-    if (usePostgres) {
-      await entityManager.delete(ScheduledEvent, {
-        building: { id: buildingId },
-        type: 'CALLS'
-      })
-    } else {
-      await scheduledCallsRepository.removeScheduledCallsForBuilding(buildingId)
-    }
+    await removeScheduledCallsService.removeScheduledCallsFor(buildingId)
   }
 }

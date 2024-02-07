@@ -18,6 +18,7 @@ import { removeScheduledCallOnDiscardedContact } from './listeners/remove-schedu
 import { updateScheduledCallController } from './controller/update-schedule-call.controller'
 import { PostgresScheduledEventsRepository } from './repository/postgres-schedule-events.repository'
 import { importScheduledEventHandlerFactory } from './service/scheduled-event-importer.service'
+import { RemoveScheduledCallsService } from './service/remove-scheduled-calls.service'
 
 export async function setupScheduledEventsDependencies (container: AwilixContainer) {
   const usePostgres = container.resolve('usePostgres')
@@ -34,6 +35,7 @@ export async function setupScheduledEventsDependencies (container: AwilixContain
   container.register({
     meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
+    removeScheduledCallsService: asClass(RemoveScheduledCallsService).classic().singleton(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
     postgresScheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
