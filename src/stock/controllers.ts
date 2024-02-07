@@ -2,7 +2,7 @@ import { wrap } from 'express-promise-wrap'
 import { closeSellStock, updateSellStock } from './application'
 import type { StockService } from './service/StockService'
 import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import type { CouchbaseStockSalesService } from './service/CouchbaseStockSalesService'
+import type { CouchbaseStockSalesService } from './service/couchbase-stock-sales.service'
 
 export const getRankingController = (propertyManagerRankingService: PropertyManagerRankingService) => {
   return wrap(async (req, res) => {

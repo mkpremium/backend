@@ -9,7 +9,7 @@ import {
   updateSellStockControllerFactory
 } from './controllers'
 import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import type { CouchbaseStockSalesService } from './service/CouchbaseStockSalesService'
+import type { CouchbaseStockSalesService } from './service/couchbase-stock-sales.service'
 import type { StockService } from './service/StockService'
 import type { AwilixContainer } from 'awilix'
 
