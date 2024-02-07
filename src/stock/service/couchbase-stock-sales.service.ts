@@ -1,11 +1,11 @@
 import t from 'tcomb'
-import { createTransaction } from '../application'
 import { StockStatuses } from '../types'
 import {
   UpdateBuildingNegotiationStatusService
 } from '../../building/service/update-building-negotiation-status.service'
 import type { LegacyBuildingRepository } from '../../building/models'
 import type { StockRepository } from '../models'
+import { createTransaction, type TransactionInput } from './create-transaction'
 
 export class CouchbaseStockSalesService {
   constructor (
@@ -15,7 +15,7 @@ export class CouchbaseStockSalesService {
   ) {
   }
 
-  async sellStock (params: { buildingId: string }, operatorId: string) {
+  async sellStock (params: { buildingId: string } & TransactionInput, operatorId: string) {
     await this.legacyBuildingsRepository.findByIdOrThrow(params.buildingId)
     const stock = await this.legacyStockRepository.findByBuildingIdOrThrow(params.buildingId)
 

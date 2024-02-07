@@ -1,6 +1,7 @@
 import t from 'tcomb'
+import type { Transaction as ITransaction } from './stock.entity'
 
-export const Transaction = t.struct({
+export const Transaction = t.struct<ITransaction>({
   operatorId: t.String,
   reservationAmount: t.Number,
   reservationDate: t.Date,

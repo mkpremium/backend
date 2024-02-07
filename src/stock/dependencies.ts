@@ -5,6 +5,7 @@ import {
   updatePurchaseStockFactory,
   updateSellStockControllerFactory
 } from './controllers'
+import { PostgresStockSalesService } from './service/postgres-stock-sales.service'
 
 export async function setupStockDependencies (container: AwilixContainer, usePostgres: boolean) {
   if (usePostgres) {
@@ -13,7 +14,7 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       legacyStockRepository: asValue(null),
       propertyManagersRepository: asValue(null),
       stockService: asValue(null),
-      stockSalesService: asValue(null)
+      stockSalesService: asClass(PostgresStockSalesService).classic().singleton()
     })
   } else {
     const { PropertyManagerRepository } = await import('../property-manager/PropertyManagerRepository')

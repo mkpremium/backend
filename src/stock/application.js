@@ -1,19 +1,10 @@
-import { StockStatuses, Transaction } from './types'
-import { StockRepository } from './models'
-import { LegacyBuildingRepository } from '../building/models'
 import t from 'tcomb'
-import { OperatorRepository } from '../operator/models'
+import { LegacyBuildingRepository } from '../building/models'
 import { SuperSellAward } from '../operator/Awards/SuperSellAward'
-
-export function createTransaction (params = {}, operatorId) {
-  return Transaction({
-    operatorId,
-    reservationAmount: params.reservationAmount,
-    reservationDate: new Date(params.reservationDate),
-    transactionAmount: params.transactionAmount,
-    transactionDate: new Date(params.transactionDate)
-  })
-}
+import { OperatorRepository } from '../operator/models'
+import { StockRepository } from './models'
+import { createTransaction } from './service/create-transaction'
+import { StockStatuses } from './types'
 
 export async function updatePurchaseStock (params = {}, operatorId) {
   const purchase = createTransaction(params, operatorId)

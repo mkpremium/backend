@@ -1,7 +1,7 @@
 import fromJSON from 'tcomb/lib/fromJSON'
 import { StockStatuses, TransactionParams } from '../types'
-import { createTransaction } from '../application'
 import t from 'tcomb'
+import { createTransaction } from './create-transaction'
 
 export class StockService {
   /**

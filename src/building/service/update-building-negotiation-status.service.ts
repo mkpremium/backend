@@ -2,6 +2,8 @@ import { EventPublisher } from '../../infrastructure/event-bus'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { BuildingNegotiationStatus, changeNegotiationStatus, withFeaturedOwner } from '../building'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import type { EntityManager } from 'typeorm'
+import { Building } from '../building.entity'
 
 export interface BuildingNegotiationStatusChanged {
   name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED;
@@ -14,6 +16,7 @@ interface UpdateBuildingNegotiationStatusCommand {
   status: BuildingNegotiationStatus;
   userId: string;
   sourceOwnerId?: string;
+  em?: EntityManager;
 }
 
 export class UpdateBuildingNegotiationStatusService {
@@ -23,10 +26,12 @@ export class UpdateBuildingNegotiationStatusService {
   ) {
   }
 
+  // TODO: make it accept a transactional manager
   async updateBuildingStatus (buildingId, {
     status,
     userId,
-    sourceOwnerId
+    sourceOwnerId,
+    em
   }: UpdateBuildingNegotiationStatusCommand) {
     let updatedBuilding = changeNegotiationStatus(
       await this.buildingsRepository.get(buildingId),
@@ -36,12 +41,17 @@ export class UpdateBuildingNegotiationStatusService {
       updatedBuilding = withFeaturedOwner(updatedBuilding, sourceOwnerId)
     }
 
-    await this.buildingsRepository.save(updatedBuilding)
+    if (em) {
+      await em.save(Building, updatedBuilding)
+    } else {
+      await this.buildingsRepository.save(updatedBuilding)
+    }
+
     await this.eventBus.publish({
       name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED,
       buildingId,
       userId,
       negotiationStatus: status
-    } as BuildingNegotiationStatusChanged)
+    } as BuildingNegotiationStatusChanged, em)
   }
 }
