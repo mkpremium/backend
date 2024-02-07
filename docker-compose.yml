@@ -10,22 +10,6 @@ services:
     ports:
       - "5432:5432"
 
-
-  couchbasedb:
-    image: "couchbase:community-6.6.0"
-
-    ports:
-      - "8091:8091" # REST/HTTP including Web UI
-      - "8092:8092" # Views and XDCR access
-      - "8093:8093" # Query service REST/HTTP traffic
-      - "8094:8094" # Search service REST/HTTP traffic
-      - "11210:11210" # Data Service
-
-#    ulimits:
-#      nofile: 40960
-#      core: 100000000
-#      memlock: 100000000
-
 #  sqs:
 #    image: juanformoso/moto_docker
 #    ports:
