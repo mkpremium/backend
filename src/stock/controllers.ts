@@ -4,6 +4,7 @@ import {
   updatePurchaseStock,
   updateSellStock
 } from './application'
+import type { StockService } from './service/StockService'
 
 export const getRankingController = (propertyManagerRankingService) => {
   return wrap(async (req, res) => {
@@ -34,17 +35,14 @@ async function closeSellStockFromRequest (req, res) {
   res.status(201).json(stock)
 }
 
-/**
- * @param stockService StockService
- */
-export const createPurchaseStockController = stockService => {
+export function purchaseStockControllerFactory (stockService: StockService) {
   return wrap(async (req, res) => {
     const stock = await stockService.purchaseBuilding(req.body, req.user.id)
     res.status(201).json(stock)
   })
 }
 
-export const createCancelSaleController = stockService => {
+export function createCancelSaleController (stockService: StockService) {
   return wrap(async (req, res) => {
     const stock = await stockService.cancelSale(req.body.buildingId, req.user.id)
     res.status(200).json(stock)

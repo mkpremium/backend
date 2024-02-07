@@ -2,7 +2,7 @@ import { Router } from 'express'
 import {
   createCancelSaleController,
   closeSellStockController,
-  createPurchaseStockController,
+  purchaseStockControllerFactory,
   updatePurchaseStockController,
   updateSellStockController,
   getRankingController,
@@ -19,7 +19,7 @@ export function addStockRoutes (
 ) {
   const router = Router()
 
-  router.post('/purchase', createPurchaseStockController(stockService))
+  router.post('/purchase', purchaseStockControllerFactory(stockService))
   router.put('/purchase', updatePurchaseStockController)
 
   router.post('/sell', createSellPurchasedStockController(stockSalesService))
