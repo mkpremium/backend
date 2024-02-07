@@ -18,7 +18,7 @@ export class Stock extends BaseEntity {
   @Column('text')
   currentStatus: 'PURCHASE' | 'SELL' | 'CLOSE'
 
-  @Column('jsonb', { nullable: true })
+  @Column('jsonb')
   purchase: Transaction
 
   @Column('decimal', { precision: 10, scale: 2, nullable: true })

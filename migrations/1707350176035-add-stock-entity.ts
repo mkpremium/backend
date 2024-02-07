@@ -1,16 +1,16 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class AddStockEntity1707346579226 implements MigrationInterface {
-  name = 'AddStockEntity1707346579226'
+export class AddStockEntity1707350176035 implements MigrationInterface {
+  name = 'AddStockEntity1707350176035'
 
   public async up (queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE "stock"
                              (
-                                 "id"            uuid                                NOT NULL DEFAULT uuid_generate_v4(),
-                                 "createdAt"     TIMESTAMP WITH TIME ZONE            NOT NULL DEFAULT now(),
-                                 "updatedAt"     TIMESTAMP WITH TIME ZONE            NOT NULL DEFAULT now(),
-                                 "currentStatus" "public"."stock_currentstatus_enum" NOT NULL,
-                                 "purchase"      jsonb,
+                                 "id"            uuid                     NOT NULL DEFAULT uuid_generate_v4(),
+                                 "createdAt"     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                                 "updatedAt"     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                                 "currentStatus" text                     NOT NULL,
+                                 "purchase"      jsonb                    NOT NULL,
                                  "salePrice"     numeric(10, 2),
                                  "sell"          jsonb,
                                  "close"         jsonb,
