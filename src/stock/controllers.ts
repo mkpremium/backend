@@ -1,24 +1,24 @@
 import { wrap } from 'express-promise-wrap'
-import {
-  closeSellStock,
-  updatePurchaseStock,
-  updateSellStock
-} from './application'
+import { closeSellStock, updateSellStock } from './application'
 import type { StockService } from './service/StockService'
+import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
+import type { StockSalesService } from './service/StockSalesService'
 
-export const getRankingController = (propertyManagerRankingService) => {
+export const getRankingController = (propertyManagerRankingService: PropertyManagerRankingService) => {
   return wrap(async (req, res) => {
     const ranking = await propertyManagerRankingService.ranking()
     res.status(201).json(ranking)
   })
 }
 
-async function updatePurchaseStockFromRequest (req, res) {
-  const stock = await updatePurchaseStock(req.body, req.user.id)
-  res.status(201).json(stock)
+export function updatePurchaseStockFactory (updatePurchaseStock: (data: any, userId: number) => Promise<any>) {
+  return wrap(async function updatePurchaseStockController (req, res) {
+    const stock = await updatePurchaseStock(req.body, req.user.id)
+    res.status(201).json(stock)
+  })
 }
 
-export function createSellPurchasedStockController (stockSalesService) {
+export function createSellPurchasedStockController (stockSalesService: StockSalesService) {
   return async (req, res) => {
     const stock = await stockSalesService.sellStock(req.body, req.user.id)
     res.status(201).json(stock)
@@ -49,6 +49,5 @@ export function createCancelSaleController (stockService: StockService) {
   })
 }
 
-export const updatePurchaseStockController = wrap(updatePurchaseStockFromRequest)
 export const updateSellStockController = wrap(updateSellStockFromRequest)
 export const closeSellStockController = wrap(closeSellStockFromRequest)
