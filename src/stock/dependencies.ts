@@ -20,7 +20,7 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
     const { StockRepository } = await import('./StockRepository')
     const { StockRepository: LegacyStockRepository } = await import('./models')
     const { StockService } = await import('./service/StockService')
-    const { CouchbaseStockSalesService } = await import('./service/CouchbaseStockSalesService')
+    const { CouchbaseStockSalesService } = await import('./service/couchbase-stock-sales.service')
 
     container.register({
       stockRepository: asClass(StockRepository).classic().singleton(),
