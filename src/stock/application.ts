@@ -5,7 +5,15 @@ import t from 'tcomb'
 import { OperatorRepository } from '../operator/models'
 import { SuperSellAward } from '../operator/Awards/SuperSellAward'
 
-export function createTransaction (params = {}, operatorId) {
+interface TransactionParams {
+  reservationAmount?: number;
+  reservationDate?: string;
+  transactionAmount?: number;
+  transactionDate?: string;
+  buildingId?: string;
+}
+
+export function createTransaction (params: TransactionParams = {}, operatorId: string) {
   return Transaction({
     operatorId,
     reservationAmount: params.reservationAmount,
@@ -15,7 +23,7 @@ export function createTransaction (params = {}, operatorId) {
   })
 }
 
-export async function updatePurchaseStock (params = {}, operatorId) {
+export async function updatePurchaseStock (params: {buildingId: string}, operatorId: string) {
   const purchase = createTransaction(params, operatorId)
 
   const stockRepository = new StockRepository()
@@ -33,7 +41,7 @@ export async function updatePurchaseStock (params = {}, operatorId) {
   return stockRepository.save(stock)
 }
 
-export async function updateSellStock (params = {}, operatorId) {
+export async function updateSellStock (params: { buildingId: string }, operatorId: string) {
   const legacyBuildingRepository = new LegacyBuildingRepository()
 
   await legacyBuildingRepository.findByIdOrThrow(params.buildingId)
@@ -55,7 +63,7 @@ export async function updateSellStock (params = {}, operatorId) {
   return stockRepository.save(stock)
 }
 
-export async function closeSellStock (params, operatorId) {
+export async function closeSellStock (params: {buildingId: string}, operatorId: string) {
   const legacyBuildingRepository = new LegacyBuildingRepository()
 
   await legacyBuildingRepository.findByIdOrThrow(params.buildingId)
