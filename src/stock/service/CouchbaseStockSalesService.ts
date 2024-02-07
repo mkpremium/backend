@@ -7,7 +7,7 @@ import {
 import type { LegacyBuildingRepository } from '../../building/models'
 import type { StockRepository } from '../models'
 
-export class StockSalesService {
+export class CouchbaseStockSalesService {
   constructor (
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private legacyBuildingsRepository: LegacyBuildingRepository,

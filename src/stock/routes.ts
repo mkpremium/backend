@@ -9,13 +9,13 @@ import {
   updateSellStockControllerFactory
 } from './controllers'
 import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import type { StockSalesService } from './service/StockSalesService'
+import type { CouchbaseStockSalesService } from './service/CouchbaseStockSalesService'
 import type { StockService } from './service/StockService'
 import type { AwilixContainer } from 'awilix'
 
 export function addStockRoutes (
   propertyManagerRankingService: PropertyManagerRankingService,
-  stockSalesService: StockSalesService,
+  stockSalesService: CouchbaseStockSalesService,
   stockService: StockService,
   container: AwilixContainer
 ) {
