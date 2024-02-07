@@ -29,6 +29,10 @@ export function importOwnerHandlerFactory ({ addOwnerService, eventBus, logger, 
     }
     if (!owner.person) {
       const personDocument = await getCouchbaseDocument(entityManager, owner.personId)
+      if (!personDocument) {
+        logger.error('Person not found (importing owner)', { personId: owner.personId, ownerId: owner.id })
+        return
+      }
       owner.person = personDocument.document as PersonProps
     }
 
