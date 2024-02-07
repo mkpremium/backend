@@ -41,12 +41,16 @@ export class BuildingWorkSheetsImporterService {
         .andWhere('queue.id = :id', { id: original.queueId })
         .getOne()
 
-      const queueItems = (queue.document as WorksheetQueueProps)?.worksheets || []
-      for (const worksheet of queueItems) {
-        if (worksheet.worksheetId === original.id) {
-          operatorId = worksheet.operatorId
-          break
+      if (queue) {
+        const queueItems = (queue.document as WorksheetQueueProps)?.worksheets || []
+        for (const worksheet of queueItems) {
+          if (worksheet.worksheetId === original.id) {
+            operatorId = worksheet.operatorId
+            break
+          }
         }
+      } else {
+        this.logger.error('Queue not found', { queueId: original.queueId })
       }
 
       worksheet.heldBy = await this.entityManager.findOne(Caller, {

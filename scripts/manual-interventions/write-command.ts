@@ -45,7 +45,7 @@ async function sendMessages () {
           name: DomainEventCatalog.BUILDING__BUILDING_IMPORTED,
           buildingId: id,
         },
-        listener: 'postgres_migration.import_building_worksheets',
+        listener: 'postgres_migration.trigger_building_owners_migration',
       }),
     }))
 
