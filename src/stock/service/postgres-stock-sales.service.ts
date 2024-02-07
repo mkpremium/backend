@@ -6,8 +6,9 @@ import {
 import { createTransaction, type TransactionInput } from './create-transaction'
 import type { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
+import type { StockSalesService } from './stock-sales.service'
 
-export class PostgresStockSalesService {
+export class PostgresStockSalesService implements StockSalesService {
   constructor (
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private entityManager: EntityManager,

@@ -6,8 +6,9 @@ import {
 import type { LegacyBuildingRepository } from '../../building/models'
 import type { StockRepository } from '../models'
 import { createTransaction, type TransactionInput } from './create-transaction'
+import type { StockSalesService } from './stock-sales.service'
 
-export class CouchbaseStockSalesService {
+export class CouchbaseStockSalesService implements StockSalesService {
   constructor (
     private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
     private legacyBuildingsRepository: LegacyBuildingRepository,
