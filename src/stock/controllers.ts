@@ -25,14 +25,20 @@ export function createSellPurchasedStockController (stockSalesService: StockSale
   }
 }
 
-async function updateSellStockFromRequest (req, res) {
-  const stock = await updateSellStock(req.body, req.user.id)
-  res.status(201).json(stock)
+export function updateSellStockControllerFactory () {
+  return wrap(
+    async function updateSellStockController (req, res) {
+      const stock = await updateSellStock(req.body, req.user.id)
+      res.status(201).json(stock)
+    }
+  )
 }
 
-async function closeSellStockFromRequest (req, res) {
-  const stock = await closeSellStock(req.body, req.user.id)
-  res.status(201).json(stock)
+export function closeSellStockControllerFactory () {
+  return wrap(async function closeSellStockController (req, res) {
+    const stock = await closeSellStock(req.body, req.user.id)
+    res.status(201).json(stock)
+  })
 }
 
 export function purchaseStockControllerFactory (stockService: StockService) {
@@ -48,6 +54,3 @@ export function createCancelSaleController (stockService: StockService) {
     res.status(200).json(stock)
   })
 }
-
-export const updateSellStockController = wrap(updateSellStockFromRequest)
-export const closeSellStockController = wrap(closeSellStockFromRequest)

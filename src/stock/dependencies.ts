@@ -1,6 +1,10 @@
-import { asClass, asValue, type AwilixContainer } from 'awilix'
+import { asClass, asFunction, asValue, type AwilixContainer } from 'awilix'
 import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import { updatePurchaseStockFactory } from './controllers'
+import {
+  closeSellStockControllerFactory,
+  updatePurchaseStockFactory,
+  updateSellStockControllerFactory
+} from './controllers'
 
 export async function setupStockDependencies (container: AwilixContainer, usePostgres: boolean) {
   if (usePostgres) {
@@ -26,7 +30,9 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       stockSalesService: asClass(StockSalesService).classic().singleton(),
 
       //   controllers
-      updatePurchaseStockController: asValue(updatePurchaseStockFactory)
+      updatePurchaseStockController: asFunction(updatePurchaseStockFactory).classic(),
+      updateSellStockController: asFunction(updateSellStockControllerFactory).classic(),
+      closeSellStockController: asFunction(closeSellStockControllerFactory).classic()
     })
   }
 
