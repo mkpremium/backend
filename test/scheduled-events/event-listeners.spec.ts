@@ -16,17 +16,18 @@ import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-eve
 
 describe('scheduled-events.setupEventListeners', () => {
   let eventBus
+  let removeScheduledCallsServiceMock
   let scheduledCallRepositoryMock
 
   beforeEach(() => {
     eventBus = new InMemorySyncEventBus()
-    scheduledCallRepositoryMock = {
-      removeScheduledCallsForBuilding: spy()
-    }
+    scheduledCallRepositoryMock = { removeScheduledCallsForBuilding: spy() }
+    removeScheduledCallsServiceMock = { removeScheduledCallsFor: spy() }
     const container = createContainer()
     container.register({
       eventBus: asValue(eventBus),
       scheduledCallsRepository: asValue(scheduledCallRepositoryMock),
+      removeScheduledCallsService: asValue(removeScheduledCallsServiceMock),
       scheduledCallFromOwnerMessage: asValue(undefined),
       removeCallsOnNewMeetingOrOfferRequest: asFunction(removeCallsOnNewMeetingOrOfferRequest).singleton(),
       removeScheduledCallsOnOwnerRefusal: asFunction(removeScheduledCallsOnOwnerRefusal).singleton(),
@@ -40,7 +41,7 @@ describe('scheduled-events.setupEventListeners', () => {
   it('deletes scheduled calls when a visit is scheduled for the building', () => {
     eventBus.publish({ name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED, buildingId: 'test-building-id' })
 
-    expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).to.have.been.calledWith('test-building-id')
+    expect(removeScheduledCallsServiceMock.removeScheduledCallsFor).to.have.been.calledWith('test-building-id')
   })
 
   it('deletes scheduled calls when building is mark as not for sale', () => {
@@ -50,7 +51,7 @@ describe('scheduled-events.setupEventListeners', () => {
       negotiationStatus: 'NO VENDE'
     })
 
-    expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).to.have.been.calledWith('test-building-id')
+    expect(removeScheduledCallsServiceMock.removeScheduledCallsFor).to.have.been.calledWith('test-building-id')
   })
 
   it('deletes scheduled calls when building is discarded', () => {
@@ -60,6 +61,6 @@ describe('scheduled-events.setupEventListeners', () => {
       negotiationStatus: 'DESCARTADO'
     })
 
-    expect(scheduledCallRepositoryMock.removeScheduledCallsForBuilding).to.have.been.calledWith('test-building-id')
+    expect(removeScheduledCallsServiceMock.removeScheduledCallsFor).to.have.been.calledWith('test-building-id')
   })
 })
