@@ -5,7 +5,7 @@ import {
   updatePurchaseStockFactory,
   updateSellStockControllerFactory
 } from './controllers'
-import { PostgresStockSalesService } from './service/postgres-stock-sales.service'
+import { StockSalesService } from './service/stock-sales.service'
 
 export async function setupStockDependencies (container: AwilixContainer, usePostgres: boolean) {
   if (usePostgres) {
@@ -13,8 +13,7 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       stockRepository: asValue(null),
       legacyStockRepository: asValue(null),
       propertyManagersRepository: asValue(null),
-      stockService: asValue(null),
-      stockSalesService: asClass(PostgresStockSalesService).classic().singleton()
+      stockService: asValue(null)
     })
   } else {
     const { PropertyManagerRepository } = await import('../property-manager/PropertyManagerRepository')
@@ -36,6 +35,7 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
   }
 
   container.register({
+    stockSalesService: asClass(StockSalesService).classic().singleton(),
     propertyManagerRankingService: asClass(PropertyManagerRankingService).classic().singleton()
   })
 }
