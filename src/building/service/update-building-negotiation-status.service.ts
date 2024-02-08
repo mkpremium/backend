@@ -26,8 +26,7 @@ export class UpdateBuildingNegotiationStatusService {
   ) {
   }
 
-  // TODO: make it accept a transactional manager
-  async updateBuildingStatus (buildingId, {
+  async updateBuildingStatus (buildingId: string, {
     status,
     userId,
     sourceOwnerId,
