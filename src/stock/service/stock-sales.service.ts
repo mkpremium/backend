@@ -84,6 +84,36 @@ export class StockSalesService {
     })
   }
 
+  async closeSellStock (params: { buildingId: string } & Transaction & {
+    reservationDate: string;
+    transactionDate: string
+  }, operatorId: string): Promise<Stock> {
+    return await this.entityManager.transaction(async transactionalEntityManager => {
+      const stock = await this.getStockOrFail(params.buildingId)
+
+      if (stock.currentStatus !== 'SELL') {
+        throw new Error('El stock no se encuentra en estado "SELL"')
+      }
+
+      const gain = stock.sell.transactionAmount - stock.purchase.transactionAmount
+      stock.close = {
+        operatorId,
+        gain,
+        transactionDate: new Date()
+      }
+      stock.currentStatus = 'CLOSE'
+
+      await transactionalEntityManager.save(stock)
+      await this.eventBus.publish({
+        name: DomainEventCatalog.STOCK__STOCK_CLOSED,
+        buildingId: params.buildingId,
+        userId: operatorId
+      }, transactionalEntityManager)
+
+      return stock
+    })
+  }
+
   private async getStockOrFail (buildingId: string): Promise<Stock> {
     const stock = await this.entityManager.findOneBy(Stock, { building: { id: buildingId } })
 

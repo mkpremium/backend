@@ -10,6 +10,7 @@ export enum DomainEventCatalog {
 
   STOCK__STOCK_PURCHASE_UPDATED = 'stock.stock_purchase_updated',
   STOCK__STOCK_SELL_UPDATED = 'stock.stock_sell_updated',
+  STOCK__STOCK_CLOSED= 'stock.stock_closed',
 
   OFFER_REQUEST__CREATED = 'offer_request.created',
 

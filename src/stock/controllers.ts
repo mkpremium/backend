@@ -1,5 +1,4 @@
 import { wrap } from 'express-promise-wrap'
-import { closeSellStock } from './application'
 import type { StockService } from './service/StockService'
 import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import type { StockSalesService } from './service/stock-sales.service'
@@ -34,9 +33,9 @@ export function updateSellStockControllerFactory (stockSalesService: StockSalesS
   )
 }
 
-export function closeSellStockControllerFactory () {
+export function closeSellStockControllerFactory (stockSalesService: StockSalesService) {
   return wrap(async function closeSellStockController (req, res) {
-    const stock = await closeSellStock(req.body, req.user.id)
+    const stock = await stockSalesService.closeSellStock(req.body, req.user.id)
     res.status(201).json(stock)
   })
 }
