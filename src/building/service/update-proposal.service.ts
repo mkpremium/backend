@@ -5,7 +5,7 @@ type UpdateProposalCommand = { patch: Partial<ProposalProps>; callerId: string; 
 
 export class UpdateProposalService {
   constructor (
-    private postgresProposalsRepository: PostgresProposalsRepository
+    private proposalsRepository: PostgresProposalsRepository
   ) {
   }
 
@@ -16,7 +16,7 @@ export class UpdateProposalService {
       patch: proposalUpdate
     }
 
-    return this.postgresProposalsRepository.save({
+    return this.proposalsRepository.save({
       ...cmd.patch,
       id: cmd.proposalId
     } as ProposalProps)

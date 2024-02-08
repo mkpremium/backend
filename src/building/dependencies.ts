@@ -53,7 +53,6 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
       couchbaseBuildingsRepository: asValue(null),
       couchbaseBuildingsReadRepository: asValue(null),
       couchbaseBuildingNotesRepository: asValue(null),
-      couchbaseProposalsRepository: asValue(null),
       couchbaseOfferRequestsRepository: asValue(null),
       legacyBuildingsRepository: asValue(null),
       legacyMetadataRepository: asValue(null)
@@ -62,7 +61,6 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     const { CouchbaseBuildingsRepository } = await import('./repository/couchbase-building.repository')
     const { CouchbaseBuildingsReadRepository } = await import('./repository/couchbase-buildings-read.repository')
     const { CouchbaseOfferRequestsRepository } = await import('./repository/couchbase-offer-requests.repository')
-    const { CouchbaseProposalsRepository } = await import('./repository/couchbase-proposals.repository')
     const { CouchbaseBuildingNotesRepository } = await import('./repository/couchbase-building-notes.repository')
     const { LegacyBuildingRepository } = await import('./models')
     const { MetadataRepository } = await import('./repository/metadata.repository')
@@ -71,7 +69,6 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
       couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
       couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
       couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
-      couchbaseProposalsRepository: asClass(CouchbaseProposalsRepository).classic().singleton(),
       couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
       legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
       legacyMetadataRepository: asClass(MetadataRepository).singleton()
@@ -108,8 +105,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     postgresBuildingNotesRepository: asClass(PostgresBuildingNotesRepository).classic().singleton(),
     buildingNotesRepository: aliasTo(usePostgres ? 'postgresBuildingNotesRepository' : 'couchbaseBuildingNotesRepository'),
-    postgresProposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
-    proposalsRepository: aliasTo(usePostgres ? 'postgresProposalsRepository' : 'couchbaseProposalsRepository'),
+    proposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
 
     updateNegotiationProposalController: asFunction(updateNegotiationProposalControllerFactory).singleton(),
     createBuildingController: asFunction(createBuildingController).singleton(),
