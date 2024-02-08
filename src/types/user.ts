@@ -1,5 +1,4 @@
 import t from 'tcomb'
-import { RestringedHourObject } from '../operator/restringed-hours/types'
 import { DateTimeString } from '../infrastructure/shared-types'
 
 export const UserRoles = {
@@ -101,7 +100,6 @@ export const User = t.struct<UserProps>(
     online: t.Boolean,
 
     profile: UserProfile,
-    restringedHours: t.maybe(RestringedHourObject),
     flipperId: t.maybe(t.String),
 
     profitGoal: t.maybe(ProfitGoal),

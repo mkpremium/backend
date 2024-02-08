@@ -1,7 +1,6 @@
 import t from 'tcomb'
-import { User, UserProfile, UserRole } from '../types/user'
 import { ListQuery } from '../types/params'
-import { RestringedHourObject } from './restringed-hours/types'
+import { User, UserProfile, UserRole } from '../types/user'
 
 t.Credentials = t.struct({
   username: t.String,
@@ -56,8 +55,7 @@ t.OperatorView = t.struct(
     id: t.maybe(t.String),
     username: t.String,
     roles: t.list(UserRole),
-    profile: UserProfile,
-    restringedHours: t.maybe(RestringedHourObject)
+    profile: UserProfile
   },
   {
     name: 'Operator',
