@@ -97,7 +97,7 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
   return {
     id: entity.id,
     address: entity.address,
-    floorArea: entity.floorArea,
+    floorArea: isNaN(entity.floorArea) ? null : entity.floorArea,
     cadastre: entity.publicIdentifier ? { reference: entity.publicIdentifier } : undefined,
     location: entity.location,
     ownerId: entity.featuredOwner?.id,
@@ -156,7 +156,7 @@ export function buildingEntityToReadModel (
       thumbnailUrl: previewUrl
     })),
     latestProposal: b.recentProposal,
-    floorArea: b.floorArea,
+    floorArea: isNaN(b.floorArea) ? undefined : b.floorArea,
     cadastreReference: b.publicIdentifier,
     lastMeeting: (extra.lastOfferCreatedAt && {
       dateMeeting: moment(extra.lastOfferCreatedAt).format(),

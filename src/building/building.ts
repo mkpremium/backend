@@ -171,7 +171,7 @@ type RecentBuildingProposal = Pick<ProposalProps, 'id' | 'proposal' | 'createdAt
 export interface BuildingProps {
   id: string;
   address: BuildingAddressProps;
-  floorArea: number;
+  floorArea?: number;
   cadastre?: {
     reference: string;
   };
@@ -191,7 +191,7 @@ export const Building = t.struct<BuildingProps>(
     address: Address,
     buildingType: t.maybe(t.enums.of(['VERTICAL', 'HORIZONTAL'])),
     cadastre: t.maybe(BuildingCadastre),
-    floorArea: t.union([t.Number, t.String]),
+    floorArea: t.maybe(t.union([t.Number, t.String])),
     landArea: t.union([t.Number, t.String]),
     roofArea: t.union([t.Number, t.String]),
     coefficient: t.union([t.Number, t.String]),
