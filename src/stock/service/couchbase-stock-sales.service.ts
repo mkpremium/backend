@@ -7,7 +7,8 @@ import type { LegacyBuildingRepository } from '../../building/models'
 import type { StockRepository } from '../models'
 import { createTransaction, type TransactionInput } from './create-transaction'
 import type { StockSalesService } from './stock-sales.service'
-import { updatePurchaseStock } from '../application'
+import { updatePurchaseStock, updateSellStock } from '../application'
+import { Stock, Transaction } from '../stock.entity'
 
 export class CouchbaseStockSalesService implements StockSalesService {
   constructor (
@@ -15,6 +16,10 @@ export class CouchbaseStockSalesService implements StockSalesService {
     private legacyBuildingsRepository: LegacyBuildingRepository,
     private legacyStockRepository: StockRepository
   ) {
+  }
+
+  updateSellStock (params: { buildingId: string } & Transaction & { reservationDate: string; transactionDate: string }, operatorId: string): Promise<Stock> {
+    return updateSellStock(params, operatorId)
   }
 
   updatePurchaseStock (body: any, operatorId: string): Promise<any> {

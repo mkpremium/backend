@@ -7,6 +7,7 @@ import { createTransaction, type TransactionInput } from './create-transaction'
 import type { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import type { StockSalesService } from './stock-sales.service'
+import { StockStatuses } from '../types'
 
 export class PostgresStockSalesService implements StockSalesService {
   constructor (
@@ -14,6 +15,30 @@ export class PostgresStockSalesService implements StockSalesService {
     private entityManager: EntityManager,
     private eventBus: EventPublisher
   ) {
+  }
+
+  async updateSellStock (params: { buildingId: string } & Transaction & {
+    reservationDate: string;
+    transactionDate: string
+  }, operatorId: string): Promise<Stock> {
+    const stock = await this.getStockOrFail(params.buildingId)
+    if (stock.currentStatus === StockStatuses.CLOSE) {
+      throw new Error(`El stock se encuentra en estado ${StockStatuses.CLOSE}`)
+    }
+
+    return await this.entityManager.transaction(async transactionalEntityManager => {
+      stock.sell = createTransaction(params, operatorId)
+
+      await transactionalEntityManager.save(stock)
+
+      await this.eventBus.publish({
+        name: DomainEventCatalog.STOCK__STOCK_SELL_UPDATED,
+        buildingId: params.buildingId,
+        userId: operatorId
+      }, transactionalEntityManager)
+
+      return stock
+    })
   }
 
   async sellStock (params: { buildingId: string } & TransactionInput, operatorId: string) {

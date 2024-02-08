@@ -5,4 +5,6 @@ export interface StockSalesService {
   sellStock (params: { buildingId: string } & TransactionInput, operatorId: string): Promise<Stock>
 
   updatePurchaseStock (params: { buildingId: string } & TransactionInput, operatorId: string): Promise<Stock>
+
+  updateSellStock (params: { buildingId: string } & TransactionInput, operatorId: string): Promise<Stock>
 }
