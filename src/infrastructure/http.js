@@ -4,3 +4,7 @@ export class ClientError extends Error {
     this.statusCode = statusCode
   }
 }
+
+export function notImplemented (req, res) {
+  return res.status(501)
+}
