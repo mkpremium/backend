@@ -11,9 +11,9 @@ export const getRankingController = (propertyManagerRankingService: PropertyMana
   })
 }
 
-export function updatePurchaseStockFactory (updatePurchaseStock: (data: any, userId: number) => Promise<any>) {
+export function updatePurchaseStockFactory (stockSalesService: StockSalesService) {
   return wrap(async function updatePurchaseStockController (req, res) {
-    const stock = await updatePurchaseStock(req.body, req.user.id)
+    const stock = await stockSalesService.updatePurchaseStock(req.body, req.user.id)
     res.status(201).json(stock)
   })
 }
