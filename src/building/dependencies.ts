@@ -52,20 +52,17 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     container.register({
       couchbaseBuildingsRepository: asValue(null),
       couchbaseBuildingsReadRepository: asValue(null),
-      couchbaseBuildingNotesRepository: asValue(null),
-      couchbaseOfferRequestsRepository: asValue(null)
+      couchbaseBuildingNotesRepository: asValue(null)
     })
   } else {
     const { CouchbaseBuildingsRepository } = await import('./repository/couchbase-building.repository')
     const { CouchbaseBuildingsReadRepository } = await import('./repository/couchbase-buildings-read.repository')
-    const { CouchbaseOfferRequestsRepository } = await import('./repository/couchbase-offer-requests.repository')
     const { CouchbaseBuildingNotesRepository } = await import('./repository/couchbase-building-notes.repository')
 
     container.register({
       couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
       couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
-      couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
-      couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton()
+      couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton()
     })
   }
 

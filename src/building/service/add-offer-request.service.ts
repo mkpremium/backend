@@ -4,12 +4,10 @@ import { InvalidCommand } from '../../infrastructure/invalid-command.error'
 import { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
-import { CouchbaseOfferRequestsRepository } from '../repository/couchbase-offer-requests.repository'
 import { BuildingOfferRequest } from '../repository/building-offer-request.entity'
 import { Building } from '../building.entity'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
-import { CouchbaseBuildingsRepository } from '../repository/couchbase-building.repository'
 
 interface AddOfferRequestCommand {
   ownerId: string,
@@ -51,10 +49,7 @@ export interface AddBuildingOfferCommand {
 
 export class AddOfferRequestService {
   constructor (
-    private couchbaseOfferRequestsRepository: CouchbaseOfferRequestsRepository,
-    private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private eventBus: EventPublisher,
-    private usePostgres: boolean,
     private entityManager: EntityManager
   ) {
   }
@@ -62,7 +57,7 @@ export class AddOfferRequestService {
   async addOfferRequest (cmd: AddOfferRequestCommand) {
     this.assertValidCommand(cmd)
 
-    await (this.usePostgres ? this.doPostgres(cmd) : this.doCouchbase(cmd))
+    await this.doPostgres(cmd)
   }
 
   private assertValidCommand (command: AddOfferRequestCommand) {
@@ -99,14 +94,6 @@ export class AddOfferRequestService {
 
       return offerRequest
     })
-  }
-
-  private async doCouchbase (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
-    const offerRequest = await this.couchbaseOfferRequestsRepository.add(cmd)
-    await this.couchbaseBuildingsRepository.assignBuildingToAgent(cmd.buildingId, cmd.flipperId)
-    await this.publishOfferRequested(cmd, offerRequest)
-
-    return offerRequest
   }
 
   private async publishOfferRequested (
