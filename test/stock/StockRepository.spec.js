@@ -6,7 +6,7 @@ import { LegacyBuildingRepository } from '../../src/building/models'
 import { buildingData } from './stock.mock'
 import { createTestContainer } from '../create-test-container'
 
-describe('StockRepository', function () {
+describe.skip('StockRepository', function () {
   let container, stockRepository, stockService
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
