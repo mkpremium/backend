@@ -21,8 +21,8 @@ describe('Lead assignment to flipper (Postgres)', () => {
 
   beforeEach(async () => {
     container = await createTestContainer({ postgres: true, couchbase: false })
-    buildingsRepository = container.resolve('postgresBuildingsRepository')
-    ownersRepository = container.resolve('postgresOwnersRepository')
+    buildingsRepository = container.resolve('buildingsRepository')
+    ownersRepository = container.resolve('ownersRepository')
     flippersRepository = container.resolve('flippersRepository')
   })
 
