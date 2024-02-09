@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
+import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { MeetingsRepository } from './repository/meetings.repository'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
@@ -27,8 +27,7 @@ export async function setupScheduledEventsDependencies (container: AwilixContain
     removeScheduledCallsService: asClass(RemoveScheduledCallsService).classic().singleton(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
-    postgresScheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
-    scheduledEventsRepository: aliasTo('postgresScheduledEventsRepository'),
+    scheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
     selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
     meetingsService: asClass(MeetingsService).classic().singleton(),
 

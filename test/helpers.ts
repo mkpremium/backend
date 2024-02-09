@@ -23,7 +23,6 @@ import { ListBuildingsService } from '../src/building/service/list-buildings.ser
 import { AddFlipperService } from '../src/flipper/service/add-flipper.service'
 import type { ScheduleCallService } from '../src/scheduled-events/service/schedule-call.service'
 import { ScheduledCallsService } from '../src/scheduled-events/service/scheduled-calls.service'
-import { ScheduledEventsRepository } from '../src/scheduled-events/repository/schedule-events.repository'
 import {
   PostgresScheduledEventsRepository
 } from '../src/scheduled-events/repository/postgres-schedule-events.repository'
@@ -176,12 +175,11 @@ export interface ResolvedDeps {
   listBuildingsService: ListBuildingsService,
   postgresQueueRepository: PostgresWorksheetQueueRepository,
 
-  postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
   releaseUserOtherActiveWorksheetsInQueueService: ReleaseUserExtraOpenedWorksheetsInQueueService,
   scheduleCallService: ScheduleCallService,
 
   scheduledCallsService: ScheduledCallsService,
-  scheduledEventsRepository: ScheduledEventsRepository,
+  scheduledEventsRepository: PostgresScheduledEventsRepository,
   searchOwnerOrBuildingService: SearchOwnerOrBuildingService,
   takeNextWorksheetService: TakeNextWorksheetService,
 
@@ -206,7 +204,6 @@ export async function resolveDependencies (): Promise<ResolvedDeps> {
     listBuildingsService: container.resolve('listBuildingsService'),
 
     postgresQueueRepository: container.resolve('postgresQueueRepository'),
-    postgresScheduledEventsRepository: container.resolve('postgresScheduledEventsRepository'),
 
     releaseUserOtherActiveWorksheetsInQueueService: container.resolve('releaseUserOtherActiveWorksheetsInQueueService'),
     scheduleCallService: container.resolve('scheduleCall'),
