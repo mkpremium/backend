@@ -54,8 +54,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
       couchbaseBuildingsReadRepository: asValue(null),
       couchbaseBuildingNotesRepository: asValue(null),
       couchbaseOfferRequestsRepository: asValue(null),
-      legacyBuildingsRepository: asValue(null),
-      legacyMetadataRepository: asValue(null)
+      legacyBuildingsRepository: asValue(null)
     })
   } else {
     const { CouchbaseBuildingsRepository } = await import('./repository/couchbase-building.repository')
@@ -63,15 +62,13 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     const { CouchbaseOfferRequestsRepository } = await import('./repository/couchbase-offer-requests.repository')
     const { CouchbaseBuildingNotesRepository } = await import('./repository/couchbase-building-notes.repository')
     const { LegacyBuildingRepository } = await import('./models')
-    const { MetadataRepository } = await import('./repository/metadata.repository')
 
     container.register({
       couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
       couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
       couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton(),
       couchbaseOfferRequestsRepository: asClass(CouchbaseOfferRequestsRepository).classic().singleton(),
-      legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton(),
-      legacyMetadataRepository: asClass(MetadataRepository).singleton()
+      legacyBuildingsRepository: asClass(LegacyBuildingRepository).singleton()
     })
   }
 
