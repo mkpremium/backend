@@ -1,5 +1,4 @@
 import { EntityManager, In } from 'typeorm'
-import type { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
 import { FoundOwner, FoundOwnerProps } from '../repository/owner.repository'
 import { ownerEntityToStruct } from '../repository/postgres-owners.repository'
 import fromJSON from 'tcomb/lib/fromJSON'
@@ -10,20 +9,12 @@ import { inferBuildingLastEvent } from '../../building/service/infer-building-la
 
 export class SearchOwnerOrBuildingService {
   constructor (
-    private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private entityManager: EntityManager,
-    private usePostgres: boolean,
     private listBuildingsService: ListBuildingsService
   ) {
   }
 
-  search (phoneNumber: string): Promise<FoundOwnerProps[]> {
-    return this.usePostgres
-      ? this.searchByPhoneInPostgres(phoneNumber)
-      : this.couchbaseOwnersRepository.findByPhoneNumber(phoneNumber)
-  }
-
-  private async searchByPhoneInPostgres (phoneNumber: string): Promise<FoundOwnerProps[]> {
+  async search (phoneNumber: string): Promise<FoundOwnerProps[]> {
     const owners = await this.entityManager.find(Owner, {
       where: {
         person: {
