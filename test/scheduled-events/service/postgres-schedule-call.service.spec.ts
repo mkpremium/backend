@@ -29,7 +29,7 @@ describe('PostgresScheduleCallService', () => {
     const actualScheduledCall = await deps.scheduleCallService.scheduleCall(cmd)
 
     expect(actualScheduledCall).to.not.be.null
-    const lastScheduledEventForBuilding = await deps.postgresScheduledEventsRepository.lastScheduledEventForBuilding(testBuilding.id)
+    const lastScheduledEventForBuilding = await deps.scheduledEventsRepository.lastScheduledEventForBuilding(testBuilding.id)
     expect(lastScheduledEventForBuilding).to.include({ id: actualScheduledCall.id, type: 'CALLS' })
 
     const flipperScheduledCalls = await deps.scheduledCallsService.scheduledCallsFor(testFlipper.user.id)
