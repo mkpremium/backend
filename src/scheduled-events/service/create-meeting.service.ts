@@ -1,13 +1,11 @@
 import { newHttpError } from '../../lib/http-error'
 import { isBusiness } from '../../lib/role-operators'
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { CouchbaseScheduledEventsRepository } from '../repository/couchbase-schedule-events.repository'
 import { EntityManager } from 'typeorm'
 import { UserProps } from '../../types/user'
 import { ScheduledEvent } from '../scheduled-event.entity'
 import { ScheduledEventId, ScheduledEventProps } from '../types'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
-import { CouchbaseBuildingsRepository } from '../../building/repository/couchbase-building.repository'
 
 export interface MeetingCreated {
   name: DomainEventCatalog.SCHEDULED_EVENTS__MEETING_CREATED
@@ -29,10 +27,7 @@ interface AddMeetingCommand {
 
 export class CreateMeetingService {
   constructor (
-    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository,
-    private couchbaseBuildingsRepository: CouchbaseBuildingsRepository,
     private eventBus: EventPublisher,
-    private usePostgres: boolean,
     private entityManager: EntityManager
   ) {
   }
@@ -41,9 +36,7 @@ export class CreateMeetingService {
     const meetingAgentId = cmd.notifyTo
     this.checkOperatorPermissions(user, meetingAgentId)
 
-    return await (this.usePostgres
-      ? this.doPostgres(cmd)
-      : this.doCouchbase(cmd, user, meetingAgentId))
+    return await this.doPostgres(cmd)
   }
 
   private checkOperatorPermissions (user: Pick<UserProps, 'id' | 'roles'>, meetingOperatorId) {
@@ -77,15 +70,6 @@ export class CreateMeetingService {
 
       return createdMeeting
     })
-  }
-
-  private async doCouchbase (requestBody, operator, meetingAgentId): Promise<ScheduledEventProps> {
-    const createdMeeting = await this.couchbaseScheduledEventsRepository
-      .addScheduledMeetingEvent(requestBody, operator.id)
-    await this.couchbaseBuildingsRepository.assignBuildingToAgent(createdMeeting.event.buildingId, meetingAgentId)
-    await this.publishEvent(createdMeeting, requestBody)
-
-    return createdMeeting
   }
 
   private async publishEvent (createdMeeting: ScheduledEventProps, cmd: AddMeetingCommand, entityManager?: EntityManager) {
