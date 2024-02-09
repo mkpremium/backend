@@ -33,7 +33,7 @@ export interface AddOwnerCommand {
 
 export class AddOwnerService {
   constructor (
-    private postgresOwnersRepository: PostgresOwnersRepository,
+    private ownersRepository: PostgresOwnersRepository,
     private ormDataSource: DataSource,
     private eventBus: EventBus,
     private logger: Logger
@@ -55,7 +55,7 @@ export class AddOwnerService {
     })
 
     // Return the owner with the same structure as the one in Couchbase
-    return this.postgresOwnersRepository.get(savedOwner.id)
+    return this.ownersRepository.get(savedOwner.id)
   }
 
   private async createEntities (cmd: AddOwnerCommand, entityManager: EntityManager) {

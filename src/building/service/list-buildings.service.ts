@@ -17,7 +17,7 @@ export class ListBuildingsService {
   constructor (
     private usePostgres: boolean,
     private entityManager: EntityManager,
-    private postgresOwnersRepository: PostgresOwnersRepository,
+    private ownersRepository: PostgresOwnersRepository,
     private postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
     private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
     private logger: Logger
@@ -96,7 +96,7 @@ export class ListBuildingsService {
     })
 
     const lastOfferRequests = await getLastOfferRequestForBuildings(ids, this.entityManager)
-    const allBuildingOwners = await this.postgresOwnersRepository.buildingOwners(ids)
+    const allBuildingOwners = await this.ownersRepository.buildingOwners(ids)
 
     return buildings.map((building) => {
       const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)

@@ -55,7 +55,7 @@ export async function setupContainer (
   container.register('usePostgres', asValue(usePostgres))
   await setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
   await setupBuildingDependencies(container, usePostgres)
-  setupOwnerDependencies(container, usePostgres)
+  setupOwnerDependencies(container)
   setupContactsDependencies(container)
   await setupScheduledEventsDependencies(container)
   await setupWorksheetDependencies(container, usePostgres)

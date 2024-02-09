@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
+import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { createChangeContactStatusController } from './controller/change-contact-status.controller'
 import { createSearchOwnersController } from './controller/search-owners.controller'
 import { ChangeContactStatusService } from './service/change-contact-status.service'
@@ -7,7 +7,6 @@ import { markGoodContactOnCallScheduled } from './event-listener/mark-good-conta
 import { getOwnerController } from './controller/get-owner.controller'
 import { createSetFeaturedContactController } from './controller/set-featured-contact.controller'
 import { createResetOwnerBadContactsHandler } from './command-handler/reset-owner-bad-contacts.handler'
-import { CouchbaseOwnersRepository } from './repository/couchbase-owners.repository'
 import { PostgresOwnersRepository } from './repository/postgres-owners.repository'
 import { addOwnerContactControllerFactory, updateOwnerControllerFactory } from './controllers'
 import { addOwnerToBuildingControllerFactory } from '../building/controllers'
@@ -16,7 +15,7 @@ import { AddContactService } from './service/add-contact.service'
 import { SearchOwnerOrBuildingService } from './service/search-owner-or-building.service'
 import { importOwnerHandlerFactory } from './service/import-owner-command-handler'
 
-export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: boolean) => {
+export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
     getOwnerController: asFunction(getOwnerController).singleton(),
     updateOwnerController: asFunction(updateOwnerControllerFactory).singleton(),
@@ -34,9 +33,7 @@ export const setupOwnerDependencies = (container: AwilixContainer, usePostgres: 
     addContactService: asClass(AddContactService).singleton().classic(),
     addOwnerService: asClass(AddOwnerService).singleton().classic(),
 
-    postgresOwnersRepository: asClass(PostgresOwnersRepository).singleton().classic(),
-    couchbaseOwnersRepository: asClass(CouchbaseOwnersRepository).singleton().classic(),
-    ownersRepository: aliasTo(usePostgres ? 'postgresOwnersRepository' : 'couchbaseOwnersRepository'),
+    ownersRepository: asClass(PostgresOwnersRepository).singleton().classic(),
 
     resetOwnerBadContactsHandler: asFunction(createResetOwnerBadContactsHandler).singleton(),
     importOwnerCommandHandler: asFunction(importOwnerHandlerFactory).singleton()
