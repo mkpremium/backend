@@ -4,19 +4,17 @@ import { OwnerStatus } from '../../owner/owner'
 import { setStatus, WorkSheetStatus } from '../domain/worksheet'
 import _every from 'lodash/every'
 import { OwnerRepository } from '../../owner/repository/owner.repository'
-import { ScheduledEventType } from '../../scheduled-events/types'
-import {
-  CouchbaseScheduledEventsRepository
-} from '../../scheduled-events/repository/couchbase-schedule-events.repository'
 import { WorksheetRepository } from '../repository/worksheet.repository'
 import { BuildingsRepository } from '../../building/repository/buildings.repository'
+import type { EntityManager } from 'typeorm'
+import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
 
 export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   constructor (
     private worksheetRepository: WorksheetRepository,
     private buildingsRepository: BuildingsRepository,
     private ownersRepository: OwnerRepository,
-    private couchbaseScheduledEventsRepository: CouchbaseScheduledEventsRepository
+    private entityManager: EntityManager
   ) {
   }
 
@@ -65,10 +63,16 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   }
 
   private async findMeetings (worksheetId: string) {
-    const qb = this.couchbaseScheduledEventsRepository.getQueryBuilder()
-    qb.where('type = ?', ScheduledEventType.MEETINGS)
-    qb.where('event.worksheetId = ?', worksheetId)
-    return this.couchbaseScheduledEventsRepository.query(qb)
+    return this.entityManager.find(ScheduledEvent, {
+      where: {
+        type: 'MEETING',
+        building: {
+          worksheet: {
+            id: worksheetId
+          }
+        }
+      }
+    })
   }
 }
 
