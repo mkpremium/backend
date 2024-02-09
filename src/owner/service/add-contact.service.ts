@@ -1,20 +1,8 @@
-import { CouchbaseOwnersRepository } from '../repository/couchbase-owners.repository'
 import { DataSource, EntityManager } from 'typeorm'
-import {
-  ContactProps,
-  ContactType,
-  FeaturedContact,
-  isPhoneContact,
-  Owner as OwnerStruct,
-  OwnerContactStatus,
-  OwnerProps,
-  Person as PersonStruct
-} from '../owner'
+import { ContactProps, ContactType, isPhoneContact, OwnerContactStatus, OwnerProps } from '../owner'
 import { Owner } from '../owner.entity'
 import { Contact } from '../../contacts/contact.entity'
 import { PersonContact } from '../person-contact.entity'
-import { TypedContactInfo } from '../contact'
-import t from 'tcomb'
 import { EventBus } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 
@@ -32,18 +20,12 @@ export class AddContactService {
   private recording = []
 
   constructor (
-    private couchbaseOwnersRepository: CouchbaseOwnersRepository,
     private ormDataSource: DataSource,
-    private usePostgres: boolean,
     private eventBus: EventBus
   ) {
   }
 
-  addContact (cmd: AddContactCommand): Promise<MaybeFeaturedContact | OwnerProps> {
-    return this.usePostgres ? this.saveInPostgres(cmd) : this.saveInCouchbase(cmd)
-  }
-
-  private async saveInPostgres (cmd: AddContactCommand): Promise<MaybeFeaturedContact> {
+  async addContact (cmd: AddContactCommand): Promise<MaybeFeaturedContact | OwnerProps> {
     this.recording = []
     const savedContact = await this.ormDataSource.transaction<MaybeFeaturedContact>(async entityManager => {
       const contact = await this.getOrCreateContact(entityManager, cmd)
@@ -122,36 +104,5 @@ export class AddContactService {
     }
 
     return personAndContactLink
-  }
-
-  private async saveInCouchbase (cmd: AddContactCommand): Promise<OwnerProps> {
-    const owner = await this.couchbaseOwnersRepository.get(cmd.ownerId)
-    let featuredContact = owner.featuredContact
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    const newContact = TypedContactInfo(cmd as any)
-
-    const { isFeatured } = cmd
-    if (isFeatured) {
-      featuredContact = FeaturedContact.update(featuredContact || FeaturedContact({}), {
-        [cmd.type === 'EMAIL' ? 'emailId' : 'phoneId']: {
-          $set: newContact.id
-        }
-      })
-    }
-
-    const updatedOwner = OwnerStruct.update(owner, {
-      featuredContact: { $set: featuredContact },
-      $merge: {
-        person: PersonStruct.update(owner.person, {
-          $merge: {
-            contacts: t.update(owner.person.contacts, {
-              $push: [newContact]
-            })
-          }
-        })
-      }
-    })
-
-    return await this.couchbaseOwnersRepository.save(updatedOwner)
   }
 }
