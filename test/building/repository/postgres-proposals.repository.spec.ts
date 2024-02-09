@@ -14,7 +14,7 @@ import { User } from '../../../src/user/user.entity'
 describe('ProposalsRepository(Postgres)', () => {
   it('returns all pending proposals', async () => {
     const container = await createTestContainer({ postgres: true, couchbase: false })
-    const proposalsRepository = container.resolve('postgresProposalsRepository') as ProposalsRepository
+    const proposalsRepository = container.resolve('proposalsRepository') as ProposalsRepository
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const ownersRepository = container.resolve('ownersRepository') as OwnerRepository
     const ormDataSource = container.resolve('ormDataSource') as DataSource
