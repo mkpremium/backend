@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, asValue, AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
 import { MeetingsRepository } from './repository/meetings.repository'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
@@ -21,17 +21,6 @@ import { importScheduledEventHandlerFactory } from './service/scheduled-event-im
 import { RemoveScheduledCallsService } from './service/remove-scheduled-calls.service'
 
 export async function setupScheduledEventsDependencies (container: AwilixContainer) {
-  const usePostgres = container.resolve('usePostgres')
-  if (usePostgres) {
-    container.register({
-      couchbaseScheduledEventsRepository: asValue(null)
-    })
-  } else {
-    const { CouchbaseScheduledEventsRepository } = await import('./repository/couchbase-schedule-events.repository')
-    container.register({
-      couchbaseScheduledEventsRepository: asClass(CouchbaseScheduledEventsRepository).classic().singleton()
-    })
-  }
   container.register({
     meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
@@ -39,7 +28,7 @@ export async function setupScheduledEventsDependencies (container: AwilixContain
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledCallsRepository: asClass(ScheduledCallsRepository).classic(),
     postgresScheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
-    scheduledEventsRepository: aliasTo(usePostgres ? 'postgresScheduledEventsRepository' : 'couchbaseScheduledEventsRepository'),
+    scheduledEventsRepository: aliasTo('postgresScheduledEventsRepository'),
     selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
     meetingsService: asClass(MeetingsService).classic().singleton(),
 
