@@ -16,7 +16,7 @@ export class ListBuildingsService {
   constructor (
     private entityManager: EntityManager,
     private ownersRepository: PostgresOwnersRepository,
-    private postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
+    private scheduledEventsRepository: PostgresScheduledEventsRepository,
     private logger: Logger
   ) {
   }
@@ -54,7 +54,7 @@ export class ListBuildingsService {
         loadRelationIds: true
       }),
       getLastOfferRequestForBuildings(buildingIds, this.entityManager),
-      this.postgresScheduledEventsRepository.lastMeetingForBuildings(buildingIds)
+      this.scheduledEventsRepository.lastMeetingForBuildings(buildingIds)
     ])
 
     return buildings.reduce((acc, b) => {
