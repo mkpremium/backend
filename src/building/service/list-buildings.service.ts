@@ -1,7 +1,6 @@
 import { EntityManager, In, Not } from 'typeorm'
 import { Building } from '../building.entity'
 import { BuildingReadModel } from '../repository/buildings-read.repository'
-import type { CouchbaseBuildingsReadRepository } from '../repository/couchbase-buildings-read.repository'
 import { BuildingOfferRequest } from '../repository/building-offer-request.entity'
 import { buildingEntityToReadModel, mapBuildingEntityToStruct } from '../repository/postgres-buildings.repository'
 import { PostgresOwnersRepository } from '../../owner/repository/postgres-owners.repository'
@@ -15,25 +14,19 @@ import type { Logger } from 'winston'
 
 export class ListBuildingsService {
   constructor (
-    private usePostgres: boolean,
     private entityManager: EntityManager,
     private ownersRepository: PostgresOwnersRepository,
     private postgresScheduledEventsRepository: PostgresScheduledEventsRepository,
-    private couchbaseBuildingsReadRepository: CouchbaseBuildingsReadRepository,
     private logger: Logger
   ) {
   }
 
   buildingsOfId (ids: string | string[]): Promise<BuildingReadModel[]> {
-    return this.usePostgres
-      ? this.buildingOfIdInPostgres(ids)
-      : this.couchbaseBuildingsReadRepository.listById(typeof ids === 'string' ? [ids] : ids)
+    return this.buildingOfIdInPostgres(ids)
   }
 
   buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
-    return this.usePostgres
-      ? this.buildingAssignedToInPostgres(flipperUserId)
-      : this.couchbaseBuildingsReadRepository.listAssignedToPropertyAgentOfId(flipperUserId)
+    return this.buildingAssignedToInPostgres(flipperUserId)
   }
 
   async getBuildingFullInformation (buildingIds: string[]): Promise<Record<string, {
