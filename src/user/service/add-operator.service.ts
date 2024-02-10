@@ -1,4 +1,3 @@
-import { OperatorRepository } from '../../operator/models'
 import { UserProps, UserRoles } from '../../types/user'
 import { DataSource, type DeepPartial } from 'typeorm'
 import { addUserService } from './add-user.service'
@@ -14,8 +13,6 @@ export type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'r
 export class AddOperatorService {
   constructor (
     private ormDataSource: DataSource,
-    private operatorRepository: OperatorRepository,
-    private usePostgres: boolean,
     private eventBus: EventPublisher
   ) {
   }
@@ -24,14 +21,6 @@ export class AddOperatorService {
     callerId?: string,
     flipperId?: string
   }> {
-    return this.usePostgres ? this.saveInPostgres(cmd, requester.id) : this.saveInCouchbase(cmd)
-  }
-
-  private async saveInCouchbase (cmd: AddOperatorCommand): Promise<UserProps> {
-    return await this.operatorRepository.createOperator(cmd)
-  }
-
-  private async saveInPostgres (cmd: AddOperatorCommand, requesterId: string) {
     return this.ormDataSource.transaction(async em => {
       const user = await addUserService({
         em,
@@ -63,7 +52,7 @@ export class AddOperatorService {
       await this.eventBus.publish({
         name: DomainEventCatalog.USER__OPERATOR_ADDED,
         id: user.id,
-        createdBy: requesterId,
+        createdBy: requester.id,
         flipperId,
         callerId
       }, em)
