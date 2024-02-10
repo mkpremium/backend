@@ -64,15 +64,6 @@ export const listVerifiedOwnersControllerFactory = (ownersRepository: OwnerRepos
   })
 }
 
-/**
- * @param adminBuildingRepository AdminBuildingRepository
- */
-export const allAgentsStockStatsControllerFactory = adminBuildingRepository => {
-  return wrap(async (req, res) => {
-    res.json(await adminBuildingRepository.allAgentsStockStats())
-  })
-}
-
 export const setBuildingSalePriceControllerFactory = setBuildingSalePriceService => {
   return wrap(async (req, res) => {
     const updatedBuilding = await setBuildingSalePriceService.setBuildingSalePrice({

@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 import {
-  allAgentsStockStatsControllerFactory,
   listBuildingProposalsControllerFactory,
   listVerifiedOwnersControllerFactory,
   setBuildingSalePriceControllerFactory,
@@ -40,8 +39,6 @@ export const createBuildingsRoutes = container => {
     '/:buildingId/sale-price',
     setBuildingSalePriceControllerFactory(container.resolve('setBuildingSalePriceService'))
   )
-
-  router.get('/stock-stats', allAgentsStockStatsControllerFactory(container.resolve('adminBuildingRepository')))
 
   return router
 }
