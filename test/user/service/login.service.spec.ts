@@ -7,8 +7,7 @@ import { UserProps } from '../../../src/types/user'
 
 describe('LoginService#login', () => {
   it('flipper login', async () => {
-    // TODO: disable couchbase
-    const container = await createTestContainer({ couchbase: true, postgres: true })
+    const container = await createTestContainer({ couchbase: false, postgres: true })
     const addFlipperService = container.resolve('addFlipperService') as AddFlipperService
     const testUser = Factory.build('user', { roles: [] }) as UserProps
     await addFlipperService.addFlipper(<AddFlipperCommand>testUser)
