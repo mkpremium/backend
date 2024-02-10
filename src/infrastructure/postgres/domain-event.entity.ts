@@ -9,6 +9,7 @@ export enum DomainEventCatalog {
   BUILDING__PROPOSAL_IMPORTED = 'building.proposal_imported',
 
   STOCK__STOCK_PURCHASE_UPDATED = 'stock.stock_purchase_updated',
+  STOCK__BUILDING_PURCHASED= 'stock.building_purchased',
   STOCK__STOCK_SELL_UPDATED = 'stock.stock_sell_updated',
   STOCK__STOCK_CLOSED= 'stock.stock_closed',
 

@@ -40,9 +40,9 @@ export function closeSellStockControllerFactory (stockSalesService: StockSalesSe
   })
 }
 
-export function purchaseStockControllerFactory (stockService: StockService) {
+export function purchaseStockControllerFactory (stockSalesService: StockSalesService) {
   return wrap(async (req, res) => {
-    const stock = await stockService.purchaseBuilding(req.body, req.user.id)
+    const stock = await stockSalesService.purchaseBuilding(req.body, req.user.id)
     res.status(201).json(stock)
   })
 }

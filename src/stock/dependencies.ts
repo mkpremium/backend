@@ -25,17 +25,15 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
       stockRepository: asClass(StockRepository).classic().singleton(),
       legacyStockRepository: asClass(LegacyStockRepository).singleton(),
       propertyManagersRepository: asClass(PropertyManagerRepository).classic().singleton(),
-      stockService: asClass(StockService).classic().singleton(),
-
-      //   controllers
-      updatePurchaseStockController: asFunction(updatePurchaseStockFactory).classic(),
-      updateSellStockController: asFunction(updateSellStockControllerFactory).classic(),
-      closeSellStockController: asFunction(closeSellStockControllerFactory).classic()
+      stockService: asClass(StockService).classic().singleton()
     })
   }
 
   container.register({
     stockSalesService: asClass(StockSalesService).classic().singleton(),
-    propertyManagerRankingService: asClass(PropertyManagerRankingService).classic().singleton()
+    propertyManagerRankingService: asClass(PropertyManagerRankingService).classic().singleton(),
+    updatePurchaseStockController: asFunction(updatePurchaseStockFactory).classic(),
+    updateSellStockController: asFunction(updateSellStockControllerFactory).classic(),
+    closeSellStockController: asFunction(closeSellStockControllerFactory).classic()
   })
 }

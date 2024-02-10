@@ -16,6 +16,37 @@ export class StockSalesService {
   ) {
   }
 
+  async purchaseBuilding (params: { buildingId: string } & Transaction & {
+    reservationDate: string;
+    transactionDate: string
+  }, operatorId: string): Promise<Stock> {
+    const existingStock = await this.entityManager.findOneBy(Stock, { building: { id: params.buildingId } })
+    if (existingStock) {
+      throw new Error(`Stock already exists for buildingId: ${params.buildingId}`)
+    }
+    const purchase = createTransaction(params, operatorId)
+
+    return await this.entityManager.transaction(async transactionalEntityManager => {
+      const stock = await transactionalEntityManager.save(Stock, {
+        building: { id: params.buildingId },
+        currentStatus: 'PURCHASE',
+        purchase
+      })
+      await this.updateBuildingNegotiationStatusService.updateBuildingStatus(params.buildingId, {
+        status: 'COMPRADO',
+        userId: operatorId,
+        em: transactionalEntityManager
+      })
+      await this.eventBus.publish({
+        name: DomainEventCatalog.STOCK__BUILDING_PURCHASED,
+        buildingId: params.buildingId,
+        userId: operatorId
+      }, transactionalEntityManager)
+
+      return stock
+    })
+  }
+
   async updateSellStock (params: { buildingId: string } & Transaction & {
     reservationDate: string;
     transactionDate: string

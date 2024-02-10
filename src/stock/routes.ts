@@ -21,7 +21,7 @@ export function addStockRoutes (
 ) {
   const router = Router()
 
-  router.post('/purchase', purchaseStockControllerFactory(stockService))
+  router.post('/purchase', purchaseStockControllerFactory(stockSalesService))
   router.put('/purchase',
     container.resolve('updatePurchaseStockController') as ReturnType<typeof updatePurchaseStockFactory>)
 
