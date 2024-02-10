@@ -30,7 +30,7 @@ describe('FreezerService', () => {
     await expect(deps.callcenterWorksheetService.nextAvailableWorksheetInSource({ province: testBuilding.address.province }))
       .to.be.rejectedWith(/Could not find any entity of type "Worksheet" matching/)
 
-    await deps.freezerService.moveWorksheetOutOfFreezer(testDaysInFreezer, 500)
+    await deps.freezerService.moveWorksheetOutOfFreezer(testDaysInFreezer)
 
     await expect(deps.callcenterWorksheetService.nextAvailableWorksheetInSource({ province: testBuilding.address.province }))
       .to.eventually.include({ id: testWorksheet.id })

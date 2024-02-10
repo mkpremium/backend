@@ -9,10 +9,7 @@ logger.info('starting freezer')
 createContainer()
   .then(async diContainer => {
     const freezerService = diContainer.resolve('freezerService') as FreezerService
-    await freezerService.moveWorksheetOutOfFreezer(
-      parseInt(process.env.DAYS_IN_FREEZER) || 90,
-      500
-    )
+    await freezerService.moveWorksheetOutOfFreezer(parseInt(process.env.DAYS_IN_FREEZER) || 90)
     logger.info('freezer finished correctly')
     process.exit(0)
   })
