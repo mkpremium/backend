@@ -1,10 +1,8 @@
-import http, { Server } from 'http'
+import http from 'http'
 import { logger } from '../src/infrastructure/logger'
 
 import { port } from '../config'
 import { createApp } from '../src/app'
-import { AwilixContainer } from 'awilix'
-import { Bucket } from 'couchbase'
 
 createApp()
   .then(app => {
@@ -13,7 +11,6 @@ createApp()
     server.listen(port)
     server.on('error', errorHandler)
     server.on('listen', createListenHandler(server))
-    setupGracefulShutdown(server, app.locals.diContainer)
   })
   .catch(error => {
     logger.error('Starting application', { error: error.message, stack: error.stack })
@@ -34,16 +31,4 @@ function errorHandler (error) {
   }
 
   logger.error('Error received', { error })
-}
-
-function setupGracefulShutdown (server: Server, diContainer: AwilixContainer) {
-  process.on('SIGTERM', () => {
-    const couchbaseBucket: Bucket = diContainer.resolve('couchbaseBucket')
-    server.close(() => {
-      if (couchbaseBucket) {
-        couchbaseBucket.disconnect()
-      }
-      process.exit()
-    })
-  })
 }

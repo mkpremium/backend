@@ -1,6 +1,5 @@
 import { initLogger } from '../src/infrastructure/logger'
 import { EventPoller } from '../src/infrastructure/event-bus/event-poller'
-import { Bucket } from 'couchbase'
 import { startListeners } from '../src/infrastructure/listeners'
 import { createDiContainer } from '../src/infrastructure/dependencies'
 
@@ -20,15 +19,11 @@ process.on('SIGTERM', () => {
 async function init () {
   const container = await createDiContainer()
   const poller: EventPoller = container.resolve('eventPoller')
-  const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
   await startListeners(container)
 
   while (true) {
     if (killProcess) {
       logger.info('SIGTERM received, stopping process')
-      if (couchbaseBucket) {
-        couchbaseBucket.disconnect()
-      }
       process.exit()
       return
     }
