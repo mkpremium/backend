@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, asValue, AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, AwilixContainer } from 'awilix'
 import { SetBuildingSalePriceService } from './service/set-building-sale-price.service'
 import { FeaturedOwnerService } from './service/featured-owner.service'
 import { AddProposalService } from './service/add-proposal.service'
@@ -46,19 +46,7 @@ import { importBuildingCommandHandler } from './service/import-building-command-
 import { PostgresBuildingNotesRepository } from './repository/postgres-building-notes.repository'
 import { BuildingNotesImporterService } from './service/building-notes-importer'
 
-export const setupBuildingDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
-  if (usePostgres) {
-    container.register({
-      couchbaseBuildingNotesRepository: asValue(null)
-    })
-  } else {
-    const { CouchbaseBuildingNotesRepository } = await import('./repository/couchbase-building-notes.repository')
-
-    container.register({
-      couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton()
-    })
-  }
-
+export const setupBuildingDependencies = async (container: AwilixContainer) => {
   container.register({
     setBuildingSalePriceService: asClass(SetBuildingSalePriceService).classic().singleton(),
     featuredOwnerService: asClass(FeaturedOwnerService).singleton().classic(),
@@ -88,7 +76,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
     buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     postgresBuildingNotesRepository: asClass(PostgresBuildingNotesRepository).classic().singleton(),
-    buildingNotesRepository: aliasTo(usePostgres ? 'postgresBuildingNotesRepository' : 'couchbaseBuildingNotesRepository'),
+    buildingNotesRepository: aliasTo('postgresBuildingNotesRepository'),
     proposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
 
     updateNegotiationProposalController: asFunction(updateNegotiationProposalControllerFactory).singleton(),

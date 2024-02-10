@@ -54,7 +54,7 @@ export async function setupContainer (
   container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource, usePostgres: boolean) {
   container.register('usePostgres', asValue(usePostgres))
   await setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
-  await setupBuildingDependencies(container, usePostgres)
+  await setupBuildingDependencies(container)
   setupOwnerDependencies(container)
   setupContactsDependencies(container)
   await setupScheduledEventsDependencies(container)
