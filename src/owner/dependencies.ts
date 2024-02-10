@@ -1,6 +1,6 @@
 import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { createChangeContactStatusController } from './controller/change-contact-status.controller'
-import { createSearchOwnersController } from './controller/search-owners.controller'
+import { searchOwnersControllerFactory } from './controller/search-owners.controller'
 import { ChangeContactStatusService } from './service/change-contact-status.service'
 import { SetOwnerFeaturedContactService } from './service/set-featured-contact.service'
 import { markGoodContactOnCallScheduled } from './event-listener/mark-good-contact-on-call-scheduled'
@@ -22,7 +22,7 @@ export const setupOwnerDependencies = (container: AwilixContainer) => {
     addOwnerContactController: asFunction(addOwnerContactControllerFactory).singleton(),
     addOwnerToBuildingController: asFunction(addOwnerToBuildingControllerFactory).singleton(),
     changeContactStatusController: asFunction(createChangeContactStatusController).singleton(),
-    searchOwnerController: asFunction(createSearchOwnersController).classic().singleton(),
+    searchOwnerController: asFunction(searchOwnersControllerFactory).classic().singleton(),
     setFeaturedContactController: asFunction(createSetFeaturedContactController).classic().singleton(),
 
     markGoodContactOnCallScheduled: asFunction(markGoodContactOnCallScheduled).singleton(),
