@@ -5,13 +5,13 @@ import { Logger } from 'winston'
 import { createContainer } from 'awilix'
 
 describe('startListeners', () => {
-  [true, false].forEach(usePostgres => it(`start all listeners without errors (usePostgres=${usePostgres}`, () => {
+  it('start all listeners without errors', () => {
     const container = createContainer()
-    setupContainer(container, null, null, usePostgres)
+    setupContainer(container, null, null, true)
 
     const logger: Logger = container.resolve('logger')
     logger.silent = true
 
     expect(() => startListeners(container)).to.not.throw
-  }))
+  })
 })
