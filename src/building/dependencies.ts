@@ -50,17 +50,14 @@ import { BuildingNotesImporterService } from './service/building-notes-importer'
 export const setupBuildingDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
   if (usePostgres) {
     container.register({
-      couchbaseBuildingsRepository: asValue(null),
       couchbaseBuildingsReadRepository: asValue(null),
       couchbaseBuildingNotesRepository: asValue(null)
     })
   } else {
-    const { CouchbaseBuildingsRepository } = await import('./repository/couchbase-building.repository')
     const { CouchbaseBuildingsReadRepository } = await import('./repository/couchbase-buildings-read.repository')
     const { CouchbaseBuildingNotesRepository } = await import('./repository/couchbase-building-notes.repository')
 
     container.register({
-      couchbaseBuildingsRepository: asClass(CouchbaseBuildingsRepository).singleton().classic(),
       couchbaseBuildingsReadRepository: asClass(CouchbaseBuildingsReadRepository).classic().singleton(),
       couchbaseBuildingNotesRepository: asClass(CouchbaseBuildingNotesRepository).classic().singleton()
     })
@@ -86,7 +83,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     pdfProposalComposer: asClass(PdfProposalComposer).classic().singleton(),
     proposalsSenderService: asClass(ProposalsSenderService).singleton().classic(),
     postgresBuildingsRepository: asClass(PostgresBuildingsRepository).singleton().classic(),
-    buildingsRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsRepository'),
+    buildingsRepository: aliasTo('postgresBuildingsRepository'),
     buildingsReadRepository: aliasTo(usePostgres ? 'postgresBuildingsRepository' : 'couchbaseBuildingsReadRepository'),
 
     leadRecorder: asClass(LeadRecorderService).singleton().classic(),
