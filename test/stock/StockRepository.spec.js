@@ -1,9 +1,7 @@
-import moment from 'moment-timezone'
 import { expect } from 'chai'
-import { closeSellStock } from '../../src/stock/application'
-import { LegacyBuildingRepository } from '../../src/building/models'
-import { buildingData } from './stock.mock'
+import moment from 'moment-timezone'
 import { createTestContainer } from '../create-test-container'
+import { buildingData } from './stock.mock'
 
 describe.skip('StockRepository', function () {
   let container, stockRepository, stockService
@@ -19,6 +17,9 @@ describe.skip('StockRepository', function () {
   describe('getTotalProfitInPeriodByPropertyManager', function () {
     it('returns total profit made by property owners', async function () {
       const propertyManager = { id: null }
+
+      const { LegacyBuildingRepository } = import('../../src/building/models')
+      const { closeSellStock } = import('../../src/stock/application')
 
       const testBuilding = await LegacyBuildingRepository.createNewBuilding(buildingData)
       const buildingPurchaseAmount = 1000
