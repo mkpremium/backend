@@ -1,14 +1,11 @@
 import S3 from 'aws-sdk/clients/s3'
-import { BuildingDocumentsRepository } from '../repository/building-documents.repository'
 import { EntityManager } from 'typeorm'
 import { BuildingDocument } from '../building-document.entity'
 
 export class GetDocumentsSignedURLService {
   constructor (
-    private buildingDocumentsRepository: BuildingDocumentsRepository,
     private s3Client: S3,
     private documentBucket: string,
-    private usePostgres: boolean,
     private entityManager: EntityManager
   ) {
   }
@@ -38,9 +35,6 @@ export class GetDocumentsSignedURLService {
     privateUrl: string,
     mimeType: string
   }[]> {
-    if (!this.usePostgres) {
-      return this.buildingDocumentsRepository.documentsOfBuilding(buildingId)
-    }
     const buildingDocuments = await this.entityManager.find(BuildingDocument, {
       where: { building: { id: buildingId } }
     })

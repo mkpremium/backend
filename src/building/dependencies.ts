@@ -10,7 +10,6 @@ import { GetDocumentsSignedURLService } from './service/get-documents-signed-URL
 import aws from 'aws-sdk'
 import { metadataS3Config } from '../../config'
 import { AdminBuildingRepository } from './repository/admin-building.repository'
-import { BuildingDocumentsRepository } from './repository/building-documents.repository'
 import { createListBuildingOwnersController } from './controller/list-building-owners.controller'
 import { createSetFeaturedOwnerController } from './controller/set-featured-owner.controller'
 import {
@@ -70,7 +69,6 @@ export const setupBuildingDependencies = async (container: AwilixContainer) => {
     buyOffersRepository: aliasTo('legacyBuildingsRepository'),
 
     adminBuildingRepository: asClass(AdminBuildingRepository).classic().singleton(),
-    buildingDocumentsRepository: asClass(BuildingDocumentsRepository).classic().singleton(),
     postgresBuildingNotesRepository: asClass(PostgresBuildingNotesRepository).classic().singleton(),
     buildingNotesRepository: aliasTo('postgresBuildingNotesRepository'),
     proposalsRepository: asClass(PostgresProposalsRepository).classic().singleton(),
