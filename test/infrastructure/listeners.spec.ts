@@ -7,7 +7,7 @@ import { createContainer } from 'awilix'
 describe('startListeners', () => {
   it('start all listeners without errors', () => {
     const container = createContainer()
-    setupContainer(container, null, null, true)
+    setupContainer(container, null, true)
 
     const logger: Logger = container.resolve('logger')
     logger.silent = true

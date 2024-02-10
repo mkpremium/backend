@@ -30,22 +30,20 @@ import { BuildingImportTriggerService } from './service/building-import-trigger.
 import { CouchbaseDocumentRepository } from './postgres/couchbase-document.repository'
 import { ScheduledEventImportTriggerService } from './service/scheduled-event-import-trigger.service'
 import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-import-trigger.service'
-import type { Bucket } from 'couchbase'
 import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
 
 export async function createDiContainer () {
   const container = createContainer()
   const dataSource = await initializeDataSource()
 
-  await setupContainer(container, null, dataSource, true)
+  await setupContainer(container, dataSource, true)
 
   return container
 }
 
-export async function setupContainer (
-  container: AwilixContainer, couchbaseBucket: Bucket, dataSource: DataSource, usePostgres: boolean) {
+export async function setupContainer (container: AwilixContainer, dataSource: DataSource, usePostgres: boolean) {
   container.register('usePostgres', asValue(usePostgres))
-  await setupInfrastructureDependencies(container, couchbaseBucket, dataSource)
+  await setupInfrastructureDependencies(container, dataSource)
   await setupBuildingDependencies(container)
   setupOwnerDependencies(container)
   setupContactsDependencies(container)
@@ -58,9 +56,8 @@ export async function setupContainer (
   setupFlipperDependencies(container)
 }
 
-async function setupInfrastructureDependencies (container: AwilixContainer, couchbaseBucket: Bucket | null, dataSource: DataSource) {
+async function setupInfrastructureDependencies (container: AwilixContainer, dataSource: DataSource) {
   container.register({
-    couchbaseBucket: asValue(couchbaseBucket),
     ormDataSource: asValue(dataSource),
     entityManager: asValue(dataSource?.manager),
     consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
