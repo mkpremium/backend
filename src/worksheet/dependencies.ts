@@ -27,9 +27,7 @@ export async function setupWorksheetDependencies (diContainer: AwilixContainer, 
     const { LegacyWorksheetRepository } = await import('./models/worksheet-repository')
     const { CouchbaseWorksheetRepository } = await import('./repository/couchbase-worksheet.repository')
     const { CouchbaseWorksheetQueueRepository } = await import('./repository/couchbase-worksheet-queue.repository')
-    const { CouchbaseCallSchedulerService } = await import('./service/couchbase-call-scheduler.service')
     diContainer.register({
-      couchbaseCallSchedulerService: asClass(CouchbaseCallSchedulerService).classic().singleton(),
       couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
       couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton(),
       legacyWorksheetRepository: asClass(LegacyWorksheetRepository).classic().singleton()
