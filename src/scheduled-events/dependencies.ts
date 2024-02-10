@@ -1,5 +1,4 @@
 import { asClass, asFunction, AwilixContainer } from 'awilix'
-import { MeetingsRepository } from './repository/meetings.repository'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
 import { ScheduledCallsRepository } from './repository/scheduled-calls.repository'
@@ -22,7 +21,6 @@ import { RemoveScheduledCallsService } from './service/remove-scheduled-calls.se
 
 export async function setupScheduledEventsDependencies (container: AwilixContainer) {
   container.register({
-    meetingsRepository: asClass(MeetingsRepository).classic(),
     createMeetingService: asClass(CreateMeetingService).classic(),
     removeScheduledCallsService: asClass(RemoveScheduledCallsService).classic().singleton(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),

@@ -1,10 +1,8 @@
-import type { MeetingsRepository } from '../repository/meetings.repository'
-
 export class MeetingsService {
-  constructor (private meetingsRepository: MeetingsRepository) {
+  constructor () {
   }
 
   futureMeetingsFor (userId: string) {
-    return this.meetingsRepository.futureMeetingsFor(userId)
+    throw new Error(`Not implemented. userId: ${userId}`)
   }
 }
