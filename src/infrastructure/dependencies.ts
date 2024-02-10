@@ -59,17 +59,6 @@ export async function setupContainer (
 }
 
 async function setupInfrastructureDependencies (container: AwilixContainer, couchbaseBucket: Bucket | null, dataSource: DataSource) {
-  if (couchbaseBucket) {
-    const { CouchbaseAdapter } = await import('../db/couchbase.adapter')
-    container.register({
-      couchbaseAdapter: asClass(CouchbaseAdapter).classic()
-    })
-  } else {
-    container.register({
-      couchbaseAdapter: asValue(null)
-    })
-  }
-
   container.register({
     couchbaseBucket: asValue(couchbaseBucket),
     ormDataSource: asValue(dataSource),
