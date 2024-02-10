@@ -1,9 +1,4 @@
 export const setupStockRouter = async (app, container, secured) => {
-  const usePostgres = container.resolve('usePostgres')
-  if (usePostgres) {
-    return
-  }
-
   const { addStockRoutes } = await import('./routes')
   app.use('/stock', secured, addStockRoutes(
     container.resolve('propertyManagerRankingService'),
