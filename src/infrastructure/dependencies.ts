@@ -18,7 +18,6 @@ import { ComposedBus } from './event-bus/composed-bus'
 import { ListenersRegistry } from './event-bus/listeners-registry'
 import { EventPoller } from './event-bus/event-poller'
 import { createEventRecorderListener } from './event-bus/event-recorder.listener'
-import { saveDocumentsCommandHandlerFactory } from './postgres/save-documents-command-handler'
 import { initializeDataSource } from '../data-source'
 import type { DataSource } from 'typeorm'
 import { setupContactsDependencies } from '../contacts/dependencies'
@@ -86,7 +85,6 @@ async function setupInfrastructureDependencies (container: AwilixContainer, couc
     composedEventBus: asClass(ComposedBus).classic().singleton(),
     eventBus: aliasTo(['test', 'development'].includes(process.env.NODE_ENV) ? 'eventEmitterBus' : 'sqsEventBus'),
     eventRecorderListener: asFunction(createEventRecorderListener),
-    saveDocumentsCommandHandler: asFunction(saveDocumentsCommandHandlerFactory),
     logger: asFunction(initLogger).singleton(),
 
     couchbaseToPostgresProcess: asFunction(couchbaseToPostgresProcess).singleton(),

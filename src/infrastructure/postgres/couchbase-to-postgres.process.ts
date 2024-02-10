@@ -4,7 +4,6 @@ import type { Logger } from 'winston'
 import type { DataSource, EntityManager } from 'typeorm'
 import { CouchbaseDocument, CouchbaseDocumentType } from './couchbase-document.entity'
 import { subscribeToCommand } from '../listeners'
-import type { SaveDocumentsCommandHandler } from './save-documents-command-handler'
 import type { importOwnerHandlerFactory } from '../../owner/service/import-owner-command-handler'
 import { BuildingImagesImporterService } from '../service/building-images-importer.service'
 import { importOperatorCommandHandler } from './import-operator-command-handler'
@@ -23,7 +22,6 @@ interface Deps {
   logger: Logger,
   ormDataSource: DataSource,
   entityManager: EntityManager,
-  saveDocumentsCommandHandler: SaveDocumentsCommandHandler
   importOwnerCommandHandler: ReturnType<typeof importOwnerHandlerFactory>
   importScheduledEventCommandHandler: ImportScheduledEventHandler
   buildingNotesImporterService: BuildingNotesImporterService,
@@ -43,7 +41,6 @@ export function couchbaseToPostgresProcess ({
   eventBus,
   logger,
   entityManager,
-  saveDocumentsCommandHandler,
   importOwnerCommandHandler,
   buildingNotesImporterService,
   importScheduledEventCommandHandler,
@@ -86,12 +83,6 @@ export function couchbaseToPostgresProcess ({
     async ({ buildingId }: { buildingId: string }) => {
       await buildingNotesImporterService.importBuildingNotes(buildingId)
     }
-  )
-
-  subscribeToCommand(
-    DomainEventCatalog.CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS,
-    eventBus,
-    saveDocumentsCommandHandler
   )
 
   subscribeToCommand(
