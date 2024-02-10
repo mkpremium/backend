@@ -33,7 +33,6 @@ import { PdfProposalComposer } from './service/pdf-proposal-composer'
 import { createListBuildingsController } from './controller/list-buildings.controller'
 import { createProposalScheduledListener } from './event-listener/proposal-added.listener'
 import { LeadRecorderService } from './service/lead-recorder.service'
-import { BuildingSearcherService } from './service/building-searcher.service'
 import { Portugal2021BuildingsRepository } from './repository/portugal2021-buildings.repository'
 import { Portugal2021BuildingsImporterService } from './service/portugal2021-buildings-importer.service'
 import { Portugal2021OwnersImporterService } from './service/portugal2021-owners-importer.service'
@@ -114,8 +113,6 @@ export const setupBuildingDependencies = async (container: AwilixContainer, useP
     setFeaturedOwnerFromOfferRequestListener: asFunction(setFeaturedOwnerFromOfferRequestListenerFactory).singleton(),
     addOfferRequestController: asFunction(addOfferRequestControllerFactory),
     addBuildingService: asClass(AddBuildingService).classic().singleton(),
-
-    buildingSearcherService: asClass(BuildingSearcherService).classic().singleton(),
 
     // Portugal 2021 import
     portugal2021BuildingsRepository: asClass(Portugal2021BuildingsRepository).classic().singleton(),
