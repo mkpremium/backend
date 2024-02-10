@@ -1,7 +1,5 @@
 import { EventPublisher } from '../../infrastructure/event-bus'
-import { OwnerRepository } from '../repository/owner.repository'
-import { changeContactStatus, OwnerProps, OwnerStatus } from '../owner'
-import { Logger } from 'winston'
+import { OwnerProps, OwnerStatus } from '../owner'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { EntityManager } from 'typeorm'
 import { Owner } from '../owner.entity'
@@ -27,25 +25,12 @@ export interface OwnerContactStatusChanged {
 
 export class ChangeContactStatusService {
   constructor (
-    private ownersRepository: OwnerRepository,
     private eventBus: EventPublisher,
-    private logger: Logger,
-    private usePostgres: boolean,
     private entityManager: EntityManager
   ) {
   }
 
   async change ({ ownerId, contactId, status }, user): Promise<OwnerProps> {
-    return this.usePostgres
-      ? this.doPostgres({ ownerId, contactId, status }, user)
-      : this.doCouchbase({
-        ownerId,
-        contactId,
-        status
-      }, user)
-  }
-
-  private async doPostgres ({ ownerId, contactId, status }, user): Promise<OwnerProps> {
     return this.entityManager.transaction<OwnerProps>(async (em) => {
       const owner = await em.findOne(Owner, {
         where: { id: ownerId },
@@ -84,17 +69,6 @@ export class ChangeContactStatusService {
 
       return ownerEntityToStruct(owner)
     })
-  }
-
-  private async doCouchbase ({ ownerId, contactId, status }, user): Promise<OwnerProps> {
-    const owner = await this.ownersRepository.get(ownerId) as OwnerProps
-    this.logger.debug('Changing owner contact status', { status, ownerId, contactId })
-    const updatedOwner = await this.ownersRepository.save(
-      changeContactStatus(owner, contactId, status)) as OwnerProps
-
-    await this.publishEvents({ ownerId, contactId, newContactStatus: status, owner, updatedOwner, byUserId: user.id })
-
-    return updatedOwner
   }
 
   private async publishEvents ({ ownerId, contactId, owner, updatedOwner, em, newContactStatus, byUserId }: {
