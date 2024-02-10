@@ -9,7 +9,7 @@ describe('GetDocumentsSignedURLService', function () {
   const testDocumentId = 'test-document-id'
   const testBuildingDocuments = [
     {
-      documentId: testDocumentId,
+      id: testDocumentId,
       privateUrl: testDocumentPrivateURL
     }
   ]
@@ -18,24 +18,24 @@ describe('GetDocumentsSignedURLService', function () {
 
   let service
   let s3ClientMock
-  let buildingDocumentsRepositoryMock
+  let entityManagerMock
 
   beforeEach(function () {
     s3ClientMock = {
       getSignedUrlPromise: stub()
     }
-    buildingDocumentsRepositoryMock = {
-      documentsOfBuilding: stub()
+    entityManagerMock = {
+      find: stub()
     }
     service = new GetDocumentsSignedURLService(
-      buildingDocumentsRepositoryMock,
       s3ClientMock,
-      testDocumentBucket
+      testDocumentBucket,
+      entityManagerMock
     )
   })
 
   it('returns signed URL', async function () {
-    buildingDocumentsRepositoryMock.documentsOfBuilding.withArgs(testBuildingId).resolves(testBuildingDocuments)
+    entityManagerMock.find.resolves(testBuildingDocuments)
     s3ClientMock.getSignedUrlPromise.withArgs('getObject', {
       Bucket: testDocumentBucket,
       Key: testDocumentPathWithoutInitialSlash
