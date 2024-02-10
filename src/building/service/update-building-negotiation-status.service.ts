@@ -4,6 +4,7 @@ import { BuildingNegotiationStatus, changeNegotiationStatus, withFeaturedOwner }
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import type { EntityManager } from 'typeorm'
 import { Building } from '../building.entity'
+import { mapBuildingStructToEntity } from '../repository/postgres-buildings.repository'
 
 export interface BuildingNegotiationStatusChanged {
   name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED;
@@ -41,7 +42,7 @@ export class UpdateBuildingNegotiationStatusService {
     }
 
     if (em) {
-      await em.save(Building, updatedBuilding)
+      await em.save(Building, mapBuildingStructToEntity(updatedBuilding))
     } else {
       await this.buildingsRepository.save(updatedBuilding)
     }
