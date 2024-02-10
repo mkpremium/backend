@@ -1,5 +1,4 @@
 import request from 'supertest'
-import { OperatorRepository } from '../src/operator/models'
 import { AwilixContainer } from 'awilix'
 import { addUserService } from '../src/user/service/add-user.service'
 import { DataSource } from 'typeorm'
@@ -16,11 +15,6 @@ export async function operatorLogin (app, credentials = { username: 'admin', pas
     .expect(200)
 
   return Object.assign({}, response.body, { authorization: `Bearer ${response.body.token}` })
-}
-
-export async function createFullOperator (object) {
-  const repo = new OperatorRepository()
-  return repo.save(object)
 }
 
 const defaultOperatorPrototype = {
