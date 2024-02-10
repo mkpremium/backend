@@ -3,10 +3,10 @@ import fromJSON from 'tcomb/lib/fromJSON'
 
 import { ProfitGoalRequest } from './types'
 
-export async function setProfitGoalToOperator (data, operatorRepository, now = () => new Date()) {
+export async function setProfitGoalToOperator (data, usersRepository, now = () => new Date()) {
   const { operatorId, profitAmount } = fromJSON(data, ProfitGoalRequest)
 
-  const operator = await operatorRepository.findByIdOrThrow(operatorId)
+  const operator = await usersRepository.get(operatorId)
 
   const profitGoal = {
     amount: profitAmount,
@@ -15,5 +15,5 @@ export async function setProfitGoalToOperator (data, operatorRepository, now = (
 
   const updatedOperator = t.update(operator, { profitGoal: { $set: profitGoal } })
 
-  return operatorRepository.save(updatedOperator)
+  return usersRepository.save(updatedOperator)
 }

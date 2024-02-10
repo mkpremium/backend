@@ -17,5 +17,5 @@ export default async (app, diContainer, jwt) => {
   app.use('/operators', secured, operatorRouter(diContainer))
 
   app.post('/operators/profit/goal', secured, wrap(
-    setProfitGoalToOperatorControllerFactory(diContainer.resolve('operatorRepository'))))
+    setProfitGoalToOperatorControllerFactory(diContainer.resolve('usersRepository'))))
 }
