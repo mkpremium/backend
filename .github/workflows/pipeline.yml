@@ -18,14 +18,6 @@ jobs:
         node-version: [ 18.x ]
 
     services:
-      couchbase_db:
-        image: "couchbase:community-6.6.0"
-        ports:
-          - 8091:8091
-          - 8092:8092
-          - 8093:8093
-          - 8094:8094
-          - 11210:11210
       postgresdb:
         image: "postgres:15.3"
         env:
@@ -49,29 +41,11 @@ jobs:
           npm install
           npm run lint
 
-      - name: Prepare Couchbase
-        uses: nick-invision/retry@v2
-        with:
-          max_attempts: 3
-          retry_on: error
-          timeout_minutes: 5
-          retry_wait_seconds: 30
-          command: npx ts-node scripts/couchbase/init-db.js
 
       - name: Test
         run: |
           echo $DATABASE_URL
           npm run test-ci
-
-#      - name: Extract Couchbase logs
-#        if: failure()
-#        run: docker cp `docker ps --format '{{.Names}}'`:/opt/couchbase/var/lib/couchbase/logs couchbase_logs
-#      - name: Upload Couchbase logs artifact
-#        uses: actions/upload-artifact@v2
-#        if: failure()
-#        with:
-#          name: couchbase_logs
-#          path: couchbase_logs
 
   build:
     name: Build
