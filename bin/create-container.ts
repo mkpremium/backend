@@ -10,5 +10,5 @@ export function getDatabase () {
 }
 
 export async function createContainer () {
-  return createDiContainer(getDatabase())
+  return createDiContainer()
 }

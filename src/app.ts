@@ -47,7 +47,7 @@ export const createApp = async (database: Database): Promise<Express> => {
   app.use(cors())
 
   try {
-    const diContainer = await createDiContainer(database)
+    const diContainer = await createDiContainer()
 
     app.locals.diContainer = diContainer
 

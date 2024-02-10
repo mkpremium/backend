@@ -22,7 +22,6 @@ import { saveDocumentsCommandHandlerFactory } from './postgres/save-documents-co
 import { initializeDataSource } from '../data-source'
 import type { DataSource } from 'typeorm'
 import { setupContactsDependencies } from '../contacts/dependencies'
-import type { Database } from './database'
 import { couchbaseToPostgresProcess } from './postgres/couchbase-to-postgres.process'
 import { BuildingImagesImporterService } from './service/building-images-importer.service'
 import { BuildingOwnerImportTriggerService } from './service/building-owner-import-trigger.service'
@@ -35,17 +34,11 @@ import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-i
 import type { Bucket } from 'couchbase'
 import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
 
-export async function createDiContainer (database: Database) {
-  const usePostgres: boolean = database === 'postgres'
+export async function createDiContainer () {
   const container = createContainer()
   const dataSource = await initializeDataSource()
-  let couchbaseBucket = null
-  if (!usePostgres) {
-    const { connectCouchbaseBucket } = await import('../db/connect-couchbase-bucket')
-    couchbaseBucket = await connectCouchbaseBucket()
-  }
 
-  await setupContainer(container, couchbaseBucket, dataSource, usePostgres)
+  await setupContainer(container, null, dataSource, true)
 
   return container
 }
