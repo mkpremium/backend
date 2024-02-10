@@ -1,4 +1,3 @@
-import type { OperatorRepository } from './models'
 import { canManageOperator } from '../lib/role-operators'
 import type { AddOperatorService } from '../user/service/add-operator.service'
 
@@ -21,21 +20,14 @@ export function createAddOperatorController (addOperatorService: AddOperatorServ
   }
 }
 
-export function updateOperatorControllerFactory ({ operatorRepository }: {operatorRepository: OperatorRepository}) {
+export function updateOperatorControllerFactory () {
   return async function updateOperatorController (req, res) {
-    const operatorId = req.params.id
-    const operator = await operatorRepository.findByIdOrThrow(operatorId)
-
-    canManageOperator(req.user.operator, operator)
-
-    await operatorRepository.updateOperator(operator, req.body)
-    res.status(204).send()
+    res.status(501).send()
   }
 }
 
-export function listOperatorControllerFactory ({ operatorRepository }: {operatorRepository: OperatorRepository}) {
+export function listOperatorControllerFactory () {
   return async function listOperatorController (req, res) {
-    const operators = await operatorRepository.list(req.query)
-    res.json(operators)
+    res.status(501).send()
   }
 }
