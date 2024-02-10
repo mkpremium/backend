@@ -30,28 +30,8 @@
           "value": "https://sqs.eu-west-1.amazonaws.com/173249668334/events"
         },
         {
-          "name": "COUCHBASE_BUCKET",
-          "value": "mkpremium"
-        },
-        {
-          "name": "COUCHBASE_URI",
-          "value": "couchbase://10.0.17.139:8091?n1ql_timeout=20"
-        },
-        {
-          "name": "COUCHBASE_USER",
-          "value": "admin"
-        },
-        {
-          "name": "DATABASE",
-          "value": "postgres"
-        },
-        {
           "name": "NODE_ENV",
           "value": "production_v2"
-        },
-        {
-          "name": "EVENTUAL_CONSISTENCY_DELAY",
-          "value": "500"
         },
         {
           "name": "DAYS_IN_FREEZER",
@@ -64,10 +44,6 @@
       "mountPoints": [],
       "workingDirectory": "/app",
       "secrets": [
-        {
-          "valueFrom": "backend.couchbase_admin_pass",
-          "name": "COUCHBASE_PASS"
-        },
         {
           "valueFrom": "backend.database_url",
           "name": "DATABASE_URL"

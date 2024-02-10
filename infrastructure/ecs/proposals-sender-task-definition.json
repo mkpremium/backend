@@ -29,22 +29,6 @@
           "value": "https://sqs.eu-west-1.amazonaws.com/173249668334/events"
         },
         {
-          "name": "COUCHBASE_BUCKET",
-          "value": "mkpremium"
-        },
-        {
-          "name": "COUCHBASE_URI",
-          "value": "couchbase://10.0.17.139:8091?n1ql_timeout=20"
-        },
-        {
-          "name": "COUCHBASE_USER",
-          "value": "admin"
-        },
-        {
-          "name": "DATABASE",
-          "value": "postgres"
-        },
-        {
           "name": "NODE_ENV",
           "value": "production"
         },
@@ -63,10 +47,6 @@
         {
           "name": "MAILER_USER",
           "value": "compra@mkpremium.com"
-        },
-        {
-          "name": "EVENTUAL_CONSISTENCY_DELAY",
-          "value": "500"
         }
       ],
       "resourceRequirements": null,
