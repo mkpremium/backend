@@ -1,13 +1,8 @@
 import t from 'tcomb'
-import { LegacyBuildingRepository } from '../building/models'
 import { StockRepository } from './models'
 import { StockStatuses } from './types'
 
 export async function closeSellStock (params, operatorId) {
-  const legacyBuildingRepository = new LegacyBuildingRepository()
-
-  await legacyBuildingRepository.findByIdOrThrow(params.buildingId)
-
   const stockRepository = new StockRepository()
   const stock = await stockRepository.findByBuildingIdOrDefault(params.buildingId)
 

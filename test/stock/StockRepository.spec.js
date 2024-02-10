@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import moment from 'moment-timezone'
 import { createTestContainer } from '../create-test-container'
-import { buildingData } from './stock.mock'
 
 describe.skip('StockRepository', function () {
   let container, stockRepository, stockService
@@ -18,10 +17,9 @@ describe.skip('StockRepository', function () {
     it('returns total profit made by property owners', async function () {
       const propertyManager = { id: null }
 
-      const { LegacyBuildingRepository } = import('../../src/building/models')
       const { closeSellStock } = import('../../src/stock/application')
 
-      const testBuilding = await LegacyBuildingRepository.createNewBuilding(buildingData)
+      const testBuilding = { }
       const buildingPurchaseAmount = 1000
       const buildingSellingAmount = 1200
       await purchaseBuildingBySalesAgent(stockService, testBuilding, propertyManager, buildingPurchaseAmount)
