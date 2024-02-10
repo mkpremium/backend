@@ -14,7 +14,7 @@ export async function setupPostgres () {
 export async function createTestContainer () {
   const dataSource = await setupPostgres()
   const container = createContainer()
-  await setupContainer(container, dataSource, true)
+  await setupContainer(container, dataSource)
 
   return container
 }

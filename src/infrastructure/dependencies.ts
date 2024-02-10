@@ -36,13 +36,12 @@ export async function createDiContainer () {
   const container = createContainer()
   const dataSource = await initializeDataSource()
 
-  await setupContainer(container, dataSource, true)
+  await setupContainer(container, dataSource)
 
   return container
 }
 
-export async function setupContainer (container: AwilixContainer, dataSource: DataSource, usePostgres: boolean) {
-  container.register('usePostgres', asValue(usePostgres))
+export async function setupContainer (container: AwilixContainer, dataSource: DataSource) {
   await setupInfrastructureDependencies(container, dataSource)
   await setupBuildingDependencies(container)
   setupOwnerDependencies(container)
