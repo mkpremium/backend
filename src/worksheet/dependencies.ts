@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, asValue, type AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, type AwilixContainer } from 'awilix'
 import { createStatusChangedController } from './controller/status-changed.controller'
 import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
 import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
@@ -15,18 +15,7 @@ import { PostgresWorksheetQueueRepository } from './repository/postgres-workshee
 import { FreezerService } from './service/freezer.service'
 import { importWorksheetQueueHandlerFactory } from './service/import-worksheet-queue-command-handler.service'
 
-export async function setupWorksheetDependencies (diContainer: AwilixContainer, usePostgres: boolean) {
-  if (usePostgres) {
-    diContainer.register({
-      couchbaseCallSchedulerService: asValue(null),
-      couchbaseWorksheetRepository: asValue(null)
-    })
-  } else {
-    const { CouchbaseWorksheetRepository } = await import('./repository/couchbase-worksheet.repository')
-    diContainer.register({
-      couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton()
-    })
-  }
+export async function setupWorksheetDependencies (diContainer: AwilixContainer) {
   diContainer.register({
     worksheetStatusChangedController: asFunction(createStatusChangedController).singleton(),
 
@@ -43,7 +32,7 @@ export async function setupWorksheetDependencies (diContainer: AwilixContainer, 
       .inject(() => ({ maxOpenedWorksheetPerQueueAndUser: 2 })),
 
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
-    worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
+    worksheetRepository: aliasTo('postgresWorksheetRepository'),
     postgresQueueRepository: asClass(PostgresWorksheetQueueRepository).classic().singleton(),
     worksheetQueueRepository: aliasTo('postgresQueueRepository')
   })
