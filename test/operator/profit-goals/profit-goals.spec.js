@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import request from 'supertest'
 import { setProfitGoalToOperator } from '../../../src/operator/ProfitGoal/application'
-import { createFlipper, defaultPassword, operatorCreate, operatorLogin } from '../../common'
+import { defaultPassword, operatorLogin } from '../../common'
 import { createTestApp } from '../../integration/create-test-app'
 
 describe.skip('profit goals', function () {
@@ -12,9 +12,9 @@ describe.skip('profit goals', function () {
   const salesAgentProfitGoal = 1500
 
   beforeEach(async function () {
-    app = await createTestApp({ postgres: true, couchbase: false })
+    app = await createTestApp('postgres')
 
-    salesAgent = await createFlipper()
+    salesAgent = null
   })
 
   describe('setProfitGoalToOperator', function () {
@@ -46,7 +46,7 @@ describe.skip('profit goals', function () {
 
   describe('endpoint', function () {
     it('sets profit goal to a sales agent', async function () {
-      const operator = await operatorCreate()
+      const operator = { username: '' }
       const authenticatedOperator = await operatorLogin(app,
         { username: operator.username, password: defaultPassword })
 

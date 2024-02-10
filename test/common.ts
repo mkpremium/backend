@@ -1,5 +1,4 @@
 import request from 'supertest'
-import uuid from 'uuid/v4'
 import { OperatorRepository } from '../src/operator/models'
 import { AwilixContainer } from 'awilix'
 import { addUserService } from '../src/user/service/add-user.service'
@@ -24,15 +23,6 @@ export async function createFullOperator (object) {
   return repo.save(object)
 }
 
-export async function operatorCreate () {
-  return createFullOperator(buildUser({
-    username: 'operator',
-    roles: [
-      'OPERATOR'
-    ]
-  }))
-}
-
 const defaultOperatorPrototype = {
   username: 'operator',
   password: defaultPassword,
@@ -51,26 +41,6 @@ export const buildUser = (operator = {}, prototype = defaultOperatorPrototype) =
   return {
     ...prototype, ...operator
   }
-}
-
-export async function createFlipper () {
-  const id = uuid()
-  return createFullOperator(buildUser({
-    id,
-    username: 'business' + id,
-    roles: [
-      'BUSINESS'
-    ]
-  }))
-}
-
-export async function createAdminUser () {
-  return createFullOperator(buildUser({
-    username: 'admin',
-    roles: [
-      'ADMIN'
-    ]
-  }))
 }
 
 export async function createAdminUserWithPostgres (container: AwilixContainer) {

@@ -1,4 +1,3 @@
-import { createFlipper } from '../common'
 import moment from 'moment-timezone'
 import { expect } from 'chai'
 import { closeSellStock } from '../../src/stock/application'
@@ -19,7 +18,7 @@ describe.skip('StockRepository', function () {
 
   describe('getTotalProfitInPeriodByPropertyManager', function () {
     it('returns total profit made by property owners', async function () {
-      const propertyManager = await createFlipper()
+      const propertyManager = { id: null }
 
       const testBuilding = await LegacyBuildingRepository.createNewBuilding(buildingData)
       const buildingPurchaseAmount = 1000
