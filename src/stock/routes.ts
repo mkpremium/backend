@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import {
   closeSellStockControllerFactory,
-  createCancelSaleController,
+  cancelSaleControllerFactory,
   createSellPurchasedStockController,
   getRankingController,
   purchaseStockControllerFactory,
@@ -9,14 +9,12 @@ import {
   updateSellStockControllerFactory
 } from './controllers'
 import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
-import type { StockService } from './service/StockService'
 import type { AwilixContainer } from 'awilix'
 import type { StockSalesService } from './service/stock-sales.service'
 
 export function addStockRoutes (
   propertyManagerRankingService: PropertyManagerRankingService,
   stockSalesService: StockSalesService,
-  stockService: StockService,
   container: AwilixContainer
 ) {
   const router = Router()
@@ -28,7 +26,7 @@ export function addStockRoutes (
   router.post('/sell', createSellPurchasedStockController(stockSalesService))
   router.put('/sell',
     container.resolve('updateSellStockController') as ReturnType<typeof updateSellStockControllerFactory>)
-  router.post('/sell/cancel', createCancelSaleController(stockService))
+  router.post('/sell/cancel', cancelSaleControllerFactory(stockSalesService))
 
   router.post('/close', container.resolve('closeSellStockController') as ReturnType<typeof closeSellStockControllerFactory>)
 

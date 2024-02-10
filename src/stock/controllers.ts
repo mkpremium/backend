@@ -1,5 +1,4 @@
 import { wrap } from 'express-promise-wrap'
-import type { StockService } from './service/StockService'
 import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
 import type { StockSalesService } from './service/stock-sales.service'
 
@@ -47,7 +46,7 @@ export function purchaseStockControllerFactory (stockSalesService: StockSalesSer
   })
 }
 
-export function createCancelSaleController (stockService: StockService) {
+export function cancelSaleControllerFactory (stockService: StockSalesService) {
   return wrap(async (req, res) => {
     const stock = await stockService.cancelSale(req.body.buildingId, req.user.id)
     res.status(200).json(stock)

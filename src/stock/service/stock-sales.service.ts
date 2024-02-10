@@ -145,6 +145,11 @@ export class StockSalesService {
     })
   }
 
+  /** eslint-next-line-disable @typescript-eslint/no-unused-vars */
+  async cancelSale (buildingId: string, userId: string): Promise<Stock> {
+    throw new Error(`Method not implemented. buildingId: ${buildingId}, userId: ${userId}`)
+  }
+
   private async getStockOrFail (buildingId: string): Promise<Stock> {
     const stock = await this.entityManager.findOneBy(Stock, { building: { id: buildingId } })
 

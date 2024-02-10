@@ -11,21 +11,15 @@ export async function setupStockDependencies (container: AwilixContainer, usePos
   if (usePostgres) {
     container.register({
       stockRepository: asValue(null),
-      legacyStockRepository: asValue(null),
-      propertyManagersRepository: asValue(null),
-      stockService: asValue(null)
+      propertyManagersRepository: asValue(null)
     })
   } else {
     const { PropertyManagerRepository } = await import('../property-manager/PropertyManagerRepository')
     const { StockRepository } = await import('./StockRepository')
-    const { StockRepository: LegacyStockRepository } = await import('./models')
-    const { StockService } = await import('./service/StockService')
 
     container.register({
       stockRepository: asClass(StockRepository).classic().singleton(),
-      legacyStockRepository: asClass(LegacyStockRepository).singleton(),
-      propertyManagersRepository: asClass(PropertyManagerRepository).classic().singleton(),
-      stockService: asClass(StockService).classic().singleton()
+      propertyManagersRepository: asClass(PropertyManagerRepository).classic().singleton()
     })
   }
 
