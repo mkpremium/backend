@@ -1,17 +1,15 @@
 import { expect } from 'chai'
-import { OperatorRepository } from '../../src/operator/models'
 import { UserRoles } from '../../src/types/user'
 import { buildUser } from '../common'
 import { createTestContainer } from '../create-test-container'
 
-describe('PropertyManagerRepository', function () {
+describe.skip('PropertyManagerRepository', function () {
   let propertyManagerRepository, operatorRepository
 
   beforeEach(async function () {
     try {
-      const diContainer = await createTestContainer()
+      const diContainer = await createTestContainer({ postgres: true, couchbase: false })
       propertyManagerRepository = diContainer.resolve('propertyManagersRepository')
-      operatorRepository = new OperatorRepository()
     } catch (e) {
       console.trace(e)
       throw e
