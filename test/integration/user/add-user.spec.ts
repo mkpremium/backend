@@ -11,7 +11,7 @@ describe('AddOperatorService', () => {
   let loggedInAdmin
 
   before(async () => {
-    app = await createTestApp('postgres')
+    app = await createTestApp()
     const container = app.locals.diContainer as AwilixContainer
     await createAdminUserWithPostgres(container)
 

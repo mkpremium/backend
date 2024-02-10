@@ -187,7 +187,7 @@ export interface ResolvedDeps {
 }
 
 export async function resolveDependencies (): Promise<ResolvedDeps> {
-  const container = await createTestContainer({ couchbase: false, postgres: true })
+  const container = await createTestContainer()
 
   return {
     container,

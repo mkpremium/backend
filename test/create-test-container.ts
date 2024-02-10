@@ -11,13 +11,10 @@ export async function setupPostgres () {
   return AppDataSource
 }
 
-export async function createTestContainer ({ postgres }: {
-  couchbase: boolean,
-  postgres: boolean
-} = { couchbase: false, postgres: true }) {
+export async function createTestContainer () {
   const dataSource = await setupPostgres()
   const container = createContainer()
-  await setupContainer(container, null, dataSource, postgres)
+  await setupContainer(container, null, dataSource, true)
 
   return container
 }

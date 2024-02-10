@@ -22,7 +22,7 @@ describe.skip('UpdateWorksheetStatusOnOwnerChangeService', () => {
   }
 
   before(async () => {
-    const container = await createTestContainer({ couchbase: false, postgres: true })
+    const container = await createTestContainer()
     eventBus = container.resolve('eventBus')
     worksheetEventListeners(eventBus, container)
     worksheetRepository = container.resolve('worksheetRepository')

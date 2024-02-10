@@ -10,7 +10,7 @@ describe('AddOperatorService', () => {
   let postgresUsersRepository: PostgresUserRepository
 
   beforeEach(async () => {
-    const container = await createTestContainer({ couchbase: false, postgres: true })
+    const container = await createTestContainer()
     service = container.resolve('addOperatorService')
     postgresUsersRepository = container.resolve('postgresUsersRepository')
   })

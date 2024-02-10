@@ -12,7 +12,7 @@ describe('Add Contact service', () => {
   let dataSource: DataSource
 
   beforeEach(async () => {
-    const diContainer = await createTestContainer({ couchbase: false, postgres: true })
+    const diContainer = await createTestContainer()
 
     service = diContainer.resolve('addContactService')
     dataSource = diContainer.resolve('ormDataSource')

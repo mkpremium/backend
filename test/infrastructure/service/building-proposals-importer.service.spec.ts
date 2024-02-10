@@ -16,7 +16,7 @@ describe('BuildingProposalsImporterService', () => {
   it('persists proposals', async () => {
     const start = new Date()
 
-    const testContainer = await createTestContainer({ postgres: true, couchbase: false })
+    const testContainer = await createTestContainer()
 
     const service = testContainer.resolve('buildingProposalsImporterService') as BuildingProposalsImporterService
     const em = testContainer.resolve('entityManager') as EntityManager

@@ -9,7 +9,7 @@ describe('AddOwnerService Postgres', () => {
   let service: AddOwnerService
 
   beforeEach(async () => {
-    const container = await createTestContainer({ couchbase: false, postgres: true })
+    const container = await createTestContainer()
     buildingsRepository = container.resolve('buildingsRepository')
     service = container.resolve('addOwnerService')
   })

@@ -13,7 +13,7 @@ import { User } from '../../../src/user/user.entity'
 
 describe('ProposalsRepository(Postgres)', () => {
   it('returns all pending proposals', async () => {
-    const container = await createTestContainer({ postgres: true, couchbase: false })
+    const container = await createTestContainer()
     const proposalsRepository = container.resolve('proposalsRepository') as ProposalsRepository
     const buildingsRepository = container.resolve('buildingsRepository') as BuildingsRepository
     const ownersRepository = container.resolve('ownersRepository') as OwnerRepository

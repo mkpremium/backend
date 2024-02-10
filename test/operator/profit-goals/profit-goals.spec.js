@@ -12,7 +12,7 @@ describe.skip('profit goals', function () {
   const salesAgentProfitGoal = 1500
 
   beforeEach(async function () {
-    app = await createTestApp('postgres')
+    app = await createTestApp()
 
     salesAgent = null
   })

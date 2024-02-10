@@ -8,7 +8,7 @@ describe.skip('PropertyManagerRepository', function () {
 
   beforeEach(async function () {
     try {
-      const diContainer = await createTestContainer({ postgres: true, couchbase: false })
+      const diContainer = await createTestContainer()
       propertyManagerRepository = diContainer.resolve('propertyManagersRepository')
     } catch (e) {
       console.trace(e)

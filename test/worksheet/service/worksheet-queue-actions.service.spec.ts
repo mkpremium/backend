@@ -46,7 +46,7 @@ interface Deps {
 }
 
 async function buildDependencies (): Promise<Deps> {
-  const container = await createTestContainer({ couchbase: false, postgres: true })
+  const container = await createTestContainer()
 
   return {
     addContactService: container.resolve('addContactService'),

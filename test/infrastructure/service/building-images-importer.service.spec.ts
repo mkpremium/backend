@@ -5,7 +5,7 @@ import { expect } from 'chai'
 
 describe('BuildingImagesImporterService', () => {
   it('does not break', async () => {
-    const testContainer = await createTestContainer({ postgres: true, couchbase: false })
+    const testContainer = await createTestContainer()
     const service = testContainer.resolve('buildingImagesImporterService') as BuildingImagesImporterService
 
     expect(service.importBuildingImages(uuid())).to.eventually.be.undefined

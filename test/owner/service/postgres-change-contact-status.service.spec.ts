@@ -12,7 +12,7 @@ describe('ChangeContactStatusService(Postgres)', () => {
   let testContact
 
   beforeEach(async () => {
-    const container = await createTestContainer({ postgres: true, couchbase: false })
+    const container = await createTestContainer()
     const buildingRepository: BuildingsRepository = await container.resolve('buildingsRepository')
     const testBuilding = await buildingRepository.save(buildingFactory.build())
 
