@@ -34,8 +34,8 @@ export class AddProposalForBuildingService {
       ownerId: cmd.ownerId,
       proposal: cmd.amount,
       message: cmd.message,
-      notificationStatus: 'PENDING',
-      notificationEmail: contactOfId(owner, cmd.contactId).value
+      notificationStatus: cmd.contactId ? 'PENDING' : 'SENT', // Offers without an email are verbally said to the owner
+      notificationEmail: cmd.contactId ? contactOfId(owner, cmd.contactId).value : null
     })
 
     const event: ProposalForBuildingScheduled = {
