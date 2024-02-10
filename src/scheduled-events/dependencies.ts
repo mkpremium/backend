@@ -1,7 +1,6 @@
 import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { CreateMeetingService } from './service/create-meeting.service'
 import { ScheduledCallsService } from './service/scheduled-calls.service'
-import { SelfMeetingsRepository } from './repository/self-meetings.repository'
 import { MeetingsService } from './service/meetings.service'
 import { GetSelfMeetingsService } from './service/get-self-meetings.service'
 import { ScheduleCallService } from './service/schedule-call.service'
@@ -24,7 +23,6 @@ export async function setupScheduledEventsDependencies (container: AwilixContain
     removeScheduledCallsService: asClass(RemoveScheduledCallsService).classic().singleton(),
     scheduledCallsService: asClass(ScheduledCallsService).classic(),
     scheduledEventsRepository: asClass(PostgresScheduledEventsRepository).classic().singleton(),
-    selfMeetingsRepository: asClass(SelfMeetingsRepository).classic().singleton(),
     meetingsService: asClass(MeetingsService).classic().singleton(),
 
     getUserMeetingsService: asClass(GetSelfMeetingsService).classic().singleton(),
