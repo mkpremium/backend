@@ -51,7 +51,7 @@ export async function setupContainer (container: AwilixContainer, dataSource: Da
   await setupWorksheetDependencies(container)
   setupCallerDependencies(container)
   await setupUserDependencies(container)
-  await setupStockDependencies(container, usePostgres)
+  await setupStockDependencies(container)
   setupEmailDependencies(container)
   setupFlipperDependencies(container)
 }
