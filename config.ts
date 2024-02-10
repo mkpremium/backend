@@ -22,7 +22,7 @@ export const jwt = {
   refreshTokenExpiresIn: process.env.REFRESH_TOKEN_JWT_EXPIRES || '10 days'
 }
 
-export const saltFactor = parseInt(process.env.SALT_FACTOR || '10')
+export const saltFactor = 10
 
 export const metadataS3Config = {
   region: process.env.METADATA_S3_REGION || 'eu-west-2',

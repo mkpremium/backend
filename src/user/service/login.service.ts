@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import { newHttpError } from '../../lib/http-error'
 import { AuthenticatedResponse } from '../../operator/types'
-import { CouchbaseUsersRepository } from '../repository/couchbase-users.repository'
 import { UserProps } from '../../types/user'
 import { PostgresUserRepository } from '../repository/postgres-user.repository'
 import { AuthTokenIssuerService } from './auth-token-issuer.service'
@@ -13,17 +12,14 @@ export interface Credentials {
 
 export class LoginService {
   constructor (
-    private couchbaseUsersRepository: CouchbaseUsersRepository,
     private postgresUsersRepository: PostgresUserRepository,
-    private authTokenIssuerService: AuthTokenIssuerService,
-    private usePostgres: boolean
+    private authTokenIssuerService: AuthTokenIssuerService
   ) {
   }
 
   async login (credentials: Credentials) {
     const { username, password } = credentials
-    const user =
-      await (this.usePostgres ? this.getPostgresUser(username) : this.getCouchbaseUser(username))
+    const user = await this.postgresUsersRepository.getUserWithUsername(username)
     await this.validateUserPassword(user, password)
 
     return await this.createAuthenticatedResponse(user)
@@ -54,14 +50,6 @@ export class LoginService {
       roles: user.roles,
       operator: tokenPayload.operator
     })
-  }
-
-  private getPostgresUser (username: string) {
-    return this.postgresUsersRepository.getUserWithUsername(username)
-  }
-
-  private getCouchbaseUser (username: string) {
-    return this.couchbaseUsersRepository.getUserWithUsername(username)
   }
 
   private async validateUserPassword (user: Pick<UserProps, 'enable' | 'password'>, password: string) {
