@@ -3,7 +3,6 @@ import { spy, stub } from 'sinon'
 import { utc } from '../../../src/lib/date'
 import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
 import { Worksheet } from '../../../src/worksheet/domain/worksheet'
-import { QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 import { WorksheetQueueActionsService } from '../../../src/worksheet/service/worksheet-queue-actions-service'
 
 describe('WorksheetQueueActionsService', function () {
@@ -92,39 +91,6 @@ describe('WorksheetQueueActionsService', function () {
         queueId: testQueueId,
         by: testUserId
       })
-    })
-  })
-
-  describe('removeScheduledCallFromWorksheets', function () {
-    const testScheduledCallId = 'test-scheduled-call-id'
-    const testQueueWithScheduledCall = WorksheetQueue({
-      id: testQueueId,
-      name: 'test queue',
-      source: {
-        province: 'test'
-      },
-      worksheets: [
-        {
-          worksheetId: testWorksheetId,
-          status: QueueItemStatus.SCHEDULED,
-          event: {
-            id: testScheduledCallId,
-            eventDate: new Date(),
-            type: 'CALLS'
-          }
-        }
-      ]
-    })
-
-    it('removes scheduled call from worksheet', async function () {
-      queueRepositoryMock.findQueueWithScheduledCallOfId.withArgs(testScheduledCallId)
-        .resolves(testQueueWithScheduledCall)
-
-      await service.removeScheduledCallFromWorksheets(testScheduledCallId)
-
-      expect(queueRepositoryMock.save).to.have.been.calledOnce
-      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].event).to.be.undefined
-      expect(queueRepositoryMock.save.firstCall.args[0].worksheets[0].status).to.be.equal(QueueItemStatus.AVAILABLE)
     })
   })
 })

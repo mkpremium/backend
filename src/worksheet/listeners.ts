@@ -1,6 +1,5 @@
 import { AwilixContainer } from 'awilix'
 import { EventListener } from '../infrastructure/event-bus'
-import { WorksheetQueueActionsService } from './service/worksheet-queue-actions-service'
 import { BuildingNegotiationStatusChanged } from '../building/service/update-building-negotiation-status.service'
 import {
   ReleaseUserExtraOpenedWorksheetsInQueueService
@@ -20,7 +19,6 @@ import { subscribeToCommand } from '../infrastructure/listeners'
 export function worksheetEventListeners (eventBus: EventListener, container: AwilixContainer) {
   const worksheetRepository = container.resolve('worksheetRepository') as WorksheetRepository
   const syncWorksheetStatusOnBuildingNegotiationStatusChangeService = container.resolve('syncWorksheetStatusOnBuildingNegotiationStatusChangeService') as SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
-  const worksheetQueueActionsService = container.resolve('worksheetQueueActionsService') as WorksheetQueueActionsService
   const releaseUserOtherActiveWorksheetsInQueueService = container.resolve('releaseUserOtherActiveWorksheetsInQueueService') as ReleaseUserExtraOpenedWorksheetsInQueueService
   const updateWorksheetStatusOnOwnerChangeService = container.resolve('updateWorksheetStatusOnOwnerChangeService') as UpdateWorksheetStatusOnOwnerChangeService
   const logger = container.resolve('logger') as Logger
@@ -32,19 +30,6 @@ export function worksheetEventListeners (eventBus: EventListener, container: Awi
     async (evt: BuildingNegotiationStatusChanged) => {
       logger.info('updating worksheet because building negotiation status changed', evt)
       await syncWorksheetStatusOnBuildingNegotiationStatusChangeService.updateWorksheet(evt)
-    })
-
-  eventBus.on(
-    DomainEventCatalog.SCHEDULED_EVENTS__EVENT_DELETED,
-    'worksheet.remove_scheduled_call',
-    async ({ id }) => {
-      worksheetQueueActionsService.removeScheduledCallFromWorksheets(id)
-        .then(() => {
-          logger.info('scheduled call removed from worksheet successfully')
-        })
-        .catch(error => {
-          logger.crit('error removing scheduled call from worksheets', { scheduledCallId: id, error })
-        })
     })
 
   eventBus.on(
