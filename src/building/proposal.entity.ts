@@ -22,8 +22,8 @@ export class Proposal extends BaseEntity {
   @Column({ type: 'decimal', precision: 10, scale: 2, transformer: new DecimalColumnTransformer() })
   amount: number
 
-  @Column()
-  notificationEmail: string
+  @Column({ nullable: true })
+  notificationEmail?: string
 
   @Column('text')
   notificationStatus: 'PENDING' | 'SENT' | 'DISABLED'
