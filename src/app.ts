@@ -23,12 +23,11 @@ import { scheduledEventsRoutes } from './scheduled-events/routing'
 import { flipperRoutes } from './flipper/routing'
 import { setupUserRoutes } from './user/routing'
 import { startListeners } from './infrastructure/listeners'
-import { Database } from './infrastructure/database'
 import jwt from './middleware/jwt'
 
-export const createApp = async (database: Database): Promise<Express> => {
+export const createApp = async (): Promise<Express> => {
   const logger = initLogger()
-  logger.info('starting app', { database })
+  logger.info('starting app')
 
   const app = express()
 

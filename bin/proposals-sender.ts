@@ -1,11 +1,11 @@
 import { initLogger } from '../src/infrastructure/logger'
 import type { ProposalsSenderService } from '../src/building/service/proposals-sender.service'
-import { createContainer } from './create-container'
+import { createDiContainer } from '../src/infrastructure/dependencies'
 
 const logger = initLogger()
 logger.info('Starting proposals sender')
 
-createContainer()
+createDiContainer()
   .then(container => {
     const service = container.resolve('proposalsSenderService') as ProposalsSenderService
     logger.info('Starting to process pending proposals')

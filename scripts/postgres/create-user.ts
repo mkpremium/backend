@@ -1,9 +1,9 @@
-import { createContainer } from '../../bin/create-container'
 import { AddOperatorService } from '../../src/user/service/add-operator.service'
+import { createDiContainer } from '../../src/infrastructure/dependencies'
 
 const [ username, password, role ] = process.argv.slice(2)
 
-createContainer()
+createDiContainer()
   .then(async container => {
     const addOperatorService = container.resolve('addOperatorService') as AddOperatorService
     await addOperatorService.addOperator({

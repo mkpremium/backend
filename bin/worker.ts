@@ -2,7 +2,7 @@ import { initLogger } from '../src/infrastructure/logger'
 import { EventPoller } from '../src/infrastructure/event-bus/event-poller'
 import { Bucket } from 'couchbase'
 import { startListeners } from '../src/infrastructure/listeners'
-import { createContainer } from './create-container'
+import { createDiContainer } from '../src/infrastructure/dependencies'
 
 const logger = initLogger()
 logger.info('starting worker')
@@ -18,7 +18,7 @@ process.on('SIGTERM', () => {
 })
 
 async function init () {
-  const container = await createContainer()
+  const container = await createDiContainer()
   const poller: EventPoller = container.resolve('eventPoller')
   const couchbaseBucket: Bucket = container.resolve('couchbaseBucket')
   await startListeners(container)

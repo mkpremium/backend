@@ -5,9 +5,8 @@ import { port } from '../config'
 import { createApp } from '../src/app'
 import { AwilixContainer } from 'awilix'
 import { Bucket } from 'couchbase'
-import { getDatabase } from './create-container'
 
-createApp(getDatabase())
+createApp()
   .then(app => {
     const server = http.createServer(app)
 
