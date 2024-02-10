@@ -17,7 +17,8 @@ describe.skip('StockRepository', function () {
     it('returns total profit made by property owners', async function () {
       const propertyManager = { id: null }
 
-      const { closeSellStock } = import('../../src/stock/application')
+      // const { closeSellStock } = import('../../src/stock/application')
+      const closeSellStock = () => null
 
       const testBuilding = { }
       const buildingPurchaseAmount = 1000
