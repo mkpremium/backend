@@ -8,7 +8,6 @@ import { AddFlipperService } from './service/add-flipper.service'
 import { PostgresFlippersFavoritesBuildingsService } from './service/postgres-flipper-favorites-buildings.service'
 
 export const setupFlipperDependencies = (container: AwilixContainer) => {
-  const usePostgres = container.resolve('usePostgres') as boolean
   container.register({
     addFlipperService: asClass(AddFlipperService).singleton().classic(),
     flipperAvailabilityService: asClass(FlipperAvailabilityService).singleton(),
@@ -18,6 +17,6 @@ export const setupFlipperDependencies = (container: AwilixContainer) => {
     flippersRepository: asClass(FlipperRepository).classic().singleton(),
 
     postgresFlippersFavoritesBuildingsService: asClass(PostgresFlippersFavoritesBuildingsService).classic().singleton(),
-    flipperFavoritesBuildingsService: aliasTo(usePostgres ? 'postgresFlippersFavoritesBuildingsService' : 'couchbaseUsersRepository')
+    flipperFavoritesBuildingsService: aliasTo('postgresFlippersFavoritesBuildingsService')
   })
 }
