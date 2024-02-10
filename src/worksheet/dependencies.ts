@@ -19,15 +19,12 @@ export async function setupWorksheetDependencies (diContainer: AwilixContainer, 
   if (usePostgres) {
     diContainer.register({
       couchbaseCallSchedulerService: asValue(null),
-      couchbaseWorksheetRepository: asValue(null),
-      couchbaseWorksheetQueueRepository: asValue(null)
+      couchbaseWorksheetRepository: asValue(null)
     })
   } else {
     const { CouchbaseWorksheetRepository } = await import('./repository/couchbase-worksheet.repository')
-    const { CouchbaseWorksheetQueueRepository } = await import('./repository/couchbase-worksheet-queue.repository')
     diContainer.register({
-      couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton(),
-      couchbaseWorksheetQueueRepository: asClass(CouchbaseWorksheetQueueRepository).classic().singleton()
+      couchbaseWorksheetRepository: asClass(CouchbaseWorksheetRepository).classic().singleton()
     })
   }
   diContainer.register({
@@ -48,6 +45,6 @@ export async function setupWorksheetDependencies (diContainer: AwilixContainer, 
     postgresWorksheetRepository: asClass(PostgresWorksheetRepository).classic().singleton(),
     worksheetRepository: aliasTo(usePostgres ? 'postgresWorksheetRepository' : 'couchbaseWorksheetRepository'),
     postgresQueueRepository: asClass(PostgresWorksheetQueueRepository).classic().singleton(),
-    worksheetQueueRepository: aliasTo(usePostgres ? 'postgresQueueRepository' : 'couchbaseWorksheetQueueRepository')
+    worksheetQueueRepository: aliasTo('postgresQueueRepository')
   })
 }
