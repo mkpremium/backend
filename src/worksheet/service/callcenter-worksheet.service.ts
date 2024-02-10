@@ -1,27 +1,22 @@
 import { WorksheetViewProps } from '../repository/worksheet.repository'
-import { CouchbaseWorksheetRepository } from '../repository/couchbase-worksheet.repository'
 import { DataSource } from 'typeorm'
 import { Worksheet } from '../worksheet.entity'
 import { buildingEntityToReadModel } from '../../building/repository/postgres-buildings.repository'
 
 export class CallcenterWorksheetService {
   constructor (
-    private couchbaseWorksheetRepository: CouchbaseWorksheetRepository,
-    private usePostgres: boolean,
     private ormDataSource: DataSource
   ) {
   }
 
   async getWorksheetForCallcenterView (worksheetId: string): Promise<WorksheetViewProps> {
-    return this.usePostgres ? this.getPostgresWorksheet(worksheetId) : this.couchbaseWorksheetRepository.getForCallcenterView(worksheetId)
+    return this.getPostgresWorksheet(worksheetId)
   }
 
   nextAvailableWorksheetInSource (source: {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    return this.usePostgres
-      ? this.nextAvailableWorksheetInSourcePostgres(source, skipWorksheetId)
-      : this.couchbaseWorksheetRepository.nextAvailableWorksheetInSource(source, skipWorksheetId)
+    return this.nextAvailableWorksheetInSourcePostgres(source, skipWorksheetId)
   }
 
   private async getPostgresWorksheet (worksheetId: string): Promise<WorksheetViewProps> {
