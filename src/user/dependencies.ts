@@ -1,4 +1,4 @@
-import { aliasTo, asClass, asFunction, asValue, type AwilixContainer } from 'awilix'
+import { aliasTo, asClass, asFunction, type AwilixContainer } from 'awilix'
 import { UserBlockedAvailabilityService } from './service/user-blocked-availability.service'
 import { removeFavoriteForNoSaleBuildings } from './event-listener/remove-favorite-for-no-sale-buildings'
 import { LoginService } from './service/login.service'
@@ -12,17 +12,7 @@ import { AuthTokenIssuerService } from './service/auth-token-issuer.service'
 import { AddOperatorService } from './service/add-operator.service'
 import { importOperatorCommandHandler } from '../infrastructure/postgres/import-operator-command-handler'
 
-export const setupUserDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
-  if (usePostgres) {
-    container.register({
-      operatorRepository: asValue(null)
-    })
-  } else {
-    const { OperatorRepository } = await import('../operator/models')
-    container.register({
-      operatorRepository: asClass(OperatorRepository).singleton()
-    })
-  }
+export const setupUserDependencies = async (container: AwilixContainer) => {
   container.register({
     postgresUsersRepository: asClass(PostgresUserRepository).classic().singleton(),
     usersRepository: aliasTo('postgresUsersRepository'),
