@@ -5,7 +5,7 @@ import { createContainer } from 'awilix'
 describe('createDiContainer', () => {
   it('resolves all registered dependencies', () => {
     const container = createContainer()
-    setupContainer(container, null, true)
+    setupContainer(container, null)
     for (const serviceName in container.registrations) {
       expect(() => container.resolve(serviceName)).to.not.throw
     }
