@@ -15,20 +15,17 @@ import { importOperatorCommandHandler } from '../infrastructure/postgres/import-
 export const setupUserDependencies = async (container: AwilixContainer, usePostgres: boolean) => {
   if (usePostgres) {
     container.register({
-      couchbaseUsersRepository: asValue(null),
       operatorRepository: asValue(null)
     })
   } else {
-    const { CouchbaseUsersRepository } = await import('./repository/couchbase-users.repository')
     const { OperatorRepository } = await import('../operator/models')
     container.register({
-      operatorRepository: asClass(OperatorRepository).singleton(),
-      couchbaseUsersRepository: asClass(CouchbaseUsersRepository).classic().singleton()
+      operatorRepository: asClass(OperatorRepository).singleton()
     })
   }
   container.register({
     postgresUsersRepository: asClass(PostgresUserRepository).classic().singleton(),
-    usersRepository: aliasTo(usePostgres ? 'postgresUsersRepository' : 'couchbaseUsersRepository'),
+    usersRepository: aliasTo('postgresUsersRepository'),
 
     addOperatorService: asClass(AddOperatorService).classic().singleton(),
     authTokenIssuerService: asClass(AuthTokenIssuerService).classic().singleton(),
