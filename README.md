@@ -2,7 +2,7 @@
 
 ## Instalación
 
-1. Instalar Node 18. Si tienes `nvm` instalado, ejecuntando `nvm use` va a usar la version definida en `.nvmrc`.
+1. Instalar Node 20. Si tienes `nvm` instalado, ejecuntando `nvm use` va a usar la version definida en `.nvmrc`.
 2. Instalar dependencias con `npm ci`
 3. Copia el archivo de variables de entorno por defecto con `cp .env.dist .env`
 4. Arranca bases de datos (Couchbase y Postgres) con `docker-compose up`.
