@@ -1,11 +1,14 @@
 import { WorksheetQueue } from '../../../src/worksheet/domain/queue'
-import { ReleaseUserExtraOpenedWorksheetsInQueueService } from '../../../src/worksheet/service/release-user-extra-opened-worksheets-in-queue.service'
+import {
+  ReleaseUserExtraOpenedWorksheetsInQueueService
+} from '../../../src/worksheet/service/release-user-extra-opened-worksheets-in-queue.service'
 import { spy, stub } from 'sinon'
 import { expect } from 'chai'
 import { WorkSheetStatus } from '../../../src/worksheet/domain/worksheet'
 import moment from 'moment'
 import { QueueItemStatus } from '../../../src/worksheet/models/queue-item'
 import { worksheetBuilder } from '../worksheet.builder'
+import type { Logger } from 'winston'
 
 describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
   const testUserId = 'user-id'
@@ -15,10 +18,7 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
   let worksheetRepositoryMock
 
   beforeEach(() => {
-    worksheetQueueRepositoryMock = {
-      get: stub(),
-      save: spy()
-    }
+    worksheetQueueRepositoryMock = { get: stub() }
     worksheetRepositoryMock = {
       get: stub(),
       save: stub(),
@@ -27,7 +27,8 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
     service = new ReleaseUserExtraOpenedWorksheetsInQueueService(
       worksheetQueueRepositoryMock,
       worksheetRepositoryMock,
-      2
+      2,
+      { info: stub() } as unknown as Logger
     )
   })
 
@@ -65,10 +66,6 @@ describe('ReleaseUserOtherActiveWorksheetsInQueueService', () => {
     worksheetRepositoryMock.save.resolves()
 
     await service.release(testUserId, testQueueId)
-
-    const savedQueue = worksheetQueueRepositoryMock.save.lastCall.args[0]
-    expect(savedQueue.worksheets).to.have.lengthOf(2)
-    expect(savedQueue.worksheets.find(w => w.id === '3-hours-ago-worksheet')).to.be.undefined
 
     expect(worksheetRepositoryMock.save).to.have.been
       .calledWithMatch(

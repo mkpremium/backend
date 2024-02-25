@@ -64,18 +64,8 @@ function calculateWorksheetIdsToDrop (q: WorksheetQueueProps, userId: string, ma
   return _.map(_.drop(userOpenedWorksheets, maxToKeep), 'worksheetId')
 }
 
-export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): [object, string[]] {
-  const worksheetIdToDrop = calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
-
-  return [
-    t.update(queue, {
-      // This would not have any effect on the Postgres implementation as it uses the worksheets array as a relation.
-      worksheets: {
-        $set: queue.worksheets.filter(({ worksheetId }) => !worksheetIdToDrop.includes(worksheetId))
-      }
-    }),
-    worksheetIdToDrop
-  ]
+export function keepOnlyUserNewestOpenedWorksheets (queue: WorksheetQueueProps, userId: string, maxOpenedWorksheetsByUser: number): string[] {
+  return calculateWorksheetIdsToDrop(queue, userId, maxOpenedWorksheetsByUser)
 }
 
 export function removeScheduledCall (queue: WorksheetQueueProps, scheduledCallId: string) {
