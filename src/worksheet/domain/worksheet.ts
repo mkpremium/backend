@@ -101,16 +101,6 @@ export function setStatus (worksheet: WorksheetProps, newStatus: WorksheetStatus
   return Worksheet.update(worksheet, spec)
 }
 
-export function pullOutFreezer (worksheet: WorksheetProps, newStatus: WorksheetStatusType): WorksheetProps {
-  const updated = setStatus(worksheet, newStatus)
-
-  return Worksheet.update(updated, {
-    inFreezer: { $set: false },
-    queueId: { $set: null },
-    lastAddedMeeting: { $set: null }
-  })
-}
-
 export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetProps, byUserOfId: string): [ WorksheetQueueProps, WorksheetProps ] => {
   const worksheetQueueItem = queue.worksheets.find(w => w.worksheetId === worksheet.id)
   if (worksheetQueueItem) {
