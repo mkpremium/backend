@@ -8,7 +8,7 @@ export const createStatusChangedController = ({ worksheetRepository }) => (req, 
   return Promise.all(
     worksheetsId.map(async worksheetId => {
       const worksheet = await worksheetRepository.get(worksheetId)
-      return worksheetRepository.save(setStatus(worksheet, `requested by ${req.user.id}`))
+      return worksheetRepository.save(setStatus(worksheet, worksheet.status, `requested by ${req.user.id}`))
     })
   ).then(() => {
     res.status(200).json()
