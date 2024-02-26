@@ -22,7 +22,7 @@ describe('TakeNextWorksheetService', () => {
   let eventBusSpy
 
   beforeEach(() => {
-    takeWorksheetServiceMock = { takeWorksheetInQueue: spy() }
+    takeWorksheetServiceMock = { takeWorksheetInQueue: stub().resolves({ id: 'test-next-worksheet-id' }) }
     worksheetsRepositoryMock = { nextAvailableWorksheetInSource: stub() }
     worksheetsQueueRepositoryMock = { get: stub() }
     eventBusSpy = { publish: spy() }
@@ -82,6 +82,7 @@ describe('TakeNextWorksheetService', () => {
       name: 'worksheet.next_in_queue_taken',
       by: testUserId,
       source: testQueue.source,
+      worksheetId: 'test-next-worksheet-id',
       queueId: testQueue.id
     })
   })
