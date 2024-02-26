@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import urlparse from 'url-parse'
+import path from 'path'
 
 const parsedDSN = urlparse(process.env.DATABASE_URL)
 export const AppDataSource = new DataSource({
@@ -13,8 +14,8 @@ export const AppDataSource = new DataSource({
   synchronize: ['dev', 'test'].includes(process.env.NODE_ENV),
   logging: !!process.env.DATABASE_LOG,
   entities: [
-    '**/*.entity.ts',
-    '**/*.entity.js'
+    path.join(__dirname, '**/*.entity.ts'),
+    path.join(__dirname, '**/*.entity.js')
   ],
   migrations: [
     'migrations/*.ts',
