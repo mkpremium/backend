@@ -12,6 +12,7 @@ module.exports = {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-explicit-any': 'off'
   },
+  ignorePatterns: ['k6'],
   overrides: [
     {
       files: [
