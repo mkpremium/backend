@@ -50,7 +50,8 @@ export class TakeNextWorksheetService {
     await this.eventBus.publish({
       name: DomainEventCatalog.WORKSHEET__NEXT_IN_QUEUE_TAKEN,
       by: byUserOfId,
-      source: queue.source
+      source: queue.source,
+      queueId: queue.id
     })
 
     return nextWorksheet
