@@ -1,41 +1,50 @@
-import { keepOnlyUserNewestOpenedWorksheets } from '../domain/queue'
-import { releaseWorksheet } from '../domain/worksheet'
-import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
-import { WorksheetRepository } from '../repository/worksheet.repository'
 import type { Logger } from 'winston'
+import type { EntityManager } from 'typeorm'
+import { Worksheet } from '../worksheet.entity'
+import _ from 'lodash'
 
 export class ReleaseUserExtraOpenedWorksheetsInQueueService {
   constructor (
-    private worksheetQueueRepository: WorksheetQueueRepository,
-    private worksheetRepository: WorksheetRepository,
     private maxOpenedWorksheetPerQueueAndUser: number,
-    private logger: Logger
+    private logger: Logger,
+    private entityManager: EntityManager
   ) {
   }
 
   async release (userId: string, queueId: string) {
-    const queue = await this.worksheetQueueRepository.get(queueId)
     this.logger.info(`Releasing extra opened worksheets for user ${userId} in queue ${queueId}`, {
       userId,
-      queueId,
-      queueLength: queue.worksheets.length
+      queueId
     })
-    if (queue.worksheets.length <= this.maxOpenedWorksheetPerQueueAndUser) {
-      return
-    }
+    await this.entityManager.transaction(async transactionalEntityManager => {
+      const worksheets = await transactionalEntityManager.find(Worksheet, {
+        where: {
+          queue: { id: queueId },
+          heldBy: {
+            user: { id: userId }
+          },
+          status: 'TAKEN'
+        },
+        order: {
+          lastViewedAt: 'DESC'
+        }
+      })
 
-    const releasedWorksheetIds = keepOnlyUserNewestOpenedWorksheets(
-      queue, userId, this.maxOpenedWorksheetPerQueueAndUser
-    )
-
-    this.logger.info(`Releasing ${releasedWorksheetIds.length} worksheets for user ${userId} in queue ${queueId}`)
-
-    await Promise.all(releasedWorksheetIds.map(
-      async worksheetId => {
-        const worksheet = await this.worksheetRepository.get(worksheetId)
-        const releasedWorksheet = releaseWorksheet(worksheet)
-        await this.worksheetRepository.save(releasedWorksheet)
+      if (worksheets.length <= this.maxOpenedWorksheetPerQueueAndUser) {
+        return
       }
-    ))
+
+      const worksheetsToRelease = _.takeRight(worksheets, worksheets.length - this.maxOpenedWorksheetPerQueueAndUser)
+      this.logger.info(`Releasing ${worksheetsToRelease.length} worksheets for user ${userId} in queue ${queueId}`)
+
+      await Promise.all(worksheetsToRelease.map(
+        async (worksheet) => {
+          worksheet.status = 'LOOKING_MEETING'
+          worksheet.queue = null
+          worksheet.heldBy = null
+          await transactionalEntityManager.save(worksheet)
+        }
+      ))
+    })
   }
 }
