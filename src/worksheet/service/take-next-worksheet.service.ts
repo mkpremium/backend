@@ -45,17 +45,7 @@ export class TakeNextWorksheetService {
       return
     }
 
-    const nextWorksheet = await this.takeWorksheetService.takeWorksheetInQueue(
-      queue.id, worksheetFromSource.id, byUserOfId)
-    await this.eventBus.publish({
-      name: DomainEventCatalog.WORKSHEET__NEXT_IN_QUEUE_TAKEN,
-      by: byUserOfId,
-      worksheetId: nextWorksheet.id,
-      source: queue.source,
-      queueId: queue.id
-    })
-
-    return nextWorksheet
+    return await this.takeWorksheetService.takeWorksheetInQueue(queue.id, worksheetFromSource.id, byUserOfId, true)
   }
 
   private getNextWorksheet (queue: WorksheetQueueProps, byUserOfId: string, skipWorksheetId?: string): Promise<WorksheetViewProps> {

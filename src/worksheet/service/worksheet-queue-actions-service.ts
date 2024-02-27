@@ -13,7 +13,7 @@ export class WorksheetQueueActionsService {
   ) {
   }
 
-  async takeWorksheetInQueue (queueId: string, worksheetId: string, userId: string) {
+  async takeWorksheetInQueue (queueId: string, worksheetId: string, userId: string, fromNextInQueue: boolean = false) {
     await this.entityManager.transaction(async entityManager => {
       const caller = await entityManager.findOneByOrFail(Caller, [
         { id: userId },
@@ -30,6 +30,7 @@ export class WorksheetQueueActionsService {
         name: DomainEventCatalog.WORKSHEET__TAKEN,
         worksheetId,
         queueId,
+        fromNextInQueue,
         by: caller.id
       }, entityManager)
     })
