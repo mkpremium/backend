@@ -48,9 +48,9 @@ export class SqsBus implements EventBus {
     let allEventsListeners: [ListenerRegister] | []
     // The only listener to all events is the event recorder. When the entity manager is provided, want the event to
     // be persisted within the same transaction as the rest of the business logic.
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    await this.eventRecorderListener(event as any, entityManager, !!entityManager)
     if (entityManager) {
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      await this.eventRecorderListener(event as any, entityManager, true)
       allEventsListeners = []
     } else {
       allEventsListeners = this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER) as [ListenerRegister]
