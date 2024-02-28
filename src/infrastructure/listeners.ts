@@ -17,7 +17,6 @@ export async function startListeners (diContainer) {
   scheduledEventsEventListeners(eventBus, diContainer)
   worksheetEventListeners(eventBus, diContainer)
   userEventListeners(eventBus, diContainer)
-  eventBus.on('*', 'events.event_recorder', diContainer.resolve('eventRecorderListener'))
 
   const migrationProcess = diContainer.resolve('couchbaseToPostgresProcess') as ReturnType<typeof couchbaseToPostgresProcess>
   const logger = diContainer.resolve('logger') as Logger

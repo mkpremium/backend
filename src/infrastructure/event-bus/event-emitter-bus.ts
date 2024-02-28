@@ -4,8 +4,8 @@ import { ALL_EVENTS_LISTENER, EventBus } from '../event-bus'
 import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
 import { EntityManager } from 'typeorm'
-import { createEventRecorderListener } from './event-recorder.listener'
 import type { ListenersRegistry } from './listeners-registry'
+import { DomainEvent, DomainEventCatalog } from '../postgres/domain-event.entity'
 
 export class EventEmitterBus implements EventBus {
   private emitter = new EventEmitter()
@@ -19,8 +19,7 @@ export class EventEmitterBus implements EventBus {
 
   constructor (
     private logger: Logger,
-    private eventNamingPolicy: EventNamingPolicy,
-    private eventRecorderListener: ReturnType<typeof createEventRecorderListener>
+    private eventNamingPolicy: EventNamingPolicy
   ) {
     this.emitter.setMaxListeners(0)
     this.emitter.on('error', error => {
@@ -37,7 +36,11 @@ export class EventEmitterBus implements EventBus {
     // be persisted within the same transaction as the rest of the business logic.
     if (entityManager) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      await this.eventRecorderListener(event as any, entityManager)
+      await entityManager.save(DomainEvent, {
+        name: event.name as DomainEventCatalog,
+        version: event.name || 'unknown',
+        body: { ...event, _meta: { isTransactional: true } }
+      })
     }
 
     return new Promise((resolve, reject) => {

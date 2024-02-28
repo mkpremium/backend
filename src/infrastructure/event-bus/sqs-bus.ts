@@ -2,14 +2,15 @@ import { ALL_EVENTS_LISTENER, EventBus } from '../event-bus'
 import { Logger } from '../logger'
 import { SQS } from 'aws-sdk'
 import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs'
-import { ListenerRegister, ListenersRegistry } from './listeners-registry'
+import { ListenersRegistry } from './listeners-registry'
 import { WrongEventName, WrongListenerName } from './errors'
 import { EventNamingPolicy } from './event-naming-policy'
 import { EntityManager } from 'typeorm'
-import { createEventRecorderListener } from './event-recorder.listener'
+import { DomainEvent, DomainEventCatalog } from '../postgres/domain-event.entity'
 
 interface SQSEvent {
-  name: string,
+  name: DomainEventCatalog | string,
+  version?: string,
   messageGroupId?: string,
   messageDeduplicationId?: string
 }
@@ -21,7 +22,7 @@ export class SqsBus implements EventBus {
     private eventsQueueUrl: string,
     private listenersRegistry: ListenersRegistry,
     private eventNamingPolicy: EventNamingPolicy,
-    private eventRecorderListener: ReturnType<typeof createEventRecorderListener>
+    private entityManager?: EntityManager
   ) {
   }
 
@@ -45,40 +46,38 @@ export class SqsBus implements EventBus {
       throw new WrongEventName(event.name)
     }
 
-    let allEventsListeners: [ListenerRegister] | []
     // The only listener to all events is the event recorder. When the entity manager is provided, want the event to
     // be persisted within the same transaction as the rest of the business logic.
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    await this.eventRecorderListener(event as any, entityManager, !!entityManager)
-    if (entityManager) {
-      allEventsListeners = []
-    } else {
-      allEventsListeners = this.listenersRegistry.listeningTo(ALL_EVENTS_LISTENER) as [ListenerRegister]
-    }
-
-    const listeners = this.listenersRegistry.listeningTo(event.name).concat(allEventsListeners)
-    if (listeners.length === 0) {
-      this.logger.warning('No listener for event, not publishing it', event)
-      return
-    }
-
-    await this.sqsClient.sendMessageBatch({
-      QueueUrl: this.eventsQueueUrl,
-      Entries: listeners.map(({ name }) => ({
-        Id: name.replace('.', '-'),
-        // MessageGroupId: event.messageGroupId || uuid(),
-        // MessageDeduplicationId: event.messageDeduplicationId || uuid(),
-        MessageBody: JSON.stringify({ event, listener: name })
-      } as SendMessageBatchRequestEntry)
-      )
-    }).promise()
-      .then((response) => {
-        response.Failed.forEach(error => {
-          error.SenderFault
-            ? this.logger.error('Error sending event into SQS', error)
-            : this.logger.warning('Event not saved in SQS', error)
-        })
+    await (entityManager ?? this.entityManager).transaction(async em => {
+      await em.save(DomainEvent, {
+        name: event.name as DomainEventCatalog,
+        version: event.version || 'unknown',
+        body: { ...event, _meta: { isTransactional: !!entityManager } }
       })
+
+      const listeners = this.listenersRegistry.listeningTo(event.name)
+      if (listeners.length === 0) {
+        this.logger.warning('No listener for event, not publishing it', event)
+        return
+      }
+
+      const response = await this.sqsClient.sendMessageBatch({
+        QueueUrl: this.eventsQueueUrl,
+        Entries: listeners.map(({ name }) => ({
+          Id: name.replace('.', '-'),
+          // MessageGroupId: event.messageGroupId || uuid(),
+          // MessageDeduplicationId: event.messageDeduplicationId || uuid(),
+          MessageBody: JSON.stringify({ event, listener: name })
+        } as SendMessageBatchRequestEntry)
+        )
+      }).promise()
+
+      response.Failed.forEach(error => {
+        error.SenderFault
+          ? this.logger.error('Error sending event into SQS', error)
+          : this.logger.warning('Event not saved in SQS', error)
+      })
+    })
   }
 
   private assertNamingSatisfiesPolicy (listenerName: string, eventName: string) {
