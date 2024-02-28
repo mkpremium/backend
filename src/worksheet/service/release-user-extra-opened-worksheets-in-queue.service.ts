@@ -2,6 +2,9 @@ import type { Logger } from 'winston'
 import type { EntityManager } from 'typeorm'
 import { Worksheet } from '../worksheet.entity'
 import _ from 'lodash'
+import {
+  mapNegotiationStatusToWorksheetStatus
+} from './sync-worksheet-status-on-building-negotiation-status-change.service'
 
 export class ReleaseUserExtraOpenedWorksheetsInQueueService {
   constructor (
@@ -27,6 +30,9 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
         },
         order: {
           lastViewedAt: 'DESC'
+        },
+        relations: {
+          building: true
         }
       })
 
@@ -39,7 +45,7 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
 
       await Promise.all(worksheetsToRelease.map(
         async (worksheet) => {
-          worksheet.status = 'LOOKING_MEETING'
+          worksheet.status = mapNegotiationStatusToWorksheetStatus(worksheet.building.negotiationStatus)
           worksheet.queue = null
           worksheet.heldBy = null
           await transactionalEntityManager.save(worksheet)

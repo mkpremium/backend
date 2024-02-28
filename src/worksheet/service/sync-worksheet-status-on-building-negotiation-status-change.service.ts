@@ -1,7 +1,7 @@
 import { BuildingNegotiationStatusChanged } from '../../building/service/update-building-negotiation-status.service'
 import _some from 'lodash/some'
 import { OwnerStatus } from '../../owner/owner'
-import { setStatus, WorkSheetStatus } from '../domain/worksheet'
+import { setStatus, WorkSheetStatus, WorksheetStatusType } from '../domain/worksheet'
 import _every from 'lodash/every'
 import { OwnerRepository } from '../../owner/repository/owner.repository'
 import { WorksheetRepository } from '../repository/worksheet.repository'
@@ -76,17 +76,17 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   }
 }
 
-function mapNegotiationStatusToWorksheetStatus (negotiationStatus) {
+export function mapNegotiationStatusToWorksheetStatus (negotiationStatus): WorksheetStatusType {
   switch (negotiationStatus) {
   case 'DESCARTADO':
-    return WorkSheetStatus.PUBLIC
+    return 'ENTE_PUBLICO'
   case 'NO VENDE':
-    return WorkSheetStatus.NO_SALE
+    return 'NO_SALE'
   case 'YA VENDIO':
-    return WorkSheetStatus.ALREADY_SOLD
+    return 'YA_VENDIO'
   case 'VENDIDO':
-    return WorkSheetStatus.INVALID
+    return 'INVALID'
   default:
-    return WorkSheetStatus.MEETING
+    return 'MEETING'
   }
 }
