@@ -84,7 +84,7 @@ export class AddOfferRequestService {
         contact: { id: cmd.destinationContactId },
         building: { id: cmd.buildingId }
       })
-      await entityManager.update(Building, { id: cmd.buildingId }, { assignedFlipper: flipper })
+      await entityManager.update(Building, { id: cmd.buildingId, negotiationStatus: 'PENDIENTE' }, { assignedFlipper: flipper })
 
       const offerRequest = {
         id: savedOfferRequest.id,
