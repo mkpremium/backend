@@ -21,12 +21,50 @@ export class ListBuildingsService {
   ) {
   }
 
-  buildingsOfId (ids: string | string[]): Promise<BuildingReadModel[]> {
-    return this.buildingOfIdInPostgres(ids)
+  async buildingsOfId (ids: string | string[]): Promise<BuildingReadModel[]> {
+    if (typeof ids === 'string') {
+      ids = [ids]
+    }
+
+    const buildings = await this.entityManager.find(Building, {
+      where: { id: In(ids) },
+      // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
+      relations: {
+        featuredOwner: true,
+        documents: true,
+        proposals: true
+      }
+    })
+
+    const lastOfferRequests = await getLastOfferRequestForBuildings(ids, this.entityManager)
+    const allBuildingOwners = await this.ownersRepository.buildingOwners(ids)
+
+    return buildings.map((building) => {
+      const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
+      const buildingOwners = allBuildingOwners.filter(
+        ({ buildingId }) => buildingId === building.id)
+      const mappedBuilding: BuildingReadModel = buildingEntityToReadModel(building, {
+        lastOfferCreatedAt: lastOfferRequest?.offer_createdAt,
+        owners: buildingOwners
+      })
+      if (!mappedBuilding.owner) {
+        this.logger.error('Building without owner', { buildingId: building.id })
+        return undefined
+      }
+
+      return mappedBuilding
+    }).filter(Boolean)
   }
 
-  buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
-    return this.buildingAssignedToInPostgres(flipperUserId)
+  async buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
+    const buildings = await this.entityManager.find(Building, {
+      where: {
+        assignedFlipper: { user: { id: flipperUserId } },
+        negotiationStatus: Not(In(['DESCARTADO' as const, 'NO VENDE' as const]))
+      }
+    })
+
+    return this.buildingsOfId(buildings.map(({ id }) => id))
   }
 
   async getBuildingFullInformation (buildingIds: string[]): Promise<Record<string, {
@@ -71,52 +109,6 @@ export class ListBuildingsService {
       }
       return acc
     }, {})
-  }
-
-  private async buildingOfIdInPostgres (ids: string | string[]): Promise<BuildingReadModel[]> {
-    if (typeof ids === 'string') {
-      ids = [ids]
-    }
-
-    const buildings = await this.entityManager.find(Building, {
-      where: { id: In(ids) },
-      // Same as in BuildingRepository but without the assignedFlipper as it's not needed here
-      relations: {
-        featuredOwner: true,
-        documents: true,
-        proposals: true
-      }
-    })
-
-    const lastOfferRequests = await getLastOfferRequestForBuildings(ids, this.entityManager)
-    const allBuildingOwners = await this.ownersRepository.buildingOwners(ids)
-
-    return buildings.map((building) => {
-      const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
-      const buildingOwners = allBuildingOwners.filter(
-        ({ buildingId }) => buildingId === building.id)
-      const mappedBuilding: BuildingReadModel = buildingEntityToReadModel(building, {
-        lastOfferCreatedAt: lastOfferRequest?.offer_createdAt,
-        owners: buildingOwners
-      })
-      if (!mappedBuilding.owner) {
-        this.logger.error('Building without owner', { buildingId: building.id })
-        return undefined
-      }
-
-      return mappedBuilding
-    }).filter(Boolean)
-  }
-
-  private async buildingAssignedToInPostgres (flipperUserId: string) {
-    const buildings = await this.entityManager.find(Building, {
-      where: {
-        assignedFlipper: { user: { id: flipperUserId } },
-        negotiationStatus: Not(In(['DESCARTADO' as const, 'NO VENDE' as const]))
-      }
-    })
-
-    return this.buildingOfIdInPostgres(buildings.map(({ id }) => id))
   }
 }
 
