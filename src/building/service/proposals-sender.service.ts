@@ -1,5 +1,5 @@
 import { emailCopies } from './email-copies'
-import { ProposalProps, proposalSent } from '../building'
+import { ProposalProps } from '../building'
 import { BuildingsRepository } from '../repository/buildings.repository'
 import { ProposalsRepository } from '../repository/proposals.repository'
 import { EmailSenderService } from '../../email/email-sender.service'
@@ -9,6 +9,7 @@ import moment from 'moment'
 import { UpdateBuildingNegotiationStatusService } from './update-building-negotiation-status.service'
 import { UsersRepository } from '../../user/repository/users.repository'
 import { ScheduledEventsRepository } from '../../scheduled-events/repository/schedule-events.repository'
+import { utc } from '../../lib/date'
 
 function isFridayOrWeekend (lastScheduledEventDateToInclude: moment.Moment) {
   return [5, 6, 7].includes(lastScheduledEventDateToInclude.isoWeekday())
@@ -98,7 +99,7 @@ export class ProposalsSenderService {
       }
     })
 
-    await this.proposalsRepository.save(proposalSent(proposal))
+    await this.proposalsRepository.save({ ...proposal, notificationSentAt: utc(), notificationStatus: 'SENT' })
     await this.updateBuildingNegotiationStatusService.updateBuildingStatus(
       proposal.buildingId,
       {

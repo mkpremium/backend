@@ -91,15 +91,6 @@ export const BuildingProposal = t.struct<ProposalProps>(
   }
 ) as Struct<ProposalProps>
 
-export const proposalSent = (proposal: ProposalProps) => BuildingProposal.update(proposal, {
-  notificationStatus: {
-    $set: 'SENT'
-  },
-  notificationSentAt: {
-    $set: new Date()
-  }
-})
-
 export const BuildingMetadataPreview = t.struct({
   id: t.String,
   name: t.maybe(t.String),
