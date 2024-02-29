@@ -26,8 +26,19 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
       notificationStatus: 'PENDING',
       notificationEmail: testEmailContact.value
     })
-    expect((proposals[0] as ProposalProps).proposal).to.be.closeTo(addProposalCmd.amount, 0.001)
+    const firstProposal = proposals[0] as ProposalProps
+    expect(firstProposal.proposal).to.be.closeTo(addProposalCmd.amount, 0.001)
     expect(moment((proposals[0] as any).createdAt).isSame(moment(), 'day'))
       .to.be.true
+
+    const [{ latestProposal }] = await deps.listBuildingsService.buildingsOfId(testBuilding.id)
+    expect(latestProposal).to.contains({ id: firstProposal.id })
+
+    // add another proposal
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps)
+
+    const [{ latestProposal: newLatestProposal }] = await deps.listBuildingsService.buildingsOfId(testBuilding.id)
+    expect(newLatestProposal).to.not.contains({ id: firstProposal.id })
   })
 })
