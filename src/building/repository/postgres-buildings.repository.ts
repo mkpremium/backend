@@ -60,7 +60,9 @@ export class PostgresBuildingsRepository
       notificationSentAt: moment(p.notificationSentAt),
       ownerId: p.owner.id,
       state: entityStatusToOldProposal(p.status),
-      notificationEmail: p.notificationEmail
+      notificationEmail: p.notificationEmail,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt
     }))
   }
 
