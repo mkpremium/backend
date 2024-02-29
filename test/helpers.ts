@@ -41,7 +41,9 @@ export async function addProposal (testBuilding: BuildingProps, testOwner: {
   id: string
 }, testEmailContact: ContactProps & {
   isFeatured: boolean
-}, testFlipper: Flipper, { addProposalForBuildingService }) {
+}, testFlipper: Flipper, { addProposalForBuildingService }: {
+  addProposalForBuildingService: AddProposalForBuildingService
+}) {
   const testAddProposalCommand = {
     buildingId: testBuilding.id,
     ownerId: testOwner.id,
