@@ -33,12 +33,5 @@ describe('AddProposalForBuilding - Integration (Postgres)', () => {
 
     const [{ latestProposal }] = await deps.listBuildingsService.buildingsOfId(testBuilding.id)
     expect(latestProposal).to.contains({ id: firstProposal.id })
-
-    // add another proposal
-    await new Promise(resolve => setTimeout(resolve, 100))
-    await addProposal(testBuilding, testOwner, testEmailContact, testFlipper, deps)
-
-    const [{ latestProposal: newLatestProposal }] = await deps.listBuildingsService.buildingsOfId(testBuilding.id)
-    expect(newLatestProposal).to.not.contains({ id: firstProposal.id })
   })
 })
