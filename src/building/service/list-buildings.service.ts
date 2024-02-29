@@ -118,7 +118,7 @@ export interface LastBuildingOffer {
   ownerId: string,
 }
 
-export async function getLastOfferRequestForBuildings (
+async function getLastOfferRequestForBuildings (
   ids: string[],
   entityManager: EntityManager
 ): Promise<LastBuildingOffer[]> {
