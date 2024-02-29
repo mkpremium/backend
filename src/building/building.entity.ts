@@ -56,6 +56,6 @@ export class Building extends BaseEntity {
   notes: BuildingNote[]
 
   get recentProposal (): Proposal | undefined {
-    return _.sortBy(this.proposals || [], '.createdAt').at(-1)
+    return _.sortBy(this.proposals || [], '.createdAt').at(0)
   }
 }
