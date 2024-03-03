@@ -57,18 +57,7 @@ export class AddOfferRequestService {
   async addOfferRequest (cmd: AddOfferRequestCommand) {
     this.assertValidCommand(cmd)
 
-    await this.doPostgres(cmd)
-  }
-
-  private assertValidCommand (command: AddOfferRequestCommand) {
-    const validation = validate(command, AddOfferRequestCommand)
-    if (!validation.isValid()) {
-      throw new InvalidCommand(validation.errors)
-    }
-  }
-
-  private async doPostgres (cmd: AddOfferRequestCommand): Promise<AddBuildingOfferCommand & { id: string }> {
-    return this.entityManager.transaction(async entityManager => {
+    await this.entityManager.transaction(async entityManager => {
       const flipper = await entityManager.findOneByOrFail(Flipper, [
         { id: cmd.flipperId },
         { user: { id: cmd.flipperId } }
@@ -84,16 +73,26 @@ export class AddOfferRequestService {
         contact: { id: cmd.destinationContactId },
         building: { id: cmd.buildingId }
       })
-      await entityManager.update(Building, { id: cmd.buildingId, negotiationStatus: 'PENDIENTE' }, { assignedFlipper: flipper })
+      await entityManager.update(Building, {
+        id: cmd.buildingId,
+        negotiationStatus: 'PENDIENTE'
+      }, { assignedFlipper: flipper })
 
       const offerRequest = {
         id: savedOfferRequest.id,
-        ...cmd
+        ...(cmd)
       }
       await this.publishOfferRequested(cmd, offerRequest, entityManager)
 
       return offerRequest
     })
+  }
+
+  private assertValidCommand (command: AddOfferRequestCommand) {
+    const validation = validate(command, AddOfferRequestCommand)
+    if (!validation.isValid()) {
+      throw new InvalidCommand(validation.errors)
+    }
   }
 
   private async publishOfferRequested (
