@@ -14,7 +14,7 @@ export class BuildingOfferRequest extends BaseEntity {
   @ManyToOne(() => Owner, { nullable: false })
   owner: Owner
 
-  @ManyToOne(() => Contact, { nullable: false })
+  @ManyToOne(() => Contact, { nullable: true })
   contact: Contact
 
   @ManyToOne(() => Building, { nullable: false })
