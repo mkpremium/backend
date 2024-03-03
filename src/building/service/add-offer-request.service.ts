@@ -21,8 +21,8 @@ interface AddOfferRequestCommand {
 
 const AddOfferRequestCommand = t.struct<AddOfferRequestCommand>({
   ownerId: t.String,
-  destinationContactId: t.String,
-  reporterContactId: t.String,
+  destinationContactId: t.maybe(t.String),
+  reporterContactId: t.maybe(t.String),
   buildingId: t.String,
   callerId: t.String,
   flipperId: t.String,
