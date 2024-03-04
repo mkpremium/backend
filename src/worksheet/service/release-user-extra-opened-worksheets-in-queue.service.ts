@@ -14,18 +14,23 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
   ) {
   }
 
-  async release (userId: string, queueId: string) {
-    this.logger.info(`Releasing extra opened worksheets for user ${userId} in queue ${queueId}`, {
-      userId,
+  async release (userOrCallerId: string, queueId: string) {
+    this.logger.info(`Releasing extra opened worksheets for user ${userOrCallerId} in queue ${queueId}`, {
+      userId: userOrCallerId,
       queueId
     })
     await this.entityManager.transaction(async transactionalEntityManager => {
       const worksheets = await transactionalEntityManager.find(Worksheet, {
         where: {
           queue: { id: queueId },
-          heldBy: {
-            user: { id: userId }
-          },
+          heldBy: [
+            {
+              user: { id: userOrCallerId }
+            },
+            {
+              id: userOrCallerId
+            }
+          ],
           status: 'TAKEN'
         },
         order: {
@@ -37,12 +42,12 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
       })
 
       if (worksheets.length <= this.maxOpenedWorksheetPerQueueAndUser) {
-        this.logger.info(`No extra opened worksheets for user ${userId} in queue ${queueId}`)
+        this.logger.info(`No extra opened worksheets for user ${userOrCallerId} in queue ${queueId}`)
         return
       }
 
       const worksheetsToRelease = _.takeRight(worksheets, worksheets.length - this.maxOpenedWorksheetPerQueueAndUser)
-      this.logger.info(`Releasing ${worksheetsToRelease.length} worksheets for user ${userId} in queue ${queueId}`)
+      this.logger.info(`Releasing ${worksheetsToRelease.length} worksheets for user ${userOrCallerId} in queue ${queueId}`)
 
       await Promise.all(worksheetsToRelease.map(
         async (worksheet) => {

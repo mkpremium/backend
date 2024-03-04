@@ -16,7 +16,7 @@ describe('Take and release worksheet', () => {
     let refreshedTestQueue = await deps.postgresQueueRepository.get(testQueue.id)
     expect(refreshedTestQueue.worksheets).to.have.lengthOf(3)
 
-    await deps.releaseUserOtherActiveWorksheetsInQueueService.release(testCallerUser.id, testQueue.id)
+    await deps.releaseUserOtherActiveWorksheetsInQueueService.release(testCallerUser.callerId, testQueue.id)
 
     refreshedTestQueue = await deps.postgresQueueRepository.get(testQueue.id)
     expect(refreshedTestQueue.worksheets).to.have.lengthOf(2)
