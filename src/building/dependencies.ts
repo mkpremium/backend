@@ -29,7 +29,7 @@ import { AddProposalForBuildingService } from './service/add-proposal-for-buildi
 import { ProposalsSenderService } from './service/proposals-sender.service'
 import { PdfProposalComposer } from './service/pdf-proposal-composer'
 import { createListBuildingsController } from './controller/list-buildings.controller'
-import { createProposalScheduledListener } from './event-listener/proposal-added.listener'
+import { proposalScheduledListenerFactory } from './event-listener/proposal-added.listener'
 import { LeadRecorderService } from './service/lead-recorder.service'
 import { createBuildingController } from './controller/create-building.controller'
 import { PostgresBuildingsRepository } from './repository/postgres-buildings.repository'
@@ -81,7 +81,7 @@ export const setupBuildingDependencies = async (container: AwilixContainer) => {
     setBuildingExpensesController: asFunction(createSetBuildingExpensesController).singleton(),
     scheduledCallListener: asFunction(createScheduledCallListener).singleton(),
     addProposalController: asFunction(createAddProposalController).singleton(),
-    proposalScheduledListener: asFunction(createProposalScheduledListener).singleton(),
+    proposalScheduledListener: asFunction(proposalScheduledListenerFactory).singleton(),
 
     addNoteToBuilding: asFunction(createAddNoteToBuildingListener).singleton(),
     setFeaturedOwnerAndContactFromMeeting: asFunction(setFeaturedOwnerAndContactFromMeetingListener).singleton(),

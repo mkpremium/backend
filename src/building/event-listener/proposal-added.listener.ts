@@ -9,7 +9,7 @@ interface Deps {
   logger: Logger,
 }
 
-export const createProposalScheduledListener = ({
+export const proposalScheduledListenerFactory = ({
   updateBuildingNegotiationStatusService,
   proposalsSenderService,
   logger
