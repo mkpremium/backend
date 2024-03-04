@@ -37,6 +37,7 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
       })
 
       if (worksheets.length <= this.maxOpenedWorksheetPerQueueAndUser) {
+        this.logger.info(`No extra opened worksheets for user ${userId} in queue ${queueId}`)
         return
       }
 
