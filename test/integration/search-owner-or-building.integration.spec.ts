@@ -45,6 +45,10 @@ describe('Search owner or building by phone', () => {
     expect(result[0].scheduledCalls).to.have.lengthOf(1)
     expect(result[0].lastEvent).to.include({ type: 'offer-request' },
       'Return last offer request as the last event')
+    expect(result[0]).to.include({
+      negotiationStatus: 'PENDIENTE',
+      assignedFlipperId: testFlipper.id
+    })
 
     await createMeeting(testCallerUser, testFlipper, testEmailContact, testBuilding, testOwner, deps)
     result = await deps.searchOwnerOrBuildingService.search(testPhoneContact.value)

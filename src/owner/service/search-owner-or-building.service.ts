@@ -32,7 +32,9 @@ export class SearchOwnerOrBuildingService {
             contact: true
           }
         },
-        building: true
+        building: {
+          assignedFlipper: true
+        }
       }
     })
     if (owners.length === 0) {
@@ -58,6 +60,7 @@ export class SearchOwnerOrBuildingService {
         building,
         worksheetId: building.worksheetId,
         negotiationStatus: building.negotiationStatus ?? 'PENDIENTE',
+        assignedFlipperId: building.assignedAgentId,
         matchingContactId: foundOwner.person.contacts[matchingContactIdx].contact.id,
         scheduledCalls: scheduledCalls.filter(se => (se.building as unknown as string) === building.id)
           .map(se => ({ at: se.scheduledFor.toISOString() })),

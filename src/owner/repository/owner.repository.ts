@@ -9,6 +9,7 @@ export interface FoundOwnerProps {
   id: string
   buildingId: string,
   negotiationStatus: BuildingNegotiationStatus,
+  assignedFlipperId?: string,
   worksheetId: string,
   scheduledCalls: { at: string }[],
   matchingContactId: string,
@@ -32,6 +33,7 @@ export const FoundOwner = t.struct<FoundOwnerProps>({
   id: t.String,
   buildingId: t.String,
   negotiationStatus: NegotiationStatus,
+  assignedFlipperId: t.maybe(t.String),
   worksheetId: t.String,
   scheduledCalls: t.list(t.struct({
     at: DateTimeString
