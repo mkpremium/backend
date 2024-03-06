@@ -10,16 +10,6 @@ export class CallcenterWorksheetService {
   }
 
   async getWorksheetForCallcenterView (worksheetId: string): Promise<WorksheetViewProps> {
-    return this.getPostgresWorksheet(worksheetId)
-  }
-
-  nextAvailableWorksheetInSource (source: {
-    province: string | string[]
-  }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
-    return this.nextAvailableWorksheetInSourcePostgres(source, skipWorksheetId)
-  }
-
-  private async getPostgresWorksheet (worksheetId: string): Promise<WorksheetViewProps> {
     const ws = await this.getWorksheetQueryBuilder()
       .where('worksheet.id = :worksheetId', { worksheetId })
       .getOne()
@@ -27,7 +17,7 @@ export class CallcenterWorksheetService {
     return toView(ws)
   }
 
-  private async nextAvailableWorksheetInSourcePostgres (source: {
+  async nextAvailableWorksheetInSource (source: {
     province: string | string[]
   }, skipWorksheetId?: string): Promise<WorksheetViewProps> {
     let builder = this.ormDataSource.manager.createQueryBuilder(Worksheet, 'worksheet')
@@ -48,7 +38,8 @@ export class CallcenterWorksheetService {
     const nextWorksheet = await builder
       .orderBy('worksheet.lastViewedAt')
       .getOneOrFail()
-    return this.getPostgresWorksheet(nextWorksheet.id)
+
+    return this.getWorksheetForCallcenterView(nextWorksheet.id)
   }
 
   private getWorksheetQueryBuilder () {
