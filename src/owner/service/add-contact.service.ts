@@ -27,11 +27,19 @@ export class AddContactService {
 
   async addContact (cmd: AddContactCommand): Promise<MaybeFeaturedContact | OwnerProps> {
     this.recording = []
-    const savedContact = await this.ormDataSource.transaction<MaybeFeaturedContact>(async entityManager => {
+    return await this.ormDataSource.transaction<MaybeFeaturedContact>(async entityManager => {
       const contact = await this.getOrCreateContact(entityManager, cmd)
 
       const owner = await this.getOwner(entityManager, cmd)
       const personToContactLink = await this.linkPersonToContact(entityManager, owner, contact, cmd)
+
+      await this.eventBus.publish({
+        name: DomainEventCatalog.OWNER__CONTACT_ADDED,
+        version: '1',
+        contactId: contact.id,
+        ownerId: cmd.ownerId,
+        recording: this.recording
+      }, entityManager)
 
       return {
         id: contact.id,
@@ -41,16 +49,6 @@ export class AddContactService {
         isFeatured: owner.person.featuredPhoneContact === contact || owner.person.featuredEmailContact === contact
       }
     })
-
-    await this.eventBus.publish({
-      name: DomainEventCatalog.OWNER__CONTACT_ADDED,
-      version: '1',
-      contactId: savedContact.id,
-      ownerId: cmd.ownerId,
-      recording: this.recording
-    })
-
-    return savedContact
   }
 
   private async getOwner (entityManager: EntityManager, cmd: AddContactCommand) {
