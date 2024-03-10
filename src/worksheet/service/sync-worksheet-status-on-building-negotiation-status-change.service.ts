@@ -8,6 +8,7 @@ import { WorksheetRepository } from '../repository/worksheet.repository'
 import { BuildingsRepository } from '../../building/repository/buildings.repository'
 import type { EntityManager } from 'typeorm'
 import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
+import type { BuildingNegotiationStatus } from '../../building/building'
 
 export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   constructor (
@@ -76,7 +77,7 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   }
 }
 
-export function mapNegotiationStatusToWorksheetStatus (negotiationStatus): WorksheetStatusType {
+export function mapNegotiationStatusToWorksheetStatus (negotiationStatus: BuildingNegotiationStatus): WorksheetStatusType {
   switch (negotiationStatus) {
   case 'DESCARTADO':
     return 'ENTE_PUBLICO'
