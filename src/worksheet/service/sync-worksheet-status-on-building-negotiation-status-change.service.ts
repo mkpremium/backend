@@ -31,7 +31,7 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
 
   private async calculateFixedStatus ({ building: relatedBuilding, worksheet, owners }) {
     if (relatedBuilding.negotiationStatus) {
-      return mapNegotiationStatusToWorksheetStatus(relatedBuilding.negotiationStatus)
+      return mapNegotiationStatusToWorksheetStatus(relatedBuilding.negotiationStatus, relatedBuilding.assignedAgentId)
     }
 
     const ownersStatus = (owners || []).map(owner => ({
@@ -77,7 +77,7 @@ export class SyncWorksheetStatusOnBuildingNegotiationStatusChangeService {
   }
 }
 
-export function mapNegotiationStatusToWorksheetStatus (negotiationStatus: BuildingNegotiationStatus): WorksheetStatusType {
+export function mapNegotiationStatusToWorksheetStatus (negotiationStatus: BuildingNegotiationStatus, assignedFlipperId: string): WorksheetStatusType {
   switch (negotiationStatus) {
   case 'DESCARTADO':
     return 'ENTE_PUBLICO'
@@ -87,7 +87,13 @@ export function mapNegotiationStatusToWorksheetStatus (negotiationStatus: Buildi
     return 'YA_VENDIO'
   case 'VENDIDO':
     return 'INVALID'
-  default:
+  case 'PENDIENTE':
+    return assignedFlipperId ? 'MEETING' : 'LOOKING_MEETING'
+  case 'COMPRADO':
+    return 'YA_VENDIO'
+  case 'LEAD':
+  case 'PROPOSAL_SCHEDULED':
+  case 'PROPUESTA ENVIADA':
     return 'MEETING'
   }
 }

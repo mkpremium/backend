@@ -37,7 +37,9 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
           lastViewedAt: 'DESC'
         },
         relations: {
-          building: true
+          building: {
+            assignedFlipper: true
+          }
         }
       })
 
@@ -51,7 +53,8 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
 
       await Promise.all(worksheetsToRelease.map(
         async (worksheet) => {
-          worksheet.status = mapNegotiationStatusToWorksheetStatus(worksheet.building.negotiationStatus)
+          worksheet.status = mapNegotiationStatusToWorksheetStatus(
+            worksheet.building.negotiationStatus, worksheet.building.assignedFlipper?.id)
           worksheet.queue = null
           worksheet.heldBy = null
           await transactionalEntityManager.save(worksheet)
