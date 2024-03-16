@@ -5,7 +5,6 @@ import { TakeNextWorksheetService } from './service/take-next-worksheet.service'
 import {
   ReleaseUserExtraOpenedWorksheetsInQueueService
 } from './service/release-user-extra-opened-worksheets-in-queue.service'
-import { UpdateWorksheetStatusOnOwnerChangeService } from './service/update-worksheet-status-on-owner-change.service'
 import { PostgresWorksheetRepository } from './repository/postgres-worksheet.repository'
 import {
   SyncWorksheetStatusOnBuildingNegotiationStatusChangeService
@@ -25,7 +24,6 @@ export async function setupWorksheetDependencies (diContainer: AwilixContainer) 
     syncWorksheetStatusOnBuildingNegotiationStatusChangeService: asClass(
       SyncWorksheetStatusOnBuildingNegotiationStatusChangeService).singleton().classic(),
     worksheetQueueActionsService: asClass(WorksheetQueueActionsService).classic().singleton(),
-    updateWorksheetStatusOnOwnerChangeService: asClass(UpdateWorksheetStatusOnOwnerChangeService).classic().singleton(),
     takeWorksheetService: aliasTo('worksheetQueueActionsService'),
     takeNextWorksheetService: asClass(TakeNextWorksheetService).classic().singleton(),
     releaseUserOtherActiveWorksheetsInQueueService: asClass(ReleaseUserExtraOpenedWorksheetsInQueueService).classic().singleton()

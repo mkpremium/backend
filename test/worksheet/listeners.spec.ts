@@ -2,9 +2,6 @@ import { expect } from 'chai'
 import sinon, { fake, spy } from 'sinon'
 import { asValue, createContainer } from 'awilix'
 import { worksheetEventListeners } from '../../src/worksheet/listeners'
-import { ownerBuilder } from '../owner/owner.builder'
-import { OwnerStatusChangedEvent } from '../../src/owner/service/change-contact-status.service'
-import { DomainEventCatalog } from '../../src/infrastructure/postgres/domain-event.entity'
 
 describe('worksheetEventListeners', () => {
   let eventSubscribers
@@ -53,28 +50,5 @@ describe('worksheetEventListeners', () => {
 
     expect(releaseUserOtherActiveWorksheetsInQueueServiceMock.release).to.have.been
       .calledWith(testWorksheetTakenEvent.by, testWorksheetTakenEvent.queueId)
-  })
-
-  it('updates worksheet when owner contact status changes', (done) => {
-    const testOwner = ownerBuilder({
-      id: 'test-changed-owner-id',
-      buildingId: 'test-building-id'
-    }).build()
-
-    const testEvent: OwnerStatusChangedEvent = {
-      name: DomainEventCatalog.OWNER__STATUS_CHANGED,
-      buildingId: testOwner.buildingId,
-      ownerId: testOwner.id,
-      oldStatus: 'NO_VERIFICADO',
-      newStatus: 'WITHOUT_CONTACT',
-      byUserId: 'test-user-id'
-    }
-    eventSubscribers['owner.status_changed'](testEvent)
-
-    setTimeout(() => {
-      expect(updateWorksheetStatusOnOwnerChangeSpy.updateWorksheet)
-        .to.have.been.calledWith(testEvent)
-      done()
-    }, 0)
   })
 })

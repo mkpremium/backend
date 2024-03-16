@@ -1,22 +1,14 @@
 import { WorksheetQueueRepository } from '../repository/worksheet-queue.repository'
-import { WorksheetNotFound, WorksheetViewProps } from '../repository/worksheet.repository'
 import { WorksheetQueueActionsService } from './worksheet-queue-actions-service'
-import { EventPublisher } from '../../infrastructure/event-bus'
-import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { CallcenterWorksheetService } from './callcenter-worksheet.service'
 import { WorksheetQueueProps } from '../domain/queue'
-
-export interface InvalidWorksheetFound {
-  name: DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND;
-  worksheetId: string;
-}
+import type { WorksheetViewProps } from '../repository/worksheet.repository'
 
 export class TakeNextWorksheetService {
   constructor (
     private takeWorksheetService: WorksheetQueueActionsService,
     private callcenterWorksheetService: CallcenterWorksheetService,
-    private worksheetQueueRepository: WorksheetQueueRepository,
-    private eventBus: EventPublisher
+    private worksheetQueueRepository: WorksheetQueueRepository
   ) {
   }
 
@@ -26,20 +18,7 @@ export class TakeNextWorksheetService {
   }
 
   async nextWorksheetInQueue (queue: WorksheetQueueProps, byUserOfId: string): Promise<WorksheetViewProps> {
-    let worksheetFromSource
-    try {
-      worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId)
-    } catch (error) {
-      if (error instanceof WorksheetNotFound) {
-        await this.eventBus.publish({
-          name: DomainEventCatalog.WORKSHEET__INVALID_WORKSHEET_FOUND,
-          worksheetId: error.worksheetId
-        } as InvalidWorksheetFound)
-        worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId, error.worksheetId)
-      } else {
-        throw error
-      }
-    }
+    const worksheetFromSource = await this.getNextWorksheet(queue, byUserOfId)
 
     if (!worksheetFromSource) {
       return
