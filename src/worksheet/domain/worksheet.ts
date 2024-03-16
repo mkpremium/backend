@@ -8,9 +8,9 @@ import { WorksheetQueue, WorksheetQueueProps } from './queue'
 export const WorkSheetStatus = {
   DEFAULT: 'OPEN',
   AVAILABLE: 'LOOKING_MEETING',
-  INVALID: 'INVALID',
   NO_SALE: 'NO_SALE',
   ALREADY_SOLD: 'YA_VENDIO',
+  SOLD: 'VENDIDO',
   MEETING: 'MEETING',
   PUBLIC: 'ENTE_PUBLICO',
   TAKEN: 'TAKEN'
@@ -137,7 +137,7 @@ export const takeWorksheet = (queue: WorksheetQueueProps, worksheet: WorksheetPr
 
 export type WorksheetStatusType = 'OPEN'
   | 'LOOKING_MEETING'
-  | 'INVALID'
+  | 'VENDIDO'
   | 'NO_SALE'
   | 'YA_VENDIO'
   | 'MEETING'
