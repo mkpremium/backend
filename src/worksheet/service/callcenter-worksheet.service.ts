@@ -37,7 +37,6 @@ export class CallcenterWorksheetService {
 
     const nextWorksheet = await builder
       .orderBy('worksheet.lastViewedAt', 'ASC', 'NULLS FIRST')
-      .limit(1)
       .getOneOrFail()
 
     return this.getWorksheetForCallcenterView(nextWorksheet.id)
