@@ -55,6 +55,11 @@ export class ReleaseUserExtraOpenedWorksheetsInQueueService {
         async (worksheet) => {
           worksheet.status = mapNegotiationStatusToWorksheetStatus(
             worksheet.building.negotiationStatus, worksheet.building.assignedFlipper?.id)
+          // When releasing a worksheet, if it was in NO_SALE status, it should go back to LOOKING_MEETING so it's
+          // available for the next user to take it.
+          if (worksheet.status === 'NO_SALE') {
+            worksheet.status = 'LOOKING_MEETING'
+          }
           worksheet.queue = null
           worksheet.heldBy = null
           await transactionalEntityManager.save(worksheet)
