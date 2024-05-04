@@ -10,8 +10,8 @@ import { orFail } from '../../helpers'
 import uuid from 'uuid/v4'
 import { BuildingsRepository } from '../../../src/building/repository/buildings.repository'
 import { BuildingsReadRepository } from '../../../src/building/repository/buildings-read.repository'
-import { Factory } from 'rosie'
 import { FlipperRepository } from '../../../src/flipper/flipper.repository'
+import { flipperFactory } from '../../factories'
 
 describe('Lead assignment to flipper (Postgres)', () => {
   let buildingsRepository: BuildingsRepository & BuildingsReadRepository
@@ -31,7 +31,7 @@ describe('Lead assignment to flipper (Postgres)', () => {
     const ownerContactId = uuid()
     const worksheetId = uuid()
 
-    const flipper = await flippersRepository.save(Factory.build('flipper'))
+    const flipper = await flippersRepository.save(flipperFactory.build())
     const leadBuilding = buildingBuilder({
       negotiationStatus: 'LEAD',
       assignedAgentId: flipper.id,
