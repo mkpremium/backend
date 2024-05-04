@@ -1,4 +1,4 @@
-import { PropertyManagerRankingService } from '../../src/property-manager/PropertyManagerRankingService'
+import { FlipperRankingService } from '../../src/flipper/service/flipper-ranking.service'
 import { Promise } from 'bluebird'
 import { expect } from 'chai'
 import sinon from 'sinon'
@@ -8,12 +8,12 @@ const matchingMoment = (momentToMatch) => sinon.match(
   (actual) => actual.toString() === momentToMatch.toString()
 )
 
-describe('PropertyManagerRankingService', function () {
+describe('FlipperRankingService', function () {
   const now = () => moment('2020-01-12') // January 12, 2020
   const firstMomentCurrentYear = moment('2020-01-01')
   const lastMomentCurrentYear = moment('2020-12-31').endOf('day')
 
-  const barcelonaPropertyManagerWithoutProfitGoal = {
+  const barcelonaFlipperWithoutProfitGoal = {
     id: 'property-manager-user-id',
     userName: 'Property Manager Full Name',
     city: 'Barcelona'
@@ -32,7 +32,7 @@ describe('PropertyManagerRankingService', function () {
     propertyManagersRepository.getActivePropertyManagers = sinon.stub().returns(Promise.resolve([]))
     stockRepository.getTotalProfitInPeriodByPropertyManager = sinon.stub().returns(Promise.resolve([]))
 
-    rankingService = new PropertyManagerRankingService(
+    rankingService = new FlipperRankingService(
       propertyManagersRepository,
       stockRepository,
       now
@@ -53,14 +53,14 @@ describe('PropertyManagerRankingService', function () {
   })
 
   it('returns property manager user information', async function () {
-    propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
+    propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaFlipperWithoutProfitGoal]))
 
     const ranking = await rankingService.ranking()
 
     expect(ranking[0]).to.include({
-      userId: barcelonaPropertyManagerWithoutProfitGoal.id,
-      userName: barcelonaPropertyManagerWithoutProfitGoal.userName,
-      userCity: barcelonaPropertyManagerWithoutProfitGoal.city
+      userId: barcelonaFlipperWithoutProfitGoal.id,
+      userName: barcelonaFlipperWithoutProfitGoal.userName,
+      userCity: barcelonaFlipperWithoutProfitGoal.city
     })
   })
 
@@ -71,7 +71,7 @@ describe('PropertyManagerRankingService', function () {
     it(
       'applies general default goal for property manager without goal in a city different than Lisbon',
       async function () {
-        propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
+        propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaFlipperWithoutProfitGoal]))
         const ranking = await rankingService.ranking()
 
         expect(ranking[0].goal).to.be.equal(generalProfitGoal)
@@ -79,7 +79,7 @@ describe('PropertyManagerRankingService', function () {
     )
 
     it('applies Lisbon default goal for property manager without goal in Lisbon', async function () {
-      const lisbonPropertyManagerWithoutProfitGoal = { ...barcelonaPropertyManagerWithoutProfitGoal, city: 'Lisboa' }
+      const lisbonPropertyManagerWithoutProfitGoal = { ...barcelonaFlipperWithoutProfitGoal, city: 'Lisboa' }
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([lisbonPropertyManagerWithoutProfitGoal]))
 
       const ranking = await rankingService.ranking()
@@ -89,7 +89,7 @@ describe('PropertyManagerRankingService', function () {
 
     it('applies property manager profit goal', async function () {
       const propertyManagerProfitGoal = 100000
-      const propertyManagerWithProfitGoal = { ...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: propertyManagerProfitGoal }
+      const propertyManagerWithProfitGoal = { ...barcelonaFlipperWithoutProfitGoal, profitGoal: propertyManagerProfitGoal }
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([propertyManagerWithProfitGoal]))
 
       const ranking = await rankingService.ranking()
@@ -100,10 +100,10 @@ describe('PropertyManagerRankingService', function () {
 
   describe('profit calculation', function () {
     it('gets profits from property manager stocks total gains', async function () {
-      propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaPropertyManagerWithoutProfitGoal]))
+      propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([barcelonaFlipperWithoutProfitGoal]))
       stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
-          propertyManagerId: barcelonaPropertyManagerWithoutProfitGoal.id,
+          propertyManagerId: barcelonaFlipperWithoutProfitGoal.id,
           profitAmount: 50000
         }
       ]))
@@ -117,11 +117,11 @@ describe('PropertyManagerRankingService', function () {
   describe('ranking calculation', function () {
     it('calculates percentageGoal based on profit calculation and property manager profit goal', async function () {
       propertyManagersRepository.getActivePropertyManagers.returns(Promise.resolve([
-        { ...barcelonaPropertyManagerWithoutProfitGoal, profitGoal: 120 }
+        { ...barcelonaFlipperWithoutProfitGoal, profitGoal: 120 }
       ]))
       stockRepository.getTotalProfitInPeriodByPropertyManager.returns(Promise.resolve([
         {
-          propertyManagerId: barcelonaPropertyManagerWithoutProfitGoal.id,
+          propertyManagerId: barcelonaFlipperWithoutProfitGoal.id,
           profitAmount: 60
         }
       ]))
@@ -133,12 +133,12 @@ describe('PropertyManagerRankingService', function () {
 
     it('calculates ranking based on achieved percentage goal', async function () {
       const propertyManagerWith20PercentAchievedProfitGoal = {
-        ...barcelonaPropertyManagerWithoutProfitGoal,
+        ...barcelonaFlipperWithoutProfitGoal,
         id: '20%',
         profitGoal: 120
       }
       const propertyManagerWith50PercentAchievedProfitGoal = {
-        ...barcelonaPropertyManagerWithoutProfitGoal,
+        ...barcelonaFlipperWithoutProfitGoal,
         id: '50%',
         profitGoal: 120
       }

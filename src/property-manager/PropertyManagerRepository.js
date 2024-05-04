@@ -1,5 +1,5 @@
 export class PropertyManagerRepository {
   getActivePropertyManagers () {
-    throw new Error('Not implemented')
+    return Promise.reject(new Error('Not implemented'))
   }
 }

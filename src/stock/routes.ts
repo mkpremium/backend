@@ -8,12 +8,12 @@ import {
   updatePurchaseStockFactory,
   updateSellStockControllerFactory
 } from './controllers'
-import type { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
+import type { FlipperRankingService } from '../flipper/service/flipper-ranking.service'
 import type { AwilixContainer } from 'awilix'
 import type { StockSalesService } from './service/stock-sales.service'
 
 export function addStockRoutes (
-  propertyManagerRankingService: PropertyManagerRankingService,
+  flipperRankingService: FlipperRankingService,
   stockSalesService: StockSalesService,
   container: AwilixContainer
 ) {
@@ -30,7 +30,7 @@ export function addStockRoutes (
 
   router.post('/close', container.resolve('closeSellStockController') as ReturnType<typeof closeSellStockControllerFactory>)
 
-  router.get('/ranking', getRankingController(propertyManagerRankingService))
+  router.get('/ranking', getRankingController(flipperRankingService))
 
   return router
 }

@@ -1,5 +1,5 @@
 import { asClass, asFunction, type AwilixContainer } from 'awilix'
-import { PropertyManagerRankingService } from '../property-manager/PropertyManagerRankingService'
+import { FlipperRankingService } from '../flipper/service/flipper-ranking.service'
 import {
   closeSellStockControllerFactory,
   updatePurchaseStockFactory,
@@ -13,7 +13,7 @@ export async function setupStockDependencies (container: AwilixContainer) {
   container.register({
     stockRepository: asClass(StockRepository).classic().singleton(),
     stockSalesService: asClass(StockSalesService).classic().singleton(),
-    propertyManagerRankingService: asClass(PropertyManagerRankingService).classic().singleton(),
+    flipperRakingService: asClass(FlipperRankingService).classic().singleton(),
     updatePurchaseStockController: asFunction(updatePurchaseStockFactory).classic(),
     updateSellStockController: asFunction(updateSellStockControllerFactory).classic(),
     closeSellStockController: asFunction(closeSellStockControllerFactory).classic(),

@@ -1,19 +1,22 @@
 import moment from 'moment-timezone'
+import type { PropertyManagerRepository } from '../../property-manager/PropertyManagerRepository'
+import type { StockRepository } from '../../stock/StockRepository'
 
-export class PropertyManagerRankingService {
-  constructor (propertyManagersRepository, stockRepository, now = () => moment()) {
-    this.propertyManagersRepository = propertyManagersRepository
-    this.stockRepository = stockRepository
-    this.now = now
+export class FlipperRankingService {
+  constructor (
+    private propertyManagersRepository: PropertyManagerRepository,
+    private stockRepository: StockRepository,
+    private now: () => moment.Moment = () => moment()
+  ) {
   }
 
   async ranking () {
-    const propertyManagers = await this.propertyManagersRepository.getActivePropertyManagers()
+    const propertyManagers = await this.propertyManagersRepository.getActivePropertyManagers() as any[]
 
     const now = this.now()
     const propertyManagerStockPerformanceForCurrentYear = await this.stockRepository.getTotalProfitInPeriodByPropertyManager(
       now.clone().startOf('year'), now.clone().endOf('year')
-    )
+    ) as any[]
 
     return propertyManagers.map((pm) => {
       const stockPerformance = propertyManagerStockPerformanceForCurrentYear.find(sp => sp.propertyManagerId === pm.id)
