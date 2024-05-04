@@ -12,7 +12,6 @@ import notes from './notes'
 // modules
 import operator from './operator'
 import { init as initPropertyManager } from './property-manager'
-import { setupStockRouter } from './stock/stock-router'
 import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
@@ -24,6 +23,7 @@ import { flipperRoutes } from './flipper/routing'
 import { setupUserRoutes } from './user/routing'
 import { startListeners } from './infrastructure/listeners'
 import jwt from './middleware/jwt'
+import { setupStockRouter } from './stock/routing'
 
 export const createApp = async (): Promise<Express> => {
   const logger = initLogger()
