@@ -86,7 +86,7 @@ export const BuildingOwner = t.struct<BuildingOwnerProps>({
 export function isVerifiedOwner (owner: BuildingOwnerProps) {
   const contacts = owner.contacts
   const goodContacts = contacts.filter(c => c.status === 'GOOD')
-  return goodContacts.length > 0
+  return owner.status === 'VERIFICADO' || goodContacts.length > 0
 }
 
 export interface OwnerRepository extends Repository<OwnerProps> {
