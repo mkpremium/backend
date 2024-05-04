@@ -23,16 +23,13 @@ describe('StockPerformanceService', function () {
   it('returns total profit made by property owners', async function () {
     const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
-    // const { closeSellStock } = import('../../src/stock/application')
-    // const closeSellStock = () => null
-
     const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
     const buildingPurchaseAmount = 1000
     const buildingSellingAmount = 1200
     await purchaseBuildingByFlipper(stockSalesService, testBuilding, testFlipper, buildingPurchaseAmount)
     await sellBuilding(deps.container, testBuilding, testFlipper, buildingSellingAmount)
 
-    // await closeSellStock({ buildingId: testBuilding.id }, propertyManager.id)
+    await stockSalesService.closeSellStock(testBuilding.id, testFlipper.id)
 
     const result =
       await stockPerformanceService.getFlipperProfitInPeriod(testFlipper.id, now.clone().subtract(1, 'days'), tomorrow)
