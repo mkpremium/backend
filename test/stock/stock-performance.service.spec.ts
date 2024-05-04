@@ -6,7 +6,7 @@ import { StockSalesService } from '../../src/stock/service/stock-sales.service'
 import { Factory } from 'rosie'
 import { buildingFactory } from '../factories'
 
-describe.skip('StockPerformanceService', function () {
+describe('StockPerformanceService', function () {
   let stockPerformanceService: StockPerformanceService
   let stockSalesService: StockSalesService
   let deps: ResolvedDeps
