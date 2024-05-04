@@ -53,3 +53,9 @@ Usamos `typeorm` como ORM para postgres. Para usarlo, necesitamos la variable de
 
 
 ```npm run typeorm migration:show -- -d src/data-source.ts```
+
+### Generar migracion
+
+1. Antes de cambiar alguna instancia para generar la migración, asegúrate de que la base de datos esté sincronizada con ````npm run typeorm schema:sync -- -d src/data-source.ts```.
+2. Cambiar o crear la entidad.
+3. Generar la migración con `npm run typeorm migration:generate migrations/NOMBRE-MIGRACION -- -d src/data-source.ts`.
