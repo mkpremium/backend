@@ -3,14 +3,14 @@ import moment from 'moment-timezone'
 import { createTestContainer } from '../create-test-container'
 
 describe.skip('StockRepository', function () {
-  let container, stockRepository, stockService
+  let container, stockPerformanceService, stockService
   const now = moment()
   const tomorrow = now.clone().add(1, 'day')
 
   beforeEach(async function () {
     container = await createTestContainer()
     stockService = container.resolve('stockService')
-    stockRepository = container.resolve('stockRepository')
+    stockPerformanceService = container.resolve('stockPerformanceService')
   })
 
   describe('getTotalProfitInPeriodByPropertyManager', function () {
@@ -28,7 +28,7 @@ describe.skip('StockRepository', function () {
 
       await closeSellStock({ buildingId: testBuilding.id }, propertyManager.id)
 
-      const result = await stockRepository.getTotalProfitInPeriodByPropertyManager(now, tomorrow)
+      const result = await stockPerformanceService.getTotalProfitInPeriodByPropertyManager(now, tomorrow)
 
       expect(result).to.be.deep.equal([{
         propertyManagerId: propertyManager.id,

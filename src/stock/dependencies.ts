@@ -5,12 +5,12 @@ import {
   updateSellStockControllerFactory
 } from './controllers'
 import { StockSalesService } from './service/stock-sales.service'
-import { StockRepository } from './StockRepository'
+import { StockPerformanceService } from './service/stock-performance.service'
 import { PropertyManagerRepository } from '../property-manager/PropertyManagerRepository'
 
 export async function setupStockDependencies (container: AwilixContainer) {
   container.register({
-    stockRepository: asClass(StockRepository).classic().singleton(),
+    stockPerformanceService: asClass(StockPerformanceService).classic().singleton(),
     stockSalesService: asClass(StockSalesService).classic().singleton(),
     updatePurchaseStockController: asFunction(updatePurchaseStockFactory).classic(),
     updateSellStockController: asFunction(updateSellStockControllerFactory).classic(),
