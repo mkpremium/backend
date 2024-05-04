@@ -11,7 +11,6 @@ import { initLogger } from './infrastructure/logger'
 import notes from './notes'
 // modules
 import operator from './operator'
-import { init as initPropertyManager } from './property-manager'
 import { createTestHarness } from './test-harness/routes'
 // app aware types
 import './types'
@@ -59,7 +58,6 @@ export const createApp = async (): Promise<Express> => {
     scheduledEventsRoutes(diContainer, app, secured)
     worksheetsRoutes(app, diContainer, secured)
     createTestHarness(app, diContainer, secured)
-    initPropertyManager(app, diContainer, secured)
     setupCallerRoutes(app, diContainer, secured)
     flipperRoutes(app, diContainer, secured)
     await setupStockRouter(app, diContainer, secured)

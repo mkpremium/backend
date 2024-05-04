@@ -3,9 +3,11 @@ export class StockRepository {
     return Promise.reject(new Error(`Not implemented. since: ${since}, until: ${until}`))
   }
 
-  async getPropertyManagerProfitInPeriod (propertyManagerId, since, until) {
-    return Promise.reject(
-      new Error(`Not implemented. propertyManagerId: ${propertyManagerId}, since: ${since}, until: ${until}`)
-    )
+  async getFlipperProfitInPeriod (propertyManagerId, since, until) {
+    console.log(`getFlipperProfitInPeriod: ${propertyManagerId}, ${since}, ${until}`)
+    return Promise.resolve({
+      profitAmount: 0,
+      goal: 0
+    })
   }
 }
