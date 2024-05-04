@@ -38,9 +38,9 @@ export function purchaseStockControllerFactory (stockSalesService: StockSalesSer
   })
 }
 
-export function cancelSaleControllerFactory (stockService: StockSalesService) {
+export function cancelSaleControllerFactory (stockSalesService: StockSalesService) {
   return wrap(async (req, res) => {
-    const stock = await stockService.cancelSale(req.body.buildingId, req.user.id)
+    const stock = await stockSalesService.cancelSale(req.body.buildingId, req.user.id)
     res.status(200).json(stock)
   })
 }

@@ -6,9 +6,9 @@ export type TransactionInput = ITransaction & {
   transactionDate: string
 }
 
-export function createTransaction (params: TransactionInput, operatorId) {
+export function createTransaction (params: TransactionInput, flipperOrUserId: string) {
   return Transaction({
-    operatorId,
+    operatorId: flipperOrUserId,
     reservationAmount: params.reservationAmount,
     reservationDate: new Date(params.reservationDate),
     transactionAmount: params.transactionAmount,

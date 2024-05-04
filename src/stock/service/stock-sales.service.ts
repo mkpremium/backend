@@ -71,24 +71,24 @@ export class StockSalesService {
     })
   }
 
-  async sellStock (params: { buildingId: string } & TransactionInput, operatorId: string) {
+  async sellStock (params: { buildingId: string } & TransactionInput, flipperOrUserId: string) {
     const stock = await this.getStockOrFail(params.buildingId)
 
     return await this.entityManager.transaction(async transactionalEntityManager => {
-      stock.sell = createTransaction(params, operatorId)
+      stock.sell = createTransaction(params, flipperOrUserId)
       stock.currentStatus = 'SELL'
 
       await transactionalEntityManager.save(stock)
 
       await this.updateBuildingNegotiationStatusService.updateBuildingStatus(params.buildingId, {
         status: 'VENDIDO',
-        userId: operatorId,
+        userId: flipperOrUserId,
         em: transactionalEntityManager
       })
       await this.eventBus.publish({
         name: DomainEventCatalog.STOCK__STOCK_SELL_UPDATED,
         buildingId: params.buildingId,
-        userId: operatorId
+        userId: flipperOrUserId
       }, transactionalEntityManager)
 
       return stock
