@@ -1,13 +1,5 @@
 import { wrap } from 'express-promise-wrap'
-import type { FlipperRankingService } from '../flipper/service/flipper-ranking.service'
 import type { StockSalesService } from './service/stock-sales.service'
-
-export const getRankingController = (flipperRakingService: FlipperRankingService) => {
-  return wrap(async (req, res) => {
-    const ranking = await flipperRakingService.ranking()
-    res.status(201).json(ranking)
-  })
-}
 
 export function updatePurchaseStockFactory (stockSalesService: StockSalesService) {
   return wrap(async function updatePurchaseStockController (req, res) {
