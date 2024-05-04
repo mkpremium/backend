@@ -39,6 +39,10 @@ export async function startListeners (diContainer) {
     logger.info('Triggering worksheet queues migration')
     await migrationProcess.triggerWorksheetQueueImport()
   }
+  if (process.env.TRIGGER_STOCK_MIGRATION === 'true') {
+    logger.info('Triggering stock migration')
+    await migrationProcess.triggerStockMigration()
+  }
 }
 
 export function subscribeToCommand (command: DomainEventCatalog, eventBus: EventListener, service: any): void
