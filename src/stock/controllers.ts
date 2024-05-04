@@ -26,7 +26,7 @@ export function updateSellStockControllerFactory (stockSalesService: StockSalesS
 
 export function closeSellStockControllerFactory (stockSalesService: StockSalesService) {
   return wrap(async function closeSellStockController (req, res) {
-    const stock = await stockSalesService.closeSellStock(req.body, req.user.id)
+    const stock = await stockSalesService.closeSellStock(req.body.buildingId, req.user.id)
     res.status(201).json(stock)
   })
 }

@@ -8,7 +8,7 @@ export type TransactionInput = ITransaction & {
 
 export function createTransaction (params: TransactionInput, flipperOrUserId: string) {
   return Transaction({
-    operatorId: flipperOrUserId,
+    flipperOrUserId,
     reservationAmount: params.reservationAmount,
     reservationDate: new Date(params.reservationDate),
     transactionAmount: params.transactionAmount,

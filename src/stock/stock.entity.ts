@@ -3,7 +3,7 @@ import { Building } from '../building/building.entity'
 import { BaseEntity } from '../infrastructure/entity'
 
 export interface Transaction {
-  operatorId: string;
+  flipperOrUserId: string;
   reservationAmount: number;
   reservationDate: Date;
   transactionAmount: number;
@@ -29,7 +29,7 @@ export class Stock extends BaseEntity {
 
   @Column('jsonb', { nullable: true })
   close?: {
-    operatorId: string;
+    flipperOrUserId: string;
     gain: number;
     transactionDate: Date;
   }
