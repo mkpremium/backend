@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from 'typeorm'
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm'
 import { Building } from '../building/building.entity'
 import { BaseEntity } from '../infrastructure/entity'
 
@@ -12,7 +12,8 @@ export interface Transaction {
 
 @Entity()
 export class Stock extends BaseEntity {
-  @ManyToOne(() => Building)
+  @OneToOne(() => Building)
+  @JoinColumn()
   building: Building
 
   @Column('text')

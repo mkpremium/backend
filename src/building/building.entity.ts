@@ -8,6 +8,7 @@ import { Proposal } from './proposal.entity'
 import _ from 'lodash'
 import { Worksheet } from '../worksheet/worksheet.entity'
 import { BuildingNote } from './building-note.entity'
+import { Stock } from '../stock/stock.entity'
 
 @Entity()
 export class Building extends BaseEntity {
@@ -54,6 +55,9 @@ export class Building extends BaseEntity {
 
   @OneToMany(() => BuildingNote, note => note.building)
   notes: BuildingNote[]
+
+  @OneToOne(() => Stock)
+  stock: Stock
 
   get recentProposal (): Proposal | undefined {
     return _.sortBy(this.proposals || [], '.createdAt').at(0)
