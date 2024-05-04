@@ -8,6 +8,8 @@ import { BuildingOfferRequest } from '../repository/building-offer-request.entit
 import { Building } from '../building.entity'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
+import { PersonContact } from '../../owner/person-contact.entity'
+import { Owner } from '../../owner/owner.entity'
 
 interface AddOfferRequestCommand {
   ownerId: string,
@@ -62,20 +64,9 @@ export class AddOfferRequestService {
         { id: cmd.flipperId },
         { user: { id: cmd.flipperId } }
       ])
-      const caller = await entityManager.findOneByOrFail(Caller, [
-        { id: cmd.callerId },
-        { user: { id: cmd.callerId } }
-      ])
-      const savedOfferRequest = await entityManager.save(BuildingOfferRequest, {
-        flipper,
-        caller,
-        owner: { id: cmd.ownerId },
-        contact: { id: cmd.destinationContactId },
-        building: { id: cmd.buildingId }
-      })
-      await entityManager.update(Building, {
-        id: cmd.buildingId
-      }, { assignedFlipper: flipper, negotiationStatus: 'PENDIENTE' })
+      const savedOfferRequest = await AddOfferRequestService.createOfferRequest(entityManager, cmd, flipper)
+      await AddOfferRequestService.updateOwnerAndContactStatus(entityManager, cmd)
+      await AddOfferRequestService.assignBuildingToFlipper(entityManager, cmd, flipper)
 
       const offerRequest = {
         id: savedOfferRequest.id,
@@ -87,11 +78,50 @@ export class AddOfferRequestService {
     })
   }
 
+  private static async assignBuildingToFlipper (entityManager: EntityManager, cmd: AddOfferRequestCommand, flipper: Flipper): Promise<void> {
+    await entityManager.update(Building, {
+      id: cmd.buildingId
+    }, { assignedFlipper: flipper, negotiationStatus: 'PENDIENTE' })
+  }
+
+  private static async createOfferRequest (entityManager: EntityManager, cmd: AddOfferRequestCommand, flipper: Flipper): Promise<{
+    owner: { id: string };
+    caller: Caller;
+    flipper: Flipper;
+    contact: { id: string };
+    building: { id: string }
+  } & BuildingOfferRequest> {
+    const caller = await entityManager.findOneByOrFail(Caller, [
+      { id: cmd.callerId },
+      { user: { id: cmd.callerId } }
+    ])
+    const savedOfferRequest = await entityManager.save(BuildingOfferRequest, {
+      flipper,
+      caller,
+      owner: { id: cmd.ownerId },
+      contact: { id: cmd.destinationContactId },
+      building: { id: cmd.buildingId }
+    })
+    return savedOfferRequest
+  }
+
   private assertValidCommand (command: AddOfferRequestCommand) {
     const validation = validate(command, AddOfferRequestCommand)
     if (!validation.isValid()) {
       throw new InvalidCommand(validation.errors)
     }
+  }
+
+  private static async updateOwnerAndContactStatus (entityManager: EntityManager, cmd: AddOfferRequestCommand): Promise<void> {
+    const owner = await entityManager.findOneByOrFail(Owner, { id: cmd.ownerId })
+    owner.status = 'VERIFICADO'
+    await entityManager.save(owner)
+    const personContact = await entityManager.findOneByOrFail(PersonContact, {
+      contact: { id: cmd.reporterContactId },
+      person: owner.person
+    })
+    personContact.status = 'GOOD'
+    await entityManager.save(personContact)
   }
 
   private async publishOfferRequested (
