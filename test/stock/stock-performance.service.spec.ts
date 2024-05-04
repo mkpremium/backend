@@ -32,7 +32,7 @@ describe('StockPerformanceService', function () {
     await stockSalesService.closeSellStock(testBuilding.id, testFlipper.id)
 
     const result =
-      await stockPerformanceService.getFlipperProfitInPeriod(testFlipper.id, now.clone().subtract(1, 'days'), tomorrow)
+      await stockPerformanceService.getFlipperProfitInPeriod(testFlipper.user.id, now.clone().subtract(1, 'days'), tomorrow)
 
     expect(result).to.be.deep.equal({
       goal: 0,

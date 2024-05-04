@@ -1,6 +1,7 @@
 import moment from 'moment'
 import type { EntityManager } from 'typeorm'
 import { Stock } from '../stock.entity'
+import { Flipper } from '../../flipper/flipper.entity'
 
 export class StockPerformanceService {
   constructor (
@@ -8,11 +9,12 @@ export class StockPerformanceService {
   ) {
   }
 
-  async getFlipperProfitInPeriod (flipperId: string, since: moment.Moment, until: moment.Moment) {
+  async getFlipperProfitInPeriod (flipperUserId: string, since: moment.Moment, until: moment.Moment) {
+    const flipper = await this.entityManager.findOneByOrFail(Flipper, { user: { id: flipperUserId } })
     const result = await this.entityManager.createQueryBuilder(Stock, 'stock')
       .innerJoin('stock.building', 'building')
       .select('SUM((stock.sell ->> \'transactionAmount\')::numeric - (stock.purchase ->> \'transactionAmount\')::numeric) as profitAmount')
-      .where('building.assignedFlipperId = :flipperId', { flipperId })
+      .where('building.assignedFlipperId = :flipperId', { flipperId: flipper.id })
       .andWhere('(stock.close ->> \'transactionDate\') BETWEEN :since AND :until', {
         since: since.toDate(),
         until: until.toDate()
