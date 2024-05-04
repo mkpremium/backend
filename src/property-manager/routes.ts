@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { wrap } from 'express-promise-wrap'
 import moment from 'moment'
+import type { StockRepository } from '../stock/StockRepository'
 
-export const createPropertyManagerRouter = (stockRepository) => {
-  const router = new Router()
+export const createPropertyManagerRouter = (stockRepository: StockRepository) => {
+  const router = Router()
 
   router.get('/:propertyManagerId/stock-performance', wrap(async (req, res) => {
     const propertyManagerProfit = await stockRepository.getPropertyManagerProfitInPeriod(
@@ -14,5 +15,6 @@ export const createPropertyManagerRouter = (stockRepository) => {
 
     res.json(propertyManagerProfit)
   }))
+
   return router
 }
