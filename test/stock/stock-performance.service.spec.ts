@@ -23,7 +23,7 @@ describe('StockPerformanceService', function () {
   it('returns total profit made by property owners', async function () {
     const testFlipper = await deps.addFlipperService.addFlipper(Factory.build('user'))
 
-    const testBuilding = await deps.buildingsRepository.save(buildingFactory.build())
+    const testBuilding = await deps.buildingsRepository.save(buildingFactory.build({ assignedAgentId: testFlipper.id }))
     const buildingPurchaseAmount = 1000
     const buildingSellingAmount = 1200
     await purchaseBuildingByFlipper(stockSalesService, testBuilding, testFlipper, buildingPurchaseAmount)

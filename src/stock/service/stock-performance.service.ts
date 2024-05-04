@@ -1,14 +1,26 @@
 import moment from 'moment'
+import type { EntityManager } from 'typeorm'
+import { Stock } from '../stock.entity'
 
 export class StockPerformanceService {
-  getTotalProfitInPeriodByPropertyManager (since: string, until: string) {
-    return Promise.reject(new Error(`Not implemented. since: ${since}, until: ${until}`))
+  constructor (
+    private entityManager: EntityManager
+  ) {
   }
 
   async getFlipperProfitInPeriod (flipperId: string, since: moment.Moment, until: moment.Moment) {
-    console.log(`getFlipperProfitInPeriod: ${flipperId}, ${since}, ${until}`)
+    const result = await this.entityManager.createQueryBuilder(Stock, 'stock')
+      .innerJoin('stock.building', 'building')
+      .select('SUM((stock.sell ->> \'transactionAmount\')::numeric - (stock.purchase ->> \'transactionAmount\')::numeric) as profitAmount')
+      .where('building.assignedFlipperId = :flipperId', { flipperId })
+      .andWhere('(stock.close ->> \'transactionDate\') BETWEEN :since AND :until', {
+        since: since.toDate(),
+        until: until.toDate()
+      })
+      .getRawOne()
+
     return Promise.resolve({
-      profitAmount: 0,
+      profitAmount: Number(result.profitamount) || 0,
       goal: 0
     })
   }
