@@ -16,6 +16,9 @@ import { ScheduledEventImportTriggerService } from '../service/scheduled-event-i
 import { WorksheetQueueImportTriggerService } from './worksheet-queue-import-trigger.service'
 import type { BuildingProposalsImportTriggerService } from '../service/building-proposals-importer-trigger.service'
 import type { BuildingNotesImporterService } from '../../building/service/building-notes-importer'
+import { Building } from '../../building/building.entity'
+import { Stock } from '../../stock/stock.entity'
+import { Flipper } from '../../flipper/flipper.entity'
 
 interface Deps {
   eventBus: EventBus,
@@ -35,6 +38,26 @@ interface Deps {
   buildingProposalsImporterService: BuildingProposalsImporterService,
   buildingProposalsImportTriggerService: BuildingProposalsImportTriggerService,
   buildingWorkSheetsImporterService: BuildingWorkSheetsImporterService,
+}
+
+type LegacyTransaction = {
+  operatorId: string
+  reservationDate: string
+  transactionDate: string
+  reservationAmount: number
+  transactionAmount: number
+}
+
+interface LegacyStock {
+  buildingId: string
+  currentStatus: 'PURCHASE' | 'SELL' | 'CLOSE'
+  purchase: LegacyTransaction
+  sell?: LegacyTransaction
+  close?: {
+    gain: number,
+    operatorId: string,
+    transactionDate: string,
+  }
 }
 
 export function couchbaseToPostgresProcess ({
@@ -102,6 +125,42 @@ export function couchbaseToPostgresProcess ({
     eventBus,
     async ({ buildingId }: { buildingId: string }) => {
       await buildingProposalsImporterService.importBuildingProposal(buildingId)
+    }
+  )
+  subscribeToCommand(
+    DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_STOCK,
+    eventBus,
+    async ({ stock }: { stock: LegacyStock }) => {
+      const building = await entityManager.findOneByOrFail(Building, { id: stock.buildingId })
+      const flipper = await entityManager.findOneByOrFail(Flipper, { user: { id: stock.purchase.operatorId } })
+
+      await entityManager.save(Stock, {
+        building,
+        flipper,
+        currentStatus: stock.currentStatus,
+        purchase: {
+          reservationDate: new Date(stock.purchase.reservationDate),
+          transactionDate: new Date(stock.purchase.transactionDate),
+          reservationAmount: stock.purchase.reservationAmount,
+          transactionAmount: stock.purchase.transactionAmount
+        },
+        sell: stock.sell
+          ? {
+            reservationDate: new Date(stock.sell.reservationDate),
+            transactionDate: new Date(stock.sell.transactionDate),
+            reservationAmount: stock.sell.reservationAmount,
+            transactionAmount: stock.sell.transactionAmount
+          }
+          : undefined,
+        close: stock.close
+          ? {
+            gain: stock.close.gain,
+            transactionDate: new Date(stock.close.transactionDate)
+          }
+          : undefined
+      })
+
+      logger.info('Stock migrated', { buildingId: stock.buildingId })
     }
   )
 
