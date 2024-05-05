@@ -16,7 +16,6 @@ import { ScheduledEventImportTriggerService } from '../service/scheduled-event-i
 import { WorksheetQueueImportTriggerService } from './worksheet-queue-import-trigger.service'
 import type { BuildingProposalsImportTriggerService } from '../service/building-proposals-importer-trigger.service'
 import type { BuildingNotesImporterService } from '../../building/service/building-notes-importer'
-import { Building } from '../../building/building.entity'
 
 interface Deps {
   eventBus: EventBus,
@@ -138,17 +137,19 @@ export function couchbaseToPostgresProcess ({
       logger.info('All operators migration triggered')
     },
     async triggerStockMigration () {
-      const buildingsIdWithoutStock = await entityManager.createQueryBuilder(Building, 'building')
-        .leftJoin('building.stock', 'stock')
-        .where('stock.id IS NULL')
-        .select('building.id')
-        .getRawMany<{id: string}>()
+      const stocksToMigrate = await this.entityManager.createQueryBuilder(CouchbaseDocument, 'stock')
+        .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.STOCK })
+        .andWhere('building.migratedAt IS NULL')
+        .getMany()
 
-      for (const building of buildingsIdWithoutStock) {
+      logger.info('Found stocks', { count: stocksToMigrate.length })
+      for (const stock of stocksToMigrate) {
         await eventBus.publish({
-          name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_OR_INIT_STOCK,
-          buildingId: building.id
+          name: DomainEventCatalog.CMD__POSTGRES__MIGRATION__IMPORT_STOCK,
+          stock: stock.document
         })
+
+        logger.info('Stock migration triggered', { stockId: stock.id })
       }
     }
   }

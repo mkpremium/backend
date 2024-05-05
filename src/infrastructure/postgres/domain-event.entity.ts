@@ -43,7 +43,7 @@ export enum DomainEventCatalog {
   CMD__POSTGRES__MIGRATION__SAVE_DOCUMENTS = 'postgres.save_documents_command',
   CMD__POSTGRES_MIGRATION__IMPORT_WORKSHEET_QUEUE = 'postgres_migration.scheduled_event_command',
   CMD__POSTGRES_MIGRATION__IMPORT_BUILDING_PROPOSAL = 'postgres_migration.import_building_proposal_command',
-  CMD__POSTGRES__MIGRATION__IMPORT_OR_INIT_STOCK = 'postgres_migration.import_or_init_stock_command',
+  CMD__POSTGRES__MIGRATION__IMPORT_STOCK = 'postgres_migration.import_stock_command',
 }
 
 @Entity()
