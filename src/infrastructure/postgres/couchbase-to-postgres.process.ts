@@ -137,7 +137,7 @@ export function couchbaseToPostgresProcess ({
       logger.info('All operators migration triggered')
     },
     async triggerStockMigration () {
-      const stocksToMigrate = await this.entityManager.createQueryBuilder(CouchbaseDocument, 'stock')
+      const stocksToMigrate = await entityManager.createQueryBuilder(CouchbaseDocument, 'stock')
         .where('building.documentType = :documentType', { documentType: CouchbaseDocumentType.STOCK })
         .andWhere('building.migratedAt IS NULL')
         .getMany()
