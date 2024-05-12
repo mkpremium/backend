@@ -171,7 +171,7 @@ export function buildingEntityToReadModel (
       }
       : undefined,
     usage: b.use,
-    stock: null
+    stock: b.stock
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,

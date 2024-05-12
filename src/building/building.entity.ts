@@ -57,7 +57,7 @@ export class Building extends BaseEntity {
   notes: BuildingNote[]
 
   @OneToOne(() => Stock)
-  stock: Stock
+  stock?: Stock
 
   get recentProposal (): Proposal | undefined {
     return _.sortBy(this.proposals || [], '.createdAt').at(0)

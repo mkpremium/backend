@@ -32,7 +32,8 @@ export class ListBuildingsService {
       relations: {
         featuredOwner: true,
         documents: true,
-        proposals: true
+        proposals: true,
+        stock: true
       }
     })
 
