@@ -1,11 +1,8 @@
 import { BuildingsRepository } from './buildings.repository'
-import { BuildingNegotiationStatus, BuildingProps, ProposalProps } from '../building'
+import { BuildingProps, ProposalProps } from '../building'
 import { BuildingReadModel, BuildingsReadRepository } from './buildings-read.repository'
-import * as TE from 'fp-ts/TaskEither'
 import { EntityTarget, Equal } from 'typeorm'
 import { Building } from '../building.entity'
-import { pipe } from 'fp-ts/function'
-import { fromPromise } from '../../infrastructure/fp-utils'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../../owner/owner.entity'
 import { Flipper } from '../../flipper/flipper.entity'
@@ -27,20 +24,6 @@ export class PostgresBuildingsRepository
     proposals: true
   }
   //   BuildingsReadRepository
-
-  assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]> {
-    return pipe(
-      fromPromise(this.repository.find(
-        {
-          where: { assignedFlipper: Equal(flipperId), negotiationStatus: status },
-          relations: {
-            documents: true
-          }
-        }
-      )),
-      TE.chain(buildings => TE.of(buildings.map(b => buildingEntityToReadModel(b))))
-    )
-  }
 
   async listProposalsForBuilding (buildingId: string): Promise<ProposalProps[]> {
     const proposals = await this.entityManager.find(Proposal, {

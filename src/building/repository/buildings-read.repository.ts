@@ -1,6 +1,5 @@
-import { BuildingAddressProps, BuildingNegotiationStatus, BuildingProps } from '../building'
+import { BuildingAddressProps, BuildingProps } from '../building'
 import { ContactProps } from '../../owner/owner'
-import * as TE from 'fp-ts/TaskEither'
 
 interface StockTransaction {
   reservationAmount: number
@@ -62,6 +61,4 @@ export interface BuildingReadModel extends Omit<BuildingProps, 'address' | 'meta
 
 export interface BuildingsReadRepository {
   listProposalsForBuilding (buildingId): Promise<unknown[]>
-
-  assignedToFlipperAndWithStatus (flipperId: string, status: BuildingNegotiationStatus): TE.TaskEither<Error, BuildingReadModel[]>
 }
