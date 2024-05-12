@@ -56,7 +56,7 @@ export class Building extends BaseEntity {
   @OneToMany(() => BuildingNote, note => note.building)
   notes: BuildingNote[]
 
-  @OneToOne(() => Stock)
+  @OneToOne(() => Stock, (stock) => stock.building)
   stock?: Stock
 
   get recentProposal (): Proposal | undefined {
