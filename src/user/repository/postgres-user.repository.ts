@@ -11,7 +11,8 @@ export class PostgresUserRepository extends PostgresRepository<UserProps, User>
     flipper: { favoriteBuildings: true },
     caller: {
       flipper: true
-    }
+    },
+    profileEntity: true
   }
 
   async getUserWithUsername (username: string) {
@@ -49,7 +50,14 @@ export function mapUserEntityToStruct (entity: User) {
     password: entity.password,
     enable: entity.enabled,
     flipperId: entity.caller?.flipperId,
-    profile: entity.profile
+    profile: entity.profileEntity && {
+      firstName: entity.profileEntity.firstName,
+      lastName: entity.profileEntity.lastName,
+      email: entity.profileEntity.email,
+      city: entity.profileEntity.city,
+      language: entity.profileEntity.language,
+      queueId: entity.profileEntity.worksheetQueue?.id
+    }
   }
 }
 

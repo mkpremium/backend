@@ -12,7 +12,8 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
   relations = {
     worksheets: {
       heldBy: { user: true }
-    }
+    },
+    sourceEntity: true
   }
 
   list (): Promise<WorksheetQueueProps[]> {
@@ -27,7 +28,7 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
         id: queueItem.worksheetId,
         heldBy: queueItem.operatorId ? { user: { id: queueItem.operatorId } } : null
       })) ?? [],
-      source: struct.source,
+      sourceEntity: struct.source,
       createdAt: struct.createdAt,
       updatedAt: struct.updatedAt
     }
@@ -37,7 +38,12 @@ export class PostgresWorksheetQueueRepository extends PostgresRepository<Workshe
     return {
       id: entity.id,
       name: entity.name,
-      source: entity.source,
+      source: entity.sourceEntity && {
+        province: entity.sourceEntity.provinces,
+        city: entity.sourceEntity?.city,
+        zone: entity.sourceEntity?.zone,
+        neighborhood: entity.sourceEntity?.neighborhood
+      },
       worksheets: entity.worksheets.map(
         (ws) => ({
           worksheetId: ws.id,

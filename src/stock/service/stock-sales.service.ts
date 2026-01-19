@@ -7,6 +7,8 @@ import { createTransaction, type TransactionInput } from './create-transaction'
 import type { EventPublisher } from '../../infrastructure/event-bus'
 import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.entity'
 import { StockStatuses } from '../types'
+import { StockTransaction } from '../stock-transaction.entity'
+import { User } from '../../user/user.entity'
 
 export class StockSalesService {
   constructor (
@@ -24,13 +26,15 @@ export class StockSalesService {
     if (existingStock) {
       throw new Error(`Stock already exists for buildingId: ${params.buildingId}`)
     }
-    const purchase = createTransaction(params, operatorId)
 
     return await this.entityManager.transaction(async transactionalEntityManager => {
+      const purchaseTransaction = createTransaction(params, operatorId)
+      const savedPurchaseTransaction = await transactionalEntityManager.save(StockTransaction, purchaseTransaction)
+
       const stock = await transactionalEntityManager.save(Stock, {
         building: { id: params.buildingId },
         currentStatus: 'PURCHASE',
-        purchase
+        purchaseTransaction: savedPurchaseTransaction
       })
       await this.updateBuildingNegotiationStatusService.updateBuildingStatus(params.buildingId, {
         status: 'COMPRADO',
@@ -57,8 +61,9 @@ export class StockSalesService {
     }
 
     return await this.entityManager.transaction(async transactionalEntityManager => {
-      stock.sell = createTransaction(params, operatorId)
-
+      const sellTransaction = createTransaction(params, operatorId)
+      const savedsellTransaction = await transactionalEntityManager.save(StockTransaction, sellTransaction)
+      stock.sellTransaction = savedsellTransaction
       await transactionalEntityManager.save(stock)
 
       await this.eventBus.publish({
@@ -75,9 +80,10 @@ export class StockSalesService {
     const stock = await this.getStockOrFail(params.buildingId)
 
     return await this.entityManager.transaction(async transactionalEntityManager => {
-      stock.sell = createTransaction(params, flipperOrUserId)
+      const sellTransaction = createTransaction(params, flipperOrUserId)
+      const savedsellTransaction = await transactionalEntityManager.save(StockTransaction, sellTransaction)
       stock.currentStatus = 'SELL'
-
+      stock.sellTransaction = savedsellTransaction
       await transactionalEntityManager.save(stock)
 
       await this.updateBuildingNegotiationStatusService.updateBuildingStatus(params.buildingId, {
@@ -102,7 +108,9 @@ export class StockSalesService {
     const stock = await this.getStockOrFail(params.buildingId)
 
     return await this.entityManager.transaction(async transactionalEntityManager => {
-      stock.purchase = createTransaction(params, operatorId)
+      const purchaseTransaction = createTransaction(params, operatorId)
+      const savedPurchaseTransaction = await transactionalEntityManager.save(StockTransaction, purchaseTransaction)
+      stock.purchaseTransaction = savedPurchaseTransaction
 
       await transactionalEntityManager.save(stock)
       await this.eventBus.publish({
@@ -123,12 +131,13 @@ export class StockSalesService {
         throw new Error('El stock no se encuentra en estado "SELL"')
       }
 
-      const gain = stock.sell.transactionAmount - stock.purchase.transactionAmount
-      stock.close = {
-        flipperOrUserId,
-        gain,
-        transactionDate: new Date()
-      }
+      const gain = stock.sellTransaction.transactionAmount - stock.purchaseTransaction.transactionAmount
+      const user = new User()
+      user.id = flipperOrUserId
+
+      stock.closeEntity.flipperOrUser = user
+      stock.closeEntity.gain = gain
+      stock.closeEntity.transactionDate = new Date()
       stock.currentStatus = 'CLOSE'
 
       await transactionalEntityManager.save(stock)

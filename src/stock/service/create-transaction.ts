@@ -1,4 +1,5 @@
-import { Transaction } from '../types'
+import { User } from '../../user/user.entity'
+import { StockTransaction } from '../stock-transaction.entity'
 import { Transaction as ITransaction } from '../stock.entity'
 
 export type TransactionInput = ITransaction & {
@@ -7,11 +8,13 @@ export type TransactionInput = ITransaction & {
 }
 
 export function createTransaction (params: TransactionInput, flipperOrUserId: string) {
-  return Transaction({
-    flipperOrUserId,
-    reservationAmount: params.reservationAmount,
-    reservationDate: new Date(params.reservationDate),
-    transactionAmount: params.transactionAmount,
-    transactionDate: new Date(params.transactionDate)
-  })
+  const stockTransaction = new StockTransaction()
+  const user = new User()
+  user.id = flipperOrUserId
+  stockTransaction.flipperOrUser = user
+  stockTransaction.reservationAmount = params.reservationAmount
+  stockTransaction.reservationDate = new Date(params.reservationDate)
+  stockTransaction.transactionAmount = params.transactionAmount
+  stockTransaction.transactionDate = new Date(params.transactionDate)
+  return stockTransaction
 }

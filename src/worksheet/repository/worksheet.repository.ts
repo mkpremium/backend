@@ -7,9 +7,7 @@ import { Repository } from '../../db/repository'
 
 export type WorksheetBuildingAddressProps = Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> &
   {
-    postalCode: {
-      number: number | string
-    }
+    postalCode: { number:string }
   }
 
 export type WorksheetBuildingProps =

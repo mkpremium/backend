@@ -30,6 +30,8 @@ import { CouchbaseDocumentRepository } from './postgres/couchbase-document.repos
 import { ScheduledEventImportTriggerService } from './service/scheduled-event-import-trigger.service'
 import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-import-trigger.service'
 import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
+import { AddUserService } from '../user/service/add-user.service'
+import { AddOwnerService } from '../owner/service/add-owner.service'
 
 export async function createDiContainer () {
   const container = createContainer()
@@ -69,7 +71,8 @@ async function setupInfrastructureDependencies (container: AwilixContainer, data
     composedEventBus: asClass(ComposedBus).classic().singleton(),
     eventBus: aliasTo(['test', 'development'].includes(process.env.NODE_ENV) ? 'eventEmitterBus' : 'sqsEventBus'),
     logger: asFunction(initLogger).singleton(),
-
+    addUserService: asClass(AddUserService).singleton(),
+    addOwnerService: asClass(AddOwnerService).singleton(),
     couchbaseToPostgresProcess: asFunction(couchbaseToPostgresProcess).singleton(),
     buildingImportTriggerService: asClass(BuildingImportTriggerService).classic().singleton(),
     scheduledEventImportTriggerService: asClass(ScheduledEventImportTriggerService).classic().singleton(),

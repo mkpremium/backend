@@ -68,7 +68,7 @@ export function ownerEntityToStruct (entity: Owner): OwnerProps {
     id: entity.id,
     status: entity.status,
     name: entity.person.fullName,
-    buildingId: entity.building.id,
+    buildingId: entity.building?.id ?? null,
     person: {
       name: entity.person.fullName,
       contacts: entity.person.contacts.map(cp => ({ ...cp.contact, status: cp.status }))

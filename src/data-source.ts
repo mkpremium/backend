@@ -2,6 +2,8 @@ import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import urlparse from 'url-parse'
 import path from 'path'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 const parsedDSN = urlparse(process.env.DATABASE_URL)
 export const AppDataSource = new DataSource({
@@ -18,8 +20,8 @@ export const AppDataSource = new DataSource({
     path.join(__dirname, '**/*.entity.js')
   ],
   migrations: [
-    'migrations/*.ts',
-    'migrations/*.js'
+    'src/migrations/*.ts',
+    'src/migrations/*.js'
   ],
   subscribers: []
 })

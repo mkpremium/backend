@@ -9,7 +9,9 @@ import { oldProposalToEntityStatus } from '../../building/repository/postgres-pr
 import { markCouchbaseDocumentAsMigrated } from '../postgres/get-couchbase-document'
 import { CouchbaseDocumentRepository } from '../postgres/couchbase-document.repository'
 import { Owner } from '../../owner/owner.entity'
+import { User } from '../../user/user.entity'
 import { type AddOwnerCommand, AddOwnerService } from '../../owner/service/add-owner.service'
+import { type AddUserCommand, AddUserService } from '../../user/service/add-user.service'
 
 export class BuildingProposalsImporterService {
   constructor (
@@ -17,7 +19,8 @@ export class BuildingProposalsImporterService {
     private readonly eventBus: EventPublisher,
     private readonly logger: Logger,
     private readonly couchbaseDocumentRepository: CouchbaseDocumentRepository,
-    private readonly addOwnerService: AddOwnerService
+    private readonly addOwnerService: AddOwnerService,
+    private readonly addUserService: AddUserService
   ) {
   }
 
@@ -41,12 +44,13 @@ export class BuildingProposalsImporterService {
       try {
         await this.entityManager.transaction(async em => {
           const owner = await this.getOwner(em, original)
+          const author = await this.getUser(em, original.createdBy, original.id)
           await em.save(Proposal, {
             id: (proposal.document as { id: string }).id,
             status: oldProposalToEntityStatus(original.state),
             building: { id: buildingId },
             owner,
-            author: { id: original.createdBy },
+            author,
             amount: original.proposal,
             message: original.message,
             notificationEmail: original.notificationEmail,
@@ -105,5 +109,28 @@ export class BuildingProposalsImporterService {
     }
 
     return await this.addOwnerService.addOwner(addOwnerCommand, 'building-proposals-importer')
+  }
+
+  private async getUser (entityManager: EntityManager, authorId: string, proposalId: string): Promise <User> {
+    // Buscar usuario existente por id
+    const existingUser = await entityManager.findOne(User, { where: { id: authorId } })
+    if (existingUser) {
+      return existingUser
+    }
+
+    this.logger.warning('User not found, creating a new dummy user', { userId: authorId, proposalId })
+
+    // Crear usuario dummy SIN perfil
+    const dummyUser: AddUserCommand = {
+      em: entityManager,
+      id: authorId,
+      username: `dummy_${authorId.substring(0, 8)}`,
+      password: 'dummy_password',
+      isAdmin: false,
+      profile: null,
+      enabled: false
+    }
+
+    return await this.addUserService.addUserService(dummyUser)
   }
 }

@@ -1,5 +1,5 @@
-import { Column, Entity, Index, ManyToOne, OneToMany, OneToOne } from 'typeorm'
-import { BuildingAddressProps, BuildingLocation, BuildingNegotiationStatus, Lead } from './building'
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
+import { BuildingAddressProps, BuildingNegotiationStatus, Lead } from './building'
 import { BuildingDocument } from './building-document.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { Owner } from '../owner/owner.entity'
@@ -9,18 +9,14 @@ import _ from 'lodash'
 import { Worksheet } from '../worksheet/worksheet.entity'
 import { BuildingNote } from './building-note.entity'
 import { Stock } from '../stock/stock.entity'
+import { BuildingAddress } from './building-address.entity'
+import { BuildingLead } from './building-lead.entity'
+import { BuildingLocation } from './building-location.entity'
 
 @Entity()
 export class Building extends BaseEntity {
-  @Column('jsonb')
-  @Index()
-  address: BuildingAddressProps
-
   @Column({ default: 'PENDIENTE' })
   negotiationStatus: BuildingNegotiationStatus
-
-  @Column({ type: 'jsonb', nullable: true })
-  lead?: Lead
 
   @ManyToOne(() => Owner, owner => owner.featuredInBuildings, { nullable: true })
   featuredOwner?: Owner
@@ -36,10 +32,17 @@ export class Building extends BaseEntity {
   publicIdentifier?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  location?: BuildingLocation
+  lead?: Lead
 
   @Column({ nullable: true })
   use?: string
+
+  @Column('jsonb')
+  @Index()
+  address: BuildingAddressProps
+
+  @Column({ type: 'jsonb', nullable: true })
+  location?: BuildingLocation
 
   @OneToMany(() => Proposal, proposal => proposal.building)
   proposals?: Proposal[]
@@ -58,6 +61,18 @@ export class Building extends BaseEntity {
 
   @OneToOne(() => Stock, (stock) => stock.building)
   stock?: Stock
+
+  @OneToOne(() => BuildingAddress, (address) => address.building)
+  @JoinColumn({ name: 'addressId' })
+  addressEntity: BuildingAddress
+
+  @OneToOne(() => BuildingLead, (lead) => lead.building)
+  @JoinColumn({ name: 'leadId' })
+  leadEntity: BuildingLead
+
+  @OneToOne(() => BuildingLocation, (location) => location.building)
+  @JoinColumn({ name: 'locationId' })
+  locationEntity: BuildingLocation
 
   get recentProposal (): Proposal | undefined {
     return _.sortBy(this.proposals || [], '.createdAt').at(0)

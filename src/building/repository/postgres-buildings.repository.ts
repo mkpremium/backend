@@ -13,6 +13,9 @@ import { BuildingOwnerProps } from '../../owner/repository/owner.repository'
 import { selectBuildingOwner } from '../service/owner-selection.policy'
 
 import { toOwnerInBuildingRead } from './utils'
+import { BuildingLead } from '../building-lead.entity'
+import { Contact } from '../../contacts/contact.entity'
+import { Worksheet } from '../../worksheet/worksheet.entity'
 
 export class PostgresBuildingsRepository
   extends PostgresRepository<BuildingProps, Building>
@@ -21,7 +24,10 @@ export class PostgresBuildingsRepository
     assignedFlipper: true,
     featuredOwner: true,
     documents: true,
-    proposals: true
+    proposals: true,
+    addressEntity: true,
+    leadEntity: true,
+    locationEntity: true
   }
   //   BuildingsReadRepository
 
@@ -65,10 +71,22 @@ export class PostgresBuildingsRepository
 export function mapBuildingStructToEntity (buildingStruct: BuildingProps) {
   return {
     id: buildingStruct.id,
-    address: buildingStruct.address,
+    address: buildingStruct.address
+      ? {
+        ...buildingStruct.address,
+        postalCode: { number: buildingStruct.address.postalCode?.number }
+      }
+      : undefined,
     negotiationStatus: buildingStruct.negotiationStatus,
     // TODO: validate lead IDs (contact, owner, and worksheet)
-    lead: buildingStruct.lead,
+    lead: buildingStruct.lead
+      ? {
+        owner: { id: buildingStruct.lead.ownerId } as Owner,
+        contact: { id: buildingStruct.lead.contactId } as Contact,
+        worksheet: { id: buildingStruct.lead.worksheetId } as Worksheet,
+        capturedAt: buildingStruct.lead.capturedAt
+      } as BuildingLead
+      : undefined,
     featuredOwner: { id: buildingStruct.ownerId } as Owner,
     assignedFlipper: { id: buildingStruct.assignedAgentId } as Flipper,
     floorArea: typeof buildingStruct.floorArea === 'string' ? parseFloat(buildingStruct.floorArea) : buildingStruct.floorArea,
@@ -81,13 +99,30 @@ export function mapBuildingStructToEntity (buildingStruct: BuildingProps) {
 export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
   return {
     id: entity.id,
-    address: entity.address,
+    address: entity.addressEntity && {
+      street: entity.addressEntity.street,
+      number: entity.addressEntity.number,
+      fullAddress: entity.addressEntity.fullAddress,
+      postalCode: entity.addressEntity.postalCode
+        ? { number: entity.addressEntity.postalCode }
+        : undefined,
+      postalCodeVerified: entity.addressEntity.postalCodeVerified,
+      city: entity.addressEntity.city,
+      province: entity.addressEntity.province,
+      neighborhood: entity.addressEntity.neighborhood,
+      type: entity.addressEntity.type
+    },
     floorArea: isNaN(entity.floorArea) ? null : entity.floorArea,
     cadastre: entity.publicIdentifier ? { reference: entity.publicIdentifier } : undefined,
-    location: entity.location,
+    location: entity.locationEntity,
     ownerId: entity.featuredOwner?.id,
     negotiationStatus: entity.negotiationStatus,
-    lead: entity.lead,
+    lead: entity.leadEntity && {
+      worksheetId: entity.leadEntity.worksheet.id,
+      ownerId: entity.leadEntity.owner.id,
+      contactId: entity.leadEntity.contact.id,
+      capturedAt: entity.leadEntity.capturedAt
+    },
     assignedAgentId: entity.assignedFlipper?.id,
     use: entity.use,
     recentProposal: entity.recentProposal
@@ -116,21 +151,24 @@ export function buildingEntityToReadModel (
     : undefined // TODO: pass last meeting
   return {
     id: b.id,
-    lead: b.lead,
-    negotiationStatus: b.negotiationStatus || undefined,
-    address: b.address
+    lead: b.leadEntity
       ? {
-        neighborhood: b.address.neighborhood ? b.address.neighborhood : undefined,
-        type: b.address.type ? b.address.type : undefined,
-        street: b.address.street ? b.address.street : undefined,
-        number: b.address.number ? b.address.number : undefined,
-        postalCode: b.address.postalCode && b.address.postalCode.number
-          ? {
-            number: b.address.postalCode.number
-          }
-          : undefined,
-        city: b.address.city ? b.address.city : undefined,
-        province: b.address.province
+        worksheetId: b.leadEntity.worksheet?.id ? b.leadEntity.worksheet?.id : undefined,
+        ownerId: b.leadEntity.owner?.id ? b.leadEntity.owner?.id : undefined,
+        contactId: b.leadEntity.contact?.id ? b.leadEntity.contact?.id : undefined,
+        capturedAt: b.leadEntity.capturedAt ? b.leadEntity.capturedAt : undefined
+      }
+      : null,
+    negotiationStatus: b.negotiationStatus || undefined,
+    address: b.addressEntity
+      ? {
+        neighborhood: b.addressEntity.neighborhood ? b.addressEntity.neighborhood : undefined,
+        type: b.addressEntity.type ? b.addressEntity.type : undefined,
+        street: b.addressEntity.street ? b.addressEntity.street : undefined,
+        number: b.addressEntity.number ? b.addressEntity.number : undefined,
+        postalCode: b.addressEntity.postalCode ? { number: b.addressEntity.postalCode } : undefined,
+        city: b.addressEntity.city ? b.addressEntity.city : undefined,
+        province: b.addressEntity.province
       }
       : undefined,
     owner: toOwnerInBuildingRead(owner),
@@ -147,14 +185,20 @@ export function buildingEntityToReadModel (
       dateMeeting: moment(extra.lastOfferCreatedAt).format(),
       inPerson: false
     }) || undefined,
-    geolocation: (b.location?.lat && b.location?.lng)
+    geolocation: (b.locationEntity?.lat && b.locationEntity?.lng)
       ? {
-        latitude: b.location.lat,
-        longitude: b.location.lng
+        latitude: b.locationEntity.lat,
+        longitude: b.locationEntity.lng
       }
       : undefined,
     usage: b.use,
     stock: b.stock
+      ? {
+        purchase: b.stock.purchaseTransaction,
+        sell: b.stock.sellTransaction,
+        close: b.stock.closeEntity
+      }
+      : undefined
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,

@@ -43,6 +43,10 @@ export async function startListeners (diContainer) {
     logger.info('Triggering stock migration')
     await migrationProcess.triggerStockMigration()
   }
+  if (process.env.TRIGGER_BUILDING_OWNER_MIGRATION === 'true') {
+    logger.info('Triggering building owner migration')
+    await migrationProcess.triggerAllOwnerMigration()
+  }
 }
 
 export function subscribeToCommand (command: DomainEventCatalog, eventBus: EventListener, service: any): void

@@ -33,4 +33,14 @@ export class CouchbaseDocumentRepository {
       .andWhere(`${documentType}.migratedAt is NULL`)
       .select([`${documentType}.id`, `${documentType}.document`])
   }
+  // Añadido metodo getAllNonMigratedOwners
+
+  getAllNonMigratedOwners (): Promise<CouchbaseDocument[]> {
+    return this.entityManager.find(CouchbaseDocument, {
+      where: {
+        documentType: CouchbaseDocumentType.OWNER,
+        migratedAt: null
+      }
+    })
+  }
 }

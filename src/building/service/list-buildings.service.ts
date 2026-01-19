@@ -33,7 +33,14 @@ export class ListBuildingsService {
         featuredOwner: true,
         documents: true,
         proposals: true,
-        stock: true
+        stock: {
+          purchaseTransaction: true,
+          sellTransaction: true,
+          closeEntity: true
+        },
+        addressEntity: true,
+        leadEntity: true,
+        locationEntity: true
       }
     })
 
@@ -85,7 +92,10 @@ export class ListBuildingsService {
           featuredOwner: true,
           documents: true,
           proposals: true,
-          worksheet: true
+          worksheet: true,
+          addressEntity: true,
+          leadEntity: true,
+          locationEntity: true
         }
       }),
       this.entityManager.find(ScheduledEvent, {

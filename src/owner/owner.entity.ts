@@ -4,6 +4,7 @@ import { Building } from '../building/building.entity'
 import { Person } from './person.entity'
 import type { OwnerType } from './owner'
 import { OwnerStatus } from './owner'
+import { BuildingLead } from '../building/building-lead.entity'
 
 @Entity()
 export class Owner extends BaseEntity {
@@ -25,4 +26,7 @@ export class Owner extends BaseEntity {
 
   @Column('text', { nullable: true })
   note: string
+
+  @OneToMany(() => BuildingLead, lead => lead.owner)
+  leads:BuildingLead[]
 }

@@ -1,6 +1,6 @@
 import { UserProps, UserRoles } from '../../types/user'
 import { DataSource, type DeepPartial } from 'typeorm'
-import { addUserService } from './add-user.service'
+import { AddUserService } from './add-user.service'
 import { Flipper } from '../../flipper/flipper.entity'
 import { Caller } from '../../caller/caller.entity'
 import { EventPublisher } from '../../infrastructure/event-bus'
@@ -13,7 +13,8 @@ export type AddOperatorCommand = Omit<UserProps, 'id' | 'favoriteBuildings' | 'r
 export class AddOperatorService {
   constructor (
     private ormDataSource: DataSource,
-    private eventBus: EventPublisher
+    private eventBus: EventPublisher,
+    private addUserService: AddUserService
   ) {
   }
 
@@ -22,13 +23,14 @@ export class AddOperatorService {
     flipperId?: string
   }> {
     return this.ormDataSource.transaction(async em => {
-      const user = await addUserService({
+      const user = await this.addUserService.addUserService({
         em,
         id: cmd.id,
         username: cmd.username,
         password: cmd.password,
         isAdmin: cmd.roles.includes(UserRoles.ADMIN),
-        profile: cmd.profile
+        profile: cmd.profile,
+        enabled: true
       })
       let flipperId: string
       let callerId: string

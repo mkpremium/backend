@@ -38,10 +38,8 @@ export interface AddressProp {
   type?: string
   fullAddress?: string
   registerNumber?: string
-  postalCode?: {
-    number?: string | number
-    verified?: boolean
-  }
+  postalCode?: string | number
+  PostalCodeVerified?: boolean
   province?: string
   zone?: string
   neighborhood?: string

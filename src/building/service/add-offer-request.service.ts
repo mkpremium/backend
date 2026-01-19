@@ -118,7 +118,7 @@ export class AddOfferRequestService {
     await entityManager.save(owner)
     const personContact = await entityManager.findOneByOrFail(PersonContact, {
       contact: { id: cmd.reporterContactId },
-      person: owner.person
+      person: { id: owner.person.id }
     })
     personContact.status = 'GOOD'
     await entityManager.save(personContact)

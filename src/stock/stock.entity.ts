@@ -1,6 +1,8 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm'
 import { Building } from '../building/building.entity'
 import { BaseEntity } from '../infrastructure/entity'
+import { StockTransaction } from './stock-transaction.entity'
+import { StockClose } from './stock-close.entity'
 
 export interface Transaction {
   flipperOrUserId: string;
@@ -19,11 +21,11 @@ export class Stock extends BaseEntity {
   @Column('text')
   currentStatus: 'PURCHASE' | 'SELL' | 'CLOSE'
 
-  @Column('jsonb')
-  purchase: Transaction
-
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
   salePrice: number
+
+  @Column('jsonb')
+  purchase: Transaction
 
   @Column('jsonb', { nullable: true })
   sell?: Transaction
@@ -34,4 +36,16 @@ export class Stock extends BaseEntity {
     gain: number;
     transactionDate: Date;
   }
+
+  @OneToOne(() => StockTransaction, transaction => transaction.stockPurchase)
+  @JoinColumn({ name: 'purchaseId' })
+  purchaseTransaction: StockTransaction
+
+  @OneToOne(() => StockTransaction, transaction => transaction.stockSell)
+  @JoinColumn({ name: 'sellId' })
+  sellTransaction: StockTransaction
+
+  @OneToOne(() => StockClose, close => close.stock)
+  @JoinColumn({ name: 'closeId' })
+  closeEntity: StockClose
 }

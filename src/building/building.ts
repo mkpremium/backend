@@ -116,6 +116,19 @@ export interface BuildingAddressProps {
   street: string;
   number: number | string;
   fullAddress: string;
+  postalCode?: { number:string };
+  postalCodeVerified?: boolean;
+  city: string;
+  province: string;
+  neighborhood: string;
+  type: string;
+}
+
+/*
+export interface BuildingAddressProps {
+  street: string;
+  number: number | string;
+  fullAddress: string;
   postalCode?: {
     number: number | string;
     verified?: boolean;
@@ -124,7 +137,7 @@ export interface BuildingAddressProps {
   province: string;
   neighborhood: string;
   type: string;
-}
+}*/
 
 export type BuildingNegotiationStatus =
   'LEAD'

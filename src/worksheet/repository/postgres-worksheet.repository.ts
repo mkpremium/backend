@@ -26,7 +26,7 @@ export class PostgresWorksheetRepository extends PostgresRepository<WorksheetPro
       viewedAt: entity.lastViewedAt,
       viewedBy: entity.lastViewedBy?.id,
       statusChangeReason: entity.statusChangeReason,
-      buildingAddress: entity.building.address
+      buildingAddress: entity.building.addressEntity
     }
   }
 

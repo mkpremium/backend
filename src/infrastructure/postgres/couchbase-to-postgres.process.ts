@@ -168,6 +168,27 @@ export function couchbaseToPostgresProcess ({
     async triggerBuildingMigration () {
       await buildingImportTriggerService.triggerImport(parseInt(process.env.BUILDING_MIGRATION_LIMIT) || 1000)
     },
+    // Modificacion añadiendo triggerOwnerMigration
+    async triggerOwnerMigration () {
+      logger.info('Triggering owners migration')
+
+      const allBuildings = await entityManager
+        .createQueryBuilder(Building, 'building')
+        .select(['building.id'])
+        .getMany()
+
+      logger.info('Found buildings', { count: allBuildings.length })
+
+      for (const building of allBuildings) {
+        await buildingOwnerImportTriggerService.importBuildingOwners(building.id)
+        logger.info('Triggered owner migration for building', { buildingId: building.id })
+      }
+
+      logger.info('All owners migration triggered')
+    },
+    async triggerAllOwnerMigration () {
+      await buildingOwnerImportTriggerService.importAllOwners()
+    },
     async triggerScheduledEventMigration () {
       await scheduledEventImportTriggerService.triggerImport()
     },

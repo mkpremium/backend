@@ -5,6 +5,7 @@ import { Building } from '../building/building.entity'
 import { WorksheetQueue } from './worksheet-queue.entity'
 import { User } from '../user/user.entity'
 import { Caller } from '../caller/caller.entity'
+import { BuildingLead } from '../building/building-lead.entity'
 
 @Entity()
 export class Worksheet extends BaseEntity {
@@ -33,5 +34,7 @@ export class Worksheet extends BaseEntity {
   @ManyToOne(() => User, { nullable: true })
   lastViewedBy?: User
 
+  @OneToOne(() => BuildingLead, (lead) => lead.worksheet)
+  lead: BuildingLead
   // lastMeeting
 }

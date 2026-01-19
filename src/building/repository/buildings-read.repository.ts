@@ -10,9 +10,7 @@ interface StockTransaction {
 
 export interface BuildingReadModel extends Omit<BuildingProps, 'address' | 'metadata'> {
   readonly address: Omit<BuildingAddressProps, 'fullAddress' | 'postalCode'> & {
-    postalCode: {
-      number: number | string
-    }
+    postalCode: { number: string }
   }
   readonly cadastreReference?: string
   readonly geolocation?: {
