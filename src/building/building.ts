@@ -137,7 +137,8 @@ export interface BuildingAddressProps {
   province: string;
   neighborhood: string;
   type: string;
-}*/
+}
+*/
 
 export type BuildingNegotiationStatus =
   'LEAD'
