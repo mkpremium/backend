@@ -81,17 +81,17 @@ export function mapBuildingStructToEntity (buildingStruct: BuildingProps) {
     // TODO: validate lead IDs (contact, owner, and worksheet)
     lead: buildingStruct.lead
       ? {
-        owner: { id: buildingStruct.lead.ownerId } as Owner,
-        contact: { id: buildingStruct.lead.contactId } as Contact,
-        worksheet: { id: buildingStruct.lead.worksheetId } as Worksheet,
+        owner: { id: buildingStruct.lead.ownerId } as any,
+        contact: { id: buildingStruct.lead.contactId } as any,
+        worksheet: { id: buildingStruct.lead.worksheetId } as any,
         capturedAt: buildingStruct.lead.capturedAt
-      } as BuildingLead
+      } as any
       : undefined,
     featuredOwner: { id: buildingStruct.ownerId } as Owner,
     assignedFlipper: { id: buildingStruct.assignedAgentId } as Flipper,
     floorArea: typeof buildingStruct.floorArea === 'string' ? parseFloat(buildingStruct.floorArea) : buildingStruct.floorArea,
     publicIdentifier: buildingStruct.cadastre?.reference,
-    location: buildingStruct.location,
+    location: buildingStruct.location as any,
     use: buildingStruct.use
   }
 }
