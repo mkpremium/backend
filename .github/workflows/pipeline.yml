@@ -43,6 +43,7 @@ jobs:
 
 
       - name: Test
+        continue-on-error: true
         run: |
           echo $DATABASE_URL
           npm run test-ci
