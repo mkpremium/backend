@@ -13,10 +13,6 @@ import { BuildingOwnerProps } from '../../owner/repository/owner.repository'
 import { selectBuildingOwner } from '../service/owner-selection.policy'
 
 import { toOwnerInBuildingRead } from './utils'
-import { BuildingLead } from '../building-lead.entity'
-import { Contact } from '../../contacts/contact.entity'
-import { Worksheet } from '../../worksheet/worksheet.entity'
-
 export class PostgresBuildingsRepository
   extends PostgresRepository<BuildingProps, Building>
   implements BuildingsRepository, BuildingsReadRepository {
