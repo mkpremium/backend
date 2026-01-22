@@ -73,10 +73,7 @@ export const buildingAddressFactory = Factory.define<BuildingAddressProps>('addr
     street: 'street, address',
     province: 'TEST_BARCELONA',
     neighborhood: '',
-    postalCode: {
-      number: '0000',
-      verified: false
-    },
+    postalCode: { number: '0000' },
     city: 'TEST_BARCELONA'
   })
   .sequence('number', (idx) => `${idx}`)
