@@ -12,8 +12,7 @@ describe('PdfProposalComposer', () => {
       number: '295',
       city: 'TEST_PORTO',
       postalCode: {
-        number: undefined,
-        verified: undefined
+        number: undefined
       },
       fullAddress: undefined,
       neighborhood: undefined,
