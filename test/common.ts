@@ -1,8 +1,8 @@
 import request from 'supertest'
 import { AwilixContainer } from 'awilix'
-import { addUserService } from '../src/user/service/add-user.service'
 import { DataSource } from 'typeorm'
 import { User } from '../src/user/user.entity'
+import { AddUserService, AddUserCommand } from '../src/user/service/add-user.service'
 
 export const defaultPassword = 'Passw0rd'
 
@@ -39,16 +39,18 @@ export const buildUser = (operator = {}, prototype = defaultOperatorPrototype) =
 
 export async function createAdminUserWithPostgres (container: AwilixContainer) {
   const dataSource = container.resolve('ormDataSource') as DataSource
+  const addUserServiceInstance = container.resolve<AddUserService>('addUserService')
   const [existingAdmin] = await dataSource.manager.findBy(User, { username: 'admin' })
   if (existingAdmin) {
     return existingAdmin
   }
 
-  return addUserService({
+  const addUserCommand: AddUserCommand = {
     em: dataSource.manager,
     username: 'admin',
     password: defaultPassword,
     isAdmin: true,
+    enabled: true,
     profile: {
       firstName: 'test',
       lastName: 'admin',
@@ -56,5 +58,7 @@ export async function createAdminUserWithPostgres (container: AwilixContainer) {
       email: 'admin@test.org',
       language: 'es'
     }
-  })
+  }
+
+  return addUserServiceInstance.addUserService(addUserCommand)
 }
