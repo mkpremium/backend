@@ -5,7 +5,6 @@ import { Caller } from '../caller/caller.entity'
 import { UserProfile } from './user-profile.entity'
 import { StockTransaction } from '../stock/stock-transaction.entity'
 import { StockClose } from '../stock/stock-close.entity'
-import { UserProfileProps } from '../types/user'
 
 @Entity()
 export class User extends BaseEntity {
