@@ -1,5 +1,5 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
-import { BuildingAddressProps, BuildingNegotiationStatus, Lead } from './building'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm'
+import { BuildingNegotiationStatus } from './building'
 import { BuildingDocument } from './building-document.entity'
 import { BaseEntity } from '../infrastructure/entity'
 import { Owner } from '../owner/owner.entity'
@@ -31,18 +31,8 @@ export class Building extends BaseEntity {
   @Column({ nullable: true, unique: true })
   publicIdentifier?: string
 
-  @Column({ type: 'jsonb', nullable: true })
-  lead?: Lead
-
   @Column({ nullable: true })
   use?: string
-
-  @Column('jsonb')
-  @Index()
-  address: BuildingAddressProps
-
-  @Column({ type: 'jsonb', nullable: true })
-  location?: BuildingLocation
 
   @OneToMany(() => Proposal, proposal => proposal.building)
   proposals?: Proposal[]

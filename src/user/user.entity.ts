@@ -18,9 +18,6 @@ export class User extends BaseEntity {
   @Column()
   enabled: boolean
 
-  @Column('jsonb')
-  profile: UserProfileProps
-
   @OneToOne(() => Flipper, flipper => flipper.user)
   flipper?: Flipper
 

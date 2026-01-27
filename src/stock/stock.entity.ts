@@ -24,19 +24,6 @@ export class Stock extends BaseEntity {
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
   salePrice: number
 
-  @Column('jsonb')
-  purchase: Transaction
-
-  @Column('jsonb', { nullable: true })
-  sell?: Transaction
-
-  @Column('jsonb', { nullable: true })
-  close?: {
-    flipperOrUserId: string;
-    gain: number;
-    transactionDate: Date;
-  }
-
   @OneToOne(() => StockTransaction, transaction => transaction.stockPurchase)
   @JoinColumn({ name: 'purchaseId' })
   purchaseTransaction: StockTransaction
