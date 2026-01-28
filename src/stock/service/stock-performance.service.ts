@@ -13,9 +13,12 @@ export class StockPerformanceService {
     const flipper = await this.entityManager.findOneByOrFail(Flipper, { user: { id: flipperUserId } })
     const result = await this.entityManager.createQueryBuilder(Stock, 'stock')
       .innerJoin('stock.building', 'building')
-      .select('SUM((stock.sell ->> \'transactionAmount\')::numeric - (stock.purchase ->> \'transactionAmount\')::numeric) as profitAmount')
+      .innerJoin('stock.purchaseTransaction', 'purchase')
+      .innerJoin('stock.sellTransaction', 'sell')
+      .innerJoin('stock.closeEntity', 'close')
+      .select('SUM((sell.transactionAmount::numeric - (purchase.transactionAmount::numeric) as profitAmount')
       .where('building.assignedFlipperId = :flipperId', { flipperId: flipper.id })
-      .andWhere('(stock.close ->> \'transactionDate\') BETWEEN :since AND :until', {
+      .andWhere('close.transactionDate BETWEEN :since AND :until', {
         since: since.toDate(),
         until: until.toDate()
       })
