@@ -16,7 +16,7 @@ export class StockPerformanceService {
       .innerJoin('stock.purchaseTransaction', 'purchase')
       .innerJoin('stock.sellTransaction', 'sell')
       .innerJoin('stock.closeEntity', 'close')
-      .select('SUM((sell.transactionAmount::numeric - (purchase.transactionAmount::numeric) as profitAmount')
+      .select('SUM(sell."transactionAmount"::numeric - purchase."transactionAmount"::numeric) AS profitAmount')
       .where('building.assignedFlipperId = :flipperId', { flipperId: flipper.id })
       .andWhere('close.transactionDate BETWEEN :since AND :until', {
         since: since.toDate(),
