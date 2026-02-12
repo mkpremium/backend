@@ -32,6 +32,10 @@ import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-i
 import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
 import { AddUserService } from '../user/service/add-user.service'
 import { AddOwnerService } from '../owner/service/add-owner.service'
+import { CallService } from '../retell/service/call-service'
+import { ContactService } from '../retell/service/contact-service'
+import Retell from 'retell-sdk'
+import { setupCallDependencies } from '../retell/dependencies'
 
 export async function createDiContainer () {
   const container = createContainer()
@@ -54,6 +58,7 @@ export async function setupContainer (container: AwilixContainer, dataSource: Da
   await setupStockDependencies(container)
   setupEmailDependencies(container)
   setupFlipperDependencies(container)
+  await setupCallDependencies(container)
 }
 
 async function setupInfrastructureDependencies (container: AwilixContainer, dataSource: DataSource) {
@@ -64,6 +69,11 @@ async function setupInfrastructureDependencies (container: AwilixContainer, data
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
     eventsQueueUrl: asValue(process.env.EVENTS_QUEUE_URL),
+    retellClient: asValue(
+      new Retell({
+        apiKey: process.env.RETELL_API_KEY!
+      })
+    ),
     eventPoller: asClass(EventPoller).classic().singleton(),
     listenersRegistry: asClass(ListenersRegistry).classic().singleton(),
     sqsEventBus: asClass(SqsBus).classic().singleton(),
@@ -73,6 +83,8 @@ async function setupInfrastructureDependencies (container: AwilixContainer, data
     logger: asFunction(initLogger).singleton(),
     addUserService: asClass(AddUserService).singleton(),
     addOwnerService: asClass(AddOwnerService).singleton(),
+    callService: asClass(CallService).singleton(),
+    contactService: asClass(ContactService).singleton(),
     couchbaseToPostgresProcess: asFunction(couchbaseToPostgresProcess).singleton(),
     buildingImportTriggerService: asClass(BuildingImportTriggerService).classic().singleton(),
     scheduledEventImportTriggerService: asClass(ScheduledEventImportTriggerService).classic().singleton(),

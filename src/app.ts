@@ -23,6 +23,9 @@ import { setupUserRoutes } from './user/routing'
 import { startListeners } from './infrastructure/listeners'
 import jwt from './middleware/jwt'
 import { setupStockRouter } from './stock/routing'
+import { CallService } from './retell/service/call-service'
+import cron from 'node-cron'
+import { createCallRoutes } from './retell/routes'
 
 export const createApp = async (): Promise<Express> => {
   const logger = initLogger()
@@ -48,7 +51,7 @@ export const createApp = async (): Promise<Express> => {
     const diContainer = await createDiContainer()
 
     app.locals.diContainer = diContainer
-
+    app.use('/call', createCallRoutes(diContainer))
     const secured = jwt(diContainer.resolve('usersRepository'))
 
     await operator(app, diContainer, secured) // start with login router
@@ -61,7 +64,6 @@ export const createApp = async (): Promise<Express> => {
     setupCallerRoutes(app, diContainer, secured)
     flipperRoutes(app, diContainer, secured)
     await setupStockRouter(app, diContainer, secured)
-
     notes(app, diContainer, secured)
     email(app, secured)
 
@@ -72,6 +74,12 @@ export const createApp = async (): Promise<Express> => {
     const eventBus: EventsDiagnostics = diContainer.resolve('eventBus')
     logger.info('App is ready', {
       eventSubscribersInfo: eventBus.info
+    })
+
+    const callService:CallService = diContainer.resolve('callService')
+    cron.schedule('*/5 * * * *', async () => {
+      logger.info('Enviando llamadas del día...')
+      await callService.readScheduleCalls()
     })
 
     return app
