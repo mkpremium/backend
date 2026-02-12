@@ -73,6 +73,7 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
+          docker image prune -af
           docker build -t $IMAGE_URL --build-arg app_version=$GITHUB_SHA .
           docker push $IMAGE_URL
 
