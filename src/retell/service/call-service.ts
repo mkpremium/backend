@@ -33,9 +33,10 @@ export class CallService {
         this.logger.info(JSON.stringify(temporalContacts, null, 2))
         const tasks:Task[] = this.transformContactstoBatchCallTask(temporalContacts)
         this.logger.info(JSON.stringify(tasks, null, 2))
+        /*
         const startHour = this.timeToMinutes(request.startHour)
         const endHour = this.timeToMinutes(request.endHour)
-        /*
+
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall({
           from_number: process.env.TELF_ORIGIN,
           tasks: tasks,
@@ -84,7 +85,6 @@ export class CallService {
       const schedules = await callScheduleRepo.find()
       const date = new Date()
       const currentDay = date.getDay()
-      const currentTime = date.toTimeString().slice(0, 5)
 
       for (const s of schedules) {
         if (!this.isValidDay(currentDay, s.days)) continue
@@ -103,7 +103,7 @@ export class CallService {
     }
 
     isValidDay (day:number, days: string):boolean {
-      if (days === '1-5') return day >= 1 && day <= 5
+      if (days === '1-5') return day >= 1 && day <= 6
       return days.split(',').map(Number).includes(day)
     }
 
