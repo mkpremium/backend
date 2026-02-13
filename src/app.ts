@@ -77,7 +77,7 @@ export const createApp = async (): Promise<Express> => {
     })
 
     const callService:CallService = diContainer.resolve('callService')
-    cron.schedule('*/5 * * * *', async () => {
+    cron.schedule('0 7 * * *', async () => {
       logger.info('Enviando llamadas del día...')
       await callService.readScheduleCalls()
     })
