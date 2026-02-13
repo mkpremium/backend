@@ -70,4 +70,7 @@ export class CallLog {
 
   @Column({ type: 'text', nullable: true })
   provincia?: string
+
+  @Column({ type: 'uuid', name: 'building_id', nullable: true })
+  buildingId?: string
 }

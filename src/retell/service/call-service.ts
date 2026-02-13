@@ -7,6 +7,8 @@ import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { CallSchedule } from '../call-schedule.entity'
 import Retell from 'retell-sdk'
+import { CallLogResponse } from '../types/call-log-response.dto'
+import { CallLog } from '../call-log.entity'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -64,6 +66,12 @@ export class CallService {
           nombre: contact.name,
           apellido: contact.lastName,
           direccion: contact.address
+        },
+        metadata: {
+          buildingId: contact.buildingId,
+          ownerId: contact.ownerId,
+          city: contact.city,
+          use: contact.use
         }
       }))
 
@@ -80,9 +88,8 @@ export class CallService {
     }
 
     async readScheduleCalls () {
-      const callScheduleRepo = await AppDataSource.getRepository(CallSchedule)
+      const schedules: CallSchedule[] = await this.getScheduleCalls()
       const results: CityCallResponse[] = []
-      const schedules = await callScheduleRepo.find()
       const date = new Date()
       const currentDay = date.getDay()
 
@@ -110,5 +117,31 @@ export class CallService {
     timeToMinutes (time:string) {
       const [hours, minutes] = time.split(':').map(Number)
       return hours! * 60 + minutes!
+    }
+
+    formatMiliseconds (ms: number): string {
+      const totalSeconds = Math.floor(ms / 1000)
+      const minutes = Math.floor(totalSeconds / 60)
+      const seconds = totalSeconds % 60
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`
+    }
+
+    async saveCallLog (body:CallLogResponse) {
+      const callLogRepo = await AppDataSource.getRepository(CallLog)
+      const callLog = callLogRepo.create({
+        createdAt: new Date(body.call.start_timestamp),
+        duration: this.formatMiliseconds(body.call.duration_ms),
+        toNumber: body.call.to_number,
+        summary: body.call.call_analysis.call_summary,
+        transcript: body.call.transcript,
+        endReason: body.call.disconnection_reason,
+        recordings: body.call.recording_url,
+        callId: body.call.call_id,
+        status: body.call.call_status,
+        clientId: body.call.metadata.ownerId
+
+        
+      })
+      return body
     }
 }

@@ -10,14 +10,19 @@ export class ContactService {
   async getCityContacts (city:string, limit:number) {
     const queryRunner = AppDataSource.createQueryRunner()
     await queryRunner.connect()
+    const prefix = this.checkPrefixCountryCity(city)
     try {
       const contacts: ContactDTO[] = await queryRunner.query(
         `
                     WITH s AS (
-                        SELECT CONCAT('+34', contact."value") AS "phoneNumber",
+                        SELECT CONCAT($3, contact."value") AS "phoneNumber",
                                 person."fullName",
                                 regexp_split_to_array(trim("fullName"), '\\s+') AS full_name,
-                                CONCAT(building_address."type", ' ', building_address."street", ' ', building_address."number") AS address
+                                CONCAT(building_address."type", ' ', building_address."street", ' ', building_address."number") AS address,
+                                building.id AS "buildingId",
+                                owner.id AS "ownerId",
+                                building_address.city AS "city",
+                                building.use AS "use"
                         FROM owner
                         INNER JOIN building
                         ON owner."buildingId" = building.id
@@ -47,11 +52,14 @@ export class ContactService {
                     END AS name,
                 
                     array_to_string(full_name[1:2], ' ') AS "lastName",
-                    address
-                                    
+                    address,
+                    "buildingId",
+                    "ownerId",
+                    "city"
+                    "use"                
                     FROM s
                     LIMIT $2
-                    `, [city, limit]
+                    `, [city, limit, prefix]
       )
       this.logger.info(`Fetched ${contacts.length} contacts for city=${city}`)
       return contacts
@@ -60,5 +68,11 @@ export class ContactService {
     } finally {
       await queryRunner.release()
     }
+  }
+
+  checkPrefixCountryCity (city:string) {
+    const portugalCities = ['PORTO', 'LISBOA', 'VILANOVA DE GAIA']
+    if (portugalCities.includes(city.toUpperCase())) return '+351'
+    return '+34'
   }
 }
