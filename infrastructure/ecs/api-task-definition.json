@@ -57,6 +57,14 @@
         {
           "name": "NODE_ENV",
           "value": "production"
+        },
+        {
+          "name": "RETELL_API_KEY",
+          "value": "key_693992e4edf4d0621d01d900782e"
+        },
+        {
+          "name": "TELF_ORIGIN",
+          "value": "+34663700807"
         }
       ],
       "resourceRequirements": null,
