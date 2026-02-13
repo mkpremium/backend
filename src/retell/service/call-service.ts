@@ -9,6 +9,7 @@ import { CallSchedule } from '../call-schedule.entity'
 import Retell from 'retell-sdk'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
+import { DeepPartial } from 'typeorm'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -126,10 +127,14 @@ export class CallService {
       return `${minutes}:${seconds.toString().padStart(2, '0')}`
     }
 
+    normalizePhoneNumber (phone: string): string {
+      if (phone.startsWith('+351')) return phone.slice(4)
+      return phone.slice(3)
+    }
+
     async saveCallLog (body:CallLogResponse) {
       const callLogRepo = await AppDataSource.getRepository(CallLog)
       const callLog = callLogRepo.create({
-        createdAt: new Date(body.call.start_timestamp),
         duration: this.formatMiliseconds(body.call.duration_ms),
         toNumber: body.call.to_number,
         summary: body.call.call_analysis.call_summary,
@@ -137,11 +142,19 @@ export class CallService {
         endReason: body.call.disconnection_reason,
         recordings: body.call.recording_url,
         callId: body.call.call_id,
+        tipoVivienda: body.call.metadata.use,
         status: body.call.call_status,
-        clientId: body.call.metadata.ownerId
-
-        
-      })
-      return body
+        clientId: body.call.metadata.ownerId,
+        cost: body.call.call_cost,
+        fromNumber: body.call.from_number,
+        fromNumberNorm: this.normalizePhoneNumber(body.call.from_number),
+        toNumberNorm: this.normalizePhoneNumber(body.call.to_number),
+        name: body.call.agent_name,
+        agentId: body.call.agent_id,
+        metadata: body.call.metadata,
+        provincia: body.call.metadata.city,
+        buildingId: body.call.metadata.buildingId
+      }as unknown as DeepPartial<CallLog>)
+      return await callLogRepo.save(callLog)
     }
 }

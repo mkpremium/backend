@@ -7,6 +7,7 @@ export const createCallRoutes = container => {
   router.put('/schedule-calls', wrap(container.resolve('scheduleDailyCallsController')))
   router.get('/schedule-calls', wrap(container.resolve('getScheduleDailyCallsController')))
   router.get('/contacts', wrap(container.resolve('getCityContactsController')))
+  router.post('/call-logs', wrap(container.resolve('getCallLogController')))
 
   return router
 }
