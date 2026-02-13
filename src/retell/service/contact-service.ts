@@ -55,7 +55,7 @@ export class ContactService {
                     address,
                     "buildingId",
                     "ownerId",
-                    "city"
+                    "city",
                     "use"                
                     FROM s
                     LIMIT $2
