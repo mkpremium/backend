@@ -4,13 +4,14 @@ import { CallService } from '../service/call-service'
 import { CityCallRequest } from '../types/call-batch-request-dto'
 import { ContactService } from '../service/contact-service'
 import { CallLogResponse } from '../types/call-log-response.dto'
-import Retell from 'retell-sdk/index.mjs'
+import Retell from 'retell-sdk'
+import { ContactDTO } from '../types/contact-dto'
 
 export const getCityContactsController = ({ contactService }: { contactService: ContactService }) =>
   wrap(async (req: Request, res: Response) => {
     const city = req.query.city as string
     const limit = Number(req.query.limit)
-    const contacts = await contactService.getCityContacts(city, limit)
+    const contacts:ContactDTO[] = await contactService.getCityContacts(city, limit)
     res.status(200).json({ contacts })
   })
 
@@ -38,6 +39,7 @@ export const getCallLogController = ({ callService }: { callService: CallService
     ) {
       res.status(401).send('Invalid signature')
     }
+
     const body: CallLogResponse = req.body
     if (body.event === 'call_analyzed') {
       const databaseResponse = await callService.saveCallLog(body)

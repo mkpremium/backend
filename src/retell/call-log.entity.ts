@@ -11,8 +11,8 @@ export class CallLog {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: string
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at', nullable: true })
-  createdAt?: Date
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+  createdAt: Date
 
   @Column({ type: 'text', nullable: true })
   duration?: string

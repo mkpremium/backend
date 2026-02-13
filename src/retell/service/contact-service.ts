@@ -11,11 +11,13 @@ export class ContactService {
     const queryRunner = AppDataSource.createQueryRunner()
     await queryRunner.connect()
     const prefix = this.checkPrefixCountryCity(city)
+    const mobileStart = prefix === '+34' ? '6%' : '9%'
+
     try {
       const contacts: ContactDTO[] = await queryRunner.query(
         `
                     WITH s AS (
-                        SELECT CONCAT($3, contact."value") AS "phoneNumber",
+                        SELECT $3::text || contact."value" AS "phoneNumber",
                                 person."fullName",
                                 regexp_split_to_array(trim("fullName"), '\\s+') AS full_name,
                                 CONCAT(building_address."type", ' ', building_address."street", ' ', building_address."number") AS address,
@@ -34,7 +36,7 @@ export class ContactService {
                         ON contact.id = person_contact."contactId"
                         INNER JOIN building_address
                         ON building."addressId" = building_address.id
-                        WHERE building_address."city" = $1 AND contact."value" LIKE '6%'
+                        WHERE building_address."city" = $1 AND contact."value" LIKE $4
                         AND NOT EXISTS (
                             SELECT 1
                             FROM call_logs cl
@@ -59,19 +61,20 @@ export class ContactService {
                     "use"                
                     FROM s
                     LIMIT $2
-                    `, [city, limit, prefix]
+                    `, [city, limit, prefix, mobileStart]
       )
       this.logger.info(`Fetched ${contacts.length} contacts for city=${city}`)
       return contacts
     } catch (error) {
       this.logger.error(`Error fetching contacts: ${(error as Error).message}`)
+      throw error
     } finally {
       await queryRunner.release()
     }
   }
 
   checkPrefixCountryCity (city:string) {
-    const portugalCities = ['PORTO', 'LISBOA', 'VILANOVA DE GAIA']
+    const portugalCities = ['PORTO', 'LISBOA', 'VILA NOVA DE GAIA']
     if (portugalCities.includes(city.toUpperCase())) return '+351'
     return '+34'
   }
