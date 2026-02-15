@@ -47,3 +47,9 @@ export const getCallLogController = ({ callService }: { callService: CallService
     }
     res.status(204).send()
   })
+
+export const sendCallsController = ({ callService }: { callService: CallService }) =>
+  wrap(async (req: Request, res: Response) => {
+    await callService.readScheduleCalls()
+    res.status(200).json({ success: true, message: 'Batch Calls sended to Retell' })
+  })

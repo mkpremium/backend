@@ -36,7 +36,7 @@ export class CallService {
         this.logger.info(JSON.stringify(temporalContacts, null, 2))
         const tasks:Task[] = this.transformContactstoBatchCallTask(temporalContacts)
         this.logger.info(JSON.stringify(tasks, null, 2))
-        /*
+
         const startHour = this.timeToMinutes(request.startHour)
         const endHour = this.timeToMinutes(request.endHour)
 
@@ -50,7 +50,7 @@ export class CallService {
         } as any)
 
         this.logger.info(batchCallResponse.batch_call_id)
-        */
+
         result.status = 'ok'
         result.info = `se han conseguido ${temporalContacts.length} contactos`
       } catch (error) {
