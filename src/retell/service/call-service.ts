@@ -13,6 +13,7 @@ import { DeepPartial } from 'typeorm'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
+    private callScheduleRepo = AppDataSource.getRepository(CallSchedule)
 
     constructor (
       private contactService: ContactService,
@@ -24,13 +25,13 @@ export class CallService {
       const result: CityCallResponse = {
         city: request.city,
         status: 'ok',
-        info: ''
+        message: ''
       }
       try {
         const temporalContacts = await this.contactService.getCityContacts(request.city, request.limit)
         if (!temporalContacts) {
           result.status = 'error'
-          result.info = 'No quedan contactos sin llamar'
+          result.message = 'No quedan contactos sin llamar'
           return result
         }
         this.logger.info(JSON.stringify(temporalContacts, null, 2))
@@ -50,12 +51,11 @@ export class CallService {
         } as any)
 
         this.logger.info(batchCallResponse.batch_call_id)
-
         result.status = 'ok'
-        result.info = `se han conseguido ${temporalContacts.length} contactos`
+        result.message = `se han conseguido ${temporalContacts.length} contactos`
       } catch (error) {
         result.status = 'error'
-        result.info = (error as Error).message
+        result.message = (error as Error).message
       }
       return result
     }
@@ -80,33 +80,29 @@ export class CallService {
     }
 
     async saveScheduleDailyCalls (body:CityCallRequest[]) {
-      const callScheduleRepo = AppDataSource.getRepository(CallSchedule)
-      await callScheduleRepo.clear()
+      await this.callScheduleRepo.clear()
 
       for (const city of body) {
-        await callScheduleRepo.save(city)
+        await this.callScheduleRepo.save(city)
       }
     }
 
-    async readScheduleCalls () {
+    async readScheduleCalls (): Promise<CityCallResponse[]> {
       const schedules: CallSchedule[] = await this.getScheduleCalls()
       const results: CityCallResponse[] = []
       const date = new Date()
       const currentDay = date.getDay()
 
+      if (schedules.length === 0) return [{ city: '', status: 'error', message: 'No hay lista de planificación' }]
       for (const s of schedules) {
         if (!this.isValidDay(currentDay, s.days)) continue
         results.push(await this.makeBatchCall(s))
       }
-
-      if (results.length === 0) return { Error: 'Lista de llamadas sin procesar' }
       return results
     }
 
     async getScheduleCalls () {
-      const callScheduleRepo = await AppDataSource.getRepository(CallSchedule)
-      const callSchedule: CallSchedule [] = await callScheduleRepo.find()
-
+      const callSchedule: CallSchedule [] = await this.callScheduleRepo.find()
       return callSchedule
     }
 
@@ -157,5 +153,9 @@ export class CallService {
         interest: body.call.call_analysis?.user_sentiment
       }as unknown as DeepPartial<CallLog>)
       return await callLogRepo.save(callLog)
+    }
+
+    async deleteCallSchedule () {
+      await this.callScheduleRepo.clear()
     }
 }

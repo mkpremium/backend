@@ -17,15 +17,23 @@ export const getCityContactsController = ({ contactService }: { contactService: 
 
 export const scheduleDailyCallsController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
-    const body: CityCallRequest[] = req.body
-    await callService.saveScheduleDailyCalls(body)
-    res.status(200).json(body)
+    try {
+      const body: CityCallRequest[] = req.body
+      await callService.saveScheduleDailyCalls(body)
+      res.status(200).json({ status: 'ok', message: 'La planificación se ha guardado correctamente' })
+    } catch (err:any) {
+      res.status(400).json({ status: 'error', message: 'No se ha podido guardar la planificación' })
+    }
   })
 
 export const getScheduleDailyCallsController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
-    const schedule = await callService.getScheduleCalls()
-    res.status(200).json(schedule)
+    try {
+      const schedule = await callService.getScheduleCalls()
+      res.status(200).json(schedule)
+    } catch (err:any) {
+      res.status(400).json({ status: 'error', message: 'No se ha podido obtener la planificación' })
+    }
   })
 
 export const getCallLogController = ({ callService }: { callService: CallService }) =>
@@ -50,6 +58,20 @@ export const getCallLogController = ({ callService }: { callService: CallService
 
 export const sendCallsController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
-    await callService.readScheduleCalls()
-    res.status(200).json({ success: true, message: 'Batch Calls sended to Retell' })
+    try {
+      const result = await callService.readScheduleCalls()
+      res.status(200).json(result)
+    } catch (err:any) {
+      res.status(400).json({ status: 'error', message: err.message })
+    }
+  })
+
+export const deleteScheduleDailyCallsController = ({ callService }: { callService: CallService }) =>
+  wrap(async (req: Request, res: Response) => {
+    try {
+      await callService.deleteCallSchedule()
+      res.status(200).json({ success: true, message: 'Planificación eliminada correctamente' })
+    } catch (err:any) {
+      res.status(500).json({ success: false, message: 'No se ha podido eliminar la planificación' })
+    }
   })

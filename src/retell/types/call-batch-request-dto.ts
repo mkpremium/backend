@@ -9,5 +9,5 @@ export interface CityCallRequest {
 export interface CityCallResponse {
     city:string;
     status: 'ok' | 'error';
-    info:string;
+    message:string;
 }
