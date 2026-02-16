@@ -136,7 +136,7 @@ export class CallService {
     async saveCallLog (body:CallLogResponse) {
       const callLogRepo = await AppDataSource.getRepository(CallLog)
       const callLog = callLogRepo.create({
-        startTime: body.call?.start_timestamp ? new Date(body.call?.start_timestamp).toLocaleTimeString() : null,
+        startTime: body.call?.start_timestamp ? new Date(body.call?.start_timestamp) : null,
         duration: this.formatMiliseconds(body.call.duration_ms!),
         toNumber: body.call?.to_number,
         summary: body.call.call_analysis?.call_summary,
