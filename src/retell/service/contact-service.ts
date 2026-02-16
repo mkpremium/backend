@@ -36,14 +36,20 @@ export class ContactService {
                         ON contact.id = person_contact."contactId"
                         INNER JOIN building_address
                         ON building."addressId" = building_address.id
-                        WHERE building_address."city" = $1 AND contact."value" LIKE $4
-                        AND NOT EXISTS (
-                            SELECT 1
-                            FROM call_logs cl
-                            WHERE cl.to_number_norm = contact."value" AND cl.status <> 'not_connected'
-                        )
-
-                    )
+                        WHERE building_address."city" = $1 
+                          AND contact."value" LIKE $4             
+                          AND fullName NOT LIKE '% SL'
+                          AND fullName NOT LIKE '% SA'
+                          AND fullName NOT LIKE '% S.L'
+                          AND fullName NOT LIKE '% S.A'
+                          AND fullName NOT LIKE '% S.L.'
+                          AND fullName NOT LIKE '% S.A.'
+                          AND NOT EXISTS (
+                                SELECT 1
+                                FROM call_logs cl
+                                WHERE cl.to_number_norm = contact."value"
+                                  AND cl.status <> 'not_connected'
+                          )
                     SELECT 
 
                     "phoneNumber",  
