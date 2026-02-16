@@ -12,7 +12,7 @@ export const getCityContactsController = ({ contactService }: { contactService: 
     const city = req.query.city as string
     const limit = Number(req.query.limit)
     const contacts:ContactDTO[] = await contactService.getCityContacts(city, limit)
-    res.status(200).json({ contacts })
+    return res.status(200).json({ contacts })
   })
 
 export const scheduleDailyCallsController = ({ callService }: { callService: CallService }) =>
@@ -20,9 +20,9 @@ export const scheduleDailyCallsController = ({ callService }: { callService: Cal
     try {
       const body: CityCallRequest[] = req.body
       await callService.saveScheduleDailyCalls(body)
-      res.status(200).json({ status: 'ok', message: 'La planificación se ha guardado correctamente' })
+      return res.status(200).json({ status: 'ok', message: 'La planificación se ha guardado correctamente' })
     } catch (err:any) {
-      res.status(400).json({ status: 'error', message: 'No se ha podido guardar la planificación' })
+      return res.status(400).json({ status: 'error', message: 'No se ha podido guardar la planificación' })
     }
   })
 
@@ -30,9 +30,10 @@ export const getScheduleDailyCallsController = ({ callService }: { callService: 
   wrap(async (req: Request, res: Response) => {
     try {
       const schedule = await callService.getScheduleCalls()
-      res.status(200).json(schedule)
+      if (schedule.length === 0) return res.status(200).json({ status: 'ok', message: 'No hay planificación en la base de datos' })
+      return res.status(200).json(schedule)
     } catch (err:any) {
-      res.status(400).json({ status: 'error', message: 'No se ha podido obtener la planificación' })
+      return res.status(400).json({ status: 'error', message: 'No se ha podido obtener la planificación' })
     }
   })
 
@@ -45,15 +46,15 @@ export const getCallLogController = ({ callService }: { callService: CallService
         req.headers['x-retell-signature'] as string
       )
     ) {
-      res.status(401).send('Invalid signature')
+      return res.status(401).send('Invalid signature')
     }
 
     const body: CallLogResponse = req.body
     if (body.event === 'call_analyzed') {
       const databaseResponse = await callService.saveCallLog(body)
-      res.status(200).json(databaseResponse)
+      return res.status(200).json(databaseResponse)
     }
-    res.status(204).send()
+    return res.status(204).send()
   })
 
 export const sendCallsController = ({ callService }: { callService: CallService }) =>
@@ -70,8 +71,8 @@ export const deleteScheduleDailyCallsController = ({ callService }: { callServic
   wrap(async (req: Request, res: Response) => {
     try {
       await callService.deleteCallSchedule()
-      res.status(200).json({ success: true, message: 'Planificación eliminada correctamente' })
+      return res.status(200).json({ success: true, message: 'Planificación eliminada correctamente' })
     } catch (err:any) {
-      res.status(500).json({ success: false, message: 'No se ha podido eliminar la planificación' })
+      return res.status(500).json({ success: false, message: 'No se ha podido eliminar la planificación' })
     }
   })
