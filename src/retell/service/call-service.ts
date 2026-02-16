@@ -44,6 +44,7 @@ export class CallService {
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall({
           from_number: process.env.TELF_ORIGIN,
           tasks: tasks,
+          reserved_concurrency: 0,
           call_time_window: {
             windows: [{ start: startHour, end: endHour }],
             timezone: 'Europe/Madrid'
