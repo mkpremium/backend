@@ -41,17 +41,20 @@ export class CallService {
         const startHour = this.timeToMinutes(request.startHour)
         const endHour = this.timeToMinutes(request.endHour)
 
-        const batchCallResponse = await this.retellClient.batchCall.createBatchCall({
-          from_number: process.env.TELF_ORIGIN,
+        const params = {
+          from_number: process.env.TELF_ORIGIN!,
           tasks: tasks,
           reserved_concurrency: 0,
           call_time_window: {
             windows: [{ start: startHour, end: endHour }],
             timezone: 'Europe/Madrid'
           }
-        } as any)
+        }
 
+        this.logger.info(params)
+        const batchCallResponse = await this.retellClient.batchCall.createBatchCall(params)
         this.logger.info(batchCallResponse.batch_call_id)
+
         result.status = 'ok'
         result.message = `se han conseguido ${temporalContacts.length} contactos`
       } catch (error) {
