@@ -50,6 +50,7 @@ export class ContactService {
                                 WHERE cl.to_number_norm = contact."value"
                                   AND cl.status <> 'not_connected'
                           )
+                    )
                     SELECT 
 
                     "phoneNumber",  
