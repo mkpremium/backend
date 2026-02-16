@@ -136,6 +136,7 @@ export class CallService {
     async saveCallLog (body:CallLogResponse) {
       const callLogRepo = await AppDataSource.getRepository(CallLog)
       const callLog = callLogRepo.create({
+        startTime: body.call?.start_timestamp ? new Date(body.call?.start_timestamp).toLocaleTimeString() : null,
         duration: this.formatMiliseconds(body.call.duration_ms!),
         toNumber: body.call?.to_number,
         summary: body.call.call_analysis?.call_summary,
@@ -146,7 +147,7 @@ export class CallService {
         tipoVivienda: body.call?.metadata?.use,
         status: body.call?.call_status,
         clientId: body.call?.metadata?.ownerId,
-        cost: body.call?.call_cost,
+        cost: body.call?.call_cost?.combined_cost,
         fromNumber: body.call?.from_number,
         fromNumberNorm: this.normalizePhoneNumber(body.call.from_number!),
         toNumberNorm: this.normalizePhoneNumber(body.call.to_number!),

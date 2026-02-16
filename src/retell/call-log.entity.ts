@@ -14,6 +14,9 @@ export class CallLog {
   @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   createdAt: Date
 
+  @Column({ type: 'time with time zone', name: 'start_time' })
+  startTime?: Date
+
   @Column({ type: 'text', nullable: true })
   duration?: string
 
