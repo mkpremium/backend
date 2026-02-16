@@ -38,12 +38,20 @@ export class ContactService {
                         ON building."addressId" = building_address.id
                         WHERE building_address."city" = $1 
                           AND contact."value" LIKE $4             
-                          AND fullName NOT LIKE '% SL'
-                          AND fullName NOT LIKE '% SA'
-                          AND fullName NOT LIKE '% S.L'
-                          AND fullName NOT LIKE '% S.A'
-                          AND fullName NOT LIKE '% S.L.'
-                          AND fullName NOT LIKE '% S.A.'
+                          AND person."fullName" NOT LIKE '% SL'
+                          AND person."fullName" NOT LIKE '% SA'
+                          AND person."fullName" NOT LIKE '% S.L'
+                          AND person."fullName" NOT LIKE '%,S.L'
+                          AND person."fullName" NOT LIKE '% S.A'
+                          AND person."fullName" NOT LIKE '%,S.L.'
+                          AND person."fullName" NOT LIKE '% S.L.'
+                          AND person."fullName" NOT LIKE '% S.A.'
+                          AND person."fullName" NOT LIKE '% S.A.'
+                          AND person."fullName" NOT LIKE '% AYUNTAMIENTO%'
+                          AND person."fullName" NOT LIKE '% GRUPO%'
+                          AND person."fullName" NOT LIKE '% AGENCIA%'
+                          AND person."fullName" NOT LIKE '% FINCA%'
+                          AND person."fullName" NOT LIKE '% INMOBILIARIA%'
                           AND NOT EXISTS (
                                 SELECT 1
                                 FROM call_logs cl
