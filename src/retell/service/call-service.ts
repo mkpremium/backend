@@ -123,7 +123,8 @@ export class CallService {
       return `${minutes}:${seconds.toString().padStart(2, '0')}`
     }
 
-    normalizePhoneNumber (phone: string): string {
+    normalizePhoneNumber (phone: string): string | null {
+      if (!phone) return null
       if (phone.startsWith('+351')) return phone.slice(4)
       return phone.slice(3)
     }

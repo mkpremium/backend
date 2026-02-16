@@ -39,22 +39,26 @@ export const getScheduleDailyCallsController = ({ callService }: { callService: 
 
 export const getCallLogController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
-    if (
-      !Retell.verify(
-        JSON.stringify(req.body),
-        process.env.RETELL_API_KEY!,
-        req.headers['x-retell-signature'] as string
-      )
-    ) {
-      return res.status(401).send('Invalid signature')
-    }
+    try {
+      if (
+        !Retell.verify(
+          JSON.stringify(req.body),
+          process.env.RETELL_API_KEY_WEBHOOK!,
+          req.headers['x-retell-signature'] as string
+        )
+      ) {
+        return res.status(401).send('Invalid signature')
+      }
 
-    const body: CallLogResponse = req.body
-    if (body.event === 'call_analyzed') {
-      const databaseResponse = await callService.saveCallLog(body)
-      return res.status(200).json(databaseResponse)
+      const body: CallLogResponse = req.body
+      if (body.event === 'call_analyzed') {
+        await callService.saveCallLog(body)
+        return res.status(200).json({ status: 'ok', message: 'Call Log registrado en la base de datos' })
+      }
+      return res.status(200).send({ status: 'ok', message: 'Call Log no es call analyzed' })
+    } catch (err:any) {
+      res.status(400).json({ status: 'error', message: err?.message || String(err) })
     }
-    return res.status(204).send()
   })
 
 export const sendCallsController = ({ callService }: { callService: CallService }) =>
