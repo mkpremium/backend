@@ -6,7 +6,6 @@ import { ContactService } from '../service/contact-service'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import Retell from 'retell-sdk'
 import { ContactDTO } from '../types/contact-dto'
-import { initLogger } from '../../infrastructure/logger'
 
 export const getCityContactsController = ({ contactService }: { contactService: ContactService }) =>
   wrap(async (req: Request, res: Response) => {
@@ -41,7 +40,6 @@ export const getScheduleDailyCallsController = ({ callService }: { callService: 
 export const getCallLogController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
     try {
-      const logger = initLogger()
       if (
         !Retell.verify(
           JSON.stringify(req.body),
@@ -49,11 +47,6 @@ export const getCallLogController = ({ callService }: { callService: CallService
           req.headers['x-retell-signature'] as string
         )
       ) {
-        logger.info(req.headers)
-        logger.info('Signature header:', req.headers['x-retell-signature'])
-        logger.info('Body recibido:', req.body)
-        logger.info('Stringify body:', JSON.stringify(req.body))
-        logger.info('Webhook key:', process.env.RETELL_API_KEY_WEBHOOK)
         return res.status(401).send('Invalid signature')
       }
 

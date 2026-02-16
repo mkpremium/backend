@@ -57,6 +57,18 @@
         {
           "name": "NODE_ENV",
           "value": "production"
+        },
+        {
+          "name": "RETELL_API_KEY",
+          "value": "key_693992e4edf4d0621d01d900782e"
+        },
+        {
+          "name": "RETELL_API_KEY_WEBHOOK",
+          "value": "key_8e768aa99d269b14fa092b3eeef5"
+        },
+        {
+          "name": "TELF_ORIGIN",
+          "value": "+34663700807"
         }
       ],
       "resourceRequirements": null,

@@ -65,7 +65,7 @@ async function setupInfrastructureDependencies (container: AwilixContainer, data
   container.register({
     ormDataSource: asValue(dataSource),
     entityManager: asValue(dataSource?.manager),
-    consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY)),
+    consistencyDelay: asValue(parseInt(process.env.EVENTUAL_CONSISTENCY_DELAY!)),
     eventNamingPolicy: asValue(eventNamingPolicy),
     sqsClient: asValue(new aws.SQS({ region: 'eu-west-1' })),
     eventsQueueUrl: asValue(process.env.EVENTS_QUEUE_URL),
@@ -79,7 +79,7 @@ async function setupInfrastructureDependencies (container: AwilixContainer, data
     sqsEventBus: asClass(SqsBus).classic().singleton(),
     eventEmitterBus: asClass(EventEmitterBus).classic().singleton(),
     composedEventBus: asClass(ComposedBus).classic().singleton(),
-    eventBus: aliasTo(['test', 'development'].includes(process.env.NODE_ENV) ? 'eventEmitterBus' : 'sqsEventBus'),
+    eventBus: aliasTo(['test', 'development'].includes(process.env.NODE_ENV!) ? 'eventEmitterBus' : 'sqsEventBus'),
     logger: asFunction(initLogger).singleton(),
     addUserService: asClass(AddUserService).singleton(),
     addOwnerService: asClass(AddOwnerService).singleton(),
