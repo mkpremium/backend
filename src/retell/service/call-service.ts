@@ -10,6 +10,7 @@ import Retell from 'retell-sdk'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
+import { boolean } from 'fp-ts'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -156,7 +157,12 @@ export class CallService {
         metadata: body.call?.metadata,
         provincia: body.call.metadata?.city,
         buildingId: body.call.metadata?.buildingId,
-        interest: body.call.call_analysis?.user_sentiment
+        interest: body.call.call_analysis?.user_sentiment,
+        callSuccessful: body.call.call_analysis?.call_successful,
+        vende: String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si',
+        resumen: body.call.call_analysis?.custom_analysis_data?.resumen,
+        noLlamar: String(body.call.call_analysis?.custom_analysis_data?.no_llamar).toLowerCase() === 'si',
+        rellamada: String(body.call.call_analysis?.custom_analysis_data?.rellamada).toLowerCase() === 'si'
       }as unknown as DeepPartial<CallLog>)
       return await callLogRepo.save(callLog)
     }

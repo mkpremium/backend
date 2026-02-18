@@ -76,4 +76,19 @@ export class CallLog {
 
   @Column({ type: 'uuid', name: 'building_id', nullable: true })
   buildingId?: string
+
+  @Column({ type: 'text', name: 'resumen' })
+  resumen?: string
+
+  @Column({ type: 'boolean', name: 'call_successful' })
+  callSuccessful?: boolean
+
+  @Column({ type: 'boolean', name: 'vende' })
+  vende?: boolean
+
+  @Column({ type: 'boolean', name: 'no_llamar' })
+  noLlamar?: boolean
+
+  @Column({ type: 'boolean', name: 'rellamada' })
+  rellamada?: boolean
 }
