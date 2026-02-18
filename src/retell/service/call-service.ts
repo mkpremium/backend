@@ -10,7 +10,6 @@ import Retell from 'retell-sdk'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
-import { boolean } from 'fp-ts'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
