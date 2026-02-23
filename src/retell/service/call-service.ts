@@ -10,6 +10,9 @@ import Retell from 'retell-sdk'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
+import { changeContactStatus } from '../../owner/owner';
+import { Building } from '../../building/building.entity';
+import { Flipper } from '../../flipper/flipper.entity'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -23,12 +26,12 @@ export class CallService {
 
     async makeBatchCall (request:CityCallRequest) {
       const result: CityCallResponse = {
-        city: request.city,
+        city: request.city!,
         status: 'ok',
         message: ''
       }
       try {
-        const temporalContacts = await this.contactService.getCityContacts(request.city, request.limit)
+        const temporalContacts = await this.contactService.getCityContacts(request.city!, request.limit!)
         if (!temporalContacts) {
           result.status = 'error'
           result.message = 'No quedan contactos sin llamar'
@@ -38,8 +41,8 @@ export class CallService {
         const tasks:Task[] = this.transformContactstoBatchCallTask(temporalContacts)
         this.logger.info(JSON.stringify(tasks, null, 2))
 
-        const startHour = this.timeToMinutes(request.startHour)
-        const endHour = this.timeToMinutes(request.endHour)
+        const startHour = this.timeToMinutes(request.startHour!)
+        const endHour = this.timeToMinutes(request.endHour!)
 
         const params = {
           from_number: process.env.TELF_ORIGIN!,
@@ -75,8 +78,10 @@ export class CallService {
         metadata: {
           buildingId: contact.buildingId,
           ownerId: contact.ownerId,
+          contactId: contact.contactId,
           city: contact.city,
-          use: contact.use
+          use: contact.use,
+          callQueueId: contact.callQueueId
         }
       }))
 
@@ -99,7 +104,7 @@ export class CallService {
 
       if (schedules.length === 0) return [{ city: '', status: 'error', message: 'No hay lista de planificación' }]
       for (const s of schedules) {
-        if (!this.isValidDay(currentDay, s.days)) continue
+        if (!this.isValidDay(currentDay, s.days!)) continue
         results.push(await this.makeBatchCall(s))
       }
       return results
@@ -135,6 +140,13 @@ export class CallService {
 
     async saveCallLog (body:CallLogResponse) {
       const callLogRepo = await AppDataSource.getRepository(CallLog)
+      const buildingId = String(body.call.metadata!.buildingId)
+      if (buildingId) {
+        if (String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si') {
+          this.changeNegotiationStatus(buildingId)
+        }
+      }
+
       const callLog = callLogRepo.create({
         startTime: body.call?.start_timestamp ? new Date(body.call?.start_timestamp) : null,
         duration: this.formatMiliseconds(body.call.duration_ms!),
@@ -147,7 +159,7 @@ export class CallService {
         tipoVivienda: body.call?.metadata?.use,
         status: body.call?.call_status,
         clientId: body.call?.metadata?.ownerId,
-        cost: body.call?.call_cost?.combined_cost,
+        cost: (body.call?.call_cost?.combined_cost ?? 0) / 100,
         fromNumber: body.call?.from_number,
         fromNumberNorm: this.normalizePhoneNumber(body.call.from_number!),
         toNumberNorm: this.normalizePhoneNumber(body.call.to_number!),
@@ -156,17 +168,40 @@ export class CallService {
         metadata: body.call?.metadata,
         provincia: body.call.metadata?.city,
         buildingId: body.call.metadata?.buildingId,
+        contactId: body.call.metadata?.contactId,
         interest: body.call.call_analysis?.user_sentiment,
         callSuccessful: body.call.call_analysis?.call_successful,
         vende: String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si',
         resumen: body.call.call_analysis?.custom_analysis_data?.resumen,
         noLlamar: String(body.call.call_analysis?.custom_analysis_data?.no_llamar).toLowerCase() === 'si',
-        rellamada: String(body.call.call_analysis?.custom_analysis_data?.rellamada).toLowerCase() === 'si'
+        rellamada: String(body.call.call_analysis?.custom_analysis_data?.rellamada).toLowerCase() === 'si',
+        callQueueId: body.call.metadata?.callQueueId
       }as unknown as DeepPartial<CallLog>)
       return await callLogRepo.save(callLog)
     }
 
     async deleteCallSchedule () {
       await this.callScheduleRepo.clear()
+    }
+
+    async changeNegotiationStatus (buildingId:string) {
+      const flipperId = '24113328-ed9d-4ca6-919d-630b2cd05062'
+      const buildingRepo = AppDataSource.getRepository(Building)
+      const flipperRepo = AppDataSource.getRepository(Flipper)
+      const building = await buildingRepo.findOne({ where: { id: buildingId } })
+
+      if (!building) {
+        throw new Error(`Building with id ${buildingId} not found`)
+      }
+
+      const flipper = await flipperRepo.findOne({ where: { id: flipperId } })
+
+      if (!flipper) {
+        throw new Error(`Flipper with id ${flipperId} not found`)
+      }
+
+      building.negotiationStatus = 'PENDIENTE'
+      building.assignedFlipper = flipper
+      await buildingRepo.save(building)
     }
 }

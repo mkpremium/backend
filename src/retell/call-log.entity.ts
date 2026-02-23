@@ -1,4 +1,5 @@
-import { Entity, Column, Index, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm'
+import { Entity, Column, Index, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
+import { CallQueue } from './call-queue.entity'
 
 @Entity({ name: 'call_logs' })
 @Index('idx_call_logs_created_at', ['createdAt'])
@@ -77,6 +78,9 @@ export class CallLog {
   @Column({ type: 'uuid', name: 'building_id', nullable: true })
   buildingId?: string
 
+  @Column({ type: 'uuid', name: 'contact_id', nullable: true })
+  contactId?: string
+
   @Column({ type: 'text', name: 'resumen' })
   resumen?: string
 
@@ -91,4 +95,11 @@ export class CallLog {
 
   @Column({ type: 'boolean', name: 'rellamada' })
   rellamada?: boolean
+
+  @Column({ type: 'uuid', name: 'call_queue_id' })
+  callQueueId?: string
+
+  @ManyToOne(() => CallQueue, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'call_queue_id' })
+  callQueue?: CallQueue
 }

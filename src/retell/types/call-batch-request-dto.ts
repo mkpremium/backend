@@ -1,9 +1,9 @@
 export interface CityCallRequest {
-    city: string;
-    limit: number;
-    startHour: string;
-    endHour: string;
-    days: string;
+    city?: string;
+    limit?: number;
+    startHour?: string;
+    endHour?: string;
+    days?: string;
 }
 
 export interface CityCallResponse {

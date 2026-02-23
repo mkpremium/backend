@@ -5,6 +5,8 @@ export interface ContactDTO {
     address: string,
     buildingId: string,
     ownerId: string,
+    contactId: string,
+    callQueueId: string,
     city: string,
     use: string
 }

@@ -17,14 +17,14 @@ export class ContactService {
       const contacts: ContactDTO[] = await queryRunner.query(
         `
                     WITH s AS (
-                        SELECT $3::text || contact."value" AS "phoneNumber",
-                                person."fullName",
-                                regexp_split_to_array(trim("fullName"), '\\s+') AS full_name,
+                        SELECT $3::text || contact."value" AS "phoneNumber",                                
                                 CONCAT(building_address."type", ' ', building_address."street", ' ', building_address."number") AS address,
                                 building.id AS "buildingId",
                                 owner.id AS "ownerId",
+                                contact.id AS "contactId",
                                 building_address.city AS "city",
-                                building.use AS "use"
+                                building.use AS "use",
+                                call_queue.id AS "call_queueId"
                         FROM owner
                         INNER JOIN building
                         ON owner."buildingId" = building.id
@@ -36,44 +36,21 @@ export class ContactService {
                         ON contact.id = person_contact."contactId"
                         INNER JOIN building_address
                         ON building."addressId" = building_address.id
+                        INNER JOIN call_queue 
+                        ON call_queue."building_id" = building.id
                         WHERE building_address."city" = $1 
-                          AND contact."value" LIKE $4             
-                          AND person."fullName" NOT LIKE '% SL'
-                          AND person."fullName" NOT LIKE '% SA'
-                          AND person."fullName" NOT LIKE '% S.L'
-                          AND person."fullName" NOT LIKE '%,S.L'
-                          AND person."fullName" NOT LIKE '% S.A'
-                          AND person."fullName" NOT LIKE '%,S.L.'
-                          AND person."fullName" NOT LIKE '% S.L.'
-                          AND person."fullName" NOT LIKE '% S.A.'
-                          AND person."fullName" NOT LIKE '% S.A.'
-                          AND person."fullName" NOT LIKE '% AYUNTAMIENTO%'
-                          AND person."fullName" NOT LIKE '% GRUPO%'
-                          AND person."fullName" NOT LIKE '% AGENCIA%'
-                          AND person."fullName" NOT LIKE '% FINCA%'
-                          AND person."fullName" NOT LIKE '% INMOBILIARIA%'
-                          AND NOT EXISTS (
-                                SELECT 1
-                                FROM call_logs cl
-                                WHERE cl.to_number_norm = contact."value"
-                                  AND cl.status <> 'not_connected'
-                          )
+                          AND contact."value" LIKE $4       
+                          AND (call_queue.can_call = TRUE OR (call_queue.freeze_until IS NOT NULL AND call_queue.freeze_until <= NOW()))    
                     )
-                    SELECT 
-
-                    "phoneNumber",  
-                
-                    CASE 
-                        WHEN array_length(full_name,1) > 2 THEN array_to_string(full_name[3:array_length(full_name,1)], ' ')
-                        ELSE ''
-                    END AS name,
-                
-                    array_to_string(full_name[1:2], ' ') AS "lastName",
+                    SELECT
+                    "phoneNumber",                
                     address,
                     "buildingId",
                     "ownerId",
+                    "contactId",
                     "city",
-                    "use"                
+                    "use",
+                    "call_queueId"                
                     FROM s
                     LIMIT $2
                     `, [city, limit, prefix, mobileStart]
