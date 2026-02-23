@@ -10,8 +10,7 @@ import Retell from 'retell-sdk'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
-import { changeContactStatus } from '../../owner/owner';
-import { Building } from '../../building/building.entity';
+import { Building } from '../../building/building.entity'
 import { Flipper } from '../../flipper/flipper.entity'
 
 export class CallService {
