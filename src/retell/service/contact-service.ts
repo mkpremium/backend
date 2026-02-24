@@ -17,30 +17,30 @@ export class ContactService {
       const contacts: ContactDTO[] = await queryRunner.query(
         `
                     WITH s AS (
-                        SELECT $3::text || contact."value" AS "phoneNumber",                                
-                                CONCAT(building_address."type", ' ', building_address."street", ' ', building_address."number") AS address,
-                                building.id AS "buildingId",
-                                owner.id AS "ownerId",
-                                contact.id AS "contactId",
-                                building_address.city AS "city",
-                                building.use AS "use",
-                                call_queue.id AS "call_queueId"
-                        FROM owner
-                        INNER JOIN building
-                        ON owner."buildingId" = building.id
-                        INNER JOIN person
-                        ON owner."personId" = person.id
-                        INNER JOIN person_contact
-                        ON person_contact."personId" = person.id
-                        INNER JOIN contact
-                        ON contact.id = person_contact."contactId"
-                        INNER JOIN building_address
-                        ON building."addressId" = building_address.id
-                        INNER JOIN call_queue 
-                        ON call_queue."building_id" = building.id
-                        WHERE building_address."city" = $1 
-                          AND contact."value" LIKE $4       
-                          AND (call_queue.can_call = TRUE OR (call_queue.freeze_until IS NOT NULL AND call_queue.freeze_until <= NOW()))    
+                        SELECT $3::text || c."value" AS "phoneNumber",                                
+                                CONCAT(ba."type", ' ', ba."street", ' ', ba."number") AS address,
+                                b.id AS "buildingId",
+                                o.id AS "ownerId",
+                                c.id AS "contactId",
+                                ba.city AS "city",
+                                b.use AS "use",
+                                cq.id AS "call_queueId"
+                        FROM call_queue cq
+                        INNER JOIN owner o
+                        ON o.id = cq.owner_id
+                        INNER JOIN building b
+                        ON b.id = cq.building_id   
+                        INNER JOIN building_address ba
+                        ON ba.id = b."addressId"             
+                        INNER JOIN contact c
+                        ON c.id = cq.contact_id
+                        INNER JOIN person_contact pc
+                        ON pc."contactId" = cq.contact_id
+                        INNER JOIN person p
+                        ON p.id = pc."personId"             
+                        WHERE ba."city" = $1 
+                          AND c."value" LIKE $4       
+                          AND (cq.can_call = TRUE OR (cq.freeze_until IS NOT NULL AND cq.freeze_until <= NOW()))    
                     )
                     SELECT
                     "phoneNumber",                
