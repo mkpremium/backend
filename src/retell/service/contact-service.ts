@@ -10,6 +10,7 @@ export class ContactService {
   async getCityContacts (city:string, limit:number) {
     const queryRunner = AppDataSource.createQueryRunner()
     await queryRunner.connect()
+    await queryRunner.startTransaction()
     const prefix = this.checkPrefixCountryCity(city)
     const mobileStart = prefix === '+34' ? '6%' : '9%'
 
