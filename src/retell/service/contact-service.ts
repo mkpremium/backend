@@ -26,7 +26,7 @@ export class ContactService {
                 can_call = FALSE
                 AND freeze_until IS NOT NULL
                 AND freeze_until <= NOW()
-                AND freeze_type = 'NO_ANSWER',
+                AND freeze_type = 'NO_ANSWER'
                 AND last_called_at <= NOW() - INTERVAL '1 month';
           `)
 
@@ -41,6 +41,7 @@ export class ContactService {
                                 ba.city AS "city",
                                 b.use AS "use",
                                 cq.id AS "call_queueId"
+                                cq.last_called_at AS "lastCalledAt"
                         FROM call_queue cq
                         INNER JOIN owner o
                         ON o.id = cq.owner_id
@@ -56,7 +57,7 @@ export class ContactService {
                         ON p.id = pc."personId"             
                         WHERE ba."city" = $1 
                           AND c."value" LIKE $4       
-                          AND (cq.can_call = TRUE OR (cq.freeze_until IS NOT NULL AND cq.freeze_until <= NOW()))    
+                          AND (cq.can_call = TRUE OR (cq.freeze_until IS NOT NULL AND cq.freeze_until <= NOW()))                         
                     )
                     SELECT
                     "phoneNumber",                
@@ -68,7 +69,7 @@ export class ContactService {
                     "use",
                     "call_queueId"                
                     FROM s
-                    ORDER BY cq.last_called_at ASC
+                    ORDER BY "lastCalledAt" ASC                      
                     LIMIT $2
                     `, [city, limit, prefix, mobileStart]
       )
