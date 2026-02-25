@@ -139,7 +139,7 @@ export class CallService {
 
     async saveCallLog (body:CallLogResponse) {
       const callLogRepo = await AppDataSource.getRepository(CallLog)
-      const buildingId = String(body.call.metadata!.buildingId)
+      const buildingId = body.call.metadata?.buildingId as string | undefined
       if (buildingId) {
         if (String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si') {
           this.changeNegotiationStatus(buildingId)
@@ -157,7 +157,7 @@ export class CallService {
         callId: body.call?.call_id,
         tipoVivienda: body.call?.metadata?.use,
         status: body.call?.call_status,
-        clientId: body.call?.metadata?.ownerId,
+        ownerId: body.call?.metadata?.ownerId,
         cost: (body.call?.call_cost?.combined_cost ?? 0) / 100,
         fromNumber: body.call?.from_number,
         fromNumberNorm: this.normalizePhoneNumber(body.call.from_number!),

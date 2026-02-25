@@ -48,8 +48,8 @@ export class CallLog {
   @Column({ type: 'text', nullable: true })
   status?: string
 
-  @Column({ type: 'text', name: 'client_id', nullable: true })
-  clientId?: string
+  @Column({ type: 'uuid', name: 'owner_id', nullable: true })
+  ownerId?: string
 
   @Column({ type: 'text', nullable: true })
   cost?: string
@@ -98,6 +98,9 @@ export class CallLog {
 
   @Column({ type: 'uuid', name: 'call_queue_id' })
   callQueueId?: string
+
+  @Column({ type: 'text', name: 'client_id', default: 'elevate_003' })
+  clientId?: string
 
   @ManyToOne(() => CallQueue, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'call_queue_id' })
