@@ -14,6 +14,21 @@ export class ContactService {
     const mobileStart = prefix === '+34' ? '6%' : '9%'
 
     try {
+      await queryRunner.query(`
+            UPDATE call_queue
+            SET 
+                can_call = TRUE,
+                call_count = 0,
+                freeze_until = NULL,
+                freeze_type = NULL
+            WHERE 
+                can_call = FALSE
+                AND freeze_until IS NOT NULL
+                AND freeze_until <= NOW()
+                AND freeze_type = 'NO_ANSWER',
+                AND last_called_at <= NOW() - INTERVAL '1 month';
+          `)
+
       const contacts: ContactDTO[] = await queryRunner.query(
         `
                     WITH s AS (
@@ -52,12 +67,15 @@ export class ContactService {
                     "use",
                     "call_queueId"                
                     FROM s
+                    ORDER BY cq.last_called_at ASC
                     LIMIT $2
                     `, [city, limit, prefix, mobileStart]
       )
       this.logger.info(`Fetched ${contacts.length} contacts for city=${city}`)
+      await queryRunner.commitTransaction()
       return contacts
     } catch (error) {
+      await queryRunner.rollbackTransaction()
       this.logger.error(`Error fetching contacts: ${(error as Error).message}`)
       throw error
     } finally {

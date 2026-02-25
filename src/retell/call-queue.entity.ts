@@ -23,6 +23,18 @@ export class CallQueue {
   @Column({ type: 'timestamp', nullable: true })
   freeze_until?: Date
 
+  @Column({ name: 'call_count', type: 'int', default: () => '0' })
+  callCount?: number
+
+  @Column({ name: 'max_attempts', type: 'int', default: () => '3' })
+  maxAttempts?: number
+
+  @Column({ name: 'last_called_at', type: 'timestamp', nullable: true })
+  lastCalledAt?: Date
+
+  @Column({ type: 'varchar', length: 20 })
+  freezeType?: string
+
   // Relaciones
   @ManyToOne(() => Owner, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'owner_id' })
