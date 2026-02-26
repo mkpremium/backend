@@ -145,36 +145,39 @@ export class CallService {
           this.changeNegotiationStatus(buildingId)
         }
       }
+      const metadata = body.call.metadata || {}
+      const custom = body.call.call_analysis?.custom_analysis_data || {}
+      const callAnalysis = body.call.call_analysis || {}
 
       const callLog = callLogRepo.create({
-        startTime: body.call?.start_timestamp ? new Date(body.call?.start_timestamp) : null,
-        duration: this.formatMiliseconds(body.call.duration_ms!),
-        toNumber: body.call?.to_number,
-        summary: body.call.call_analysis?.call_summary,
-        transcript: body.call?.transcript,
-        endReason: body.call?.disconnection_reason,
-        recordings: body.call?.recording_url,
-        callId: body.call?.call_id,
-        tipoVivienda: body.call?.metadata?.use,
-        status: body.call?.call_status,
-        ownerId: body.call?.metadata?.ownerId,
-        cost: (body.call?.call_cost?.combined_cost ?? 0) / 100,
-        fromNumber: body.call?.from_number,
-        fromNumberNorm: this.normalizePhoneNumber(body.call.from_number!),
-        toNumberNorm: this.normalizePhoneNumber(body.call.to_number!),
-        name: body.call?.agent_name,
-        agentId: body.call?.agent_id,
-        metadata: body.call?.metadata,
-        provincia: body.call.metadata?.city,
-        buildingId: body.call.metadata?.buildingId,
-        contactId: body.call.metadata?.contactId,
-        interest: body.call.call_analysis?.user_sentiment,
-        callSuccessful: body.call.call_analysis?.call_successful,
-        vende: String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si',
-        resumen: body.call.call_analysis?.custom_analysis_data?.resumen,
-        noLlamar: String(body.call.call_analysis?.custom_analysis_data?.no_llamar).toLowerCase() === 'si',
-        rellamada: String(body.call.call_analysis?.custom_analysis_data?.rellamada).toLowerCase() === 'si',
-        callQueueId: body.call.metadata?.callQueueId
+        startTime: body.call.start_timestamp ? new Date(body.call?.start_timestamp) : null,
+        duration: body.call.duration_ms ? this.formatMiliseconds(body.call.duration_ms) : 0,
+        toNumber: body.call.to_number || null,
+        summary: callAnalysis.call_summary || null,
+        transcript: body.call.transcript || null,
+        endReason: body.call.disconnection_reason || null,
+        recordings: body.call.recording_url || null,
+        callId: body.call.call_id || null,
+        tipoVivienda: metadata.use || null,
+        status: body.call.call_status || null,
+        ownerId: metadata.ownerId || null,
+        cost: (body.call.call_cost?.combined_cost ?? 0) / 100 || 0,
+        fromNumber: body.call.from_number || null,
+        fromNumberNorm: body.call.from_number ? this.normalizePhoneNumber(body.call.from_number!) : null,
+        toNumberNorm: body.call.from_number ? this.normalizePhoneNumber(body.call.to_number!) : null,
+        name: body.call.agent_name || null,
+        agentId: body.call.agent_id || null,
+        metadata,
+        provincia: metadata.city || null,
+        buildingId: metadata.buildingId || null,
+        contactId: metadata.contactId || null,
+        interest: callAnalysis.user_sentiment || null,
+        callSuccessful: callAnalysis.call_successful ?? null,
+        vende: String(custom.vende || '').toLowerCase() === 'si',
+        resumen: custom.resumen || null,
+        noLlamar: String(custom.no_llamar || '').toLowerCase() === 'si',
+        rellamada: String(custom.rellamada || '').toLowerCase() === 'si',
+        callQueueId: metadata.callQueueId || null
       }as unknown as DeepPartial<CallLog>)
       return await callLogRepo.save(callLog)
     }
