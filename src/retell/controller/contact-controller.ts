@@ -6,9 +6,6 @@ import { ContactService } from '../service/contact-service'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import Retell from 'retell-sdk'
 import { ContactDTO } from '../types/contact-dto'
-import { initLogger } from '../../infrastructure/logger'
-
-const logger = initLogger()
 
 export const getCityContactsController = ({ contactService }: { contactService: ContactService }) =>
   wrap(async (req: Request, res: Response) => {
@@ -59,18 +56,20 @@ export const getCallLogController = ({ callService }: { callService: CallService
       if (body.event === 'call_analyzed') {
         try {
           await callService.saveCallLog(body)
+          console.info('Call log registrado en la bbdd')
           return res.status(200).json({ status: 'ok', message: 'Call Log registrado en la base de datos' })
         } catch (err: any) {
-          logger.warn('Call log save warning:', err?.message || err)
+          console.warn('Call log save warning:', err?.message || err)
           return res.status(200).json({
             status: 'warning',
             message: 'Call log recibido pero hubo problemas: ' + (err?.message || String(err))
           })
         }
       }
+      console.info('Call log no es call analyzed')
       return res.status(200).send({ status: 'ok', message: 'Call Log no es call analyzed' })
     } catch (err: any) {
-      logger.error({ status: 'error', message: err?.message || String(err) })
+      console.error({ status: 'error', message: err?.message || String(err) })
       return res.status(400).json({ status: 'error', message: err?.message || String(err) })
     }
   })
