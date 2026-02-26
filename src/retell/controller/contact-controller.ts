@@ -6,7 +6,9 @@ import { ContactService } from '../service/contact-service'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import Retell from 'retell-sdk'
 import { ContactDTO } from '../types/contact-dto'
-import { logger } from '../../infrastructure/logger'
+import { initLogger } from '../../infrastructure/logger'
+
+const logger = initLogger()
 
 export const getCityContactsController = ({ contactService }: { contactService: ContactService }) =>
   wrap(async (req: Request, res: Response) => {
