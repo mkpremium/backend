@@ -97,6 +97,16 @@ export const deleteScheduleDailyCallsController = ({ callService }: { callServic
 export const getCallBackController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
     try {
+      // Verificación de firma
+      if (
+        !Retell.verify(
+          JSON.stringify(req.body),
+          process.env.RETELL_API_KEY_WEBHOOK!,
+          req.headers['x-retell-signature'] as string
+        )
+      ) {
+        return res.status(401).send('Invalid signature')
+      }
       const params = req.params
       const body = req.body
       await callService.configScheduledCall(body, params)
