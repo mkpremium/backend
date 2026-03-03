@@ -151,12 +151,11 @@ export class CallService {
         city: entity.city,
         limit: entity.limit,
         days: entity.days,
-        TimeWindow: {
+        timeWindow: {
           startHour: entity.startHour,
           endHour: entity.endHour
         }
       }))
-      return callSchedule
     }
 
     isValidDay (day:number, days: string):boolean {
