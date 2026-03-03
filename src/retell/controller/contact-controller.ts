@@ -94,7 +94,7 @@ export const deleteScheduleDailyCallsController = ({ callService }: { callServic
     }
   })
 
-export const getCallBackController = ({ callService }: { callService: CallService }) =>
+export const getCallbackController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
     try {
       // Verificación de firma
