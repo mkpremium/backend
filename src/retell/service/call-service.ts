@@ -194,7 +194,12 @@ export class CallService {
 
       if (buildingId && ownerId && contactId) {
         if (String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si') {
-          this.changeNegotiationStatus(buildingId, ownerId, contactId)
+          try {
+            await this.changeNegotiationStatus(buildingId, ownerId, contactId)
+          } catch (error) {
+            console.log('Error changing negotiation status', error)
+            throw error
+          }
         }
       }
 
@@ -263,60 +268,36 @@ export class CallService {
     async changeNegotiationStatus (buildingId:string, ownerId:string, contactId:string) {
       const flipperId = '24113328-ed9d-4ca6-919d-630b2cd05062'
       const callerId = '807cc64b-0c3f-45f9-ae5d-d37a45a2bb64'
-      const buildingOfferRepo = AppDataSource.getRepository(BuildingOfferRequest)
-      const buildingRepo = AppDataSource.getRepository(Building)
-      const flipperRepo = AppDataSource.getRepository(Flipper)
-      const contactRepo = AppDataSource.getRepository(Contact)
-      const callerRepo = AppDataSource.getRepository(Caller)
-      const ownerRepo = AppDataSource.getRepository(Owner)
-      const building = await buildingRepo.findOne({ where: { id: buildingId } })
-      const queryRunner = AppDataSource.createQueryRunner()
-      queryRunner.startTransaction()
-      try {
-        if (!building) {
-          throw new Error(`Building with id ${buildingId} not found`)
-        }
 
-        const flipper = await flipperRepo.findOne({ where: { id: flipperId } })
-        if (!flipper) {
-          throw new Error(`Flipper with id ${flipperId} not found`)
-        }
+      await AppDataSource.transaction(async (manager) => {
+        const building = await manager.findOne(Building, { where: { id: buildingId } })
+        if (!building) throw new Error(`Building with id ${buildingId} not found`)
 
-        const owner = await ownerRepo.findOne({ where: { id: ownerId } })
-        if (!owner) {
-          throw new Error(`Owner with id ${ownerId} not found`)
-        }
+        const flipper = await manager.findOne(Flipper, { where: { id: flipperId } })
+        if (!flipper) throw new Error(`Flipper with id ${flipperId} not found`)
 
-        const contact = await contactRepo.findOne({ where: { id: contactId } })
-        if (!contact) {
-          throw new Error(`Contact with id ${contactId} not found`)
-        }
+        const owner = await manager.findOne(Owner, { where: { id: ownerId } })
+        if (!owner) throw new Error(`Owner with id ${ownerId} not found`)
 
-        const caller = await callerRepo.findOne({ where: { id: callerId } })
-        if (!caller) {
-          throw new Error(`Caller with id ${callerId} not found`)
-        }
+        const contact = await manager.findOne(Contact, { where: { id: contactId } })
+        if (!contact) throw new Error(`Contact with id ${contactId} not found`)
+
+        const caller = await manager.findOne(Caller, { where: { id: callerId } })
+        if (!caller) throw new Error(`Caller with id ${callerId} not found`)
 
         building.negotiationStatus = 'PENDIENTE'
         building.assignedFlipper = flipper
-        await buildingRepo.save(building)
+        await manager.save(building)
 
-        const buildingOffer = buildingOfferRepo.create({
+        const buildingOffer = manager.create(BuildingOfferRequest, {
           flipper,
           owner,
           contact,
           building,
           caller
         })
-        buildingOfferRepo.save(buildingOffer)
-        await queryRunner.commitTransaction()
-      } catch (error) {
-        await queryRunner.rollbackTransaction()
-        this.logger.error(`Error al gestionar la oferta del Edificio: ${(error as Error).message}`)
-        throw error
-      } finally {
-        await queryRunner.release()
-      }
+        await manager.save(buildingOffer)
+      })
     }
 
     async configScheduledCall (body:Call, params:any) {
