@@ -8,5 +8,5 @@ export interface ContactDTO {
     contactId: string,
     callQueueId: string,
     city: string,
-    use: string
+    use: string,
 }

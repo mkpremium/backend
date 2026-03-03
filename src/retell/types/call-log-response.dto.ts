@@ -8,6 +8,7 @@ export interface Call {
     from_number?: string;
     to_number?: string;
     call_analysis?: CallAnalysis;
+    retell_llm_dynamic_variables: DynamicVariables;
     transcript?: string;
     disconnection_reason?: string;
     recording_url?: string;
@@ -32,6 +33,7 @@ export interface CallAnalysis {
 
 export type Metadata = Record<string, unknown>;
 export type Data = Record<string, unknown>;
+export type DynamicVariables = Record<string, unknown>;
 
 export interface CallCost {
     product_costs?: ProductCost[];

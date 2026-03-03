@@ -102,6 +102,12 @@ export class CallLog {
   @Column({ type: 'text', name: 'client_id', default: 'elevate_003' })
   clientId?: string
 
+  @Column({ type: 'text', name: 'scheduled_at', nullable: true })
+  scheduled_at?: string
+
+  @Column({ type: 'text', name: 'contact_name', nullable: true })
+  contact_name?: string
+
   @ManyToOne(() => CallQueue, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'call_queue_id' })
   callQueue?: CallQueue

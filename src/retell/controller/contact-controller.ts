@@ -93,3 +93,15 @@ export const deleteScheduleDailyCallsController = ({ callService }: { callServic
       return res.status(500).json({ success: false, message: 'No se ha podido eliminar la planificación' })
     }
   })
+
+export const getCallBackController = ({ callService }: { callService: CallService }) =>
+  wrap(async (req: Request, res: Response) => {
+    try {
+      const params = req.params
+      const body = req.body
+      await callService.configScheduledCall(body, params)
+      return res.status(200).json({ success: true, message: 'Llamada planificada correctamente' })
+    } catch (err:any) {
+      return res.status(500).json({ success: false, message: 'Error al planificar la llamada' })
+    }
+  })

@@ -7,11 +7,17 @@ import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { CallSchedule } from '../call-schedule.entity'
 import Retell from 'retell-sdk'
-import { CallLogResponse } from '../types/call-log-response.dto'
+import { Call, CallLogResponse } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
 import { Building } from '../../building/building.entity'
 import { Flipper } from '../../flipper/flipper.entity'
+import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
+import { Contact } from '../../contacts/contact.entity'
+import { Caller } from '../../caller/caller.entity'
+import { Owner } from '../../owner/owner'
+
+import { BatchCallCreateBatchCallParams } from 'retell-sdk/resources/batch-call.mjs'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -40,21 +46,15 @@ export class CallService {
         const tasks:Task[] = this.transformContactstoBatchCallTask(temporalContacts)
         this.logger.info(JSON.stringify(tasks, null, 2))
 
-        const startHour = this.timeToMinutes(request.startHour!)
-        const endHour = this.timeToMinutes(request.endHour!)
-
-        const params = {
-          from_number: process.env.TELF_ORIGIN!,
-          tasks: tasks,
-          reserved_concurrency: 0,
-          call_time_window: {
-            windows: [{ start: startHour, end: endHour }],
-            timezone: 'Europe/Madrid'
-          }
+        const timeWindow = {
+          startTime: this.timeToMinutes(request.timeWindow!.startHour),
+          endTime: this.timeToMinutes(request.timeWindow!.endHour)
         }
 
-        this.logger.info(params)
-        const batchCallResponse = await this.retellClient.batchCall.createBatchCall(params)
+        const batchCallPayload = this.buildCallPayload(tasks, timeWindow)
+
+        this.logger.info(batchCallPayload)
+        const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(batchCallResponse.batch_call_id)
 
         result.status = 'ok'
@@ -64,6 +64,35 @@ export class CallService {
         result.message = (error as Error).message
       }
       return result
+    }
+
+    buildCallPayload (tasks:Task[], timeWindow?:any, timeStamp?:string): BatchCallCreateBatchCallParams {
+      if (!timeStamp && !timeWindow) {
+        throw new Error('Debe proporcionar timeWindow o timeStamp')
+      }
+
+      const baseParams = {
+        from_number: process.env.TELF_ORIGIN!,
+        tasks,
+        reserved_concurrency: 1
+      }
+
+      if (timeStamp) {
+        const params = {
+          ...baseParams,
+          trigger_timestamp: new Date(timeStamp).getTime()
+        }
+        return params
+      }
+
+      const params = {
+        ...baseParams,
+        call_time_window: {
+          windows: [{ start: timeWindow.startHour, end: timeWindow.endHour }],
+          timezone: 'Europe/Madrid'
+        }
+      }
+      return params
     }
 
     transformContactstoBatchCallTask (contacts:ContactDTO[]) {
@@ -80,7 +109,8 @@ export class CallService {
           contactId: contact.contactId,
           city: contact.city,
           use: contact.use,
-          callQueueId: contact.callQueueId
+          callQueueId: contact.callQueueId,
+          address: contact.address
         }
       }))
 
@@ -89,9 +119,15 @@ export class CallService {
 
     async saveScheduleDailyCalls (body:CityCallRequest[]) {
       await this.callScheduleRepo.clear()
-
       for (const city of body) {
-        await this.callScheduleRepo.save(city)
+        const callSchedule = this.callScheduleRepo.create({
+          city: city.city,
+          limit: city.limit,
+          days: city.days,
+          startHour: city.timeWindow?.startHour,
+          endHour: city.timeWindow?.endHour
+        })
+        await this.callScheduleRepo.save(callSchedule)
       }
     }
 
@@ -111,6 +147,15 @@ export class CallService {
 
     async getScheduleCalls () {
       const callSchedule: CallSchedule [] = await this.callScheduleRepo.find()
+      return callSchedule.map(entity => ({
+        city: entity.city,
+        limit: entity.limit,
+        days: entity.days,
+        TimeWindow: {
+          startHour: entity.startHour,
+          endHour: entity.endHour
+        }
+      }))
       return callSchedule
     }
 
@@ -139,15 +184,20 @@ export class CallService {
 
     async saveCallLog (body:CallLogResponse) {
       const callLogRepo = await AppDataSource.getRepository(CallLog)
-      const buildingId = body.call.metadata?.buildingId as string | undefined
-      if (buildingId) {
-        if (String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si') {
-          this.changeNegotiationStatus(buildingId)
-        }
-      }
-      const metadata = body.call.metadata || {}
       const custom = body.call.call_analysis?.custom_analysis_data || {}
       const callAnalysis = body.call.call_analysis || {}
+      const metadata = body.call.metadata || {}
+      const buildingId = metadata.buildingId as string | undefined
+      const ownerId = metadata.ownerId as string | undefined
+      const contactId = metadata.contactId as string | undefined
+      const scheduledAt = custom.scheduledAt as string | null
+      const contactName = custom.contact_name as string | null
+
+      if (buildingId && ownerId && contactId) {
+        if (String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si') {
+          this.changeNegotiationStatus(buildingId, ownerId, contactId)
+        }
+      }
 
       const callLog = callLogRepo.create({
         startTime: body.call.start_timestamp ? new Date(body.call?.start_timestamp) : null,
@@ -160,7 +210,7 @@ export class CallService {
         callId: body.call.call_id || null,
         tipoVivienda: metadata.use || null,
         status: body.call.call_status || null,
-        ownerId: metadata.ownerId || null,
+        ownerId: ownerId || null,
         cost: (body.call.call_cost?.combined_cost ?? 0) / 100 || 0,
         fromNumber: body.call.from_number || null,
         fromNumberNorm: body.call.from_number ? this.normalizePhoneNumber(body.call.from_number!) : null,
@@ -169,15 +219,17 @@ export class CallService {
         agentId: body.call.agent_id || null,
         metadata,
         provincia: metadata.city || null,
-        buildingId: metadata.buildingId || null,
-        contactId: metadata.contactId || null,
+        buildingId: buildingId || null,
+        contactId: contactId || null,
         interest: callAnalysis.user_sentiment || null,
         callSuccessful: callAnalysis.call_successful ?? null,
         vende: String(custom.vende || '').toLowerCase() === 'si',
         resumen: custom.resumen || null,
         noLlamar: String(custom.no_llamar || '').toLowerCase() === 'si',
         rellamada: String(custom.rellamada || '').toLowerCase() === 'si',
-        callQueueId: metadata.callQueueId || null
+        callQueueId: metadata.callQueueId || null,
+        scheduled_at: scheduledAt || null,
+        contact_name: contactName || null
       }as unknown as DeepPartial<CallLog>)
       return await callLogRepo.save(callLog)
     }
@@ -186,24 +238,81 @@ export class CallService {
       await this.callScheduleRepo.clear()
     }
 
-    async changeNegotiationStatus (buildingId:string) {
+    async changeNegotiationStatus (buildingId:string, ownerId:string, contactId:string) {
       const flipperId = '24113328-ed9d-4ca6-919d-630b2cd05062'
+      const callerId = '807cc64b-0c3f-45f9-ae5d-d37a45a2bb64'
+      const buildingOfferRepo = AppDataSource.getRepository(BuildingOfferRequest)
       const buildingRepo = AppDataSource.getRepository(Building)
       const flipperRepo = AppDataSource.getRepository(Flipper)
+      const contactRepo = AppDataSource.getRepository(Contact)
+      const callerRepo = AppDataSource.getRepository(Caller)
+      const ownerRepo = AppDataSource.getRepository(Owner)
       const building = await buildingRepo.findOne({ where: { id: buildingId } })
+      const queryRunner = AppDataSource.createQueryRunner()
+      queryRunner.startTransaction()
+      try {
+        if (!building) {
+          throw new Error(`Building with id ${buildingId} not found`)
+        }
 
-      if (!building) {
-        throw new Error(`Building with id ${buildingId} not found`)
+        const flipper = await flipperRepo.findOne({ where: { id: flipperId } })
+        if (!flipper) {
+          throw new Error(`Flipper with id ${flipperId} not found`)
+        }
+
+        const owner = await ownerRepo.findOne({ where: { id: ownerId } })
+        if (!owner) {
+          throw new Error(`Owner with id ${ownerId} not found`)
+        }
+
+        const contact = await contactRepo.findOne({ where: { id: contactId } })
+        if (!contact) {
+          throw new Error(`Contact with id ${contactId} not found`)
+        }
+
+        const caller = await callerRepo.findOne({ where: { id: callerId } })
+        if (!caller) {
+          throw new Error(`Caller with id ${callerId} not found`)
+        }
+
+        building.negotiationStatus = 'PENDIENTE'
+        building.assignedFlipper = flipper
+        await buildingRepo.save(building)
+
+        const buildingOffer = buildingOfferRepo.create({
+          flipper,
+          owner,
+          contact,
+          building,
+          caller
+        })
+        buildingOfferRepo.save(buildingOffer)
+        await queryRunner.commitTransaction()
+      } catch (error) {
+        await queryRunner.rollbackTransaction()
+        this.logger.error(`Error al gestionar la oferta del Edificio: ${(error as Error).message}`)
+        throw error
+      } finally {
+        await queryRunner.release()
       }
+    }
 
-      const flipper = await flipperRepo.findOne({ where: { id: flipperId } })
-
-      if (!flipper) {
-        throw new Error(`Flipper with id ${flipperId} not found`)
+    async configScheduledCall (body:Call, params:any) {
+      const contact: ContactDTO = {
+        phoneNumber: body.to_number!,
+        name: params.contact_name,
+        lastName: String(body.retell_llm_dynamic_variables.apellidos),
+        buildingId: String(body.metadata!.buildingId),
+        ownerId: String(body.metadata!.ownerId),
+        contactId: String(body.metadata!.contactId),
+        city: String(body.metadata!.city),
+        use: String(body.metadata!.use),
+        callQueueId: String(body.metadata!.callQueueId),
+        address: String(body.metadata!.address)
       }
-
-      building.negotiationStatus = 'PENDIENTE'
-      building.assignedFlipper = flipper
-      await buildingRepo.save(building)
+      const tasks = this.transformContactstoBatchCallTask([contact])
+      const batchCallPayload = this.buildCallPayload(tasks, params.contact_at)
+      const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
+      this.logger.info(batchCallResponse.batch_call_id)
     }
 }
