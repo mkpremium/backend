@@ -1,7 +1,7 @@
 import { asClass, asFunction, AwilixContainer } from 'awilix'
 import { CallService } from './service/call-service'
 import { ContactService } from './service/contact-service'
-import { deleteScheduleDailyCallsController, getCallLogController, getCityContactsController, getScheduleDailyCallsController, scheduleDailyCallsController, sendCallsController } from './controller/contact-controller'
+import { deleteScheduleDailyCallsController, getCallbackController, getCallLogController, getCityContactsController, getScheduleDailyCallsController, scheduleDailyCallsController, sendCallsController } from './controller/contact-controller'
 
 export const setupCallDependencies = async (container: AwilixContainer) => {
   container.register({
@@ -12,6 +12,7 @@ export const setupCallDependencies = async (container: AwilixContainer) => {
     getScheduleDailyCallsController: asFunction(getScheduleDailyCallsController).singleton(),
     getCallLogController: asFunction(getCallLogController).singleton(),
     sendCallsController: asFunction(sendCallsController).singleton(),
-    deleteScheduleDailyCallsController: asFunction(deleteScheduleDailyCallsController).singleton()
+    deleteScheduleDailyCallsController: asFunction(deleteScheduleDailyCallsController).singleton(),
+    getCallbackController: asFunction(getCallbackController).singleton()
   })
 }
