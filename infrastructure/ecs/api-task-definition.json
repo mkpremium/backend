@@ -69,6 +69,14 @@
         {
           "name": "RETELL_API_KEY_WEBHOOK",
           "value": "key_8e768aa99d269b14fa092b3eeef5"
+        },
+        {
+          "name":"UMINDS_URL",
+          "value":"https://api.iacreatorhub.com/api/calls/create-call-log"
+        },
+        {
+          "name":"UMINDS_CLIENT_ID",
+          "value":"elevate_003"
         }
       ],
       "resourceRequirements": null,

@@ -7,7 +7,7 @@ import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { CallSchedule } from '../call-schedule.entity'
 import Retell from 'retell-sdk'
-import { Call, CallLogResponse } from '../types/call-log-response.dto'
+import { Call, CallLogResponse, UmindCallLog } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
 import { Building } from '../../building/building.entity'
@@ -199,7 +199,7 @@ export class CallService {
         }
       }
 
-      const callLog = callLogRepo.create({
+      const callLogMap = {
         startTime: body.call.start_timestamp ? new Date(body.call?.start_timestamp) : null,
         duration: body.call.duration_ms ? this.formatMiliseconds(body.call.duration_ms) : 0,
         toNumber: body.call.to_number || null,
@@ -230,8 +230,31 @@ export class CallService {
         callQueueId: metadata.callQueueId || null,
         scheduled_at: scheduledAt || null,
         contact_name: contactName || null
-      }as unknown as DeepPartial<CallLog>)
-      return await callLogRepo.save(callLog)
+      }as unknown as DeepPartial<CallLog>
+
+      const callLog: CallLog = callLogRepo.create(callLogMap)
+      await callLogRepo.save(callLog)
+      return await this.buildUmindCallLog(callLog)
+    }
+
+    async buildUmindCallLog (callLog:DeepPartial<CallLog>) {
+      const umindCallLog:UmindCallLog = {
+        client_id: process.env.UMINDS_CLIENT_ID!,
+        call_id: callLog.callId!,
+        from_number: callLog.fromNumber,
+        to_number: callLog.toNumber,
+        duration: callLog.duration,
+        status: callLog.status,
+        transcript: callLog.transcript,
+        summary: callLog.summary,
+        recordings: callLog.recordings,
+        end_reason: callLog.endReason,
+        interest: callLog.interest,
+        tipo_vivienda: callLog.tipoVivienda,
+        cost: callLog.cost,
+        metadata: callLog.metadata
+      }
+      return umindCallLog
     }
 
     async deleteCallSchedule () {

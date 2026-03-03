@@ -3,9 +3,10 @@ import { wrap } from 'express-promise-wrap'
 import { CallService } from '../service/call-service'
 import { CityCallRequest } from '../types/call-batch-request-dto'
 import { ContactService } from '../service/contact-service'
-import { CallLogResponse } from '../types/call-log-response.dto'
+import { CallLogResponse, UmindCallLog } from '../types/call-log-response.dto'
 import Retell from 'retell-sdk'
 import { ContactDTO } from '../types/contact-dto'
+import axios from 'axios'
 
 export const getCityContactsController = ({ contactService }: { contactService: ContactService }) =>
   wrap(async (req: Request, res: Response) => {
@@ -55,8 +56,14 @@ export const getCallLogController = ({ callService }: { callService: CallService
 
       if (body.event === 'call_analyzed') {
         try {
-          await callService.saveCallLog(body)
+          const callLog:UmindCallLog = await callService.saveCallLog(body)
           console.info('Call log registrado en la bbdd')
+          try {
+            await axios.post(process.env.UMINDS_URL!, callLog, { headers: { 'Content-Type': 'application/json' } })
+            console.info('Call log enviado a Umind correctamente')
+          } catch (err:any) {
+            console.warn('Error enviando Call Log a Umind:', err?.message || err)
+          }
           return res.status(200).json({ status: 'ok', message: 'Call Log registrado en la base de datos' })
         } catch (err: any) {
           console.warn('Call log save warning:', err?.message || err)

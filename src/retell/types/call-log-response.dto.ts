@@ -48,3 +48,24 @@ export interface ProductCost {
     unit_price?: number;
     is_transfer_leg_cost?: boolean;
 }
+export interface UmindCallLog {
+    duration?: string;
+    to_number?: string;
+    summary?: string;
+    transcript?: string;
+    end_reason?: string;
+    recordings?: string;
+    call_id: string;
+    interest?: string;
+    tipo_vivienda?: string;
+    status?: string;
+    client_id: string;
+    cost?: string;
+    from_number?: string;
+    from_number_norm?: string;
+    to_number_norm?: string;
+    name?: string;
+    agent_id?: string;
+    metadata?: Metadata;
+    provincia?: string;
+}
