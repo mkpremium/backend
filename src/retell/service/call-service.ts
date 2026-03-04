@@ -88,7 +88,7 @@ export class CallService {
       const params = {
         ...baseParams,
         call_time_window: {
-          windows: [{ start: timeWindow.startHour, end: timeWindow.endHour }],
+          windows: [{ start: timeWindow.startTime, end: timeWindow.endTime }],
           timezone: 'Europe/Madrid'
         }
       }
