@@ -40,7 +40,7 @@ export class ContactService {
                                 c.id AS "contactId",
                                 ba.city AS "city",
                                 b.use AS "use",
-                                cq.id AS "call_queueId",
+                                cq.id AS "callQueueId"
                                 cq.last_called_at AS "lastCalledAt"
                         FROM call_queue cq
                         INNER JOIN owner o
@@ -67,7 +67,7 @@ export class ContactService {
                     "contactId",
                     "city",
                     "use",
-                    "call_queueId"                
+                    "callQueueId"              
                     FROM s
                     ORDER BY "lastCalledAt" ASC                      
                     LIMIT $2

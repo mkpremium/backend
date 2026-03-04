@@ -15,7 +15,7 @@ import { Flipper } from '../../flipper/flipper.entity'
 import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
 import { Contact } from '../../contacts/contact.entity'
 import { Caller } from '../../caller/caller.entity'
-import { Owner } from '../../owner/owner'
+import { Owner } from '../../owner/owner.entity'
 
 import { BatchCallCreateBatchCallParams } from 'retell-sdk/resources/batch-call.mjs'
 
