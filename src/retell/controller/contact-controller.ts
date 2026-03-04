@@ -52,6 +52,8 @@ export const getCallLogController = ({ callService }: { callService: CallService
         return res.status(401).send('Invalid signature')
       }
 
+      res.status(200).json({ status: 'ok' })
+
       const body: CallLogResponse = req.body
 
       if (body.event === 'call_analyzed') {
@@ -64,20 +66,13 @@ export const getCallLogController = ({ callService }: { callService: CallService
           } catch (err:any) {
             console.warn('Error enviando Call Log a Umind:', err?.message || err)
           }
-          return res.status(200).json({ status: 'ok', message: 'Call Log registrado en la base de datos' })
         } catch (err: any) {
           console.warn('Call log save warning:', err?.message || err)
-          return res.status(200).json({
-            status: 'warning',
-            message: 'Call log recibido pero hubo problemas: ' + (err?.message || String(err))
-          })
         }
       }
       console.info('Call log no es call analyzed')
-      return res.status(200).send({ status: 'ok', message: 'Call Log no es call analyzed' })
     } catch (err: any) {
       console.error({ status: 'error', message: err?.message || String(err) })
-      return res.status(400).json({ status: 'error', message: err?.message || String(err) })
     }
   })
 
