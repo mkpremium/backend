@@ -16,23 +16,27 @@ export class ContactService {
 
     try {
       await queryRunner.query(`
-            UPDATE call_queue
-            SET 
-                can_call = TRUE,
-                call_count = 0,
-                freeze_until = NULL,
-                freeze_type = NULL
-            WHERE 
-                can_call = FALSE
-                AND freeze_until IS NOT NULL
-                AND freeze_until <= NOW()
-                AND freeze_type = 'NO_ANSWER'
-                AND last_called_at <= NOW() - INTERVAL '1 month';
-          `)
-
-      const contacts: ContactDTO[] = await queryRunner.query(
-        `
-                    WITH s AS (
+                  -- Reactiva los freeze expirados de cualquier tipo
+                  UPDATE call_queue
+                  SET 
+                      can_call = TRUE,
+                      call_count = 0,
+                      freeze_until = NULL,
+                      freeze_type = NULL
+                  WHERE 
+                      can_call = FALSE
+                      AND freeze_until IS NOT NULL
+                      AND freeze_until <= NOW()
+                      AND (
+                          (freeze_type = 'NO_ANSWER' AND last_called_at <= NOW() - INTERVAL '1 month') OR
+                          (freeze_type = 'NO_SALE' AND last_called_at <= NOW() - INTERVAL '3 months') OR
+                          (freeze_type = 'DO_NOT_CALL' AND last_called_at <= NOW() - INTERVAL '6 months')
+                      );
+      `)
+      const contacts: ContactDTO[] = await queryRunner.query(`
+                  
+                   -- Obtener contactos listos    
+                   WITH s AS (
                         SELECT $3::text || c."value" AS "phoneNumber",                                
                                 CONCAT(ba."street", ' ', ba."number") AS address,
                                 b.id AS "buildingId",
@@ -40,24 +44,18 @@ export class ContactService {
                                 c.id AS "contactId",
                                 ba.city AS "city",
                                 b.use AS "use",
-                                cq.id AS "callQueueId"
+                                cq.id AS "callQueueId",
                                 cq.last_called_at AS "lastCalledAt"
                         FROM call_queue cq
-                        INNER JOIN owner o
-                        ON o.id = cq.owner_id
-                        INNER JOIN building b
-                        ON b.id = cq.building_id   
-                        INNER JOIN building_address ba
-                        ON ba.id = b."addressId"             
-                        INNER JOIN contact c
-                        ON c.id = cq.contact_id
-                        INNER JOIN person_contact pc
-                        ON pc."contactId" = cq.contact_id
-                        INNER JOIN person p
-                        ON p.id = pc."personId"             
+                        INNER JOIN owner o ON o.id = cq.owner_id
+                        INNER JOIN building b ON b.id = cq.building_id   
+                        INNER JOIN building_address ba ON ba.id = b."addressId"             
+                        INNER JOIN contact c ON c.id = cq.contact_id
+                        INNER JOIN person_contact pc ON pc."contactId" = cq.contact_id
+                        INNER JOIN person p ON p.id = pc."personId"             
                         WHERE ba."city" = $1 
                           AND c."value" LIKE $4       
-                          AND (cq.can_call = TRUE OR (cq.freeze_until IS NOT NULL AND cq.freeze_until <= NOW()))                         
+                          AND cq.can_call = TRUE                       
                     )
                     SELECT
                     "phoneNumber",                
@@ -69,7 +67,7 @@ export class ContactService {
                     "use",
                     "callQueueId"              
                     FROM s
-                    ORDER BY "lastCalledAt" ASC                      
+                    ORDER BY "lastCalledAt" ASC NULLS FIRST                      
                     LIMIT $2
                     `, [city, limit, prefix, mobileStart]
       )
