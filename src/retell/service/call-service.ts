@@ -302,6 +302,8 @@ export class CallService {
       const dynamicVar = body.retell_llm_dynamic_variables || {}
       const phoneNumber = body.to_number
 
+      this.logger.info(`metadata: ${metadata}`)
+      this.logger.info(`dynamic: ${dynamicVar}`)
       if (!phoneNumber) throw new Error('Missing phoneNumber in call payload')
       if (!metadata) throw new Error('Missing metadata in call payload')
 

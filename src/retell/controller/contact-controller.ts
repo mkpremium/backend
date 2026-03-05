@@ -108,14 +108,14 @@ export const getCallbackController = ({ callService }: { callService: CallServic
       ) {
         return res.status(401).send('Invalid signature')
       }
+      res.status(200).json({ status: 'ok' })
       const params = req.params
       const body = req.body
-      console.log('schedule-callback body:', body)
-      console.log('schedule-callback params:', params)
+      console.log('schedule-callback body:', JSON.stringify(body, null, 2))
+      console.log('schedule-callback params:', JSON.stringify(params, null, 2))
       await callService.configScheduledCall(body, params)
-      return res.status(200).json({ success: true, message: 'Llamada planificada correctamente' })
+      console.log('Llamada planificada correctamente')
     } catch (err:any) {
       console.error('schedule-callback error:', err)
-      return res.status(500).json({ success: false, message: 'Error al planificar la llamada' })
     }
   })
