@@ -52,11 +52,8 @@ export class CallService {
         }
 
         const batchCallPayload = this.buildCallPayload(tasks, timeWindow)
-
-        this.logger.info(batchCallPayload)
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(batchCallResponse.batch_call_id)
-
         result.status = 'ok'
         result.message = `se han conseguido ${temporalContacts.length} contactos`
       } catch (error) {
@@ -301,21 +298,32 @@ export class CallService {
     }
 
     async configScheduledCall (body:Call, params:any) {
+      const metadata = body.metadata || {}
+      const dynamicVar = body.retell_llm_dynamic_variables || {}
+      const phoneNumber = body.to_number
+
+      if (!phoneNumber) throw new Error('Missing phoneNumber in call payload')
+      if (!metadata) throw new Error('Missing metadata in call payload')
+
       const contact: ContactDTO = {
-        phoneNumber: body.to_number!,
+        phoneNumber,
         name: params.contact_name,
-        lastName: String(body.retell_llm_dynamic_variables.apellidos),
-        buildingId: String(body.metadata!.buildingId),
-        ownerId: String(body.metadata!.ownerId),
-        contactId: String(body.metadata!.contactId),
-        city: String(body.metadata!.city),
-        use: String(body.metadata!.use),
-        callQueueId: String(body.metadata!.callQueueId),
-        address: String(body.metadata!.address)
+        lastName: String(dynamicVar.apellidos),
+        buildingId: String(metadata.buildingId),
+        ownerId: String(metadata.ownerId),
+        contactId: String(metadata.contactId),
+        city: String(metadata.city),
+        use: String(metadata.use),
+        callQueueId: String(metadata.callQueueId),
+        address: String(metadata.address)
       }
       const tasks = this.transformContactstoBatchCallTask([contact])
       const batchCallPayload = this.buildCallPayload(tasks, params.contact_at)
-      const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
-      this.logger.info(batchCallResponse.batch_call_id)
+      try {
+        const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
+        this.logger.info(`Batch call created:${batchCallResponse.batch_call_id}`)
+      } catch (err:any) {
+        this.logger.error(`Error creating batch call:${err.message || err}`)
+      }
     }
 }
