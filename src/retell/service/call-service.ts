@@ -63,7 +63,7 @@ export class CallService {
       return result
     }
 
-    buildCallPayload (tasks:Task[], timeWindow?:any, timeStamp?:string): BatchCallCreateBatchCallParams {
+    buildCallPayload (tasks:Task[], timeWindow?:any, timeStamp?:number): BatchCallCreateBatchCallParams {
       if (!timeStamp && !timeWindow) {
         throw new Error('Debe proporcionar timeWindow o timeStamp')
       }
@@ -77,7 +77,7 @@ export class CallService {
       if (timeStamp) {
         const params = {
           ...baseParams,
-          trigger_timestamp: new Date(timeStamp).getTime()
+          trigger_timestamp: timeStamp
         }
         return params
       }
@@ -301,7 +301,7 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
-      const scheduledAt = body.args.scheduled_at
+      const scheduledAt = this.verifyScheduleAt(body.args.scheduled_at)
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
       this.logger.info(scheduledAt)
@@ -330,5 +330,13 @@ export class CallService {
         this.logger.error(`Error creating batch call:${err.message || err}`)
         throw err
       }
+    }
+
+    verifyScheduleAt (scheduledAt:string) {
+      const timeStamp = new Date(scheduledAt)
+      const now = new Date()
+      if (timeStamp.getFullYear() !== now.getFullYear()) timeStamp.setFullYear(now.getFullYear())
+      if (timeStamp < now) timeStamp.setDate(now.getDate() + 1)
+      return timeStamp.getTime()
     }
 }
