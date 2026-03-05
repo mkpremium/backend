@@ -7,6 +7,7 @@ import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { CallSchedule } from '../call-schedule.entity'
 import Retell from 'retell-sdk'
+import { DateTime } from 'luxon'
 import { CallLogResponse, RetellCustomFunctionResponse, UmindCallLog } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
@@ -301,11 +302,10 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
-      const scheduledAt = Date.parse(body.args.scheduled_at)
+      const scheduledAt = DateTime.fromISO(body.args.scheduled_at).toMillis()
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
       this.logger.info(body.args.scheduled_at)
-      this.logger.info(new Date(scheduledAt).toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }))
 
       if (!phoneNumber) throw new Error('Missing phoneNumber in call payload')
       if (!metadata) throw new Error('Missing metadata in call payload')
