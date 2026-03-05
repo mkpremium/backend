@@ -301,10 +301,11 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
-      const scheduledAt = this.verifyScheduleAt(body.args.scheduled_at)
+      const scheduledAt = Date.parse(body.args.scheduled_at)
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
       this.logger.info(body.args.scheduled_at)
+      this.logger.info(new Date(scheduledAt).toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }))
 
       if (!phoneNumber) throw new Error('Missing phoneNumber in call payload')
       if (!metadata) throw new Error('Missing metadata in call payload')
@@ -330,13 +331,5 @@ export class CallService {
         this.logger.error(`Error creating batch call:${err.message || err}`)
         throw err
       }
-    }
-
-    verifyScheduleAt (scheduledAt:string) {
-      const timeStamp = new Date(scheduledAt)
-      const now = new Date()
-      if (timeStamp.getFullYear() !== now.getFullYear()) timeStamp.setFullYear(now.getFullYear())
-      if (timeStamp < now) timeStamp.setDate(now.getDate() + 1)
-      return timeStamp.getTime()
     }
 }
