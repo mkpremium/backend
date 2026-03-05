@@ -320,12 +320,13 @@ export class CallService {
         address: String(metadata.address)
       }
       const tasks = this.transformContactstoBatchCallTask([contact])
-      const batchCallPayload = this.buildCallPayload(tasks, body.args.scheduled_at)
+      const batchCallPayload = this.buildCallPayload(tasks, undefined, body.args.scheduled_at)
       try {
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(`Batch call created:${batchCallResponse.batch_call_id}`)
       } catch (err:any) {
         this.logger.error(`Error creating batch call:${err.message || err}`)
+        throw err
       }
     }
 }
