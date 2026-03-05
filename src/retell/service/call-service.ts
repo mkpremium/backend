@@ -301,6 +301,7 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
+      const scheduledAt = body.args.scheduled_at
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
 
@@ -309,18 +310,18 @@ export class CallService {
 
       const contact: ContactDTO = {
         phoneNumber,
-        name: body.args.contact_name,
-        lastName: String(dynamicVar.apellidos),
+        name: String(dynamicVar.nombre),
+        lastName: String(dynamicVar.apellido),
         buildingId: String(metadata.buildingId),
         ownerId: String(metadata.ownerId),
         contactId: String(metadata.contactId),
         city: String(metadata.city),
         use: String(metadata.use),
         callQueueId: String(metadata.callQueueId),
-        address: String(metadata.address)
+        address: String(dynamicVar.direccion)
       }
       const tasks = this.transformContactstoBatchCallTask([contact])
-      const batchCallPayload = this.buildCallPayload(tasks, undefined, body.args.scheduled_at)
+      const batchCallPayload = this.buildCallPayload(tasks, undefined, scheduledAt)
       try {
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(`Batch call created:${batchCallResponse.batch_call_id}`)
