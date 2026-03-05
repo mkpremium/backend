@@ -69,3 +69,13 @@ export interface UmindCallLog {
     metadata?: Metadata;
     provincia?: string;
 }
+
+export interface RetellCustomFunctionResponse {
+    name: string;
+    args: Args;
+    call: Call;
+}
+export interface Args {
+    scheduled_at: string;
+    contact_name: string;
+}

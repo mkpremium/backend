@@ -7,7 +7,7 @@ import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { CallSchedule } from '../call-schedule.entity'
 import Retell from 'retell-sdk'
-import { Call, CallLogResponse, UmindCallLog } from '../types/call-log-response.dto'
+import { CallLogResponse, RetellCustomFunctionResponse, UmindCallLog } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
 import { Building } from '../../building/building.entity'
@@ -297,19 +297,19 @@ export class CallService {
       })
     }
 
-    async configScheduledCall (body:Call, params:any) {
-      const metadata = body.metadata || {}
-      const dynamicVar = body.retell_llm_dynamic_variables || {}
-      const phoneNumber = body.to_number
+    async configScheduledCall (body:RetellCustomFunctionResponse) {
+      const metadata = body.call.metadata || {}
+      const dynamicVar = body.call.retell_llm_dynamic_variables || {}
+      const phoneNumber = body.call.to_number
 
-      this.logger.info(`metadata: ${metadata}`)
-      this.logger.info(`dynamic: ${dynamicVar}`)
+      this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
+
       if (!phoneNumber) throw new Error('Missing phoneNumber in call payload')
       if (!metadata) throw new Error('Missing metadata in call payload')
 
       const contact: ContactDTO = {
         phoneNumber,
-        name: params.contact_name,
+        name: body.args.contact_name,
         lastName: String(dynamicVar.apellidos),
         buildingId: String(metadata.buildingId),
         ownerId: String(metadata.ownerId),
@@ -320,7 +320,7 @@ export class CallService {
         address: String(metadata.address)
       }
       const tasks = this.transformContactstoBatchCallTask([contact])
-      const batchCallPayload = this.buildCallPayload(tasks, params.contact_at)
+      const batchCallPayload = this.buildCallPayload(tasks, body.args.scheduled_at)
       try {
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(`Batch call created:${batchCallResponse.batch_call_id}`)
