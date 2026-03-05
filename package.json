@@ -34,6 +34,7 @@
     "io-ts-types": "^0.5.19",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.15",
+    "luxon": "^3.7.2",
     "mime-types": "^2.1.19",
     "moment-range": "^4.0.1",
     "moment-timezone": "^0.5.16",

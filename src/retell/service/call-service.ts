@@ -306,6 +306,7 @@ export class CallService {
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
       this.logger.info(body.args.scheduled_at)
+      this.logger.info(DateTime.fromMillis(scheduledAt).setZone('Europe/Madrid').toLocaleString(DateTime.DATETIME_MED))
 
       if (!phoneNumber) throw new Error('Missing phoneNumber in call payload')
       if (!metadata) throw new Error('Missing metadata in call payload')
