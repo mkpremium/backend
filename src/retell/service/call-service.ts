@@ -302,7 +302,7 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
-      const scheduledAt = DateTime.fromISO(body.args.scheduled_at).toMillis()
+      const scheduledAt = DateTime.fromISO(body.args.scheduled_at, { zone: 'Europe/Madrid' }).toMillis()
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
       this.logger.info(body.args.scheduled_at)
