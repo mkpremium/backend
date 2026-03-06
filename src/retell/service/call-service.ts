@@ -282,8 +282,7 @@ export class CallService {
 
         const caller = await manager.findOne(Caller, { where: { id: callerId } })
         if (!caller) throw new Error(`Caller with id ${callerId} not found`)
-
-        building.negotiationStatus = 'PENDIENTE'
+        if (building.negotiationStatus === 'NO VENDE') building.negotiationStatus = 'PENDIENTE'
         building.assignedFlipper = flipper
         await manager.save(building)
 

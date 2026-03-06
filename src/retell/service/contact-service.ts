@@ -55,9 +55,10 @@ export class ContactService {
                         INNER JOIN person p ON p.id = pc."personId"             
                         WHERE ba."city" = $1 
                           AND c."value" LIKE $4       
-                          AND cq.can_call = TRUE                       
+                          AND cq.can_call = TRUE  
+                          AND b."negotiationStatus" IN ('PENDIENTE','NO VENDE')                     
                     )
-                    SELECT
+                    SELECT DISTINCT
                     "phoneNumber",                
                     address,
                     "buildingId",
