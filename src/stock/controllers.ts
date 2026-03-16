@@ -10,6 +10,7 @@ export function updatePurchaseStockFactory (stockSalesService: StockSalesService
 
 export function createSellPurchasedStockController (stockSalesService: StockSalesService) {
   return async (req, res) => {
+    console.log('FRONTEND BODY:', JSON.stringify(req.body, null, 2))
     const stock = await stockSalesService.sellStock(req.body, req.user.id)
     res.status(201).json(stock)
   }
@@ -18,6 +19,7 @@ export function createSellPurchasedStockController (stockSalesService: StockSale
 export function updateSellStockControllerFactory (stockSalesService: StockSalesService) {
   return wrap(
     async function updateSellStockController (req, res) {
+      console.log('FRONTEND BODY:', JSON.stringify(req.body, null, 2))
       const stock = await stockSalesService.updateSellStock(req.body, req.user.id)
       res.status(201).json(stock)
     }
@@ -27,6 +29,7 @@ export function updateSellStockControllerFactory (stockSalesService: StockSalesS
 export function closeSellStockControllerFactory (stockSalesService: StockSalesService) {
   return wrap(async function closeSellStockController (req, res) {
     const stock = await stockSalesService.closeSellStock(req.body.buildingId, req.user.id)
+    console.log('BACKEND CLOSESELL BODY', JSON.stringify(stock, null, 2))
     res.status(201).json(stock)
   })
 }

@@ -9,6 +9,7 @@ import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.e
 import { StockStatuses } from '../types'
 import { StockTransaction } from '../stock-transaction.entity'
 import { User } from '../../user/user.entity'
+import { StockClose } from '../stock-close.entity'
 
 export class StockSalesService {
   constructor (
@@ -126,18 +127,31 @@ export class StockSalesService {
   async closeSellStock (buildingId: string, flipperOrUserId: string): Promise<Stock> {
     return await this.entityManager.transaction(async transactionalEntityManager => {
       const stock = await this.getStockOrFail(buildingId)
-
+      if (!stock) {
+        console.log('STOCK SIN DATOS')
+        return
+      }
+      console.log('STOCK EXISTE', stock)
       if (stock.currentStatus !== 'SELL') {
         throw new Error('El stock no se encuentra en estado "SELL"')
       }
 
       const gain = stock.sellTransaction.transactionAmount - stock.purchaseTransaction.transactionAmount
-      const user = new User()
-      user.id = flipperOrUserId
+      const user = await this.getUserOrFail(flipperOrUserId)
+      if (!user) {
+        console.log('USUARIO NO EXISTE')
+        return
+      }
 
-      stock.closeEntity.flipperOrUser = user
-      stock.closeEntity.gain = gain
-      stock.closeEntity.transactionDate = new Date()
+      const closeEntity = new StockClose()
+
+      closeEntity.flipperOrUser = user
+      closeEntity.gain = gain
+      closeEntity.transactionDate = new Date()
+
+      const savedCloseEntity = await transactionalEntityManager.save(StockClose, closeEntity)
+
+      stock.closeEntity = savedCloseEntity
       stock.currentStatus = 'CLOSE'
 
       await transactionalEntityManager.save(stock)
@@ -157,11 +171,25 @@ export class StockSalesService {
   }
 
   private async getStockOrFail (buildingId: string): Promise<Stock> {
-    const stock = await this.entityManager.findOneBy(Stock, { building: { id: buildingId } })
+    const stock = await this.entityManager.findOne(Stock, {
+      where: { building: { id: buildingId } },
+      relations: ['purchaseTransaction', 'sellTransaction', 'closeEntity']
+    })
 
     if (!stock) {
       throw new Error(`Stock not found for buildingId: ${buildingId}`)
     }
     return stock
+  }
+
+  private async getUserOrFail (userId:string): Promise<User> {
+    const user = await this.entityManager.findOne(User, {
+      where: { id: userId }
+    })
+
+    if (!user) {
+      throw new Error(`User not found for userId: ${userId}`)
+    }
+    return user
   }
 }

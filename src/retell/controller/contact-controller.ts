@@ -118,3 +118,17 @@ export const getCallbackController = ({ callService }: { callService: CallServic
       console.error('schedule-callback error:', err)
     }
   })
+
+export const getLastCalledDate = ({ callService }: { callService: CallService}) =>
+  wrap(async (req: Request, res: Response) => {
+    try {
+      const buildingId = req.query.buildingId as string
+      console.log(`${buildingId}`)
+      if (!buildingId) return res.status(400).json({ success: false, message: 'El Id del edificio es obligatorio' })
+      await callService.changeNegotiationStatus(buildingId)
+
+      return res.status(200).json({ success: 'ok' })
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: 'No se ha podido obtener la última fecha de llamada' })
+    }
+  })

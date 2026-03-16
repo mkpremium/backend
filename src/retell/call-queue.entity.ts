@@ -8,20 +8,20 @@ export class CallQueue {
   @PrimaryGeneratedColumn('uuid')
   id?: string
 
-  @Column('uuid')
-  owner_id?: string
+  @Column({ name: 'owner_id', type: 'uuid' })
+  ownerId?: string
 
-  @Column('uuid')
-  building_id?: string
+  @Column({ name: 'building_id', type: 'uuid' })
+  buildingId?: string
 
-  @Column('uuid')
-  contact_id?: string
+  @Column({ name: 'contact_id', type: 'uuid' })
+  contactId?: string
 
-  @Column({ type: 'boolean', default: true })
-  can_call?: boolean
+  @Column({ name: 'can_call', type: 'boolean', default: true })
+  canCall?: boolean
 
-  @Column({ type: 'timestamp', nullable: true })
-  freeze_until?: Date
+  @Column({ name: 'freeze_until', type: 'timestamp', nullable: true })
+  freezeUntil?: Date
 
   @Column({ name: 'call_count', type: 'int', default: () => '0' })
   callCount?: number
@@ -32,7 +32,7 @@ export class CallQueue {
   @Column({ name: 'last_called_at', type: 'timestamp', nullable: true })
   lastCalledAt?: Date
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ name: 'freeze_type', type: 'varchar', length: 20, nullable: true })
   freezeType?: string
 
   // Relaciones

@@ -11,15 +11,11 @@ import { DateTime } from 'luxon'
 import { CallLogResponse, RetellCustomFunctionResponse, UmindCallLog } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
-import { Building } from '../../building/building.entity'
-import { Flipper } from '../../flipper/flipper.entity'
-import { BuildingOfferRequest } from '../../building/repository/building-offer-request.entity'
-import { Contact } from '../../contacts/contact.entity'
-import { Caller } from '../../caller/caller.entity'
-import { Owner } from '../../owner/owner.entity'
-
+import { CallQueue } from '../call-queue.entity'
 import { BatchCallCreateBatchCallParams } from 'retell-sdk/resources/batch-call.mjs'
-
+import moment from 'moment-timezone'
+import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
+import { BuildingNegotiationStatus } from '../../building/building'
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
     private callScheduleRepo = AppDataSource.getRepository(CallSchedule)
@@ -27,7 +23,8 @@ export class CallService {
     constructor (
       private contactService: ContactService,
       private retellClient: Retell,
-      private logger: ReturnType<typeof initLogger>
+      private logger: ReturnType<typeof initLogger>,
+      private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService
     ) {}
 
     async makeBatchCall (request:CityCallRequest) {
@@ -193,7 +190,7 @@ export class CallService {
       if (buildingId && ownerId && contactId) {
         if (String(body.call.call_analysis?.custom_analysis_data?.vende).toLowerCase() === 'si') {
           try {
-            await this.changeNegotiationStatus(buildingId, ownerId, contactId)
+            await this.changeNegotiationStatus(buildingId)
           } catch (error) {
             console.log('Error changing negotiation status', error)
             throw error
@@ -263,38 +260,16 @@ export class CallService {
       await this.callScheduleRepo.clear()
     }
 
-    async changeNegotiationStatus (buildingId:string, ownerId:string, contactId:string) {
+    async changeNegotiationStatus (buildingId:string) {
       const flipperId = '24113328-ed9d-4ca6-919d-630b2cd05062'
-      const callerId = '807cc64b-0c3f-45f9-ae5d-d37a45a2bb64'
-
-      await AppDataSource.transaction(async (manager) => {
-        const building = await manager.findOne(Building, { where: { id: buildingId } })
-        if (!building) throw new Error(`Building with id ${buildingId} not found`)
-
-        const flipper = await manager.findOne(Flipper, { where: { id: flipperId } })
-        if (!flipper) throw new Error(`Flipper with id ${flipperId} not found`)
-
-        const owner = await manager.findOne(Owner, { where: { id: ownerId } })
-        if (!owner) throw new Error(`Owner with id ${ownerId} not found`)
-
-        const contact = await manager.findOne(Contact, { where: { id: contactId } })
-        if (!contact) throw new Error(`Contact with id ${contactId} not found`)
-
-        const caller = await manager.findOne(Caller, { where: { id: callerId } })
-        if (!caller) throw new Error(`Caller with id ${callerId} not found`)
-        if (building.negotiationStatus === 'NO VENDE') building.negotiationStatus = 'PENDIENTE'
-        building.assignedFlipper = flipper
-        await manager.save(building)
-
-        const buildingOffer = manager.create(BuildingOfferRequest, {
-          flipper,
-          owner,
-          contact,
-          building,
-          caller
-        })
-        await manager.save(buildingOffer)
-      })
+      const userId = '56ecc194-b998-43b5-a118-62e40b69aa84'
+      const status:BuildingNegotiationStatus = 'PENDIENTE'
+      const params = {
+        status,
+        userId,
+        flipperId
+      }
+      await this.updateBuildingNegotiationStatusService.updateBuildingStatus(buildingId, params)
     }
 
     async configScheduledCall (body:RetellCustomFunctionResponse) {
@@ -331,5 +306,14 @@ export class CallService {
         this.logger.error(`Error creating batch call:${err.message || err}`)
         throw err
       }
+    }
+
+    async getLastCalledDate (buildingId:string, contactId:string) {
+      const callQueueEntry = await AppDataSource.manager.findOne(CallQueue, {
+        where: { buildingId, contactId }
+      })
+
+      if (!callQueueEntry?.lastCalledAt) return null
+      return moment(callQueueEntry!.lastCalledAt).format('DD/MM/YY')
     }
 }

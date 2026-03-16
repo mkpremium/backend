@@ -58,17 +58,17 @@ export class ContactService {
                           AND cq.can_call = TRUE  
                           AND b."negotiationStatus" IN ('PENDIENTE','NO VENDE')                     
                     )
-                    SELECT DISTINCT
-                    "phoneNumber",                
-                    address,
-                    "buildingId",
-                    "ownerId",
-                    "contactId",
-                    "city",
-                    "use",
-                    "callQueueId"              
+                    SELECT DISTINCT ON ("phoneNumber")
+                        "phoneNumber",                
+                        address,
+                        "buildingId",
+                        "ownerId",
+                        "contactId",
+                        "city",
+                        "use",
+                        "callQueueId"              
                     FROM s
-                    ORDER BY "lastCalledAt" ASC NULLS FIRST                      
+                    ORDER BY "phoneNumber", "lastCalledAt" ASC NULLS FIRST                      
                     LIMIT $2
                     `, [city, limit, prefix, mobileStart]
       )
