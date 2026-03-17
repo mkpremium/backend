@@ -78,6 +78,9 @@ export const getCallLogController = ({ callService }: { callService: CallService
 export const sendCallsController = ({ callService }: { callService: CallService }) =>
   wrap(async (req: Request, res: Response) => {
     try {
+      if (process.env.ALLOW_MANUAL_SEND_CALLS === 'false') {
+        return res.status(400).json({ status: 'error', message: 'Manual call trigger disabled' })
+      }
       const result = await callService.readScheduleCalls()
       res.status(200).json(result)
     } catch (err:any) {

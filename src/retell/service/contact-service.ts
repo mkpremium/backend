@@ -56,7 +56,8 @@ export class ContactService {
                         WHERE ba."city" = $1 
                           AND c."value" LIKE $4       
                           AND cq.can_call = TRUE  
-                          AND b."negotiationStatus" IN ('PENDIENTE','NO VENDE')                     
+                          AND b."negotiationStatus" IN ('PENDIENTE','NO VENDE')
+                          AND o.type = 'PRINCIPAL'                     
                     )
                     SELECT DISTINCT ON ("phoneNumber")
                         "phoneNumber",                
