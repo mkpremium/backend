@@ -57,7 +57,8 @@ export class ContactService {
                           AND c."value" LIKE $4       
                           AND cq.can_call = TRUE  
                           AND b."negotiationStatus" IN ('PENDIENTE','NO VENDE')
-                          AND o.type = 'PRINCIPAL'                     
+                          AND o.type = 'PRINCIPAL'
+                          AND b.id NOT IN (SELECT "buildingId" FROM building_offer_request)                     
                     )
                     SELECT DISTINCT ON ("phoneNumber")
                         "phoneNumber",                
