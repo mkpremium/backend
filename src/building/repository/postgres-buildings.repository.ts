@@ -113,12 +113,14 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
     location: entity.locationEntity,
     ownerId: entity.featuredOwner?.id,
     negotiationStatus: entity.negotiationStatus,
-    lead: entity.leadEntity && {
-      worksheetId: entity.leadEntity.worksheet.id,
-      ownerId: entity.leadEntity.owner.id,
-      contactId: entity.leadEntity.contact.id,
-      capturedAt: entity.leadEntity.capturedAt
-    },
+    lead: entity.leadEntity?.worksheet && entity.leadEntity.owner && entity.leadEntity.contact
+      ? {
+        worksheetId: entity.leadEntity.worksheet?.id,
+        ownerId: entity.leadEntity.owner?.id,
+        contactId: entity.leadEntity.contact?.id,
+        capturedAt: entity.leadEntity?.capturedAt
+      }
+      : undefined,
     assignedAgentId: entity.assignedFlipper?.id,
     use: entity.use,
     recentProposal: entity.recentProposal
@@ -136,7 +138,8 @@ export function mapBuildingEntityToStruct (entity: Building): BuildingProps {
 
 interface BuildingReadModelData {
   lastOfferCreatedAt?: Date
-  owners?: (BuildingOwnerProps & { buildingId: string })[]
+  owners?: (BuildingOwnerProps & { buildingId: string })[],
+  lastCalledAt?: Date
 }
 
 export function buildingEntityToReadModel (
@@ -168,7 +171,7 @@ export function buildingEntityToReadModel (
       }
       : undefined,
     owner: toOwnerInBuildingRead(owner),
-    metadata: b.documents.map(({ id, mimeType, previewUrl }) => ({
+    metadata: b.documents?.map(({ id, mimeType, previewUrl }) => ({
       id,
       mimeType,
       previewUrl,
@@ -194,7 +197,8 @@ export function buildingEntityToReadModel (
         sell: b.stock.sellTransaction,
         close: b.stock.closeEntity
       }
-      : undefined
+      : undefined,
+    lastCalledAt: extra.lastCalledAt || undefined
     // stock: {
     //   purchase: stock && stock.purchase ? {
     //     reservationAmount: stock.purchase.reservationAmount,

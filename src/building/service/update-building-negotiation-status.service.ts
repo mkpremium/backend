@@ -17,6 +17,7 @@ interface UpdateBuildingNegotiationStatusCommand {
   status: BuildingNegotiationStatus;
   userId: string;
   sourceOwnerId?: string;
+  flipperId?: string;
   em?: EntityManager;
 }
 
@@ -31,11 +32,13 @@ export class UpdateBuildingNegotiationStatusService {
     status,
     userId,
     sourceOwnerId,
+    flipperId,
     em
   }: UpdateBuildingNegotiationStatusCommand) {
     let updatedBuilding = changeNegotiationStatus(
       await this.buildingsRepository.get(buildingId),
-      status
+      status,
+      flipperId
     )
     if (sourceOwnerId) {
       updatedBuilding = withFeaturedOwner(updatedBuilding, sourceOwnerId)

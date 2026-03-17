@@ -270,7 +270,7 @@ export const Building = t.struct<BuildingProps>(
   }
 )
 
-export function changeNegotiationStatus (building: BuildingProps, newStatus: BuildingNegotiationStatus): BuildingProps {
+export function changeNegotiationStatus (building: BuildingProps, newStatus: BuildingNegotiationStatus, flipperId?: string): BuildingProps {
   const spec = {
     negotiationStatus: {
       $set: newStatus
@@ -279,6 +279,10 @@ export function changeNegotiationStatus (building: BuildingProps, newStatus: Bui
   if (newStatus === 'NO VENDE') {
     spec.assignedAgentId = {
       $set: null
+    }
+  } else if (flipperId) {
+    spec.assignedAgentId = {
+      $set: flipperId
     }
   }
 

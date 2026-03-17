@@ -5,6 +5,7 @@ import { Person } from './person.entity'
 import type { OwnerType } from './owner'
 import { OwnerStatus } from './owner'
 import { BuildingLead } from '../building/building-lead.entity'
+import { CallQueue } from '../retell/call-queue.entity'
 
 @Entity()
 export class Owner extends BaseEntity {
@@ -29,4 +30,7 @@ export class Owner extends BaseEntity {
 
   @OneToMany(() => BuildingLead, lead => lead.owner)
   leads:BuildingLead[]
+
+  @OneToMany(() => CallQueue, callQueue => callQueue.owner)
+  callQueues?: CallQueue[]
 }

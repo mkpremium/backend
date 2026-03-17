@@ -12,6 +12,7 @@ import { Stock } from '../stock/stock.entity'
 import { BuildingAddress } from './building-address.entity'
 import { BuildingLead } from './building-lead.entity'
 import { BuildingLocation } from './building-location.entity'
+import { CallQueue } from '../retell/call-queue.entity'
 
 @Entity()
 export class Building extends BaseEntity {
@@ -63,6 +64,9 @@ export class Building extends BaseEntity {
   @OneToOne(() => BuildingLocation, (location) => location.building)
   @JoinColumn({ name: 'locationId' })
   locationEntity: BuildingLocation
+
+  @OneToMany(() => CallQueue, callQueue => callQueue.building)
+  callQueues?: CallQueue[]
 
   get recentProposal (): Proposal | undefined {
     return _.sortBy(this.proposals || [], '.createdAt').at(0)

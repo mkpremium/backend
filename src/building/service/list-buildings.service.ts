@@ -11,6 +11,7 @@ import {
 } from '../../scheduled-events/repository/postgres-schedule-events.repository'
 import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
 import type { Logger } from 'winston'
+import { CallQueue } from '../../retell/call-queue.entity'
 
 export class ListBuildingsService {
   constructor (
@@ -40,7 +41,8 @@ export class ListBuildingsService {
         },
         addressEntity: true,
         leadEntity: true,
-        locationEntity: true
+        locationEntity: true,
+        callQueues: true
       }
     })
 
@@ -51,9 +53,19 @@ export class ListBuildingsService {
       const lastOfferRequest = lastOfferRequests.find(({ buildingId }) => buildingId === building.id)
       const buildingOwners = allBuildingOwners.filter(
         ({ buildingId }) => buildingId === building.id)
+
+      const callQueueLastCalled = building.callQueues?.reduce((latest, current) => {
+        if (!current.lastCalledAt) return latest
+        if (!latest || current.lastCalledAt > latest.lastCalledAt!) return current
+        return latest
+      }, undefined as CallQueue | undefined)
+
+      const lastCalledDate = callQueueLastCalled?.lastCalledAt
+
       const mappedBuilding: BuildingReadModel = buildingEntityToReadModel(building, {
         lastOfferCreatedAt: lastOfferRequest?.offer_createdAt,
-        owners: buildingOwners
+        owners: buildingOwners,
+        lastCalledAt: lastCalledDate
       })
       if (!mappedBuilding.owner) {
         this.logger.error('Building without owner', { buildingId: building.id })
@@ -61,7 +73,7 @@ export class ListBuildingsService {
       }
 
       return mappedBuilding
-    }).filter(Boolean)
+    }).filter((b):b is BuildingReadModel => Boolean(b))
   }
 
   async buildingsAssignedTo (flipperUserId: string): Promise<BuildingReadModel[]> {
