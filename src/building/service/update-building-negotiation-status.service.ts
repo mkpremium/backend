@@ -5,7 +5,8 @@ import { DomainEventCatalog } from '../../infrastructure/postgres/domain-event.e
 import type { EntityManager } from 'typeorm'
 import { Building } from '../building.entity'
 import { mapBuildingStructToEntity } from '../repository/postgres-buildings.repository'
-
+import { AppDataSource } from '../../data-source'
+import { CallQueue } from '../../retell/call-queue.entity'
 export interface BuildingNegotiationStatusChanged {
   name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED;
   buildingId: string;
@@ -43,7 +44,9 @@ export class UpdateBuildingNegotiationStatusService {
     if (sourceOwnerId) {
       updatedBuilding = withFeaturedOwner(updatedBuilding, sourceOwnerId)
     }
-
+    if (status === 'NO VENDE') {
+      await this.syncCallQueueStatus(buildingId)
+    }
     if (em) {
       await em.save(Building, mapBuildingStructToEntity(updatedBuilding))
     } else {
@@ -56,5 +59,21 @@ export class UpdateBuildingNegotiationStatusService {
       userId,
       negotiationStatus: status
     } as BuildingNegotiationStatusChanged, em)
+  }
+
+  async syncCallQueueStatus (buildingId: string) {
+    try {
+      const callQueueRepo = AppDataSource.getRepository(CallQueue)
+      const callQueue = await callQueueRepo.findOne({
+        where: { buildingId }
+      })
+      if (!callQueue) return
+      callQueue.freezeType = 'NO_SALE'
+      callQueue.freezeUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 meses
+      callQueue.callCount = 0
+      callQueue.canCall = false
+    } catch (err) {
+      console.log('Error actualizando call_queue')
+    }
   }
 }

@@ -16,6 +16,7 @@ import { BatchCallCreateBatchCallParams } from 'retell-sdk/resources/batch-call.
 import moment from 'moment-timezone'
 import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
 import { BuildingNegotiationStatus } from '../../building/building'
+
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
     private callScheduleRepo = AppDataSource.getRepository(CallSchedule)
@@ -52,10 +53,12 @@ export class CallService {
         const batchCallPayload = this.buildCallPayload(tasks, timeWindow)
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(batchCallResponse.batch_call_id)
+        this.logger.info('Full Retell Response:', JSON.stringify(batchCallResponse, null, 2))
         result.status = 'ok'
         result.message = `se han conseguido ${temporalContacts.length} contactos`
       } catch (error) {
         result.status = 'error'
+        this.logger.info('Error Retell: ', error)
         result.message = (error as Error).message
       }
       return result
@@ -203,7 +206,6 @@ export class CallService {
         duration: body.call.duration_ms ? this.formatMiliseconds(body.call.duration_ms) : 0,
         toNumber: body.call.to_number || null,
         summary: callAnalysis.call_summary || null,
-        transcript: body.call.transcript || null,
         endReason: body.call.disconnection_reason || null,
         recordings: body.call.recording_url || null,
         callId: body.call.call_id || null,

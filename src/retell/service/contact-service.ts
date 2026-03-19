@@ -17,21 +17,29 @@ export class ContactService {
     try {
       await queryRunner.query(`
                   -- Reactiva los freeze expirados de cualquier tipo
-                  UPDATE call_queue
-                  SET 
-                      can_call = TRUE,
-                      call_count = 0,
-                      freeze_until = NULL,
-                      freeze_type = NULL
-                  WHERE 
-                      can_call = FALSE
-                      AND freeze_until IS NOT NULL
-                      AND freeze_until <= NOW()
-                      AND (
-                          (freeze_type = 'NO_ANSWER' AND last_called_at <= NOW() - INTERVAL '1 month') OR
-                          (freeze_type = 'NO_SALE' AND last_called_at <= NOW() - INTERVAL '3 months') OR
-                          (freeze_type = 'DO_NOT_CALL' AND last_called_at <= NOW() - INTERVAL '6 months')
-                      );
+                  WITH reactivated AS(
+                      UPDATE call_queue
+                      SET 
+                          can_call = TRUE,
+                          call_count = 0,
+                          freeze_until = NULL,
+                          freeze_type = 'PENDING'
+                      WHERE 
+                          can_call = FALSE
+                          AND freeze_until IS NOT NULL
+                          AND freeze_until <= NOW()
+                          AND (
+                              (freeze_type = 'NO_ANSWER' AND last_called_at <= NOW() - INTERVAL '1 month') OR
+                              (freeze_type = 'NO_SALE' AND last_called_at <= NOW() - INTERVAL '3 months') OR
+                              (freeze_type = 'DO_NOT_CALL' AND last_called_at <= NOW() - INTERVAL '6 months')
+                          )
+                      RETURNING building_id
+                 )
+                  UPDATE building
+                  SET "negotiationStatus" = 'PENDIENTE',
+                      "assignedFlipperId" = NULL
+                  WHERE id IN (SELECT building_id FROM reactivated);
+
       `)
       const contacts: ContactDTO[] = await queryRunner.query(`
                   
@@ -56,9 +64,8 @@ export class ContactService {
                         WHERE ba."city" = $1 
                           AND c."value" LIKE $4       
                           AND cq.can_call = TRUE  
-                          AND b."negotiationStatus" IN ('PENDIENTE','NO VENDE')
-                          AND o.type = 'PRINCIPAL'
-                          AND b.id NOT IN (SELECT "buildingId" FROM building_offer_request)                     
+                          AND b."negotiationStatus" IN ('PENDIENTE')                          
+                          AND o.type = 'PRINCIPAL'                   
                     )
                     SELECT DISTINCT ON ("phoneNumber")
                         "phoneNumber",                

@@ -49,6 +49,7 @@ export const getCallLogController = ({ callService }: { callService: CallService
           req.headers['x-retell-signature'] as string
         )
       ) {
+        console.error('Firma de Retell incorrecta')
         return res.status(401).send('Invalid signature')
       }
 
@@ -84,6 +85,7 @@ export const sendCallsController = ({ callService }: { callService: CallService 
       const result = await callService.readScheduleCalls()
       res.status(200).json(result)
     } catch (err:any) {
+      console.error('Error SendCallsController:', err.message)
       res.status(400).json({ status: 'error', message: err.message })
     }
   })
