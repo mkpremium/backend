@@ -62,7 +62,8 @@ export class ContactService {
                         INNER JOIN person_contact pc ON pc."contactId" = cq.contact_id
                         INNER JOIN person p ON p.id = pc."personId"             
                         WHERE ba."city" = $1 
-                          AND c."value" LIKE $4       
+                          AND c."value" LIKE $4  
+                          AND LENGTH(c."value") = 9        
                           AND cq.can_call = TRUE  
                           AND b."negotiationStatus" IN ('PENDIENTE')                          
                           AND o.type = 'PRINCIPAL'                   
