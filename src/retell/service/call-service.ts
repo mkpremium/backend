@@ -16,6 +16,8 @@ import { BatchCallCreateBatchCallParams } from 'retell-sdk/resources/batch-call.
 import moment from 'moment-timezone'
 import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
 import { BuildingNegotiationStatus } from '../../building/building'
+import { PostgresBuildingNotesRepository } from '../../building/repository/postgres-building-notes.repository'
+import { CreateNoteCommand } from '../../notes/types'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -235,7 +237,25 @@ export class CallService {
 
       const callLog: CallLog = callLogRepo.create(callLogMap)
       await callLogRepo.save(callLog)
+      const notesParams = [callLog.resumen!, callLog.recordings!]
+      if (callLog.vende === true) await this.saveBuildingNotes(buildingId!, notesParams)
       return await this.buildUmindCallLog(callLog)
+    }
+
+    async saveBuildingNotes (buildingId:string, notesParams:string[]) {
+      if (!buildingId) return
+      const buildingNoteRepo = new PostgresBuildingNotesRepository(AppDataSource)
+      const userId = '56ecc194-b998-43b5-a118-62e40b69aa84'
+
+      for (const elem of notesParams) {
+        if (!elem) continue
+        const note = `${elem}`
+        const newNote:CreateNoteCommand = {
+          note,
+          context: { buildingId }
+        }
+        await buildingNoteRepo.createNote(newNote, userId)
+      }
     }
 
     async buildUmindCallLog (callLog:DeepPartial<CallLog>) {
