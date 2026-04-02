@@ -18,7 +18,9 @@ import { UpdateBuildingNegotiationStatusService } from '../../building/service/u
 import { BuildingNegotiationStatus } from '../../building/building'
 import { PostgresBuildingNotesRepository } from '../../building/repository/postgres-building-notes.repository'
 import { CreateNoteCommand } from '../../notes/types'
-
+import { isValidDay, timeToMinutes, formatMiliseconds } from '../utils/call-service-utils'
+import { PostgresCallScheduleRepository } from '../repository/postgres-call-schedule.repository'
+import { CallScheduleProps } from '../models/call-schedule.model'
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
     private callScheduleRepo = AppDataSource.getRepository(CallSchedule)
@@ -27,52 +29,58 @@ export class CallService {
       private contactService: ContactService,
       private retellClient: Retell,
       private logger: ReturnType<typeof initLogger>,
-      private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService
+      private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
+      private callScheduleRepository: PostgresCallScheduleRepository
     ) {}
 
-    async makeBatchCall (request:CityCallRequest) {
+    async makeBatchCall (request:CityCallRequest):Promise<CityCallResponse> {
       const result: CityCallResponse = {
         city: request.city!,
         status: 'ok',
         message: ''
       }
+
+      const currentCity = request.city!
+      const currentCityLimit = request.limit!
+
+      if (!currentCity && !currentCityLimit) return { ...result, status: 'error', message: 'No se proporcionó la ciudad o el límite' }
+
       try {
-        const temporalContacts = await this.contactService.getCityContacts(request.city!, request.limit!)
-        if (!temporalContacts) {
-          result.status = 'error'
-          result.message = 'No quedan contactos sin llamar'
-          return result
-        }
+        const temporalContacts = await this.contactService.getCityContacts(currentCity, currentCityLimit)
+        if (!temporalContacts) return { ...result, status: 'error', message: 'No quedan contactos sin llamar' }
+
         this.logger.info(JSON.stringify(temporalContacts, null, 2))
         const tasks:Task[] = this.transformContactstoBatchCallTask(temporalContacts)
         this.logger.info(JSON.stringify(tasks, null, 2))
 
         const timeWindow = {
-          startTime: this.timeToMinutes(request.timeWindow!.startHour),
-          endTime: this.timeToMinutes(request.timeWindow!.endHour)
+          startTime: timeToMinutes(request.timeWindow!.startHour),
+          endTime: timeToMinutes(request.timeWindow!.endHour)
         }
 
-        const batchCallPayload = this.buildCallPayload(tasks, timeWindow)
+        const currentRetellOriginTelf = this.assignRetellOriginTelf(currentCity)
+        this.logger.debug(`Telefono origen de la ciudad actual: ${currentRetellOriginTelf}`)
+        const batchCallPayload = this.buildCallPayload(tasks, currentRetellOriginTelf!, timeWindow)
+        this.logger.debug({ batchCallPayload })
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(batchCallResponse.batch_call_id)
         this.logger.info('Full Retell Response:', JSON.stringify(batchCallResponse, null, 2))
         result.status = 'ok'
         result.message = `se han conseguido ${temporalContacts.length} contactos`
       } catch (error) {
-        result.status = 'error'
         this.logger.info('Error Retell: ', error)
-        result.message = (error as Error).message
+        return { ...result, status: 'error', message: (error as Error).message }
       }
       return result
     }
 
-    buildCallPayload (tasks:Task[], timeWindow?:any, timeStamp?:number): BatchCallCreateBatchCallParams {
+    buildCallPayload (tasks:Task[], originTelf:string, timeWindow?:any, timeStamp?:number): BatchCallCreateBatchCallParams {
       if (!timeStamp && !timeWindow) {
         throw new Error('Debe proporcionar timeWindow o timeStamp')
       }
 
       const baseParams = {
-        from_number: process.env.TELF_ORIGIN!,
+        from_number: originTelf,
         tasks,
         reserved_concurrency: 1
       }
@@ -117,62 +125,33 @@ export class CallService {
       return tasks
     }
 
+    assignRetellOriginTelf (city:string) {
+      const portugalCities = ['PORTO', 'LISBOA', 'VILA NOVA DE GAIA']
+      if (portugalCities.includes(city.toUpperCase())) return process.env.RETELL_ORIGIN_TELF_PORTUGAL
+      return process.env.RETELL_ORIGIN_TELF_SPAIN
+    }
+
     async saveScheduleDailyCalls (body:CityCallRequest[]) {
-      await this.callScheduleRepo.clear()
-      for (const city of body) {
-        const callSchedule = this.callScheduleRepo.create({
-          city: city.city,
-          limit: city.limit,
-          days: city.days,
-          startHour: city.timeWindow?.startHour,
-          endHour: city.timeWindow?.endHour
-        })
-        await this.callScheduleRepo.save(callSchedule)
-      }
+      this.callScheduleRepository.saveAll(body)
     }
 
     async readScheduleCalls (): Promise<CityCallResponse[]> {
-      const schedules: CallSchedule[] = await this.getScheduleCalls()
+      const schedules: CallScheduleProps[] = await this.callScheduleRepository.getAll()
+      this.logger.debug({ schedules })
       const results: CityCallResponse[] = []
       const date = new Date()
       const currentDay = date.getDay()
 
       if (schedules.length === 0) return [{ city: '', status: 'error', message: 'No hay lista de planificación' }]
       for (const s of schedules) {
-        if (!this.isValidDay(currentDay, s.days!)) continue
+        if (!isValidDay(currentDay, s.days!)) continue
         results.push(await this.makeBatchCall(s))
       }
       return results
     }
 
     async getScheduleCalls () {
-      const callSchedule: CallSchedule [] = await this.callScheduleRepo.find()
-      return callSchedule.map(entity => ({
-        city: entity.city,
-        limit: entity.limit,
-        days: entity.days,
-        timeWindow: {
-          startHour: entity.startHour,
-          endHour: entity.endHour
-        }
-      }))
-    }
-
-    isValidDay (day:number, days: string):boolean {
-      if (days === '1-5') return day >= 1 && day <= 6
-      return days.split(',').map(Number).includes(day)
-    }
-
-    timeToMinutes (time:string) {
-      const [hours, minutes] = time.split(':').map(Number)
-      return hours! * 60 + minutes!
-    }
-
-    formatMiliseconds (ms: number): string {
-      const totalSeconds = Math.floor(ms / 1000)
-      const minutes = Math.floor(totalSeconds / 60)
-      const seconds = totalSeconds % 60
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`
+      return this.callScheduleRepository.getAll()
     }
 
     normalizePhoneNumber (phone: string): string | null {
@@ -205,7 +184,7 @@ export class CallService {
 
       const callLogMap = {
         startTime: body.call.start_timestamp ? new Date(body.call?.start_timestamp) : null,
-        duration: body.call.duration_ms ? this.formatMiliseconds(body.call.duration_ms) : 0,
+        duration: body.call.duration_ms ? formatMiliseconds(body.call.duration_ms) : 0,
         toNumber: body.call.to_number || null,
         summary: callAnalysis.call_summary || null,
         endReason: body.call.disconnection_reason || null,
@@ -298,6 +277,7 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
+      const retellOriginTelf = body.call.from_number
       const scheduledAt = DateTime.fromISO(body.args.scheduled_at, { zone: 'Europe/Madrid' }).toMillis()
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
@@ -320,7 +300,7 @@ export class CallService {
         address: String(dynamicVar.direccion)
       }
       const tasks = this.transformContactstoBatchCallTask([contact])
-      const batchCallPayload = this.buildCallPayload(tasks, undefined, scheduledAt)
+      const batchCallPayload = this.buildCallPayload(tasks, retellOriginTelf!, undefined, scheduledAt)
       try {
         const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
         this.logger.info(`Batch call created:${batchCallResponse.batch_call_id}`)

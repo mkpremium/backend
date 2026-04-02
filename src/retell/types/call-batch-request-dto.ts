@@ -1,8 +1,8 @@
 export interface CityCallRequest {
-    city?: string;
-    limit?: number;
-    timeWindow?: TimeWindow;
-    days?: string;
+    city: string;
+    limit: number;
+    timeWindow: TimeWindow;
+    days: string;
 }
 
 export interface CityCallResponse {
