@@ -1,18 +1,16 @@
 import { ContactService } from './contact-service'
 import { initLogger } from '../../infrastructure/logger'
 import { ContactDTO } from '../types/contact-dto'
-import { Task } from '../types/task-call'
 import { CityCallRequest, CityCallResponse } from '../types/call-batch-request-dto'
 import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { CallSchedule } from '../call-schedule.entity'
-import Retell from 'retell-sdk'
 import { DateTime } from 'luxon'
 import { CallLogResponse, RetellCustomFunctionResponse, UmindCallLog } from '../types/call-log-response.dto'
 import { CallLog } from '../call-log.entity'
 import { DeepPartial } from 'typeorm'
 import { CallQueue } from '../call-queue.entity'
-import { BatchCallCreateBatchCallParams } from 'retell-sdk/resources/batch-call.mjs'
+
 import moment from 'moment-timezone'
 import { UpdateBuildingNegotiationStatusService } from '../../building/service/update-building-negotiation-status.service'
 import { BuildingNegotiationStatus } from '../../building/building'
@@ -21,16 +19,20 @@ import { CreateNoteCommand } from '../../notes/types'
 import { isValidDay, timeToMinutes, formatMiliseconds } from '../utils/call-service-utils'
 import { PostgresCallScheduleRepository } from '../repository/postgres-call-schedule.repository'
 import { CallScheduleProps } from '../models/call-schedule.model'
+import { RetellCallProvider } from '../infrastructure/retell/retell-call.provider'
+import { transformContactstoTask } from './mappers/contacts-to-task.mapper'
+import { BatchCallRequest } from '../types/batch-call-request'
+
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
     private callScheduleRepo = AppDataSource.getRepository(CallSchedule)
 
     constructor (
       private contactService: ContactService,
-      private retellClient: Retell,
       private logger: ReturnType<typeof initLogger>,
       private updateBuildingNegotiationStatusService: UpdateBuildingNegotiationStatusService,
-      private callScheduleRepository: PostgresCallScheduleRepository
+      private callScheduleRepository: PostgresCallScheduleRepository,
+      private retellCallProvider: RetellCallProvider
     ) {}
 
     async makeBatchCall (request:CityCallRequest):Promise<CityCallResponse> {
@@ -50,20 +52,24 @@ export class CallService {
         if (!temporalContacts) return { ...result, status: 'error', message: 'No quedan contactos sin llamar' }
 
         this.logger.info(JSON.stringify(temporalContacts, null, 2))
-        const tasks:Task[] = this.transformContactstoBatchCallTask(temporalContacts)
-        this.logger.info(JSON.stringify(tasks, null, 2))
 
         const timeWindow = {
           startTime: timeToMinutes(request.timeWindow!.startHour),
           endTime: timeToMinutes(request.timeWindow!.endHour)
         }
 
-        const currentRetellOriginTelf = this.assignRetellOriginTelf(currentCity)
-        this.logger.debug(`Telefono origen de la ciudad actual: ${currentRetellOriginTelf}`)
-        const batchCallPayload = this.buildCallPayload(tasks, currentRetellOriginTelf!, timeWindow)
-        this.logger.debug({ batchCallPayload })
-        const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
-        this.logger.info(batchCallResponse.batch_call_id)
+        const currentOriginTelf = this.assignOriginTelf(currentCity)
+        this.logger.debug(`Telefono origen de la ciudad actual: ${currentOriginTelf}`)
+
+        const batchCallRequest:BatchCallRequest = {
+          originTelf: this.assignOriginTelf(currentCity)!,
+          tasks: transformContactstoTask(temporalContacts),
+          timeWindow
+        }
+
+        this.logger.debug({ batchCallRequest })
+        const batchCallResponse = await this.retellCallProvider.createBatchCall(batchCallRequest)
+        this.logger.info(batchCallResponse.batchId)
         this.logger.info('Full Retell Response:', JSON.stringify(batchCallResponse, null, 2))
         result.status = 'ok'
         result.message = `se han conseguido ${temporalContacts.length} contactos`
@@ -74,58 +80,7 @@ export class CallService {
       return result
     }
 
-    buildCallPayload (tasks:Task[], originTelf:string, timeWindow?:any, timeStamp?:number): BatchCallCreateBatchCallParams {
-      if (!timeStamp && !timeWindow) {
-        throw new Error('Debe proporcionar timeWindow o timeStamp')
-      }
-
-      const baseParams = {
-        from_number: originTelf,
-        tasks,
-        reserved_concurrency: 1
-      }
-
-      if (timeStamp) {
-        const params = {
-          ...baseParams,
-          trigger_timestamp: timeStamp
-        }
-        return params
-      }
-
-      const params = {
-        ...baseParams,
-        call_time_window: {
-          windows: [{ start: timeWindow.startTime, end: timeWindow.endTime }],
-          timezone: 'Europe/Madrid'
-        }
-      }
-      return params
-    }
-
-    transformContactstoBatchCallTask (contacts:ContactDTO[]) {
-      const tasks:Task[] = contacts.map(contact => ({
-        to_number: contact.phoneNumber,
-        retell_llm_dynamic_variables: {
-          nombre: contact.name,
-          apellido: contact.lastName,
-          direccion: contact.address
-        },
-        metadata: {
-          buildingId: contact.buildingId,
-          ownerId: contact.ownerId,
-          contactId: contact.contactId,
-          city: contact.city,
-          use: contact.use,
-          callQueueId: contact.callQueueId,
-          address: contact.address
-        }
-      }))
-
-      return tasks
-    }
-
-    assignRetellOriginTelf (city:string) {
+    assignOriginTelf (city:string) {
       const portugalCities = ['PORTO', 'LISBOA', 'VILA NOVA DE GAIA']
       if (portugalCities.includes(city.toUpperCase())) return process.env.RETELL_ORIGIN_TELF_PORTUGAL
       return process.env.RETELL_ORIGIN_TELF_SPAIN
@@ -277,7 +232,7 @@ export class CallService {
       const metadata = body.call.metadata || {}
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
-      const retellOriginTelf = body.call.from_number
+      const originTelf = body.call.from_number!
       const scheduledAt = DateTime.fromISO(body.args.scheduled_at, { zone: 'Europe/Madrid' }).toMillis()
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
@@ -299,11 +254,16 @@ export class CallService {
         callQueueId: String(metadata.callQueueId),
         address: String(dynamicVar.direccion)
       }
-      const tasks = this.transformContactstoBatchCallTask([contact])
-      const batchCallPayload = this.buildCallPayload(tasks, retellOriginTelf!, undefined, scheduledAt)
+
+      const batchCallRequest:BatchCallRequest = {
+        originTelf,
+        tasks: transformContactstoTask([contact]),
+        timeStamp: scheduledAt
+      }
+
       try {
-        const batchCallResponse = await this.retellClient.batchCall.createBatchCall(batchCallPayload)
-        this.logger.info(`Batch call created:${batchCallResponse.batch_call_id}`)
+        const batchCallResponse = await this.retellCallProvider.createBatchCall(batchCallRequest)
+        this.logger.info(`Batch call created:${batchCallResponse.batchId}`)
       } catch (err:any) {
         this.logger.error(`Error creating batch call:${err.message || err}`)
         throw err

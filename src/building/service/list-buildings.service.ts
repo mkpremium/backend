@@ -11,7 +11,7 @@ import {
 } from '../../scheduled-events/repository/postgres-schedule-events.repository'
 import { ScheduledEvent } from '../../scheduled-events/scheduled-event.entity'
 import type { Logger } from 'winston'
-import { CallQueue } from '../../retell/call-queue.entity'
+import { CallQueue } from '../../call/call-queue.entity'
 
 export class ListBuildingsService {
   constructor (

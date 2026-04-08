@@ -32,10 +32,10 @@ import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-i
 import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
 import { AddUserService } from '../user/service/add-user.service'
 import { AddOwnerService } from '../owner/service/add-owner.service'
-import { CallService } from '../retell/service/call-service'
-import { ContactService } from '../retell/service/contact-service'
+import { CallService } from '../call/service/call-service'
+import { ContactService } from '../call/service/contact-service'
 import Retell from 'retell-sdk'
-import { setupCallDependencies } from '../retell/dependencies'
+import { setupCallDependencies } from '../call/dependencies'
 
 export async function createDiContainer () {
   const container = createContainer()

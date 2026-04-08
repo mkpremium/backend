@@ -6,7 +6,7 @@ import type { EntityManager } from 'typeorm'
 import { Building } from '../building.entity'
 import { mapBuildingStructToEntity } from '../repository/postgres-buildings.repository'
 import { AppDataSource } from '../../data-source'
-import { CallQueue } from '../../retell/call-queue.entity'
+import { CallQueue } from '../../call/call-queue.entity'
 export interface BuildingNegotiationStatusChanged {
   name: DomainEventCatalog.BUILDING__NEGOTIATION_STATUS_CHANGED;
   buildingId: string;

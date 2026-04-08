@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node","mocha"],
     "outDir": "./build",
     "allowJs": true,
     "target": "es6",

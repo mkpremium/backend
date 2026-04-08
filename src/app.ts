@@ -23,9 +23,9 @@ import { setupUserRoutes } from './user/routing'
 import { startListeners } from './infrastructure/listeners'
 import jwt from './middleware/jwt'
 import { setupStockRouter } from './stock/routing'
-import { CallService } from './retell/service/call-service'
+import { CallService } from './call/service/call-service'
 import cron from 'node-cron'
-import { createCallRoutes } from './retell/routes'
+import { createCallRoutes } from './call/routes'
 
 export const createApp = async (): Promise<Express> => {
   const logger = initLogger()

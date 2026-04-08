@@ -12,7 +12,7 @@ import { Stock } from '../stock/stock.entity'
 import { BuildingAddress } from './building-address.entity'
 import { BuildingLead } from './building-lead.entity'
 import { BuildingLocation } from './building-location.entity'
-import { CallQueue } from '../retell/call-queue.entity'
+import { CallQueue } from '../call/call-queue.entity'
 
 @Entity()
 export class Building extends BaseEntity {

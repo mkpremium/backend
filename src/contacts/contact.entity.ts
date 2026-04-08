@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm'
 import { BaseEntity } from '../infrastructure/entity'
 import { ContactType } from '../owner/owner'
 import { BuildingLead } from '../building/building-lead.entity'
-import { CallQueue } from '../retell/call-queue.entity'
+import { CallQueue } from '../call/call-queue.entity'
 
 @Entity()
 export class Contact extends BaseEntity {

@@ -1,4 +1,4 @@
-export interface Task {
+export interface RetellTaskCall {
     to_number: string,
     metadata: Metadata,
     retell_llm_dynamic_variables: DynamicVariables

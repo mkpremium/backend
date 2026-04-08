@@ -11,7 +11,7 @@ export interface CityCallResponse {
     message:string;
 }
 
-export interface TimeWindow{
+export interface TimeWindow {
     startHour: string;
     endHour: string;
 }

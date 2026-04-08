@@ -3,12 +3,14 @@ import { CallService } from './service/call-service'
 import { ContactService } from './service/contact-service'
 import { deleteScheduleDailyCallsController, getCallbackController, getCallLogController, getCityContactsController, getLastCalledDate, getScheduleDailyCallsController, scheduleDailyCallsController, sendCallsController } from './controller/contact-controller'
 import { PostgresCallScheduleRepository } from './repository/postgres-call-schedule.repository'
+import { RetellCallProvider } from './infrastructure/retell/retell-call.provider'
 
 export const setupCallDependencies = async (container: AwilixContainer) => {
   container.register({
     callScheduleRepository: asClass(PostgresCallScheduleRepository).singleton(),
     callService: asClass(CallService).classic().singleton(),
     contactService: asClass(ContactService).classic().singleton(),
+    retellCallProvider: asClass(RetellCallProvider).classic().singleton(),
     getCityContactsController: asFunction(getCityContactsController).singleton(),
     scheduleDailyCallsController: asFunction(scheduleDailyCallsController).singleton(),
     getScheduleDailyCallsController: asFunction(getScheduleDailyCallsController).singleton(),
