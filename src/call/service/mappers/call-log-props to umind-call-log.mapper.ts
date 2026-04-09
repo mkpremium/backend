@@ -1,5 +1,4 @@
-import { CallLogProps } from '../../models/call-log.model'
-import { UmindCallLog } from '../../types/call-log-response.dto'
+import { CallLogProps, UmindCallLog } from '../../models/call-log.model'
 
 export const transformCallLogPropsToUmindCallLog = (callLogProps:CallLogProps) => {
   const umindCallLog:UmindCallLog = {
