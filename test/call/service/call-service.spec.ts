@@ -5,10 +5,7 @@ import { CallService } from '../../../src/call/service/call.service'
 describe('CallService', () => {
   let contactService: any
   let logger: any
-  let updateBuildingNegotiationStatusService: any
-  let callScheduleRepository: any
   let retellCallProvider: any
-
   let service: CallService
 
   beforeEach(() => {
