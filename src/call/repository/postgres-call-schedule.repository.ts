@@ -21,6 +21,10 @@ export class PostgresCallScheduleRepository {
     return callScheduleList.map(cityCallSchedule => this.entityToStruct(cityCallSchedule))
   }
 
+  async deleteAll () {
+    await this.callScheduleRepository.clear()
+  }
+
   protected structToEntity (cityCallSchedule: CallScheduleProps): DeepPartial<CallSchedule> {
     return {
       city: cityCallSchedule.city,

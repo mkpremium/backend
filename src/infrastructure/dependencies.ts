@@ -32,8 +32,6 @@ import { WorksheetQueueImportTriggerService } from './postgres/worksheet-queue-i
 import { BuildingProposalsImportTriggerService } from './service/building-proposals-importer-trigger.service'
 import { AddUserService } from '../user/service/add-user.service'
 import { AddOwnerService } from '../owner/service/add-owner.service'
-import { CallService } from '../call/service/call-service'
-import { ContactService } from '../call/service/contact-service'
 import Retell from 'retell-sdk'
 import { setupCallDependencies } from '../call/dependencies'
 
@@ -83,8 +81,6 @@ async function setupInfrastructureDependencies (container: AwilixContainer, data
     logger: asFunction(initLogger).singleton(),
     addUserService: asClass(AddUserService).singleton(),
     addOwnerService: asClass(AddOwnerService).singleton(),
-    callService: asClass(CallService).singleton(),
-    contactService: asClass(ContactService).singleton(),
     couchbaseToPostgresProcess: asFunction(couchbaseToPostgresProcess).singleton(),
     buildingImportTriggerService: asClass(BuildingImportTriggerService).classic().singleton(),
     scheduledEventImportTriggerService: asClass(ScheduledEventImportTriggerService).classic().singleton(),

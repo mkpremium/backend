@@ -46,7 +46,7 @@ export class ContactService {
                    -- Obtener contactos listos    
                    WITH s AS (
                         SELECT $3::text || c."value" AS "phoneNumber",                                
-                                CONCAT(ba."street", ' ', ba."number") AS address,
+                                CONCAT(ba."type_full", ' ' ,ba."street", ' ', ba."number") AS address,
                                 b.id AS "buildingId",
                                 o.id AS "ownerId",
                                 c.id AS "contactId",

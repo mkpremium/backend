@@ -14,3 +14,9 @@ export const formatMiliseconds = (ms: number):string => {
   const seconds = totalSeconds % 60
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
+
+export const normalizePhoneNumber = (phone: string|undefined): string | undefined => {
+  if (!phone) return undefined
+  if (phone.startsWith('+351')) return phone.slice(4)
+  return phone.slice(3)
+}

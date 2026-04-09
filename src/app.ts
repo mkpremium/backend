@@ -23,9 +23,9 @@ import { setupUserRoutes } from './user/routing'
 import { startListeners } from './infrastructure/listeners'
 import jwt from './middleware/jwt'
 import { setupStockRouter } from './stock/routing'
-import { CallService } from './call/service/call-service'
 import cron from 'node-cron'
 import { createCallRoutes } from './call/routes'
+import { CallScheduleService } from './call/service/call-schedule.service'
 
 export const createApp = async (): Promise<Express> => {
   const logger = initLogger()
@@ -76,10 +76,10 @@ export const createApp = async (): Promise<Express> => {
       eventSubscribersInfo: eventBus.info
     })
 
-    const callService:CallService = diContainer.resolve('callService')
+    const callScheduleService:CallScheduleService = diContainer.resolve('callScheduleService')
     cron.schedule('0 7 * * *', async () => {
       logger.info('Enviando llamadas del día...')
-      await callService.readScheduleCalls()
+      await callScheduleService.readCallSchedule()
     })
 
     return app

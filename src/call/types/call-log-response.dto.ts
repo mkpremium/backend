@@ -31,9 +31,21 @@ export interface CallAnalysis {
     custom_analysis_data?: Data;
 }
 
-export type Metadata = Record<string, unknown>;
 export type Data = Record<string, unknown>;
-export type DynamicVariables = Record<string, unknown>;
+export interface Metadata {
+    buildingId?: string
+    ownerId?: string
+    contactId?: string
+    city?: string
+    use?: string
+    callQueueId?: string
+}
+
+export interface DynamicVariables {
+    nombre?: string,
+    apellido?: string,
+    direccion?: string
+}
 
 export interface CallCost {
     product_costs?: ProductCost[];
@@ -47,27 +59,6 @@ export interface ProductCost {
     cost?: number;
     unit_price?: number;
     is_transfer_leg_cost?: boolean;
-}
-export interface UmindCallLog {
-    duration?: string;
-    to_number?: string;
-    summary?: string;
-    transcript?: string;
-    end_reason?: string;
-    recordings?: string;
-    call_id: string;
-    interest?: string;
-    tipo_vivienda?: string;
-    status?: string;
-    client_id: string;
-    cost?: string;
-    from_number?: string;
-    from_number_norm?: string;
-    to_number_norm?: string;
-    name?: string;
-    agent_id?: string;
-    metadata?: Metadata;
-    provincia?: string;
 }
 
 export interface RetellCustomFunctionResponse {
