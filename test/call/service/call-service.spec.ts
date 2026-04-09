@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
-import { CallService } from '../../../src/call/service/call-service'
+import { CallService } from '../../../src/call/service/call.service'
 
 describe('CallService', () => {
   let contactService: any
@@ -22,15 +22,6 @@ describe('CallService', () => {
       error: sinon.spy()
     }
 
-    updateBuildingNegotiationStatusService = {
-      updateBuildingStatus: sinon.stub()
-    }
-
-    callScheduleRepository = {
-      getAll: sinon.stub(),
-      saveAll: sinon.stub()
-    }
-
     retellCallProvider = {
       createBatchCall: sinon.stub()
     }
@@ -38,8 +29,6 @@ describe('CallService', () => {
     service = new CallService(
       contactService,
       logger,
-      updateBuildingNegotiationStatusService,
-      callScheduleRepository,
       retellCallProvider
     )
   })

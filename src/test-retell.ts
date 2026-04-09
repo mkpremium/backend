@@ -1,11 +1,11 @@
 import Retell from 'retell-sdk'
-import { CallService } from './call/service/call-service'
+import { CallService } from './call/service/call.service'
 import { RetellCallProvider } from './call/infrastructure/retell/retell-call.provider'
 import { initLogger } from './infrastructure/logger'
 import path from 'path'
 import dotenv from 'dotenv'
 
-//export const fakePhoneNumber = '+34634531701'
+export const fakePhoneNumber2 = '+34634531701'
 export const fakePhoneNumber = '+34629685014'
 export const contactId = '32e8ead3-8a5e-4d32-b7b3-a3aa1ef809fa'
 export const contactService = {
@@ -25,15 +25,6 @@ export const contactService = {
   ]
 }
 
-const updateBuildingNegotiationStatusService = {
-  updateBuildingStatus: async () => {}
-}
-
-const callScheduleRepository = {
-  getAll: async () => [],
-  saveAll: async () => {}
-}
-
 async function main () {
   dotenv.config({
     path: path.resolve(__dirname, '../.env')
@@ -49,8 +40,6 @@ async function main () {
   const service = new CallService(
     contactService as any,
     logger,
-    updateBuildingNegotiationStatusService as any,
-    callScheduleRepository as any,
     retellProvider
   )
 
