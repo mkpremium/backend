@@ -33,10 +33,10 @@ export const transformCallLogResponseToCallLogProps = (callLogResponse:CallLogRe
     provincia: metadata.city || undefined,
     buildingId: buildingId || undefined,
     callSuccessful: callAnalysis.call_successful ?? undefined,
-    vende: typeof custom.vende === 'boolean' ? custom.vende : undefined,
+    vende: typeof custom.vende === 'boolean' ? custom.vende : false,
     resumen: typeof custom.resumen === 'string' ? custom.resumen : undefined,
-    noLlamar: typeof custom.no_llamar === 'boolean' ? custom.no_llamar : undefined,
-    rellamada: typeof custom.rellamada === 'string' ? custom.rellamada.toLowerCase() === 'si' : undefined,
+    noLlamar: typeof custom.no_llamar === 'boolean' ? custom.no_llamar : false,
+    rellamada: typeof custom.rellamada === 'string' ? ['si', 'sim'].includes(custom.rellamada.toLowerCase()) : false,
     contactId: contactId || undefined,
     callQueueId: metadata.callQueueId || undefined
   }
