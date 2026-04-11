@@ -28,8 +28,13 @@ export class CallScheduleService {
 
      if (schedules.length === 0) return [{ city: '', status: 'error', message: 'No hay lista de planificación' }]
      for (const s of schedules) {
-       if (!isValidDay(currentDay, s.days!)) continue
-       results.push(await this.callService.makeBatchCall(s))
+       try {
+         if (!isValidDay(currentDay, s.days!)) continue
+         results.push(await this.callService.makeBatchCall(s))
+       } catch (error) {
+         if (error instanceof Error) this.logger.error(error.message)
+         continue
+       }
      }
      return results
    }
