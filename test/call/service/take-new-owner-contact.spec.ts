@@ -9,7 +9,6 @@ const retellCallProvider = {} as any
 
 describe('CallService.takeNewOwnerContact', () => {
   let service: CallService
-
   let searchOwnerOrBuildingService: any
   let addOwnerService: any
   let updateOwnerTypeService: any
@@ -88,7 +87,7 @@ describe('CallService.takeNewOwnerContact', () => {
     }
 
     await service.takeNewOwnerContact(body as any)
-
+    expect(mapperStub.calledOnce).to.be.true
     expect(addOwnerService.addOwner.calledOnce).to.be.true
 
     expect(updateOwnerTypeService.updateOwnerType.calledOnce).to.be.true

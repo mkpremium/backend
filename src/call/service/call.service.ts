@@ -17,7 +17,6 @@ import { UpdateOwnerTypeService } from '../../owner/service/update-owner-type.se
 import { SearchOwnerOrBuildingService } from '../../owner/service/search-owner-or-building.service'
 import { FoundOwnerProps } from '../../owner/repository/owner.repository'
 import { addOwnerCommandMapper } from './mappers/add-owner-command.mapper'
-import { OwnerProps } from '../../owner/owner'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null

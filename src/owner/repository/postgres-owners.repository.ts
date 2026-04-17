@@ -1,5 +1,5 @@
 import { BuildingOwnerProps, isVerifiedOwner, OwnerRepository } from './owner.repository'
-import { OwnerProps, OwnerType } from '../owner';
+import { OwnerProps, OwnerType } from '../owner'
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
 import { DeepPartial, EntityTarget, In } from 'typeorm'
