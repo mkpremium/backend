@@ -1,9 +1,9 @@
-import Retell from 'retell-sdk/index.mjs'
-import { CallService } from '../service/call.service'
 import { Request, Response } from 'express'
+import { CallService } from '../service/call.service'
+import Retell from 'retell-sdk/index.mjs'
 
-export const getCallbackController = ({ callService }:{callService:CallService}) =>
-  async (req: Request, res: Response) => {
+export const getNewOwnerContactController = ({ callService }:{callService:CallService}) =>
+  async (req:Request, res:Response) => {
     try {
       // Verificación de firma
       if (
@@ -16,12 +16,10 @@ export const getCallbackController = ({ callService }:{callService:CallService})
         return res.status(401).send('Invalid signature')
       }
       res.status(200).json({ status: 'ok' })
-
       const body = req.body
-
-      await callService.configScheduledCall(body)
-      console.log('Llamada planificada correctamente')
+      await callService.takeNewOwnerContact(body)
+      console.log('Nuevo contacto modificado correctamente')
     } catch (err:any) {
-      console.error('schedule-callback error:', err)
+      res.status(400).json({ status: 'error', message: err.message })
     }
   }

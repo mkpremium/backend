@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm'
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'call_schedule' })
 export class CallSchedule {
@@ -16,4 +16,10 @@ export class CallSchedule {
 
     @Column({ type: 'text' })
     days!: string
+
+    @CreateDateColumn({ type: 'timestamp with time zone' })
+    createdAt!: Date
+
+    @UpdateDateColumn({ type: 'timestamp with time zone' })
+    updatedAt!: Date
 }

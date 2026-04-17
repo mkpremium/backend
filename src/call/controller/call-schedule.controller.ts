@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { CallScheduleService } from '../service/call-schedule.service'
 import { CityCallRequest } from '../types/call-batch-request-dto'
 
-export const saveScheduleCallsController = ({ callScheduleService }: { callScheduleService: CallScheduleService }) =>
+export const saveScheduleCallsController = ({ callScheduleService }:{callScheduleService:CallScheduleService}) =>
   async (req:Request, res:Response) => {
     try {
       const body: CityCallRequest[] = req.body

@@ -67,6 +67,9 @@ export interface RetellCustomFunctionResponse {
     call: Call;
 }
 export interface Args {
-    scheduled_at: string;
-    contact_name: string;
+    scheduled_at?: string;
+    contact_name?: string;
+    name?:string;
+    surname?:string;
+    phone?:string;
 }

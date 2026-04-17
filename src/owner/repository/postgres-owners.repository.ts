@@ -1,5 +1,5 @@
 import { BuildingOwnerProps, isVerifiedOwner, OwnerRepository } from './owner.repository'
-import { OwnerProps } from '../owner'
+import { OwnerProps, OwnerType } from '../owner';
 import { PostgresRepository } from '../../infrastructure/postgres/postgres-repository'
 import { Owner } from '../owner.entity'
 import { DeepPartial, EntityTarget, In } from 'typeorm'
@@ -26,6 +26,10 @@ export class PostgresOwnersRepository extends PostgresRepository<OwnerProps, Own
     })
 
     return owners.map(ownerEntityToBuildingOwnerProps)
+  }
+
+  async updateOwnerType (id: string, type: OwnerType): Promise<void> {
+    await this.repository.update(id, { type })
   }
 
   async verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]> {
@@ -68,6 +72,7 @@ export function ownerEntityToStruct (entity: Owner): OwnerProps {
     id: entity.id,
     status: entity.status,
     name: entity.person.fullName,
+    type: entity.type,
     buildingId: entity.building?.id ?? null,
     person: {
       name: entity.person.fullName,

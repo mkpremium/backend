@@ -1,7 +1,7 @@
 import { CallScheduleService } from '../service/call-schedule.service'
 import { Request, Response } from 'express'
 
-export const sendCallsController = ({ callScheduleService }: { callScheduleService: CallScheduleService }) =>
+export const sendCallsController = ({ callScheduleService }:{callScheduleService:CallScheduleService}) =>
   async (req: Request, res: Response) => {
     try {
       if (process.env.ALLOW_MANUAL_SEND_CALLS === 'false') {

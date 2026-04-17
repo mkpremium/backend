@@ -11,6 +11,7 @@ import { RetellCallProvider } from './infrastructure/retell/retell-call.provider
 import { CallScheduleService } from './service/call-schedule.service'
 import { CallLogService } from './service/call-log.service'
 import { PostgresCallLogRepository } from './repository/postgres-call-log.repository'
+import { getNewOwnerContactController } from './controller/get-new-owner-contact.controller'
 
 export const setupCallDependencies = async (container: AwilixContainer) => {
   container.register({
@@ -27,6 +28,7 @@ export const setupCallDependencies = async (container: AwilixContainer) => {
     getCallLogController: asFunction(getCallLogController).singleton(),
     sendCallsController: asFunction(sendCallsController).singleton(),
     deleteScheduleCallsController: asFunction(deleteScheduleCallsController).singleton(),
-    getCallbackController: asFunction(getCallbackController).singleton()
+    getCallbackController: asFunction(getCallbackController).singleton(),
+    getNewOwnerContactController: asFunction(getNewOwnerContactController).singleton()
   })
 }

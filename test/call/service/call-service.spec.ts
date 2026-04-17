@@ -7,6 +7,9 @@ describe('CallService', () => {
   let logger: any
   let retellCallProvider: any
   let service: CallService
+  let searchOwnerOrBuildingService: any
+  let addOwnerService: any
+  let updateOwnerTypeService: any
 
   beforeEach(() => {
     contactService = {
@@ -23,10 +26,22 @@ describe('CallService', () => {
       createBatchCall: sinon.stub()
     }
 
+    searchOwnerOrBuildingService = {
+      search: sinon.stub()
+    }
+    addOwnerService = {
+      addOwner: sinon.stub()
+    }
+    updateOwnerTypeService = {
+      updateOwnerType: sinon.stub().resolves()
+    }
     service = new CallService(
       contactService,
       logger,
-      retellCallProvider
+      retellCallProvider,
+      addOwnerService,
+      updateOwnerTypeService,
+      searchOwnerOrBuildingService
     )
   })
 

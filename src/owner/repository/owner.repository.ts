@@ -14,6 +14,7 @@ export interface FoundOwnerProps {
   scheduledCalls: { at: string }[],
   matchingContactId: string,
   name: string,
+  type: OwnerType,
   contacts: {
     id: string,
     value: string,
@@ -40,6 +41,7 @@ export const FoundOwner = t.struct<FoundOwnerProps>({
   })),
   matchingContactId: t.String,
   name: t.String,
+  type: t.enums.of(['NINGUNO', 'PRINCIPAL', 'SECUNDARIO', 'VECINO', 'FAMILIAR', 'HERMANOS', 'HIJOS', 'MISMA CASA']),
   contacts: t.list(t.struct({
     id: t.String,
     value: t.String,
@@ -93,4 +95,5 @@ export interface OwnerRepository extends Repository<OwnerProps> {
   buildingOwners (buildingId: string): Promise<BuildingOwnerProps[]>
 
   verifiedOwnersOfBuildingWithId (buildingId: string): Promise<BuildingOwnerProps[]>
+  updateOwnerType(id: string, type: OwnerType): Promise<void>
 }

@@ -11,6 +11,7 @@ export const createCallRoutes = (container) => {
   router.post('/call-logs', wrap(container.resolve('getCallLogController')))
   router.post('/send-calls', wrap(container.resolve('sendCallsController')))
   router.post('/schedule-callback', wrap(container.resolve('getCallbackController')))
+  router.post('/owner-contact', wrap(container.resolve('getNewOwnerContactController')))
 
   return router
 }

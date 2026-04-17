@@ -3,7 +3,7 @@ import { CallLogService } from '../service/call-log.service'
 import { CallLogResponse } from '../types/call-log-response.dto'
 import { Request, Response } from 'express'
 
-export const getCallLogController = ({ callLogService }: { callLogService: CallLogService }) =>
+export const getCallLogController = ({ callLogService }: {callLogService:CallLogService}) =>
   async (req: Request, res: Response) => {
     try {
       // Verificación de firma

@@ -12,6 +12,12 @@ import { RetellCallProvider } from '../infrastructure/retell/retell-call.provide
 import { transformContactstoTask } from './mappers/contacts-to-task.mapper'
 import { BatchCallRequest } from '../types/batch-call-request'
 import { timeToMinutes } from '../utils/call-service-utils'
+import { AddOwnerService, AddOwnerCommand } from '../../owner/service/add-owner.service'
+import { UpdateOwnerTypeService } from '../../owner/service/update-owner-type.service'
+import { SearchOwnerOrBuildingService } from '../../owner/service/search-owner-or-building.service'
+import { FoundOwnerProps } from '../../owner/repository/owner.repository'
+import { addOwnerCommandMapper } from './mappers/add-owner-command.mapper'
+import { OwnerProps } from '../../owner/owner'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -19,7 +25,10 @@ export class CallService {
     constructor (
       private contactService: ContactService,
       private logger: ReturnType<typeof initLogger>,
-      private retellCallProvider: RetellCallProvider
+      private retellCallProvider: RetellCallProvider,
+      private addOwnerService: AddOwnerService,
+      private updateOwnerTypeService: UpdateOwnerTypeService,
+      private searchOwnerOrBuildingService: SearchOwnerOrBuildingService
     ) {}
 
     async makeBatchCall (request:CityCallRequest):Promise<CityCallResponse> {
@@ -78,7 +87,7 @@ export class CallService {
       const dynamicVar = body.call.retell_llm_dynamic_variables || {}
       const phoneNumber = body.call.to_number
       const originTelf = body.call.from_number!
-      const scheduledAt = DateTime.fromISO(body.args.scheduled_at, { zone: 'Europe/Madrid' }).toMillis()
+      const scheduledAt = DateTime.fromISO(body.args.scheduled_at!, { zone: 'Europe/Madrid' }).toMillis()
 
       this.logger.info(`metadata: ${JSON.stringify(metadata, null, 2)}`)
       this.logger.info(body.args.scheduled_at)
@@ -122,5 +131,30 @@ export class CallService {
 
       if (!callQueueEntry?.lastCalledAt) return null
       return moment(callQueueEntry!.lastCalledAt).format('DD/MM/YY')
+    }
+
+    async takeNewOwnerContact (body: RetellCustomFunctionResponse) {
+      const userId = '56ecc194-b998-43b5-a118-62e40b69aa84'
+      const currentOwnerId = body.call.metadata?.ownerId
+      if (!body.args.phone) return
+      const foundOwner: FoundOwnerProps | undefined = (await this.searchOwnerOrBuildingService.search(body.args.phone))[0]
+      const newOwnerFullName = [body.args.name, body.args.surname]
+        .filter(Boolean)
+        .join(' ')
+        .toUpperCase()
+        .trim()
+
+      if (foundOwner) {
+        if ((foundOwner.matchingContactId === body.call.metadata?.contactId) ||
+            (foundOwner.name.toUpperCase().trim() === newOwnerFullName)) {
+          if (foundOwner.type !== 'PRINCIPAL') await this.updateOwnerTypeService.updateOwnerType(foundOwner.id, 'PRINCIPAL')
+          return
+        }
+      }
+      const newOwner: AddOwnerCommand = addOwnerCommandMapper(body)
+      await this.addOwnerService.addOwner(newOwner, userId)
+      if (currentOwnerId) {
+        await this.updateOwnerTypeService.updateOwnerType(currentOwnerId, 'SECUNDARIO')
+      }
     }
 }

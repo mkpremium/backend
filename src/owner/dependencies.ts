@@ -14,6 +14,7 @@ import { AddOwnerService } from './service/add-owner.service'
 import { AddContactService } from './service/add-contact.service'
 import { SearchOwnerOrBuildingService } from './service/search-owner-or-building.service'
 import { importOwnerHandlerFactory } from './service/import-owner-command-handler'
+import { UpdateOwnerTypeService } from './service/update-owner-type.service'
 
 export const setupOwnerDependencies = (container: AwilixContainer) => {
   container.register({
@@ -32,7 +33,7 @@ export const setupOwnerDependencies = (container: AwilixContainer) => {
     setOwnerFeaturedContactService: asClass(SetOwnerFeaturedContactService).singleton().classic(),
     addContactService: asClass(AddContactService).singleton().classic(),
     addOwnerService: asClass(AddOwnerService).singleton().classic(),
-
+    updateOwnerTypeService: asClass(UpdateOwnerTypeService).singleton().classic(),
     ownersRepository: asClass(PostgresOwnersRepository).singleton().classic(),
 
     resetOwnerBadContactsHandler: asFunction(createResetOwnerBadContactsHandler).singleton(),
