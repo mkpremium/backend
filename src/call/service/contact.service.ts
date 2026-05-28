@@ -1,11 +1,42 @@
 import { AppDataSource } from '../../data-source'
 import { initLogger } from '../../infrastructure/logger'
+import { PostgresCallQueueRepository } from '../repository/postgres-call-queue.repository'
 import { ContactDTO } from '../types/contact-dto'
-
+import { ContactType } from '../types/contact-types'
 export class ContactService {
   constructor (
-        private logger: ReturnType<typeof initLogger>
+        private logger: ReturnType<typeof initLogger>,
+        private callQueueRepository: PostgresCallQueueRepository
   ) {}
+
+  async checkExpiredFreezes () {
+    try {
+      await this.callQueueRepository.checkExpiredFreezes()
+    } catch (error) {
+      this.logger.error(`Error checking call queue freezes: ${(error as Error).message}`)
+      throw error
+    }
+  }
+
+  async getBuildingIdFromCallQueue (city:string) {
+    try {
+      const buildingId = await this.callQueueRepository.getBuildingIdFromCallQueue(city)
+      return buildingId
+    } catch (error) {
+      this.logger.error(`Error getting building id from call queue: ${(error as Error).message}`)
+      throw error
+    }
+  }
+
+  async getContactByBuildingIdAndContactType (buildingId:string, contactType:string, prefix:string) {
+    try {
+      const contact = await this.callQueueRepository.getContactByBuildingIdAndContactType(buildingId, contactType, prefix)
+      return contact
+    } catch (error) {
+      this.logger.error(`Error getting building contact from call queue: ${(error as Error).message}`)
+      throw error
+    }
+  }
 
   async getCityContacts (city:string, limit:number) {
     const queryRunner = AppDataSource.createQueryRunner()
@@ -15,82 +46,12 @@ export class ContactService {
     const mobileStart = prefix === '+34' ? '6%' : '9%'
 
     try {
-      await queryRunner.query(`
-                  -- Reactiva los freeze expirados de cualquier tipo
-                  WITH reactivated AS(
-                      UPDATE call_queue
-                      SET 
-                          can_call = TRUE,
-                          call_count = 0,
-                          freeze_until = NULL,
-                          freeze_type = 'PENDING'
-                      WHERE 
-                          can_call = FALSE
-                          AND freeze_until IS NOT NULL
-                          AND freeze_until <= NOW()
-                          AND (
-                              (freeze_type = 'NO_ANSWER' AND last_called_at <= NOW() - INTERVAL '1 month') OR
-                              (freeze_type = 'NO_SALE' AND last_called_at <= NOW() - INTERVAL '3 months') OR
-                              (freeze_type = 'DO_NOT_CALL' AND last_called_at <= NOW() - INTERVAL '6 months')
-                          )
-                      RETURNING building_id
-                 )
-                  UPDATE building
-                  SET "negotiationStatus" = 'PENDIENTE',
-                      "assignedFlipperId" = NULL
-                  WHERE id IN (SELECT building_id FROM reactivated);
-
-      `)
-      const contacts: ContactDTO[] = await queryRunner.query(`
-                  
-                   -- Obtener contactos listos    
-                   WITH s AS (
-                        SELECT $3::text || c."value" AS "phoneNumber",                                
-                                CONCAT(ba."type_full", ' ' ,ba."street", ' ', ba."number") AS address,
-                                b.id AS "buildingId",
-                                o.id AS "ownerId",
-                                c.id AS "contactId",
-                                ba.city AS "city",
-                                b.use AS "use",
-                                cq.id AS "callQueueId",
-                                cq.last_called_at AS "lastCalledAt"
-                        FROM call_queue cq
-                        INNER JOIN owner o ON o.id = cq.owner_id
-                        INNER JOIN building b ON b.id = cq.building_id   
-                        INNER JOIN building_address ba ON ba.id = b."addressId"             
-                        INNER JOIN contact c ON c.id = cq.contact_id
-                        INNER JOIN person_contact pc ON pc."contactId" = cq.contact_id
-                        INNER JOIN person p ON p.id = pc."personId"             
-                        WHERE ba."city" = $1 
-                          AND c."value" LIKE $4  
-                          AND LENGTH(c."value") = 9        
-                          AND cq.can_call = TRUE  
-                          AND b."negotiationStatus" IN ('PENDIENTE')                          
-                          AND o.type = 'PRINCIPAL'                   
-                    )
-                    SELECT DISTINCT ON ("phoneNumber")
-                        "phoneNumber",                
-                        address,
-                        "buildingId",
-                        "ownerId",
-                        "contactId",
-                        "city",
-                        "use",
-                        "callQueueId"              
-                    FROM s
-                    ORDER BY "phoneNumber", "lastCalledAt" ASC NULLS FIRST                      
-                    LIMIT $2
-                    `, [city, limit, prefix, mobileStart]
-      )
+      const contacts: ContactDTO[] = await this.callQueueRepository.getAllCityContacts(city, limit, prefix, mobileStart)
       this.logger.info(`Fetched ${contacts.length} contacts for city=${city}`)
-      await queryRunner.commitTransaction()
       return contacts
     } catch (error) {
-      await queryRunner.rollbackTransaction()
       this.logger.error(`Error fetching contacts: ${(error as Error).message}`)
       throw error
-    } finally {
-      await queryRunner.release()
     }
   }
 
@@ -98,5 +59,36 @@ export class ContactService {
     const portugalCities = ['PORTO', 'LISBOA', 'VILA NOVA DE GAIA']
     if (portugalCities.includes(city.toUpperCase())) return '+351'
     return '+34'
+  }
+
+  async changeContactStatus (status:string, canCall: boolean, queueId:string) {
+    const queryRunner = AppDataSource.createQueryRunner()
+    await queryRunner.connect()
+    try {
+      await this.callQueueRepository.changeContactStatus(status, canCall, queueId)
+    } catch (error) {
+      this.logger.error(`Error fetching contact: ${(error as Error).message}`)
+      throw error
+    }
+  }
+
+  async getNextContactInBuilding (city:string, buildingId: string) {
+    const contactTypePriorities = [
+      ContactType.PRINCIPAL,
+      ContactType.SECUNDARIO,
+      ContactType.MISMA_CASA,
+      ContactType.HERMANOS,
+      ContactType.HIJOS,
+      ContactType.FAMILIAR,
+      ContactType.VECINO,
+      ContactType.NINGUNO
+    ]
+
+    for (const contactType of contactTypePriorities) {
+      const prefix = this.checkPrefixCountryCity(city)
+      const contact = await this.getContactByBuildingIdAndContactType(buildingId, contactType, prefix)
+      if (contact) return contact
+    }
+    return null
   }
 }

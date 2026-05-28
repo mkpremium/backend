@@ -17,6 +17,9 @@ export class CallSchedule {
     @Column({ type: 'text' })
     days!: string
 
+    @Column({ type: 'int', name: 'daily_remaining_buildings' })
+    dailyRemainingBuildings!: number
+
     @CreateDateColumn({ type: 'timestamp with time zone' })
     createdAt!: Date
 

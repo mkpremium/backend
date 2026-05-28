@@ -31,11 +31,6 @@ export class RetellCallProvider implements CallProvider {
 
   buildCallPayload (request:RetellBatchCallRequest): BatchCallCreateBatchCallParams {
     const timeStamp = request.timeStamp
-    const timeWindow = request.timeWindow
-
-    if (timeStamp && timeWindow) {
-      throw new Error('Debe proporcionar timeWindow o timeStamp')
-    }
 
     const baseParams = {
       from_number: request.originTelf,
@@ -43,7 +38,7 @@ export class RetellCallProvider implements CallProvider {
       reserved_concurrency: 1
     }
 
-    if (request.timeStamp) {
+    if (timeStamp) {
       const params = {
         ...baseParams,
         trigger_timestamp: request.timeStamp
@@ -51,16 +46,6 @@ export class RetellCallProvider implements CallProvider {
       return params
     }
 
-    if (timeWindow) {
-      const params = {
-        ...baseParams,
-        call_time_window: {
-          windows: [{ start: timeWindow.startTime, end: timeWindow.endTime }],
-          timezone: 'Europe/Madrid'
-        }
-      }
-      return params
-    }
     return baseParams
   }
 }

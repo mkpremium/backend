@@ -12,6 +12,8 @@ export const createCallRoutes = (container) => {
   router.post('/send-calls', wrap(container.resolve('sendCallsController')))
   router.post('/schedule-callback', wrap(container.resolve('getCallbackController')))
   router.post('/owner-contact', wrap(container.resolve('getNewOwnerContactController')))
-
+  router.post('/test/process-next-building/:city', wrap(container.resolve('processNextBuildingController')))
+  router.post('/test/emit-call-completed', wrap(container.resolve('emitCallCompletedController')))
+  router.post('/test/fake-retell-webhook', wrap(container.resolve('fakeRetellWebhookController')))
   return router
 }

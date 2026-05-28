@@ -1,0 +1,10 @@
+export enum CallQueueStatus {
+  DO_NOT_CALL = 'DO_NOT_CALL',
+  NO_ANSWER = 'NO_ANSWER',
+  SALE = 'SALE',
+  PENDING = 'PENDING',
+  NO_SALE = 'NO_SALE',
+  SOLD = 'SOLD',
+  DISCARDED = 'DISCARDED',
+  IN_PROGRESS = 'IN_PROGRESS'
+}

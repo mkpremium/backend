@@ -32,8 +32,8 @@ export class CallQueue {
   @Column({ name: 'last_called_at', type: 'timestamp', nullable: true })
   lastCalledAt?: Date
 
-  @Column({ name: 'freeze_type', type: 'varchar', length: 20, nullable: true })
-  freezeType?: string
+  @Column({ name: 'status', type: 'varchar', length: 20, nullable: true })
+  status?: string
 
   // Relaciones
   @ManyToOne(() => Owner, { onDelete: 'CASCADE' })

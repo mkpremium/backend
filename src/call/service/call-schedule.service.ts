@@ -1,7 +1,7 @@
 import { initLogger } from '../../infrastructure/logger'
 import { CallScheduleProps } from '../models/call-schedule.model'
 import { PostgresCallScheduleRepository } from '../repository/postgres-call-schedule.repository'
-import { CityCallRequest, CityCallResponse } from '../types/call-batch-request-dto'
+import { CityCallRequest } from '../types/call-batch-request-dto'
 import { isValidDay } from '../utils/call-service-utils'
 import { CallService } from './call.service'
 import { ScheduledTask } from 'node-cron'
@@ -19,24 +19,34 @@ export class CallScheduleService {
      await this.callScheduleRepository.saveAll(body)
    }
 
-   async readCallSchedule (): Promise<CityCallResponse[]> {
-     const schedules: CallScheduleProps[] = await this.callScheduleRepository.getAll()
-     this.logger.debug({ schedules })
-     const results: CityCallResponse[] = []
-     const date = new Date()
-     const currentDay = date.getDay()
+   async readCallSchedule () {
+     try {
+       const schedules: CallScheduleProps[] | null = await this.callScheduleRepository.getAll()
+       const currentDay = new Date().getDay()
 
-     if (schedules.length === 0) return [{ city: '', status: 'error', message: 'No hay lista de planificación' }]
-     for (const s of schedules) {
-       try {
-         if (!isValidDay(currentDay, s.days!)) continue
-         results.push(await this.callService.makeBatchCall(s))
-       } catch (error) {
-         if (error instanceof Error) this.logger.error(error.message)
-         continue
+       if (!schedules || schedules.length === 0) return { status: 'error', message: 'No hay lista de planificación' }
+
+       for (const schedule of schedules) {
+         if (!isValidDay(currentDay, schedule.days)) {
+           this.logger.info(`Hoy no toca ejecutar llamadas para ${schedule.city}`)
+           continue
+         }
+         const result = await this.callService.processNextBuilding(schedule.city)
+         this.logger.info(`[processNextBuilding] ${result}`)
+         if (result?.status === 'empty') {
+           this.logger.info(`No quedan contactos pendientes para ${schedule.city}`)
+           continue
+         }
+         if (result.status === 'finished') {
+           this.logger.info(`Ya se gestionaron todos los edificios del día para ${schedule.city}`)
+           continue
+         }
        }
+       return { status: 'ok', message: 'Planificaciones procesadas' }
+     } catch (error) {
+       if (error instanceof Error) this.logger.error(error.message)
+       return { status: 'error', message: 'Error leyendo planificación de llamadas' }
      }
-     return results
    }
 
    async getCallSchedule () {
@@ -45,5 +55,17 @@ export class CallScheduleService {
 
    async deleteCallSchedule () {
      await this.callScheduleRepository.deleteAll()
+   }
+
+   async updateDailyRemainingBuildings (city:string) {
+     await this.callScheduleRepository.updateDailyRemainingBuildings(city)
+   }
+
+   async getDailyRemainingBuildings (city:string) {
+     return await this.callScheduleRepository.getDailyRemainingBuildings(city)
+   }
+
+   async resetDailyRemainingBuildings () {
+     await this.callScheduleRepository.resetDailyRemainingBuildings()
    }
 }

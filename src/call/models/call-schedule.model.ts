@@ -6,6 +6,7 @@ export interface CallScheduleProps {
     limit: number;
     timeWindow: TimeWindow;
     days: string;
+    daily_remaining_buildings?:number;
 }
 
 export const CallSchedule = t.struct<CallScheduleProps>({

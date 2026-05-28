@@ -1,7 +1,6 @@
 import { ContactService } from './contact.service'
 import { initLogger } from '../../infrastructure/logger'
 import { ContactDTO } from '../types/contact-dto'
-import { CityCallRequest, CityCallResponse } from '../types/call-batch-request-dto'
 import { ScheduledTask } from 'node-cron'
 import { AppDataSource } from '../../data-source'
 import { DateTime } from 'luxon'
@@ -9,20 +8,21 @@ import { RetellCustomFunctionResponse } from '../types/call-log-response.dto'
 import { CallQueue } from '../call-queue.entity'
 import moment from 'moment-timezone'
 import { RetellCallProvider } from '../infrastructure/retell/retell-call.provider'
-import { transformContactstoTask } from './mappers/contacts-to-task.mapper'
+import { transformContactToTask } from './mappers/contacts-to-task.mapper'
 import { BatchCallRequest } from '../types/batch-call-request'
-import { timeToMinutes } from '../utils/call-service-utils'
 import { AddOwnerService, AddOwnerCommand } from '../../owner/service/add-owner.service'
 import { UpdateOwnerTypeService } from '../../owner/service/update-owner-type.service'
 import { SearchOwnerOrBuildingService } from '../../owner/service/search-owner-or-building.service'
 import { FoundOwnerProps } from '../../owner/repository/owner.repository'
 import { addOwnerCommandMapper } from './mappers/add-owner-command.mapper'
+import { PostgresCallScheduleRepository } from '../repository/postgres-call-schedule.repository'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
 
     constructor (
       private contactService: ContactService,
+      private callScheduleRepository: PostgresCallScheduleRepository,
       private logger: ReturnType<typeof initLogger>,
       private retellCallProvider: RetellCallProvider,
       private addOwnerService: AddOwnerService,
@@ -30,49 +30,62 @@ export class CallService {
       private searchOwnerOrBuildingService: SearchOwnerOrBuildingService
     ) {}
 
-    async makeBatchCall (request:CityCallRequest):Promise<CityCallResponse> {
-      const result: CityCallResponse = {
-        city: request.city!,
-        status: 'ok',
-        message: ''
-      }
-
-      const currentCity = request.city!
-      const currentCityLimit = request.limit!
-
-      if (!currentCity && !currentCityLimit) return { ...result, status: 'error', message: 'No se proporcionó la ciudad o el límite' }
-
+    async processNextBuilding (currentCity:string) {
+      if (!currentCity) return { status: 'error', message: 'No se proporcionó la ciudad' }
       try {
-        const temporalContacts = await this.contactService.getCityContacts(currentCity, currentCityLimit)
-        if (!temporalContacts) return { ...result, status: 'error', message: 'No quedan contactos sin llamar' }
-
-        this.logger.info(JSON.stringify(temporalContacts, null, 2))
-
-        const timeWindow = {
-          startTime: timeToMinutes(request.timeWindow!.startHour),
-          endTime: timeToMinutes(request.timeWindow!.endHour)
+        while (true) {
+          // Retorna el numero de edificios restantes por gestionar
+          const remainingBuildings = await this.callScheduleRepository.getDailyRemainingBuildings(currentCity)
+          // Si no quedan edificios por gestionar se acaba
+          if (remainingBuildings === null || remainingBuildings <= 0) return { status: 'finished', message: `Limite de edificios diarios procesado para ${currentCity}` }
+          // Coge Id del Edificio
+          const buildingId = await this.contactService.getBuildingIdFromCallQueue(currentCity)
+          if (!buildingId) return { status: 'empty', message: `No quedan edificios pendientes para ${currentCity}` }
+          // Procesa todos los contactos del edificio hasta que no quede ninguno
+          const result = await this.processBuildingContactCall(buildingId, currentCity)
+          if (result!.status === 'empty') {
+            await this.callScheduleRepository.updateDailyRemainingBuildings(currentCity)
+            continue
+          }
+          this.logger.info(`[processNextBuilding] city=${currentCity}`)
+          this.logger.info(`[processNextBuilding] buildingId=${buildingId}`)
+          return result
         }
+      } catch (error) {
+        this.logger.info(error)
+        return { status: 'error', message: 'Error procesando edificio' }
+      }
+    }
 
+    async processBuildingContactCall (buildingId:string, currentCity:string) {
+      let contact: ContactDTO | null = null
+      if (!buildingId) return { status: 'error', message: 'No se proporcionó id del edificio' }
+      try {
+        // Consigue un contacto de ese edificio
+        contact = await this.contactService.getNextContactInBuilding(currentCity, buildingId)
+        if (!contact) return { status: 'empty', message: `No quedan contactos pendientes en el edificio ${buildingId}` }
+        // Asignamos el número de telefono desde el que llamar
         const currentOriginTelf = this.assignOriginTelf(currentCity)
         this.logger.debug(`Telefono origen de la ciudad actual: ${currentOriginTelf}`)
-
+        // Preparamos el request para llamar a retell y lanzamos llamada
         const batchCallRequest:BatchCallRequest = {
           originTelf: this.assignOriginTelf(currentCity)!,
-          tasks: transformContactstoTask(temporalContacts),
-          timeWindow
+          tasks: transformContactToTask(contact)
         }
-
-        this.logger.debug({ batchCallRequest })
+        await this.contactService.changeContactStatus('IN_PROGRESS', false, contact.callQueueId)
         const batchCallResponse = await this.retellCallProvider.createBatchCall(batchCallRequest)
-        this.logger.info(batchCallResponse.batchId)
         this.logger.info('Full Retell Response:', JSON.stringify(batchCallResponse, null, 2))
-        result.status = 'ok'
-        result.message = `se han conseguido ${temporalContacts.length} contactos`
+        this.logger.info(`[processBuildingContactCall] buildingId=${buildingId}`)
+        this.logger.info(`[processBuildingContactCall] contact=${contact?.callQueueId}`)
+        this.logger.info(`[processBuildingContactCall] contact=${JSON.stringify(contact)}`)
+        return { status: 'sent', city: currentCity, buildingId: buildingId, callQueueId: contact.callQueueId, message: `Llamada para el contacto ${contact} realizada` }
       } catch (error) {
         this.logger.info('Error Retell: ', error)
-        return { ...result, status: 'error', message: (error as Error).message }
+        if (contact?.callQueueId) {
+          await this.contactService.changeContactStatus('PENDING', true, contact.callQueueId)
+        }
+        return { status: 'error', message: 'Error enviando llamada del edificio' }
       }
-      return result
     }
 
     assignOriginTelf (city:string) {
@@ -110,7 +123,7 @@ export class CallService {
 
       const batchCallRequest:BatchCallRequest = {
         originTelf,
-        tasks: transformContactstoTask([contact]),
+        tasks: transformContactToTask(contact),
         timeStamp: scheduledAt
       }
 

@@ -21,6 +21,42 @@ export class PostgresCallScheduleRepository {
     return callScheduleList.map(cityCallSchedule => this.entityToStruct(cityCallSchedule))
   }
 
+  async getFirst ():Promise<CallScheduleProps | null> {
+    const result = await AppDataSource.query(
+      `SELECT * 
+       FROM public.call_schedule 
+       LIMIT 1`
+    )
+
+    return result[0] ?? null
+  }
+
+  async updateDailyRemainingBuildings (city:string) {
+    await AppDataSource.query(
+      `UPDATE public.call_schedule
+        SET daily_remaining_buildings = daily_remaining_buildings - 1
+        WHERE city = $1
+        AND daily_remaining_buildings > 0
+        `, [city]
+    )
+  }
+
+  async resetDailyRemainingBuildings () {
+    await AppDataSource.query(
+      `UPDATE public.call_schedule
+      SET daily_remaining_buildings = daily_limit`
+    )
+  }
+
+  async getDailyRemainingBuildings (city:string) {
+    const result = await AppDataSource.query(
+      `SELECT daily_remaining_buildings 
+      FROM call_schedule
+      WHERE city =$1`, [city]
+    )
+    return result[0]?.daily_remaining_buildings ?? null
+  }
+
   async deleteAll () {
     await this.callScheduleRepository.clear()
   }
@@ -31,7 +67,8 @@ export class PostgresCallScheduleRepository {
       limit: cityCallSchedule.limit,
       days: cityCallSchedule.days,
       startHour: cityCallSchedule.timeWindow?.startHour,
-      endHour: cityCallSchedule.timeWindow?.endHour
+      endHour: cityCallSchedule.timeWindow?.endHour,
+      dailyRemainingBuildings: cityCallSchedule.limit
     }
   }
 
