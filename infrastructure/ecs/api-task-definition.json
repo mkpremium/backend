@@ -81,6 +81,10 @@
         {
           "name":"UMINDS_CLIENT_ID",
           "value":"elevate_003"
+        },
+        {
+          "name":"ALLOW_MANUAL_SEND_CALLS",
+          "value": "true"
         }
       ],
       "resourceRequirements": null,

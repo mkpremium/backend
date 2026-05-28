@@ -68,10 +68,11 @@ export class UpdateBuildingNegotiationStatusService {
         where: { buildingId }
       })
       if (!callQueue) return
-      callQueue.freezeType = 'NO_SALE'
+      callQueue.status = 'NO_SALE'
       callQueue.freezeUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 meses
       callQueue.callCount = 0
       callQueue.canCall = false
+      await callQueueRepo.save(callQueue)
     } catch (err) {
       console.log('Error actualizando call_queue')
     }

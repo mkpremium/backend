@@ -26,6 +26,9 @@ import { setupStockRouter } from './stock/routing'
 import cron from 'node-cron'
 import { createCallRoutes } from './call/routes'
 import { CallScheduleService } from './call/service/call-schedule.service'
+import { CallService } from './call/service/call.service'
+import { registerCallCycleListener } from './call/events/call-cycle.listener'
+import { ContactService } from './call/service/contact.service'
 
 export const createApp = async (): Promise<Express> => {
   const logger = initLogger()
@@ -68,6 +71,8 @@ export const createApp = async (): Promise<Express> => {
     email(app, secured)
 
     await startListeners(diContainer)
+    const callService: CallService = diContainer.resolve('callService')
+    registerCallCycleListener(callService, logger)
 
     app.use(appErrorHandler)
     app.set('IS_READY', true)
@@ -77,7 +82,12 @@ export const createApp = async (): Promise<Express> => {
     })
 
     const callScheduleService:CallScheduleService = diContainer.resolve('callScheduleService')
-    cron.schedule('0 7 * * *', async () => {
+    const contactService:ContactService = diContainer.resolve('contactService')
+    cron.schedule('0 8 * * *', async () => {
+      logger.info('Checkeando los freeze de la cola de llamadas')
+      await contactService.checkExpiredFreezes()
+      logger.info('Reseteando límites diarios...')
+      await callScheduleService.resetDailyRemainingBuildings()
       logger.info('Enviando llamadas del día...')
       await callScheduleService.readCallSchedule()
     })

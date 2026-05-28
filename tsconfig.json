@@ -10,5 +10,14 @@
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-  }
+  },
+  "exclude": [
+    "test",
+    "tests",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "node_modules",
+    "build",
+    "dist"
+  ]
 }
