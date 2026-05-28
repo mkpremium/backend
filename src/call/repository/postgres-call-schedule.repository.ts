@@ -80,7 +80,8 @@ export class PostgresCallScheduleRepository {
       timeWindow: {
         startHour: entity.startHour,
         endHour: entity.endHour
-      }
+      },
+      daily_remaining_buildings: entity.dailyRemainingBuildings
     }
   }
 }
