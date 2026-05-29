@@ -99,19 +99,20 @@ export class CallLogService {
       await this.contactNoAnswer(callLog)
       return
     }
-    if (callLog.vende === true) {
-      this.logger.info(`[checkCallLog] This contact SALE -callQueueId=${callLog.callQueueId} endReason=${endReason}`)
-      await this.contactSale(callLog)
-      return
-    }
     if (callLog.noLlamar === true) {
       this.logger.info(`[checkCallLog] This contact DONT_NOT_CALL -callQueueId=${callLog.callQueueId} endReason=${endReason}`)
       await this.contactDoNotCall(callLog)
       return
     }
+    if (callLog.vende === true) {
+      this.logger.info(`[checkCallLog] This contact SALE -callQueueId=${callLog.callQueueId} endReason=${endReason}`)
+      await this.contactSale(callLog)
+      return
+    }
     if (callLog.vende === false) {
       this.logger.info(`[checkCallLog] This contact NO_SALE -callQueueId=${callLog.callQueueId} endReason=${endReason}`)
       await this.contactNoSale(callLog)
+      return
     }
     this.logger.info(`[checkCallLog] No handler matched for callQueueId=${callLog.callQueueId} status=${callLog.status}`)
   }

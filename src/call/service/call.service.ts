@@ -50,7 +50,7 @@ export class CallService {
         const result = await this.processBuildingContactCall(buildingId, currentCity)
         this.logger.info(`[processNextBuilding] result=${JSON.stringify(result)} buildingId=${buildingId}`)
         if (result!.status === 'building_without_contacts') {
-          await this.callScheduleRepository.updateDailyRemainingBuildings(currentCity)
+          return { status: 'building_without_contacts', message: `No quedan contactos para buildingId=${buildingId}` }
         }
         this.logger.info(`[processNextBuilding] city=${currentCity}`)
         this.logger.info(`[processNextBuilding] buildingId=${buildingId}`)
@@ -172,5 +172,11 @@ export class CallService {
       if (currentOwnerId) {
         await this.updateOwnerTypeService.updateOwnerType(currentOwnerId, 'SECUNDARIO')
       }
+    }
+
+    async finishBuilding (buildingId:string, city:string) {
+      this.logger.info(`[finishBuilding] START buildingId=${buildingId} city=${city}`)
+      const result = await this.callScheduleRepository.updateDailyRemainingBuildings(city)
+      this.logger.info(`[finishBuilding] END buildingId=${buildingId} city=${city} result=${JSON.stringify(result)}`)
     }
 }

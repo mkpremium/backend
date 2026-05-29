@@ -32,13 +32,15 @@ export class PostgresCallScheduleRepository {
   }
 
   async updateDailyRemainingBuildings (city:string) {
-    await AppDataSource.query(
+    const result = await AppDataSource.query(
       `UPDATE public.call_schedule
         SET daily_remaining_buildings = daily_remaining_buildings - 1
         WHERE city = $1
         AND daily_remaining_buildings > 0
+        RETURNING id, city, daily_remaining_buildings
         `, [city]
     )
+    return result[0] ?? null
   }
 
   async resetDailyRemainingBuildings () {
