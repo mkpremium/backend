@@ -16,7 +16,6 @@ import { SearchOwnerOrBuildingService } from '../../owner/service/search-owner-o
 import { FoundOwnerProps } from '../../owner/repository/owner.repository'
 import { addOwnerCommandMapper } from './mappers/add-owner-command.mapper'
 import { PostgresCallScheduleRepository } from '../repository/postgres-call-schedule.repository'
-import { callEmitter, CallEvent } from '../events/call-events'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
