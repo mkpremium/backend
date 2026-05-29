@@ -14,7 +14,7 @@ RETURNS TABLE (
 )
 LANGUAGE sql
 AS $$
-  SELECT DISTINCT 
+  SELECT
     CONCAT_WS(' ',ba."type_full", ba."street", ' ', ba."number") AS address, 
     ba.city AS city,
     cq.id AS "callQueueId",
@@ -30,6 +30,7 @@ AS $$
     AND cq.can_call = true
     AND cq.status = 'PENDING'
     AND (cq.last_called_at IS NULL OR cq.last_called_at::date <> CURRENT_DATE)
+    ORDER BY cq.last_called_at ASC NULLS FIRST, cq.id ASC
   LIMIT 1;
 $$;
 

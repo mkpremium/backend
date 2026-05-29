@@ -66,7 +66,10 @@ export class CallService {
       if (!buildingId) return { status: 'error', message: 'No se proporcionó id del edificio' }
       try {
         // Consigue un contacto de ese edificio
+        this.logger.info(`[processBuildingContactCall] START buildingId=${buildingId} city=${currentCity}`)
+        this.logger.info(`[processBuildingContactCall] before getNextContactInBuilding buildingId=${buildingId}`)
         contact = await this.contactService.getNextContactInBuilding(currentCity, buildingId)
+        this.logger.info(`[processBuildingContactCall] after getNextContactInBuilding contact=${JSON.stringify(contact)} buildingId=${buildingId}`)
         if (!contact) return { status: 'building_without_contacts', message: `No quedan contactos pendientes en el edificio ${buildingId}` }
         // Asignamos el número de telefono desde el que llamar
         const currentOriginTelf = this.assignOriginTelf(currentCity)
@@ -76,15 +79,20 @@ export class CallService {
           originTelf: this.assignOriginTelf(currentCity)!,
           tasks: transformContactToTask(contact)
         }
+        this.logger.info(`[processBuildingContactCall] before changeContactStatus IN_PROGRESS callQueueId=${contact.callQueueId}`)
         await this.contactService.changeContactStatus('IN_PROGRESS', false, contact.callQueueId)
+        this.logger.info(`[processBuildingContactCall] after changeContactStatus IN_PROGRESS callQueueId=${contact.callQueueId}`)
+        this.logger.info(`[processBuildingContactCall] before createBatchCall callQueueId=${contact.callQueueId} buildingId=${buildingId}`)
         const batchCallResponse = await this.retellCallProvider.createBatchCall(batchCallRequest)
+        this.logger.info(`[processBuildingContactCall] after createBatchCall callQueueId=${contact.callQueueId} buildingId=${buildingId}`)
         this.logger.info('Full Retell Response:', JSON.stringify(batchCallResponse, null, 2))
         this.logger.info(`[processBuildingContactCall] buildingId=${buildingId}`)
         this.logger.info(`[processBuildingContactCall] queueId=${contact?.callQueueId}`)
         this.logger.info(`[processBuildingContactCall] contact=${JSON.stringify(contact)}`)
-        return { status: 'sent', city: currentCity, buildingId: buildingId, callQueueId: contact.callQueueId, message: `Llamada para el contacto ${contact} realizada` }
+        return { status: 'sent', city: currentCity, buildingId: buildingId, callQueueId: contact.callQueueId, message: `Llamada para el contacto ${contact.callQueueId} realizada` }
       } catch (error) {
         this.logger.info('Error Retell: ', error)
+        this.logger.error(`[processBuildingContactCall] Error buildingId=${buildingId} city=${currentCity} message=${(error as Error).message} stack=${(error as Error).stack}`)
         if (contact?.callQueueId) {
           await this.contactService.changeContactStatus('PENDING', true, contact.callQueueId)
         }

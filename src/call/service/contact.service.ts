@@ -86,7 +86,9 @@ export class ContactService {
 
     for (const contactType of contactTypePriorities) {
       const prefix = this.checkPrefixCountryCity(city)
+      this.logger.info(`[getNextContactInBuilding] START city=${city} buildingId=${buildingId}`)
       const contact = await this.getContactByBuildingIdAndContactType(buildingId, contactType, prefix)
+      this.logger.info(`[getNextContactInBuilding] START city=${city} buildingId=${buildingId}`)
       if (contact) return contact
     }
     return null
