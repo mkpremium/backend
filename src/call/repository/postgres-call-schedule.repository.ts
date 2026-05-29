@@ -37,7 +37,7 @@ export class PostgresCallScheduleRepository {
         SET daily_remaining_buildings = daily_remaining_buildings - 1
         WHERE city = $1
         AND daily_remaining_buildings > 0
-        RETURNING id, city, daily_remaining_buildings
+        RETURNING city, daily_remaining_buildings
         `, [city]
     )
     return result[0] ?? null
