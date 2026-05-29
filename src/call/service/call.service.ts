@@ -16,6 +16,7 @@ import { SearchOwnerOrBuildingService } from '../../owner/service/search-owner-o
 import { FoundOwnerProps } from '../../owner/repository/owner.repository'
 import { addOwnerCommandMapper } from './mappers/add-owner-command.mapper'
 import { PostgresCallScheduleRepository } from '../repository/postgres-call-schedule.repository'
+import { callEmitter, CallEvent } from '../events/call-events'
 
 export class CallService {
     private scheduleTask: ScheduledTask | null = null
@@ -33,24 +34,28 @@ export class CallService {
     async processNextBuilding (currentCity:string) {
       if (!currentCity) return { status: 'error', message: 'No se proporcionó la ciudad' }
       try {
-        while (true) {
-          // Retorna el numero de edificios restantes por gestionar
-          const remainingBuildings = await this.callScheduleRepository.getDailyRemainingBuildings(currentCity)
-          // Si no quedan edificios por gestionar se acaba
-          if (remainingBuildings === null || remainingBuildings <= 0) return { status: 'finished', message: `Limite de edificios diarios procesado para ${currentCity}` }
-          // Coge Id del Edificio
-          const buildingId = await this.contactService.getBuildingIdFromCallQueue(currentCity)
-          if (!buildingId) return { status: 'empty', message: `No quedan edificios pendientes para ${currentCity}` }
-          // Procesa todos los contactos del edificio hasta que no quede ninguno
-          const result = await this.processBuildingContactCall(buildingId, currentCity)
-          if (result!.status === 'empty') {
-            await this.callScheduleRepository.updateDailyRemainingBuildings(currentCity)
-            continue
-          }
-          this.logger.info(`[processNextBuilding] city=${currentCity}`)
-          this.logger.info(`[processNextBuilding] buildingId=${buildingId}`)
-          return result
+        // Retorna el numero de edificios restantes por gestionar
+        const remainingBuildings = await this.callScheduleRepository.getDailyRemainingBuildings(currentCity)
+        this.logger.info(`[processNextBuilding] city=${currentCity} remainingBuildings=${remainingBuildings}`)
+        // Si no quedan edificios por gestionar se acaba
+        if (remainingBuildings === null || remainingBuildings <= 0) {
+          this.logger.info(`[CITY_FINISHED] city=${currentCity} reason=reached_daily_limit_buildings`)
+          return { status: 'reached_daily_limit_buildings', message: `Limite de edificios diarios procesado para ${currentCity}` }
         }
+        // Coge Id del Edificio
+        const buildingId = await this.contactService.getBuildingIdFromCallQueue(currentCity)
+        if (!buildingId) {
+          this.logger.info(`[CITY_FINISHED] city=${currentCity} reason=no_more_buildings`)
+          return { status: 'no_buildings', message: `No quedan edificios pendientes para ${currentCity}` }
+        }
+        const result = await this.processBuildingContactCall(buildingId, currentCity)
+        this.logger.info(`[processNextBuilding] result=${JSON.stringify(result)} buildingId=${buildingId}`)
+        if (result!.status === 'building_without_contacts') {
+          await this.callScheduleRepository.updateDailyRemainingBuildings(currentCity)
+        }
+        this.logger.info(`[processNextBuilding] city=${currentCity}`)
+        this.logger.info(`[processNextBuilding] buildingId=${buildingId}`)
+        return result
       } catch (error) {
         this.logger.info(error)
         return { status: 'error', message: 'Error procesando edificio' }
@@ -63,7 +68,7 @@ export class CallService {
       try {
         // Consigue un contacto de ese edificio
         contact = await this.contactService.getNextContactInBuilding(currentCity, buildingId)
-        if (!contact) return { status: 'empty', message: `No quedan contactos pendientes en el edificio ${buildingId}` }
+        if (!contact) return { status: 'building_without_contacts', message: `No quedan contactos pendientes en el edificio ${buildingId}` }
         // Asignamos el número de telefono desde el que llamar
         const currentOriginTelf = this.assignOriginTelf(currentCity)
         this.logger.debug(`Telefono origen de la ciudad actual: ${currentOriginTelf}`)
@@ -76,7 +81,7 @@ export class CallService {
         const batchCallResponse = await this.retellCallProvider.createBatchCall(batchCallRequest)
         this.logger.info('Full Retell Response:', JSON.stringify(batchCallResponse, null, 2))
         this.logger.info(`[processBuildingContactCall] buildingId=${buildingId}`)
-        this.logger.info(`[processBuildingContactCall] contact=${contact?.callQueueId}`)
+        this.logger.info(`[processBuildingContactCall] queueId=${contact?.callQueueId}`)
         this.logger.info(`[processBuildingContactCall] contact=${JSON.stringify(contact)}`)
         return { status: 'sent', city: currentCity, buildingId: buildingId, callQueueId: contact.callQueueId, message: `Llamada para el contacto ${contact} realizada` }
       } catch (error) {

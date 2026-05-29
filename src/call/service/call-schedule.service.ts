@@ -31,16 +31,9 @@ export class CallScheduleService {
            this.logger.info(`Hoy no toca ejecutar llamadas para ${schedule.city}`)
            continue
          }
+         this.logger.info(`[readCallSchedule] Arrancando ciclo inicial city=${schedule.city}`)
          const result = await this.callService.processNextBuilding(schedule.city)
-         this.logger.info(`[processNextBuilding] ${result}`)
-         if (result?.status === 'empty') {
-           this.logger.info(`No quedan contactos pendientes para ${schedule.city}`)
-           continue
-         }
-         if (result.status === 'finished') {
-           this.logger.info(`Ya se gestionaron todos los edificios del día para ${schedule.city}`)
-           continue
-         }
+         this.logger.info(`[readCallSchedule] processNextBuilding result=${JSON.stringify(result)}`)
        }
        return { status: 'ok', message: 'Planificaciones procesadas' }
      } catch (error) {

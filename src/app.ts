@@ -83,7 +83,7 @@ export const createApp = async (): Promise<Express> => {
 
     const callScheduleService:CallScheduleService = diContainer.resolve('callScheduleService')
     const contactService:ContactService = diContainer.resolve('contactService')
-    cron.schedule('0 8 * * *', async () => {
+    cron.schedule('0 7 * * *', async () => {
       logger.info('Checkeando los freeze de la cola de llamadas')
       await contactService.checkExpiredFreezes()
       logger.info('Reseteando límites diarios...')
