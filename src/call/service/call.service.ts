@@ -41,6 +41,11 @@ export class CallService {
           this.logger.info(`[CITY_FINISHED] city=${currentCity} reason=reached_daily_limit_buildings`)
           return { status: 'reached_daily_limit_buildings', message: `Limite de edificios diarios procesado para ${currentCity}` }
         }
+        const cityHasContactInProgress = await this.contactService.checkInProgressContactInCity(currentCity)
+        if (cityHasContactInProgress) {
+          this.logger.info(`[processNextBuilding] city=${currentCity} already has IN_PROGRESS call.`)
+          return { status: 'in_progress', message: `${currentCity} already has IN_PROGRESS call.` }
+        }
         // Coge Id del Edificio
         const buildingId = await this.contactService.getBuildingIdFromCallQueue(currentCity)
         if (!buildingId) {
@@ -66,6 +71,11 @@ export class CallService {
       if (!buildingId) return { status: 'error', message: 'No se proporcionó id del edificio' }
       try {
         // Consigue un contacto de ese edificio
+        const hasContactInProgress = await this.contactService.checkInProgressContactInBuilding(buildingId)
+        if (hasContactInProgress) {
+          this.logger.info(`[processBuildingContactCall] buildingId=${buildingId} already has IN_PROGRESS contact.`)
+          return { status: 'in_progress', message: `El edificio ${buildingId} already has IN_PROGRESS contact.` }
+        }
         this.logger.info(`[processBuildingContactCall] START buildingId=${buildingId} city=${currentCity}`)
         this.logger.info(`[processBuildingContactCall] before getNextContactInBuilding buildingId=${buildingId}`)
         contact = await this.contactService.getNextContactInBuilding(currentCity, buildingId)

@@ -93,4 +93,16 @@ export class ContactService {
     }
     return null
   }
+
+  async checkInProgressContactInBuilding (buildingId:string) {
+    return await this.callQueueRepository.checkInProgressContactInBuilding(buildingId)
+  }
+
+  async checkInProgressContactInCity (city:string) {
+    return await this.callQueueRepository.checkInProgressContactInCity(city)
+  }
+
+  async markCallback (calledAt: Date, callQueueId:string) {
+    await this.callQueueRepository.markCallback(calledAt, callQueueId)
+  }
 }

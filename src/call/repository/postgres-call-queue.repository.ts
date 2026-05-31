@@ -158,6 +158,18 @@ export class PostgresCallQueueRepository {
      )
    }
 
+   async markCallback (calledAt: Date, callQueueId:string) {
+     await AppDataSource.query(
+       `UPDATE public.call_queue
+        SET
+           can_call = false,
+          status = 'CALLBACK'
+          last_called_at = $1,
+          call_count = 0
+        WHERE id = $2`, [calledAt, callQueueId]
+     )
+   }
+
    async freezeNoAnswer (calledAt: Date, callQueueId:string) {
      await AppDataSource.query(
        `UPDATE public.call_queue
@@ -181,5 +193,31 @@ export class PostgresCallQueueRepository {
                 call_count = 0
             WHERE id = $2`, [calledAt, callQueueId]
      )
+   }
+
+   async checkInProgressContactInBuilding (buildingId:string) {
+     const result = await AppDataSource.query(
+       `SELECT EXISTS(
+          SELECT 1
+          FROM public.call_queue
+          WHERE building_id = $1
+            AND status = 'IN_PROGRESS'
+        ) AS "exists"`, [buildingId]
+     )
+     return result[0]?.exists === true
+   }
+
+   async checkInProgressContactInCity (city: string) {
+     const result = await AppDataSource.query(
+       `SELECT EXISTS(
+          SELECT 1
+          FROM public.call_queue cq
+          INNER JOIN public.building b ON b.id=cq.building_id
+          INNER JOIN public.building_address ba ON ba.id=b."addressId"
+          WHERE ba.city = $1
+          AND cq.status = 'IN_PROGRESS'
+        ) AS "exists`, [city]
+     )
+     return result[0]?.exists === true
    }
 }

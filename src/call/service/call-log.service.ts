@@ -33,6 +33,8 @@ export class CallLogService {
       {
         city: callLogProps.provincia!,
         buildingId: callLogProps.buildingId,
+        callQueueId: callLogProps.callQueueId,
+        calledAt: callLogProps.startTimestamp,
         vende: callLogProps.vende,
         status: callLogProps.status,
         noLlamar: callLogProps.noLlamar,
