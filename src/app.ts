@@ -72,7 +72,9 @@ export const createApp = async (): Promise<Express> => {
 
     await startListeners(diContainer)
     const callService: CallService = diContainer.resolve('callService')
-    registerCallCycleListener(callService, logger)
+    const contactService:ContactService = diContainer.resolve('contactService')
+    const callScheduleService:CallScheduleService = diContainer.resolve('callScheduleService')
+    registerCallCycleListener(callService, contactService, logger)
 
     app.use(appErrorHandler)
     app.set('IS_READY', true)
@@ -81,8 +83,6 @@ export const createApp = async (): Promise<Express> => {
       eventSubscribersInfo: eventBus.info
     })
 
-    const callScheduleService:CallScheduleService = diContainer.resolve('callScheduleService')
-    const contactService:ContactService = diContainer.resolve('contactService')
     cron.schedule('0 7 * * *', async () => {
       logger.info('Checkeando los freeze de la cola de llamadas')
       await contactService.checkExpiredFreezes()
